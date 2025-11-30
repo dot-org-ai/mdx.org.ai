@@ -30,9 +30,22 @@
     "mdxe",
     "next",
     "nextjs",
-    "framework"
+    "framework",
+    "mdx",
+    "mdxld"
   ],
   "license": "MIT",
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "peerDependencies": {
+    "next": ">=13.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
