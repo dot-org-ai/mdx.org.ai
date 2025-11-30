@@ -21,8 +21,13 @@
   "devDependencies": {
     "@eslint/js": "^9.16.0",
     "@types/node": "^22.10.1",
+    "@types/react": "^18.3.0",
     "eslint": "^9.16.0",
+    "hono": "^4.6.0",
+    "ink": "^5.0.1",
+    "ink-testing-library": "^4.0.0",
     "prettier": "^3.4.2",
+    "react": "^18.3.1",
     "tsup": "^8.3.5",
     "turbo": "^2.3.3",
     "typescript": "^5.7.2",
