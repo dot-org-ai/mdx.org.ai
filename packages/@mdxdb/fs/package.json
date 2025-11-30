@@ -1,7 +1,7 @@
 {
   "name": "@mdxdb/fs",
   "version": "0.0.0",
-  "description": "File system adapter for mdxdb",
+  "description": "Filesystem adapter for mdxdb - stores MDX documents as files",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -30,10 +30,18 @@
     "mdxdb",
     "filesystem",
     "fs",
-    "adapter"
+    "adapter",
+    "mdx",
+    "database"
   ],
   "license": "MIT",
+  "peerDependencies": {
+    "mdxdb": "workspace:*",
+    "mdxld": "workspace:*"
+  },
   "devDependencies": {
+    "mdxdb": "workspace:*",
+    "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
