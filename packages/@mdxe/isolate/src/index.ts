@@ -118,10 +118,7 @@ export { Fragment, jsx, jsxs };
 const WORKER_ENTRY_TEMPLATE = `
 import * as MDXModule from './mdx.js';
 
-// Export all MDX exports
-export * from './mdx.js';
-
-// Default export handler
+// Default export handler - Workers only allow handlers as exports
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -222,7 +219,7 @@ export async function compileToModule(
     outputFormat: 'program',
     jsx: false,
     jsxRuntime: opts.jsxRuntime,
-    jsxImportSource: opts.bundleRuntime ? './jsx-runtime.js' : opts.jsxImportSource,
+    jsxImportSource: opts.bundleRuntime ? '.' : opts.jsxImportSource,
   })
 
   const jsCode = String(compiled)
@@ -234,8 +231,9 @@ export async function compileToModule(
   }
 
   // Add JSX runtime shim if bundling
+  // Name it 'jsx-runtime' to match import from './jsx-runtime'
   if (opts.bundleRuntime) {
-    modules['jsx-runtime.js'] = JSX_RUNTIME_SHIM
+    modules['jsx-runtime'] = JSX_RUNTIME_SHIM
   }
 
   return {
@@ -310,9 +308,11 @@ export async function compileToWorkerConfig(
  * @returns Array of exported function/variable names
  */
 export function getExports(module: CompiledModule): string[] {
-  const mainCode = module.modules[module.mainModule] || ''
-  const exportMatches = mainCode.matchAll(/export\s+(?:const|let|var|function|class|async\s+function)\s+(\w+)/g)
-  const namedExports = mainCode.matchAll(/export\s*\{\s*([^}]+)\s*\}/g)
+  // Look at mdx.js where the actual MDX exports are (for compiled MDX)
+  // Fall back to mainModule for other module structures
+  const code = module.modules['mdx.js'] || module.modules[module.mainModule] || ''
+  const exportMatches = code.matchAll(/export\s+(?:const|let|var|function|class|async\s+function)\s+(\w+)/g)
+  const namedExports = code.matchAll(/export\s*\{\s*([^}]+)\s*\}/g)
 
   const exports = new Set<string>()
 

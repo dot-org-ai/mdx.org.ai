@@ -98,17 +98,26 @@ async function createMiniflareInstance(
 ): Promise<Miniflare> {
   const config = createWorkerConfig(module, sandbox)
 
-  // Build combined script from all modules
-  const scripts: string[] = []
-  for (const [name, content] of Object.entries(config.modules)) {
-    if (name === config.mainModule) {
-      scripts.push(content)
-    }
+  // Build ES modules array for Miniflare
+  const modules = Object.entries(config.modules).map(([name, content]) => ({
+    type: 'ESModule' as const,
+    path: `./${name}`,
+    contents: content,
+  }))
+
+  // Find the main module
+  const mainModule = modules.find(m => m.path === `./${config.mainModule}`)
+  if (!mainModule) {
+    throw new Error(`Main module ${config.mainModule} not found`)
   }
 
   const mf = new Miniflare({
-    modules: true,
-    script: scripts.join('\n'),
+    modules: [
+      // Main module first
+      mainModule,
+      // Then other modules
+      ...modules.filter(m => m !== mainModule),
+    ],
     compatibilityDate: config.compatibilityDate,
     ...options,
   })
@@ -149,8 +158,11 @@ export async function evaluate<T = unknown>(
 ): Promise<EvaluateResult<T>> {
   const { sandbox, miniflareOptions, ...compileOpts } = options
 
-  // Compile MDX to module
-  const module = await compileToModule(content, compileOpts)
+  // Compile MDX to module - always bundle JSX runtime since we're in isolated env
+  const module = await compileToModule(content, {
+    bundleRuntime: true,
+    ...compileOpts,
+  })
   const moduleId = generateModuleId(content)
 
   // Create or reuse miniflare instance

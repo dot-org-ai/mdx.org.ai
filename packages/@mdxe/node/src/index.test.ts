@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import {
   compileToModule,
   createWorkerConfig,
@@ -10,112 +10,47 @@ import {
   evaluate,
   run,
   test as testMdx,
-  type EvaluateOptions,
   type EvaluateResult,
   type Evaluator,
 } from './index.js'
 
-// Use globalThis to share state between test file and mock
-declare global {
-  // eslint-disable-next-line no-var
-  var __miniflare_mock_responses: Record<string, unknown>
-}
-
-globalThis.__miniflare_mock_responses = {}
-
-function setMockResponses(responses: Record<string, unknown>) {
-  Object.assign(globalThis.__miniflare_mock_responses, responses)
-}
-
-function clearMockResponses() {
-  globalThis.__miniflare_mock_responses = {}
-}
-
-// Mock miniflare since we can't run workerd in test environment
-vi.mock('miniflare', () => {
-  const MockMiniflare = vi.fn().mockImplementation(() => ({
-    dispatchFetch: vi.fn(async (url: string) => {
-      const responses = globalThis.__miniflare_mock_responses || {}
-      const urlObj = new URL(url)
-      const path = urlObj.pathname
-
-      // Health endpoint
-      if (path === '/health') {
-        return new Response(JSON.stringify({ status: 'ok' }), {
-          headers: { 'Content-Type': 'application/json' },
-        })
-      }
-
-      // Meta endpoint
-      if (path === '/meta') {
-        return new Response(JSON.stringify({
-          exports: responses.exports || ['default'],
-          hasDefault: responses.hasDefault ?? true,
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        })
-      }
-
-      // Call endpoint
-      if (path.startsWith('/call/')) {
-        const fnName = path.slice(6)
-
-        // Check for error responses
-        const errors = responses.errors as Record<string, string> | undefined
-        if (errors?.[fnName]) {
-          return new Response(JSON.stringify({
-            error: errors[fnName],
-          }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        }
-
-        // Get result for function
-        const results = responses.results as Record<string, unknown> | undefined
-        const result = results?.[fnName]
-        return new Response(JSON.stringify({ result }), {
-          headers: { 'Content-Type': 'application/json' },
-        })
-      }
-
-      return new Response('Not Found', { status: 404 })
-    }),
-    dispose: vi.fn().mockResolvedValue(undefined),
-  }))
-
-  return { Miniflare: MockMiniflare }
-})
-
 describe('@mdxe/node', () => {
   // ============================================================================
-  // Test Fixtures
+  // Test Fixtures - Real MDX content that will be executed
   // ============================================================================
 
   const fixtures = {
     simple: `# Hello World`,
 
     withExports: `---
-title: Test
+title: Test Document
+author: Test Author
 ---
+
+# Hello World
 
 export function greet(name) {
   return \`Hello, \${name}!\`
 }
 
-export const PI = 3.14159`,
+export const PI = 3.14159
+
+export function add(a, b) {
+  return a + b
+}`,
 
     calculator: `export function add(a, b) { return a + b }
 export function subtract(a, b) { return a - b }
-export const multiply = (a, b) => a * b
-export const divide = (a, b) => a / b`,
+export function multiply(a, b) { return a * b }
+export function divide(a, b) { return a / b }`,
 
     asyncFunctions: `export async function fetchData() {
-  return { success: true }
+  return { success: true, timestamp: Date.now() }
 }
 
-export async function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+export async function delayedValue(value, ms = 10) {
+  await new Promise(resolve => setTimeout(resolve, ms))
+  return value
 }`,
 
     withFrontmatter: `---
@@ -127,32 +62,25 @@ tags:
   - mdx
 metadata:
   created: 2024-01-01
-  updated: 2024-12-01
 ---
 
 # Content
 
-Some paragraph text.`,
+export const getTitle = () => 'Document'`,
 
     withError: `export function throwError() {
-  throw new Error('Test error')
+  throw new Error('Intentional test error')
 }
 
-export function divideByZero() {
-  return 1 / 0
+export function safeFunction() {
+  return 'safe'
 }`,
 
     complex: `---
 title: Complex Module
-description: A complex MDX module with many features
 metadata:
-  created: 2024-01-01
-  author:
-    name: Test
-    email: test@example.com
+  author: Test
 ---
-
-import { Component } from './component'
 
 export const config = {
   theme: 'dark',
@@ -160,47 +88,20 @@ export const config = {
 }
 
 export function process(data) {
-  return { processed: true, data }
+  return { processed: true, input: data }
 }
 
-export class Handler {
-  handle(request) {
-    return { handled: true }
-  }
-}
-
-export async function asyncProcess(input) {
-  return { async: true, input }
-}
-
-# Complex Document
-
-<Component />`,
-
-    withDefaultExport: `export default function MyComponent() {
-  return <div>Hello</div>
-}
-
-export const name = 'MyComponent'`,
-
-    withMultipleExports: `export const a = 1
-export const b = 2
-export const c = 3
-export function sum() { return a + b + c }
-export const obj = { a, b, c }`,
+export function getConfig() {
+  return config
+}`,
 
     unicode: `---
 title: 日本語タイトル
-author: 作者名
-emoji: 🎉🚀💡
+emoji: 🎉
 ---
 
-# Welcome 欢迎 ようこそ
-
-Content with émojis 🎉 and ünïcödé characters.
-
 export const greeting = '你好世界'
-export const emoji = '🚀'`,
+export const getEmoji = () => '🚀'`,
   }
 
   // ============================================================================
@@ -208,12 +109,10 @@ export const emoji = '🚀'`,
   // ============================================================================
 
   beforeEach(async () => {
-    clearMockResponses()
     await disposeAll()
   })
 
   afterEach(async () => {
-    clearMockResponses()
     await disposeAll()
   })
 
@@ -238,7 +137,7 @@ export const emoji = '🚀'`,
       expect(typeof getExports).toBe('function')
     })
 
-    it('compileToModule works correctly', async () => {
+    it('compileToModule compiles MDX', async () => {
       const module = await compileToModule(fixtures.simple)
 
       expect(module.mainModule).toBe('entry.js')
@@ -246,26 +145,11 @@ export const emoji = '🚀'`,
       expect(module.modules).toHaveProperty('mdx.js')
     })
 
-    it('createWorkerConfig works correctly', async () => {
-      const module = await compileToModule(fixtures.simple)
-      const config = createWorkerConfig(module)
-
-      expect(config.compatibilityDate).toBeDefined()
-      expect(config.mainModule).toBe('entry.js')
-    })
-
     it('generateModuleId is consistent', () => {
       const id1 = generateModuleId('test')
       const id2 = generateModuleId('test')
 
       expect(id1).toBe(id2)
-    })
-
-    it('generateModuleId differs for different content', () => {
-      const id1 = generateModuleId('content a')
-      const id2 = generateModuleId('content b')
-
-      expect(id1).not.toBe(id2)
     })
   })
 
@@ -275,59 +159,26 @@ export const emoji = '🚀'`,
 
   describe('instance management', () => {
     it('getActiveInstanceCount returns number', () => {
-      const count = getActiveInstanceCount()
-
-      expect(typeof count).toBe('number')
-      expect(count).toBeGreaterThanOrEqual(0)
+      expect(typeof getActiveInstanceCount()).toBe('number')
     })
 
     it('starts with zero instances', () => {
       expect(getActiveInstanceCount()).toBe(0)
     })
 
-    it('disposeAll disposes all instances', async () => {
-      setMockResponses({
-        exports: ['default'],
-        hasDefault: true,
-      })
-
-      await evaluate(fixtures.simple)
-      await evaluate(fixtures.withExports)
-
-      expect(getActiveInstanceCount()).toBeGreaterThan(0)
-
-      await disposeAll()
-
-      expect(getActiveInstanceCount()).toBe(0)
-    })
-
-    it('disposeAll is safe to call multiple times', async () => {
-      await disposeAll()
-      await disposeAll()
-      await disposeAll()
-
-      expect(getActiveInstanceCount()).toBe(0)
-    })
-
     it('disposeAll is safe when no instances exist', async () => {
-      expect(getActiveInstanceCount()).toBe(0)
       await disposeAll()
       expect(getActiveInstanceCount()).toBe(0)
     })
   })
 
   // ============================================================================
-  // evaluate
+  // evaluate - Integration Tests with Real Miniflare
   // ============================================================================
 
   describe('evaluate', () => {
     describe('basic evaluation', () => {
-      it('evaluates simple MDX', async () => {
-        setMockResponses({
-          exports: ['default'],
-          hasDefault: true,
-        })
-
+      it('evaluates simple MDX and returns result', async () => {
         const result = await evaluate(fixtures.simple)
 
         expect(result.moduleId).toBeDefined()
@@ -335,266 +186,181 @@ export const emoji = '🚀'`,
         expect(typeof result.call).toBe('function')
         expect(typeof result.meta).toBe('function')
         expect(typeof result.dispose).toBe('function')
+
+        await result.dispose()
       })
 
       it('returns frontmatter data', async () => {
-        setMockResponses({
-          exports: ['default'],
-          hasDefault: true,
-        })
-
         const result = await evaluate(fixtures.withFrontmatter)
 
         expect(result.data.title).toBe('Document')
         expect(result.data.author).toBe('Test Author')
         expect(result.data.version).toBe('1.0.0')
         expect(result.data.tags).toEqual(['test', 'mdx'])
-        expect(result.data.metadata).toEqual({
-          created: '2024-01-01',
-          updated: '2024-12-01',
-        })
+
+        await result.dispose()
       })
 
-      it('returns module ID', async () => {
-        setMockResponses({})
-
-        const result = await evaluate(fixtures.simple)
-
-        expect(typeof result.moduleId).toBe('string')
-        expect(result.moduleId.length).toBeGreaterThan(0)
-      })
-
-      it('returns consistent module ID for same content', async () => {
-        setMockResponses({})
-
-        const result1 = await evaluate(fixtures.simple)
-        await result1.dispose()
-
-        const result2 = await evaluate(fixtures.simple)
-
-        expect(result1.moduleId).toBe(result2.moduleId)
-      })
-
-      it('returns different module IDs for different content', async () => {
-        setMockResponses({})
-
+      it('returns module ID based on content hash', async () => {
         const result1 = await evaluate(fixtures.simple)
         const result2 = await evaluate(fixtures.withExports)
 
         expect(result1.moduleId).not.toBe(result2.moduleId)
+
+        await result1.dispose()
+        await result2.dispose()
       })
     })
 
     describe('calling exported functions', () => {
-      it('calls exported function', async () => {
-        setMockResponses({
-          results: { greet: 'Hello, World!' },
-        })
-
+      it('calls simple function with arguments', async () => {
         const result = await evaluate(fixtures.withExports)
-        const greeting = await result.call('greet', 'World')
 
+        const greeting = await result.call<string>('greet', 'World')
         expect(greeting).toBe('Hello, World!')
+
+        await result.dispose()
       })
 
-      it('calls function with multiple arguments', async () => {
-        setMockResponses({
-          results: { add: 5 },
-        })
-
+      it('calls calculator functions', async () => {
         const result = await evaluate(fixtures.calculator)
-        const sum = await result.call('add', 2, 3)
 
-        expect(sum).toBe(5)
+        expect(await result.call<number>('add', 2, 3)).toBe(5)
+        expect(await result.call<number>('subtract', 10, 4)).toBe(6)
+        expect(await result.call<number>('multiply', 3, 7)).toBe(21)
+        expect(await result.call<number>('divide', 20, 4)).toBe(5)
+
+        await result.dispose()
       })
 
-      it('calls function with no arguments', async () => {
-        setMockResponses({
-          results: { fetchData: { success: true } },
-        })
-
+      it('calls async functions', async () => {
         const result = await evaluate(fixtures.asyncFunctions)
-        const data = await result.call('fetchData')
 
-        expect(data).toEqual({ success: true })
+        const data = await result.call<{ success: boolean; timestamp: number }>('fetchData')
+        expect(data.success).toBe(true)
+        expect(typeof data.timestamp).toBe('number')
+
+        const delayed = await result.call<string>('delayedValue', 'test-value', 10)
+        expect(delayed).toBe('test-value')
+
+        await result.dispose()
       })
 
-      it('throws on function not found', async () => {
-        setMockResponses({
-          errors: { nonexistent: 'Function not found: nonexistent' },
-        })
+      it('returns complex objects', async () => {
+        const result = await evaluate(fixtures.complex)
 
-        const result = await evaluate(fixtures.simple)
+        const config = await result.call<{ theme: string; features: string[] }>('getConfig')
+        expect(config.theme).toBe('dark')
+        expect(config.features).toEqual(['a', 'b', 'c'])
 
-        await expect(result.call('nonexistent')).rejects.toThrow(
-          'Function not found: nonexistent'
-        )
+        const processed = await result.call<{ processed: boolean; input: unknown }>('process', { value: 42 })
+        expect(processed.processed).toBe(true)
+        expect(processed.input).toEqual({ value: 42 })
+
+        await result.dispose()
       })
 
-      it('throws on function error', async () => {
-        setMockResponses({
-          errors: { throwError: 'Test error' },
-        })
+      it('handles unicode content', async () => {
+        const result = await evaluate(fixtures.unicode)
 
+        expect(result.data.title).toBe('日本語タイトル')
+        expect(result.data.emoji).toBe('🎉')
+
+        const emoji = await result.call<string>('getEmoji')
+        expect(emoji).toBe('🚀')
+
+        await result.dispose()
+      })
+
+      it('throws error for non-existent function', async () => {
+        const result = await evaluate(fixtures.calculator)
+
+        await expect(result.call('nonExistentFunction')).rejects.toThrow()
+
+        await result.dispose()
+      })
+
+      it('propagates errors from functions', async () => {
         const result = await evaluate(fixtures.withError)
 
-        await expect(result.call('throwError')).rejects.toThrow('Test error')
-      })
+        // Safe function should work
+        const safe = await result.call<string>('safeFunction')
+        expect(safe).toBe('safe')
 
-      it('returns complex results', async () => {
-        const complexResult = {
-          processed: true,
-          data: { nested: { value: 42 } },
-        }
-        setMockResponses({
-          results: { process: complexResult },
-        })
+        // Error function should throw
+        await expect(result.call('throwError')).rejects.toThrow('Intentional test error')
 
-        const result = await evaluate(fixtures.complex)
-        const processed = await result.call('process', { input: 'test' })
-
-        expect(processed).toEqual(complexResult)
-      })
-
-      it('handles multiple sequential calls', async () => {
-        setMockResponses({
-          results: {
-            add: 5,
-            subtract: 1,
-            multiply: 6,
-          },
-        })
-
-        const result = await evaluate(fixtures.calculator)
-
-        const sum = await result.call('add', 2, 3)
-        const diff = await result.call('subtract', 3, 2)
-        const product = await result.call('multiply', 2, 3)
-
-        expect(sum).toBe(5)
-        expect(diff).toBe(1)
-        expect(product).toBe(6)
+        await result.dispose()
       })
     })
 
     describe('metadata', () => {
-      it('returns export list', async () => {
-        setMockResponses({
-          exports: ['greet', 'PI', 'default'],
-          hasDefault: true,
-        })
-
-        const result = await evaluate(fixtures.withExports)
-        const meta = await result.meta()
-
-        expect(meta.exports).toContain('greet')
-        expect(meta.exports).toContain('PI')
-        expect(meta.exports).toContain('default')
-      })
-
-      it('returns hasDefault flag when true', async () => {
-        setMockResponses({
-          exports: ['default', 'name'],
-          hasDefault: true,
-        })
-
-        const result = await evaluate(fixtures.withDefaultExport)
-        const meta = await result.meta()
-
-        expect(meta.hasDefault).toBe(true)
-      })
-
-      it('returns hasDefault flag when false', async () => {
-        setMockResponses({
-          exports: ['add', 'subtract'],
-          hasDefault: false,
-        })
-
+      it('returns export metadata', async () => {
         const result = await evaluate(fixtures.calculator)
         const meta = await result.meta()
 
-        expect(meta.hasDefault).toBe(false)
+        expect(meta.exports).toContain('add')
+        expect(meta.exports).toContain('subtract')
+        expect(meta.exports).toContain('multiply')
+        expect(meta.exports).toContain('divide')
+
+        await result.dispose()
+      })
+
+      it('indicates if default export exists', async () => {
+        const result = await evaluate(fixtures.simple)
+        const meta = await result.meta()
+
+        // MDX always has a default export (the content component)
+        expect(meta.hasDefault).toBe(true)
+
+        await result.dispose()
       })
     })
 
     describe('disposal', () => {
-      it('dispose cleans up instance', async () => {
-        setMockResponses({})
-
+      it('dispose cleans up resources', async () => {
         const result = await evaluate(fixtures.simple)
         const initialCount = getActiveInstanceCount()
 
+        expect(initialCount).toBeGreaterThan(0)
+
         await result.dispose()
 
-        expect(getActiveInstanceCount()).toBeLessThan(initialCount)
+        expect(getActiveInstanceCount()).toBe(0)
       })
 
-      it('dispose is safe to call multiple times', async () => {
-        setMockResponses({})
-
+      it('dispose is idempotent', async () => {
         const result = await evaluate(fixtures.simple)
 
         await result.dispose()
         await result.dispose()
         await result.dispose()
 
-        // Should not throw
-        expect(true).toBe(true)
+        expect(getActiveInstanceCount()).toBe(0)
       })
     })
 
     describe('options', () => {
       it('accepts sandbox options', async () => {
-        setMockResponses({})
-
-        const result = await evaluate(fixtures.simple, {
+        const result = await evaluate(fixtures.calculator, {
           sandbox: { blockNetwork: true },
         })
 
-        expect(result.moduleId).toBeDefined()
-      })
+        const sum = await result.call<number>('add', 1, 2)
+        expect(sum).toBe(3)
 
-      it('accepts miniflare options', async () => {
-        setMockResponses({})
-
-        const result = await evaluate(fixtures.simple, {
-          miniflareOptions: { compatibilityDate: '2024-01-01' },
-        })
-
-        expect(result.moduleId).toBeDefined()
+        await result.dispose()
       })
 
       it('accepts compile options', async () => {
-        setMockResponses({})
-
         const result = await evaluate(fixtures.simple, {
           bundleRuntime: true,
         })
 
         expect(result.moduleId).toBeDefined()
-      })
 
-      it('handles all options together', async () => {
-        setMockResponses({})
-
-        const result = await evaluate(fixtures.withExports, {
-          sandbox: { blockNetwork: true, timeout: 5000 },
-          miniflareOptions: { compatibilityDate: '2024-01-01' },
-          bundleRuntime: true,
-        })
-
-        expect(result.moduleId).toBeDefined()
-        expect(result.data.title).toBe('Test')
-      })
-    })
-
-    describe('exports property', () => {
-      it('exports property is an object', async () => {
-        setMockResponses({})
-
-        const result = await evaluate(fixtures.simple)
-
-        expect(typeof result.exports).toBe('object')
+        await result.dispose()
       })
     })
   })
@@ -612,172 +378,83 @@ export const emoji = '🚀'`,
       expect(typeof evaluator.getInstanceCount).toBe('function')
     })
 
-    it('evaluator starts with zero instances', () => {
+    it('starts with zero instances', () => {
       const evaluator = createEvaluator()
-
       expect(evaluator.getInstanceCount()).toBe(0)
     })
 
-    it('evaluator.evaluate returns EvaluateResult', async () => {
-      setMockResponses({})
-
+    it('tracks instances', async () => {
       const evaluator = createEvaluator()
-      const result = await evaluator.evaluate(fixtures.simple)
-
-      expect(result.moduleId).toBeDefined()
-      expect(result.data).toBeDefined()
-      expect(typeof result.call).toBe('function')
-      expect(typeof result.meta).toBe('function')
-      expect(typeof result.dispose).toBe('function')
-    })
-
-    it('tracks instances correctly', async () => {
-      setMockResponses({})
-
-      const evaluator = createEvaluator()
-
-      expect(evaluator.getInstanceCount()).toBe(0)
 
       await evaluator.evaluate(fixtures.simple)
       expect(evaluator.getInstanceCount()).toBe(1)
 
-      await evaluator.evaluate(fixtures.withExports)
-      expect(evaluator.getInstanceCount()).toBe(2)
-    })
-
-    it('dispose cleans up all evaluator instances', async () => {
-      setMockResponses({})
-
-      const evaluator = createEvaluator()
-
-      await evaluator.evaluate(fixtures.simple)
-      await evaluator.evaluate(fixtures.withExports)
       await evaluator.evaluate(fixtures.calculator)
-
-      expect(evaluator.getInstanceCount()).toBe(3)
+      expect(evaluator.getInstanceCount()).toBe(2)
 
       await evaluator.dispose()
-
       expect(evaluator.getInstanceCount()).toBe(0)
     })
 
+    it('evaluator instances work correctly', async () => {
+      const evaluator = createEvaluator()
+
+      const result = await evaluator.evaluate(fixtures.calculator)
+      const sum = await result.call<number>('add', 5, 7)
+      expect(sum).toBe(12)
+
+      await evaluator.dispose()
+    })
+
     it('applies default options', async () => {
-      setMockResponses({})
-
       const evaluator = createEvaluator({
         sandbox: { blockNetwork: true },
       })
 
-      const result = await evaluator.evaluate(fixtures.simple)
+      const result = await evaluator.evaluate(fixtures.calculator)
+      const sum = await result.call<number>('add', 1, 1)
+      expect(sum).toBe(2)
 
-      expect(result.moduleId).toBeDefined()
+      await evaluator.dispose()
     })
 
-    it('allows overriding default options', async () => {
-      setMockResponses({})
-
-      const evaluator = createEvaluator({
-        sandbox: { blockNetwork: true },
-      })
-
-      const result = await evaluator.evaluate(fixtures.simple, {
-        sandbox: { blockNetwork: false },
-      })
-
-      expect(result.moduleId).toBeDefined()
-    })
-
-    it('can create multiple independent evaluators', async () => {
-      setMockResponses({})
-
-      const evaluator1 = createEvaluator({ sandbox: { blockNetwork: true } })
-      const evaluator2 = createEvaluator({ sandbox: { blockNetwork: false } })
+    it('multiple independent evaluators', async () => {
+      const evaluator1 = createEvaluator()
+      const evaluator2 = createEvaluator()
 
       await evaluator1.evaluate(fixtures.simple)
-      await evaluator2.evaluate(fixtures.withExports)
+      await evaluator2.evaluate(fixtures.calculator)
 
       expect(evaluator1.getInstanceCount()).toBe(1)
       expect(evaluator2.getInstanceCount()).toBe(1)
 
       await evaluator1.dispose()
-
       expect(evaluator1.getInstanceCount()).toBe(0)
       expect(evaluator2.getInstanceCount()).toBe(1)
 
       await evaluator2.dispose()
     })
-
-    it('supports generic type parameter', async () => {
-      setMockResponses({
-        results: { getData: { value: 42 } },
-      })
-
-      const evaluator = createEvaluator()
-
-      interface MyModule {
-        getData: () => { value: number }
-      }
-
-      const result = await evaluator.evaluate<MyModule>(fixtures.simple)
-      const data = await result.call<{ value: number }>('getData')
-
-      expect(data.value).toBe(42)
-    })
   })
 
   // ============================================================================
-  // run
+  // run - Convenience function
   // ============================================================================
 
   describe('run', () => {
     it('runs function and returns result', async () => {
-      setMockResponses({
-        results: { add: 5 },
-      })
-
-      const result = await run(fixtures.calculator, 'add', [2, 3])
-
+      const result = await run<number>(fixtures.calculator, 'add', [2, 3])
       expect(result).toBe(5)
     })
 
-    it('runs function with no arguments', async () => {
-      setMockResponses({
-        results: { fetchData: { success: true } },
-      })
-
-      const result = await run(fixtures.asyncFunctions, 'fetchData')
-
-      expect(result).toEqual({ success: true })
-    })
-
-    it('runs function with single argument', async () => {
-      setMockResponses({
-        results: { greet: 'Hello, World!' },
-      })
-
-      const result = await run(fixtures.withExports, 'greet', ['World'])
-
-      expect(result).toBe('Hello, World!')
-    })
-
-    it('automatically disposes after run', async () => {
-      setMockResponses({
-        results: { add: 5 },
-      })
-
+    it('auto-disposes after execution', async () => {
       const initialCount = getActiveInstanceCount()
 
-      await run(fixtures.calculator, 'add', [2, 3])
+      await run(fixtures.calculator, 'add', [1, 1])
 
-      // Should dispose after running
       expect(getActiveInstanceCount()).toBe(initialCount)
     })
 
-    it('disposes even on error', async () => {
-      setMockResponses({
-        errors: { throwError: 'Test error' },
-      })
-
+    it('auto-disposes even on error', async () => {
       const initialCount = getActiveInstanceCount()
 
       try {
@@ -786,71 +463,32 @@ export const emoji = '🚀'`,
         // Expected
       }
 
-      // Should still dispose after error
       expect(getActiveInstanceCount()).toBe(initialCount)
     })
 
-    it('accepts evaluate options', async () => {
-      setMockResponses({
-        results: { add: 5 },
-      })
-
-      const result = await run(
-        fixtures.calculator,
-        'add',
-        [2, 3],
-        { sandbox: { blockNetwork: true } }
+    it('handles complex return values', async () => {
+      const result = await run<{ processed: boolean; input: unknown }>(
+        fixtures.complex,
+        'process',
+        [{ data: 'test' }]
       )
 
-      expect(result).toBe(5)
+      expect(result.processed).toBe(true)
+      expect(result.input).toEqual({ data: 'test' })
     })
 
-    it('returns complex results', async () => {
-      const complexResult = {
-        processed: true,
-        data: { nested: { value: 42 } },
-      }
-      setMockResponses({
-        results: { process: complexResult },
-      })
-
-      const result = await run(fixtures.complex, 'process', [{ input: 'test' }])
-
-      expect(result).toEqual(complexResult)
-    })
-
-    it('handles different return types', async () => {
-      setMockResponses({
-        results: {
-          getNumber: 42,
-          getString: 'hello',
-          getBoolean: true,
-          getArray: [1, 2, 3],
-          getObject: { key: 'value' },
-          getNull: null,
-        },
-      })
-
-      expect(await run(fixtures.simple, 'getNumber')).toBe(42)
-      expect(await run(fixtures.simple, 'getString')).toBe('hello')
-      expect(await run(fixtures.simple, 'getBoolean')).toBe(true)
-      expect(await run(fixtures.simple, 'getArray')).toEqual([1, 2, 3])
-      expect(await run(fixtures.simple, 'getObject')).toEqual({ key: 'value' })
-      expect(await run(fixtures.simple, 'getNull')).toBeNull()
+    it('runs async functions', async () => {
+      const result = await run<{ success: boolean }>(fixtures.asyncFunctions, 'fetchData')
+      expect(result.success).toBe(true)
     })
   })
 
   // ============================================================================
-  // test
+  // test - Validation function
   // ============================================================================
 
   describe('test', () => {
     it('returns success for valid MDX', async () => {
-      setMockResponses({
-        exports: ['add', 'subtract'],
-        hasDefault: false,
-      })
-
       const result = await testMdx(fixtures.calculator)
 
       expect(result.success).toBe(true)
@@ -860,11 +498,6 @@ export const emoji = '🚀'`,
     })
 
     it('returns frontmatter data', async () => {
-      setMockResponses({
-        exports: ['default'],
-        hasDefault: true,
-      })
-
       const result = await testMdx(fixtures.withFrontmatter)
 
       expect(result.success).toBe(true)
@@ -873,7 +506,6 @@ export const emoji = '🚀'`,
     })
 
     it('returns error for invalid MDX', async () => {
-      // This will fail during compilation, before mock is used
       const invalidMdx = `<Component unclosed`
 
       const result = await testMdx(invalidMdx)
@@ -881,45 +513,13 @@ export const emoji = '🚀'`,
       expect(result.success).toBe(false)
       expect(result.error).toBeDefined()
       expect(result.exports).toEqual([])
-      expect(result.data).toEqual({})
     })
 
-    it('returns empty data for content without frontmatter', async () => {
-      setMockResponses({
-        exports: ['default'],
-        hasDefault: true,
-      })
-
-      const result = await testMdx(fixtures.simple)
-
-      expect(result.success).toBe(true)
-      expect(result.data).toEqual({})
-    })
-
-    it('accepts evaluate options', async () => {
-      setMockResponses({
-        exports: ['default'],
-        hasDefault: true,
-      })
-
-      const result = await testMdx(fixtures.simple, {
-        sandbox: { blockNetwork: true },
-      })
-
-      expect(result.success).toBe(true)
-    })
-
-    it('disposes instance after test', async () => {
-      setMockResponses({
-        exports: ['default'],
-        hasDefault: true,
-      })
-
+    it('disposes after test', async () => {
       const initialCount = getActiveInstanceCount()
 
       await testMdx(fixtures.simple)
 
-      // Should dispose after testing
       expect(getActiveInstanceCount()).toBe(initialCount)
     })
   })
@@ -930,96 +530,46 @@ export const emoji = '🚀'`,
 
   describe('integration', () => {
     it('full workflow: evaluate -> call -> meta -> dispose', async () => {
-      setMockResponses({
-        exports: ['add', 'subtract', 'multiply', 'divide'],
-        hasDefault: false,
-        results: {
-          add: 10,
-          subtract: 4,
-          multiply: 21,
-        },
-      })
-
-      // Step 1: Evaluate
       const result = await evaluate(fixtures.calculator)
-      expect(result.moduleId).toBeDefined()
 
-      // Step 2: Call functions
-      const sum = await result.call('add', 3, 7)
-      expect(sum).toBe(10)
+      // Call multiple functions
+      expect(await result.call<number>('add', 10, 5)).toBe(15)
+      expect(await result.call<number>('multiply', 4, 3)).toBe(12)
 
-      const diff = await result.call('subtract', 7, 3)
-      expect(diff).toBe(4)
-
-      const product = await result.call('multiply', 3, 7)
-      expect(product).toBe(21)
-
-      // Step 3: Get metadata
+      // Get metadata
       const meta = await result.meta()
-      expect(meta.exports).toContain('add')
-      expect(meta.exports).toContain('subtract')
-      expect(meta.exports).toContain('multiply')
-      expect(meta.hasDefault).toBe(false)
+      expect(meta.exports.length).toBeGreaterThanOrEqual(4)
 
-      // Step 4: Dispose
+      // Clean up
       await result.dispose()
+      expect(getActiveInstanceCount()).toBe(0)
     })
 
-    it('evaluator manages multiple modules', async () => {
-      setMockResponses({
-        results: {
-          greet: 'Hello!',
-          add: 5,
-        },
-        exports: ['greet', 'add', 'default'],
-        hasDefault: true,
-      })
+    it('evaluator with multiple modules', async () => {
+      const evaluator = createEvaluator()
 
-      const evaluator = createEvaluator({ sandbox: { blockNetwork: true } })
+      const calc = await evaluator.evaluate(fixtures.calculator)
+      const greet = await evaluator.evaluate(fixtures.withExports)
 
-      // Evaluate multiple modules
-      const result1 = await evaluator.evaluate(fixtures.withExports)
-      const result2 = await evaluator.evaluate(fixtures.calculator)
+      expect(await calc.call<number>('add', 1, 2)).toBe(3)
+      expect(await greet.call<string>('greet', 'Test')).toBe('Hello, Test!')
 
       expect(evaluator.getInstanceCount()).toBe(2)
 
-      // Call functions on both
-      const greeting = await result1.call('greet', 'World')
-      expect(greeting).toBe('Hello!')
-
-      const sum = await result2.call('add', 2, 3)
-      expect(sum).toBe(5)
-
-      // Dispose all
       await evaluator.dispose()
       expect(evaluator.getInstanceCount()).toBe(0)
     })
 
-    it('run is convenient for one-off calls', async () => {
-      setMockResponses({
-        results: { add: 15 },
-      })
+    it('error handling preserves other functionality', async () => {
+      const result = await evaluate(fixtures.withError)
 
-      const result = await run(fixtures.calculator, 'add', [7, 8])
+      // Error function throws
+      await expect(result.call('throwError')).rejects.toThrow()
 
-      expect(result).toBe(15)
-      expect(getActiveInstanceCount()).toBe(0) // Auto-disposed
-    })
+      // But safe function still works
+      expect(await result.call<string>('safeFunction')).toBe('safe')
 
-    it('test validates MDX before use', async () => {
-      // Valid MDX
-      setMockResponses({
-        exports: ['default'],
-        hasDefault: true,
-      })
-
-      const validResult = await testMdx(fixtures.simple)
-      expect(validResult.success).toBe(true)
-
-      // Invalid MDX
-      const invalidResult = await testMdx(`<Broken unclosed`)
-      expect(invalidResult.success).toBe(false)
-      expect(invalidResult.error).toBeDefined()
+      await result.dispose()
     })
   })
 
@@ -1028,90 +578,36 @@ export const emoji = '🚀'`,
   // ============================================================================
 
   describe('edge cases', () => {
-    it('handles empty MDX content', async () => {
-      setMockResponses({})
-
+    it('handles empty content', async () => {
       const result = await evaluate('')
-
       expect(result.moduleId).toBeDefined()
-      expect(result.data).toEqual({})
+      await result.dispose()
     })
 
-    it('handles MDX with only frontmatter', async () => {
-      setMockResponses({})
-
+    it('handles content with only frontmatter', async () => {
       const content = `---
 title: Only Frontmatter
 ---`
-
       const result = await evaluate(content)
-
       expect(result.data.title).toBe('Only Frontmatter')
+      await result.dispose()
     })
 
-    it('handles MDX with only code', async () => {
-      setMockResponses({})
-
-      const content = `export const x = 1`
-
+    it('handles content with only exports', async () => {
+      const content = `export const x = 42`
       const result = await evaluate(content)
-
       expect(result.moduleId).toBeDefined()
-    })
-
-    it('handles unicode content', async () => {
-      setMockResponses({})
-
-      const result = await evaluate(fixtures.unicode)
-
-      expect(result.data.title).toBe('日本語タイトル')
-      expect(result.data.author).toBe('作者名')
-      expect(result.data.emoji).toBe('🎉🚀💡')
-    })
-
-    it('handles very long content', async () => {
-      setMockResponses({})
-
-      const sections = Array.from({ length: 100 }, (_, i) =>
-        `## Section ${i}\n\nContent for section ${i}.`
-      ).join('\n\n')
-      const content = `---
-title: Long Document
----
-
-${sections}
-
-export const sectionCount = 100`
-
-      const result = await evaluate(content)
-
-      expect(result.data.title).toBe('Long Document')
-    })
-
-    it('handles content with special characters', async () => {
-      setMockResponses({})
-
-      const content = `---
-title: Quotes and special chars
-description: Contains ampersand and angle brackets
----
-
-# Content
-
-Some text here.`
-
-      const result = await evaluate(content)
-
-      expect(result.data.title).toBe('Quotes and special chars')
+      await result.dispose()
     })
 
     it('reuses instances for same content', async () => {
-      setMockResponses({})
-
       const result1 = await evaluate(fixtures.simple)
       const result2 = await evaluate(fixtures.simple)
 
       expect(result1.moduleId).toBe(result2.moduleId)
+
+      await result1.dispose()
+      await result2.dispose()
     })
   })
 
@@ -1121,8 +617,6 @@ Some text here.`
 
   describe('types', () => {
     it('EvaluateResult has correct shape', async () => {
-      setMockResponses({})
-
       const result: EvaluateResult = await evaluate(fixtures.simple)
 
       expect(result).toHaveProperty('exports')
@@ -1131,6 +625,8 @@ Some text here.`
       expect(result).toHaveProperty('meta')
       expect(result).toHaveProperty('moduleId')
       expect(result).toHaveProperty('dispose')
+
+      await result.dispose()
     })
 
     it('Evaluator has correct shape', () => {

@@ -316,7 +316,7 @@ export function Forward({ as: Component = 'div', ...rest }) {
 
         expect(module.mainModule).toBe('entry.js')
         expect(module.modules['entry.js']).toContain('import * as MDXModule')
-        expect(module.modules['entry.js']).toContain("export * from './mdx.js'")
+        expect(module.modules['entry.js']).toContain('export default')
       })
 
       it('entry.js contains health endpoint', async () => {
@@ -360,22 +360,22 @@ export function Forward({ as: Component = 'div', ...rest }) {
       it('bundles JSX runtime when bundleRuntime is true', async () => {
         const module = await compileToModule(fixtures.simple, { bundleRuntime: true })
 
-        expect(module.modules).toHaveProperty('jsx-runtime.js')
+        expect(module.modules).toHaveProperty('jsx-runtime')
         expect(Object.keys(module.modules)).toHaveLength(3)
       })
 
       it('JSX runtime contains Fragment and jsx functions', async () => {
         const module = await compileToModule(fixtures.simple, { bundleRuntime: true })
 
-        expect(module.modules['jsx-runtime.js']).toContain('Fragment')
-        expect(module.modules['jsx-runtime.js']).toContain('function jsx')
-        expect(module.modules['jsx-runtime.js']).toContain('function jsxs')
+        expect(module.modules['jsx-runtime']).toContain('Fragment')
+        expect(module.modules['jsx-runtime']).toContain('function jsx')
+        expect(module.modules['jsx-runtime']).toContain('function jsxs')
       })
 
       it('uses bundled runtime import when bundleRuntime is true', async () => {
         const module = await compileToModule(fixtures.withJsx, { bundleRuntime: true })
 
-        expect(module.modules['mdx.js']).toContain('./jsx-runtime.js')
+        expect(module.modules['mdx.js']).toContain('./jsx-runtime')
       })
 
       it('uses react import source by default', async () => {
@@ -640,11 +640,11 @@ export function Forward({ as: Component = 'div', ...rest }) {
         expect(config.modules['mdx.js']).toBe(compiledModule.modules['mdx.js'])
       })
 
-      it('preserves jsx-runtime.js when present', async () => {
+      it('preserves jsx-runtime when present', async () => {
         const moduleWithRuntime = await compileToModule(fixtures.simple, { bundleRuntime: true })
         const config = createWorkerConfig(moduleWithRuntime)
 
-        expect(config.modules['jsx-runtime.js']).toBe(moduleWithRuntime.modules['jsx-runtime.js'])
+        expect(config.modules['jsx-runtime']).toBe(moduleWithRuntime.modules['jsx-runtime'])
       })
     })
   })
@@ -671,7 +671,7 @@ export function Forward({ as: Component = 'div', ...rest }) {
       })
 
       expect(result.modules).toHaveProperty('custom.js')
-      expect(result.modules).toHaveProperty('jsx-runtime.js')
+      expect(result.modules).toHaveProperty('jsx-runtime')
     })
 
     it('passes sandbox options through', async () => {
@@ -1106,7 +1106,7 @@ A simple calculator module.
 
       expect(module.mainModule).toBe('entry.js')
       expect(module.data.title).toBe('Integration Test')
-      expect(Object.keys(module.modules)).toHaveLength(3) // entry, mdx, jsx-runtime
+      expect(Object.keys(module.modules)).toHaveLength(3) // entry.js, mdx.js, jsx-runtime
 
       // Step 2: Create worker config
       const config = createWorkerConfig(module, { blockNetwork: true })

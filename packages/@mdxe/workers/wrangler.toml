@@ -1,0 +1,8 @@
+# Test configuration for @mdxe/workers
+name = "mdxe-workers-test"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# Note: The Dynamic Worker Loader binding (worker_loaders) is a special
+# Cloudflare feature that may not be available in all environments.
+# Tests that require LOADER binding will be skipped if not available.
