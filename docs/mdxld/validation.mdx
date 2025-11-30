@@ -1,0 +1,230 @@
+---
+title: Validation
+description: Validate MDXLD documents with ArkType schemas
+---
+
+# Document Validation
+
+mdxld integrates with [ArkType](https://arktype.io) for powerful runtime validation of your documents.
+
+## Installation
+
+ArkType is an optional peer dependency:
+
+```bash
+npm install arktype
+```
+
+## Basic Validation
+
+```typescript
+import { parse } from 'mdxld'
+import { createValidator } from 'mdxld/validate'
+import { type } from 'arktype'
+
+// Define your schema
+const ArticleSchema = type({
+  '$type': '"Article"',
+  'title': 'string',
+  'author': 'string',
+  'publishedAt?': 'string',
+  'draft?': 'boolean',
+})
+
+// Create a validator
+const validateArticle = createValidator(ArticleSchema)
+
+// Validate a document
+const doc = parse(content)
+const result = validateArticle(doc)
+
+if (result.success) {
+  console.log('Valid article:', result.data)
+} else {
+  console.error('Validation errors:', result.errors)
+}
+```
+
+## Schema Examples
+
+### Blog Post Schema
+
+```typescript
+const BlogPost = type({
+  '$type': '"BlogPost"',
+  'title': 'string',
+  'slug': 'string',
+  'author': {
+    'name': 'string',
+    'email?': 'string.email',
+    'url?': 'string.url',
+  },
+  'publishedAt': 'string',
+  'updatedAt?': 'string',
+  'tags?': 'string[]',
+  'draft?': 'boolean',
+  'featured?': 'boolean',
+})
+```
+
+### Documentation Page Schema
+
+```typescript
+const DocPage = type({
+  '$type': '"Documentation"',
+  'title': 'string',
+  'description?': 'string',
+  'order?': 'number',
+  'category?': 'string',
+  'keywords?': 'string[]',
+})
+```
+
+### API Reference Schema
+
+```typescript
+const APIReference = type({
+  '$type': '"APIReference"',
+  'title': 'string',
+  'method': '"GET" | "POST" | "PUT" | "DELETE" | "PATCH"',
+  'endpoint': 'string',
+  'authentication?': '"none" | "api-key" | "oauth"',
+  'parameters?': [{
+    'name': 'string',
+    'type': 'string',
+    'required': 'boolean',
+    'description?': 'string',
+  }],
+})
+```
+
+## Union Types
+
+Validate different document types:
+
+```typescript
+const Content = type({
+  '$type': '"Article" | "BlogPost" | "Tutorial"',
+  'title': 'string',
+  'content': 'string',
+})
+
+// Or use discriminated unions
+const Document = type([
+  {
+    '$type': '"Article"',
+    'title': 'string',
+    'author': 'string',
+  },
+  '|',
+  {
+    '$type': '"Tutorial"',
+    'title': 'string',
+    'steps': 'string[]',
+  },
+])
+```
+
+## Custom Validators
+
+Create reusable validators:
+
+```typescript
+import { type } from 'arktype'
+
+// Reusable person type
+const Person = type({
+  'name': 'string',
+  'email?': 'string.email',
+  'url?': 'string.url',
+})
+
+// Reusable metadata
+const ContentMeta = type({
+  'title': 'string',
+  'description?': 'string',
+  'keywords?': 'string[]',
+})
+
+// Compose into document schemas
+const Article = type({
+  '$type': '"Article"',
+  ...ContentMeta.infer,
+  'author': Person,
+  'publishedAt': 'string',
+})
+```
+
+## Validation with Defaults
+
+```typescript
+import { createValidator } from 'mdxld/validate'
+import { type } from 'arktype'
+
+const schema = type({
+  'title': 'string',
+  'draft': 'boolean = false',
+  'order': 'number = 0',
+})
+
+const validate = createValidator(schema)
+const result = validate(doc)
+
+// Missing draft and order will use defaults
+console.log(result.data.draft) // false
+console.log(result.data.order) // 0
+```
+
+## Error Messages
+
+```typescript
+const result = validateArticle(doc)
+
+if (!result.success) {
+  for (const error of result.errors) {
+    console.log(`${error.path}: ${error.message}`)
+    // Example output:
+    // author: must be a string
+    // publishedAt: required but missing
+  }
+}
+```
+
+## Conditional Validation
+
+```typescript
+const conditionalSchema = type({
+  '$type': 'string',
+  'title': 'string',
+  // Require author only for published content
+  'author': (data) => {
+    if (data.draft === false) {
+      return 'string'
+    }
+    return 'string | undefined'
+  },
+  'draft?': 'boolean',
+})
+```
+
+## Integration with mdxdb
+
+```typescript
+import { createDatabase } from '@mdxdb/fs'
+import { createValidator } from 'mdxld/validate'
+import { type } from 'arktype'
+
+const db = createDatabase({ path: './content' })
+const validateArticle = createValidator(ArticleSchema)
+
+// Validate before storing
+async function saveArticle(doc) {
+  const result = validateArticle(doc)
+
+  if (!result.success) {
+    throw new Error(`Invalid article: ${result.errors.join(', ')}`)
+  }
+
+  await db.set(`articles/${doc.data.slug}`, doc)
+}
+```

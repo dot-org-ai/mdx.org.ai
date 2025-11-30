@@ -1,0 +1,13 @@
+{
+  "title": "mdxld",
+  "root": true,
+  "defaultOpen": true,
+  "pages": [
+    "index",
+    "getting-started",
+    "parsing",
+    "validation",
+    "ast",
+    "compilation"
+  ]
+}

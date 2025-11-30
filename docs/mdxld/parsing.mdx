@@ -1,0 +1,168 @@
+---
+title: Parsing
+description: Parse MDXLD documents from strings
+---
+
+# Parsing MDXLD Documents
+
+The `parse` function converts MDX strings into structured document objects.
+
+## Basic Parsing
+
+```typescript
+import { parse } from 'mdxld'
+
+const doc = parse(`---
+title: Hello World
+---
+
+# Hello World
+
+Content here.
+`)
+```
+
+## Return Value
+
+The `parse` function returns an `MDXLDDocument` object:
+
+```typescript
+interface MDXLDDocument {
+  /** Parsed frontmatter data */
+  data: MDXLDData
+  /** Document content (without frontmatter) */
+  content: string
+  /** Document identifier (from $id or @id) */
+  id?: string
+  /** Document type (from $type or @type) */
+  type?: string
+}
+```
+
+## Linked Data Extraction
+
+mdxld automatically extracts linked data properties:
+
+```typescript
+const doc = parse(`---
+$type: Article
+$id: https://example.com/article/1
+$context: https://schema.org
+title: My Article
+---
+
+Content...
+`)
+
+console.log(doc.type)  // 'Article'
+console.log(doc.id)    // 'https://example.com/article/1'
+console.log(doc.data.$context)  // 'https://schema.org'
+```
+
+## JSON-LD Compatibility
+
+Both `$` and `@` prefixes are supported:
+
+```typescript
+// These are equivalent
+const doc1 = parse(`---
+$type: Article
+$id: urn:article:1
+---
+`)
+
+const doc2 = parse(`---
+"@type": Article
+"@id": urn:article:1
+---
+`)
+
+console.log(doc1.type === doc2.type) // true
+```
+
+## Handling Edge Cases
+
+### Empty Frontmatter
+
+```typescript
+const doc = parse(`# No Frontmatter
+
+Just content here.
+`)
+
+console.log(doc.data)    // {}
+console.log(doc.content) // '# No Frontmatter\n\nJust content here.'
+```
+
+### Empty Content
+
+```typescript
+const doc = parse(`---
+title: Metadata Only
+---
+`)
+
+console.log(doc.data.title) // 'Metadata Only'
+console.log(doc.content)    // ''
+```
+
+### Nested Data
+
+```typescript
+const doc = parse(`---
+$type: Article
+author:
+  $type: Person
+  name: Jane Doe
+  email: jane@example.com
+tags:
+  - mdx
+  - tutorial
+---
+
+Content...
+`)
+
+console.log(doc.data.author.name) // 'Jane Doe'
+console.log(doc.data.tags[0])     // 'mdx'
+```
+
+## Error Handling
+
+```typescript
+import { parse } from 'mdxld'
+
+try {
+  const doc = parse(content)
+} catch (error) {
+  if (error instanceof SyntaxError) {
+    console.error('Invalid YAML frontmatter:', error.message)
+  }
+}
+```
+
+## Stringifying Back
+
+Convert a document back to MDX string:
+
+```typescript
+import { parse, stringify } from 'mdxld'
+
+const original = `---
+title: Hello
+---
+
+# Hello
+`
+
+const doc = parse(original)
+doc.data.title = 'Updated Title'
+
+const updated = stringify(doc)
+console.log(updated)
+// ---
+// title: Updated Title
+// ---
+//
+// # Hello
+```

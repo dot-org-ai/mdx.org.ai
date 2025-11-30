@@ -1,0 +1,269 @@
+---
+title: mdxdb
+description: Create, Manage, & Publish MDX & URL-centric File System & Database
+---
+
+# mdxdb
+
+**mdxdb** provides a unified interface for storing and querying MDXLD documents across multiple storage backends.
+
+## Installation
+
+```bash
+npm install mdxdb
+```
+
+## Features
+
+- **Unified API** - Same interface across all storage backends
+- **URL-centric** - Documents are addressed by URLs/paths
+- **Full-text Search** - Search across document content
+- **Type-safe** - Full TypeScript support
+- **Pluggable** - Easy to add custom adapters
+
+## Storage Adapters
+
+| Package | Backend | Use Case |
+|---------|---------|----------|
+| [@mdxdb/fs](/docs/mdxdb/adapters/fs) | File System | Local development, static sites |
+| [@mdxdb/sqlite](/docs/mdxdb/adapters/sqlite) | SQLite | Embedded database, edge computing |
+| [@mdxdb/postgres](/docs/mdxdb/adapters/postgres) | PostgreSQL | Production applications |
+| [@mdxdb/mongo](/docs/mdxdb/adapters/mongo) | MongoDB | Document-heavy workloads |
+| [@mdxdb/clickhouse](/docs/mdxdb/adapters/clickhouse) | ClickHouse | Analytics, time-series |
+| [@mdxdb/api](/docs/mdxdb/adapters/api) | HTTP API | Remote mdxdb server |
+
+## Quick Start
+
+### File System Adapter
+
+```typescript
+import { createDatabase } from '@mdxdb/fs'
+
+const db = createDatabase({
+  path: './content',
+})
+
+// Store a document
+await db.set('posts/hello-world', {
+  data: {
+    $type: 'BlogPost',
+    title: 'Hello World',
+    author: 'Jane Doe',
+  },
+  content: '# Hello World\n\nWelcome to my blog!',
+})
+
+// Retrieve a document
+const doc = await db.get('posts/hello-world')
+console.log(doc.data.title) // 'Hello World'
+
+// List all documents
+const posts = await db.list('posts/')
+console.log(posts.length) // 1
+```
+
+### SQLite Adapter
+
+```typescript
+import { createDatabase } from '@mdxdb/sqlite'
+
+const db = createDatabase({
+  filename: './content.db',
+})
+
+// Same API as file system
+await db.set('docs/getting-started', doc)
+const result = await db.get('docs/getting-started')
+```
+
+## Core API
+
+### Database Interface
+
+```typescript
+interface Database {
+  /** Get a document by path */
+  get(path: string, options?: GetOptions): Promise<MDXLDDocument | null>
+
+  /** Store a document */
+  set(path: string, doc: MDXLDDocument, options?: SetOptions): Promise<SetResult>
+
+  /** Delete a document */
+  delete(path: string, options?: DeleteOptions): Promise<DeleteResult>
+
+  /** List documents */
+  list(prefix?: string, options?: ListOptions): Promise<ListResult>
+
+  /** Search documents */
+  search(query: string, options?: SearchOptions): Promise<SearchResult>
+}
+```
+
+### Get Options
+
+```typescript
+interface GetOptions {
+  /** Include content in response */
+  includeContent?: boolean
+}
+```
+
+### Set Options
+
+```typescript
+interface SetOptions {
+  /** Overwrite existing document */
+  overwrite?: boolean
+  /** Create parent directories/collections */
+  createParents?: boolean
+}
+```
+
+### List Options
+
+```typescript
+interface ListOptions {
+  /** Maximum results to return */
+  limit?: number
+  /** Pagination offset */
+  offset?: number
+  /** Sort order */
+  orderBy?: 'path' | 'createdAt' | 'updatedAt'
+  /** Sort direction */
+  order?: 'asc' | 'desc'
+  /** Filter by type */
+  type?: string
+}
+```
+
+### Search Options
+
+```typescript
+interface SearchOptions {
+  /** Fields to search */
+  fields?: ('title' | 'content' | 'data')[]
+  /** Maximum results */
+  limit?: number
+  /** Filter by type */
+  type?: string
+}
+```
+
+## Working with Documents
+
+### Creating Documents
+
+```typescript
+import { parse } from 'mdxld'
+
+// From MDX string
+const doc = parse(`---
+$type: Article
+title: My Article
+---
+
+# My Article
+
+Content here...
+`)
+
+await db.set('articles/my-article', doc)
+
+// From object
+await db.set('articles/another', {
+  data: {
+    $type: 'Article',
+    title: 'Another Article',
+  },
+  content: '# Another Article\n\nMore content...',
+})
+```
+
+### Querying Documents
+
+```typescript
+// List all articles
+const articles = await db.list('articles/', {
+  type: 'Article',
+  orderBy: 'createdAt',
+  order: 'desc',
+  limit: 10,
+})
+
+// Search content
+const results = await db.search('typescript tutorial', {
+  fields: ['title', 'content'],
+  limit: 20,
+})
+```
+
+### Updating Documents
+
+```typescript
+const doc = await db.get('articles/my-article')
+
+// Modify the document
+doc.data.title = 'Updated Title'
+doc.data.updatedAt = new Date().toISOString()
+
+// Save changes
+await db.set('articles/my-article', doc, { overwrite: true })
+```
+
+### Deleting Documents
+
+```typescript
+await db.delete('articles/old-article')
+
+// Delete with confirmation
+const result = await db.delete('articles/important')
+if (result.success) {
+  console.log('Document deleted')
+}
+```
+
+## API Client
+
+Connect to a remote mdxdb server:
+
+```typescript
+import { createApiClient } from 'mdxdb/client'
+
+const client = createApiClient({
+  baseUrl: 'https://api.example.com/mdxdb',
+  apiKey: process.env.MDXDB_API_KEY,
+})
+
+// Same interface as local database
+const doc = await client.get('posts/hello-world')
+```
+
+## Fumadocs Integration
+
+Use mdxdb as a content source for Fumadocs:
+
+```typescript
+import { createSource } from '@mdxdb/fumadocs'
+import { loader } from 'fumadocs-core/source'
+
+const db = createDatabase({ path: './content' })
+const docs = await db.list('docs/')
+
+const source = createSource(
+  docs.map(doc => [doc.path, doc]),
+  { basePath: 'docs' }
+)
+
+export const docsSource = loader({
+  source,
+  baseUrl: '/docs',
+})
+```
+
+See [@mdxdb/fumadocs](/docs/mdxdb/fumadocs) for more details.
+
+## Next Steps
+
+- [Getting Started](/docs/mdxdb/getting-started) - Detailed setup guide
+- [Adapters](/docs/mdxdb/adapters) - Choose a storage backend
+- [Fumadocs Integration](/docs/mdxdb/fumadocs) - Use with Fumadocs

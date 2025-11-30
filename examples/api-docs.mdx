@@ -1,0 +1,150 @@
+---
+$type: API
+title: User API Documentation
+version: 1.0.0
+baseUrl: https://api.example.com
+---
+
+# User API Documentation
+
+This document describes the User API and includes inline tests
+to verify the data validation logic.
+
+## Data Models
+
+### User Schema
+
+```ts
+interface User {
+  id: string
+  email: string
+  name: string
+  role: 'admin' | 'user' | 'guest'
+  createdAt: Date
+}
+```
+
+## Validation Functions
+
+### Email Validation
+
+Validate email addresses using a regex pattern.
+
+```ts test name="validates correct email addresses"
+const isValidEmail = (email: string): boolean => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return regex.test(email)
+}
+
+expect(isValidEmail('user@example.com')).toBe(true)
+expect(isValidEmail('test.email@domain.org')).toBe(true)
+expect(isValidEmail('name+tag@company.co.uk')).toBe(true)
+```
+
+```ts test name="rejects invalid email addresses"
+const isValidEmail = (email: string): boolean => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return regex.test(email)
+}
+
+expect(isValidEmail('invalid')).toBe(false)
+expect(isValidEmail('missing@domain')).toBe(false)
+expect(isValidEmail('@nodomain.com')).toBe(false)
+expect(isValidEmail('spaces in@email.com')).toBe(false)
+```
+
+### Role Validation
+
+Ensure user roles are valid.
+
+```ts test name="validates user roles"
+const validRoles = ['admin', 'user', 'guest']
+
+const isValidRole = (role) => {
+  return validRoles.includes(role)
+}
+
+expect(isValidRole('admin')).toBe(true)
+expect(isValidRole('user')).toBe(true)
+expect(isValidRole('guest')).toBe(true)
+expect(isValidRole('superadmin')).toBe(false)
+expect(isValidRole('')).toBe(false)
+```
+
+### ID Validation
+
+Validate UUID format for user IDs.
+
+```ts test name="validates UUID format"
+const isValidUUID = (id: string): boolean => {
+  const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  return regex.test(id)
+}
+
+expect(isValidUUID('550e8400-e29b-41d4-a716-446655440000')).toBe(true)
+expect(isValidUUID('123e4567-e89b-12d3-a456-426614174000')).toBe(true)
+expect(isValidUUID('not-a-uuid')).toBe(false)
+expect(isValidUUID('123')).toBe(false)
+```
+
+## API Endpoints
+
+### GET /users
+
+Returns a list of users.
+
+```ts
+// Response type
+interface UsersResponse {
+  users: User[]
+  total: number
+  page: number
+  perPage: number
+}
+```
+
+### POST /users
+
+Create a new user.
+
+```ts test name="user creation validation"
+const validateCreateUser = (input) => {
+  const errors = []
+
+  if (!input.email) {
+    errors.push('Email is required')
+  }
+
+  if (!input.name || input.name.length < 2) {
+    errors.push('Name must be at least 2 characters')
+  }
+
+  if (input.role && !['admin', 'user', 'guest'].includes(input.role)) {
+    errors.push('Invalid role')
+  }
+
+  return errors
+}
+
+expect(validateCreateUser({ email: 'test@example.com', name: 'John' })).toEqual([])
+expect(validateCreateUser({ email: '', name: 'John' })).toContain('Email is required')
+expect(validateCreateUser({ email: 'test@example.com', name: 'J' })).toContain('Name must be at least 2 characters')
+expect(validateCreateUser({ email: 'test@example.com', name: 'John', role: 'invalid' })).toContain('Invalid role')
+```
+
+## Utility Functions
+
+### Pagination Helper
+
+```ts test name="pagination calculates correctly"
+const paginate = (page, perPage, total) => ({
+  offset: (page - 1) * perPage,
+  limit: perPage,
+  totalPages: Math.ceil(total / perPage),
+})
+
+expect(paginate(1, 10, 100)).toEqual({ offset: 0, limit: 10, totalPages: 10 })
+expect(paginate(2, 10, 100)).toEqual({ offset: 10, limit: 10, totalPages: 10 })
+expect(paginate(1, 25, 100)).toEqual({ offset: 0, limit: 25, totalPages: 4 })
+expect(paginate(1, 10, 0)).toEqual({ offset: 0, limit: 10, totalPages: 0 })
+```

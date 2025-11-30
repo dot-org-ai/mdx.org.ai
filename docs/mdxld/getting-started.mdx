@@ -1,0 +1,210 @@
+---
+title: Getting Started
+description: Quick start guide for mdxld
+---
+
+# Getting Started with mdxld
+
+This guide will help you get up and running with mdxld in minutes.
+
+## Installation
+
+Install mdxld using your preferred package manager:
+
+```bash
+# npm
+npm install mdxld
+
+# pnpm
+pnpm add mdxld
+
+# yarn
+yarn add mdxld
+
+# bun
+bun add mdxld
+```
+
+## Basic Usage
+
+### Parse an MDXLD Document
+
+```typescript
+import { parse } from 'mdxld'
+
+const content = `---
+$type: Article
+title: Getting Started with MDXLD
+author: Jane Doe
+publishedAt: 2024-01-15
+tags:
+  - mdx
+  - linked-data
+  - tutorial
+---
+
+# Getting Started with MDXLD
+
+Welcome to this tutorial on MDXLD!
+
+## What You'll Learn
+
+- How to parse MDXLD documents
+- Working with linked data properties
+- Validating document schemas
+`
+
+const doc = parse(content)
+
+console.log(doc.data)
+// {
+//   $type: 'Article',
+//   title: 'Getting Started with MDXLD',
+//   author: 'Jane Doe',
+//   publishedAt: '2024-01-15',
+//   tags: ['mdx', 'linked-data', 'tutorial']
+// }
+
+console.log(doc.content)
+// # Getting Started with MDXLD
+//
+// Welcome to this tutorial on MDXLD!
+// ...
+```
+
+### Create a Document
+
+```typescript
+import { stringify } from 'mdxld'
+
+const doc = {
+  data: {
+    $type: 'BlogPost',
+    $id: 'https://example.com/posts/hello-world',
+    title: 'Hello World',
+    author: 'John Smith',
+    draft: false,
+  },
+  content: `# Hello World
+
+This is my first blog post!
+
+## Introduction
+
+Let me tell you about MDX...
+`,
+}
+
+const mdx = stringify(doc)
+console.log(mdx)
+```
+
+### Working with the AST
+
+```typescript
+import { parse, toAst } from 'mdxld'
+
+const doc = parse(content)
+const ast = toAst(doc)
+
+// Extract all headings
+function extractHeadings(ast) {
+  const headings = []
+
+  for (const node of ast.children) {
+    if (node.type === 'heading') {
+      const text = node.children
+        ?.map(child => child.value || '')
+        .join('')
+      headings.push({
+        depth: node.depth,
+        text,
+      })
+    }
+  }
+
+  return headings
+}
+
+console.log(extractHeadings(ast))
+// [
+//   { depth: 1, text: 'Getting Started with MDXLD' },
+//   { depth: 2, text: 'What You\'ll Learn' },
+// ]
+```
+
+## Linked Data Properties
+
+MDXLD supports special properties that provide semantic meaning:
+
+### $type / @type
+
+Define the type of your document:
+
+```yaml
+---
+$type: Article
+# or
+"@type": Article
+---
+```
+
+### $id / @id
+
+Provide a unique identifier:
+
+```yaml
+---
+$id: https://example.com/articles/my-article
+# or
+"@id": urn:uuid:550e8400-e29b-41d4-a716-446655440000
+---
+```
+
+### $context / @context
+
+Specify a JSON-LD context:
+
+```yaml
+---
+$context: https://schema.org
+# or a custom context
+$context:
+  "@vocab": https://example.com/vocab#
+  author: https://schema.org/author
+---
+```
+
+## TypeScript Integration
+
+mdxld provides full TypeScript support:
+
+```typescript
+import type { MDXLDDocument, MDXLDData } from 'mdxld'
+
+// Define your document type
+interface ArticleData extends MDXLDData {
+  $type: 'Article'
+  title: string
+  author: string
+  publishedAt?: string
+  tags?: string[]
+}
+
+interface Article extends MDXLDDocument {
+  data: ArticleData
+}
+
+function processArticle(doc: Article) {
+  console.log(`Processing: ${doc.data.title}`)
+  console.log(`By: ${doc.data.author}`)
+}
+```
+
+## Next Steps
+
+Now that you have the basics, explore:
+
+- [Parsing in Depth](/docs/mdxld/parsing) - Advanced parsing options
+- [Validation](/docs/mdxld/validation) - Validate documents with schemas
+- [AST Manipulation](/docs/mdxld/ast) - Transform document content

@@ -1,0 +1,11 @@
+{
+  "title": "mdxdb",
+  "root": true,
+  "defaultOpen": true,
+  "pages": [
+    "index",
+    "getting-started",
+    "adapters",
+    "fumadocs"
+  ]
+}

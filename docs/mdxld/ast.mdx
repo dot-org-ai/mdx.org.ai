@@ -1,0 +1,304 @@
+---
+title: AST
+description: Work with the MDXLD abstract syntax tree
+---
+
+# AST Manipulation
+
+mdxld provides utilities for working with the abstract syntax tree (AST) of MDX documents.
+
+## Converting to AST
+
+```typescript
+import { parse, toAst } from 'mdxld'
+
+const doc = parse(`---
+title: Hello World
+---
+
+# Hello World
+
+This is a **bold** statement.
+
+- Item 1
+- Item 2
+`)
+
+const ast = toAst(doc)
+```
+
+## AST Structure
+
+The AST follows the mdast (Markdown AST) specification:
+
+```typescript
+interface MDXLDAst {
+  type: 'root'
+  children: MDXLDAstNode[]
+}
+
+interface MDXLDAstNode {
+  type: string
+  depth?: number       // For headings
+  children?: MDXLDAstNode[]
+  value?: string       // For text nodes
+  url?: string         // For links and images
+  alt?: string         // For images
+  lang?: string        // For code blocks
+  ordered?: boolean    // For lists
+}
+```
+
+## Node Types
+
+### Headings
+
+```typescript
+{
+  type: 'heading',
+  depth: 1,  // 1-6
+  children: [
+    { type: 'text', value: 'Hello World' }
+  ]
+}
+```
+
+### Paragraphs
+
+```typescript
+{
+  type: 'paragraph',
+  children: [
+    { type: 'text', value: 'This is ' },
+    { type: 'strong', children: [{ type: 'text', value: 'bold' }] },
+    { type: 'text', value: ' text.' }
+  ]
+}
+```
+
+### Links
+
+```typescript
+{
+  type: 'link',
+  url: 'https://example.com',
+  children: [
+    { type: 'text', value: 'Click here' }
+  ]
+}
+```
+
+### Code Blocks
+
+```typescript
+{
+  type: 'code',
+  lang: 'typescript',
+  value: 'const x = 1'
+}
+```
+
+### Lists
+
+```typescript
+{
+  type: 'list',
+  ordered: false,
+  children: [
+    {
+      type: 'listItem',
+      children: [
+        {
+          type: 'paragraph',
+          children: [{ type: 'text', value: 'Item 1' }]
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Traversing the AST
+
+### Simple Traversal
+
+```typescript
+function traverse(node, callback) {
+  callback(node)
+  if (node.children) {
+    for (const child of node.children) {
+      traverse(child, callback)
+    }
+  }
+}
+
+traverse(ast, (node) => {
+  console.log(node.type)
+})
+```
+
+### Finding Nodes
+
+```typescript
+function findAll(ast, type) {
+  const results = []
+
+  function search(node) {
+    if (node.type === type) {
+      results.push(node)
+    }
+    if (node.children) {
+      for (const child of node.children) {
+        search(child)
+      }
+    }
+  }
+
+  search(ast)
+  return results
+}
+
+const headings = findAll(ast, 'heading')
+const links = findAll(ast, 'link')
+```
+
+### Extracting Text
+
+```typescript
+function extractText(node) {
+  if (node.value) return node.value
+  if (!node.children) return ''
+
+  return node.children
+    .map(extractText)
+    .join('')
+}
+
+// Get all text from a heading
+const heading = ast.children.find(n => n.type === 'heading')
+console.log(extractText(heading)) // 'Hello World'
+```
+
+## Transforming the AST
+
+### Modify Nodes
+
+```typescript
+function transformLinks(ast, baseUrl) {
+  function transform(node) {
+    if (node.type === 'link' && node.url?.startsWith('/')) {
+      node.url = baseUrl + node.url
+    }
+    if (node.children) {
+      node.children.forEach(transform)
+    }
+  }
+
+  transform(ast)
+  return ast
+}
+
+const transformed = transformLinks(ast, 'https://example.com')
+```
+
+### Filter Nodes
+
+```typescript
+function removeCodeBlocks(ast) {
+  return {
+    ...ast,
+    children: ast.children
+      .filter(node => node.type !== 'code')
+      .map(node => {
+        if (node.children) {
+          return { ...node, children: removeCodeBlocks(node).children }
+        }
+        return node
+      })
+  }
+}
+```
+
+### Add Nodes
+
+```typescript
+function addTableOfContents(ast) {
+  const headings = findAll(ast, 'heading')
+    .filter(h => h.depth === 2)
+
+  const tocList = {
+    type: 'list',
+    ordered: false,
+    children: headings.map(h => ({
+      type: 'listItem',
+      children: [{
+        type: 'paragraph',
+        children: [{
+          type: 'link',
+          url: `#${slugify(extractText(h))}`,
+          children: [{ type: 'text', value: extractText(h) }]
+        }]
+      }]
+    }))
+  }
+
+  return {
+    ...ast,
+    children: [tocList, ...ast.children]
+  }
+}
+```
+
+## Converting Back to Document
+
+```typescript
+import { fromAst } from 'mdxld/ast'
+
+const modifiedAst = transformLinks(ast, 'https://example.com')
+const doc = fromAst(modifiedAst)
+
+console.log(doc.content) // Updated MDX content
+```
+
+## Use Cases
+
+### Extract Table of Contents
+
+```typescript
+function getTableOfContents(doc) {
+  const ast = toAst(doc)
+  const headings = findAll(ast, 'heading')
+
+  return headings
+    .filter(h => h.depth >= 2 && h.depth <= 3)
+    .map(h => ({
+      depth: h.depth,
+      text: extractText(h),
+      slug: slugify(extractText(h))
+    }))
+}
+```
+
+### Count Words
+
+```typescript
+function countWords(doc) {
+  const ast = toAst(doc)
+  const text = extractText(ast)
+  return text.split(/\s+/).filter(Boolean).length
+}
+```
+
+### Extract All Links
+
+```typescript
+function getLinks(doc) {
+  const ast = toAst(doc)
+  const links = findAll(ast, 'link')
+
+  return links.map(link => ({
+    text: extractText(link),
+    url: link.url
+  }))
+}
+```

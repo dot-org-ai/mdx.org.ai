@@ -1,0 +1,246 @@
+---
+title: mdxld
+description: Parse, Stringify, Validate, and Compile MDXLD Documents
+---
+
+# mdxld
+
+**mdxld** is the core package for working with MDXLD (MDX + Linked Data) documents. It provides utilities to parse, stringify, validate, and compile MDX documents with semantic frontmatter.
+
+## Installation
+
+```bash
+npm install mdxld
+```
+
+## What is MDXLD?
+
+MDXLD extends standard MDX frontmatter with JSON-LD compatible properties, enabling semantic web capabilities in your MDX documents.
+
+### Standard MDX
+
+```mdx
+---
+title: Hello World
+author: Jane Doe
+---
+
+# Hello World
+
+Content here...
+```
+
+### MDXLD
+
+```mdx
+---
+$type: Article
+$id: https://example.com/posts/hello-world
+$context: https://schema.org
+title: Hello World
+author:
+  $type: Person
+  name: Jane Doe
+  url: https://example.com/authors/jane
+publishedAt: 2024-01-15
+---
+
+# Hello World
+
+Content here with **semantic** meaning.
+```
+
+## Core Concepts
+
+### Linked Data Properties
+
+MDXLD recognizes special frontmatter properties that map to JSON-LD:
+
+| MDXLD | JSON-LD | Description |
+|-------|---------|-------------|
+| `$type` | `@type` | Document or entity type |
+| `$id` | `@id` | Unique identifier (URI) |
+| `$context` | `@context` | JSON-LD context |
+
+### Document Structure
+
+An MDXLD document consists of:
+
+```typescript
+interface MDXLDDocument {
+  /** Frontmatter data with LD properties */
+  data: MDXLDData
+  /** MDX content body */
+  content: string
+  /** Optional document identifier */
+  id?: string
+  /** Optional document type */
+  type?: string
+}
+```
+
+## Quick Start
+
+### Parsing
+
+```typescript
+import { parse } from 'mdxld'
+
+const doc = parse(`---
+$type: BlogPost
+title: My First Post
+---
+
+# My First Post
+
+Hello, world!
+`)
+
+console.log(doc.data.$type) // 'BlogPost'
+console.log(doc.data.title) // 'My First Post'
+console.log(doc.content)    // '# My First Post\n\nHello, world!'
+```
+
+### Stringifying
+
+```typescript
+import { stringify } from 'mdxld'
+
+const mdx = stringify({
+  data: {
+    $type: 'Article',
+    title: 'Hello World',
+  },
+  content: '# Hello World\n\nContent here.',
+})
+
+console.log(mdx)
+// ---
+// $type: Article
+// title: Hello World
+// ---
+//
+// # Hello World
+//
+// Content here.
+```
+
+### Converting to AST
+
+```typescript
+import { parse, toAst } from 'mdxld'
+
+const doc = parse(content)
+const ast = toAst(doc)
+
+// Traverse the AST
+for (const node of ast.children) {
+  if (node.type === 'heading') {
+    console.log(`H${node.depth}: ${node.children?.[0]?.value}`)
+  }
+}
+```
+
+## Submodules
+
+### mdxld/ast
+
+Work with the MDX abstract syntax tree:
+
+```typescript
+import { toAst, fromAst } from 'mdxld/ast'
+
+const ast = toAst(doc)
+// Manipulate the AST...
+const newDoc = fromAst(ast)
+```
+
+### mdxld/validate
+
+Validate documents with ArkType schemas:
+
+```typescript
+import { createValidator } from 'mdxld/validate'
+import { type } from 'arktype'
+
+const validateArticle = createValidator(type({
+  '$type': '"Article"',
+  'title': 'string',
+  'author': 'string',
+}))
+
+const result = validateArticle(doc)
+if (result.success) {
+  console.log('Valid article:', result.data)
+} else {
+  console.error('Validation errors:', result.errors)
+}
+```
+
+### mdxld/compile
+
+Compile MDX to executable code:
+
+```typescript
+import { compile } from 'mdxld/compile'
+
+const result = await compile(doc, {
+  jsx: true,
+  remarkPlugins: [],
+  rehypePlugins: [],
+})
+```
+
+### mdxld/types
+
+TypeScript types for MDXLD:
+
+```typescript
+import type {
+  MDXLDDocument,
+  MDXLDData,
+  MDXLDAst,
+  MDXLDAstNode,
+  LDProperties,
+} from 'mdxld/types'
+```
+
+## API Reference
+
+### parse(content: string): MDXLDDocument
+
+Parse MDX string into a document object.
+
+### stringify(doc: MDXLDDocument): string
+
+Convert a document object back to MDX string.
+
+### toAst(doc: MDXLDDocument): MDXLDAst
+
+Convert a document to an abstract syntax tree.
+
+### fromAst(ast: MDXLDAst): MDXLDDocument
+
+Convert an AST back to a document.
+
+## TypeScript Support
+
+mdxld is written in TypeScript and provides full type definitions:
+
+```typescript
+import type { MDXLDDocument } from 'mdxld'
+
+function processDocument(doc: MDXLDDocument) {
+  // Full autocomplete and type checking
+  if (doc.data.$type === 'Article') {
+    // Handle articles
+  }
+}
+```
+
+## Next Steps
+
+- [Parsing Documents](/docs/mdxld/parsing) - Deep dive into parsing
+- [Validation](/docs/mdxld/validation) - Schema validation with ArkType
+- [AST Manipulation](/docs/mdxld/ast) - Working with the syntax tree
+- [Compilation](/docs/mdxld/compilation) - Compiling MDX to code

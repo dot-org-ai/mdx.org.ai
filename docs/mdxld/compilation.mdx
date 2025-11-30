@@ -1,0 +1,286 @@
+---
+title: Compilation
+description: Compile MDXLD documents to executable code
+---
+
+# Compilation
+
+mdxld can compile MDX documents to executable JavaScript/JSX code.
+
+## Basic Compilation
+
+```typescript
+import { compile } from 'mdxld/compile'
+
+const doc = parse(`---
+title: Hello World
+---
+
+# Hello World
+
+<Button onClick={() => alert('clicked')}>
+  Click me
+</Button>
+`)
+
+const result = await compile(doc)
+console.log(result.code)
+```
+
+## Options
+
+```typescript
+interface CompileOptions {
+  /** Output JSX instead of React.createElement calls */
+  jsx?: boolean
+
+  /** JSX import source for automatic runtime */
+  jsxImportSource?: string
+
+  /** Remark plugins for markdown processing */
+  remarkPlugins?: Plugin[]
+
+  /** Rehype plugins for HTML processing */
+  rehypePlugins?: Plugin[]
+
+  /** Output format: 'function-body' or 'program' */
+  outputFormat?: 'function-body' | 'program'
+
+  /** Development mode (more detailed errors) */
+  development?: boolean
+}
+```
+
+## Example Output
+
+### Input
+
+```mdx
+---
+title: Example
+---
+
+# Hello
+
+This is **bold** text.
+```
+
+### Output (function-body)
+
+```javascript
+function _createMdxContent(props) {
+  const _components = {
+    h1: "h1",
+    p: "p",
+    strong: "strong",
+    ...props.components
+  }
+  return (
+    <>
+      <_components.h1>Hello</_components.h1>
+      <_components.p>
+        This is <_components.strong>bold</_components.strong> text.
+      </_components.p>
+    </>
+  )
+}
+export default function MDXContent(props = {}) {
+  return <_createMdxContent {...props} />
+}
+```
+
+## Using Plugins
+
+### Remark Plugins
+
+```typescript
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+
+const result = await compile(doc, {
+  remarkPlugins: [
+    remarkGfm,      // GitHub Flavored Markdown
+    remarkMath,     // Math support
+  ],
+})
+```
+
+### Rehype Plugins
+
+```typescript
+import rehypeHighlight from 'rehype-highlight'
+import rehypeSlug from 'rehype-slug'
+
+const result = await compile(doc, {
+  rehypePlugins: [
+    rehypeHighlight,  // Syntax highlighting
+    rehypeSlug,       // Add IDs to headings
+  ],
+})
+```
+
+## Runtime Execution
+
+### Browser
+
+```typescript
+import * as runtime from 'react/jsx-runtime'
+
+const result = await compile(doc, {
+  outputFormat: 'function-body',
+})
+
+const { default: Content } = await evaluate(result.code, runtime)
+
+// Use in React
+function Page() {
+  return <Content components={{ Button: MyButton }} />
+}
+```
+
+### Server-Side
+
+```typescript
+import { compile, run } from 'mdxld/compile'
+import * as runtime from 'react/jsx-runtime'
+
+const compiled = await compile(doc)
+const { default: Content } = await run(compiled.code, runtime)
+
+// Render to string
+import { renderToString } from 'react-dom/server'
+const html = renderToString(<Content />)
+```
+
+## Custom Components
+
+```typescript
+const components = {
+  // Override default elements
+  h1: ({ children }) => <h1 className="text-4xl font-bold">{children}</h1>,
+  p: ({ children }) => <p className="my-4">{children}</p>,
+
+  // Custom components
+  Button: ({ children, onClick }) => (
+    <button
+      onClick={onClick}
+      className="px-4 py-2 bg-blue-500 text-white rounded"
+    >
+      {children}
+    </button>
+  ),
+
+  // Code blocks with syntax highlighting
+  code: ({ className, children }) => {
+    const language = className?.replace('language-', '')
+    return (
+      <SyntaxHighlighter language={language}>
+        {children}
+      </SyntaxHighlighter>
+    )
+  },
+}
+
+function Page() {
+  return <Content components={components} />
+}
+```
+
+## Frontmatter Access
+
+Access frontmatter data in your compiled output:
+
+```typescript
+const result = await compile(doc, {
+  remarkPlugins: [
+    // Include frontmatter as export
+    () => (tree, file) => {
+      tree.children.unshift({
+        type: 'mdxjsEsm',
+        value: `export const frontmatter = ${JSON.stringify(doc.data)}`,
+      })
+    }
+  ]
+})
+
+// In the compiled output
+import Content, { frontmatter } from './compiled.js'
+
+console.log(frontmatter.title) // 'Example'
+```
+
+## Error Handling
+
+```typescript
+import { compile, CompileError } from 'mdxld/compile'
+
+try {
+  const result = await compile(doc, { development: true })
+} catch (error) {
+  if (error instanceof CompileError) {
+    console.error('Compilation failed:')
+    console.error(`Line ${error.line}, Column ${error.column}`)
+    console.error(error.message)
+  }
+}
+```
+
+## Caching
+
+```typescript
+import { compile } from 'mdxld/compile'
+import { createHash } from 'crypto'
+
+const cache = new Map()
+
+async function compileWithCache(doc) {
+  const hash = createHash('md5')
+    .update(doc.content)
+    .update(JSON.stringify(doc.data))
+    .digest('hex')
+
+  if (cache.has(hash)) {
+    return cache.get(hash)
+  }
+
+  const result = await compile(doc)
+  cache.set(hash, result)
+  return result
+}
+```
+
+## Integration with Bundlers
+
+### Vite
+
+```typescript
+// vite.config.ts
+import mdx from '@mdx-js/rollup'
+
+export default {
+  plugins: [
+    mdx({
+      remarkPlugins: [],
+      rehypePlugins: [],
+    })
+  ]
+}
+```
+
+### Next.js
+
+```typescript
+// next.config.js
+import createMDX from '@next/mdx'
+
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+})
+
+export default withMDX({
+  pageExtensions: ['js', 'jsx', 'md', 'mdx'],
+})
+```

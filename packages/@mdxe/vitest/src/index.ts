@@ -82,6 +82,7 @@ export function parseMeta(meta: string): Record<string, string | boolean> {
 
   while ((match = regex.exec(meta)) !== null) {
     const [, key, quotedDouble, quotedSingle, unquoted] = match
+    if (!key) continue
     const value = quotedDouble ?? quotedSingle ?? unquoted
     result[key] = value ?? true
   }
@@ -120,8 +121,14 @@ export function extractTests(content: string, options: ExtractTestsOptions = {})
 
   function visitNode(node: MDXLDAstNode, lineOffset: number = 0): void {
     if (node.type === 'code') {
-      const lang = (node.lang as string) || ''
-      const meta = (node.meta as string) || ''
+      // mdxld puts the entire info string (lang + meta) in the lang property
+      const infoString = (node.lang as string) || ''
+
+      // Split info string into language and meta
+      // e.g., "ts test name=\"foo\"" -> lang="ts", meta="test name=\"foo\""
+      const parts = infoString.split(/\s+/)
+      const lang = parts[0] || ''
+      const meta = parts.slice(1).join(' ')
       const parsedMeta = parseMeta(meta)
 
       // Check if this is a test block
@@ -374,6 +381,63 @@ export function mdxTestPlugin(options: ExtractTestsOptions = {}) {
 }
 
 /**
+ * Strip TypeScript type annotations from code for execution
+ * This is a simple transform that handles common cases:
+ * - Type annotations: `const x: number`
+ * - Function parameter types: `(a: number, b: string)`
+ * - Return types: `function foo(): number`
+ * - Generic type parameters: `Array<number>`
+ * - Type assertions: `as Type`
+ * - Interface/type declarations
+ */
+function stripTypeScript(code: string): string {
+  // Remove interface and type declarations (entire lines)
+  let result = code.replace(/^\s*(interface|type)\s+\w+[^}]*\{[^}]*\}/gm, '')
+
+  // Remove type imports
+  result = result.replace(/import\s+type\s+[^;]+;?/g, '')
+  result = result.replace(/import\s*\{[^}]*type\s+[^}]*\}\s*from\s*['"][^'"]+['"];?/g, (match) => {
+    // Only remove type imports, keep value imports
+    return match.replace(/,?\s*type\s+\w+\s*(,|(?=\}))/g, '')
+  })
+
+  // Remove type annotations from variable declarations
+  // `const x: Type = ` -> `const x = `
+  result = result.replace(/(\b(?:const|let|var)\s+\w+)\s*:\s*[^=]+(?==)/g, '$1 ')
+
+  // Remove type annotations from function parameters
+  // Only match when followed by known TypeScript type patterns:
+  // - Primitive types: string, number, boolean, any, void, null, undefined, never, object, unknown
+  // - Array types: type[] or Array<type>
+  // - Generic uppercase types: Type, MyType, etc.
+  // This avoids matching object literal properties like {limit: perPage}
+  const typePattern = '(?:string|number|boolean|any|void|null|undefined|never|object|unknown|[A-Z]\\w*)(?:\\[\\]|<[^>]+>)?'
+  const paramTypeRegex = new RegExp(`(\\(\\s*\\w+)\\s*:\\s*${typePattern}(?=[,)])`, 'g')
+  const paramTypeRegex2 = new RegExp(`(,\\s*\\w+)\\s*:\\s*${typePattern}(?=[,)])`, 'g')
+  result = result.replace(paramTypeRegex, '$1')
+  result = result.replace(paramTypeRegex2, '$1')
+
+  // Remove return type annotations (but not ternary operators)
+  // `function foo(): Type {` -> `function foo() {`
+  // Only match when followed by { or =>
+  // Match both uppercase (custom types) and lowercase (string, number, boolean, etc.)
+  result = result.replace(/\)\s*:\s*[a-zA-Z][^{=>]*(?=\s*\{)/g, ') ')
+  result = result.replace(/\)\s*:\s*[a-zA-Z][^{=>]*(?=\s*=>)/g, ') ')
+
+  // Remove generic type parameters in declarations
+  // `Array<number>` -> `Array`
+  result = result.replace(/(\w+)<[^>]+>/g, '$1')
+
+  // Remove `as Type` assertions (but be careful with 'as' in strings)
+  result = result.replace(/\s+as\s+(?:const|[A-Z])[<>[\]\w\s|&]*(?=[;,)\]\s]|$)/g, '')
+
+  // Remove type-only exports
+  result = result.replace(/export\s+type\s+\{[^}]*\};?/g, '')
+
+  return result
+}
+
+/**
  * Run tests from an MDX file programmatically
  *
  * @param filePath - Path to MDX file
@@ -395,10 +459,13 @@ export async function runMDXTests(
     }
 
     try {
+      // Strip TypeScript types for execution
+      const jsCode = stripTypeScript(test.code)
+
       // Create a function from the test code
       const testFn = test.async
-        ? new Function('expect', `return (async () => { ${test.code} })()`)
-        : new Function('expect', test.code)
+        ? new Function('expect', `return (async () => { ${jsCode} })()`)
+        : new Function('expect', jsCode)
 
       // Simple expect implementation for standalone execution
       const expect = createSimpleExpect()

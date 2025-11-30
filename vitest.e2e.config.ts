@@ -20,6 +20,7 @@ export default defineConfig({
       // @mdxe packages
       '@mdxe/hono': path.resolve(__dirname, 'packages/@mdxe/hono/src/index.ts'),
       '@mdxe/ink': path.resolve(__dirname, 'packages/@mdxe/ink/src/index.ts'),
+      '@mdxe/vitest': path.resolve(__dirname, 'packages/@mdxe/vitest/src/index.ts'),
 
       // @mdxui packages
       '@mdxui/markdown': path.resolve(__dirname, 'packages/@mdxui/markdown/src/index.ts'),

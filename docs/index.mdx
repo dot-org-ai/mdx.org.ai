@@ -1,0 +1,154 @@
+---
+title: MDX.org.ai Documentation
+description: The complete MDX ecosystem for building AI-powered applications, databases, and user interfaces
+---
+
+# MDX.org.ai
+
+Welcome to the MDX.org.ai documentation. This ecosystem provides a comprehensive set of tools for working with MDX (Markdown + JSX) enhanced with Linked Data capabilities.
+
+## What is MDX.org.ai?
+
+MDX.org.ai is a suite of packages that extend MDX with:
+
+- **Linked Data** - Semantic frontmatter with JSON-LD compatibility
+- **Database Storage** - Store and query MDX documents in various databases
+- **Execution Runtimes** - Run MDX in different environments
+- **AI Integration** - Build and deploy AI agents with MDX
+- **UI Components** - Render MDX with customizable components
+
+## Packages
+
+### Core
+
+| Package | Description |
+|---------|-------------|
+| [mdxld](/docs/mdxld) | Parse, stringify, validate, and compile MDXLD documents |
+
+### Storage
+
+| Package | Description |
+|---------|-------------|
+| [mdxdb](/docs/mdxdb) | MDX document database with multiple storage adapters |
+
+### Execution
+
+| Package | Description |
+|---------|-------------|
+| [mdxe](/docs/mdxe) | Execute MDX in various runtime environments |
+
+### AI
+
+| Package | Description |
+|---------|-------------|
+| [mdxai](/docs/mdxai) | Build and deploy MDX-based AI agents |
+
+### UI
+
+| Package | Description |
+|---------|-------------|
+| [mdxui](/docs/mdxui) | Render MDX with customizable UI components |
+
+## Quick Start
+
+Install the core package:
+
+```bash
+npm install mdxld
+```
+
+Parse an MDXLD document:
+
+```typescript
+import { parse } from 'mdxld'
+
+const doc = parse(`---
+$type: Article
+title: Hello World
+author: https://example.com/authors/jane
+---
+
+# Hello World
+
+This is an **MDXLD** document with linked data.
+`)
+
+console.log(doc.data.$type) // 'Article'
+console.log(doc.data.title) // 'Hello World'
+```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        mdxai                                │
+│              (AI Agents & MCP Server)                       │
+├─────────────────────────────────────────────────────────────┤
+│                         mdxe                                │
+│        (Execution: Next.js, Hono, Workers, etc.)           │
+├─────────────────────────────────────────────────────────────┤
+│                        mdxdb                                │
+│     (Storage: FS, SQLite, Postgres, MongoDB, etc.)         │
+├─────────────────────────────────────────────────────────────┤
+│                        mdxld                                │
+│           (Core: Parse, Validate, Compile)                  │
+├─────────────────────────────────────────────────────────────┤
+│                        mdxui                                │
+│         (Rendering: HTML, Markdown, Shadcn)                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Features
+
+### Linked Data Support
+
+MDXLD extends standard MDX frontmatter with JSON-LD compatible properties:
+
+- `$type` / `@type` - Document type (maps to schema.org or custom types)
+- `$id` / `@id` - Unique document identifier
+- `$context` / `@context` - JSON-LD context for vocabulary
+
+### Type-Safe Validation
+
+Use ArkType schemas to validate your documents:
+
+```typescript
+import { parse } from 'mdxld'
+import { type } from 'arktype'
+
+const Article = type({
+  '$type': '"Article"',
+  'title': 'string',
+  'author': 'string',
+  'publishedAt?': 'Date',
+})
+
+const doc = parse(content)
+const result = Article(doc.data)
+```
+
+### Multiple Storage Backends
+
+Store MDX documents in your preferred database:
+
+```typescript
+import { createDatabase } from '@mdxdb/fs'
+// or @mdxdb/sqlite, @mdxdb/postgres, @mdxdb/mongo, etc.
+
+const db = createDatabase({ path: './content' })
+await db.set('posts/hello-world', doc)
+```
+
+### Execution Environments
+
+Run MDX in various environments:
+
+- **@mdxe/next** - Next.js App Router integration
+- **@mdxe/hono** - Hono web framework
+- **@mdxe/workers** - Cloudflare Workers
+- **@mdxe/node** - Node.js runtime
+- **@mdxe/vitest** - Test MDX with Vitest
+
+## License
+
+MIT
