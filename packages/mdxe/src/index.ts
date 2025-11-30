@@ -1,21 +1,25 @@
+/**
+ * MDXE - Execute, Test, & Deploy MDX-based Agents, Apps, APIs, and Sites
+ *
+ * @packageDocumentation
+ */
+
 export const name = 'mdxe'
 
-export function dev(): void {
-  // TODO: Implement dev command
-}
+// Export all types
+export type {
+  ExecutionContext,
+  ExecutionResult,
+  DoOptions,
+  DoResult,
+  TestOptions,
+  TestResult,
+  DeployOptions,
+  DeployResult,
+  Executor,
+  ExecutorConfig,
+  CreateExecutor,
+} from './types.js'
 
-export function test(): void {
-  // TODO: Implement test command
-}
-
-export function build(): void {
-  // TODO: Implement build command
-}
-
-export function start(): void {
-  // TODO: Implement start command
-}
-
-export function deploy(): void {
-  // TODO: Implement deploy command
-}
+// Re-export mdxld types for convenience
+export type { MDXLDDocument, MDXLDData } from 'mdxld'
