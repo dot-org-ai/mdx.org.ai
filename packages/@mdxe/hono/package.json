@@ -1,7 +1,7 @@
 {
   "name": "@mdxe/hono",
   "version": "0.0.0",
-  "description": "Hono integration for mdxe",
+  "description": "Serve and render MDXLD documents with Hono",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -28,11 +28,21 @@
   },
   "keywords": [
     "mdxe",
+    "mdxld",
     "hono",
-    "framework"
+    "web",
+    "server",
+    "edge"
   ],
   "license": "MIT",
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "peerDependencies": {
+    "hono": "^4.0.0"
+  },
   "devDependencies": {
+    "hono": "^4.6.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
