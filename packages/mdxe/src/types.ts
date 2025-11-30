@@ -121,6 +121,75 @@ export interface DeployOptions {
 }
 
 /**
+ * Cloudflare-specific deploy options
+ */
+export interface CloudflareDeployOptions extends DeployOptions {
+  platform: 'cloudflare'
+  /** Cloudflare account ID */
+  accountId?: string
+  /** Cloudflare API token */
+  apiToken?: string
+  /** Project name for Cloudflare */
+  projectName?: string
+  /** Use OpenNext for SSR (dynamic) or Static Assets */
+  mode?: 'static' | 'opennext'
+  /** Compatibility date for Workers */
+  compatibilityDate?: string
+  /** Compatibility flags */
+  compatibilityFlags?: string[]
+  /** Custom routes configuration */
+  routes?: string[]
+  /** KV namespace bindings */
+  kvNamespaces?: Record<string, string>
+  /** D1 database bindings */
+  d1Databases?: Record<string, string>
+  /** R2 bucket bindings */
+  r2Buckets?: Record<string, string>
+
+  /**
+   * Use direct Cloudflare API instead of wrangler CLI
+   * Enables custom auth and multi-tenant namespace support
+   */
+  useApi?: boolean
+
+  /**
+   * Custom Cloudflare API base URL
+   * Use this to proxy requests through your own auth server
+   * @default 'https://api.cloudflare.com/client/v4'
+   */
+  apiBaseUrl?: string
+
+  /**
+   * Custom headers to include in API requests
+   * Useful for tenant-specific authentication
+   */
+  apiHeaders?: Record<string, string>
+
+  /**
+   * Deploy to a dispatch namespace for multi-tenant isolation
+   * Creates isolated worker instances per tenant
+   */
+  dispatchNamespace?: string
+
+  /**
+   * Tenant/customer identifier for namespace isolation
+   */
+  tenantId?: string
+}
+
+/**
+ * Source type detection result
+ */
+export interface SourceTypeInfo {
+  /** Whether the source is static (fs-based) */
+  isStatic: boolean
+  /** Detected source adapter */
+  adapter?: 'fs' | 'sqlite' | 'postgres' | 'mongo' | 'api' | 'clickhouse' | 'unknown'
+  /** Path to source configuration */
+  configPath?: string
+}
+
+/**
  * Deploy result
  */
 export interface DeployResult {

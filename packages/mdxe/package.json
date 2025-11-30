@@ -6,11 +6,24 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "mdxe": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./deploy": {
+      "types": "./dist/commands/deploy.d.ts",
+      "import": "./dist/commands/deploy.js",
+      "require": "./dist/commands/deploy.cjs"
+    },
+    "./cloudflare": {
+      "types": "./dist/cloudflare/api.d.ts",
+      "import": "./dist/cloudflare/api.js",
+      "require": "./dist/cloudflare/api.cjs"
     }
   },
   "files": [
@@ -30,13 +43,18 @@
     "mdx",
     "mdxe",
     "execute",
-    "deploy"
+    "deploy",
+    "cloudflare",
+    "workers",
+    "fumadocs",
+    "opennext"
   ],
   "license": "MIT",
   "peerDependencies": {
     "mdxld": "workspace:*"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.9",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
