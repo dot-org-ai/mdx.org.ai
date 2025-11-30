@@ -1,21 +1,30 @@
+/**
+ * MDXDB - Create, Manage, & Publish MDX & URL-centric File System & Database
+ *
+ * @packageDocumentation
+ */
+
 export const name = 'mdxdb'
 
-export function list(): void {
-  // TODO: Implement list command
-}
+// API Client for connecting to remote mdxdb servers
+export { ApiClient, createApiClient } from './client.js'
+export type { ApiClientConfig } from './client.js'
 
-export function search(): void {
-  // TODO: Implement search command
-}
+// Export all types
+export type {
+  ListOptions,
+  ListResult,
+  SearchOptions,
+  SearchResult,
+  GetOptions,
+  SetOptions,
+  SetResult,
+  DeleteOptions,
+  DeleteResult,
+  Database,
+  DatabaseConfig,
+  CreateDatabase,
+} from './types.js'
 
-export function get(): void {
-  // TODO: Implement get command
-}
-
-export function set(): void {
-  // TODO: Implement set command
-}
-
-export function del(): void {
-  // TODO: Implement delete command
-}
+// Re-export mdxld types for convenience
+export type { MDXLDDocument, MDXLDData, LDProperties } from 'mdxld'
