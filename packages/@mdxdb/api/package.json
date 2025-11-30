@@ -1,7 +1,7 @@
 {
   "name": "@mdxdb/api",
   "version": "0.0.0",
-  "description": "HTTP API adapter for mdxdb",
+  "description": "HTTP API server for mdxdb using Hono - works with any runtime",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -11,6 +11,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
     }
   },
   "files": [
@@ -31,10 +36,22 @@
     "api",
     "http",
     "rest",
+    "hono",
     "adapter"
   ],
   "license": "MIT",
+  "dependencies": {
+    "hono": "^4.6.0"
+  },
+  "peerDependencies": {
+    "mdxdb": "workspace:*",
+    "mdxld": "workspace:*"
+  },
   "devDependencies": {
+    "@mdxdb/fs": "workspace:*",
+    "@mdxdb/sqlite": "workspace:*",
+    "mdxdb": "workspace:*",
+    "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
