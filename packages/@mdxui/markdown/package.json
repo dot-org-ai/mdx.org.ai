@@ -1,7 +1,7 @@
 {
   "name": "@mdxui/markdown",
   "version": "0.0.0",
-  "description": "Markdown renderer for mdxui",
+  "description": "Render MDXLD documents to clean markdown (string to string)",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -29,9 +29,14 @@
   "keywords": [
     "mdxui",
     "markdown",
-    "renderer"
+    "renderer",
+    "mdxld",
+    "mdx"
   ],
   "license": "MIT",
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
   "devDependencies": {
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
