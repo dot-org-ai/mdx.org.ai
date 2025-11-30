@@ -6,11 +6,19 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "mdxai": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js",
+      "require": "./dist/cli.cjs"
     }
   },
   "files": [
@@ -30,10 +38,20 @@
     "mdx",
     "mdxai",
     "ai",
-    "agents"
+    "agents",
+    "claude",
+    "mcp"
   ],
   "license": "MIT",
+  "dependencies": {
+    "@mdxdb/fs": "workspace:*",
+    "@mdxdb/sqlite": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.23.0",
+    "zod": "^3.24.0"
+  },
   "devDependencies": {
+    "mdxdb": "workspace:*",
+    "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
