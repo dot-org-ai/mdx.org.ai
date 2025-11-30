@@ -1,7 +1,7 @@
 {
   "name": "@mdxe/node",
   "version": "0.0.0",
-  "description": "Node.js runtime for mdxe",
+  "description": "Securely evaluate MDX in Node.js using miniflare workerd runtime",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -29,9 +29,19 @@
   "keywords": [
     "mdxe",
     "node",
-    "runtime"
+    "runtime",
+    "miniflare",
+    "workerd",
+    "isolate",
+    "sandbox",
+    "mdx",
+    "evaluate"
   ],
   "license": "MIT",
+  "dependencies": {
+    "@mdxe/isolate": "workspace:*",
+    "miniflare": "^4.20250508.2"
+  },
   "devDependencies": {
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

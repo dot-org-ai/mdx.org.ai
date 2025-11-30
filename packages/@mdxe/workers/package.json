@@ -1,7 +1,7 @@
 {
   "name": "@mdxe/workers",
   "version": "0.0.0",
-  "description": "Cloudflare Workers runtime for mdxe",
+  "description": "Securely evaluate MDX in Cloudflare Workers using Dynamic Worker Loader",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -30,10 +30,19 @@
     "mdxe",
     "workers",
     "cloudflare",
-    "runtime"
+    "runtime",
+    "isolate",
+    "sandbox",
+    "mdx",
+    "evaluate"
   ],
   "license": "MIT",
+  "dependencies": {
+    "@mdxe/isolate": "workspace:*"
+  },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "wrangler": "^4.21.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

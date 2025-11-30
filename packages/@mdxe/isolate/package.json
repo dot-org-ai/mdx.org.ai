@@ -1,7 +1,7 @@
 {
   "name": "@mdxe/isolate",
   "version": "0.0.0",
-  "description": "Isolated runtime for mdxe",
+  "description": "Compile MDX to isolated Worker modules for secure execution",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -30,10 +30,18 @@
     "mdxe",
     "isolate",
     "sandbox",
-    "runtime"
+    "runtime",
+    "workers",
+    "workerd",
+    "mdx"
   ],
   "license": "MIT",
+  "dependencies": {
+    "@mdx-js/mdx": "^3.1.0",
+    "mdxld": "workspace:*"
+  },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
