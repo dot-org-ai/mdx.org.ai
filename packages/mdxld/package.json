@@ -22,6 +22,11 @@
       "import": "./dist/compile.js",
       "require": "./dist/compile.cjs"
     },
+    "./validate": {
+      "types": "./dist/validate.d.ts",
+      "import": "./dist/validate.js",
+      "require": "./dist/validate.cjs"
+    },
     "./types": {
       "types": "./dist/types.d.ts",
       "import": "./dist/types.js",
@@ -49,10 +54,21 @@
     "parse",
     "stringify",
     "compile",
-    "ast"
+    "ast",
+    "validate",
+    "arktype"
   ],
   "license": "MIT",
+  "peerDependencies": {
+    "arktype": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "arktype": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "arktype": "^2.1.27",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

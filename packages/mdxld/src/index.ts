@@ -17,7 +17,13 @@ export type {
   MDXLDAstNodeType,
   ParseOptions,
   StringifyOptions,
+  // Generic type utilities
+  TypedData,
+  ExtractType,
 } from './types.js'
+
+// Type guard and factory functions
+export { isType, isOneOfTypes, createTypedDocument } from './types.js'
 
 // Core functions
 export { parse } from './parse.js'
