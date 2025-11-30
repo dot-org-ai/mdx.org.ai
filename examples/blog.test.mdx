@@ -1,0 +1,103 @@
+---
+$type: TestSuite
+title: Tests for Getting Started Blog Post
+sourceFile: ./blog.mdx
+---
+
+# Tests for Getting Started Blog Post
+
+This is a **companion test file** for `blog.mdx`.
+It tests the utility functions defined in the blog post.
+
+## String Utility Tests
+
+### Capitalize Tests
+
+```ts test name="capitalize capitalizes first letter"
+function capitalize(str: string): string {
+  if (!str) return ''
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+expect(capitalize('hello')).toBe('Hello')
+expect(capitalize('world')).toBe('World')
+expect(capitalize('a')).toBe('A')
+```
+
+```ts test name="capitalize handles edge cases"
+function capitalize(str: string): string {
+  if (!str) return ''
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+expect(capitalize('')).toBe('')
+expect(capitalize('HELLO')).toBe('HELLO')
+expect(capitalize('123abc')).toBe('123abc')
+```
+
+### Slugify Tests
+
+```ts test name="slugify creates URL-friendly slugs"
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+expect(slugify('Hello World')).toBe('hello-world')
+expect(slugify('Getting Started with MDX')).toBe('getting-started-with-mdx')
+```
+
+```ts test name="slugify handles special characters"
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+expect(slugify('Hello, World!')).toBe('hello-world')
+expect(slugify('Test@#$%String')).toBe('teststring')
+expect(slugify('  spaces  ')).toBe('spaces')
+```
+
+```ts test name="slugify normalizes dashes"
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+expect(slugify('hello---world')).toBe('hello-world')
+expect(slugify('hello___world')).toBe('hello-world')
+expect(slugify('hello   world')).toBe('hello-world')
+```
+
+## Edge Cases
+
+```ts test name="empty inputs handled correctly"
+function capitalize(str: string): string {
+  if (!str) return ''
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+expect(capitalize('')).toBe('')
+expect(slugify('')).toBe('')
+```

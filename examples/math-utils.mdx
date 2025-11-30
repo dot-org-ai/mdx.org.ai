@@ -1,0 +1,100 @@
+---
+$type: Documentation
+title: Math Utilities
+description: A collection of math utility functions with inline tests
+---
+
+# Math Utilities
+
+This document demonstrates **literate programming** with inline tests.
+Each code block marked with `test` will be executed as a test.
+
+## Addition
+
+The `add` function adds two numbers together.
+
+```ts test name="addition works correctly"
+const add = (a: number, b: number) => a + b
+
+expect(add(1, 2)).toBe(3)
+expect(add(-1, 1)).toBe(0)
+expect(add(0, 0)).toBe(0)
+```
+
+## Multiplication
+
+The `multiply` function multiplies two numbers.
+
+```ts test name="multiplication works correctly"
+const multiply = (a: number, b: number) => a * b
+
+expect(multiply(2, 3)).toBe(6)
+expect(multiply(-2, 3)).toBe(-6)
+expect(multiply(0, 100)).toBe(0)
+```
+
+## Array Operations
+
+### Sum Array
+
+Sum all numbers in an array.
+
+```ts test name="sumArray adds all elements"
+const sumArray = (arr: number[]) => arr.reduce((a, b) => a + b, 0)
+
+expect(sumArray([1, 2, 3])).toBe(6)
+expect(sumArray([])).toBe(0)
+expect(sumArray([10])).toBe(10)
+```
+
+### Average
+
+Calculate the average of an array.
+
+```ts test name="average calculates correctly"
+const average = (arr: number[]) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
+
+expect(average([1, 2, 3])).toBe(2)
+expect(average([10, 20])).toBe(15)
+expect(average([])).toBe(0)
+```
+
+## Skipped Tests
+
+Sometimes you want to skip a test temporarily.
+
+```ts skip name="this test is skipped"
+// This test will be skipped
+expect(true).toBe(false)
+```
+
+## Async Operations
+
+You can also write async tests.
+
+```ts test async name="async delay works"
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+const start = Date.now()
+await delay(10)
+const elapsed = Date.now() - start
+
+expect(elapsed).toBeGreaterThan(5)
+```
+
+## Non-test Code Blocks
+
+Regular code blocks without the `test` flag are just for documentation.
+
+```ts
+// This is just documentation, not a test
+function exampleUsage() {
+  const result = add(1, 2)
+  console.log(result) // 3
+}
+```
+
+```javascript
+// JavaScript example (not TypeScript)
+const greeting = 'Hello, World!'
+```
