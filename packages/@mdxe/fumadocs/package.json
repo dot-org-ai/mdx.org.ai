@@ -1,0 +1,63 @@
+{
+  "name": "@mdxe/fumadocs",
+  "version": "0.0.0",
+  "description": "Next.js integration for MDX with Fumadocs",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./components": {
+      "types": "./dist/components.d.ts",
+      "import": "./dist/components.js",
+      "require": "./dist/components.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxe",
+    "fumadocs",
+    "nextjs",
+    "mdx",
+    "documentation",
+    "react"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "mdxld": "workspace:*",
+    "@mdxdb/fumadocs": "workspace:*"
+  },
+  "peerDependencies": {
+    "fumadocs-core": ">=14.0.0",
+    "fumadocs-ui": ">=14.0.0",
+    "next": ">=14.0.0",
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "fumadocs-core": "^14.0.0",
+    "fumadocs-ui": "^14.0.0",
+    "next": "^15.0.0",
+    "react": "^18.3.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

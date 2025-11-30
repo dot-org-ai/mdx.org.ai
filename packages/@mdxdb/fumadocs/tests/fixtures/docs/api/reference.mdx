@@ -1,0 +1,38 @@
+---
+title: API Methods
+description: Available API methods
+icon: Code
+---
+
+# API Methods
+
+## createSource
+
+Creates a new source from documents.
+
+```typescript
+function createSource(
+  documents: Array<[string, MDXLDDocument]>,
+  options?: CreateSourceOptions
+): FumadocsSource
+```
+
+### Parameters
+
+- `documents` - Array of path and document tuples
+- `options` - Optional configuration
+
+### Returns
+
+A Fumadocs-compatible source object.
+
+## queryToSource
+
+Converts query results to a source.
+
+```typescript
+function queryToSource(
+  documents: MDXLDDocument[],
+  options?: CreateSourceOptions
+): FumadocsSource
+```
