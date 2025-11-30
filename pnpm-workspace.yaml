@@ -1,0 +1,6 @@
+packages:
+  - 'packages/*'
+  - 'packages/@mdxe/*'
+  - 'packages/@mdxai/*'
+  - 'packages/@mdxdb/*'
+  - 'packages/@mdxui/*'

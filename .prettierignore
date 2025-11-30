@@ -1,0 +1,6 @@
+dist
+node_modules
+.turbo
+coverage
+*.md
+pnpm-lock.yaml
