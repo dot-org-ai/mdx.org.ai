@@ -1,7 +1,7 @@
 {
   "name": "@mdxdb/sqlite",
   "version": "0.0.0",
-  "description": "SQLite adapter for mdxdb",
+  "description": "SQLite adapter for mdxdb - stores MDX documents in SQLite",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -30,10 +30,21 @@
     "mdxdb",
     "sqlite",
     "database",
-    "adapter"
+    "adapter",
+    "mdx"
   ],
   "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.7.0"
+  },
+  "peerDependencies": {
+    "mdxdb": "workspace:*",
+    "mdxld": "workspace:*"
+  },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "mdxdb": "workspace:*",
+    "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
