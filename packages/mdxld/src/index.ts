@@ -1,17 +1,29 @@
-export const name = 'mdxld'
+/**
+ * MDXLD - Parse, Stringify, Validate, and Compile MDXLD Documents
+ *
+ * @packageDocumentation
+ */
 
-export function parse(): void {
-  // TODO: Implement parse
-}
+// Core types
+export type {
+  LDProperties,
+  MDXLDData,
+  MDXLDDocument,
+  MDXLDDocumentWithAST,
+  MDXLDDocumentWithCode,
+  MDXLDDocumentFull,
+  MDXLDAst,
+  MDXLDAstNode,
+  MDXLDAstNodeType,
+  ParseOptions,
+  StringifyOptions,
+} from './types.js'
 
-export function stringify(): void {
-  // TODO: Implement stringify
-}
+// Core functions
+export { parse } from './parse.js'
+export { stringify } from './stringify.js'
 
-export function validate(): void {
-  // TODO: Implement validate
-}
-
-export function compile(): void {
-  // TODO: Implement compile
-}
+// Re-export for convenience (tree-shakable via submodules)
+export { toAst, fromAst, parseWithAst, stringifyAst } from './ast.js'
+export { compile, compileFromString, evaluate } from './compile.js'
+export type { CompileOptions } from './compile.js'
