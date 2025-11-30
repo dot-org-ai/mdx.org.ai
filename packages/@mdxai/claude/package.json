@@ -1,7 +1,7 @@
 {
   "name": "@mdxai/claude",
   "version": "0.0.0",
-  "description": "Claude integration for mdxai",
+  "description": "Claude Agent SDK integration for MDX - exposes mdxdb and mdxe as Claude tools",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -11,6 +11,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./tools": {
+      "types": "./dist/tools.d.ts",
+      "import": "./dist/tools.js",
+      "require": "./dist/tools.cjs"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
     }
   },
   "files": [
@@ -30,10 +40,26 @@
     "mdxai",
     "claude",
     "anthropic",
-    "ai"
+    "ai",
+    "agent-sdk",
+    "mcp",
+    "tools"
   ],
   "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.1.0",
+    "zod": "^3.24.0"
+  },
+  "peerDependencies": {
+    "mdxdb": "workspace:*",
+    "mdxe": "workspace:*",
+    "mdxld": "workspace:*"
+  },
   "devDependencies": {
+    "@mdxdb/fs": "workspace:*",
+    "mdxdb": "workspace:*",
+    "mdxe": "workspace:*",
+    "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
