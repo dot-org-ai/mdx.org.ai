@@ -1,7 +1,7 @@
 {
   "name": "@mdxe/ink",
   "version": "0.0.0",
-  "description": "Ink CLI integration for mdxe",
+  "description": "Render MDXLD documents in the terminal with Ink",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -28,12 +28,25 @@
   },
   "keywords": [
     "mdxe",
+    "mdxld",
     "ink",
     "cli",
-    "terminal"
+    "terminal",
+    "react"
   ],
   "license": "MIT",
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "peerDependencies": {
+    "ink": "^5.0.0",
+    "react": "^18.0.0"
+  },
   "devDependencies": {
+    "@types/react": "^18.3.0",
+    "ink": "^5.0.1",
+    "ink-testing-library": "^4.0.0",
+    "react": "^18.3.1",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
