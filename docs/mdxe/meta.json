@@ -1,0 +1,6 @@
+{
+  "title": "mdxe",
+  "root": true,
+  "defaultOpen": true,
+  "pages": ["index", "getting-started", "runtimes", "isolate", "vitest", "fumadocs"]
+}

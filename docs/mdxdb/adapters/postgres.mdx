@@ -1,0 +1,139 @@
+---
+title: "@mdxdb/postgres"
+description: PostgreSQL storage adapter
+---
+
+# @mdxdb/postgres
+
+Store MDXLD documents in PostgreSQL.
+
+## Installation
+
+```bash
+npm install @mdxdb/postgres
+```
+
+## Usage
+
+```typescript
+import { createDatabase } from '@mdxdb/postgres'
+
+const db = createDatabase({
+  connectionString: process.env.DATABASE_URL,
+})
+```
+
+## Configuration
+
+```typescript
+interface PostgresConfig {
+  /** Connection string */
+  connectionString?: string
+
+  /** Or individual options */
+  host?: string
+  port?: number
+  database?: string
+  user?: string
+  password?: string
+
+  /** Schema name (default: 'mdxdb') */
+  schema?: string
+
+  /** Enable full-text search (default: true) */
+  fts?: boolean
+
+  /** Connection pool size */
+  poolSize?: number
+}
+```
+
+## Schema
+
+```sql
+CREATE SCHEMA IF NOT EXISTS mdxdb;
+
+CREATE TABLE mdxdb.documents (
+  path TEXT PRIMARY KEY,
+  type TEXT,
+  data JSONB,
+  content TEXT,
+  search_vector TSVECTOR,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_documents_type ON mdxdb.documents(type);
+CREATE INDEX idx_documents_search ON mdxdb.documents USING GIN(search_vector);
+CREATE INDEX idx_documents_data ON mdxdb.documents USING GIN(data);
+```
+
+## Examples
+
+### Basic Usage
+
+```typescript
+import { createDatabase } from '@mdxdb/postgres'
+
+const db = createDatabase({
+  host: 'localhost',
+  database: 'myapp',
+  user: 'postgres',
+  password: 'secret',
+})
+
+await db.set('posts/hello', doc)
+const post = await db.get('posts/hello')
+```
+
+### Full-Text Search
+
+PostgreSQL's powerful full-text search:
+
+```typescript
+const results = await db.search('typescript & react', {
+  fields: ['title', 'content'],
+  limit: 20,
+})
+```
+
+### JSONB Queries
+
+Query documents by metadata:
+
+```typescript
+// Custom query for tagged documents
+const tagged = await db.query(`
+  SELECT * FROM mdxdb.documents
+  WHERE data @> '{"tags": ["typescript"]}'
+`)
+```
+
+### Connection Pooling
+
+```typescript
+const db = createDatabase({
+  connectionString: process.env.DATABASE_URL,
+  poolSize: 20,
+})
+```
+
+## Migrations
+
+The adapter handles migrations automatically:
+
+```typescript
+const db = createDatabase({
+  connectionString: process.env.DATABASE_URL,
+})
+
+// Run migrations on startup
+await db.migrate()
+```
+
+## Best Practices
+
+1. **Use connection pooling** - Set appropriate pool size
+2. **Index JSONB fields** - For frequently queried metadata
+3. **Use read replicas** - For read-heavy workloads
+4. **Regular vacuuming** - Maintain database health

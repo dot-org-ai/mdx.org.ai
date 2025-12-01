@@ -1,0 +1,169 @@
+---
+title: "@mdxe/node"
+description: Node.js MDX execution runtime
+---
+
+# @mdxe/node
+
+Execute MDX documents in Node.js with full access to the runtime.
+
+## Installation
+
+```bash
+npm install @mdxe/node
+```
+
+## Usage
+
+```typescript
+import { execute } from '@mdxe/node'
+
+const mdx = `
+# Hello from Node.js
+
+Current directory: {process.cwd()}
+`
+
+const result = await execute(mdx)
+```
+
+## Configuration
+
+```typescript
+interface NodeExecuteOptions {
+  /** Working directory */
+  cwd?: string
+
+  /** Custom components */
+  components?: Record<string, Component>
+
+  /** Scope variables */
+  scope?: Record<string, unknown>
+
+  /** Output format */
+  outputFormat?: 'react' | 'html' | 'string'
+
+  /** Enable source maps */
+  sourceMaps?: boolean
+}
+```
+
+## Features
+
+### File System Access
+
+```typescript
+import { execute } from '@mdxe/node'
+import { readFile } from 'fs/promises'
+
+const mdx = await readFile('./content/page.mdx', 'utf-8')
+const result = await execute(mdx, {
+  cwd: './content',
+})
+```
+
+### HTML Output
+
+```typescript
+const { html } = await execute(mdx, {
+  outputFormat: 'html',
+})
+
+// Returns rendered HTML string
+console.log(html)
+```
+
+### Custom Components
+
+```typescript
+import { execute } from '@mdxe/node'
+
+const result = await execute(mdx, {
+  components: {
+    CodeBlock: ({ code, language }) => (
+      <pre data-language={language}>
+        <code>{code}</code>
+      </pre>
+    ),
+    Alert: ({ type, children }) => (
+      <div className={`alert alert-${type}`}>
+        {children}
+      </div>
+    ),
+  },
+})
+```
+
+### Scope Injection
+
+```typescript
+const result = await execute(mdx, {
+  scope: {
+    user: { name: 'John', role: 'admin' },
+    config: { theme: 'dark' },
+  },
+})
+
+// In MDX:
+// Welcome, {user.name}!
+// Theme: {config.theme}
+```
+
+## Server Integration
+
+### Express
+
+```typescript
+import express from 'express'
+import { execute } from '@mdxe/node'
+
+const app = express()
+
+app.get('/docs/:slug', async (req, res) => {
+  const mdx = await loadContent(req.params.slug)
+  const { html } = await execute(mdx, {
+    outputFormat: 'html',
+  })
+
+  res.send(html)
+})
+```
+
+### Fastify
+
+```typescript
+import Fastify from 'fastify'
+import { execute } from '@mdxe/node'
+
+const app = Fastify()
+
+app.get('/docs/:slug', async (request, reply) => {
+  const mdx = await loadContent(request.params.slug)
+  const { html } = await execute(mdx, {
+    outputFormat: 'html',
+  })
+
+  return reply.type('text/html').send(html)
+})
+```
+
+## CLI Usage
+
+```typescript
+import { execute } from '@mdxe/node'
+import { renderToStaticMarkup } from 'react-dom/server'
+
+// Build script
+const files = await glob('content/**/*.mdx')
+
+for (const file of files) {
+  const mdx = await readFile(file, 'utf-8')
+  const { content } = await execute(mdx)
+  const html = renderToStaticMarkup(content)
+
+  await writeFile(
+    file.replace('.mdx', '.html'),
+    html
+  )
+}
+```

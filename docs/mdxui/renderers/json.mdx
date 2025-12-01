@@ -1,0 +1,281 @@
+---
+title: "@mdxui/json"
+description: Render MDX to JSON
+---
+
+# @mdxui/json
+
+Serialize MDX documents to JSON for APIs and storage.
+
+## Installation
+
+```bash
+npm install @mdxui/json
+```
+
+## Usage
+
+```typescript
+import { renderToJSON } from '@mdxui/json'
+
+const mdx = `
+---
+title: Hello World
+---
+
+# Welcome
+
+This is a **paragraph**.
+`
+
+const json = await renderToJSON(mdx)
+```
+
+## Output Structure
+
+```typescript
+interface JSONOutput {
+  /** Frontmatter data */
+  frontmatter: Record<string, unknown>
+
+  /** Document content tree */
+  content: ContentNode
+
+  /** Table of contents */
+  toc: TocEntry[]
+
+  /** Export values */
+  exports: Record<string, unknown>
+}
+
+interface ContentNode {
+  type: string
+  props?: Record<string, unknown>
+  children?: (ContentNode | string)[]
+}
+```
+
+## Example Output
+
+```json
+{
+  "frontmatter": {
+    "title": "Hello World"
+  },
+  "content": {
+    "type": "root",
+    "children": [
+      {
+        "type": "heading",
+        "props": { "depth": 1, "id": "welcome" },
+        "children": ["Welcome"]
+      },
+      {
+        "type": "paragraph",
+        "children": [
+          "This is a ",
+          { "type": "strong", "children": ["paragraph"] },
+          "."
+        ]
+      }
+    ]
+  },
+  "toc": [
+    { "id": "welcome", "text": "Welcome", "depth": 1 }
+  ],
+  "exports": {}
+}
+```
+
+## Configuration
+
+```typescript
+interface JSONRenderOptions {
+  /** Include frontmatter */
+  frontmatter?: boolean
+
+  /** Include TOC */
+  toc?: boolean
+
+  /** Include exports */
+  exports?: boolean
+
+  /** Flatten text nodes */
+  flattenText?: boolean
+
+  /** Custom node transforms */
+  transforms?: Record<string, Transform>
+}
+```
+
+## Features
+
+### Flat Text Nodes
+
+```typescript
+const json = await renderToJSON(mdx, {
+  flattenText: true,
+})
+
+// Output:
+{
+  "type": "paragraph",
+  "text": "This is a paragraph.",
+  "formatting": [
+    { "type": "strong", "start": 10, "end": 19 }
+  ]
+}
+```
+
+### Custom Transforms
+
+```typescript
+const json = await renderToJSON(mdx, {
+  transforms: {
+    // Transform code blocks
+    code: (node) => ({
+      type: 'codeBlock',
+      language: node.props.className?.replace('language-', ''),
+      code: node.children[0],
+    }),
+
+    // Transform custom components
+    Callout: (node) => ({
+      type: 'callout',
+      variant: node.props.type,
+      content: node.children,
+    }),
+  },
+})
+```
+
+### Selective Output
+
+```typescript
+// Content only
+const contentOnly = await renderToJSON(mdx, {
+  frontmatter: false,
+  toc: false,
+  exports: false,
+})
+
+// Metadata only
+const metaOnly = await renderToJSON(mdx, {
+  content: false,
+  frontmatter: true,
+  toc: true,
+})
+```
+
+## Use Cases
+
+### API Response
+
+```typescript
+import { renderToJSON } from '@mdxui/json'
+
+app.get('/api/content/:slug', async (req, res) => {
+  const mdx = await getContent(req.params.slug)
+  const json = await renderToJSON(mdx)
+
+  res.json({
+    ...json.frontmatter,
+    content: json.content,
+    toc: json.toc,
+  })
+})
+```
+
+### Database Storage
+
+```typescript
+import { renderToJSON } from '@mdxui/json'
+import { db } from './database'
+
+async function saveDocument(path: string, mdx: string) {
+  const json = await renderToJSON(mdx)
+
+  await db.documents.upsert({
+    path,
+    title: json.frontmatter.title,
+    content: JSON.stringify(json.content),
+    toc: JSON.stringify(json.toc),
+    raw: mdx,
+  })
+}
+```
+
+### Search Indexing
+
+```typescript
+import { renderToJSON } from '@mdxui/json'
+
+async function indexDocument(path: string, mdx: string) {
+  const json = await renderToJSON(mdx, {
+    flattenText: true,
+  })
+
+  return {
+    path,
+    title: json.frontmatter.title,
+    description: json.frontmatter.description,
+    text: extractText(json.content),
+    headings: json.toc.map(t => t.text),
+  }
+}
+```
+
+### Content Migration
+
+```typescript
+import { renderToJSON } from '@mdxui/json'
+
+// Convert MDX to portable format
+const docs = await glob('docs/**/*.mdx')
+
+const exported = await Promise.all(
+  docs.map(async (path) => {
+    const mdx = await readFile(path, 'utf-8')
+    const json = await renderToJSON(mdx)
+
+    return {
+      path: path.replace('docs/', ''),
+      ...json,
+    }
+  })
+)
+
+await writeFile('export.json', JSON.stringify(exported, null, 2))
+```
+
+## Round-Trip
+
+Convert JSON back to MDX:
+
+```typescript
+import { renderToJSON, jsonToMDX } from '@mdxui/json'
+
+// MDX -> JSON
+const json = await renderToJSON(originalMDX)
+
+// Modify JSON
+json.frontmatter.updatedAt = new Date().toISOString()
+
+// JSON -> MDX
+const mdx = await jsonToMDX(json)
+```
+
+## TypeScript
+
+```typescript
+import { renderToJSON, type JSONOutput } from '@mdxui/json'
+
+interface BlogPost {
+  title: string
+  date: string
+  tags: string[]
+}
+
+const json = await renderToJSON<BlogPost>(mdx)
+// json.frontmatter is typed as BlogPost
+```

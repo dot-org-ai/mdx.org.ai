@@ -1,0 +1,272 @@
+---
+title: "@mdxai/agentkit"
+description: Multi-agent orchestration for MDX workflows
+---
+
+# @mdxai/agentkit
+
+Build multi-agent systems for complex MDX workflows.
+
+## Installation
+
+```bash
+npm install @mdxai/agentkit
+```
+
+## Usage
+
+```typescript
+import { createAgent, createTeam } from '@mdxai/agentkit'
+
+const writer = createAgent({
+  name: 'technical-writer',
+  instructions: 'Write clear, accurate technical documentation',
+  tools: ['generateMDX', 'readFile'],
+})
+
+const reviewer = createAgent({
+  name: 'reviewer',
+  instructions: 'Review documentation for accuracy and clarity',
+  tools: ['analyzeMDX', 'suggestImprovements'],
+})
+
+const team = createTeam([writer, reviewer])
+
+const result = await team.run({
+  task: 'Create documentation for the auth module',
+})
+```
+
+## Configuration
+
+```typescript
+interface AgentConfig {
+  /** Agent name */
+  name: string
+
+  /** Instructions for the agent */
+  instructions: string
+
+  /** Available tools */
+  tools: string[] | Tool[]
+
+  /** Model to use */
+  model?: string
+
+  /** Maximum iterations */
+  maxIterations?: number
+}
+```
+
+## Features
+
+### Single Agent
+
+```typescript
+import { createAgent } from '@mdxai/agentkit'
+
+const docWriter = createAgent({
+  name: 'doc-writer',
+  instructions: `
+    You are a technical documentation specialist.
+    Generate comprehensive, well-structured MDX documentation.
+  `,
+  tools: [
+    {
+      name: 'readSourceCode',
+      description: 'Read source code files',
+      execute: async (path) => readFile(path, 'utf-8'),
+    },
+    {
+      name: 'generateMDX',
+      description: 'Generate MDX content',
+      execute: async (prompt) => generateMDX({ prompt }),
+    },
+  ],
+})
+
+const result = await docWriter.run({
+  task: 'Document the Button component in src/components/Button.tsx',
+})
+```
+
+### Agent Teams
+
+```typescript
+import { createAgent, createTeam } from '@mdxai/agentkit'
+
+const researcher = createAgent({
+  name: 'researcher',
+  instructions: 'Analyze codebases and gather information',
+  tools: ['readFile', 'searchCode', 'analyzeAST'],
+})
+
+const writer = createAgent({
+  name: 'writer',
+  instructions: 'Write documentation based on research',
+  tools: ['generateMDX', 'formatContent'],
+})
+
+const editor = createAgent({
+  name: 'editor',
+  instructions: 'Review and improve documentation',
+  tools: ['analyzeMDX', 'suggestEdits', 'checkGrammar'],
+})
+
+const team = createTeam([researcher, writer, editor], {
+  workflow: 'sequential', // or 'parallel', 'custom'
+})
+
+const docs = await team.run({
+  task: 'Create complete documentation for the API module',
+})
+```
+
+### Custom Workflows
+
+```typescript
+import { createWorkflow } from '@mdxai/agentkit'
+
+const docWorkflow = createWorkflow({
+  name: 'documentation-pipeline',
+  steps: [
+    {
+      name: 'analyze',
+      agent: 'researcher',
+      input: (context) => ({
+        files: context.sourceFiles,
+      }),
+    },
+    {
+      name: 'draft',
+      agent: 'writer',
+      input: (context) => ({
+        analysis: context.steps.analyze.output,
+      }),
+    },
+    {
+      name: 'review',
+      agent: 'editor',
+      input: (context) => ({
+        draft: context.steps.draft.output,
+      }),
+      condition: (context) => context.steps.draft.output.wordCount > 100,
+    },
+  ],
+})
+
+const result = await docWorkflow.execute({
+  sourceFiles: ['src/**/*.ts'],
+})
+```
+
+### Tool Definitions
+
+```typescript
+import { defineTool } from '@mdxai/agentkit'
+
+const readFileTool = defineTool({
+  name: 'readFile',
+  description: 'Read contents of a file',
+  parameters: {
+    path: { type: 'string', description: 'File path to read' },
+  },
+  execute: async ({ path }) => {
+    return await readFile(path, 'utf-8')
+  },
+})
+
+const generateMDXTool = defineTool({
+  name: 'generateMDX',
+  description: 'Generate MDX content from a prompt',
+  parameters: {
+    prompt: { type: 'string', description: 'Generation prompt' },
+    schema: { type: 'object', description: 'Output schema', optional: true },
+  },
+  execute: async ({ prompt, schema }) => {
+    return await generateMDX({ prompt, schema })
+  },
+})
+```
+
+## Examples
+
+### Documentation Generator
+
+```typescript
+import { createAgent, createTeam } from '@mdxai/agentkit'
+
+// Agent that analyzes code structure
+const analyzer = createAgent({
+  name: 'code-analyzer',
+  instructions: 'Analyze code and identify documentation needs',
+  tools: ['readFile', 'parseAST', 'extractTypes'],
+})
+
+// Agent that writes documentation
+const writer = createAgent({
+  name: 'doc-writer',
+  instructions: 'Write clear, comprehensive documentation',
+  tools: ['generateMDX'],
+})
+
+// Agent that validates documentation
+const validator = createAgent({
+  name: 'doc-validator',
+  instructions: 'Ensure documentation is accurate and complete',
+  tools: ['validateMDX', 'checkCodeExamples'],
+})
+
+const pipeline = createTeam([analyzer, writer, validator], {
+  workflow: 'sequential',
+  onStepComplete: (step, result) => {
+    console.log(`${step.agent.name} completed:`, result.summary)
+  },
+})
+
+const docs = await pipeline.run({
+  task: 'Generate API documentation for all exported functions',
+  context: {
+    sourceDir: './src',
+    outputDir: './docs',
+  },
+})
+```
+
+### Content Migration
+
+```typescript
+const migrator = createAgent({
+  name: 'content-migrator',
+  instructions: `
+    Migrate documentation from one format to another.
+    Preserve all information and improve structure where possible.
+  `,
+  tools: [
+    'readFile',
+    'parseMarkdown',
+    'generateMDX',
+    'writeFile',
+  ],
+})
+
+await migrator.run({
+  task: 'Migrate all .md files in docs/ to MDX with proper frontmatter',
+})
+```
+
+## Monitoring
+
+```typescript
+const team = createTeam([...agents], {
+  onMessage: (agent, message) => {
+    console.log(`[${agent.name}] ${message}`)
+  },
+  onToolUse: (agent, tool, args) => {
+    console.log(`[${agent.name}] Using ${tool}:`, args)
+  },
+  onError: (agent, error) => {
+    console.error(`[${agent.name}] Error:`, error)
+  },
+})
+```

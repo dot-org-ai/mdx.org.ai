@@ -1,0 +1,12 @@
+{
+  "title": "Adapters",
+  "pages": [
+    "index",
+    "fs",
+    "sqlite",
+    "postgres",
+    "mongo",
+    "clickhouse",
+    "api"
+  ]
+}

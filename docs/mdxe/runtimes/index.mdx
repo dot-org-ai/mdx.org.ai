@@ -1,0 +1,113 @@
+---
+title: Runtimes
+description: MDX execution across JavaScript runtimes
+---
+
+# Runtimes
+
+mdxe provides adapters for executing MDX in any JavaScript environment.
+
+## Available Runtimes
+
+| Runtime | Package | Use Case |
+|---------|---------|----------|
+| Node.js | [@mdxe/node](/docs/mdxe/runtimes/node) | Server-side, build tools, CLI |
+| Next.js | [@mdxe/next](/docs/mdxe/runtimes/next) | Full-stack React apps |
+| Workers | [@mdxe/workers](/docs/mdxe/runtimes/workers) | Cloudflare edge computing |
+| Hono | [@mdxe/hono](/docs/mdxe/runtimes/hono) | Lightweight edge servers |
+| Ink | [@mdxe/ink](/docs/mdxe/runtimes/ink) | Terminal applications |
+
+## Choosing a Runtime
+
+### Server-Side Rendering
+
+For traditional server rendering, use `@mdxe/node`:
+
+```typescript
+import { execute } from '@mdxe/node'
+
+const html = await execute(mdx, {
+  outputFormat: 'html',
+})
+```
+
+### Full-Stack Applications
+
+For Next.js applications, use `@mdxe/next`:
+
+```typescript
+import { compileMDX } from '@mdxe/next'
+
+const { content } = await compileMDX({ source: mdx })
+```
+
+### Edge Computing
+
+For Cloudflare Workers or similar, use `@mdxe/workers`:
+
+```typescript
+import { execute } from '@mdxe/workers'
+
+export default {
+  fetch: async (request) => {
+    const result = await execute(mdx)
+    return new Response(result.html)
+  },
+}
+```
+
+### CLI Applications
+
+For terminal UIs, use `@mdxe/ink`:
+
+```typescript
+import { render } from '@mdxe/ink'
+
+render(mdx, {
+  components: {
+    Box: InkBox,
+    Text: InkText,
+  },
+})
+```
+
+## Universal API
+
+All runtimes share a common API:
+
+```typescript
+interface ExecuteResult {
+  /** Rendered content */
+  content: ReactElement | string
+
+  /** Parsed frontmatter */
+  frontmatter: Record<string, unknown>
+
+  /** Export values from MDX */
+  exports: Record<string, unknown>
+
+  /** Table of contents */
+  toc: TocEntry[]
+}
+
+interface ExecuteOptions {
+  /** Custom React components */
+  components?: Record<string, Component>
+
+  /** Variables accessible in MDX scope */
+  scope?: Record<string, unknown>
+
+  /** MDX compiler options */
+  mdxOptions?: MDXOptions
+}
+```
+
+## Feature Comparison
+
+| Feature | Node | Next | Workers | Hono | Ink |
+|---------|------|------|---------|------|-----|
+| React Components | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Server Components | - | ✓ | - | - | - |
+| Streaming | ✓ | ✓ | ✓ | ✓ | - |
+| Hot Reload | ✓ | ✓ | - | - | ✓ |
+| File System | ✓ | ✓ | - | - | ✓ |

@@ -1,0 +1,125 @@
+---
+title: "@mdxdb/fs"
+description: File system storage adapter
+---
+
+# @mdxdb/fs
+
+Store MDXLD documents as files on the file system.
+
+## Installation
+
+```bash
+npm install @mdxdb/fs
+```
+
+## Usage
+
+```typescript
+import { createDatabase } from '@mdxdb/fs'
+
+const db = createDatabase({
+  path: './content',
+})
+```
+
+## Configuration
+
+```typescript
+interface FsConfig {
+  /** Base directory for content */
+  path: string
+
+  /** File extension (default: '.mdx') */
+  extension?: string
+
+  /** Watch for file changes */
+  watch?: boolean
+
+  /** Custom file encoding (default: 'utf-8') */
+  encoding?: BufferEncoding
+}
+```
+
+## File Structure
+
+Documents are stored as MDX files:
+
+```
+content/
+├── posts/
+│   ├── hello-world.mdx
+│   └── second-post.mdx
+└── pages/
+    ├── about.mdx
+    └── contact.mdx
+```
+
+Each file contains frontmatter and content:
+
+```mdx
+---
+$type: BlogPost
+title: Hello World
+author: Jane Doe
+---
+
+# Hello World
+
+Content here...
+```
+
+## Examples
+
+### Basic Operations
+
+```typescript
+import { createDatabase } from '@mdxdb/fs'
+import { parse } from 'mdxld'
+
+const db = createDatabase({ path: './content' })
+
+// Create
+await db.set('posts/hello', parse(`---
+title: Hello
+---
+# Hello
+`))
+
+// Read
+const doc = await db.get('posts/hello')
+
+// List
+const posts = await db.list('posts/')
+
+// Delete
+await db.delete('posts/hello')
+```
+
+### Watching for Changes
+
+```typescript
+const db = createDatabase({
+  path: './content',
+  watch: true,
+})
+
+db.on('change', (event) => {
+  console.log(`${event.type}: ${event.path}`)
+})
+
+db.on('add', (path, doc) => {
+  console.log(`Added: ${path}`)
+})
+
+db.on('remove', (path) => {
+  console.log(`Removed: ${path}`)
+})
+```
+
+## Best Practices
+
+1. **Use meaningful paths** - Organize content by type or category
+2. **Include metadata** - Use frontmatter for all document metadata
+3. **Git integration** - Commit content changes to version control
+4. **Backup regularly** - The content directory is your database

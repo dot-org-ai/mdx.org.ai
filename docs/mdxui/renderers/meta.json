@@ -1,0 +1,5 @@
+{
+  "title": "Renderers",
+  "defaultOpen": true,
+  "pages": ["index", "html", "json", "markdown", "shadcn"]
+}

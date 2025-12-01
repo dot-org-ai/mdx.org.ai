@@ -1,0 +1,116 @@
+---
+title: "@mdxdb/clickhouse"
+description: ClickHouse storage adapter
+---
+
+# @mdxdb/clickhouse
+
+Store MDXLD documents in ClickHouse for analytics workloads.
+
+## Installation
+
+```bash
+npm install @mdxdb/clickhouse
+```
+
+## Usage
+
+```typescript
+import { createDatabase } from '@mdxdb/clickhouse'
+
+const db = createDatabase({
+  host: 'localhost',
+  database: 'mdxdb',
+})
+```
+
+## Configuration
+
+```typescript
+interface ClickHouseConfig {
+  /** ClickHouse host */
+  host: string
+
+  /** Port (default: 8123) */
+  port?: number
+
+  /** Database name */
+  database: string
+
+  /** Username */
+  username?: string
+
+  /** Password */
+  password?: string
+}
+```
+
+## Schema
+
+```sql
+CREATE TABLE mdxdb.documents (
+  path String,
+  type String,
+  data String,  -- JSON
+  content String,
+  created_at DateTime DEFAULT now(),
+  updated_at DateTime DEFAULT now()
+) ENGINE = MergeTree()
+ORDER BY (type, path);
+```
+
+## Use Cases
+
+ClickHouse is ideal for:
+
+- Analytics dashboards
+- Content metrics
+- Time-series analysis
+- Large-scale aggregations
+
+## Examples
+
+### Analytics Queries
+
+```typescript
+// Page views over time
+const views = await db.query(`
+  SELECT
+    toDate(created_at) as date,
+    count() as views
+  FROM mdxdb.page_views
+  WHERE path LIKE 'posts/%'
+  GROUP BY date
+  ORDER BY date
+`)
+
+// Popular content
+const popular = await db.query(`
+  SELECT
+    path,
+    count() as views
+  FROM mdxdb.page_views
+  GROUP BY path
+  ORDER BY views DESC
+  LIMIT 10
+`)
+```
+
+### Content Metrics
+
+```typescript
+// Word count distribution
+const wordCounts = await db.query(`
+  SELECT
+    type,
+    avg(length(content) - length(replace(content, ' ', '')) + 1) as avg_words
+  FROM mdxdb.documents
+  GROUP BY type
+`)
+```
+
+## Limitations
+
+- Not designed for frequent updates
+- Better for append-only workloads
+- Use with a primary database for CRUD operations

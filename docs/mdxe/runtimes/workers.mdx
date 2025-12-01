@@ -1,0 +1,200 @@
+---
+title: "@mdxe/workers"
+description: Cloudflare Workers MDX execution
+---
+
+# @mdxe/workers
+
+Execute MDX at the edge with Cloudflare Workers.
+
+## Installation
+
+```bash
+npm install @mdxe/workers
+```
+
+## Usage
+
+```typescript
+import { execute } from '@mdxe/workers'
+
+export default {
+  async fetch(request, env, ctx) {
+    const mdx = await env.CONTENT.get('page.mdx')
+
+    const { html } = await execute(mdx, {
+      outputFormat: 'html',
+    })
+
+    return new Response(html, {
+      headers: { 'content-type': 'text/html' },
+    })
+  },
+}
+```
+
+## Configuration
+
+```typescript
+interface WorkerExecuteOptions {
+  /** Custom components */
+  components?: Record<string, Component>
+
+  /** Output format */
+  outputFormat?: 'react' | 'html'
+
+  /** Cache compiled results */
+  cache?: KVNamespace | Cache
+
+  /** Scope variables */
+  scope?: Record<string, unknown>
+}
+```
+
+## Features
+
+### KV Storage
+
+```typescript
+import { execute } from '@mdxe/workers'
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url)
+    const slug = url.pathname.slice(1)
+
+    // Load from KV
+    const mdx = await env.CONTENT.get(`docs/${slug}.mdx`)
+    if (!mdx) {
+      return new Response('Not found', { status: 404 })
+    }
+
+    const { html } = await execute(mdx)
+
+    return new Response(html, {
+      headers: { 'content-type': 'text/html' },
+    })
+  },
+}
+```
+
+### D1 Database
+
+```typescript
+import { execute } from '@mdxe/workers'
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url)
+    const slug = url.pathname.slice(1)
+
+    // Load from D1
+    const result = await env.DB.prepare(
+      'SELECT content FROM documents WHERE path = ?'
+    ).bind(slug).first()
+
+    if (!result) {
+      return new Response('Not found', { status: 404 })
+    }
+
+    const { html } = await execute(result.content)
+
+    return new Response(html, {
+      headers: { 'content-type': 'text/html' },
+    })
+  },
+}
+```
+
+### Caching
+
+```typescript
+import { execute } from '@mdxe/workers'
+
+export default {
+  async fetch(request, env, ctx) {
+    const cache = caches.default
+    const cacheKey = new Request(request.url)
+
+    // Check cache
+    let response = await cache.match(cacheKey)
+    if (response) return response
+
+    // Execute MDX
+    const mdx = await env.CONTENT.get('page.mdx')
+    const { html } = await execute(mdx)
+
+    response = new Response(html, {
+      headers: {
+        'content-type': 'text/html',
+        'cache-control': 'public, max-age=3600',
+      },
+    })
+
+    // Store in cache
+    ctx.waitUntil(cache.put(cacheKey, response.clone()))
+
+    return response
+  },
+}
+```
+
+### R2 Storage
+
+```typescript
+import { execute } from '@mdxe/workers'
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url)
+    const path = url.pathname.slice(1) + '.mdx'
+
+    // Load from R2
+    const object = await env.BUCKET.get(path)
+    if (!object) {
+      return new Response('Not found', { status: 404 })
+    }
+
+    const mdx = await object.text()
+    const { html } = await execute(mdx)
+
+    return new Response(html, {
+      headers: { 'content-type': 'text/html' },
+    })
+  },
+}
+```
+
+## wrangler.toml
+
+```toml
+name = "mdx-worker"
+main = "src/index.ts"
+
+[[kv_namespaces]]
+binding = "CONTENT"
+id = "your-kv-namespace-id"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mdx-docs"
+database_id = "your-d1-database-id"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "mdx-content"
+```
+
+## Limitations
+
+- No file system access
+- Limited bundle size (1MB)
+- No native Node.js modules
+- 50ms CPU time limit (can be extended)
+
+## Best Practices
+
+1. **Pre-compile MDX** - Compile at build time when possible
+2. **Use caching** - Cache rendered output aggressively
+3. **Minimize components** - Keep component library small
+4. **Stream responses** - Use streaming for large documents

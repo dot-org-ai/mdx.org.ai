@@ -1,0 +1,136 @@
+---
+title: "@mdxdb/mongo"
+description: MongoDB storage adapter
+---
+
+# @mdxdb/mongo
+
+Store MDXLD documents in MongoDB.
+
+## Installation
+
+```bash
+npm install @mdxdb/mongo
+```
+
+## Usage
+
+```typescript
+import { createDatabase } from '@mdxdb/mongo'
+
+const db = createDatabase({
+  uri: process.env.MONGODB_URI,
+  database: 'mdxdb',
+})
+```
+
+## Configuration
+
+```typescript
+interface MongoConfig {
+  /** MongoDB connection URI */
+  uri: string
+
+  /** Database name */
+  database: string
+
+  /** Collection name (default: 'documents') */
+  collection?: string
+
+  /** Enable text index (default: true) */
+  textIndex?: boolean
+}
+```
+
+## Document Structure
+
+```javascript
+{
+  _id: "posts/hello-world",
+  path: "posts/hello-world",
+  type: "BlogPost",
+  data: {
+    $type: "BlogPost",
+    title: "Hello World",
+    author: "Jane Doe"
+  },
+  content: "# Hello World\n\nContent...",
+  createdAt: ISODate("2024-01-15T00:00:00Z"),
+  updatedAt: ISODate("2024-01-15T00:00:00Z")
+}
+```
+
+## Examples
+
+### Basic Usage
+
+```typescript
+import { createDatabase } from '@mdxdb/mongo'
+
+const db = createDatabase({
+  uri: 'mongodb://localhost:27017',
+  database: 'myapp',
+})
+
+await db.set('posts/hello', doc)
+const post = await db.get('posts/hello')
+const posts = await db.list('posts/')
+```
+
+### Text Search
+
+```typescript
+const results = await db.search('typescript tutorial', {
+  fields: ['title', 'content'],
+})
+```
+
+### Aggregation
+
+Access the underlying collection for complex queries:
+
+```typescript
+const collection = db.getCollection()
+
+const byAuthor = await collection.aggregate([
+  { $match: { 'data.type': 'BlogPost' } },
+  { $group: { _id: '$data.author', count: { $sum: 1 } } },
+  { $sort: { count: -1 } },
+]).toArray()
+```
+
+### Change Streams
+
+React to document changes:
+
+```typescript
+const stream = db.watch()
+
+stream.on('change', (change) => {
+  if (change.operationType === 'insert') {
+    console.log('New document:', change.fullDocument.path)
+  }
+})
+```
+
+## Indexes
+
+The adapter creates these indexes:
+
+```javascript
+// Path index (unique)
+{ path: 1 }
+
+// Type index
+{ type: 1 }
+
+// Text index for search
+{ "data.title": "text", content: "text" }
+```
+
+## Best Practices
+
+1. **Use appropriate write concern** - Balance durability and performance
+2. **Create indexes for queries** - Index frequently queried fields
+3. **Use connection pooling** - Managed by the driver
+4. **Consider sharding** - For large datasets

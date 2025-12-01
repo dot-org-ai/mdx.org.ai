@@ -1,0 +1,144 @@
+---
+title: Getting Started
+description: Set up mdxe for MDX execution
+---
+
+# Getting Started
+
+Get mdxe running in your project in minutes.
+
+## Installation
+
+```bash
+npm install mdxe
+```
+
+## Basic Execution
+
+```typescript
+import { execute } from 'mdxe'
+
+const mdx = `
+---
+title: Hello World
+---
+
+# {frontmatter.title}
+
+This is **MDX** content with {1 + 1} expressions.
+`
+
+const { content, frontmatter } = await execute(mdx)
+```
+
+## With Components
+
+Inject custom components into MDX:
+
+```typescript
+import { execute } from 'mdxe'
+
+const mdx = `
+# Interactive Demo
+
+<Button onClick={() => alert('clicked!')}>
+  Click me
+</Button>
+
+<Chart data={[1, 2, 3, 4, 5]} />
+`
+
+const result = await execute(mdx, {
+  components: {
+    Button: (props) => <button {...props} />,
+    Chart: ({ data }) => <svg>{/* render chart */}</svg>,
+  },
+})
+```
+
+## Runtime Selection
+
+Choose the right runtime for your environment:
+
+### Node.js Server
+
+```typescript
+import { execute } from '@mdxe/node'
+
+// Full Node.js APIs available
+const result = await execute(mdx, {
+  cwd: process.cwd(),
+})
+```
+
+### Next.js App
+
+```typescript
+// app/docs/[slug]/page.tsx
+import { compileMDX } from '@mdxe/next'
+
+export default async function Page({ params }) {
+  const { content, frontmatter } = await compileMDX({
+    source: await getContent(params.slug),
+  })
+
+  return <article>{content}</article>
+}
+```
+
+### Edge Runtime
+
+```typescript
+import { execute } from '@mdxe/workers'
+
+export default {
+  async fetch(request, env) {
+    const mdx = await env.CONTENT.get('page.mdx')
+    const { content } = await execute(mdx)
+
+    return new Response(content, {
+      headers: { 'content-type': 'text/html' },
+    })
+  },
+}
+```
+
+## Configuration
+
+```typescript
+interface ExecuteOptions {
+  /** Custom components */
+  components?: Record<string, Component>
+
+  /** Scope variables accessible in MDX */
+  scope?: Record<string, unknown>
+
+  /** MDX compile options */
+  mdxOptions?: MDXOptions
+
+  /** Enable development mode */
+  development?: boolean
+}
+```
+
+## Error Handling
+
+```typescript
+import { execute, MDXError } from 'mdxe'
+
+try {
+  const result = await execute(invalidMdx)
+} catch (error) {
+  if (error instanceof MDXError) {
+    console.log(error.line)    // Line number
+    console.log(error.column)  // Column number
+    console.log(error.source)  // Source context
+  }
+}
+```
+
+## Next Steps
+
+- [Node.js Runtime](/docs/mdxe/runtimes/node) - Server-side execution
+- [Next.js Integration](/docs/mdxe/runtimes/next) - Full-stack apps
+- [Isolated Execution](/docs/mdxe/isolate) - Sandboxed environments

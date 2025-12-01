@@ -1,0 +1,263 @@
+---
+title: "@mdxe/isolate"
+description: Sandboxed MDX execution
+---
+
+# @mdxe/isolate
+
+Execute MDX in isolated, sandboxed environments for security.
+
+## Installation
+
+```bash
+npm install @mdxe/isolate
+```
+
+## Usage
+
+```typescript
+import { createIsolate } from '@mdxe/isolate'
+
+const isolate = createIsolate({
+  timeout: 5000,
+  memoryLimit: 128, // MB
+})
+
+const result = await isolate.execute(mdx)
+```
+
+## Configuration
+
+```typescript
+interface IsolateConfig {
+  /** Execution timeout in ms */
+  timeout?: number
+
+  /** Memory limit in MB */
+  memoryLimit?: number
+
+  /** Allowed globals */
+  allowedGlobals?: string[]
+
+  /** Custom sandbox APIs */
+  sandbox?: Record<string, unknown>
+
+  /** Enable network access */
+  network?: boolean
+}
+```
+
+## Security Features
+
+### Isolated Globals
+
+```typescript
+const isolate = createIsolate({
+  // Only expose safe globals
+  allowedGlobals: [
+    'console',
+    'Math',
+    'JSON',
+    'Date',
+  ],
+})
+
+// process, require, etc. are not available
+const result = await isolate.execute(`
+# User Content
+
+{/* This would fail: */}
+{/* process.env.SECRET */}
+`)
+```
+
+### Resource Limits
+
+```typescript
+const isolate = createIsolate({
+  timeout: 1000,      // 1 second max
+  memoryLimit: 64,    // 64MB max
+})
+
+try {
+  await isolate.execute(maliciousMdx)
+} catch (error) {
+  if (error.code === 'TIMEOUT') {
+    console.log('Execution timed out')
+  }
+  if (error.code === 'MEMORY_EXCEEDED') {
+    console.log('Memory limit exceeded')
+  }
+}
+```
+
+### No Network by Default
+
+```typescript
+const isolate = createIsolate({
+  network: false, // default
+})
+
+// fetch() is not available in sandbox
+```
+
+## Custom Sandbox
+
+### Safe APIs
+
+```typescript
+const isolate = createIsolate({
+  sandbox: {
+    // Provide safe data fetching
+    fetchData: async (key: string) => {
+      // Validated, rate-limited data access
+      return safeDataStore.get(key)
+    },
+
+    // Safe date formatting
+    formatDate: (date: Date) => {
+      return new Intl.DateTimeFormat('en-US').format(date)
+    },
+  },
+})
+
+const result = await isolate.execute(`
+# Data Display
+
+<Text>{await fetchData('public-stats')}</Text>
+
+Updated: {formatDate(new Date())}
+`)
+```
+
+### Component Restrictions
+
+```typescript
+const isolate = createIsolate({
+  components: {
+    // Safe display components only
+    Text: SafeText,
+    Box: SafeBox,
+    Image: SafeImage,
+
+    // No script execution, form submission, etc.
+  },
+})
+```
+
+## Use Cases
+
+### User-Generated Content
+
+```typescript
+import { createIsolate } from '@mdxe/isolate'
+
+const isolate = createIsolate({
+  timeout: 2000,
+  memoryLimit: 32,
+  allowedGlobals: ['Math', 'Date'],
+})
+
+app.post('/preview', async (req, res) => {
+  const { content } = req.body
+
+  try {
+    const result = await isolate.execute(content)
+    res.json({ html: result.html })
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid content' })
+  }
+})
+```
+
+### Plugin System
+
+```typescript
+const isolate = createIsolate({
+  sandbox: {
+    // Plugin API
+    registerWidget: (name, render) => {
+      widgets.set(name, render)
+    },
+    getData: (key) => publicData.get(key),
+  },
+})
+
+// Execute third-party plugin
+await isolate.execute(pluginCode)
+```
+
+### Multi-Tenant Rendering
+
+```typescript
+const createTenantIsolate = (tenant: Tenant) => {
+  return createIsolate({
+    timeout: tenant.plan === 'pro' ? 10000 : 2000,
+    memoryLimit: tenant.plan === 'pro' ? 256 : 64,
+    sandbox: {
+      tenantId: tenant.id,
+      theme: tenant.theme,
+    },
+  })
+}
+
+app.get('/render/:tenant/:page', async (req, res) => {
+  const tenant = await getTenant(req.params.tenant)
+  const isolate = createTenantIsolate(tenant)
+
+  const mdx = await getContent(tenant.id, req.params.page)
+  const result = await isolate.execute(mdx)
+
+  res.send(result.html)
+})
+```
+
+## Pool Management
+
+```typescript
+import { createIsolatePool } from '@mdxe/isolate'
+
+const pool = createIsolatePool({
+  min: 2,
+  max: 10,
+  idleTimeout: 30000,
+})
+
+// Acquire isolate from pool
+const isolate = await pool.acquire()
+
+try {
+  const result = await isolate.execute(mdx)
+  return result
+} finally {
+  // Return to pool
+  pool.release(isolate)
+}
+```
+
+## Error Handling
+
+```typescript
+import { createIsolate, IsolateError } from '@mdxe/isolate'
+
+try {
+  const result = await isolate.execute(mdx)
+} catch (error) {
+  if (error instanceof IsolateError) {
+    switch (error.code) {
+      case 'TIMEOUT':
+        // Execution took too long
+        break
+      case 'MEMORY_EXCEEDED':
+        // Used too much memory
+        break
+      case 'SYNTAX_ERROR':
+        // Invalid MDX syntax
+        break
+      case 'RUNTIME_ERROR':
+        // Error during execution
+        break
+    }
+  }
+}
+```

@@ -1,0 +1,298 @@
+---
+title: "@mdxai/mastra"
+description: Mastra AI workflow integration
+---
+
+# @mdxai/mastra
+
+Integrate mdxai with Mastra AI workflow framework.
+
+## Installation
+
+```bash
+npm install @mdxai/mastra
+```
+
+## Usage
+
+```typescript
+import { Mastra } from '@mastra/core'
+import { mdxTools, mdxIntegration } from '@mdxai/mastra'
+
+const mastra = new Mastra({
+  integrations: [mdxIntegration()],
+  tools: mdxTools,
+})
+
+const workflow = mastra.createWorkflow({
+  name: 'doc-generator',
+  steps: [
+    { action: 'mdx.generate', input: { prompt: '...' } },
+  ],
+})
+```
+
+## Configuration
+
+```typescript
+interface MastraConfig {
+  /** MDX generation defaults */
+  defaults?: {
+    model?: string
+    schema?: object
+  }
+
+  /** Custom tools */
+  tools?: Tool[]
+
+  /** Content storage */
+  storage?: StorageAdapter
+}
+```
+
+## Features
+
+### MDX Tools
+
+Pre-built tools for Mastra workflows:
+
+```typescript
+import { mdxTools } from '@mdxai/mastra'
+
+// Available tools:
+// - mdx.generate: Generate MDX from prompts
+// - mdx.transform: Transform existing MDX
+// - mdx.extract: Extract data from MDX
+// - mdx.validate: Validate MDX structure
+// - mdx.compile: Compile MDX to JavaScript
+```
+
+### Workflows
+
+```typescript
+import { Mastra } from '@mastra/core'
+import { mdxIntegration } from '@mdxai/mastra'
+
+const mastra = new Mastra({
+  integrations: [mdxIntegration()],
+})
+
+const docWorkflow = mastra.createWorkflow({
+  name: 'generate-api-docs',
+  trigger: {
+    type: 'event',
+    event: 'code.push',
+  },
+  steps: [
+    {
+      name: 'analyze',
+      action: 'code.analyze',
+      input: {
+        files: '{{trigger.files}}',
+      },
+    },
+    {
+      name: 'generate',
+      action: 'mdx.generate',
+      input: {
+        prompt: 'Generate documentation for: {{steps.analyze.output}}',
+        schema: {
+          $type: 'APIReference',
+          title: 'string',
+          functions: 'array',
+        },
+      },
+    },
+    {
+      name: 'save',
+      action: 'storage.write',
+      input: {
+        path: 'docs/api/{{trigger.module}}.mdx',
+        content: '{{steps.generate.output.content}}',
+      },
+    },
+  ],
+})
+```
+
+### Event Triggers
+
+```typescript
+const contentWorkflow = mastra.createWorkflow({
+  name: 'content-pipeline',
+  trigger: {
+    type: 'schedule',
+    cron: '0 0 * * *', // Daily
+  },
+  steps: [
+    {
+      name: 'fetch-updates',
+      action: 'api.fetch',
+      input: { url: '{{env.CONTENT_API}}' },
+    },
+    {
+      name: 'generate-content',
+      action: 'mdx.generate',
+      input: {
+        prompt: 'Create blog post from: {{steps.fetch-updates.output}}',
+      },
+    },
+  ],
+})
+```
+
+### Conditional Logic
+
+```typescript
+const reviewWorkflow = mastra.createWorkflow({
+  name: 'content-review',
+  steps: [
+    {
+      name: 'analyze',
+      action: 'mdx.extract',
+      input: {
+        content: '{{input.mdx}}',
+        schema: { wordCount: 'number', hasCodeBlocks: 'boolean' },
+      },
+    },
+    {
+      name: 'quick-review',
+      action: 'mdx.validate',
+      condition: '{{steps.analyze.output.wordCount < 500}}',
+      input: { content: '{{input.mdx}}' },
+    },
+    {
+      name: 'deep-review',
+      action: 'ai.review',
+      condition: '{{steps.analyze.output.wordCount >= 500}}',
+      input: {
+        content: '{{input.mdx}}',
+        criteria: ['accuracy', 'clarity', 'completeness'],
+      },
+    },
+  ],
+})
+```
+
+## Integration
+
+### With mdxdb
+
+```typescript
+import { mdxIntegration } from '@mdxai/mastra'
+import { createDatabase } from '@mdxdb/postgres'
+
+const db = createDatabase({
+  connectionString: process.env.DATABASE_URL,
+})
+
+const mastra = new Mastra({
+  integrations: [
+    mdxIntegration({
+      storage: db,
+    }),
+  ],
+})
+```
+
+### With External APIs
+
+```typescript
+const workflow = mastra.createWorkflow({
+  name: 'cms-sync',
+  steps: [
+    {
+      name: 'fetch',
+      action: 'http.get',
+      input: { url: '{{env.CMS_API}}/articles' },
+    },
+    {
+      name: 'convert',
+      action: 'mdx.transform',
+      forEach: '{{steps.fetch.output.articles}}',
+      input: {
+        content: '{{item.content}}',
+        instructions: 'Convert to MDX with proper frontmatter',
+      },
+    },
+    {
+      name: 'store',
+      action: 'mdxdb.set',
+      forEach: '{{steps.convert.output}}',
+      input: {
+        path: 'articles/{{item.slug}}',
+        document: '{{item}}',
+      },
+    },
+  ],
+})
+```
+
+## Examples
+
+### Blog Content Pipeline
+
+```typescript
+const blogPipeline = mastra.createWorkflow({
+  name: 'blog-pipeline',
+  trigger: { type: 'webhook', path: '/content/new' },
+  steps: [
+    {
+      name: 'generate',
+      action: 'mdx.generate',
+      input: {
+        prompt: '{{trigger.body.topic}}',
+        schema: {
+          $type: 'BlogPost',
+          title: 'string',
+          excerpt: 'string',
+          tags: 'string[]',
+        },
+      },
+    },
+    {
+      name: 'review',
+      action: 'ai.review',
+      input: { content: '{{steps.generate.output}}' },
+    },
+    {
+      name: 'publish',
+      action: 'mdxdb.set',
+      condition: '{{steps.review.output.approved}}',
+      input: {
+        path: 'posts/{{steps.generate.output.slug}}',
+        document: '{{steps.generate.output}}',
+      },
+    },
+  ],
+})
+```
+
+### Documentation Sync
+
+```typescript
+const docSync = mastra.createWorkflow({
+  name: 'doc-sync',
+  trigger: {
+    type: 'event',
+    event: 'github.push',
+    filter: { branch: 'main', paths: ['src/**/*.ts'] },
+  },
+  steps: [
+    {
+      name: 'detect-changes',
+      action: 'git.diff',
+      input: { base: '{{trigger.before}}', head: '{{trigger.after}}' },
+    },
+    {
+      name: 'update-docs',
+      action: 'mdx.transform',
+      forEach: '{{steps.detect-changes.output.files}}',
+      input: {
+        prompt: 'Update documentation to reflect code changes',
+        context: '{{item}}',
+      },
+    },
+  ],
+})
+```

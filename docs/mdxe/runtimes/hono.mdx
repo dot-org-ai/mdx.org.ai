@@ -1,0 +1,239 @@
+---
+title: "@mdxe/hono"
+description: Hono framework MDX integration
+---
+
+# @mdxe/hono
+
+MDX execution middleware for the Hono web framework.
+
+## Installation
+
+```bash
+npm install @mdxe/hono
+```
+
+## Usage
+
+```typescript
+import { Hono } from 'hono'
+import { mdx } from '@mdxe/hono'
+
+const app = new Hono()
+
+app.use('/docs/*', mdx({
+  contentDir: './docs',
+}))
+
+export default app
+```
+
+## Configuration
+
+```typescript
+interface MDXMiddlewareOptions {
+  /** Content directory */
+  contentDir?: string
+
+  /** Custom components */
+  components?: Record<string, Component>
+
+  /** Layout component */
+  layout?: Component
+
+  /** Enable caching */
+  cache?: boolean
+
+  /** Cache TTL in seconds */
+  cacheTTL?: number
+}
+```
+
+## Features
+
+### Basic Middleware
+
+```typescript
+import { Hono } from 'hono'
+import { mdx } from '@mdxe/hono'
+
+const app = new Hono()
+
+// Serve MDX files from ./content
+app.use('/docs/*', mdx({
+  contentDir: './content',
+  components: {
+    Alert: ({ type, children }) => (
+      <div class={`alert ${type}`}>{children}</div>
+    ),
+  },
+}))
+
+export default app
+```
+
+### Manual Execution
+
+```typescript
+import { Hono } from 'hono'
+import { execute } from '@mdxe/hono'
+
+const app = new Hono()
+
+app.get('/docs/:slug', async (c) => {
+  const slug = c.req.param('slug')
+  const mdx = await loadContent(slug)
+
+  const { html, frontmatter } = await execute(mdx, {
+    components: customComponents,
+  })
+
+  return c.html(renderLayout(html, frontmatter))
+})
+```
+
+### With Layout
+
+```typescript
+import { mdx } from '@mdxe/hono'
+import { Layout } from './components/Layout'
+
+app.use('/docs/*', mdx({
+  contentDir: './docs',
+  layout: ({ children, frontmatter }) => (
+    <Layout title={frontmatter.title}>
+      {children}
+    </Layout>
+  ),
+}))
+```
+
+### JSX Renderer
+
+```typescript
+import { Hono } from 'hono'
+import { jsxRenderer } from 'hono/jsx-renderer'
+import { execute } from '@mdxe/hono'
+
+const app = new Hono()
+
+app.use(jsxRenderer(({ children }) => (
+  <html>
+    <head>
+      <title>MDX Docs</title>
+    </head>
+    <body>{children}</body>
+  </html>
+)))
+
+app.get('/docs/:slug', async (c) => {
+  const mdx = await loadContent(c.req.param('slug'))
+  const { content } = await execute(mdx)
+
+  return c.render(content)
+})
+```
+
+## Platform Support
+
+### Cloudflare Workers
+
+```typescript
+import { Hono } from 'hono'
+import { mdx } from '@mdxe/hono'
+
+const app = new Hono()
+
+app.use('/docs/*', mdx({
+  loader: async (path, env) => {
+    return await env.CONTENT.get(path)
+  },
+}))
+
+export default app
+```
+
+### Deno
+
+```typescript
+import { Hono } from 'https://deno.land/x/hono/mod.ts'
+import { mdx } from '@mdxe/hono'
+
+const app = new Hono()
+
+app.use('/docs/*', mdx({
+  contentDir: './docs',
+}))
+
+Deno.serve(app.fetch)
+```
+
+### Bun
+
+```typescript
+import { Hono } from 'hono'
+import { mdx } from '@mdxe/hono'
+
+const app = new Hono()
+
+app.use('/docs/*', mdx({
+  contentDir: './docs',
+}))
+
+export default {
+  port: 3000,
+  fetch: app.fetch,
+}
+```
+
+## Examples
+
+### API Documentation
+
+```typescript
+import { Hono } from 'hono'
+import { mdx } from '@mdxe/hono'
+
+const app = new Hono()
+
+// API reference from MDX
+app.use('/api/*', mdx({
+  contentDir: './api-docs',
+  components: {
+    Endpoint: ({ method, path, children }) => (
+      <div class="endpoint">
+        <span class={`method ${method}`}>{method}</span>
+        <code>{path}</code>
+        {children}
+      </div>
+    ),
+    Parameter: ({ name, type, required }) => (
+      <tr>
+        <td>{name}</td>
+        <td>{type}</td>
+        <td>{required ? 'Yes' : 'No'}</td>
+      </tr>
+    ),
+  },
+}))
+```
+
+### Blog
+
+```typescript
+import { Hono } from 'hono'
+import { mdx, listContent } from '@mdxe/hono'
+
+const app = new Hono()
+
+// Blog index
+app.get('/blog', async (c) => {
+  const posts = await listContent('./blog')
+  return c.json(posts.map(p => p.frontmatter))
+})
+
+// Blog posts
+app.use('/blog/*', mdx({
+  contentDir: './blog',
+}))
+```

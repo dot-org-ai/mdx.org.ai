@@ -1,0 +1,226 @@
+---
+title: "@mdxe/next"
+description: Next.js MDX integration
+---
+
+# @mdxe/next
+
+Full-stack MDX execution for Next.js applications.
+
+## Installation
+
+```bash
+npm install @mdxe/next
+```
+
+## Usage
+
+### App Router
+
+```typescript
+// app/docs/[...slug]/page.tsx
+import { compileMDX } from '@mdxe/next'
+
+export default async function Page({
+  params,
+}: {
+  params: { slug: string[] }
+}) {
+  const source = await getContent(params.slug.join('/'))
+
+  const { content, frontmatter } = await compileMDX({
+    source,
+    components: {
+      // Custom components
+    },
+  })
+
+  return (
+    <article>
+      <h1>{frontmatter.title}</h1>
+      {content}
+    </article>
+  )
+}
+```
+
+### Pages Router
+
+```typescript
+// pages/docs/[slug].tsx
+import { compileMDX } from '@mdxe/next'
+
+export async function getStaticProps({ params }) {
+  const source = await getContent(params.slug)
+
+  const { content, frontmatter } = await compileMDX({
+    source,
+  })
+
+  return {
+    props: {
+      content,
+      frontmatter,
+    },
+  }
+}
+
+export default function Page({ content, frontmatter }) {
+  return (
+    <article>
+      <h1>{frontmatter.title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: content }} />
+    </article>
+  )
+}
+```
+
+## Configuration
+
+```typescript
+interface CompileMDXOptions {
+  /** MDX source content */
+  source: string
+
+  /** Custom React components */
+  components?: Record<string, Component>
+
+  /** Scope variables */
+  scope?: Record<string, unknown>
+
+  /** Remark plugins */
+  remarkPlugins?: Plugin[]
+
+  /** Rehype plugins */
+  rehypePlugins?: Plugin[]
+
+  /** Parse frontmatter (default: true) */
+  parseFrontmatter?: boolean
+}
+```
+
+## Features
+
+### Server Components
+
+Use React Server Components with MDX:
+
+```typescript
+// app/docs/[slug]/page.tsx
+import { compileMDX } from '@mdxe/next/rsc'
+
+export default async function Page({ params }) {
+  const { content } = await compileMDX({
+    source: await getContent(params.slug),
+    components: {
+      // Server components work here
+      AsyncData: async () => {
+        const data = await fetchData()
+        return <div>{data}</div>
+      },
+    },
+  })
+
+  return content
+}
+```
+
+### Static Generation
+
+```typescript
+export async function generateStaticParams() {
+  const files = await getAllContentPaths()
+
+  return files.map((path) => ({
+    slug: path.split('/'),
+  }))
+}
+```
+
+### Metadata
+
+```typescript
+import { compileMDX } from '@mdxe/next'
+
+export async function generateMetadata({ params }) {
+  const source = await getContent(params.slug.join('/'))
+  const { frontmatter } = await compileMDX({ source })
+
+  return {
+    title: frontmatter.title,
+    description: frontmatter.description,
+  }
+}
+```
+
+### MDX Plugins
+
+```typescript
+import remarkGfm from 'remark-gfm'
+import rehypePrism from 'rehype-prism'
+
+const { content } = await compileMDX({
+  source,
+  remarkPlugins: [remarkGfm],
+  rehypePlugins: [rehypePrism],
+})
+```
+
+## Components
+
+### Custom Components
+
+```typescript
+const components = {
+  // Override HTML elements
+  h1: ({ children }) => (
+    <h1 className="text-4xl font-bold">{children}</h1>
+  ),
+
+  // Custom components
+  Callout: ({ type, children }) => (
+    <aside className={`callout callout-${type}`}>
+      {children}
+    </aside>
+  ),
+
+  // Code blocks with syntax highlighting
+  pre: ({ children }) => (
+    <CodeBlock>{children}</CodeBlock>
+  ),
+}
+
+const { content } = await compileMDX({
+  source,
+  components,
+})
+```
+
+### Component Provider
+
+```typescript
+// components/mdx-provider.tsx
+'use client'
+
+import { MDXProvider } from '@mdx-js/react'
+import { components } from './mdx-components'
+
+export function MDXWrapper({ children }) {
+  return (
+    <MDXProvider components={components}>
+      {children}
+    </MDXProvider>
+  )
+}
+```
+
+## next.config.js
+
+```javascript
+// next.config.js
+import { withMDXe } from '@mdxe/next/config'
+
+export default withMDXe({
+  // Next.js config
+})
+```

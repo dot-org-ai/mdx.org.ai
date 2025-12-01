@@ -1,0 +1,129 @@
+---
+title: Integrations
+description: AI platform integrations for mdxai
+---
+
+# Integrations
+
+Connect mdxai to various AI platforms and frameworks.
+
+## Available Integrations
+
+| Integration | Package | Description |
+|-------------|---------|-------------|
+| Claude | [@mdxai/claude](/docs/mdxai/integrations/claude) | Anthropic Claude for content generation |
+| AgentKit | [@mdxai/agentkit](/docs/mdxai/integrations/agentkit) | Multi-agent orchestration |
+| Mastra | [@mdxai/mastra](/docs/mdxai/integrations/mastra) | AI workflow automation |
+| Vapi | [@mdxai/vapi](/docs/mdxai/integrations/vapi) | Voice AI assistants |
+
+## Choosing an Integration
+
+### Content Generation
+
+For generating and transforming MDX content, use **@mdxai/claude**:
+
+```typescript
+import { generateMDX } from '@mdxai/claude'
+
+const doc = await generateMDX({
+  prompt: 'Write documentation for the Button component',
+})
+```
+
+### Agent Workflows
+
+For complex multi-step processes, use **@mdxai/agentkit**:
+
+```typescript
+import { createAgent } from '@mdxai/agentkit'
+
+const agent = createAgent({
+  name: 'documentation-writer',
+  tools: [analyzeCode, generateDocs, reviewContent],
+})
+```
+
+### Workflow Automation
+
+For integrating with existing AI workflows, use **@mdxai/mastra**:
+
+```typescript
+import { createWorkflow } from '@mdxai/mastra'
+
+const workflow = createWorkflow({
+  trigger: 'code-change',
+  steps: [
+    { action: 'analyze', model: 'claude' },
+    { action: 'generate', template: 'api-docs' },
+    { action: 'review', criteria: 'accuracy' },
+  ],
+})
+```
+
+### Voice Interfaces
+
+For voice-enabled documentation, use **@mdxai/vapi**:
+
+```typescript
+import { createVoiceAgent } from '@mdxai/vapi'
+
+const agent = createVoiceAgent({
+  documents: docs,
+  voice: 'alloy',
+})
+```
+
+## Common Patterns
+
+### Schema-Driven Generation
+
+All integrations support MDXLD schemas:
+
+```typescript
+const schema = {
+  $type: 'APIReference',
+  endpoint: 'string',
+  method: 'GET | POST | PUT | DELETE',
+  parameters: [{
+    name: 'string',
+    type: 'string',
+    required: 'boolean',
+  }],
+}
+
+// Works with any integration
+const result = await generateMDX({
+  prompt: 'Document the /users endpoint',
+  schema,
+})
+```
+
+### Streaming Responses
+
+All integrations support streaming:
+
+```typescript
+const stream = await streamMDX({
+  prompt: 'Write a comprehensive guide',
+})
+
+for await (const chunk of stream) {
+  // Process incrementally
+}
+```
+
+### Error Handling
+
+Consistent error handling across integrations:
+
+```typescript
+import { AIError } from 'mdxai'
+
+try {
+  await generateMDX({ prompt })
+} catch (error) {
+  if (error instanceof AIError) {
+    // Handle AI-specific errors
+  }
+}
+```

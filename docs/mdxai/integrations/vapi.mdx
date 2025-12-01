@@ -1,0 +1,278 @@
+---
+title: "@mdxai/vapi"
+description: Voice AI integration for MDX documentation
+---
+
+# @mdxai/vapi
+
+Build voice-enabled documentation assistants with Vapi.
+
+## Installation
+
+```bash
+npm install @mdxai/vapi
+```
+
+## Usage
+
+```typescript
+import { createVoiceAgent } from '@mdxai/vapi'
+import { createDatabase } from '@mdxdb/fs'
+
+const db = createDatabase({ path: './docs' })
+
+const agent = await createVoiceAgent({
+  documents: db,
+  voice: 'alloy',
+  instructions: 'Help users navigate and understand the documentation',
+})
+
+// Start voice session
+const session = await agent.startSession()
+```
+
+## Configuration
+
+```typescript
+interface VapiConfig {
+  /** Vapi API key */
+  apiKey?: string
+
+  /** Voice to use */
+  voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'
+
+  /** Agent instructions */
+  instructions?: string
+
+  /** Document source */
+  documents: Database | Document[]
+
+  /** Custom tools */
+  tools?: Tool[]
+
+  /** Webhook URL for events */
+  webhookUrl?: string
+}
+```
+
+## Features
+
+### Document-Aware Agent
+
+```typescript
+import { createVoiceAgent } from '@mdxai/vapi'
+
+const agent = await createVoiceAgent({
+  documents: await loadDocs('./docs'),
+  instructions: `
+    You are a helpful documentation assistant.
+    Answer questions based on the documentation.
+    If you don't know something, say so.
+  `,
+})
+```
+
+### Phone Integration
+
+```typescript
+const agent = await createVoiceAgent({
+  documents: db,
+  phone: {
+    number: '+1234567890',
+    provider: 'twilio',
+  },
+})
+
+// Handle incoming calls
+agent.onCall(async (call) => {
+  console.log('Incoming call from:', call.from)
+})
+```
+
+### Web Integration
+
+```typescript
+// Server
+import { createVoiceAgent, createWebSocket } from '@mdxai/vapi'
+
+const agent = await createVoiceAgent({ documents: db })
+const ws = createWebSocket(agent)
+
+app.get('/voice', ws.handler)
+
+// Client
+const client = new VapiClient({
+  url: 'wss://example.com/voice',
+})
+
+await client.connect()
+client.speak('How do I install the package?')
+```
+
+### Custom Tools
+
+```typescript
+const agent = await createVoiceAgent({
+  documents: db,
+  tools: [
+    {
+      name: 'searchDocs',
+      description: 'Search documentation for a topic',
+      parameters: {
+        query: { type: 'string', description: 'Search query' },
+      },
+      execute: async ({ query }) => {
+        const results = await db.search(query)
+        return results.map(r => r.data.title).join(', ')
+      },
+    },
+    {
+      name: 'getExample',
+      description: 'Get a code example for a topic',
+      parameters: {
+        topic: { type: 'string', description: 'Topic name' },
+      },
+      execute: async ({ topic }) => {
+        const doc = await db.get(`examples/${topic}`)
+        return doc?.content || 'No example found'
+      },
+    },
+  ],
+})
+```
+
+## Examples
+
+### Documentation Helpdesk
+
+```typescript
+import { createVoiceAgent } from '@mdxai/vapi'
+import { createSource } from '@mdxdb/fumadocs'
+
+const source = createSource(db, { baseUrl: '/docs' })
+
+const helpdesk = await createVoiceAgent({
+  documents: source.getPages(),
+  voice: 'nova',
+  instructions: `
+    You are a friendly documentation assistant.
+
+    When users ask questions:
+    1. Search the documentation for relevant information
+    2. Provide clear, concise answers
+    3. Offer to explain further if needed
+    4. Suggest related topics they might find helpful
+  `,
+  tools: [
+    {
+      name: 'navigateTo',
+      description: 'Suggest a documentation page to visit',
+      parameters: {
+        path: { type: 'string', description: 'Page path' },
+      },
+      execute: async ({ path }) => {
+        return `You can find more information at ${path}`
+      },
+    },
+  ],
+})
+```
+
+### Tutorial Guide
+
+```typescript
+const tutorialGuide = await createVoiceAgent({
+  documents: await loadTutorials('./tutorials'),
+  voice: 'echo',
+  instructions: `
+    Guide users through tutorials step by step.
+
+    - Read each step clearly
+    - Wait for confirmation before proceeding
+    - Offer to repeat or explain further
+    - Provide encouragement
+  `,
+})
+
+tutorialGuide.onMessage(async (message, session) => {
+  if (message.includes('next')) {
+    const nextStep = await session.getNextStep()
+    return nextStep.content
+  }
+})
+```
+
+### Multi-Language Support
+
+```typescript
+const agent = await createVoiceAgent({
+  documents: db,
+  voice: 'alloy',
+  instructions: 'Help users in their preferred language',
+  tools: [
+    {
+      name: 'translateResponse',
+      description: 'Translate response to target language',
+      parameters: {
+        text: { type: 'string' },
+        language: { type: 'string' },
+      },
+      execute: async ({ text, language }) => {
+        return await translate(text, language)
+      },
+    },
+  ],
+})
+```
+
+## Events
+
+```typescript
+const agent = await createVoiceAgent({ documents: db })
+
+agent.on('session.start', (session) => {
+  console.log('Session started:', session.id)
+})
+
+agent.on('speech.start', (data) => {
+  console.log('User speaking...')
+})
+
+agent.on('speech.end', (data) => {
+  console.log('User said:', data.transcript)
+})
+
+agent.on('response.start', (data) => {
+  console.log('Agent responding...')
+})
+
+agent.on('tool.use', (data) => {
+  console.log('Tool used:', data.tool, data.args)
+})
+
+agent.on('session.end', (session) => {
+  console.log('Session ended:', session.id)
+})
+```
+
+## Analytics
+
+```typescript
+import { createVoiceAgent, getAnalytics } from '@mdxai/vapi'
+
+const agent = await createVoiceAgent({ documents: db })
+
+// Get usage analytics
+const analytics = await getAnalytics({
+  agentId: agent.id,
+  period: 'week',
+})
+
+console.log(analytics)
+// {
+//   totalSessions: 150,
+//   avgDuration: 180, // seconds
+//   topQuestions: [...],
+//   satisfactionScore: 4.5,
+// }
+```

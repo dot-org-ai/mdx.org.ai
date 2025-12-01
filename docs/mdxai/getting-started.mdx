@@ -1,0 +1,181 @@
+---
+title: Getting Started
+description: Set up mdxai for AI-powered MDX
+---
+
+# Getting Started
+
+Get started with AI-powered MDX generation and transformation.
+
+## Installation
+
+```bash
+npm install mdxai @mdxai/claude
+```
+
+## Configuration
+
+Set your API key:
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Or configure programmatically:
+
+```typescript
+import { configure } from 'mdxai'
+
+configure({
+  anthropic: {
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  },
+})
+```
+
+## Basic Generation
+
+### Simple Content
+
+```typescript
+import { generateMDX } from '@mdxai/claude'
+
+const result = await generateMDX({
+  prompt: 'Write a short introduction to GraphQL',
+})
+
+console.log(result.content)
+// # Introduction to GraphQL
+//
+// GraphQL is a query language for APIs...
+```
+
+### With Schema
+
+Define the expected structure:
+
+```typescript
+const result = await generateMDX({
+  prompt: 'Write a tutorial about React hooks',
+  schema: {
+    $type: 'Tutorial',
+    title: 'string',
+    difficulty: 'beginner | intermediate | advanced',
+    prerequisites: 'string[]',
+  },
+})
+
+console.log(result.frontmatter)
+// {
+//   $type: 'Tutorial',
+//   title: 'Understanding React Hooks',
+//   difficulty: 'intermediate',
+//   prerequisites: ['JavaScript basics', 'React fundamentals']
+// }
+```
+
+## Content Transformation
+
+### Enhance Existing Content
+
+```typescript
+import { transformMDX } from '@mdxai/claude'
+
+const original = `
+# API Reference
+
+The \`get\` method retrieves a document.
+`
+
+const enhanced = await transformMDX(original, {
+  instructions: 'Add code examples and parameter descriptions',
+})
+```
+
+### Translate Content
+
+```typescript
+const translated = await transformMDX(englishMDX, {
+  instructions: 'Translate to Spanish while preserving code blocks',
+})
+```
+
+### Extract Structure
+
+```typescript
+import { extractFromMDX } from '@mdxai/claude'
+
+const data = await extractFromMDX(documentation, {
+  schema: {
+    functions: [{
+      name: 'string',
+      parameters: 'string[]',
+      returnType: 'string',
+    }],
+  },
+})
+```
+
+## Streaming
+
+For long content, stream the response:
+
+```typescript
+import { streamMDX } from '@mdxai/claude'
+
+const stream = await streamMDX({
+  prompt: 'Write a comprehensive guide to testing',
+})
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk)
+}
+```
+
+## Type Safety
+
+Use MDXLD types for validation:
+
+```typescript
+import { generateMDX } from '@mdxai/claude'
+import { type } from 'arktype'
+
+const BlogPost = type({
+  $type: '"BlogPost"',
+  title: 'string',
+  author: 'string',
+  publishedAt: 'string',
+  tags: 'string[]',
+})
+
+const result = await generateMDX({
+  prompt: 'Write a blog post about AI',
+  schema: BlogPost,
+})
+
+// result.frontmatter is typed as BlogPost
+```
+
+## Error Handling
+
+```typescript
+import { generateMDX, AIError } from '@mdxai/claude'
+
+try {
+  const result = await generateMDX({
+    prompt: 'Generate content',
+  })
+} catch (error) {
+  if (error instanceof AIError) {
+    console.log(error.code)     // 'rate_limit' | 'invalid_request' | ...
+    console.log(error.message)  // Human-readable message
+    console.log(error.retryAfter) // Seconds until retry (for rate limits)
+  }
+}
+```
+
+## Next Steps
+
+- [Claude Integration](/docs/mdxai/integrations/claude) - Advanced Claude features
+- [AgentKit](/docs/mdxai/integrations/agentkit) - Multi-agent workflows
+- [Vapi](/docs/mdxai/integrations/vapi) - Voice interfaces

@@ -1,0 +1,204 @@
+---
+title: Getting Started
+description: Set up mdxui for MDX rendering
+---
+
+# Getting Started
+
+Render MDX to multiple output formats with mdxui.
+
+## Installation
+
+```bash
+npm install mdxui
+```
+
+## Basic Rendering
+
+### HTML Output
+
+```typescript
+import { renderToHTML } from '@mdxui/html'
+
+const mdx = `
+# Welcome
+
+This is a **paragraph** with *formatting*.
+
+- List item 1
+- List item 2
+`
+
+const html = await renderToHTML(mdx)
+// <h1>Welcome</h1>
+// <p>This is a <strong>paragraph</strong> with <em>formatting</em>.</p>
+// <ul><li>List item 1</li><li>List item 2</li></ul>
+```
+
+### JSON Output
+
+```typescript
+import { renderToJSON } from '@mdxui/json'
+
+const json = await renderToJSON(mdx)
+// {
+//   type: 'root',
+//   children: [
+//     { type: 'heading', depth: 1, text: 'Welcome' },
+//     { type: 'paragraph', children: [...] },
+//     { type: 'list', items: [...] }
+//   ]
+// }
+```
+
+### Markdown Output
+
+```typescript
+import { renderToMarkdown } from '@mdxui/markdown'
+
+const markdown = await renderToMarkdown(mdx)
+// # Welcome
+//
+// This is a **paragraph** with *formatting*.
+```
+
+## Custom Components
+
+Register components for custom elements:
+
+```typescript
+import { renderToHTML, registerComponent } from '@mdxui/html'
+
+registerComponent('Alert', ({ type, children }) => `
+  <div class="alert alert-${type}">
+    ${children}
+  </div>
+`)
+
+const mdx = `
+<Alert type="warning">
+  Be careful!
+</Alert>
+`
+
+const html = await renderToHTML(mdx)
+// <div class="alert alert-warning">Be careful!</div>
+```
+
+## With React
+
+Use the shadcn integration for React:
+
+```typescript
+import { MDXProvider, components } from '@mdxui/shadcn'
+
+function App() {
+  return (
+    <MDXProvider components={components}>
+      <MDXContent />
+    </MDXProvider>
+  )
+}
+```
+
+## Component Override
+
+Override default components:
+
+```typescript
+import { renderToHTML } from '@mdxui/html'
+
+const html = await renderToHTML(mdx, {
+  components: {
+    h1: ({ children }) => `<h1 class="text-4xl font-bold">${children}</h1>`,
+    p: ({ children }) => `<p class="my-4">${children}</p>`,
+    code: ({ children, language }) => `
+      <pre class="code-block" data-language="${language}">
+        <code>${children}</code>
+      </pre>
+    `,
+  },
+})
+```
+
+## Styling
+
+### CSS Classes
+
+```typescript
+import { renderToHTML } from '@mdxui/html'
+
+const html = await renderToHTML(mdx, {
+  classNames: {
+    h1: 'text-4xl font-bold mb-4',
+    h2: 'text-3xl font-semibold mb-3',
+    p: 'text-base leading-relaxed mb-4',
+    ul: 'list-disc list-inside mb-4',
+    code: 'bg-gray-100 px-1 rounded',
+    pre: 'bg-gray-900 text-white p-4 rounded-lg',
+  },
+})
+```
+
+### CSS-in-JS
+
+```typescript
+const html = await renderToHTML(mdx, {
+  styles: {
+    h1: { fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' },
+    p: { lineHeight: 1.75, marginBottom: '1rem' },
+  },
+})
+```
+
+## Format Detection
+
+Automatically detect output format:
+
+```typescript
+import { render } from 'mdxui'
+
+// Render based on content-type or extension
+const output = await render(mdx, {
+  format: 'html', // 'html' | 'json' | 'markdown'
+})
+```
+
+## Plugins
+
+### Syntax Highlighting
+
+```typescript
+import { renderToHTML } from '@mdxui/html'
+import { highlightPlugin } from '@mdxui/html/plugins'
+
+const html = await renderToHTML(mdx, {
+  plugins: [
+    highlightPlugin({
+      theme: 'github-dark',
+    }),
+  ],
+})
+```
+
+### Table of Contents
+
+```typescript
+import { renderToHTML, tocPlugin } from '@mdxui/html'
+
+const { html, toc } = await renderToHTML(mdx, {
+  plugins: [tocPlugin()],
+})
+
+console.log(toc)
+// [
+//   { id: 'welcome', text: 'Welcome', depth: 1 },
+//   { id: 'getting-started', text: 'Getting Started', depth: 2 },
+// ]
+```
+
+## Next Steps
+
+- [HTML Renderer](/docs/mdxui/renderers/html) - Full HTML options
+- [JSON Renderer](/docs/mdxui/renderers/json) - API serialization
+- [shadcn Components](/docs/mdxui/renderers/shadcn) - React integration

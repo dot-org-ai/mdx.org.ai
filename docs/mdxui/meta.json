@@ -1,0 +1,6 @@
+{
+  "title": "mdxui",
+  "root": true,
+  "defaultOpen": true,
+  "pages": ["index", "getting-started", "renderers"]
+}

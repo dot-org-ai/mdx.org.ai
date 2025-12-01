@@ -1,0 +1,267 @@
+---
+title: "@mdxai/claude"
+description: Anthropic Claude integration for MDX
+---
+
+# @mdxai/claude
+
+Generate and transform MDX content using Anthropic's Claude.
+
+## Installation
+
+```bash
+npm install @mdxai/claude
+```
+
+## Configuration
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+```typescript
+import { configure } from '@mdxai/claude'
+
+configure({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  model: 'claude-sonnet-4-20250514', // default
+  maxTokens: 4096,
+})
+```
+
+## Usage
+
+### Generate Content
+
+```typescript
+import { generateMDX } from '@mdxai/claude'
+
+const result = await generateMDX({
+  prompt: 'Write a guide about TypeScript generics',
+  schema: {
+    $type: 'Guide',
+    title: 'string',
+    difficulty: 'beginner | intermediate | advanced',
+  },
+})
+
+console.log(result.frontmatter.title)
+console.log(result.content)
+```
+
+### Transform Content
+
+```typescript
+import { transformMDX } from '@mdxai/claude'
+
+const enhanced = await transformMDX(existingMDX, {
+  instructions: `
+    - Add code examples for each concept
+    - Include TypeScript types
+    - Add a summary section at the end
+  `,
+})
+```
+
+### Extract Data
+
+```typescript
+import { extractFromMDX } from '@mdxai/claude'
+
+const data = await extractFromMDX(documentation, {
+  schema: {
+    apis: [{
+      name: 'string',
+      method: 'string',
+      path: 'string',
+      description: 'string',
+    }],
+  },
+})
+```
+
+## Configuration
+
+```typescript
+interface ClaudeConfig {
+  /** API key */
+  apiKey: string
+
+  /** Model to use */
+  model?: 'claude-sonnet-4-20250514' | 'claude-opus-4-20250514' | 'claude-3-haiku-20240307'
+
+  /** Maximum tokens to generate */
+  maxTokens?: number
+
+  /** Temperature (0-1) */
+  temperature?: number
+
+  /** System prompt */
+  systemPrompt?: string
+}
+```
+
+## Advanced Features
+
+### Custom System Prompts
+
+```typescript
+const result = await generateMDX({
+  prompt: 'Document the authentication flow',
+  systemPrompt: `
+    You are a technical writer specializing in security documentation.
+    Always include:
+    - Security considerations
+    - Best practices
+    - Common pitfalls
+  `,
+})
+```
+
+### Streaming
+
+```typescript
+import { streamMDX } from '@mdxai/claude'
+
+const stream = await streamMDX({
+  prompt: 'Write a comprehensive API reference',
+})
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk)
+}
+```
+
+### Tool Use
+
+```typescript
+import { generateWithTools } from '@mdxai/claude'
+
+const result = await generateWithTools({
+  prompt: 'Document this codebase',
+  tools: {
+    readFile: async (path: string) => {
+      return await fs.readFile(path, 'utf-8')
+    },
+    listFiles: async (pattern: string) => {
+      return await glob(pattern)
+    },
+  },
+})
+```
+
+### Batch Processing
+
+```typescript
+import { batchGenerate } from '@mdxai/claude'
+
+const topics = [
+  'React hooks',
+  'State management',
+  'API integration',
+]
+
+const results = await batchGenerate(
+  topics.map(topic => ({
+    prompt: `Write a tutorial about ${topic}`,
+    schema: tutorialSchema,
+  })),
+  { concurrency: 3 }
+)
+```
+
+## Examples
+
+### API Documentation Generator
+
+```typescript
+import { generateMDX } from '@mdxai/claude'
+import { readFile } from 'fs/promises'
+
+async function generateAPIDocs(sourceFile: string) {
+  const source = await readFile(sourceFile, 'utf-8')
+
+  return generateMDX({
+    prompt: `Generate API documentation for this code:\n\n${source}`,
+    schema: {
+      $type: 'APIReference',
+      title: 'string',
+      description: 'string',
+      functions: [{
+        name: 'string',
+        description: 'string',
+        parameters: [{
+          name: 'string',
+          type: 'string',
+          description: 'string',
+        }],
+        returns: 'string',
+        example: 'string',
+      }],
+    },
+  })
+}
+```
+
+### Content Translation
+
+```typescript
+import { transformMDX } from '@mdxai/claude'
+
+async function translateDocs(mdx: string, targetLang: string) {
+  return transformMDX(mdx, {
+    instructions: `
+      Translate this documentation to ${targetLang}.
+      - Keep all code blocks unchanged
+      - Preserve MDX component syntax
+      - Maintain technical accuracy
+    `,
+  })
+}
+```
+
+### Content Review
+
+```typescript
+import { extractFromMDX } from '@mdxai/claude'
+
+async function reviewContent(mdx: string) {
+  return extractFromMDX(mdx, {
+    prompt: 'Review this documentation for issues',
+    schema: {
+      issues: [{
+        type: 'error | warning | suggestion',
+        location: 'string',
+        description: 'string',
+        suggestion: 'string',
+      }],
+      score: 'number',
+    },
+  })
+}
+```
+
+## Error Handling
+
+```typescript
+import { generateMDX, ClaudeError } from '@mdxai/claude'
+
+try {
+  const result = await generateMDX({ prompt })
+} catch (error) {
+  if (error instanceof ClaudeError) {
+    switch (error.code) {
+      case 'rate_limit':
+        await sleep(error.retryAfter * 1000)
+        // Retry
+        break
+      case 'context_length':
+        // Reduce prompt size
+        break
+      case 'invalid_api_key':
+        // Check configuration
+        break
+    }
+  }
+}
+```

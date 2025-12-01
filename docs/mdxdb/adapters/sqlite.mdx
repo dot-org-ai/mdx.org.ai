@@ -1,0 +1,143 @@
+---
+title: "@mdxdb/sqlite"
+description: SQLite storage adapter
+---
+
+# @mdxdb/sqlite
+
+Store MDXLD documents in a SQLite database.
+
+## Installation
+
+```bash
+npm install @mdxdb/sqlite
+```
+
+## Usage
+
+```typescript
+import { createDatabase } from '@mdxdb/sqlite'
+
+const db = createDatabase({
+  filename: './content.db',
+})
+```
+
+## Configuration
+
+```typescript
+interface SqliteConfig {
+  /** Database file path, or ':memory:' for in-memory */
+  filename: string
+
+  /** Enable WAL mode (default: true) */
+  wal?: boolean
+
+  /** Enable full-text search (default: true) */
+  fts?: boolean
+}
+```
+
+## Schema
+
+The adapter automatically creates these tables:
+
+```sql
+-- Main documents table
+CREATE TABLE documents (
+  path TEXT PRIMARY KEY,
+  type TEXT,
+  data JSON,
+  content TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Full-text search index
+CREATE VIRTUAL TABLE documents_fts USING fts5(
+  path,
+  title,
+  content,
+  content=documents
+);
+```
+
+## Examples
+
+### Basic Usage
+
+```typescript
+import { createDatabase } from '@mdxdb/sqlite'
+
+const db = createDatabase({
+  filename: './data/content.db',
+})
+
+// All standard operations work
+await db.set('posts/hello', doc)
+const post = await db.get('posts/hello')
+const posts = await db.list('posts/')
+```
+
+### In-Memory Database
+
+```typescript
+const db = createDatabase({
+  filename: ':memory:',
+})
+
+// Great for testing
+await db.set('test/doc', doc)
+```
+
+### Full-Text Search
+
+```typescript
+const results = await db.search('typescript tutorial', {
+  fields: ['title', 'content'],
+  limit: 10,
+})
+
+for (const result of results.documents) {
+  console.log(result.data.title)
+}
+```
+
+## Edge Computing
+
+SQLite works great at the edge:
+
+### Cloudflare D1
+
+```typescript
+import { createDatabase } from '@mdxdb/sqlite/d1'
+
+export default {
+  async fetch(request, env) {
+    const db = createDatabase({
+      d1: env.DB,
+    })
+
+    const doc = await db.get('posts/hello')
+    return Response.json(doc)
+  },
+}
+```
+
+### Turso
+
+```typescript
+import { createDatabase } from '@mdxdb/sqlite/turso'
+
+const db = createDatabase({
+  url: process.env.TURSO_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+})
+```
+
+## Performance Tips
+
+1. **Enable WAL mode** - Better concurrent read performance
+2. **Use indexes** - Create indexes for frequently queried fields
+3. **Batch operations** - Use transactions for bulk inserts
+4. **Vacuum periodically** - Reclaim disk space

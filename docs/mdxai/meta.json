@@ -1,0 +1,6 @@
+{
+  "title": "mdxai",
+  "root": true,
+  "defaultOpen": true,
+  "pages": ["index", "getting-started", "integrations"]
+}

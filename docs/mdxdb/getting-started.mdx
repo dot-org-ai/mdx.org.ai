@@ -1,0 +1,276 @@
+---
+title: Getting Started
+description: Set up mdxdb for your project
+---
+
+# Getting Started with mdxdb
+
+This guide walks you through setting up mdxdb for your project.
+
+## Choose an Adapter
+
+First, decide which storage backend fits your needs:
+
+| Adapter | Best For |
+|---------|----------|
+| `@mdxdb/fs` | Local development, static sites, Git-based workflows |
+| `@mdxdb/sqlite` | Embedded applications, edge computing, serverless |
+| `@mdxdb/postgres` | Production apps, complex queries, full-text search |
+| `@mdxdb/mongo` | Document-heavy workloads, flexible schemas |
+| `@mdxdb/clickhouse` | Analytics, time-series data, large datasets |
+
+## Installation
+
+Install the core package and your chosen adapter:
+
+```bash
+# Core package (optional, included with adapters)
+npm install mdxdb
+
+# Choose an adapter
+npm install @mdxdb/fs      # File system
+npm install @mdxdb/sqlite  # SQLite
+npm install @mdxdb/postgres # PostgreSQL
+```
+
+## Basic Setup
+
+### File System
+
+```typescript
+import { createDatabase } from '@mdxdb/fs'
+
+const db = createDatabase({
+  path: './content',
+  // Optional: file extension
+  extension: '.mdx',
+})
+```
+
+### SQLite
+
+```typescript
+import { createDatabase } from '@mdxdb/sqlite'
+
+const db = createDatabase({
+  // In-memory database
+  filename: ':memory:',
+
+  // Or persistent file
+  // filename: './data/content.db',
+})
+```
+
+### PostgreSQL
+
+```typescript
+import { createDatabase } from '@mdxdb/postgres'
+
+const db = createDatabase({
+  connectionString: process.env.DATABASE_URL,
+  // Or individual options
+  // host: 'localhost',
+  // port: 5432,
+  // database: 'mdxdb',
+  // user: 'postgres',
+  // password: 'secret',
+})
+```
+
+## CRUD Operations
+
+### Create
+
+```typescript
+import { parse } from 'mdxld'
+
+// From MDX string
+const doc = parse(`---
+$type: Article
+title: My First Article
+author: Jane Doe
+publishedAt: 2024-01-15
+tags:
+  - tutorial
+  - mdx
+---
+
+# My First Article
+
+Welcome to my article!
+
+## Introduction
+
+This is the introduction...
+`)
+
+await db.set('articles/my-first-article', doc)
+```
+
+### Read
+
+```typescript
+// Get single document
+const doc = await db.get('articles/my-first-article')
+
+if (doc) {
+  console.log(doc.data.title)  // 'My First Article'
+  console.log(doc.content)      // '# My First Article...'
+}
+
+// Get without content (metadata only)
+const meta = await db.get('articles/my-first-article', {
+  includeContent: false,
+})
+```
+
+### Update
+
+```typescript
+const doc = await db.get('articles/my-first-article')
+
+// Modify
+doc.data.title = 'Updated Title'
+doc.data.updatedAt = new Date().toISOString()
+doc.content += '\n\n## New Section\n\nAdded content...'
+
+// Save
+await db.set('articles/my-first-article', doc, {
+  overwrite: true,
+})
+```
+
+### Delete
+
+```typescript
+const result = await db.delete('articles/old-article')
+
+console.log(result.success)  // true
+console.log(result.path)     // 'articles/old-article'
+```
+
+## Listing Documents
+
+```typescript
+// List all documents
+const all = await db.list()
+
+// List with prefix
+const articles = await db.list('articles/')
+
+// With pagination
+const page1 = await db.list('articles/', {
+  limit: 10,
+  offset: 0,
+  orderBy: 'createdAt',
+  order: 'desc',
+})
+
+// Filter by type
+const blogPosts = await db.list('', {
+  type: 'BlogPost',
+})
+```
+
+## Searching
+
+```typescript
+// Basic search
+const results = await db.search('typescript')
+
+// Search specific fields
+const titleSearch = await db.search('tutorial', {
+  fields: ['title'],
+  limit: 5,
+})
+
+// Search with type filter
+const articleSearch = await db.search('react hooks', {
+  type: 'Article',
+  fields: ['title', 'content'],
+})
+```
+
+## Organizing Content
+
+### By Type
+
+```
+content/
+├── articles/
+│   ├── hello-world.mdx
+│   └── typescript-tips.mdx
+├── tutorials/
+│   ├── getting-started.mdx
+│   └── advanced-patterns.mdx
+└── docs/
+    ├── api/
+    │   └── reference.mdx
+    └── guides/
+        └── installation.mdx
+```
+
+### By Date
+
+```
+content/
+└── posts/
+    ├── 2024/
+    │   ├── 01/
+    │   │   └── hello-world.mdx
+    │   └── 02/
+    │       └── february-update.mdx
+    └── 2023/
+        └── 12/
+            └── year-in-review.mdx
+```
+
+## TypeScript Types
+
+```typescript
+import type {
+  Database,
+  DatabaseConfig,
+  GetOptions,
+  SetOptions,
+  ListOptions,
+  SearchOptions,
+  ListResult,
+  SearchResult,
+} from 'mdxdb'
+
+// Type your documents
+interface Article {
+  $type: 'Article'
+  title: string
+  author: string
+  publishedAt: string
+  tags?: string[]
+}
+
+async function getArticle(path: string) {
+  const doc = await db.get(path)
+  return doc as MDXLDDocument & { data: Article }
+}
+```
+
+## Error Handling
+
+```typescript
+import { DatabaseError, NotFoundError } from 'mdxdb'
+
+try {
+  const doc = await db.get('articles/missing')
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    console.log('Document not found')
+  } else if (error instanceof DatabaseError) {
+    console.error('Database error:', error.message)
+  }
+}
+```
+
+## Next Steps
+
+- [Adapters](/docs/mdxdb/adapters) - Detailed adapter documentation
+- [Fumadocs Integration](/docs/mdxdb/fumadocs) - Use with Fumadocs

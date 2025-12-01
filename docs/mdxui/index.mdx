@@ -1,0 +1,137 @@
+---
+title: mdxui
+description: Component libraries and renderers for MDX
+---
+
+# mdxui
+
+Render MDX to any format with customizable component libraries.
+
+## What is mdxui?
+
+mdxui provides output renderers and component libraries for MDX documents:
+
+- **Multiple Formats** - HTML, JSON, Markdown, and more
+- **Component Libraries** - Pre-built UI components
+- **Customizable** - Extend and override components
+- **Consistent** - Same content, multiple outputs
+
+## Features
+
+- **Format Flexibility** - Render to any output format
+- **Design Systems** - Integrate with shadcn/ui
+- **Serialization** - JSON output for APIs
+- **Round-Trip** - Convert between formats
+
+## Renderers
+
+| Package | Output | Description |
+|---------|--------|-------------|
+| [@mdxui/html](/docs/mdxui/renderers/html) | HTML | Static HTML rendering |
+| [@mdxui/json](/docs/mdxui/renderers/json) | JSON | Structured data output |
+| [@mdxui/markdown](/docs/mdxui/renderers/markdown) | Markdown | Convert back to Markdown |
+| [@mdxui/shadcn](/docs/mdxui/renderers/shadcn) | React | shadcn/ui components |
+
+## Installation
+
+```bash
+npm install mdxui
+```
+
+Or install specific renderers:
+
+```bash
+# HTML rendering
+npm install @mdxui/html
+
+# shadcn/ui components
+npm install @mdxui/shadcn
+```
+
+## Quick Example
+
+```typescript
+import { renderToHTML } from '@mdxui/html'
+
+const mdx = `
+# Hello World
+
+This is **bold** and *italic* text.
+
+<Alert type="info">
+  Important information here.
+</Alert>
+`
+
+const html = await renderToHTML(mdx)
+```
+
+## Architecture
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│    MDX      │────▶│   mdxui     │────▶│   Output    │
+│  Document   │     │  (Render)   │     │   Format    │
+└─────────────┘     └──────┬──────┘     └─────────────┘
+                          │
+              ┌───────────┼───────────┐
+              │           │           │
+        ┌─────▼─────┐ ┌───▼───┐ ┌────▼────┐
+        │   HTML    │ │  JSON │ │ shadcn  │
+        └───────────┘ └───────┘ └─────────┘
+```
+
+## Use Cases
+
+### Static Site Generation
+
+```typescript
+import { renderToHTML } from '@mdxui/html'
+
+const pages = await glob('content/**/*.mdx')
+
+for (const page of pages) {
+  const mdx = await readFile(page, 'utf-8')
+  const html = await renderToHTML(mdx, {
+    components: customComponents,
+  })
+
+  await writeFile(
+    page.replace('.mdx', '.html'),
+    html
+  )
+}
+```
+
+### API Responses
+
+```typescript
+import { renderToJSON } from '@mdxui/json'
+
+app.get('/api/content/:slug', async (req, res) => {
+  const mdx = await getContent(req.params.slug)
+  const json = await renderToJSON(mdx)
+
+  res.json(json)
+})
+```
+
+### Design System Integration
+
+```typescript
+import { MDXProvider } from '@mdxui/shadcn'
+
+export default function App({ children }) {
+  return (
+    <MDXProvider>
+      {children}
+    </MDXProvider>
+  )
+}
+```
+
+## Next Steps
+
+- [Getting Started](/docs/mdxui/getting-started) - Set up mdxui
+- [HTML Renderer](/docs/mdxui/renderers/html) - Static HTML output
+- [shadcn Components](/docs/mdxui/renderers/shadcn) - React component library

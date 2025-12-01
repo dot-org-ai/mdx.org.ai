@@ -1,0 +1,129 @@
+---
+title: mdxai
+description: AI agent framework for MDX documents
+---
+
+# mdxai
+
+Build AI agents and workflows powered by MDX documents.
+
+## What is mdxai?
+
+mdxai connects MDX documents to AI systems, enabling:
+
+- **AI-Powered Content** - Generate and transform MDX with LLMs
+- **Agent Workflows** - Define agentic behaviors in MDX
+- **Voice Interfaces** - Voice-enabled documentation
+- **Multi-Model Support** - Claude, GPT, and more
+
+## Features
+
+- **Semantic Context** - MDXLD types inform AI understanding
+- **Tool Integration** - Define AI tools in MDX
+- **Streaming** - Real-time content generation
+- **Validation** - Type-safe AI outputs
+
+## Integrations
+
+| Package | Platform | Description |
+|---------|----------|-------------|
+| [@mdxai/claude](/docs/mdxai/integrations/claude) | Anthropic | Claude AI integration |
+| [@mdxai/agentkit](/docs/mdxai/integrations/agentkit) | AgentKit | Multi-agent orchestration |
+| [@mdxai/mastra](/docs/mdxai/integrations/mastra) | Mastra | AI workflow framework |
+| [@mdxai/vapi](/docs/mdxai/integrations/vapi) | Vapi | Voice AI assistants |
+
+## Installation
+
+```bash
+npm install mdxai
+```
+
+Or install specific integrations:
+
+```bash
+# Claude
+npm install @mdxai/claude
+
+# Voice
+npm install @mdxai/vapi
+```
+
+## Quick Example
+
+```typescript
+import { generateMDX } from 'mdxai'
+
+const result = await generateMDX({
+  prompt: 'Write a tutorial about React hooks',
+  schema: {
+    $type: 'Tutorial',
+    title: 'string',
+    difficulty: 'beginner | intermediate | advanced',
+  },
+})
+
+console.log(result.frontmatter.title)
+console.log(result.content)
+```
+
+## Architecture
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Prompt    │────▶│   mdxai     │────▶│     MDX     │
+│             │     │  (Generate) │     │  Document   │
+└─────────────┘     └──────┬──────┘     └─────────────┘
+                          │
+              ┌───────────┼───────────┐
+              │           │           │
+        ┌─────▼─────┐ ┌───▼───┐ ┌────▼────┐
+        │  Claude   │ │  GPT  │ │  Vapi   │
+        └───────────┘ └───────┘ └─────────┘
+```
+
+## Use Cases
+
+### Content Generation
+
+```typescript
+import { generateMDX } from '@mdxai/claude'
+
+const blogPost = await generateMDX({
+  prompt: 'Write a blog post about TypeScript 5.0 features',
+  schema: {
+    $type: 'BlogPost',
+    title: 'string',
+    excerpt: 'string',
+    tags: 'string[]',
+  },
+})
+```
+
+### Document Transformation
+
+```typescript
+import { transformMDX } from '@mdxai/claude'
+
+const enhanced = await transformMDX(existingMDX, {
+  instructions: 'Add code examples and improve explanations',
+  preserveStructure: true,
+})
+```
+
+### Voice Documentation
+
+```typescript
+import { createVoiceAgent } from '@mdxai/vapi'
+
+const agent = createVoiceAgent({
+  documents: await loadDocs('./docs'),
+  voice: 'alloy',
+  instructions: 'Help users navigate the documentation',
+})
+```
+
+## Next Steps
+
+- [Getting Started](/docs/mdxai/getting-started) - Set up mdxai
+- [Claude Integration](/docs/mdxai/integrations/claude) - Use Claude for generation
+- [Voice Agents](/docs/mdxai/integrations/vapi) - Build voice interfaces

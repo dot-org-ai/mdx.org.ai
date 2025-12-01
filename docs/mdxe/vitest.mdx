@@ -1,0 +1,273 @@
+---
+title: "@mdxe/vitest"
+description: Vitest testing utilities for MDX
+---
+
+# @mdxe/vitest
+
+Test MDX documents and components with Vitest.
+
+## Installation
+
+```bash
+npm install @mdxe/vitest -D
+```
+
+## Setup
+
+```typescript
+// vitest.config.ts
+import { defineConfig } from 'vitest/config'
+import { mdxPlugin } from '@mdxe/vitest'
+
+export default defineConfig({
+  plugins: [mdxPlugin()],
+  test: {
+    environment: 'jsdom',
+  },
+})
+```
+
+## Usage
+
+### Testing MDX Content
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { render } from '@mdxe/vitest'
+
+describe('MDX Content', () => {
+  it('renders markdown correctly', async () => {
+    const mdx = `
+# Hello World
+
+This is **bold** text.
+`
+    const { container } = await render(mdx)
+
+    expect(container.querySelector('h1')).toHaveTextContent('Hello World')
+    expect(container.querySelector('strong')).toHaveTextContent('bold')
+  })
+})
+```
+
+### Testing Components
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { render } from '@mdxe/vitest'
+import { Button } from './components/Button'
+
+describe('Custom Components', () => {
+  it('renders custom components', async () => {
+    const mdx = `
+<Button variant="primary">Click me</Button>
+`
+    const { getByRole } = await render(mdx, {
+      components: { Button },
+    })
+
+    expect(getByRole('button')).toHaveTextContent('Click me')
+  })
+})
+```
+
+### Testing Frontmatter
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { compile } from '@mdxe/vitest'
+
+describe('Frontmatter', () => {
+  it('parses frontmatter correctly', async () => {
+    const mdx = `
+---
+title: My Page
+description: A test page
+tags:
+  - test
+  - example
+---
+
+# {frontmatter.title}
+`
+    const { frontmatter } = await compile(mdx)
+
+    expect(frontmatter.title).toBe('My Page')
+    expect(frontmatter.description).toBe('A test page')
+    expect(frontmatter.tags).toEqual(['test', 'example'])
+  })
+})
+```
+
+## API
+
+### render(mdx, options)
+
+Render MDX and return testing-library queries.
+
+```typescript
+const {
+  container,
+  getByRole,
+  getByText,
+  queryByText,
+  // ... all testing-library queries
+} = await render(mdx, {
+  components: {},
+  scope: {},
+})
+```
+
+### compile(mdx, options)
+
+Compile MDX without rendering.
+
+```typescript
+const {
+  frontmatter,
+  exports,
+  code,
+  toc,
+} = await compile(mdx)
+```
+
+### renderToString(mdx, options)
+
+Render to HTML string.
+
+```typescript
+const html = await renderToString(mdx)
+expect(html).toContain('<h1>Hello</h1>')
+```
+
+## Testing Patterns
+
+### Snapshot Testing
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { renderToString } from '@mdxe/vitest'
+
+describe('Snapshots', () => {
+  it('matches snapshot', async () => {
+    const html = await renderToString(`
+# Heading
+
+Paragraph content.
+`)
+    expect(html).toMatchSnapshot()
+  })
+})
+```
+
+### Testing Exports
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { compile } from '@mdxe/vitest'
+
+describe('Exports', () => {
+  it('extracts exports', async () => {
+    const mdx = `
+export const meta = {
+  title: 'Test',
+  date: '2024-01-15',
+}
+
+# Content
+`
+    const { exports } = await compile(mdx)
+
+    expect(exports.meta.title).toBe('Test')
+    expect(exports.meta.date).toBe('2024-01-15')
+  })
+})
+```
+
+### Testing Table of Contents
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { compile } from '@mdxe/vitest'
+
+describe('Table of Contents', () => {
+  it('generates TOC', async () => {
+    const mdx = `
+# Introduction
+
+## Getting Started
+
+### Installation
+
+## Usage
+`
+    const { toc } = await compile(mdx)
+
+    expect(toc).toHaveLength(4)
+    expect(toc[0].title).toBe('Introduction')
+    expect(toc[1].title).toBe('Getting Started')
+    expect(toc[1].depth).toBe(2)
+  })
+})
+```
+
+### Testing Interactive Components
+
+```typescript
+import { describe, it, expect, vi } from 'vitest'
+import { render } from '@mdxe/vitest'
+import { fireEvent } from '@testing-library/react'
+
+describe('Interactive', () => {
+  it('handles click events', async () => {
+    const onClick = vi.fn()
+
+    const { getByRole } = await render(`
+<Button onClick={onClick}>Click</Button>
+`, {
+      components: {
+        Button: ({ onClick, children }) => (
+          <button onClick={onClick}>{children}</button>
+        ),
+      },
+      scope: { onClick },
+    })
+
+    fireEvent.click(getByRole('button'))
+    expect(onClick).toHaveBeenCalledOnce()
+  })
+})
+```
+
+## Fixtures
+
+### Loading MDX Files
+
+```typescript
+import { describe, it } from 'vitest'
+import { renderFile } from '@mdxe/vitest'
+
+describe('Content Files', () => {
+  it('renders file correctly', async () => {
+    const { container } = await renderFile('./content/about.mdx')
+    expect(container.querySelector('h1')).toBeTruthy()
+  })
+})
+```
+
+### Testing Multiple Files
+
+```typescript
+import { describe, it } from 'vitest'
+import { glob } from 'glob'
+import { renderFile } from '@mdxe/vitest'
+
+describe('All Content', () => {
+  const files = glob.sync('content/**/*.mdx')
+
+  it.each(files)('renders %s without errors', async (file) => {
+    await expect(renderFile(file)).resolves.not.toThrow()
+  })
+})
+```

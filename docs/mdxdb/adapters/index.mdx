@@ -1,0 +1,174 @@
+---
+title: Storage Adapters
+description: Choose the right storage backend for your needs
+---
+
+# Storage Adapters
+
+mdxdb supports multiple storage backends through adapter packages.
+
+## Available Adapters
+
+| Package | Backend | Description |
+|---------|---------|-------------|
+| [@mdxdb/fs](/docs/mdxdb/adapters/fs) | File System | Store documents as files |
+| [@mdxdb/sqlite](/docs/mdxdb/adapters/sqlite) | SQLite | Embedded SQL database |
+| [@mdxdb/postgres](/docs/mdxdb/adapters/postgres) | PostgreSQL | Full-featured SQL database |
+| [@mdxdb/mongo](/docs/mdxdb/adapters/mongo) | MongoDB | Document database |
+| [@mdxdb/clickhouse](/docs/mdxdb/adapters/clickhouse) | ClickHouse | Analytics database |
+| [@mdxdb/api](/docs/mdxdb/adapters/api) | HTTP | Remote mdxdb server |
+
+## Choosing an Adapter
+
+### @mdxdb/fs - File System
+
+**Best for:**
+- Local development
+- Static site generation
+- Git-based content workflows
+- Simple deployments
+
+**Pros:**
+- No database setup required
+- Files can be edited directly
+- Works with Git version control
+- Easy to backup and migrate
+
+**Cons:**
+- No full-text search (requires external indexing)
+- Limited query capabilities
+- Not suitable for high-traffic applications
+
+### @mdxdb/sqlite - SQLite
+
+**Best for:**
+- Embedded applications
+- Edge computing (Cloudflare Workers, etc.)
+- Serverless functions
+- Single-server deployments
+
+**Pros:**
+- Zero configuration
+- Full SQL query support
+- Full-text search built-in
+- Single file storage
+
+**Cons:**
+- Single-writer limitation
+- Not suitable for distributed systems
+
+### @mdxdb/postgres - PostgreSQL
+
+**Best for:**
+- Production applications
+- Multi-server deployments
+- Complex queries
+- Full-text search
+
+**Pros:**
+- Robust and battle-tested
+- Advanced query capabilities
+- Excellent full-text search
+- ACID compliance
+
+**Cons:**
+- Requires database server
+- More complex setup
+
+### @mdxdb/mongo - MongoDB
+
+**Best for:**
+- Document-heavy workloads
+- Flexible schemas
+- Horizontal scaling
+- Real-time applications
+
+**Pros:**
+- Flexible document model
+- Horizontal scaling
+- Rich query language
+- Change streams
+
+**Cons:**
+- Requires MongoDB server
+- No ACID across documents (by default)
+
+### @mdxdb/clickhouse - ClickHouse
+
+**Best for:**
+- Analytics workloads
+- Time-series data
+- Large datasets
+- Aggregation queries
+
+**Pros:**
+- Extremely fast analytics
+- Excellent compression
+- Column-oriented storage
+
+**Cons:**
+- Not designed for frequent updates
+- Complex setup
+
+## Adapter Interface
+
+All adapters implement the same interface:
+
+```typescript
+interface Database {
+  get(path: string, options?: GetOptions): Promise<MDXLDDocument | null>
+  set(path: string, doc: MDXLDDocument, options?: SetOptions): Promise<SetResult>
+  delete(path: string, options?: DeleteOptions): Promise<DeleteResult>
+  list(prefix?: string, options?: ListOptions): Promise<ListResult>
+  search(query: string, options?: SearchOptions): Promise<SearchResult>
+}
+```
+
+## Switching Adapters
+
+The unified interface makes it easy to switch adapters:
+
+```typescript
+// Development: file system
+import { createDatabase as createFsDb } from '@mdxdb/fs'
+
+// Production: PostgreSQL
+import { createDatabase as createPgDb } from '@mdxdb/postgres'
+
+const db = process.env.NODE_ENV === 'production'
+  ? createPgDb({ connectionString: process.env.DATABASE_URL })
+  : createFsDb({ path: './content' })
+
+// Same API regardless of backend
+const doc = await db.get('articles/hello-world')
+```
+
+## Custom Adapters
+
+Create your own adapter by implementing the Database interface:
+
+```typescript
+import type { Database, MDXLDDocument } from 'mdxdb'
+
+class MyCustomAdapter implements Database {
+  async get(path: string): Promise<MDXLDDocument | null> {
+    // Your implementation
+  }
+
+  async set(path: string, doc: MDXLDDocument): Promise<SetResult> {
+    // Your implementation
+  }
+
+  async delete(path: string): Promise<DeleteResult> {
+    // Your implementation
+  }
+
+  async list(prefix?: string): Promise<ListResult> {
+    // Your implementation
+  }
+
+  async search(query: string): Promise<SearchResult> {
+    // Your implementation
+  }
+}
+```

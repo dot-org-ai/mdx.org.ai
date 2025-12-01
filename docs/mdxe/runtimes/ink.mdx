@@ -1,0 +1,247 @@
+---
+title: "@mdxe/ink"
+description: Terminal MDX rendering with Ink
+---
+
+# @mdxe/ink
+
+Render MDX documents in the terminal using Ink.
+
+## Installation
+
+```bash
+npm install @mdxe/ink
+```
+
+## Usage
+
+```typescript
+import { render } from '@mdxe/ink'
+
+const mdx = `
+# Hello Terminal
+
+This is **bold** and *italic* text.
+
+<Box borderStyle="round" padding={1}>
+  <Text color="green">Success!</Text>
+</Box>
+`
+
+render(mdx)
+```
+
+## Configuration
+
+```typescript
+interface InkRenderOptions {
+  /** Custom Ink components */
+  components?: Record<string, Component>
+
+  /** Enable interactive mode */
+  interactive?: boolean
+
+  /** Output stream */
+  stdout?: NodeJS.WriteStream
+
+  /** Input stream */
+  stdin?: NodeJS.ReadStream
+}
+```
+
+## Features
+
+### Markdown Rendering
+
+MDX markdown is automatically converted to terminal-friendly output:
+
+```typescript
+import { render } from '@mdxe/ink'
+
+const mdx = `
+# Heading
+
+This is a paragraph with **bold** and *italic*.
+
+- List item 1
+- List item 2
+- List item 3
+
+\`\`\`javascript
+const hello = 'world'
+\`\`\`
+`
+
+render(mdx)
+```
+
+### Ink Components
+
+Use Ink components directly in MDX:
+
+```typescript
+import { render } from '@mdxe/ink'
+
+const mdx = `
+# Status Report
+
+<Box flexDirection="column" gap={1}>
+  <Text>Loading...</Text>
+  <Spinner type="dots" />
+</Box>
+
+<Box marginTop={1}>
+  <Text color="cyan">Press any key to continue</Text>
+</Box>
+`
+
+render(mdx, {
+  components: {
+    Spinner: InkSpinner,
+  },
+})
+```
+
+### Interactive CLI
+
+```typescript
+import { render } from '@mdxe/ink'
+
+const mdx = `
+# Select an Option
+
+<SelectInput
+  items={[
+    { label: 'Option 1', value: '1' },
+    { label: 'Option 2', value: '2' },
+    { label: 'Option 3', value: '3' },
+  ]}
+  onSelect={handleSelect}
+/>
+`
+
+const { result } = await render(mdx, {
+  interactive: true,
+  components: {
+    SelectInput: InkSelectInput,
+  },
+  scope: {
+    handleSelect: (item) => {
+      console.log('Selected:', item.value)
+    },
+  },
+})
+```
+
+### Progress Display
+
+```typescript
+import { render, rerender } from '@mdxe/ink'
+
+const Progress = ({ value, total }) => `
+# Build Progress
+
+<Box width={50}>
+  <Text>{${'█'.repeat(Math.floor(value / total * 50))}}</Text>
+</Box>
+
+<Text>{value}/{total} files processed</Text>
+`
+
+let current = 0
+const total = 100
+
+const { rerender } = render(Progress({ value: current, total }))
+
+const interval = setInterval(() => {
+  current += 10
+  rerender(Progress({ value: current, total }))
+
+  if (current >= total) {
+    clearInterval(interval)
+  }
+}, 100)
+```
+
+## CLI Tool
+
+Build CLI tools with MDX:
+
+```typescript
+#!/usr/bin/env node
+import { render } from '@mdxe/ink'
+import { readFile } from 'fs/promises'
+
+const mdx = await readFile('./help.mdx', 'utf-8')
+
+render(mdx, {
+  scope: {
+    args: process.argv.slice(2),
+    version: '1.0.0',
+  },
+})
+```
+
+### help.mdx
+
+```mdx
+# My CLI Tool v{version}
+
+## Usage
+
+<Box marginLeft={2}>
+  <Text>my-cli [command] [options]</Text>
+</Box>
+
+## Commands
+
+<Box flexDirection="column" marginLeft={2}>
+  <Text><Text bold>init</Text>    Initialize a new project</Text>
+  <Text><Text bold>build</Text>   Build the project</Text>
+  <Text><Text bold>serve</Text>   Start development server</Text>
+</Box>
+
+## Options
+
+<Box flexDirection="column" marginLeft={2}>
+  <Text><Text color="cyan">--help</Text>     Show this help</Text>
+  <Text><Text color="cyan">--version</Text>  Show version</Text>
+</Box>
+```
+
+## Styling
+
+### Colors
+
+```mdx
+<Text color="red">Error message</Text>
+<Text color="yellow">Warning</Text>
+<Text color="green">Success</Text>
+<Text color="cyan">Info</Text>
+```
+
+### Box Model
+
+```mdx
+<Box
+  borderStyle="round"
+  borderColor="cyan"
+  padding={1}
+  margin={1}
+>
+  <Text>Boxed content</Text>
+</Box>
+```
+
+### Layout
+
+```mdx
+<Box flexDirection="row" gap={2}>
+  <Box width="50%">
+    <Text>Left column</Text>
+  </Box>
+  <Box width="50%">
+    <Text>Right column</Text>
+  </Box>
+</Box>
+```

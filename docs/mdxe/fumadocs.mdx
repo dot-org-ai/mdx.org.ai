@@ -1,0 +1,290 @@
+---
+title: "@mdxe/fumadocs"
+description: Fumadocs React components for mdxe
+---
+
+# @mdxe/fumadocs
+
+React components and utilities for building Fumadocs-powered documentation with mdxe.
+
+## Installation
+
+```bash
+npm install @mdxe/fumadocs
+```
+
+## Usage
+
+```typescript
+import { DocsLayout, DocsPage } from '@mdxe/fumadocs'
+import { source } from '@/lib/source'
+
+export default function Layout({ children }) {
+  return (
+    <DocsLayout tree={source.pageTree}>
+      {children}
+    </DocsLayout>
+  )
+}
+```
+
+## Components
+
+### DocsLayout
+
+Main layout component for documentation sites.
+
+```typescript
+import { DocsLayout } from '@mdxe/fumadocs'
+
+<DocsLayout
+  tree={pageTree}
+  nav={{
+    title: 'My Docs',
+    links: [
+      { text: 'GitHub', url: 'https://github.com/...' },
+    ],
+  }}
+  sidebar={{
+    defaultOpen: true,
+  }}
+>
+  {children}
+</DocsLayout>
+```
+
+### DocsPage
+
+Page wrapper with TOC and navigation.
+
+```typescript
+import { DocsPage, DocsBody, DocsTitle } from '@mdxe/fumadocs'
+
+export default function Page({ page }) {
+  return (
+    <DocsPage
+      toc={page.data.toc}
+      prev={page.prev}
+      next={page.next}
+    >
+      <DocsTitle>{page.data.title}</DocsTitle>
+      <DocsBody>
+        <page.data.body />
+      </DocsBody>
+    </DocsPage>
+  )
+}
+```
+
+### MDX Components
+
+Pre-styled components for MDX content.
+
+```typescript
+import {
+  Callout,
+  Card,
+  Cards,
+  Tab,
+  Tabs,
+  Steps,
+  Step,
+  Accordions,
+  Accordion,
+  TypeTable,
+  ImageZoom,
+} from '@mdxe/fumadocs'
+
+const components = {
+  Callout,
+  Card,
+  Cards,
+  Tab,
+  Tabs,
+  Steps,
+  Step,
+  Accordions,
+  Accordion,
+  TypeTable,
+  ImageZoom,
+}
+```
+
+## Features
+
+### Callouts
+
+```mdx
+<Callout type="info">
+  This is an informational callout.
+</Callout>
+
+<Callout type="warning">
+  Be careful with this operation.
+</Callout>
+
+<Callout type="error">
+  This action is irreversible.
+</Callout>
+```
+
+### Tabs
+
+```mdx
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab value="npm">
+    ```bash
+    npm install package
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm add package
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn add package
+    ```
+  </Tab>
+</Tabs>
+```
+
+### Cards
+
+```mdx
+<Cards>
+  <Card title="Getting Started" href="/docs/getting-started">
+    Learn how to set up your project.
+  </Card>
+  <Card title="API Reference" href="/docs/api">
+    Explore the full API documentation.
+  </Card>
+</Cards>
+```
+
+### Steps
+
+```mdx
+<Steps>
+  <Step>
+    ### Install dependencies
+
+    ```bash
+    npm install @mdxe/fumadocs
+    ```
+  </Step>
+  <Step>
+    ### Configure your project
+
+    Create a `source.ts` file.
+  </Step>
+  <Step>
+    ### Start building
+
+    You're ready to create documentation!
+  </Step>
+</Steps>
+```
+
+### Type Table
+
+```mdx
+<TypeTable
+  type={{
+    name: { type: 'string', description: 'The name property' },
+    age: { type: 'number', default: '0', description: 'The age property' },
+    active: { type: 'boolean', default: 'true' },
+  }}
+/>
+```
+
+## Integration
+
+### With @mdxdb/fumadocs
+
+```typescript
+// lib/source.ts
+import { createSource } from '@mdxdb/fumadocs'
+import { createDatabase } from '@mdxdb/fs'
+
+const db = createDatabase({ path: './docs' })
+export const source = createSource(db, { baseUrl: '/docs' })
+```
+
+```typescript
+// app/docs/layout.tsx
+import { DocsLayout } from '@mdxe/fumadocs'
+import { source } from '@/lib/source'
+
+export default function Layout({ children }) {
+  return (
+    <DocsLayout tree={source.pageTree}>
+      {children}
+    </DocsLayout>
+  )
+}
+```
+
+```typescript
+// app/docs/[[...slug]]/page.tsx
+import { DocsPage, DocsBody } from '@mdxe/fumadocs'
+import { source } from '@/lib/source'
+import { notFound } from 'next/navigation'
+
+export default function Page({ params }) {
+  const page = source.getPage(params.slug)
+  if (!page) notFound()
+
+  const MDX = page.data.body
+
+  return (
+    <DocsPage toc={page.data.toc}>
+      <DocsBody>
+        <MDX />
+      </DocsBody>
+    </DocsPage>
+  )
+}
+```
+
+## Customization
+
+### Theme
+
+```typescript
+import { DocsLayout } from '@mdxe/fumadocs'
+
+<DocsLayout
+  theme={{
+    colors: {
+      primary: '#0070f3',
+      background: '#ffffff',
+    },
+    fonts: {
+      body: 'Inter, sans-serif',
+      code: 'JetBrains Mono, monospace',
+    },
+  }}
+>
+```
+
+### Custom Components
+
+```typescript
+import { DocsPage } from '@mdxe/fumadocs'
+
+const customComponents = {
+  // Override default heading
+  h1: ({ children }) => (
+    <h1 className="custom-h1">{children}</h1>
+  ),
+
+  // Custom code block
+  pre: ({ children }) => (
+    <CustomCodeBlock>{children}</CustomCodeBlock>
+  ),
+}
+
+<DocsPage components={customComponents}>
+```

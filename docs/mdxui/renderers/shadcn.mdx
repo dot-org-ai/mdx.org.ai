@@ -1,0 +1,296 @@
+---
+title: "@mdxui/shadcn"
+description: shadcn/ui components for MDX
+---
+
+# @mdxui/shadcn
+
+Pre-built React components using shadcn/ui for MDX rendering.
+
+## Installation
+
+```bash
+npm install @mdxui/shadcn
+```
+
+Requires shadcn/ui to be set up in your project.
+
+## Usage
+
+```typescript
+import { MDXProvider, components } from '@mdxui/shadcn'
+
+function App() {
+  return (
+    <MDXProvider components={components}>
+      <MDXContent />
+    </MDXProvider>
+  )
+}
+```
+
+## Components
+
+### Typography
+
+```mdx
+# Heading 1
+## Heading 2
+### Heading 3
+
+Regular paragraph text with **bold** and *italic*.
+
+> Blockquote with styled border.
+
+- Unordered list item
+- Another item
+
+1. Ordered list item
+2. Another item
+```
+
+### Code Blocks
+
+Syntax-highlighted code with copy button:
+
+```mdx
+\`\`\`typescript
+const greeting = 'Hello, World!'
+console.log(greeting)
+\`\`\`
+```
+
+### Callouts
+
+```mdx
+<Callout>
+  Default informational callout.
+</Callout>
+
+<Callout type="warning">
+  Warning callout with yellow styling.
+</Callout>
+
+<Callout type="error">
+  Error callout with red styling.
+</Callout>
+
+<Callout type="success">
+  Success callout with green styling.
+</Callout>
+```
+
+### Tabs
+
+```mdx
+<Tabs defaultValue="npm">
+  <TabsList>
+    <TabsTrigger value="npm">npm</TabsTrigger>
+    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+    <TabsTrigger value="yarn">yarn</TabsTrigger>
+  </TabsList>
+  <TabsContent value="npm">
+    ```bash
+    npm install package
+    ```
+  </TabsContent>
+  <TabsContent value="pnpm">
+    ```bash
+    pnpm add package
+    ```
+  </TabsContent>
+  <TabsContent value="yarn">
+    ```bash
+    yarn add package
+    ```
+  </TabsContent>
+</Tabs>
+```
+
+### Cards
+
+```mdx
+<Cards>
+  <Card href="/docs/getting-started">
+    <CardHeader>
+      <CardTitle>Getting Started</CardTitle>
+      <CardDescription>
+        Learn how to set up your project.
+      </CardDescription>
+    </CardHeader>
+  </Card>
+  <Card href="/docs/api">
+    <CardHeader>
+      <CardTitle>API Reference</CardTitle>
+      <CardDescription>
+        Explore the full API documentation.
+      </CardDescription>
+    </CardHeader>
+  </Card>
+</Cards>
+```
+
+### Accordion
+
+```mdx
+<Accordion type="single" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Is it accessible?</AccordionTrigger>
+    <AccordionContent>
+      Yes. It adheres to the WAI-ARIA design pattern.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="item-2">
+    <AccordionTrigger>Is it styled?</AccordionTrigger>
+    <AccordionContent>
+      Yes. It comes with default styles using Tailwind CSS.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+### Steps
+
+```mdx
+<Steps>
+  <Step title="Install dependencies">
+    Run `npm install @mdxui/shadcn` to install the package.
+  </Step>
+  <Step title="Configure your project">
+    Add the MDXProvider to your app root.
+  </Step>
+  <Step title="Start building">
+    Use the components in your MDX files.
+  </Step>
+</Steps>
+```
+
+## Configuration
+
+### Custom Theme
+
+```typescript
+import { MDXProvider, createComponents } from '@mdxui/shadcn'
+
+const components = createComponents({
+  theme: {
+    code: {
+      theme: 'github-dark',
+      showLineNumbers: true,
+    },
+    callout: {
+      icons: true,
+    },
+  },
+})
+
+<MDXProvider components={components}>
+```
+
+### Component Overrides
+
+```typescript
+import { MDXProvider, components as defaultComponents } from '@mdxui/shadcn'
+import { CustomCodeBlock } from './components'
+
+const components = {
+  ...defaultComponents,
+  pre: CustomCodeBlock,
+  h1: ({ children }) => (
+    <h1 className="scroll-m-20 text-4xl font-extrabold">
+      {children}
+    </h1>
+  ),
+}
+
+<MDXProvider components={components}>
+```
+
+## Integration
+
+### With Next.js
+
+```typescript
+// app/docs/[[...slug]]/page.tsx
+import { MDXProvider, components } from '@mdxui/shadcn'
+import { getMDXContent } from '@/lib/mdx'
+
+export default async function Page({ params }) {
+  const { content } = await getMDXContent(params.slug)
+
+  return (
+    <MDXProvider components={components}>
+      <article className="prose prose-neutral dark:prose-invert">
+        {content}
+      </article>
+    </MDXProvider>
+  )
+}
+```
+
+### With Fumadocs
+
+```typescript
+import { DocsPage, DocsBody } from '@mdxe/fumadocs'
+import { components } from '@mdxui/shadcn'
+
+export default function Page({ page }) {
+  return (
+    <DocsPage>
+      <DocsBody>
+        <page.data.body components={components} />
+      </DocsBody>
+    </DocsPage>
+  )
+}
+```
+
+## Styling
+
+### Tailwind Configuration
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: [
+    './node_modules/@mdxui/shadcn/**/*.{js,ts,jsx,tsx}',
+    // ... your content paths
+  ],
+}
+```
+
+### Dark Mode
+
+Components automatically support dark mode:
+
+```typescript
+import { ThemeProvider } from 'next-themes'
+import { MDXProvider, components } from '@mdxui/shadcn'
+
+function App({ children }) {
+  return (
+    <ThemeProvider attribute="class">
+      <MDXProvider components={components}>
+        {children}
+      </MDXProvider>
+    </ThemeProvider>
+  )
+}
+```
+
+### Custom CSS Variables
+
+```css
+:root {
+  --mdx-code-background: hsl(0 0% 98%);
+  --mdx-code-foreground: hsl(0 0% 10%);
+  --mdx-callout-info: hsl(200 80% 95%);
+  --mdx-callout-warning: hsl(40 80% 95%);
+  --mdx-callout-error: hsl(0 80% 95%);
+}
+
+.dark {
+  --mdx-code-background: hsl(0 0% 10%);
+  --mdx-code-foreground: hsl(0 0% 98%);
+}
+```

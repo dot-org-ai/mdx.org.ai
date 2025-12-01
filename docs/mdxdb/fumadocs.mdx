@@ -1,0 +1,223 @@
+---
+title: "@mdxdb/fumadocs"
+description: Fumadocs content source adapter for mdxdb
+---
+
+# @mdxdb/fumadocs
+
+Use mdxdb as a content source for Fumadocs documentation sites.
+
+## Installation
+
+```bash
+npm install @mdxdb/fumadocs
+```
+
+## Usage
+
+```typescript
+import { createSource } from '@mdxdb/fumadocs'
+import { createDatabase } from '@mdxdb/fs'
+
+const db = createDatabase({ path: './content' })
+const source = createSource(db, {
+  baseUrl: '/docs',
+})
+
+// Use with Fumadocs
+const { getPage, getPages, pageTree } = source
+```
+
+## Configuration
+
+```typescript
+interface SourceConfig {
+  /** Base URL for generated pages */
+  baseUrl?: string
+
+  /** Root directory in database */
+  rootDir?: string
+
+  /** File extensions to include */
+  extensions?: string[]
+
+  /** Transform function for pages */
+  transform?: (page: Page) => Page
+}
+```
+
+## Integration
+
+### With Next.js App Router
+
+```typescript
+// lib/source.ts
+import { createSource } from '@mdxdb/fumadocs'
+import { createDatabase } from '@mdxdb/fs'
+
+const db = createDatabase({ path: './docs' })
+
+export const source = createSource(db, {
+  baseUrl: '/docs',
+})
+```
+
+```typescript
+// app/docs/[[...slug]]/page.tsx
+import { source } from '@/lib/source'
+import { notFound } from 'next/navigation'
+
+export default async function Page({
+  params,
+}: {
+  params: { slug?: string[] }
+}) {
+  const page = source.getPage(params.slug)
+  if (!page) notFound()
+
+  const MDX = page.data.body
+
+  return (
+    <DocsPage>
+      <MDX />
+    </DocsPage>
+  )
+}
+
+export function generateStaticParams() {
+  return source.getPages().map((page) => ({
+    slug: page.slugs,
+  }))
+}
+```
+
+### Page Tree
+
+Access the navigation tree:
+
+```typescript
+import { source } from '@/lib/source'
+
+// Get full page tree for navigation
+const tree = source.pageTree
+
+// Tree structure
+interface PageTree {
+  name: string
+  children: (PageTreeNode | PageTreeFolder)[]
+}
+```
+
+### Meta Files
+
+The adapter supports `meta.json` files for navigation configuration:
+
+```json
+{
+  "title": "Getting Started",
+  "root": true,
+  "defaultOpen": true,
+  "pages": ["index", "installation", "quick-start"]
+}
+```
+
+## Features
+
+### Compatible Output
+
+The adapter produces output compatible with `fumadocs-mdx`:
+
+- **VirtualFile**: File representation with path and content
+- **VirtualPage**: Page with slugs, URL, and data
+- **VirtualMeta**: Navigation metadata from meta.json
+
+### MDXLD Support
+
+Full support for linked data frontmatter:
+
+```mdx
+---
+$type: Guide
+$id: https://example.com/guides/intro
+title: Introduction
+description: Getting started guide
+---
+
+# Introduction
+
+Content with semantic metadata...
+```
+
+### Dynamic Content
+
+Unlike static file-based sources, mdxdb enables:
+
+- Database-backed content storage
+- Real-time content updates
+- Multi-tenant documentation
+- Content versioning
+
+## Examples
+
+### Remote Database
+
+```typescript
+import { createSource } from '@mdxdb/fumadocs'
+import { createApiClient } from '@mdxdb/api'
+
+const db = createApiClient({
+  baseUrl: 'https://api.example.com/mdxdb',
+  apiKey: process.env.MDXDB_API_KEY,
+})
+
+export const source = createSource(db, {
+  baseUrl: '/docs',
+})
+```
+
+### PostgreSQL Backend
+
+```typescript
+import { createSource } from '@mdxdb/fumadocs'
+import { createDatabase } from '@mdxdb/postgres'
+
+const db = createDatabase({
+  connectionString: process.env.DATABASE_URL,
+})
+
+export const source = createSource(db, {
+  baseUrl: '/docs',
+})
+```
+
+### Content Transformation
+
+```typescript
+const source = createSource(db, {
+  baseUrl: '/docs',
+  transform: (page) => ({
+    ...page,
+    data: {
+      ...page.data,
+      // Add reading time
+      readingTime: Math.ceil(page.data.content.split(' ').length / 200),
+    },
+  }),
+})
+```
+
+## API Reference
+
+### createSource(db, config)
+
+Creates a Fumadocs-compatible content source.
+
+**Parameters:**
+- `db`: mdxdb database instance
+- `config`: Source configuration
+
+**Returns:**
+- `getPage(slugs)`: Get a single page by slug array
+- `getPages()`: Get all pages
+- `pageTree`: Navigation tree structure
+- `files`: Array of virtual files

@@ -1,0 +1,128 @@
+---
+title: "@mdxdb/api"
+description: HTTP API client adapter
+---
+
+# @mdxdb/api
+
+Connect to a remote mdxdb server via HTTP.
+
+## Installation
+
+```bash
+npm install @mdxdb/api
+```
+
+## Usage
+
+```typescript
+import { createApiClient } from '@mdxdb/api'
+
+const db = createApiClient({
+  baseUrl: 'https://api.example.com/mdxdb',
+  apiKey: process.env.MDXDB_API_KEY,
+})
+```
+
+## Configuration
+
+```typescript
+interface ApiConfig {
+  /** Base URL of the mdxdb server */
+  baseUrl: string
+
+  /** API key for authentication */
+  apiKey?: string
+
+  /** Custom headers */
+  headers?: Record<string, string>
+
+  /** Request timeout in ms */
+  timeout?: number
+}
+```
+
+## API Endpoints
+
+The client expects these endpoints:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/documents/:path` | Get document |
+| PUT | `/documents/:path` | Create/update document |
+| DELETE | `/documents/:path` | Delete document |
+| GET | `/documents` | List documents |
+| GET | `/search` | Search documents |
+
+## Examples
+
+### Basic Usage
+
+```typescript
+import { createApiClient } from '@mdxdb/api'
+
+const db = createApiClient({
+  baseUrl: 'https://api.example.com/mdxdb',
+  apiKey: process.env.MDXDB_API_KEY,
+})
+
+// Same API as local adapters
+const doc = await db.get('posts/hello')
+await db.set('posts/new', newDoc)
+const posts = await db.list('posts/')
+```
+
+### Custom Headers
+
+```typescript
+const db = createApiClient({
+  baseUrl: 'https://api.example.com/mdxdb',
+  headers: {
+    'X-Tenant-ID': 'my-tenant',
+    'Authorization': `Bearer ${token}`,
+  },
+})
+```
+
+### Error Handling
+
+```typescript
+import { ApiError } from '@mdxdb/api'
+
+try {
+  const doc = await db.get('posts/missing')
+} catch (error) {
+  if (error instanceof ApiError) {
+    console.log(error.status)   // 404
+    console.log(error.message)  // 'Not found'
+  }
+}
+```
+
+## Server Implementation
+
+Example server using Hono:
+
+```typescript
+import { Hono } from 'hono'
+import { createDatabase } from '@mdxdb/fs'
+
+const app = new Hono()
+const db = createDatabase({ path: './content' })
+
+app.get('/documents/:path{.+}', async (c) => {
+  const doc = await db.get(c.req.param('path'))
+  if (!doc) return c.notFound()
+  return c.json(doc)
+})
+
+app.put('/documents/:path{.+}', async (c) => {
+  const doc = await c.req.json()
+  await db.set(c.req.param('path'), doc)
+  return c.json({ success: true })
+})
+
+// ... more endpoints
+
+export default app
+```

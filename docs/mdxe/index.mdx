@@ -1,0 +1,101 @@
+---
+title: mdxe
+description: Execute MDX documents in any JavaScript runtime
+---
+
+# mdxe
+
+Execute MDX documents as live, interactive applications across any JavaScript runtime.
+
+## What is mdxe?
+
+mdxe is the execution layer for MDX documents. It compiles and runs MDX content in:
+
+- **Node.js** - Server-side execution
+- **Edge** - Cloudflare Workers, Vercel Edge
+- **Browser** - Client-side rendering
+- **Terminals** - CLI applications with Ink
+
+## Features
+
+- **Universal Execution** - Run MDX anywhere JavaScript runs
+- **Isolated Contexts** - Secure sandboxed execution
+- **Hot Reloading** - Development with instant feedback
+- **Component Injection** - Custom component libraries
+- **Streaming** - Progressive rendering support
+
+## Runtime Adapters
+
+| Package | Runtime | Description |
+|---------|---------|-------------|
+| [@mdxe/node](/docs/mdxe/runtimes/node) | Node.js | Server-side execution |
+| [@mdxe/workers](/docs/mdxe/runtimes/workers) | Cloudflare | Edge worker execution |
+| [@mdxe/next](/docs/mdxe/runtimes/next) | Next.js | Full-stack integration |
+| [@mdxe/hono](/docs/mdxe/runtimes/hono) | Hono | Lightweight web framework |
+| [@mdxe/ink](/docs/mdxe/runtimes/ink) | Terminal | CLI applications |
+
+## Supporting Packages
+
+| Package | Purpose |
+|---------|---------|
+| [@mdxe/isolate](/docs/mdxe/isolate) | Sandboxed execution |
+| [@mdxe/vitest](/docs/mdxe/vitest) | Testing utilities |
+| [@mdxe/fumadocs](/docs/mdxe/fumadocs) | Documentation sites |
+
+## Installation
+
+```bash
+npm install mdxe
+```
+
+Or install runtime-specific packages:
+
+```bash
+# Node.js
+npm install @mdxe/node
+
+# Next.js
+npm install @mdxe/next
+
+# Cloudflare Workers
+npm install @mdxe/workers
+```
+
+## Quick Example
+
+```typescript
+import { execute } from 'mdxe'
+
+const mdx = `
+# Hello World
+
+<Counter initial={0} />
+`
+
+const result = await execute(mdx, {
+  components: {
+    Counter: ({ initial }) => <button>{initial}</button>
+  }
+})
+```
+
+## Architecture
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Source    │────▶│   Compile   │────▶│   Execute   │
+│    MDX      │     │    (mdxld)  │     │   (mdxe)    │
+└─────────────┘     └─────────────┘     └─────────────┘
+                                               │
+                    ┌──────────────────────────┴──────────┐
+                    │                                     │
+              ┌─────▼─────┐  ┌─────────┐  ┌─────────────┐
+              │  Node.js  │  │  Edge   │  │  Browser    │
+              └───────────┘  └─────────┘  └─────────────┘
+```
+
+## Next Steps
+
+- [Getting Started](/docs/mdxe/getting-started) - Set up your first mdxe project
+- [Node.js Runtime](/docs/mdxe/runtimes/node) - Server-side execution
+- [Next.js Integration](/docs/mdxe/runtimes/next) - Full-stack apps

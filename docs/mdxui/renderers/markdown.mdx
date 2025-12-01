@@ -1,0 +1,265 @@
+---
+title: "@mdxui/markdown"
+description: Convert MDX back to Markdown
+---
+
+# @mdxui/markdown
+
+Convert MDX documents back to standard Markdown.
+
+## Installation
+
+```bash
+npm install @mdxui/markdown
+```
+
+## Usage
+
+```typescript
+import { renderToMarkdown } from '@mdxui/markdown'
+
+const mdx = `
+---
+title: Hello World
+---
+
+# Welcome
+
+<Callout type="info">
+  This is a callout component.
+</Callout>
+
+Regular **markdown** content.
+`
+
+const markdown = await renderToMarkdown(mdx)
+```
+
+## Output
+
+```markdown
+---
+title: Hello World
+---
+
+# Welcome
+
+> **Info:** This is a callout component.
+
+Regular **markdown** content.
+```
+
+## Configuration
+
+```typescript
+interface MarkdownRenderOptions {
+  /** Include frontmatter */
+  frontmatter?: boolean
+
+  /** Component handlers */
+  components?: Record<string, ComponentHandler>
+
+  /** Markdown flavor */
+  flavor?: 'gfm' | 'commonmark'
+
+  /** Line width for wrapping */
+  lineWidth?: number
+
+  /** Code fence style */
+  codeFence?: '```' | '~~~'
+
+  /** Emphasis marker */
+  emphasis?: '*' | '_'
+}
+```
+
+## Features
+
+### Component Handling
+
+Define how MDX components convert to Markdown:
+
+```typescript
+const markdown = await renderToMarkdown(mdx, {
+  components: {
+    Callout: ({ type, children }) => {
+      const prefix = type === 'warning' ? '⚠️' : 'ℹ️'
+      return `> ${prefix} ${children}\n`
+    },
+
+    Tabs: ({ children }) => children,
+
+    Tab: ({ label, children }) => `### ${label}\n\n${children}`,
+
+    CodeBlock: ({ code, language }) => `\`\`\`${language}\n${code}\n\`\`\``,
+  },
+})
+```
+
+### GFM Support
+
+```typescript
+const markdown = await renderToMarkdown(mdx, {
+  flavor: 'gfm',
+})
+
+// Supports:
+// - Tables
+// - Task lists
+// - Strikethrough
+// - Autolinks
+```
+
+### Frontmatter Options
+
+```typescript
+// Keep frontmatter
+const withFrontmatter = await renderToMarkdown(mdx, {
+  frontmatter: true,
+})
+
+// Strip frontmatter
+const contentOnly = await renderToMarkdown(mdx, {
+  frontmatter: false,
+})
+```
+
+### Line Wrapping
+
+```typescript
+const markdown = await renderToMarkdown(mdx, {
+  lineWidth: 80, // Wrap at 80 characters
+})
+```
+
+## Use Cases
+
+### Export to Standard Markdown
+
+```typescript
+import { renderToMarkdown } from '@mdxui/markdown'
+
+async function exportDocs(outputDir: string) {
+  const files = await glob('docs/**/*.mdx')
+
+  for (const file of files) {
+    const mdx = await readFile(file, 'utf-8')
+    const markdown = await renderToMarkdown(mdx)
+
+    const outPath = file
+      .replace('docs/', outputDir)
+      .replace('.mdx', '.md')
+
+    await writeFile(outPath, markdown)
+  }
+}
+```
+
+### Content Migration
+
+```typescript
+import { renderToMarkdown } from '@mdxui/markdown'
+
+// Migrate MDX to a different platform
+async function migrateToGitHub(mdx: string) {
+  return renderToMarkdown(mdx, {
+    flavor: 'gfm',
+    components: {
+      // Convert custom components to GFM equivalents
+      Alert: ({ type, children }) => {
+        const emoji = { info: 'ℹ️', warning: '⚠️', error: '❌' }[type]
+        return `> ${emoji} **${type.toUpperCase()}**\n> ${children}\n`
+      },
+    },
+  })
+}
+```
+
+### Email Conversion
+
+```typescript
+// Convert MDX to plain Markdown for email clients
+const emailMarkdown = await renderToMarkdown(newsletter, {
+  frontmatter: false,
+  components: {
+    Button: ({ href, children }) => `[${children}](${href})`,
+    Image: ({ src, alt }) => `![${alt}](${src})`,
+  },
+})
+```
+
+### Documentation Preview
+
+```typescript
+// Convert MDX for platforms that don't support it
+async function previewOnGitHub(mdx: string) {
+  const markdown = await renderToMarkdown(mdx, {
+    flavor: 'gfm',
+    components: {
+      // Render code examples
+      CodeExample: ({ children }) => children,
+
+      // Convert tabs to sections
+      Tabs: ({ children }) => children,
+      Tab: ({ label, children }) => `#### ${label}\n\n${children}`,
+
+      // Convert cards to links
+      Card: ({ title, href }) => `- [${title}](${href})`,
+    },
+  })
+
+  return markdown
+}
+```
+
+## Component Mapping Examples
+
+### Callouts to Blockquotes
+
+```typescript
+components: {
+  Callout: ({ type, title, children }) => {
+    const icons = {
+      info: 'ℹ️',
+      warning: '⚠️',
+      error: '❌',
+      success: '✅',
+    }
+
+    const lines = [
+      title ? `> **${icons[type]} ${title}**` : `> ${icons[type]}`,
+      `> ${children}`,
+    ]
+
+    return lines.join('\n') + '\n'
+  },
+}
+```
+
+### Code Blocks with Metadata
+
+```typescript
+components: {
+  CodeBlock: ({ language, filename, children }) => {
+    const header = filename ? `<!-- ${filename} -->\n` : ''
+    return `${header}\`\`\`${language}\n${children}\n\`\`\`\n`
+  },
+}
+```
+
+### Tables from Components
+
+```typescript
+components: {
+  PropertyTable: ({ properties }) => {
+    const rows = properties.map(
+      p => `| ${p.name} | ${p.type} | ${p.description} |`
+    )
+    return [
+      '| Property | Type | Description |',
+      '|----------|------|-------------|',
+      ...rows,
+    ].join('\n') + '\n'
+  },
+}
+```

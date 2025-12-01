@@ -1,0 +1,147 @@
+---
+title: Renderers
+description: MDX output format renderers
+---
+
+# Renderers
+
+mdxui provides multiple renderers for different output formats.
+
+## Available Renderers
+
+| Renderer | Package | Output | Use Case |
+|----------|---------|--------|----------|
+| HTML | [@mdxui/html](/docs/mdxui/renderers/html) | HTML string | Static sites, emails |
+| JSON | [@mdxui/json](/docs/mdxui/renderers/json) | JSON object | APIs, storage |
+| Markdown | [@mdxui/markdown](/docs/mdxui/renderers/markdown) | Markdown string | Export, migration |
+| shadcn | [@mdxui/shadcn](/docs/mdxui/renderers/shadcn) | React elements | React apps |
+
+## Choosing a Renderer
+
+### Static Output
+
+For static HTML pages, emails, or server rendering:
+
+```typescript
+import { renderToHTML } from '@mdxui/html'
+
+const html = await renderToHTML(mdx)
+```
+
+### API Responses
+
+For JSON APIs or structured data:
+
+```typescript
+import { renderToJSON } from '@mdxui/json'
+
+const json = await renderToJSON(mdx)
+```
+
+### React Applications
+
+For React applications with styled components:
+
+```typescript
+import { MDXProvider } from '@mdxui/shadcn'
+
+<MDXProvider>
+  <MDXContent />
+</MDXProvider>
+```
+
+### Content Export
+
+For converting MDX back to Markdown:
+
+```typescript
+import { renderToMarkdown } from '@mdxui/markdown'
+
+const markdown = await renderToMarkdown(mdx)
+```
+
+## Common API
+
+All renderers share a common interface:
+
+```typescript
+interface RenderOptions {
+  /** Custom component overrides */
+  components?: Record<string, Component>
+
+  /** CSS class names for elements */
+  classNames?: Record<string, string>
+
+  /** Plugins to apply */
+  plugins?: Plugin[]
+
+  /** Scope variables */
+  scope?: Record<string, unknown>
+}
+
+interface RenderResult<T> {
+  /** Rendered output */
+  output: T
+
+  /** Extracted frontmatter */
+  frontmatter: Record<string, unknown>
+
+  /** Table of contents */
+  toc: TocEntry[]
+
+  /** Exports from MDX */
+  exports: Record<string, unknown>
+}
+```
+
+## Multi-Format Output
+
+Render to multiple formats at once:
+
+```typescript
+import { renderMultiple } from 'mdxui'
+
+const results = await renderMultiple(mdx, {
+  formats: ['html', 'json'],
+})
+
+console.log(results.html)
+console.log(results.json)
+```
+
+## Custom Renderers
+
+Create custom renderers:
+
+```typescript
+import { createRenderer } from 'mdxui'
+
+const xmlRenderer = createRenderer({
+  name: 'xml',
+
+  renderElement: (element, children) => {
+    const attrs = Object.entries(element.props)
+      .map(([k, v]) => `${k}="${v}"`)
+      .join(' ')
+
+    return `<${element.type} ${attrs}>${children}</${element.type}>`
+  },
+
+  renderText: (text) => escapeXml(text),
+
+  wrap: (content) => `<?xml version="1.0"?>\n<document>${content}</document>`,
+})
+
+const xml = await xmlRenderer.render(mdx)
+```
+
+## Feature Comparison
+
+| Feature | HTML | JSON | Markdown | shadcn |
+|---------|------|------|----------|--------|
+| Syntax Highlighting | ✓ | - | ✓ | ✓ |
+| Custom Components | ✓ | ✓ | - | ✓ |
+| CSS Classes | ✓ | - | - | ✓ |
+| Table of Contents | ✓ | ✓ | - | ✓ |
+| Round-trip | - | ✓ | ✓ | - |
+| Streaming | ✓ | - | - | ✓ |
