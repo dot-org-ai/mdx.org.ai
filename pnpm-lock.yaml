@@ -68,13 +68,13 @@ importers:
       '@anthropic-ai/claude-agent-sdk':
         specifier: ^0.1.0
         version: 0.1.55(zod@3.25.76)
+      '@mdxdb/fs':
+        specifier: workspace:*
+        version: link:../../@mdxdb/fs
       zod:
         specifier: ^3.24.0
         version: 3.25.76
     devDependencies:
-      '@mdxdb/fs':
-        specifier: workspace:*
-        version: link:../../@mdxdb/fs
       mdxdb:
         specifier: workspace:*
         version: link:../../mdxdb
@@ -631,6 +631,9 @@ importers:
 
   packages/mdxai:
     dependencies:
+      '@mdxai/claude':
+        specifier: workspace:*
+        version: link:../@mdxai/claude
       '@mdxdb/fs':
         specifier: workspace:*
         version: link:../@mdxdb/fs

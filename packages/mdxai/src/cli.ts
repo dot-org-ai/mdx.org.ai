@@ -141,8 +141,49 @@ export function createDatabase(options: CliOptions): Database {
   })
 }
 
+/**
+ * Check if args contain any substantive options (not just help/version)
+ */
+function hasSubstantiveArgs(args: string[]): boolean {
+  return args.some((arg) => {
+    // Skip help and version flags
+    if (arg === '--help' || arg === '-h' || arg === '--version' || arg === '-v') {
+      return false
+    }
+    // Any other arg is substantive
+    return true
+  })
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2)
+
+  // If no substantive args, delegate to @mdxai/claude
+  if (!hasSubstantiveArgs(args)) {
+    // Check for help/version flags first
+    if (args.includes('--help') || args.includes('-h')) {
+      console.log(HELP_TEXT)
+      console.log('\nNote: Running mdxai without arguments delegates to @mdxai/claude')
+      process.exit(0)
+    }
+    if (args.includes('--version') || args.includes('-v')) {
+      console.log('mdxai version 0.0.0')
+      process.exit(0)
+    }
+
+    // Delegate to @mdxai/claude by importing and running its main function
+    try {
+      // Set env var to prevent auto-execution on import
+      process.env.__MDXAI_IMPORTED__ = '1'
+      const { main: claudeMain } = await import('@mdxai/claude/cli')
+      await claudeMain()
+    } catch (error) {
+      console.error('Error running @mdxai/claude:', error)
+      process.exit(1)
+    }
+    return
+  }
+
   const options = parseArgs(args)
 
   if (options.help) {

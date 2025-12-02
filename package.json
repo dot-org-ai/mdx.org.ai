@@ -16,7 +16,8 @@
     "typecheck": "turbo run typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "clean": "turbo run clean && rm -rf node_modules",
+    "mdxai": "node packages/mdxai/dist/cli.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.16.0",

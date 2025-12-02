@@ -6,6 +6,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "@mdxai/claude": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -21,6 +24,10 @@
       "types": "./dist/server.d.ts",
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js"
     }
   },
   "files": [
@@ -48,6 +55,7 @@
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.1.0",
+    "@mdxdb/fs": "workspace:*",
     "zod": "^3.24.0"
   },
   "peerDependencies": {
@@ -56,7 +64,6 @@
     "mdxld": "workspace:*"
   },
   "devDependencies": {
-    "@mdxdb/fs": "workspace:*",
     "mdxdb": "workspace:*",
     "mdxe": "workspace:*",
     "mdxld": "workspace:*",

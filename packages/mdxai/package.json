@@ -44,6 +44,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@mdxai/claude": "workspace:*",
     "@mdxdb/fs": "workspace:*",
     "@mdxdb/sqlite": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.23.0",
