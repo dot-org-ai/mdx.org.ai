@@ -125,8 +125,36 @@ Defines runtimes, servers, and communication protocols:
 ├── evaluate   → Runtime evaluation
 ├── validate   → Schema validation (JSON Schema, Zod)
 ├── jsonld     → JSON-LD ↔ MDXLD conversion
+├── extract    → Bi-directional MDX ↔ Markdown translation
 └── config     → Shared TypeScript/ESLint configs
 ```
+
+#### Bi-directional Extraction (@mdxld/extract)
+
+Extract structured data from rendered markdown using MDX templates:
+
+```typescript
+import { extract, diff, applyExtract } from '@mdxld/extract'
+
+// Template defines the structure
+const template = `# {data.title}\n\n{data.content}`
+
+// User edits the rendered markdown
+const edited = `# Updated Title\n\nNew content here`
+
+// Extract changes back to structured data
+const result = extract({ template, rendered: edited })
+// { data: { title: 'Updated Title', content: 'New content here' } }
+
+// Diff and apply to original document
+const changes = diff(original, result.data)
+const updated = applyExtract(original, result.data)
+```
+
+Use cases:
+- **Headless CMS**: Edit rendered content, sync back to frontmatter
+- **AI editing**: Let AI improve content, extract the changes
+- **Round-trip sync**: Keep source MDX and rendered output in sync
 
 ### @mdxai - AI Integrations
 
