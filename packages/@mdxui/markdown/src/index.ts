@@ -6,7 +6,8 @@
  * @packageDocumentation
  */
 
-import { parse, stringify, toAst, type MDXLDDocument, type MDXLDAst, type MDXLDAstNode } from 'mdxld'
+import { parse, stringify, type MDXLDDocument } from 'mdxld'
+import { toAst, type MDXLDAst, type MDXLDAstNode } from '@mdxld/ast'
 
 /**
  * Options for rendering markdown
@@ -125,7 +126,7 @@ export function render(doc: MDXLDDocument, options: RenderOptions = {}): string 
   }
 
   // Render AST content (skip yaml node)
-  const contentNodes = ast.children.filter((n) => n.type !== 'yaml')
+  const contentNodes = ast.children.filter((n: MDXLDAstNode) => n.type !== 'yaml')
   const content = renderNodes(contentNodes, opts)
 
   if (content) {
