@@ -1,0 +1,8 @@
+{
+  "extends": "@mdxld/config/typescript/react",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}

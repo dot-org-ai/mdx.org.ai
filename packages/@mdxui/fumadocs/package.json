@@ -1,7 +1,7 @@
 {
-  "name": "@mdxui/markdown",
+  "name": "@mdxui/fumadocs",
   "version": "0.0.0",
-  "description": "Render MDXLD documents to clean markdown (string to string)",
+  "description": "Fumadocs UI components and utilities for MDX documentation sites",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -11,6 +11,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./components": {
+      "types": "./dist/components.d.ts",
+      "import": "./dist/components.js",
+      "require": "./dist/components.cjs"
     }
   },
   "files": [
@@ -28,18 +33,31 @@
   },
   "keywords": [
     "mdxui",
-    "markdown",
-    "renderer",
-    "mdxld",
-    "mdx"
+    "fumadocs",
+    "nextjs",
+    "mdx",
+    "documentation",
+    "react",
+    "ui"
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxld/ast": "workspace:*",
+    "@mdxdb/fumadocs": "workspace:*",
     "mdxld": "workspace:*"
+  },
+  "peerDependencies": {
+    "fumadocs-core": ">=14.0.0",
+    "fumadocs-ui": ">=14.0.0",
+    "next": ">=14.0.0",
+    "react": ">=18.0.0"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
+    "@types/react": "^18.3.0",
+    "fumadocs-core": "^14.0.0",
+    "fumadocs-ui": "^14.0.0",
+    "next": "^15.0.0",
+    "react": "^18.3.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
