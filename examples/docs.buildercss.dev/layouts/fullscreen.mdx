@@ -10,20 +10,20 @@ screenshot: /screenshots/layouts/fullscreen.png
 An edge-to-edge immersive layout for media, games, presentations, and focused experiences.
 
 <Preview>
-  <div data-layout="fullscreen" style={{ minHeight: '400px', background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', borderRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-    <div style={{ position: 'absolute', top: 'var(--spacing-4)', right: 'var(--spacing-4)', display: 'flex', gap: 'var(--spacing-2)' }}>
-      <button style={{ padding: 'var(--spacing-2)', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 'var(--radius)', color: 'white', cursor: 'pointer' }}>Settings</button>
-      <button style={{ padding: 'var(--spacing-2)', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 'var(--radius)', color: 'white', cursor: 'pointer' }}>Exit</button>
-    </div>
-    <div style={{ textAlign: 'center', color: 'white' }}>
-      <div style={{ fontSize: 'var(--text-4xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Immersive Experience</div>
-      <p style={{ color: 'rgba(255,255,255,0.7)' }}>Full viewport content with minimal UI</p>
-    </div>
-    <div style={{ position: 'absolute', bottom: 'var(--spacing-4)', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 'var(--spacing-4)' }}>
-      <button style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white' }}>&#9664;</button>
-      <button style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'white', border: 'none', color: 'black' }}>&#9654;</button>
-      <button style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white' }}>&#9654;&#9654;</button>
-    </div>
+  <div data-layout="fullscreen">
+    <aside>
+      <button>Settings</button>
+      <button>Exit</button>
+    </aside>
+    <main>
+      <h1>Immersive Experience</h1>
+      <p>Full viewport content with minimal UI</p>
+    </main>
+    <nav aria-label="Media controls">
+      <button>&#9664;</button>
+      <button aria-current="true">&#9654;</button>
+      <button>&#9654;&#9654;</button>
+    </nav>
   </div>
 </Preview>
 
@@ -40,21 +40,21 @@ An edge-to-edge immersive layout for media, games, presentations, and focused ex
 
 ```html
 <body data-layout="fullscreen">
+  <aside>
+    <button>Settings</button>
+    <button>Exit</button>
+  </aside>
+
   <main>
     <!-- Immersive content -->
     <video src="/media/video.mp4" autoplay loop muted></video>
   </main>
 
-  <nav data-controls aria-label="Media controls">
-    <button data-action="previous">Previous</button>
-    <button data-action="play">Play</button>
-    <button data-action="next">Next</button>
+  <nav aria-label="Media controls">
+    <button>Previous</button>
+    <button>Play</button>
+    <button>Next</button>
   </nav>
-
-  <aside data-overlay>
-    <button data-action="settings">Settings</button>
-    <button data-action="exit">Exit</button>
-  </aside>
 </body>
 ```
 
@@ -64,16 +64,26 @@ An edge-to-edge immersive layout for media, games, presentations, and focused ex
 [data-layout="fullscreen"] {
   position: fixed;
   inset: 0;
-  background: black;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   overflow: hidden;
-}
-
-[data-layout="fullscreen"] > main {
-  width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+[data-layout="fullscreen"] > main {
+  text-align: center;
+  color: white;
+}
+
+[data-layout="fullscreen"] > main h1 {
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-layout="fullscreen"] > main p {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 [data-layout="fullscreen"] > main > video,
@@ -83,22 +93,7 @@ An edge-to-edge immersive layout for media, games, presentations, and focused ex
   object-fit: contain;
 }
 
-[data-layout="fullscreen"] [data-controls] {
-  position: absolute;
-  bottom: var(--spacing-8);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: var(--spacing-4);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-[data-layout="fullscreen"]:hover [data-controls] {
-  opacity: 1;
-}
-
-[data-layout="fullscreen"] [data-overlay] {
+[data-layout="fullscreen"] > aside {
   position: absolute;
   top: var(--spacing-4);
   right: var(--spacing-4);
@@ -108,8 +103,47 @@ An edge-to-edge immersive layout for media, games, presentations, and focused ex
   transition: opacity 0.3s;
 }
 
-[data-layout="fullscreen"]:hover [data-overlay] {
+[data-layout="fullscreen"]:hover > aside {
   opacity: 1;
+}
+
+[data-layout="fullscreen"] > aside button {
+  padding: var(--spacing-2);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  cursor: pointer;
+}
+
+[data-layout="fullscreen"] > nav {
+  position: absolute;
+  bottom: var(--spacing-4);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--spacing-4);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+[data-layout="fullscreen"]:hover > nav {
+  opacity: 1;
+}
+
+[data-layout="fullscreen"] > nav button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+[data-layout="fullscreen"] > nav button[aria-current] {
+  background: white;
+  color: black;
 }
 ```
 

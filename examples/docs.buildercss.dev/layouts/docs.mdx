@@ -10,30 +10,32 @@ screenshot: /screenshots/layouts/docs.png
 A three-column layout optimized for documentation with a sidebar navigation and table of contents.
 
 <Preview>
-  <div data-layout="docs" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 140px', minHeight: '400px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-    <aside style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRight: '1px solid var(--border)' }}>
+  <div data-layout="docs">
+    <aside>
       <nav>
-        <h4 style={{ fontSize: 'var(--text-xs)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 'var(--spacing-2)' }}>Getting Started</h4>
-        <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
-          <li><a href="#">Introduction</a></li>
-          <li><a href="#" style={{ color: 'var(--primary)' }}>Installation</a></li>
-          <li><a href="#">Quick Start</a></li>
-        </ul>
+        <section>
+          <h4>Getting Started</h4>
+          <ul>
+            <li><a href="#">Introduction</a></li>
+            <li><a href="#" aria-current="page">Installation</a></li>
+            <li><a href="#">Quick Start</a></li>
+          </ul>
+        </section>
       </nav>
     </aside>
-    <main style={{ padding: 'var(--spacing-6)' }}>
+    <main>
       <article>
         <h1>Installation</h1>
         <p>Learn how to install and configure BuilderCSS.</p>
         <h2 id="npm">Using npm</h2>
         <p>Install via package manager:</p>
-        <pre style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius)' }}>npm install buildercss</pre>
+        <pre>npm install buildercss</pre>
       </article>
     </main>
-    <aside style={{ padding: 'var(--spacing-4)', borderLeft: '1px solid var(--border)' }}>
-      <nav>
-        <h4 style={{ fontSize: 'var(--text-xs)', fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>On this page</h4>
-        <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
+    <aside>
+      <nav aria-label="Table of contents">
+        <h4>On this page</h4>
+        <ul>
           <li><a href="#npm">Using npm</a></li>
           <li><a href="#cdn">Using CDN</a></li>
         </ul>
@@ -57,7 +59,7 @@ A three-column layout optimized for documentation with a sidebar navigation and 
     <nav><!-- Top navigation --></nav>
   </header>
 
-  <aside data-sidebar>
+  <aside>
     <nav>
       <section>
         <h4>Getting Started</h4>
@@ -75,7 +77,7 @@ A three-column layout optimized for documentation with a sidebar navigation and 
     </article>
   </main>
 
-  <aside data-toc>
+  <aside>
     <nav aria-label="Table of contents">
       <h4>On this page</h4>
       <ul>
@@ -102,7 +104,7 @@ A three-column layout optimized for documentation with a sidebar navigation and 
   border-bottom: 1px solid var(--border);
 }
 
-[data-layout="docs"] > [data-sidebar] {
+[data-layout="docs"] > aside:first-of-type {
   padding: var(--spacing-4);
   border-right: 1px solid var(--border);
   position: sticky;
@@ -111,13 +113,37 @@ A three-column layout optimized for documentation with a sidebar navigation and 
   overflow-y: auto;
 }
 
+[data-layout="docs"] > aside h4 {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-layout="docs"] > aside ul {
+  list-style: none;
+  padding: 0;
+  font-size: var(--text-sm);
+}
+
+[data-layout="docs"] > aside a[aria-current] {
+  color: var(--primary);
+}
+
 [data-layout="docs"] > main {
   padding: var(--spacing-8);
   max-width: 800px;
 }
 
-[data-layout="docs"] > [data-toc] {
+[data-layout="docs"] > main pre {
+  background: var(--muted);
   padding: var(--spacing-4);
+  border-radius: var(--radius);
+}
+
+[data-layout="docs"] > aside:last-of-type {
+  padding: var(--spacing-4);
+  border-left: 1px solid var(--border);
   position: sticky;
   top: 60px;
   height: calc(100vh - 60px);
@@ -128,8 +154,7 @@ A three-column layout optimized for documentation with a sidebar navigation and 
     grid-template-columns: 1fr;
   }
 
-  [data-layout="docs"] > [data-sidebar],
-  [data-layout="docs"] > [data-toc] {
+  [data-layout="docs"] > aside {
     display: none;
   }
 }

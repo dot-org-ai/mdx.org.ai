@@ -10,47 +10,47 @@ screenshot: /screenshots/pages/privacy-policy.png
 A legal page for privacy policy documentation.
 
 <Preview>
-  <article data-page="privacy-policy" style={{ padding: 'var(--spacing-6)', maxWidth: '800px', margin: '0 auto' }}>
-    <header style={{ marginBottom: 'var(--spacing-6)' }}>
-      <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Privacy Policy</h1>
-      <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Last updated: December 1, 2024</p>
+  <article data-page="privacy-policy">
+    <header>
+      <h1>Privacy Policy</h1>
+      <p><time datetime="2024-12-01">Last updated: December 1, 2024</time></p>
     </header>
 
-    <nav style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius-lg)', marginBottom: 'var(--spacing-6)' }}>
-      <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-2)', fontSize: 'var(--text-sm)' }}>Table of Contents</h3>
-      <ul style={{ fontSize: 'var(--text-sm)', paddingLeft: 'var(--spacing-4)' }}>
-        <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--primary)' }}>Information We Collect</a></li>
-        <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--primary)' }}>How We Use Your Information</a></li>
-        <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--primary)' }}>Data Security</a></li>
-        <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--primary)' }}>Your Rights</a></li>
+    <nav aria-label="Table of contents">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li><a href="#collect">Information We Collect</a></li>
+        <li><a href="#use">How We Use Your Information</a></li>
+        <li><a href="#security">Data Security</a></li>
+        <li><a href="#rights">Your Rights</a></li>
       </ul>
     </nav>
 
-    <div style={{ lineHeight: 1.8, color: 'var(--muted-foreground)' }}>
-      <section style={{ marginBottom: 'var(--spacing-6)' }}>
-        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--foreground)', marginBottom: 'var(--spacing-3)' }}>1. Information We Collect</h2>
-        <p style={{ marginBottom: 'var(--spacing-3)' }}>We collect information you provide directly to us, such as when you create an account, make a purchase, or contact us for support.</p>
+    <div>
+      <section id="collect">
+        <h2>1. Information We Collect</h2>
+        <p>We collect information you provide directly to us, such as when you create an account, make a purchase, or contact us for support.</p>
         <p>This may include:</p>
-        <ul style={{ paddingLeft: 'var(--spacing-6)', marginTop: 'var(--spacing-2)' }}>
+        <ul>
           <li>Name and email address</li>
           <li>Payment information</li>
           <li>Usage data and preferences</li>
         </ul>
       </section>
 
-      <section style={{ marginBottom: 'var(--spacing-6)' }}>
-        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--foreground)', marginBottom: 'var(--spacing-3)' }}>2. How We Use Your Information</h2>
-        <p style={{ marginBottom: 'var(--spacing-3)' }}>We use the information we collect to provide, maintain, and improve our services, and to communicate with you.</p>
+      <section id="use">
+        <h2>2. How We Use Your Information</h2>
+        <p>We use the information we collect to provide, maintain, and improve our services, and to communicate with you.</p>
       </section>
 
-      <section style={{ marginBottom: 'var(--spacing-6)' }}>
-        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--foreground)', marginBottom: 'var(--spacing-3)' }}>3. Data Security</h2>
+      <section id="security">
+        <h2>3. Data Security</h2>
         <p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, or destruction.</p>
       </section>
 
-      <section>
-        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--foreground)', marginBottom: 'var(--spacing-3)' }}>4. Contact Us</h2>
-        <p>If you have questions about this Privacy Policy, please contact us at <a href="#" style={{ color: 'var(--primary)' }}>privacy@example.com</a></p>
+      <section id="contact">
+        <h2>4. Contact Us</h2>
+        <p>If you have questions about this Privacy Policy, please contact us at <a href="mailto:privacy@example.com">privacy@example.com</a></p>
       </section>
     </div>
   </article>
@@ -67,12 +67,12 @@ A legal page for privacy policy documentation.
 
 ```html
 <article data-page="privacy-policy">
-  <header data-page-header>
+  <header>
     <h1>Privacy Policy</h1>
-    <p data-last-updated>Last updated: December 1, 2024</p>
+    <p><time datetime="2024-12-01">Last updated: December 1, 2024</time></p>
   </header>
 
-  <nav data-toc>
+  <nav aria-label="Table of contents">
     <h3>Table of Contents</h3>
     <ul>
       <li><a href="#collect">Information We Collect</a></li>
@@ -81,7 +81,7 @@ A legal page for privacy policy documentation.
     </ul>
   </nav>
 
-  <div data-content>
+  <div>
     <section id="collect">
       <h2>1. Information We Collect</h2>
       <p>We collect information you provide...</p>
@@ -108,51 +108,73 @@ A legal page for privacy policy documentation.
   margin: 0 auto;
 }
 
-[data-page="privacy-policy"] [data-page-header] {
+[data-page="privacy-policy"] > header {
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="privacy-policy"] [data-last-updated] {
+[data-page="privacy-policy"] > header h1 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="privacy-policy"] > header time {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
 }
 
-[data-page="privacy-policy"] [data-toc] {
+[data-page="privacy-policy"] > nav {
   background: var(--muted);
   padding: var(--spacing-4);
   border-radius: var(--radius-lg);
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="privacy-policy"] [data-toc] h3 {
+[data-page="privacy-policy"] > nav h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-2);
   font-size: var(--text-sm);
 }
 
-[data-page="privacy-policy"] [data-toc] ul {
+[data-page="privacy-policy"] > nav ul {
   font-size: var(--text-sm);
   padding-left: var(--spacing-4);
 }
 
-[data-page="privacy-policy"] [data-content] {
+[data-page="privacy-policy"] > nav li {
+  padding: var(--spacing-1) 0;
+}
+
+[data-page="privacy-policy"] > nav a {
+  color: var(--primary);
+}
+
+[data-page="privacy-policy"] > div {
   line-height: 1.8;
   color: var(--muted-foreground);
 }
 
-[data-page="privacy-policy"] [data-content] section {
+[data-page="privacy-policy"] > div section {
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="privacy-policy"] [data-content] h2 {
+[data-page="privacy-policy"] > div h2 {
   font-size: var(--text-lg);
   font-weight: 600;
   color: var(--foreground);
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="privacy-policy"] [data-content] ul {
+[data-page="privacy-policy"] > div p {
+  margin-bottom: var(--spacing-3);
+}
+
+[data-page="privacy-policy"] > div ul {
   padding-left: var(--spacing-6);
   margin-top: var(--spacing-2);
+}
+
+[data-page="privacy-policy"] > div a {
+  color: var(--primary);
 }
 ```

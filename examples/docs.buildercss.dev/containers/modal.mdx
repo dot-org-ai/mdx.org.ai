@@ -1,209 +1,211 @@
 ---
 $type: DocsPage
-title: Modal
-description: Centered dialog overlay for focused interactions
+title: Modal Container
+description: Centered dialog overlay
 screenshot: /screenshots/containers/modal.png
 ---
 
-# Modal
+# Modal Container
 
-A centered dialog overlay for focused interactions and confirmations.
+A centered dialog overlay for confirmations, forms, and focused content.
 
 <Preview>
-  <div style={{ position: 'relative', height: '400px', background: 'var(--muted)', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <article style={{ background: 'var(--background)', borderRadius: 'var(--radius-lg)', width: '100%', maxWidth: '400px', margin: 'var(--spacing-4)', overflow: 'hidden' }}>
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
-          <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600 }}>Delete Item?</h2>
-          <button style={{ background: 'none', border: 'none', fontSize: 'var(--text-xl)', cursor: 'pointer', color: 'var(--muted-foreground)' }}>&times;</button>
-        </header>
-        <section style={{ padding: 'var(--spacing-4)' }}>
-          <p>This action cannot be undone. Are you sure you want to delete this item?</p>
-        </section>
-        <footer style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)', padding: 'var(--spacing-4)', borderTop: '1px solid var(--border)' }}>
-          <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Cancel</button>
-          <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--destructive)', color: 'var(--destructive-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Delete</button>
-        </footer>
-      </article>
-    </div>
+  <div data-container="modal">
+    <article>
+      <header>
+        <h2>Confirm Action</h2>
+        <button aria-label="Close">×</button>
+      </header>
+      <p>Are you sure you want to continue? This action cannot be undone.</p>
+      <footer>
+        <button>Cancel</button>
+        <button>Confirm</button>
+      </footer>
+    </article>
   </div>
 </Preview>
 
 ## When to Use
 
 - Confirmation dialogs
-- Quick forms
-- Alerts and notifications
-- Focused interactions
+- Form submissions
+- Alert messages
+- Focused tasks
 
 ## Structure
 
 ```html
-<!-- Trigger -->
-<button data-modal-trigger="confirm-delete">Delete</button>
-
-<!-- Modal -->
-<aside data-modal id="confirm-delete" aria-hidden="true">
+<div data-container="modal">
   <article>
     <header>
-      <h2>Delete Item?</h2>
-      <button data-action="close" aria-label="Close">&times;</button>
+      <h2>Confirm Action</h2>
+      <button aria-label="Close">×</button>
     </header>
-    <section>
-      <p>This action cannot be undone. Are you sure?</p>
-    </section>
+    <p>Are you sure you want to continue?</p>
     <footer>
-      <button data-button="ghost" data-action="close">Cancel</button>
-      <button data-button="destructive">Delete</button>
+      <button>Cancel</button>
+      <button>Confirm</button>
     </footer>
   </article>
-</aside>
+</div>
 ```
 
 ## CSS
 
 ```css
-[data-modal] {
+[data-container="modal"] {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 50;
 }
 
-[data-modal]::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-[data-modal] > article {
-  position: relative;
+[data-container="modal"] > article {
   background: var(--background);
   border-radius: var(--radius-lg);
-  max-width: 500px;
+  padding: var(--spacing-6);
   width: 100%;
-  margin: var(--spacing-4);
-  animation: modalIn 0.2s ease;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-[data-modal] > article > header {
+[data-container="modal"] header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-4);
-  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--spacing-4);
 }
 
-[data-modal] > article > section {
-  padding: var(--spacing-4);
+[data-container="modal"] header h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
 }
 
-[data-modal] > article > footer {
+[data-container="modal"] header button {
+  background: none;
+  border: none;
+  font-size: var(--text-xl);
+  cursor: pointer;
+  color: var(--muted-foreground);
+}
+
+[data-container="modal"] > article > p {
+  color: var(--muted-foreground);
+}
+
+[data-container="modal"] footer {
+  margin-top: var(--spacing-4);
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-2);
-  padding: var(--spacing-4);
-  border-top: 1px solid var(--border);
 }
 
-[data-modal][aria-hidden="true"] {
+[data-container="modal"] footer button {
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+[data-container="modal"] footer button:first-child {
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+[data-container="modal"] footer button:last-child {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+}
+
+[data-container="modal"][hidden] {
   display: none;
-}
-
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 ```
 
 ## JavaScript
 
 ```js
-// Open modal
-document.querySelectorAll('[data-modal-trigger]').forEach(trigger => {
-  trigger.addEventListener('click', () => {
-    const modalId = trigger.dataset.modalTrigger
-    const modal = document.getElementById(modalId)
-    modal.setAttribute('aria-hidden', 'false')
-  })
-})
-
-// Close modal
-document.querySelectorAll('[data-modal] [data-action="close"]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const modal = btn.closest('[data-modal]')
-    modal.setAttribute('aria-hidden', 'true')
-  })
-})
+const modal = document.querySelector('[data-container="modal"]')
 
 // Close on backdrop click
-document.querySelectorAll('[data-modal]').forEach(modal => {
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.setAttribute('aria-hidden', 'true')
-    }
-  })
-})
-
-// Close on Escape
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('[data-modal][aria-hidden="false"]').forEach(modal => {
-      modal.setAttribute('aria-hidden', 'true')
-    })
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    modal.hidden = true
   }
 })
+
+// Close on escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !modal.hidden) {
+    modal.hidden = true
+  }
+})
+
+// Open modal
+function openModal() {
+  modal.hidden = false
+  modal.querySelector('article').focus()
+}
 ```
+
+## Accessibility
+
+- Use `role="dialog"` and `aria-modal="true"` for screen readers
+- Trap focus within the modal when open
+- Return focus to trigger element on close
+- Support Escape key to dismiss
 
 ## Variations
 
-### Form Modal
+### Destructive
 
 ```html
-<aside data-modal id="edit-profile">
+<div data-container="modal">
+  <article>
+    <header>
+      <h2>Delete Item</h2>
+      <button aria-label="Close">×</button>
+    </header>
+    <p>This action cannot be undone.</p>
+    <footer>
+      <button>Cancel</button>
+      <button>Delete</button>
+    </footer>
+  </article>
+</div>
+```
+
+```css
+[data-container="modal"] footer button:last-child:has(+ :empty) {
+  /* When it's destructive action */
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+}
+```
+
+### With Form
+
+```html
+<div data-container="modal">
   <article>
     <header>
       <h2>Edit Profile</h2>
-      <button data-action="close">&times;</button>
+      <button aria-label="Close">×</button>
     </header>
     <form>
-      <section>
-        <div data-field>
-          <label for="name">Name</label>
-          <input type="text" id="name" />
-        </div>
-      </section>
+      <label>Name</label>
+      <input type="text" />
+      <label>Email</label>
+      <input type="email" />
       <footer>
-        <button type="button" data-button="ghost" data-action="close">Cancel</button>
-        <button type="submit" data-button="primary">Save</button>
+        <button type="button">Cancel</button>
+        <button type="submit">Save</button>
       </footer>
     </form>
   </article>
-</aside>
-```
-
-### Alert Modal
-
-```html
-<aside data-modal data-variant="alert">
-  <article>
-    <section>
-      <div data-icon="warning">⚠️</div>
-      <h2>Session Expired</h2>
-      <p>Please log in again to continue.</p>
-    </section>
-    <footer>
-      <button data-button="primary" data-action="close">Log In</button>
-    </footer>
-  </article>
-</aside>
+</div>
 ```

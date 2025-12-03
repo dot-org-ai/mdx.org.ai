@@ -10,14 +10,14 @@ screenshot: /screenshots/sections/logos.png
 A logo cloud showing trusted companies and partners.
 
 <Preview>
-  <section data-section="logos" style={{ padding: 'var(--spacing-12) var(--spacing-4)', textAlign: 'center' }}>
-    <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-8)', fontSize: 'var(--text-sm)' }}>Trusted by teams at</p>
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 'var(--spacing-12)', flexWrap: 'wrap', opacity: 0.6 }}>
-      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 1</div>
-      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 2</div>
-      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 3</div>
-      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 4</div>
-      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 5</div>
+  <section data-section="logos">
+    <p>Trusted by teams at</p>
+    <div>
+      <figure>Company 1</figure>
+      <figure>Company 2</figure>
+      <figure>Company 3</figure>
+      <figure>Company 4</figure>
+      <figure>Company 5</figure>
     </div>
   </section>
 </Preview>
@@ -34,7 +34,7 @@ A logo cloud showing trusted companies and partners.
 ```html
 <section data-section="logos">
   <p>Trusted by teams at</p>
-  <div data-logo-grid>
+  <div>
     <img src="/logos/company1.svg" alt="Company 1" />
     <img src="/logos/company2.svg" alt="Company 2" />
     <img src="/logos/company3.svg" alt="Company 3" />
@@ -58,7 +58,7 @@ A logo cloud showing trusted companies and partners.
   margin-bottom: var(--spacing-8);
 }
 
-[data-section="logos"] [data-logo-grid] {
+[data-section="logos"] > div {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,7 +66,7 @@ A logo cloud showing trusted companies and partners.
   flex-wrap: wrap;
 }
 
-[data-section="logos"] [data-logo-grid] img {
+[data-section="logos"] > div img {
   height: 32px;
   width: auto;
   opacity: 0.6;
@@ -74,17 +74,28 @@ A logo cloud showing trusted companies and partners.
   transition: opacity 0.2s, filter 0.2s;
 }
 
-[data-section="logos"] [data-logo-grid] img:hover {
+[data-section="logos"] > div img:hover {
   opacity: 1;
   filter: grayscale(0%);
 }
 
+[data-section="logos"] > div figure {
+  width: 120px;
+  height: 40px;
+  background: var(--muted);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+}
+
 @media (max-width: 768px) {
-  [data-section="logos"] [data-logo-grid] {
+  [data-section="logos"] > div {
     gap: var(--spacing-6);
   }
 
-  [data-section="logos"] [data-logo-grid] img {
+  [data-section="logos"] > div img {
     height: 24px;
   }
 }
@@ -95,10 +106,10 @@ A logo cloud showing trusted companies and partners.
 ### Scrolling Marquee
 
 ```html
-<section data-section="logos" data-variant="marquee">
+<section data-section="logos">
   <p>Trusted by teams at</p>
-  <div data-marquee>
-    <div data-marquee-content>
+  <div>
+    <div>
       <img src="/logos/company1.svg" alt="" />
       <img src="/logos/company2.svg" alt="" />
       <!-- Duplicate for seamless loop -->
@@ -108,7 +119,7 @@ A logo cloud showing trusted companies and partners.
 ```
 
 ```css
-[data-section="logos"][data-variant="marquee"] [data-marquee] {
+[data-section="logos"] > div {
   overflow: hidden;
   mask-image: linear-gradient(
     to right,
@@ -119,7 +130,7 @@ A logo cloud showing trusted companies and partners.
   );
 }
 
-[data-section="logos"] [data-marquee-content] {
+[data-section="logos"] > div > div {
   display: flex;
   gap: var(--spacing-12);
   animation: marquee 30s linear infinite;
@@ -134,8 +145,8 @@ A logo cloud showing trusted companies and partners.
 ### With Borders
 
 ```html
-<section data-section="logos" data-variant="bordered">
-  <div data-logo-grid>
+<section data-section="logos">
+  <div>
     <a href="https://company1.com">
       <img src="/logos/company1.svg" alt="Company 1" />
     </a>

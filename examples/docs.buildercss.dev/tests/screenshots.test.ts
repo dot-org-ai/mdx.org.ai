@@ -149,8 +149,14 @@ describe('BuilderCSS Screenshots', () => {
           // Navigate to the page
           await page.goto(url, { waitUntil: 'networkidle' })
 
-          // Wait for Preview component to render (if present)
-          const preview = await page.$('[data-preview], article[data-view], article[data-page], article[data-layout], section[data-section], div[data-container]')
+          // Wait for semantic Preview component to render
+          // Components are identified purely by semantic HTML structure:
+          // - layouts: article with structural children (aside, main, header, footer)
+          // - pages: article (full document)
+          // - views: article with content elements (table, form, dl, ul)
+          // - sections: section (thematic content grouping)
+          // - containers: dialog (modal/popup) or aside (slideover)
+          const preview = await page.$('article, section, dialog, aside')
 
           if (preview) {
             // Screenshot just the preview element

@@ -10,67 +10,75 @@ screenshot: /screenshots/views/list.png
 A vertical list of items with search, filters, and actions.
 
 <Preview>
-  <article data-view="list" style={{ padding: 'var(--spacing-6)', background: 'var(--background)' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
-      <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Projects</h1>
-      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-        <input type="search" placeholder="Search..." style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', width: '200px' }} />
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>New Project</button>
-      </div>
+  <article data-view="list">
+    <header>
+      <h1>Projects</h1>
+      <nav>
+        <input type="search" placeholder="Search..." />
+        <button>New Project</button>
+      </nav>
     </header>
-    <ul style={{ listStyle: 'none', padding: 0, border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-      <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
+    <ul>
+      <li>
         <div>
-          <h3 style={{ fontWeight: 600 }}>Project Alpha</h3>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Web application redesign</p>
-          <div style={{ display: 'flex', gap: 'var(--spacing-2)', marginTop: 'var(--spacing-1)' }}>
-            <span style={{ padding: '2px 8px', background: 'green', color: 'white', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Active</span>
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>Updated 2h ago</span>
-          </div>
+          <h3>Project Alpha</h3>
+          <p>Web application redesign</p>
+          <footer>
+            <mark>Active</mark>
+            <time>Updated 2h ago</time>
+          </footer>
         </div>
-        <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Edit</button>
-          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Delete</button>
-        </div>
+        <menu>
+          <button>Edit</button>
+          <button>Delete</button>
+        </menu>
       </li>
-      <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
+      <li>
         <div>
-          <h3 style={{ fontWeight: 600 }}>Project Beta</h3>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Mobile app development</p>
-          <div style={{ display: 'flex', gap: 'var(--spacing-2)', marginTop: 'var(--spacing-1)' }}>
-            <span style={{ padding: '2px 8px', background: 'orange', color: 'white', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>In Review</span>
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>Updated 1d ago</span>
-          </div>
+          <h3>Project Beta</h3>
+          <p>Mobile app development</p>
+          <footer>
+            <mark>In Review</mark>
+            <time>Updated 1d ago</time>
+          </footer>
         </div>
-        <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Edit</button>
-          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Delete</button>
-        </div>
+        <menu>
+          <button>Edit</button>
+          <button>Delete</button>
+        </menu>
       </li>
-      <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)' }}>
+      <li>
         <div>
-          <h3 style={{ fontWeight: 600 }}>Project Gamma</h3>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>API integration</p>
-          <div style={{ display: 'flex', gap: 'var(--spacing-2)', marginTop: 'var(--spacing-1)' }}>
-            <span style={{ padding: '2px 8px', background: 'var(--muted)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Draft</span>
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>Updated 3d ago</span>
-          </div>
+          <h3>Project Gamma</h3>
+          <p>API integration</p>
+          <footer>
+            <mark>Draft</mark>
+            <time>Updated 3d ago</time>
+          </footer>
         </div>
-        <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Edit</button>
-          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Delete</button>
-        </div>
+        <menu>
+          <button>Edit</button>
+          <button>Delete</button>
+        </menu>
       </li>
     </ul>
-    <footer style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--spacing-4)' }}>
-      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Showing 1-3 of 12</span>
-      <nav style={{ display: 'flex', gap: 'var(--spacing-1)' }}>
-        <button disabled style={{ padding: 'var(--spacing-2)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>Previous</button>
-        <button style={{ padding: 'var(--spacing-2)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Next</button>
+    <footer>
+      <span>Showing 1-3 of 12</span>
+      <nav>
+        <button disabled>Previous</button>
+        <button>Next</button>
       </nav>
     </footer>
   </article>
 </Preview>
+
+## When to Use
+
+- Project lists
+- Task lists
+- File browsers
+- Search results
+- Email inbox
 
 ## Structure
 
@@ -78,40 +86,38 @@ A vertical list of items with search, filters, and actions.
 <article data-view="list">
   <header>
     <h1>Projects</h1>
-    <div data-actions>
+    <nav>
       <input type="search" placeholder="Search..." />
       <select>
         <option>All Status</option>
         <option>Active</option>
         <option>Archived</option>
       </select>
-      <button data-button="primary">New Project</button>
-    </div>
+      <button>New Project</button>
+    </nav>
   </header>
 
-  <section data-content>
-    <ul data-list>
-      <li data-list-item>
-        <div data-list-item-content>
-          <h3>Project Alpha</h3>
-          <p>Description of the project</p>
-          <div data-meta>
-            <span data-badge="success">Active</span>
-            <span>Updated 2 hours ago</span>
-          </div>
-        </div>
-        <div data-list-item-actions>
-          <button data-button="ghost">Edit</button>
-          <button data-button="ghost">Delete</button>
-        </div>
-      </li>
-    </ul>
-  </section>
+  <ul>
+    <li>
+      <div>
+        <h3>Project Alpha</h3>
+        <p>Description of the project</p>
+        <footer>
+          <mark>Active</mark>
+          <time>Updated 2 hours ago</time>
+        </footer>
+      </div>
+      <menu>
+        <button>Edit</button>
+        <button>Delete</button>
+      </menu>
+    </li>
+  </ul>
 
   <footer>
-    <nav data-pagination>
+    <span>Showing 1-10 of 50</span>
+    <nav>
       <button disabled>Previous</button>
-      <span>Page 1 of 5</span>
       <button>Next</button>
     </nav>
   </footer>
@@ -132,14 +138,39 @@ A vertical list of items with search, filters, and actions.
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="list"] [data-list] {
+[data-view="list"] > header h1 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+[data-view="list"] > header nav {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-view="list"] > header input[type="search"] {
+  padding: var(--spacing-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 200px;
+}
+
+[data-view="list"] > header nav button {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+}
+
+[data-view="list"] > ul {
   list-style: none;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
 }
 
-[data-view="list"] [data-list-item] {
+[data-view="list"] > ul > li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -147,14 +178,79 @@ A vertical list of items with search, filters, and actions.
   border-bottom: 1px solid var(--border);
 }
 
-[data-view="list"] [data-list-item]:last-child {
+[data-view="list"] > ul > li:last-child {
   border-bottom: none;
 }
 
-[data-view="list"] [data-pagination] {
+[data-view="list"] > ul h3 {
+  font-weight: 600;
+}
+
+[data-view="list"] > ul p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-view="list"] > ul footer {
   display: flex;
-  justify-content: center;
   gap: var(--spacing-2);
+  align-items: center;
+  margin-top: var(--spacing-1);
+}
+
+[data-view="list"] > ul mark {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  background: var(--muted);
+}
+
+[data-view="list"] > ul time {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+[data-view="list"] > ul menu {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-view="list"] > ul menu button {
+  padding: var(--spacing-2);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-view="list"] > footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-top: var(--spacing-4);
+}
+
+[data-view="list"] > footer > span {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-view="list"] > footer nav {
+  display: flex;
+  gap: var(--spacing-1);
+}
+
+[data-view="list"] > footer nav button {
+  padding: var(--spacing-2);
+  border-radius: var(--radius);
+  border: none;
+}
+
+[data-view="list"] > footer nav button:disabled {
+  background: var(--muted);
+}
+
+[data-view="list"] > footer nav button:not(:disabled) {
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 ```

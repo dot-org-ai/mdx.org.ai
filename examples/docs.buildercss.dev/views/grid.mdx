@@ -10,55 +10,63 @@ screenshot: /screenshots/views/grid.png
 A card grid layout for visual browsing of items.
 
 <Preview>
-  <article data-view="grid" style={{ padding: 'var(--spacing-6)' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
-      <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Templates</h1>
-      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-        <input type="search" placeholder="Search..." style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
-        <select style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+  <article data-view="grid">
+    <header>
+      <h1>Templates</h1>
+      <nav>
+        <input type="search" placeholder="Search..." />
+        <select>
           <option>All Categories</option>
           <option>Marketing</option>
           <option>E-commerce</option>
         </select>
-      </div>
+      </nav>
     </header>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-4)' }}>
-      <article style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-        <div style={{ height: '120px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}></div>
-        <div style={{ padding: 'var(--spacing-4)' }}>
-          <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Landing Page</h3>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Modern marketing template</p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>Free</span>
-            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Use</button>
-          </div>
+    <section>
+      <article>
+        <figure></figure>
+        <div>
+          <h3>Landing Page</h3>
+          <p>Modern marketing template</p>
+          <footer>
+            <span>Free</span>
+            <button>Use</button>
+          </footer>
         </div>
       </article>
-      <article style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-        <div style={{ height: '120px', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}></div>
-        <div style={{ padding: 'var(--spacing-4)' }}>
-          <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Dashboard</h3>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Analytics dashboard</p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>$29</span>
-            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Use</button>
-          </div>
+      <article>
+        <figure></figure>
+        <div>
+          <h3>Dashboard</h3>
+          <p>Analytics dashboard</p>
+          <footer>
+            <span>$29</span>
+            <button>Use</button>
+          </footer>
         </div>
       </article>
-      <article style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-        <div style={{ height: '120px', background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}></div>
-        <div style={{ padding: 'var(--spacing-4)' }}>
-          <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>E-commerce</h3>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Online store template</p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>$49</span>
-            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Use</button>
-          </div>
+      <article>
+        <figure></figure>
+        <div>
+          <h3>E-commerce</h3>
+          <p>Online store template</p>
+          <footer>
+            <span>$49</span>
+            <button>Use</button>
+          </footer>
         </div>
       </article>
-    </div>
+    </section>
   </article>
 </Preview>
+
+## When to Use
+
+- Template galleries
+- Product catalogs
+- Image galleries
+- Portfolio displays
+- App stores
 
 ## Structure
 
@@ -66,32 +74,32 @@ A card grid layout for visual browsing of items.
 <article data-view="grid">
   <header>
     <h1>Templates</h1>
-    <div data-actions>
+    <nav>
       <input type="search" placeholder="Search..." />
       <select>
         <option>All Categories</option>
       </select>
-    </div>
+    </nav>
   </header>
 
-  <section data-content>
-    <div data-grid="3">
-      <article data-card>
-        <img src="/template-preview.jpg" alt="" data-card-image />
-        <div data-card-content>
-          <h3>Landing Page</h3>
-          <p>Modern marketing template</p>
-          <div data-card-footer>
-            <span data-price>Free</span>
-            <button data-button="primary">Use</button>
-          </div>
-        </div>
-      </article>
-    </div>
+  <section>
+    <article>
+      <figure>
+        <img src="/template-preview.jpg" alt="" />
+      </figure>
+      <div>
+        <h3>Landing Page</h3>
+        <p>Modern marketing template</p>
+        <footer>
+          <span>Free</span>
+          <button>Use</button>
+        </footer>
+      </div>
+    </article>
   </section>
 
   <footer>
-    <nav data-pagination>...</nav>
+    <nav><!-- Pagination --></nav>
   </footer>
 </article>
 ```
@@ -110,38 +118,101 @@ A card grid layout for visual browsing of items.
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="grid"] [data-grid] {
+[data-view="grid"] > header h1 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+[data-view="grid"] > header nav {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-view="grid"] > header input,
+[data-view="grid"] > header select {
+  padding: var(--spacing-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-view="grid"] > section {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-4);
 }
 
-[data-view="grid"] [data-grid="3"] {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-[data-view="grid"] [data-card] {
+[data-view="grid"] > section > article {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: box-shadow 0.2s;
 }
 
-[data-view="grid"] [data-card]:hover {
+[data-view="grid"] > section > article:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-[data-view="grid"] [data-card-image] {
+[data-view="grid"] > section figure {
+  height: 120px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: 0;
+}
+
+[data-view="grid"] > section figure:nth-child(1) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+[data-view="grid"] > section > article:nth-child(2) figure {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+[data-view="grid"] > section > article:nth-child(3) figure {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+[data-view="grid"] > section figure img {
   width: 100%;
-  height: 150px;
+  height: 100%;
   object-fit: cover;
 }
 
-[data-view="grid"] [data-card-content] {
+[data-view="grid"] > section > article > div {
   padding: var(--spacing-4);
 }
 
+[data-view="grid"] > section h3 {
+  font-weight: 600;
+  margin-bottom: var(--spacing-1);
+}
+
+[data-view="grid"] > section p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-2);
+}
+
+[data-view="grid"] > section footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+[data-view="grid"] > section footer span {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+[data-view="grid"] > section footer button {
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+}
+
 @media (max-width: 768px) {
-  [data-view="grid"] [data-grid="3"] {
+  [data-view="grid"] > section {
     grid-template-columns: 1fr;
   }
 }

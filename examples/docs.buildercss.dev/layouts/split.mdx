@@ -1,55 +1,47 @@
 ---
 $type: DocsPage
 title: Split Layout
-description: 50/50 split layout for comparison or onboarding
+description: Two-panel layout for visual and content areas
 screenshot: /screenshots/layouts/split.png
 ---
 
 # Split Layout
 
-A 50/50 split layout ideal for comparison views, onboarding, and hero sections with visual content.
+A two-panel layout perfect for onboarding flows, auth screens, and focused content presentation.
 
 <Preview>
-  <div data-layout="split" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '400px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-    <div style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-8)' }}>
-      <div style={{ width: '200px', height: '200px', background: 'rgba(255,255,255,0.2)', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-        Visual Content
-      </div>
-    </div>
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-8)' }}>
-      <div style={{ maxWidth: '300px' }}>
-        <h1 style={{ fontSize: 'var(--text-3xl)', marginBottom: 'var(--spacing-4)' }}>Welcome aboard</h1>
-        <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)' }}>Get started with our platform in just a few steps.</p>
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Get Started</button>
-      </div>
-    </div>
+  <div data-layout="split">
+    <aside>
+      <figure>Visual Content</figure>
+    </aside>
+    <main>
+      <h1>Welcome aboard</h1>
+      <p>Get started with our platform in just a few steps.</p>
+      <button>Get Started</button>
+    </main>
   </div>
 </Preview>
 
 ## When to Use
 
 - Onboarding flows
-- Comparison views (before/after)
-- Hero sections with imagery
-- Login/signup with branding
-- Feature highlights
+- Authentication screens
+- Feature introductions
+- Landing page sections
 
 ## Structure
 
 ```html
-<body data-layout="split">
-  <section data-panel="visual">
-    <img src="/hero-image.jpg" alt="Hero" />
-  </section>
-
-  <section data-panel="content">
-    <article>
-      <h1>Welcome aboard</h1>
-      <p>Get started with our platform in just a few steps.</p>
-      <a href="/signup" data-button="primary">Get Started</a>
-    </article>
-  </section>
-</body>
+<div data-layout="split">
+  <aside>
+    <img src="/hero.jpg" alt="" />
+  </aside>
+  <main>
+    <h1>Welcome aboard</h1>
+    <p>Get started with our platform in just a few steps.</p>
+    <button>Get Started</button>
+  </main>
+</div>
 ```
 
 ## CSS
@@ -61,99 +53,88 @@ A 50/50 split layout ideal for comparison views, onboarding, and hero sections w
   min-height: 100vh;
 }
 
-[data-layout="split"] > [data-panel="visual"] {
-  background: var(--primary);
+[data-layout="split"] > aside {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-}
-
-[data-layout="split"] > [data-panel="visual"] > img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-[data-layout="split"] > [data-panel="content"] {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: var(--spacing-8);
 }
 
-[data-layout="split"] > [data-panel="content"] > article {
+[data-layout="split"] > aside img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+[data-layout="split"] > main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8);
   max-width: 400px;
+  margin: auto;
+}
+
+[data-layout="split"] h1 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-layout="split"] p {
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-6);
+}
+
+[data-layout="split"] button {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
   [data-layout="split"] {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
   }
 
-  [data-layout="split"] > [data-panel="visual"] {
-    max-height: 40vh;
+  [data-layout="split"] > aside {
+    min-height: 200px;
   }
 }
 ```
 
 ## Variations
 
-### Reversed Split
+### Reversed
 
 ```html
-<body data-layout="split" data-reverse>
-  <section data-panel="content">...</section>
-  <section data-panel="visual">...</section>
-</body>
+<div data-layout="split" dir="rtl">
+  <main dir="ltr">...</main>
+  <aside>...</aside>
+</div>
 ```
 
-```css
-[data-layout="split"][data-reverse] {
-  direction: rtl;
-}
+### With Form
 
-[data-layout="split"][data-reverse] > * {
-  direction: ltr;
-}
-```
-
-### Asymmetric Split
-
-```css
-[data-layout="split"][data-ratio="40-60"] {
-  grid-template-columns: 40% 60%;
-}
-
-[data-layout="split"][data-ratio="30-70"] {
-  grid-template-columns: 30% 70%;
-}
-```
-
-## React Native
-
-```tsx
-import { View } from 'react-native'
-
-export function SplitLayout({ left, right }) {
-  return (
-    <View style={styles.container}>
-      <View style={styles.panel}>{left}</View>
-      <View style={styles.panel}>{right}</View>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  panel: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-})
+```html
+<div data-layout="split">
+  <aside>
+    <img src="/brand.svg" alt="" />
+  </aside>
+  <main>
+    <h1>Create account</h1>
+    <form>
+      <label>Email</label>
+      <input type="email" />
+      <label>Password</label>
+      <input type="password" />
+      <button type="submit">Sign Up</button>
+    </form>
+  </main>
+</div>
 ```

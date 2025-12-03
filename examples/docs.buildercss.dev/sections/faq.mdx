@@ -10,42 +10,39 @@ screenshot: /screenshots/sections/faq.png
 An accordion of frequently asked questions.
 
 <Preview>
-  <section data-section="faq" style={{ padding: 'var(--spacing-16) var(--spacing-4)', maxWidth: '800px', margin: '0 auto' }}>
-    <header style={{ textAlign: 'center', marginBottom: 'var(--spacing-12)' }}>
-      <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Frequently Asked Questions</h2>
-      <p style={{ color: 'var(--muted-foreground)' }}>Everything you need to know.</p>
+  <section data-section="faq">
+    <header>
+      <h2>Frequently Asked Questions</h2>
+      <p>Everything you need to know.</p>
     </header>
-    <dl style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-4)' }}>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+    <dl>
+      <div>
         <dt>
-          <button style={{ width: '100%', padding: 'var(--spacing-4)', background: 'transparent', border: 'none', textAlign: 'left', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <button aria-expanded="true">
             How is BuilderCSS different from Tailwind?
-            <span>+</span>
           </button>
         </dt>
-        <dd style={{ padding: '0 var(--spacing-4) var(--spacing-4)', color: 'var(--muted-foreground)' }}>
+        <dd>
           BuilderCSS uses semantic HTML and data attributes instead of utility classes, making code more readable and accessible.
         </dd>
       </div>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+      <div>
         <dt>
-          <button style={{ width: '100%', padding: 'var(--spacing-4)', background: 'transparent', border: 'none', textAlign: 'left', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <button aria-expanded="false">
             Does it work with React Native?
-            <span>+</span>
           </button>
         </dt>
-        <dd style={{ padding: '0 var(--spacing-4) var(--spacing-4)', color: 'var(--muted-foreground)' }}>
+        <dd hidden>
           Yes! Every component has a React Native implementation using StyleSheet for consistent cross-platform design.
         </dd>
       </div>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+      <div>
         <dt>
-          <button style={{ width: '100%', padding: 'var(--spacing-4)', background: 'transparent', border: 'none', textAlign: 'left', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <button aria-expanded="false">
             Is it production ready?
-            <span>+</span>
           </button>
         </dt>
-        <dd style={{ padding: '0 var(--spacing-4) var(--spacing-4)', color: 'var(--muted-foreground)' }}>
+        <dd hidden>
           Absolutely. BuilderCSS is used in production by thousands of websites and applications.
         </dd>
       </div>
@@ -69,8 +66,8 @@ An accordion of frequently asked questions.
     <p>Everything you need to know.</p>
   </header>
 
-  <dl data-accordion>
-    <div data-accordion-item>
+  <dl>
+    <div>
       <dt>
         <button aria-expanded="false">
           How is BuilderCSS different from Tailwind?
@@ -83,7 +80,7 @@ An accordion of frequently asked questions.
       </dd>
     </div>
 
-    <div data-accordion-item>
+    <div>
       <dt>
         <button aria-expanded="false">
           Does it work with React Native?
@@ -95,7 +92,7 @@ An accordion of frequently asked questions.
       </dd>
     </div>
 
-    <div data-accordion-item>
+    <div>
       <dt>
         <button aria-expanded="true">
           Is it production ready?
@@ -124,19 +121,29 @@ An accordion of frequently asked questions.
   margin-bottom: var(--spacing-12);
 }
 
-[data-section="faq"] [data-accordion] {
+[data-section="faq"] > header h2 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-section="faq"] > header p {
+  color: var(--muted-foreground);
+}
+
+[data-section="faq"] dl {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
 }
 
-[data-section="faq"] [data-accordion-item] {
+[data-section="faq"] dl > div {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
-[data-section="faq"] [data-accordion-item] dt button {
+[data-section="faq"] dt button {
   width: 100%;
   padding: var(--spacing-4);
   background: transparent;
@@ -149,33 +156,34 @@ An accordion of frequently asked questions.
   align-items: center;
 }
 
-[data-section="faq"] [data-accordion-item] dt button::after {
+[data-section="faq"] dt button::after {
   content: '+';
   font-size: var(--text-xl);
 }
 
-[data-section="faq"] [data-accordion-item] dt button[aria-expanded="true"]::after {
+[data-section="faq"] dt button[aria-expanded="true"]::after {
   content: '−';
 }
 
-[data-section="faq"] [data-accordion-item] dd {
+[data-section="faq"] dd {
   padding: 0 var(--spacing-4) var(--spacing-4);
   color: var(--muted-foreground);
-  display: none;
 }
 
-[data-section="faq"] [data-accordion-item] dt button[aria-expanded="true"] + dd {
-  display: block;
+[data-section="faq"] dd[hidden] {
+  display: none;
 }
 ```
 
 ## JavaScript
 
 ```js
-document.querySelectorAll('[data-accordion-item] button').forEach(button => {
+document.querySelectorAll('[data-section="faq"] dt button').forEach(button => {
   button.addEventListener('click', () => {
     const expanded = button.getAttribute('aria-expanded') === 'true'
     button.setAttribute('aria-expanded', !expanded)
+    const dd = button.closest('div').querySelector('dd')
+    dd.hidden = expanded
   })
 })
 ```

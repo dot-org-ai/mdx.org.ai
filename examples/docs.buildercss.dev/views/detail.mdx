@@ -10,64 +10,58 @@ screenshot: /screenshots/views/detail.png
 A detailed view of a single item with all its information.
 
 <Preview>
-  <article data-view="detail" style={{ padding: 'var(--spacing-6)', maxWidth: '800px' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-6)' }}>
+  <article data-view="detail">
+    <header>
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-2)' }}>
-          <span style={{ padding: '2px 8px', background: 'green', color: 'white', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Active</span>
-          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Created 3 days ago</span>
-        </div>
-        <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-1)' }}>Project Alpha</h1>
-        <p style={{ color: 'var(--muted-foreground)' }}>Web application redesign project</p>
+        <mark>Active</mark>
+        <time>Created 3 days ago</time>
       </div>
-      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Edit</button>
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--destructive)', color: 'var(--destructive-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Delete</button>
-      </div>
+      <h1>Project Alpha</h1>
+      <p>Web application redesign project</p>
+      <menu>
+        <button>Edit</button>
+        <button>Delete</button>
+      </menu>
     </header>
-
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--spacing-6)' }}>
+    <div>
       <section>
-        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Description</h2>
-        <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>
-          This project involves a complete redesign of our web application. The goal is to improve user experience, modernize the UI, and implement new features requested by customers.
-        </p>
-        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Activity</h2>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          <li style={{ display: 'flex', gap: 'var(--spacing-3)', paddingBottom: 'var(--spacing-3)', borderBottom: '1px solid var(--border)', marginBottom: 'var(--spacing-3)' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--muted)', flexShrink: 0 }}></div>
+        <h2>Description</h2>
+        <p>This project involves a complete redesign of our web application. The goal is to improve user experience, modernize the UI, and implement new features requested by customers.</p>
+        <h2>Activity</h2>
+        <ul>
+          <li>
+            <figure></figure>
             <div>
               <p><strong>John</strong> updated the status to Active</p>
-              <time style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>2 hours ago</time>
+              <time>2 hours ago</time>
             </div>
           </li>
-          <li style={{ display: 'flex', gap: 'var(--spacing-3)' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--muted)', flexShrink: 0 }}></div>
+          <li>
+            <figure></figure>
             <div>
               <p><strong>Jane</strong> added a comment</p>
-              <time style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>1 day ago</time>
+              <time>1 day ago</time>
             </div>
           </li>
         </ul>
       </section>
-
-      <aside style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius-lg)' }}>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Details</h3>
-        <dl style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-3)' }}>
+      <aside>
+        <h3>Details</h3>
+        <dl>
           <div>
-            <dt style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Owner</dt>
+            <dt>Owner</dt>
             <dd>John Doe</dd>
           </div>
           <div>
-            <dt style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Category</dt>
+            <dt>Category</dt>
             <dd>Development</dd>
           </div>
           <div>
-            <dt style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Priority</dt>
+            <dt>Priority</dt>
             <dd>High</dd>
           </div>
           <div>
-            <dt style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Due Date</dt>
+            <dt>Due Date</dt>
             <dd>Dec 31, 2024</dd>
           </div>
         </dl>
@@ -76,32 +70,40 @@ A detailed view of a single item with all its information.
   </article>
 </Preview>
 
+## When to Use
+
+- Project details
+- Item views
+- User profiles
+- Record details
+- Document previews
+
 ## Structure
 
 ```html
 <article data-view="detail">
   <header>
-    <div data-meta>
-      <span data-badge="success">Active</span>
+    <div>
+      <mark>Active</mark>
       <time>Created 3 days ago</time>
     </div>
     <h1>Project Alpha</h1>
     <p>Web application redesign project</p>
-    <div data-actions>
-      <button data-button="outline">Edit</button>
-      <button data-button="destructive">Delete</button>
-    </div>
+    <menu>
+      <button>Edit</button>
+      <button>Delete</button>
+    </menu>
   </header>
 
-  <div data-layout="sidebar">
-    <section data-main>
+  <div>
+    <section>
       <h2>Description</h2>
       <p>Project description...</p>
 
       <h2>Activity</h2>
-      <ul data-activity>
+      <ul>
         <li>
-          <img src="/avatar.jpg" alt="" />
+          <figure><img src="/avatar.jpg" alt="" /></figure>
           <div>
             <p><strong>John</strong> updated status</p>
             <time>2 hours ago</time>
@@ -110,13 +112,17 @@ A detailed view of a single item with all its information.
       </ul>
     </section>
 
-    <aside data-sidebar>
+    <aside>
       <h3>Details</h3>
       <dl>
-        <dt>Owner</dt>
-        <dd>John Doe</dd>
-        <dt>Category</dt>
-        <dd>Development</dd>
+        <div>
+          <dt>Owner</dt>
+          <dd>John Doe</dd>
+        </div>
+        <div>
+          <dt>Category</dt>
+          <dd>Development</dd>
+        </div>
       </dl>
     </aside>
   </div>
@@ -134,38 +140,86 @@ A detailed view of a single item with all its information.
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: var(--spacing-6);
 }
 
-[data-view="detail"] [data-layout="sidebar"] {
+[data-view="detail"] > header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-2);
+  width: 100%;
+}
+
+[data-view="detail"] > header mark {
+  padding: 2px 8px;
+  background: green;
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+}
+
+[data-view="detail"] > header time {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-view="detail"] > header h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-1);
+  flex: 1;
+}
+
+[data-view="detail"] > header > p {
+  color: var(--muted-foreground);
+  width: 100%;
+}
+
+[data-view="detail"] > header menu {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-view="detail"] > header menu button:first-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-view="detail"] > header menu button:last-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  border: none;
+  border-radius: var(--radius);
+}
+
+[data-view="detail"] > div {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--spacing-6);
 }
 
-[data-view="detail"] [data-sidebar] {
-  background: var(--muted);
-  padding: var(--spacing-4);
-  border-radius: var(--radius-lg);
+[data-view="detail"] section h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-4);
 }
 
-[data-view="detail"] [data-sidebar] dl {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
-[data-view="detail"] [data-sidebar] dt {
-  font-size: var(--text-sm);
+[data-view="detail"] section > p {
   color: var(--muted-foreground);
+  margin-bottom: var(--spacing-4);
 }
 
-[data-view="detail"] [data-activity] {
+[data-view="detail"] section ul {
   list-style: none;
   padding: 0;
 }
 
-[data-view="detail"] [data-activity] li {
+[data-view="detail"] section ul li {
   display: flex;
   gap: var(--spacing-3);
   padding-bottom: var(--spacing-3);
@@ -173,8 +227,49 @@ A detailed view of a single item with all its information.
   margin-bottom: var(--spacing-3);
 }
 
+[data-view="detail"] section ul li:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+[data-view="detail"] section figure {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+  margin: 0;
+}
+
+[data-view="detail"] section ul time {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-view="detail"] aside {
+  background: var(--muted);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-lg);
+}
+
+[data-view="detail"] aside h3 {
+  font-weight: 600;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-view="detail"] aside dl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+[data-view="detail"] aside dt {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
 @media (max-width: 768px) {
-  [data-view="detail"] [data-layout="sidebar"] {
+  [data-view="detail"] > div {
     grid-template-columns: 1fr;
   }
 }

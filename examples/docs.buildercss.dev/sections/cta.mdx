@@ -10,13 +10,13 @@ screenshot: /screenshots/sections/cta.png
 A call-to-action section to drive conversions.
 
 <Preview>
-  <section data-section="cta" style={{ padding: 'var(--spacing-16) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', textAlign: 'center', borderRadius: 'var(--radius-lg)' }}>
-    <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Ready to get started?</h2>
-    <p style={{ marginBottom: 'var(--spacing-8)', opacity: 0.9 }}>Join thousands of happy customers today.</p>
-    <div style={{ display: 'flex', gap: 'var(--spacing-4)', justifyContent: 'center' }}>
-      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--background)', color: 'var(--foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer', fontWeight: 500 }}>Start Free Trial</button>
-      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'transparent', border: '1px solid currentColor', borderRadius: 'var(--radius)', cursor: 'pointer', fontWeight: 500, color: 'inherit' }}>Talk to Sales</button>
-    </div>
+  <section data-section="cta">
+    <h2>Ready to get started?</h2>
+    <p>Join thousands of happy customers today.</p>
+    <nav>
+      <button>Start Free Trial</button>
+      <a href="#">Talk to Sales</a>
+    </nav>
   </section>
 </Preview>
 
@@ -33,14 +33,10 @@ A call-to-action section to drive conversions.
 <section data-section="cta">
   <h2>Ready to get started?</h2>
   <p>Join thousands of happy customers today.</p>
-  <div data-actions>
-    <a href="/signup" data-button="primary" data-size="lg">
-      Start Free Trial
-    </a>
-    <a href="/contact" data-button="outline" data-size="lg">
-      Talk to Sales
-    </a>
-  </div>
+  <nav>
+    <a href="/signup">Start Free Trial</a>
+    <a href="/contact">Talk to Sales</a>
+  </nav>
 </section>
 ```
 
@@ -52,6 +48,7 @@ A call-to-action section to drive conversions.
   background: var(--primary);
   color: var(--primary-foreground);
   text-align: center;
+  border-radius: var(--radius-lg);
 }
 
 [data-section="cta"] h2 {
@@ -65,24 +62,36 @@ A call-to-action section to drive conversions.
   opacity: 0.9;
 }
 
-[data-section="cta"] [data-actions] {
+[data-section="cta"] nav {
   display: flex;
   gap: var(--spacing-4);
   justify-content: center;
 }
 
-[data-section="cta"] [data-button="primary"] {
+[data-section="cta"] nav > :first-child {
   background: var(--background);
   color: var(--foreground);
+  padding: var(--spacing-3) var(--spacing-6);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
 }
 
-[data-section="cta"] [data-button="outline"] {
-  border-color: currentColor;
+[data-section="cta"] nav > :not(:first-child) {
+  padding: var(--spacing-3) var(--spacing-6);
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
   color: inherit;
+  text-decoration: none;
 }
 
 @media (max-width: 640px) {
-  [data-section="cta"] [data-actions] {
+  [data-section="cta"] nav {
     flex-direction: column;
     align-items: center;
   }
@@ -94,11 +103,11 @@ A call-to-action section to drive conversions.
 ### With Background Image
 
 ```html
-<section data-section="cta" data-variant="image">
-  <img src="/cta-bg.jpg" alt="" data-background />
-  <div data-content>
+<section data-section="cta">
+  <img src="/cta-bg.jpg" alt="" />
+  <div>
     <h2>Start building today</h2>
-    <a href="/signup" data-button="primary">Get Started</a>
+    <a href="/signup">Get Started</a>
   </div>
 </section>
 ```
@@ -106,12 +115,12 @@ A call-to-action section to drive conversions.
 ### Newsletter CTA
 
 ```html
-<section data-section="cta" data-variant="newsletter">
+<section data-section="cta">
   <h2>Stay in the loop</h2>
   <p>Get updates on new features and releases.</p>
-  <form data-email-form>
+  <form>
     <input type="email" placeholder="Enter your email" required />
-    <button type="submit" data-button="primary">Subscribe</button>
+    <button type="submit">Subscribe</button>
   </form>
   <small>No spam, unsubscribe anytime.</small>
 </section>
@@ -120,7 +129,7 @@ A call-to-action section to drive conversions.
 ### Minimal CTA
 
 ```html
-<section data-section="cta" data-variant="minimal">
+<section data-section="cta">
   <p>Questions? <a href="/contact">Contact us</a></p>
 </section>
 ```

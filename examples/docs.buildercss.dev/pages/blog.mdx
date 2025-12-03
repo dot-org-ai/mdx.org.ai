@@ -10,44 +10,66 @@ screenshot: /screenshots/pages/blog.png
 A blog listing page displaying articles in a grid layout.
 
 <Preview>
-  <article data-page="blog" style={{ padding: 'var(--spacing-6)' }}>
-    <header style={{ marginBottom: 'var(--spacing-8)' }}>
-      <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Blog</h1>
-      <p style={{ color: 'var(--muted-foreground)' }}>Insights, tutorials, and updates from our team</p>
+  <article data-page="blog">
+    <header>
+      <h1>Blog</h1>
+      <p>Insights, tutorials, and updates from our team</p>
     </header>
 
-    <div style={{ display: 'flex', gap: 'var(--spacing-4)', marginBottom: 'var(--spacing-6)' }}>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)' }}>All</button>
-      {['Engineering', 'Design', 'Product', 'Company'].map(cat => (
-        <button key={cat} style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)' }}>{cat}</button>
-      ))}
-    </div>
+    <nav aria-label="Categories">
+      <button aria-pressed="true">All</button>
+      <button>Engineering</button>
+      <button>Design</button>
+      <button>Product</button>
+      <button>Company</button>
+    </nav>
 
-    <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-6)' }}>
-      {[
-        { title: 'Building a Design System from Scratch', category: 'Engineering', date: 'Dec 1, 2024', readTime: '8 min' },
-        { title: 'The Power of Semantic HTML', category: 'Design', date: 'Nov 28, 2024', readTime: '5 min' },
-        { title: 'Announcing Builder CSS v2.0', category: 'Product', date: 'Nov 25, 2024', readTime: '3 min' },
-        { title: 'Our Journey to 50K Users', category: 'Company', date: 'Nov 20, 2024', readTime: '6 min' },
-        { title: 'CSS Custom Properties Deep Dive', category: 'Engineering', date: 'Nov 15, 2024', readTime: '10 min' },
-        { title: 'Designing for Accessibility', category: 'Design', date: 'Nov 10, 2024', readTime: '7 min' },
-      ].map((post, i) => (
-        <article key={i} style={{ cursor: 'pointer' }}>
-          <div style={{ background: 'var(--muted)', borderRadius: 'var(--radius-lg)', aspectRatio: '16/9', marginBottom: 'var(--spacing-3)' }}></div>
-          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--primary)', fontWeight: 500 }}>{post.category}</span>
-          <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-2)', marginTop: 'var(--spacing-1)' }}>{post.title}</h3>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>{post.date} · {post.readTime} read</p>
-        </article>
-      ))}
+    <section>
+      <article>
+        <figure></figure>
+        <mark>Engineering</mark>
+        <h3>Building a Design System from Scratch</h3>
+        <footer><time datetime="2024-12-01">Dec 1, 2024</time> · 8 min read</footer>
+      </article>
+      <article>
+        <figure></figure>
+        <mark>Design</mark>
+        <h3>The Power of Semantic HTML</h3>
+        <footer><time datetime="2024-11-28">Nov 28, 2024</time> · 5 min read</footer>
+      </article>
+      <article>
+        <figure></figure>
+        <mark>Product</mark>
+        <h3>Announcing Builder CSS v2.0</h3>
+        <footer><time datetime="2024-11-25">Nov 25, 2024</time> · 3 min read</footer>
+      </article>
+      <article>
+        <figure></figure>
+        <mark>Company</mark>
+        <h3>Our Journey to 50K Users</h3>
+        <footer><time datetime="2024-11-20">Nov 20, 2024</time> · 6 min read</footer>
+      </article>
+      <article>
+        <figure></figure>
+        <mark>Engineering</mark>
+        <h3>CSS Custom Properties Deep Dive</h3>
+        <footer><time datetime="2024-11-15">Nov 15, 2024</time> · 10 min read</footer>
+      </article>
+      <article>
+        <figure></figure>
+        <mark>Design</mark>
+        <h3>Designing for Accessibility</h3>
+        <footer><time datetime="2024-11-10">Nov 10, 2024</time> · 7 min read</footer>
+      </article>
     </section>
 
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)', marginTop: 'var(--spacing-8)' }}>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>←</button>
-      {[1, 2, 3].map(n => (
-        <button key={n} style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: n === 1 ? 'var(--primary)' : 'transparent', color: n === 1 ? 'var(--primary-foreground)' : 'inherit', border: n === 1 ? 'none' : '1px solid var(--border)', borderRadius: 'var(--radius)' }}>{n}</button>
-      ))}
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>→</button>
-    </div>
+    <nav aria-label="Pagination">
+      <button aria-label="Previous page">←</button>
+      <button aria-current="page">1</button>
+      <button>2</button>
+      <button>3</button>
+      <button aria-label="Next page">→</button>
+    </nav>
   </article>
 </Preview>
 
@@ -62,33 +84,33 @@ A blog listing page displaying articles in a grid layout.
 
 ```html
 <article data-page="blog">
-  <header data-page-header>
+  <header>
     <h1>Blog</h1>
     <p>Insights, tutorials, and updates from our team</p>
   </header>
 
-  <nav data-category-filter>
-    <button data-active>All</button>
+  <nav aria-label="Categories">
+    <button aria-pressed="true">All</button>
     <button>Engineering</button>
     <button>Design</button>
     <button>Product</button>
   </nav>
 
-  <section data-blog-grid>
-    <article data-blog-card>
-      <img src="/post-image.jpg" data-card-image />
-      <span data-category>Engineering</span>
+  <section>
+    <article>
+      <figure><img src="/post-image.jpg" alt="" /></figure>
+      <mark>Engineering</mark>
       <h3>Building a Design System from Scratch</h3>
-      <p data-meta>Dec 1, 2024 · 8 min read</p>
+      <footer><time datetime="2024-12-01">Dec 1, 2024</time> · 8 min read</footer>
     </article>
   </section>
 
-  <nav data-pagination>
-    <button data-prev>←</button>
-    <button data-page data-active>1</button>
-    <button data-page>2</button>
-    <button data-page>3</button>
-    <button data-next>→</button>
+  <nav aria-label="Pagination">
+    <button aria-label="Previous page">←</button>
+    <button aria-current="page">1</button>
+    <button>2</button>
+    <button>3</button>
+    <button aria-label="Next page">→</button>
   </nav>
 </article>
 ```
@@ -100,17 +122,27 @@ A blog listing page displaying articles in a grid layout.
   padding: var(--spacing-6);
 }
 
-[data-page="blog"] [data-page-header] {
+[data-page="blog"] > header {
   margin-bottom: var(--spacing-8);
 }
 
-[data-page="blog"] [data-category-filter] {
+[data-page="blog"] > header h1 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="blog"] > header p {
+  color: var(--muted-foreground);
+}
+
+[data-page="blog"] > nav[aria-label="Categories"] {
   display: flex;
   gap: var(--spacing-2);
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="blog"] [data-category-filter] button {
+[data-page="blog"] > nav[aria-label="Categories"] button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--muted);
   border: none;
@@ -119,39 +151,67 @@ A blog listing page displaying articles in a grid layout.
   cursor: pointer;
 }
 
-[data-page="blog"] [data-category-filter] button[data-active] {
+[data-page="blog"] > nav[aria-label="Categories"] button[aria-pressed="true"] {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-[data-page="blog"] [data-blog-grid] {
+[data-page="blog"] > section {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-6);
 }
 
-[data-page="blog"] [data-blog-card] {
+[data-page="blog"] > section > article {
   cursor: pointer;
 }
 
-[data-page="blog"] [data-blog-card] [data-card-image] {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
+[data-page="blog"] > section > article figure {
+  background: var(--muted);
   border-radius: var(--radius-lg);
-  margin-bottom: var(--spacing-3);
+  aspect-ratio: 16/9;
+  margin: 0 0 var(--spacing-3);
 }
 
-[data-page="blog"] [data-blog-card] [data-category] {
+[data-page="blog"] > section > article mark {
   font-size: var(--text-xs);
   color: var(--primary);
   font-weight: 500;
+  background: transparent;
 }
 
-[data-page="blog"] [data-pagination] {
+[data-page="blog"] > section > article h3 {
+  font-weight: 600;
+  margin: var(--spacing-1) 0 var(--spacing-2);
+}
+
+[data-page="blog"] > section > article footer {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-page="blog"] > nav[aria-label="Pagination"] {
   display: flex;
   justify-content: center;
   gap: var(--spacing-2);
   margin-top: var(--spacing-8);
+}
+
+[data-page="blog"] > nav[aria-label="Pagination"] button {
+  padding: var(--spacing-2) var(--spacing-3);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-page="blog"] > nav[aria-label="Pagination"] button[aria-current="page"] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+}
+
+[data-page="blog"] > nav[aria-label="Pagination"] button[aria-label] {
+  background: var(--muted);
+  border: none;
 }
 ```

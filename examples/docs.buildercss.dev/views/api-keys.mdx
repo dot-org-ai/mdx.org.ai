@@ -10,56 +10,61 @@ screenshot: /screenshots/views/api-keys.png
 A view for managing API keys and access tokens.
 
 <Preview>
-  <article data-view="api-keys" style={{ padding: 'var(--spacing-6)' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
+  <article data-view="api-keys">
+    <header>
       <div>
-        <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>API Keys</h1>
-        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Manage your API keys for programmatic access</p>
+        <h1>API Keys</h1>
+        <p>Manage your API keys for programmatic access</p>
       </div>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Create Key</button>
+      <button>Create Key</button>
     </header>
-
-    <div style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius-lg)', marginBottom: 'var(--spacing-4)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
-      <span style={{ fontSize: 'var(--text-xl)' }}>⚠️</span>
-      <p style={{ fontSize: 'var(--text-sm)' }}>Keep your API keys secure. Never share them in public repositories or client-side code.</p>
-    </div>
-
-    <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-      <div style={{ padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-2)' }}>
+    <aside>
+      <span>⚠️</span>
+      <p>Keep your API keys secure. Never share them in public repositories or client-side code.</p>
+    </aside>
+    <ul>
+      <li>
+        <header>
           <div>
-            <h3 style={{ fontWeight: 600 }}>Production Key</h3>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Created Dec 1, 2024</p>
+            <h3>Production Key</h3>
+            <time>Created Dec 1, 2024</time>
           </div>
-          <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Regenerate</button>
-            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--destructive)', color: 'var(--destructive-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Revoke</button>
-          </div>
+          <menu>
+            <button>Regenerate</button>
+            <button>Revoke</button>
+          </menu>
+        </header>
+        <div>
+          <code>sk_live_••••••••••••••••••••••••abcd</code>
+          <button aria-label="Copy">📋</button>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>
-          <code style={{ flex: 1, padding: 'var(--spacing-2)', background: 'var(--muted)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-sm)' }}>sk_live_••••••••••••••••••••••••abcd</code>
-          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>📋</button>
-        </div>
-      </div>
-      <div style={{ padding: 'var(--spacing-4)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-2)' }}>
+      </li>
+      <li>
+        <header>
           <div>
-            <h3 style={{ fontWeight: 600 }}>Test Key</h3>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Created Nov 15, 2024</p>
+            <h3>Test Key</h3>
+            <time>Created Nov 15, 2024</time>
           </div>
-          <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Regenerate</button>
-            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--destructive)', color: 'var(--destructive-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Revoke</button>
-          </div>
+          <menu>
+            <button>Regenerate</button>
+            <button>Revoke</button>
+          </menu>
+        </header>
+        <div>
+          <code>sk_test_••••••••••••••••••••••••efgh</code>
+          <button aria-label="Copy">📋</button>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>
-          <code style={{ flex: 1, padding: 'var(--spacing-2)', background: 'var(--muted)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-sm)' }}>sk_test_••••••••••••••••••••••••efgh</code>
-          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>📋</button>
-        </div>
-      </div>
-    </div>
+      </li>
+    </ul>
   </article>
 </Preview>
+
+## When to Use
+
+- API key management
+- Access token management
+- Developer settings
+- Integration configuration
 
 ## Structure
 
@@ -70,32 +75,32 @@ A view for managing API keys and access tokens.
       <h1>API Keys</h1>
       <p>Manage your API keys for programmatic access</p>
     </div>
-    <button data-button="primary">Create Key</button>
+    <button>Create Key</button>
   </header>
 
-  <aside data-warning>
-    <span data-icon>⚠️</span>
+  <aside>
+    <span>⚠️</span>
     <p>Keep your API keys secure. Never share them publicly.</p>
   </aside>
 
-  <section data-content>
-    <ul data-api-keys-list>
-      <li data-api-key>
-        <div data-key-info>
+  <ul>
+    <li>
+      <header>
+        <div>
           <h3>Production Key</h3>
           <time>Created Dec 1, 2024</time>
         </div>
-        <div data-key-actions>
+        <menu>
           <button>Regenerate</button>
-          <button data-button="destructive">Revoke</button>
-        </div>
-        <div data-key-value>
-          <code>sk_live_••••••••abcd</code>
-          <button data-action="copy">Copy</button>
-        </div>
-      </li>
-    </ul>
-  </section>
+          <button>Revoke</button>
+        </menu>
+      </header>
+      <div>
+        <code>sk_live_••••••••abcd</code>
+        <button aria-label="Copy">Copy</button>
+      </div>
+    </li>
+  </ul>
 </article>
 ```
 
@@ -106,7 +111,32 @@ A view for managing API keys and access tokens.
   padding: var(--spacing-6);
 }
 
-[data-view="api-keys"] [data-warning] {
+[data-view="api-keys"] > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-view="api-keys"] > header h1 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+[data-view="api-keys"] > header p {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+[data-view="api-keys"] > header > button {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+}
+
+[data-view="api-keys"] > aside {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
@@ -116,34 +146,100 @@ A view for managing API keys and access tokens.
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="api-keys"] [data-api-keys-list] {
+[data-view="api-keys"] > aside span {
+  font-size: var(--text-xl);
+}
+
+[data-view="api-keys"] > aside p {
+  font-size: var(--text-sm);
+}
+
+[data-view="api-keys"] > ul {
   list-style: none;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
 }
 
-[data-view="api-keys"] [data-api-key] {
+[data-view="api-keys"] > ul > li {
   padding: var(--spacing-4);
   border-bottom: 1px solid var(--border);
 }
 
-[data-view="api-keys"] [data-api-key]:last-child {
+[data-view="api-keys"] > ul > li:last-child {
   border-bottom: none;
 }
 
-[data-view="api-keys"] [data-key-value] {
+[data-view="api-keys"] > ul > li > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-view="api-keys"] > ul h3 {
+  font-weight: 600;
+}
+
+[data-view="api-keys"] > ul time {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-view="api-keys"] > ul menu {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-view="api-keys"] > ul menu button:first-child {
+  padding: var(--spacing-1) var(--spacing-3);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+}
+
+[data-view="api-keys"] > ul menu button:last-child {
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+}
+
+[data-view="api-keys"] > ul > li > div {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
-  margin-top: var(--spacing-2);
 }
 
-[data-view="api-keys"] [data-key-value] code {
+[data-view="api-keys"] > ul code {
   flex: 1;
   padding: var(--spacing-2);
   background: var(--muted);
   border-radius: var(--radius);
   font-family: monospace;
+  font-size: var(--text-sm);
 }
+
+[data-view="api-keys"] > ul > li > div button {
+  padding: var(--spacing-2);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+```
+
+## JavaScript
+
+```js
+document.querySelectorAll('[data-view="api-keys"] button[aria-label="Copy"]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const code = btn.previousElementSibling.textContent
+    await navigator.clipboard.writeText(code)
+    btn.textContent = '✓'
+    setTimeout(() => btn.textContent = '📋', 2000)
+  })
+})
 ```

@@ -10,30 +10,29 @@ screenshot: /screenshots/containers/slideover.png
 A side panel that slides in from the left or right edge of the screen.
 
 <Preview>
-  <div style={{ position: 'relative', height: '400px', background: 'var(--muted)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }}></div>
-    <article style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '320px', background: 'var(--background)', display: 'flex', flexDirection: 'column' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
-        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600 }}>Settings</h2>
-        <button style={{ background: 'none', border: 'none', fontSize: 'var(--text-xl)', cursor: 'pointer' }}>&times;</button>
+  <div data-container="slideover">
+    <article>
+      <header>
+        <h2>Settings</h2>
+        <button aria-label="Close">&times;</button>
       </header>
-      <section style={{ flex: 1, padding: 'var(--spacing-4)', overflow: 'auto' }}>
-        <div style={{ marginBottom: 'var(--spacing-4)' }}>
-          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontSize: 'var(--text-sm)' }}>Email notifications</label>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Receive email updates about your account.</p>
+      <section>
+        <div>
+          <label>Email notifications</label>
+          <p>Receive email updates about your account.</p>
         </div>
-        <div style={{ marginBottom: 'var(--spacing-4)' }}>
-          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontSize: 'var(--text-sm)' }}>Theme</label>
-          <select style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+        <div>
+          <label>Theme</label>
+          <select>
             <option>System</option>
             <option>Light</option>
             <option>Dark</option>
           </select>
         </div>
       </section>
-      <footer style={{ padding: 'var(--spacing-4)', borderTop: '1px solid var(--border)', display: 'flex', gap: 'var(--spacing-2)' }}>
-        <button style={{ flex: 1, padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Cancel</button>
-        <button style={{ flex: 1, padding: 'var(--spacing-2)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Save</button>
+      <footer>
+        <button>Cancel</button>
+        <button>Save</button>
       </footer>
     </article>
   </div>
@@ -51,21 +50,21 @@ A side panel that slides in from the left or right edge of the screen.
 
 ```html
 <!-- Trigger -->
-<button data-slideover-trigger="settings">Settings</button>
+<button>Settings</button>
 
 <!-- Slideover -->
-<aside data-slideover data-side="right" id="settings" aria-hidden="true">
+<aside data-container="slideover" aria-hidden="true">
   <article>
     <header>
       <h2>Settings</h2>
-      <button data-action="close">&times;</button>
+      <button aria-label="Close">&times;</button>
     </header>
     <section>
       <!-- Settings content -->
     </section>
     <footer>
-      <button data-button="ghost">Cancel</button>
-      <button data-button="primary">Save Changes</button>
+      <button>Cancel</button>
+      <button>Save Changes</button>
     </footer>
   </article>
 </aside>
@@ -74,29 +73,22 @@ A side panel that slides in from the left or right edge of the screen.
 ## CSS
 
 ```css
-[data-slideover] {
+[data-container="slideover"] {
   position: fixed;
   inset: 0;
   z-index: 100;
   display: flex;
+  justify-content: flex-end;
 }
 
-[data-slideover]::before {
+[data-container="slideover"]::before {
   content: '';
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.3);
 }
 
-[data-slideover][data-side="right"] {
-  justify-content: flex-end;
-}
-
-[data-slideover][data-side="left"] {
-  justify-content: flex-start;
-}
-
-[data-slideover] > article {
+[data-container="slideover"] > article {
   position: relative;
   background: var(--background);
   width: 100%;
@@ -104,18 +96,10 @@ A side panel that slides in from the left or right edge of the screen.
   height: 100%;
   display: flex;
   flex-direction: column;
-  animation: slideIn 0.3s ease;
+  animation: slideInRight 0.3s ease;
 }
 
-[data-slideover][data-side="right"] > article {
-  animation-name: slideInRight;
-}
-
-[data-slideover][data-side="left"] > article {
-  animation-name: slideInLeft;
-}
-
-[data-slideover] > article > header {
+[data-container="slideover"] > article > header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -123,30 +107,77 @@ A side panel that slides in from the left or right edge of the screen.
   border-bottom: 1px solid var(--border);
 }
 
-[data-slideover] > article > section {
+[data-container="slideover"] > article > header h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+[data-container="slideover"] > article > header button {
+  background: none;
+  border: none;
+  font-size: var(--text-xl);
+  cursor: pointer;
+}
+
+[data-container="slideover"] > article > section {
   flex: 1;
   padding: var(--spacing-4);
   overflow-y: auto;
 }
 
-[data-slideover] > article > footer {
+[data-container="slideover"] > article > section > div {
+  margin-bottom: var(--spacing-4);
+}
+
+[data-container="slideover"] > article > section label {
+  display: block;
+  margin-bottom: var(--spacing-1);
+  font-size: var(--text-sm);
+}
+
+[data-container="slideover"] > article > section p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-container="slideover"] > article > section select {
+  width: 100%;
+  padding: var(--spacing-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-container="slideover"] > article > footer {
   padding: var(--spacing-4);
   border-top: 1px solid var(--border);
   display: flex;
   gap: var(--spacing-2);
 }
 
-[data-slideover][aria-hidden="true"] {
+[data-container="slideover"] > article > footer button {
+  flex: 1;
+  padding: var(--spacing-2);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+[data-container="slideover"] > article > footer button:first-child {
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+[data-container="slideover"] > article > footer button:last-child {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+}
+
+[data-container="slideover"][aria-hidden="true"] {
   display: none;
 }
 
 @keyframes slideInRight {
   from { transform: translateX(100%); }
-  to { transform: translateX(0); }
-}
-
-@keyframes slideInLeft {
-  from { transform: translateX(-100%); }
   to { transform: translateX(0); }
 }
 ```
@@ -157,16 +188,15 @@ A side panel that slides in from the left or right edge of the screen.
 // Open slideover
 document.querySelectorAll('[data-slideover-trigger]').forEach(trigger => {
   trigger.addEventListener('click', () => {
-    const slideoverId = trigger.dataset.slideoverTrigger
-    const slideover = document.getElementById(slideoverId)
+    const slideover = document.querySelector('[data-container="slideover"]')
     slideover.setAttribute('aria-hidden', 'false')
   })
 })
 
-// Close slideover
-document.querySelectorAll('[data-slideover] [data-action="close"]').forEach(btn => {
+// Close on button click
+document.querySelectorAll('[data-container="slideover"] header button').forEach(btn => {
   btn.addEventListener('click', () => {
-    const slideover = btn.closest('[data-slideover]')
+    const slideover = btn.closest('[data-container="slideover"]')
     slideover.setAttribute('aria-hidden', 'true')
   })
 })
@@ -176,26 +206,25 @@ document.querySelectorAll('[data-slideover] [data-action="close"]').forEach(btn 
 
 ### Wide Slideover
 
-```html
-<aside data-slideover data-side="right" data-size="wide">
-  <!-- Max-width: 600px -->
-</aside>
+```css
+[data-container="slideover"] > article {
+  max-width: 600px;
+}
 ```
 
 ### With Tabs
 
 ```html
-<aside data-slideover data-side="right">
+<aside data-container="slideover">
   <article>
     <header>
-      <nav data-tabs>
-        <button data-tab="details" aria-selected="true">Details</button>
-        <button data-tab="activity">Activity</button>
+      <nav>
+        <button aria-selected="true">Details</button>
+        <button>Activity</button>
       </nav>
-      <button data-action="close">&times;</button>
+      <button aria-label="Close">&times;</button>
     </header>
-    <section data-tab-content="details">...</section>
-    <section data-tab-content="activity" hidden>...</section>
+    <section>...</section>
   </article>
 </aside>
 ```

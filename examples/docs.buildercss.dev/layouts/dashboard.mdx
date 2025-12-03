@@ -10,41 +10,43 @@ screenshot: /screenshots/layouts/dashboard.png
 A full application shell with sidebar navigation, header bar, and main content area.
 
 <Preview>
-  <div data-layout="dashboard" style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gridTemplateRows: 'auto 1fr', minHeight: '400px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-    <aside style={{ gridRow: '1 / -1', background: 'var(--foreground)', color: 'var(--background)', padding: 'var(--spacing-4)' }}>
-      <div style={{ fontWeight: 700, marginBottom: 'var(--spacing-6)' }}>Acme Inc</div>
+  <div data-layout="dashboard">
+    <aside>
+      <header>
+        <a href="/">Acme Inc</a>
+      </header>
       <nav>
-        <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-1)' }}>
-          <li><a href="#" style={{ display: 'block', padding: 'var(--spacing-2)', borderRadius: 'var(--radius)', background: 'rgba(255,255,255,0.1)', color: 'inherit' }}>Dashboard</a></li>
-          <li><a href="#" style={{ display: 'block', padding: 'var(--spacing-2)', color: 'rgba(255,255,255,0.7)' }}>Projects</a></li>
-          <li><a href="#" style={{ display: 'block', padding: 'var(--spacing-2)', color: 'rgba(255,255,255,0.7)' }}>Team</a></li>
-          <li><a href="#" style={{ display: 'block', padding: 'var(--spacing-2)', color: 'rgba(255,255,255,0.7)' }}>Settings</a></li>
+        <ul>
+          <li><a href="#" aria-current="page">Dashboard</a></li>
+          <li><a href="#">Projects</a></li>
+          <li><a href="#">Team</a></li>
+          <li><a href="#">Settings</a></li>
         </ul>
       </nav>
     </aside>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
-      <input type="search" placeholder="Search..." style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', width: '300px' }} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>
-        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--muted)' }}></div>
-      </div>
-    </header>
-    <main style={{ padding: 'var(--spacing-6)', overflow: 'auto' }}>
-      <h1>Dashboard</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-4)', marginTop: 'var(--spacing-4)' }}>
-        <div style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius)' }}>
-          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Total Users</div>
-          <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700 }}>12,345</div>
-        </div>
-        <div style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius)' }}>
-          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Revenue</div>
-          <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700 }}>$45,678</div>
-        </div>
-        <div style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius)' }}>
-          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Active Projects</div>
-          <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700 }}>23</div>
-        </div>
-      </div>
-    </main>
+    <div>
+      <header>
+        <input type="search" placeholder="Search..." />
+        <figure></figure>
+      </header>
+      <main>
+        <h1>Dashboard</h1>
+        <section>
+          <article>
+            <span>Total Users</span>
+            <strong>12,345</strong>
+          </article>
+          <article>
+            <span>Revenue</span>
+            <strong>$45,678</strong>
+          </article>
+          <article>
+            <span>Active Projects</span>
+            <strong>23</strong>
+          </article>
+        </section>
+      </main>
+    </div>
   </div>
 </Preview>
 
@@ -59,9 +61,9 @@ A full application shell with sidebar navigation, header bar, and main content a
 
 ```html
 <body data-layout="dashboard">
-  <aside data-sidebar>
+  <aside>
     <header>
-      <a href="/" data-logo>Acme Inc</a>
+      <a href="/">Acme Inc</a>
     </header>
     <nav>
       <ul>
@@ -73,12 +75,12 @@ A full application shell with sidebar navigation, header bar, and main content a
     </nav>
   </aside>
 
-  <div data-main>
+  <div>
     <header>
       <input type="search" placeholder="Search..." />
-      <div data-user-menu>
+      <figure>
         <img src="/avatar.jpg" alt="User" />
-      </div>
+      </figure>
     </header>
 
     <main>
@@ -97,19 +99,49 @@ A full application shell with sidebar navigation, header bar, and main content a
   min-height: 100vh;
 }
 
-[data-layout="dashboard"] > [data-sidebar] {
-  background: var(--sidebar-background, var(--foreground));
-  color: var(--sidebar-foreground, var(--background));
+[data-layout="dashboard"] > aside {
+  background: var(--foreground);
+  color: var(--background);
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-4);
+}
+
+[data-layout="dashboard"] > aside > header a {
+  font-weight: 700;
+  color: inherit;
+}
+
+[data-layout="dashboard"] > aside nav {
+  margin-top: var(--spacing-6);
+}
+
+[data-layout="dashboard"] > aside ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+[data-layout="dashboard"] > aside a {
+  display: block;
+  padding: var(--spacing-2);
+  border-radius: var(--radius);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-layout="dashboard"] > aside a[aria-current] {
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+}
+
+[data-layout="dashboard"] > div {
   display: flex;
   flex-direction: column;
 }
 
-[data-layout="dashboard"] [data-main] {
-  display: flex;
-  flex-direction: column;
-}
-
-[data-layout="dashboard"] [data-main] > header {
+[data-layout="dashboard"] > div > header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -117,10 +149,48 @@ A full application shell with sidebar navigation, header bar, and main content a
   border-bottom: 1px solid var(--border);
 }
 
-[data-layout="dashboard"] [data-main] > main {
+[data-layout="dashboard"] > div > header input {
+  padding: var(--spacing-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 300px;
+}
+
+[data-layout="dashboard"] > div > header figure {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+[data-layout="dashboard"] > div > main {
   flex: 1;
   padding: var(--spacing-6);
   overflow-y: auto;
+}
+
+[data-layout="dashboard"] > div > main section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-4);
+}
+
+[data-layout="dashboard"] > div > main section article {
+  background: var(--muted);
+  padding: var(--spacing-4);
+  border-radius: var(--radius);
+}
+
+[data-layout="dashboard"] > div > main section span {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-layout="dashboard"] > div > main section strong {
+  display: block;
+  font-size: var(--text-2xl);
+  margin-top: var(--spacing-1);
 }
 
 @media (max-width: 768px) {
@@ -128,7 +198,7 @@ A full application shell with sidebar navigation, header bar, and main content a
     grid-template-columns: 1fr;
   }
 
-  [data-layout="dashboard"] > [data-sidebar] {
+  [data-layout="dashboard"] > aside {
     position: fixed;
     inset: 0;
     z-index: 50;
@@ -136,7 +206,7 @@ A full application shell with sidebar navigation, header bar, and main content a
     transition: transform 0.3s;
   }
 
-  [data-layout="dashboard"][data-sidebar-open] > [data-sidebar] {
+  [data-layout="dashboard"][data-sidebar-open] > aside {
     transform: translateX(0);
   }
 }

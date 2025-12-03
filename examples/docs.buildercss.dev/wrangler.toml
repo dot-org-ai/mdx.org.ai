@@ -1,0 +1,30 @@
+# BuilderCSS Documentation Site
+# Cloudflare Worker Configuration
+# Deploy: pnpm --filter docs.buildercss.dev deploy
+
+name = "docs-buildercss-dev"
+main = "worker.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Custom domain configuration
+# routes = [
+#   { pattern = "docs.buildercss.dev/*", zone_name = "buildercss.dev" }
+# ]
+
+# Development settings
+[dev]
+port = 8787
+local_protocol = "http"
+
+# Environment variables
+[vars]
+SITE_NAME = "BuilderCSS Documentation"
+SITE_URL = "https://docs.buildercss.dev"
+
+# Production-specific settings
+[env.production]
+name = "docs-buildercss-dev"
+# routes = [
+#   { pattern = "docs.buildercss.dev/*", zone_name = "buildercss.dev" }
+# ]

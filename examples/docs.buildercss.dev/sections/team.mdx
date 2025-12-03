@@ -10,38 +10,38 @@ screenshot: /screenshots/sections/team.png
 Display team member profiles and roles.
 
 <Preview>
-  <section data-section="team" style={{ padding: 'var(--spacing-16) var(--spacing-4)' }}>
-    <header style={{ textAlign: 'center', marginBottom: 'var(--spacing-12)' }}>
-      <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Meet Our Team</h2>
-      <p style={{ color: 'var(--muted-foreground)' }}>The people behind the product.</p>
+  <section data-section="team">
+    <header>
+      <h2>Meet Our Team</h2>
+      <p>The people behind the product.</p>
     </header>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-8)', maxWidth: '900px', margin: '0 auto' }}>
-      <article style={{ textAlign: 'center' }}>
-        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'var(--muted)', margin: '0 auto var(--spacing-4)' }}></div>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Sarah Chen</h3>
-        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-2)' }}>CEO & Co-founder</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)' }}>
-          <a href="#" style={{ color: 'var(--muted-foreground)' }}>𝕏</a>
-          <a href="#" style={{ color: 'var(--muted-foreground)' }}>in</a>
-        </div>
+    <div>
+      <article>
+        <figure></figure>
+        <h3>Sarah Chen</h3>
+        <p>CEO & Co-founder</p>
+        <nav aria-label="Social links">
+          <a href="#">𝕏</a>
+          <a href="#">in</a>
+        </nav>
       </article>
-      <article style={{ textAlign: 'center' }}>
-        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'var(--muted)', margin: '0 auto var(--spacing-4)' }}></div>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Alex Rivera</h3>
-        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-2)' }}>CTO & Co-founder</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)' }}>
-          <a href="#" style={{ color: 'var(--muted-foreground)' }}>𝕏</a>
-          <a href="#" style={{ color: 'var(--muted-foreground)' }}>gh</a>
-        </div>
+      <article>
+        <figure></figure>
+        <h3>Alex Rivera</h3>
+        <p>CTO & Co-founder</p>
+        <nav aria-label="Social links">
+          <a href="#">𝕏</a>
+          <a href="#">gh</a>
+        </nav>
       </article>
-      <article style={{ textAlign: 'center' }}>
-        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'var(--muted)', margin: '0 auto var(--spacing-4)' }}></div>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Jordan Lee</h3>
-        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-2)' }}>Head of Design</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)' }}>
-          <a href="#" style={{ color: 'var(--muted-foreground)' }}>𝕏</a>
-          <a href="#" style={{ color: 'var(--muted-foreground)' }}>dr</a>
-        </div>
+      <article>
+        <figure></figure>
+        <h3>Jordan Lee</h3>
+        <p>Head of Design</p>
+        <nav aria-label="Social links">
+          <a href="#">𝕏</a>
+          <a href="#">dr</a>
+        </nav>
       </article>
     </div>
   </section>
@@ -63,8 +63,8 @@ Display team member profiles and roles.
     <p>The people behind the product.</p>
   </header>
 
-  <div data-team-grid>
-    <article data-team-member>
+  <div>
+    <article>
       <img src="/team/sarah.jpg" alt="Sarah Chen" />
       <h3>Sarah Chen</h3>
       <p>CEO & Co-founder</p>
@@ -74,7 +74,7 @@ Display team member profiles and roles.
       </nav>
     </article>
 
-    <article data-team-member>
+    <article>
       <img src="/team/alex.jpg" alt="Alex Rivera" />
       <h3>Alex Rivera</h3>
       <p>CTO & Co-founder</p>
@@ -84,7 +84,7 @@ Display team member profiles and roles.
       </nav>
     </article>
 
-    <article data-team-member>
+    <article>
       <img src="/team/jordan.jpg" alt="Jordan Lee" />
       <h3>Jordan Lee</h3>
       <p>Head of Design</p>
@@ -109,7 +109,17 @@ Display team member profiles and roles.
   margin-bottom: var(--spacing-12);
 }
 
-[data-section="team"] [data-team-grid] {
+[data-section="team"] > header h2 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-section="team"] > header p {
+  color: var(--muted-foreground);
+}
+
+[data-section="team"] > div {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-8);
@@ -117,41 +127,43 @@ Display team member profiles and roles.
   margin: 0 auto;
 }
 
-[data-section="team"] [data-team-member] {
+[data-section="team"] article {
   text-align: center;
 }
 
-[data-section="team"] [data-team-member] img {
+[data-section="team"] article img,
+[data-section="team"] article figure {
   width: 120px;
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
   margin: 0 auto var(--spacing-4);
+  background: var(--muted);
 }
 
-[data-section="team"] [data-team-member] h3 {
+[data-section="team"] article h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-1);
 }
 
-[data-section="team"] [data-team-member] > p {
+[data-section="team"] article > p {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
   margin-bottom: var(--spacing-2);
 }
 
-[data-section="team"] [data-team-member] nav {
+[data-section="team"] article nav {
   display: flex;
   justify-content: center;
   gap: var(--spacing-2);
 }
 
-[data-section="team"] [data-team-member] nav a {
+[data-section="team"] article nav a {
   color: var(--muted-foreground);
   transition: color 0.2s;
 }
 
-[data-section="team"] [data-team-member] nav a:hover {
+[data-section="team"] article nav a:hover {
   color: var(--foreground);
 }
 ```
@@ -161,13 +173,13 @@ Display team member profiles and roles.
 ### With Cards
 
 ```html
-<section data-section="team" data-variant="cards">
-  <article data-team-member data-card>
+<section data-section="team">
+  <article>
     <img src="/team/sarah.jpg" alt="" />
-    <div data-content>
+    <div>
       <h3>Sarah Chen</h3>
       <p>CEO & Co-founder</p>
-      <p data-bio>Building the future of design systems...</p>
+      <p>Building the future of design systems...</p>
     </div>
   </article>
 </section>
@@ -176,8 +188,8 @@ Display team member profiles and roles.
 ### Grid Layout
 
 ```html
-<section data-section="team" data-variant="grid">
-  <div data-team-grid="4">
+<section data-section="team">
+  <div>
     <!-- More compact grid with 4 columns -->
   </div>
 </section>

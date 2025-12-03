@@ -10,60 +10,62 @@ screenshot: /screenshots/pages/product.png
 A product detail page with images, description, and purchase options.
 
 <Preview>
-  <article data-page="product" style={{ padding: 'var(--spacing-6)' }}>
-    <nav style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>
-      <a href="#" style={{ color: 'var(--muted-foreground)' }}>Home</a>
-      <span style={{ margin: '0 var(--spacing-2)' }}>/</span>
-      <a href="#" style={{ color: 'var(--muted-foreground)' }}>Products</a>
-      <span style={{ margin: '0 var(--spacing-2)' }}>/</span>
-      <span>Premium Headphones</span>
+  <article data-page="product">
+    <nav aria-label="Breadcrumb">
+      <ol>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Products</a></li>
+        <li>Premium Headphones</li>
+      </ol>
     </nav>
 
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-8)' }}>
-      <div>
-        <div style={{ background: 'var(--muted)', borderRadius: 'var(--radius-lg)', aspectRatio: '1', marginBottom: 'var(--spacing-4)' }}></div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--spacing-2)' }}>
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} style={{ background: 'var(--muted)', borderRadius: 'var(--radius)', aspectRatio: '1', border: i === 1 ? '2px solid var(--primary)' : '1px solid var(--border)' }}></div>
-          ))}
-        </div>
-      </div>
+    <div>
+      <section aria-label="Gallery">
+        <figure></figure>
+        <ul>
+          <li aria-selected="true"></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </section>
 
-      <div>
-        <span style={{ display: 'inline-block', padding: '2px 8px', background: 'green', color: 'white', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)', marginBottom: 'var(--spacing-2)' }}>In Stock</span>
-        <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Premium Wireless Headphones</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-4)' }}>
-          <span style={{ color: 'gold' }}>★★★★★</span>
-          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>4.9 (128 reviews)</span>
+      <section aria-label="Details">
+        <mark data-status="success">In Stock</mark>
+        <h1>Premium Wireless Headphones</h1>
+        <div aria-label="Rating">
+          <data value="4.9">4.9</data>
+          <span>(128 reviews)</span>
         </div>
-        <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>
-          $299 <span style={{ fontSize: 'var(--text-lg)', color: 'var(--muted-foreground)', textDecoration: 'line-through' }}>$399</span>
+        <div aria-label="Price">
+          <data value="299">$299</data>
+          <s>$399</s>
         </div>
-        <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)' }}>Experience crystal-clear audio with our premium wireless headphones featuring active noise cancellation and 30-hour battery life.</p>
+        <p>Experience crystal-clear audio with our premium wireless headphones featuring active noise cancellation and 30-hour battery life.</p>
 
-        <div style={{ marginBottom: 'var(--spacing-4)' }}>
-          <label style={{ display: 'block', fontWeight: 500, marginBottom: 'var(--spacing-2)' }}>Color</label>
-          <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-            {['#000', '#fff', '#1e40af'].map(color => (
-              <button key={color} style={{ width: '32px', height: '32px', borderRadius: '50%', background: color, border: color === '#000' ? '2px solid var(--primary)' : '1px solid var(--border)' }}></button>
-            ))}
+        <fieldset aria-label="Color">
+          <legend>Color</legend>
+          <menu>
+            <button aria-pressed="true" aria-label="Black"></button>
+            <button aria-label="White"></button>
+            <button aria-label="Blue"></button>
+          </menu>
+        </fieldset>
+
+        <fieldset aria-label="Quantity">
+          <legend>Quantity</legend>
+          <div>
+            <button aria-label="Decrease">-</button>
+            <output>1</output>
+            <button aria-label="Increase">+</button>
           </div>
-        </div>
+        </fieldset>
 
-        <div style={{ marginBottom: 'var(--spacing-6)' }}>
-          <label style={{ display: 'block', fontWeight: 500, marginBottom: 'var(--spacing-2)' }}>Quantity</label>
-          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--border)', borderRadius: 'var(--radius)', width: 'fit-content' }}>
-            <button style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: 'none', border: 'none' }}>-</button>
-            <span style={{ padding: '0 var(--spacing-3)' }}>1</span>
-            <button style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: 'none', border: 'none' }}>+</button>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: 'var(--spacing-3)' }}>
-          <button style={{ flex: 1, padding: 'var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500 }}>Add to Cart</button>
-          <button style={{ padding: 'var(--spacing-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>♡</button>
-        </div>
-      </div>
+        <menu>
+          <button>Add to Cart</button>
+          <button aria-label="Add to wishlist"></button>
+        </menu>
+      </section>
     </div>
   </article>
 </Preview>
@@ -79,57 +81,57 @@ A product detail page with images, description, and purchase options.
 
 ```html
 <article data-page="product">
-  <nav data-breadcrumb>
-    <a href="/">Home</a>
-    <span>/</span>
-    <a href="/products">Products</a>
-    <span>/</span>
-    <span>Premium Headphones</span>
+  <nav aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/">Home</a></li>
+      <li><a href="/products">Products</a></li>
+      <li>Premium Headphones</li>
+    </ol>
   </nav>
 
-  <div data-product-layout>
-    <section data-product-gallery>
-      <img src="/product.jpg" data-main-image />
-      <div data-thumbnails>
-        <button data-thumbnail data-active><img src="/thumb1.jpg" /></button>
-        <button data-thumbnail><img src="/thumb2.jpg" /></button>
-      </div>
+  <div>
+    <section aria-label="Gallery">
+      <figure><img src="/product.jpg" alt="Product" /></figure>
+      <ul>
+        <li aria-selected="true"><img src="/thumb1.jpg" alt="" /></li>
+        <li><img src="/thumb2.jpg" alt="" /></li>
+      </ul>
     </section>
 
-    <section data-product-info>
-      <span data-badge="success">In Stock</span>
+    <section aria-label="Details">
+      <mark data-status="success">In Stock</mark>
       <h1>Premium Wireless Headphones</h1>
-      <div data-rating>
-        <span data-stars>★★★★★</span>
-        <span>4.9 (128 reviews)</span>
+      <div aria-label="Rating">
+        <data value="4.9">4.9</data>
+        <span>(128 reviews)</span>
       </div>
-      <div data-price>
-        <span data-current>$299</span>
-        <span data-original>$399</span>
+      <div aria-label="Price">
+        <data value="299">$299</data>
+        <s>$399</s>
       </div>
-      <p data-description>Experience crystal-clear audio...</p>
+      <p>Experience crystal-clear audio...</p>
 
-      <div data-option="color">
-        <label>Color</label>
-        <div data-swatches>
-          <button data-swatch style="--swatch: #000" data-selected></button>
-          <button data-swatch style="--swatch: #fff"></button>
+      <fieldset aria-label="Color">
+        <legend>Color</legend>
+        <menu>
+          <button aria-pressed="true" aria-label="Black"></button>
+          <button aria-label="White"></button>
+        </menu>
+      </fieldset>
+
+      <fieldset aria-label="Quantity">
+        <legend>Quantity</legend>
+        <div>
+          <button aria-label="Decrease">-</button>
+          <output>1</output>
+          <button aria-label="Increase">+</button>
         </div>
-      </div>
+      </fieldset>
 
-      <div data-option="quantity">
-        <label>Quantity</label>
-        <div data-quantity-picker>
-          <button data-decrement>-</button>
-          <span>1</span>
-          <button data-increment>+</button>
-        </div>
-      </div>
-
-      <div data-actions>
-        <button data-button="primary">Add to Cart</button>
-        <button data-button="icon">♡</button>
-      </div>
+      <menu>
+        <button>Add to Cart</button>
+        <button aria-label="Add to wishlist"></button>
+      </menu>
     </section>
   </div>
 </article>
@@ -142,65 +144,182 @@ A product detail page with images, description, and purchase options.
   padding: var(--spacing-6);
 }
 
-[data-page="product"] [data-breadcrumb] {
+[data-page="product"] > nav[aria-label="Breadcrumb"] {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="product"] [data-product-layout] {
+[data-page="product"] > nav ol {
+  display: flex;
+  gap: var(--spacing-2);
+  list-style: none;
+  padding: 0;
+}
+
+[data-page="product"] > nav li:not(:last-child)::after {
+  content: "/";
+  margin-left: var(--spacing-2);
+}
+
+[data-page="product"] > div {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-8);
 }
 
-[data-page="product"] [data-main-image] {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
+[data-page="product"] section[aria-label="Gallery"] figure {
+  background: var(--muted);
   border-radius: var(--radius-lg);
+  aspect-ratio: 1;
+  margin: 0 0 var(--spacing-4);
 }
 
-[data-page="product"] [data-thumbnails] {
+[data-page="product"] section[aria-label="Gallery"] ul {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-2);
-  margin-top: var(--spacing-4);
+  list-style: none;
+  padding: 0;
 }
 
-[data-page="product"] [data-price] [data-current] {
+[data-page="product"] section[aria-label="Gallery"] li {
+  background: var(--muted);
+  border-radius: var(--radius);
+  aspect-ratio: 1;
+  border: 1px solid var(--border);
+}
+
+[data-page="product"] section[aria-label="Gallery"] li[aria-selected="true"] {
+  border: 2px solid var(--primary);
+}
+
+[data-page="product"] section[aria-label="Details"] mark {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius);
+  font-size: var(--text-xs);
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="product"] section[aria-label="Details"] mark[data-status="success"] {
+  background: green;
+  color: white;
+}
+
+[data-page="product"] section[aria-label="Details"] h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="product"] div[aria-label="Rating"] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="product"] div[aria-label="Rating"] data::before {
+  content: "★★★★★";
+  color: gold;
+  margin-right: var(--spacing-2);
+}
+
+[data-page="product"] div[aria-label="Rating"] span {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-page="product"] div[aria-label="Price"] {
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="product"] div[aria-label="Price"] data {
   font-size: var(--text-3xl);
   font-weight: 700;
 }
 
-[data-page="product"] [data-price] [data-original] {
+[data-page="product"] div[aria-label="Price"] s {
   font-size: var(--text-lg);
   color: var(--muted-foreground);
-  text-decoration: line-through;
+  margin-left: var(--spacing-2);
 }
 
-[data-page="product"] [data-swatches] {
+[data-page="product"] section[aria-label="Details"] > p {
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="product"] fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-4);
+}
+
+[data-page="product"] fieldset legend {
+  font-weight: 500;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="product"] fieldset[aria-label="Color"] menu {
   display: flex;
   gap: var(--spacing-2);
 }
 
-[data-page="product"] [data-swatch] {
+[data-page="product"] fieldset[aria-label="Color"] button {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--swatch);
   border: 1px solid var(--border);
 }
 
-[data-page="product"] [data-swatch][data-selected] {
+[data-page="product"] fieldset[aria-label="Color"] button[aria-pressed="true"] {
   border: 2px solid var(--primary);
 }
 
-[data-page="product"] [data-quantity-picker] {
+[data-page="product"] fieldset[aria-label="Quantity"] > div {
   display: flex;
   align-items: center;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   width: fit-content;
+}
+
+[data-page="product"] fieldset[aria-label="Quantity"] button {
+  padding: var(--spacing-2) var(--spacing-3);
+  background: none;
+  border: none;
+}
+
+[data-page="product"] fieldset[aria-label="Quantity"] output {
+  padding: 0 var(--spacing-3);
+}
+
+[data-page="product"] section[aria-label="Details"] > menu {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-6);
+}
+
+[data-page="product"] section[aria-label="Details"] > menu button:first-child {
+  flex: 1;
+  padding: var(--spacing-3);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+[data-page="product"] section[aria-label="Details"] > menu button:last-child {
+  padding: var(--spacing-3);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-page="product"] section[aria-label="Details"] > menu button:last-child::before {
+  content: "♡";
 }
 ```

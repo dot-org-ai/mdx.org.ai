@@ -10,27 +10,27 @@ screenshot: /screenshots/sections/features.png
 A grid of features showcasing your product's capabilities.
 
 <Preview>
-  <section data-section="features" style={{ padding: 'var(--spacing-16) var(--spacing-4)' }}>
-    <header style={{ textAlign: 'center', marginBottom: 'var(--spacing-12)' }}>
-      <span data-badge style={{ display: 'inline-block', padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--muted)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-4)' }}>Features</span>
-      <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Everything you need to build</h2>
-      <p style={{ color: 'var(--muted-foreground)', maxWidth: '600px', margin: '0 auto' }}>Powerful features to help you ship faster.</p>
+  <section data-section="features">
+    <header>
+      <span>Features</span>
+      <h2>Everything you need to build</h2>
+      <p>Powerful features to help you ship faster.</p>
     </header>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-8)' }}>
-      <article style={{ textAlign: 'center' }}>
-        <div style={{ width: '48px', height: '48px', background: 'var(--primary)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto var(--spacing-4)', color: 'var(--primary-foreground)' }}>⚡</div>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>Lightning Fast</h3>
-        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Optimized for performance with zero runtime overhead.</p>
+    <div>
+      <article>
+        <figure>⚡</figure>
+        <h3>Lightning Fast</h3>
+        <p>Optimized for performance with zero runtime overhead.</p>
       </article>
-      <article style={{ textAlign: 'center' }}>
-        <div style={{ width: '48px', height: '48px', background: 'var(--primary)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto var(--spacing-4)', color: 'var(--primary-foreground)' }}>♿</div>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>Fully Accessible</h3>
-        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Built with accessibility in mind from day one.</p>
+      <article>
+        <figure>♿</figure>
+        <h3>Fully Accessible</h3>
+        <p>Built with accessibility in mind from day one.</p>
       </article>
-      <article style={{ textAlign: 'center' }}>
-        <div style={{ width: '48px', height: '48px', background: 'var(--primary)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto var(--spacing-4)', color: 'var(--primary-foreground)' }}>🔒</div>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>Type Safe</h3>
-        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Full TypeScript support with auto-completion.</p>
+      <article>
+        <figure>🔒</figure>
+        <h3>Type Safe</h3>
+        <p>Full TypeScript support with auto-completion.</p>
       </article>
     </div>
   </section>
@@ -48,32 +48,32 @@ A grid of features showcasing your product's capabilities.
 ```html
 <section data-section="features">
   <header>
-    <span data-badge>Features</span>
+    <span>Features</span>
     <h2>Everything you need to build</h2>
     <p>Powerful features to help you ship faster.</p>
   </header>
 
-  <div data-grid="3">
-    <article data-feature>
-      <div data-icon>
+  <div>
+    <article>
+      <figure>
         <svg><!-- Lightning icon --></svg>
-      </div>
+      </figure>
       <h3>Lightning Fast</h3>
       <p>Optimized for performance with zero runtime overhead.</p>
     </article>
 
-    <article data-feature>
-      <div data-icon>
+    <article>
+      <figure>
         <svg><!-- Accessibility icon --></svg>
-      </div>
+      </figure>
       <h3>Fully Accessible</h3>
       <p>Built with accessibility in mind from day one.</p>
     </article>
 
-    <article data-feature>
-      <div data-icon>
+    <article>
+      <figure>
         <svg><!-- Lock icon --></svg>
-      </div>
+      </figure>
       <h3>Type Safe</h3>
       <p>Full TypeScript support with auto-completion.</p>
     </article>
@@ -93,6 +93,15 @@ A grid of features showcasing your product's capabilities.
   margin-bottom: var(--spacing-12);
 }
 
+[data-section="features"] > header > span {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--muted);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-4);
+}
+
 [data-section="features"] > header h2 {
   font-size: var(--text-3xl);
   font-weight: 700;
@@ -105,20 +114,17 @@ A grid of features showcasing your product's capabilities.
   margin: 0 auto;
 }
 
-[data-section="features"] [data-grid] {
+[data-section="features"] > div {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-8);
 }
 
-[data-section="features"] [data-grid="3"] {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-[data-section="features"] [data-feature] {
+[data-section="features"] article {
   text-align: center;
 }
 
-[data-section="features"] [data-icon] {
+[data-section="features"] article figure {
   width: 48px;
   height: 48px;
   background: var(--primary);
@@ -130,18 +136,18 @@ A grid of features showcasing your product's capabilities.
   margin: 0 auto var(--spacing-4);
 }
 
-[data-section="features"] [data-feature] h3 {
+[data-section="features"] article h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-2);
 }
 
-[data-section="features"] [data-feature] p {
+[data-section="features"] article p {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
 }
 
 @media (max-width: 768px) {
-  [data-section="features"] [data-grid="3"] {
+  [data-section="features"] > div {
     grid-template-columns: 1fr;
   }
 }
@@ -152,10 +158,10 @@ A grid of features showcasing your product's capabilities.
 ### With Cards
 
 ```html
-<section data-section="features" data-variant="cards">
-  <div data-grid="3">
-    <article data-card>
-      <div data-icon>...</div>
+<section data-section="features">
+  <div>
+    <article>
+      <figure>...</figure>
       <h3>Feature Name</h3>
       <p>Feature description...</p>
       <a href="/features/name">Learn more →</a>
@@ -167,15 +173,15 @@ A grid of features showcasing your product's capabilities.
 ### Alternating Layout
 
 ```html
-<section data-section="features" data-variant="alternating">
-  <article data-feature>
-    <div data-content>
+<section data-section="features">
+  <article>
+    <div>
       <h3>Feature Name</h3>
       <p>Detailed description...</p>
     </div>
-    <div data-image>
+    <figure>
       <img src="/feature-1.png" alt="" />
-    </div>
+    </figure>
   </article>
 </section>
 ```

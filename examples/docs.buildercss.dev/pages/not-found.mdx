@@ -10,22 +10,22 @@ screenshot: /screenshots/pages/not-found.png
 A friendly 404 error page when content is not found.
 
 <Preview>
-  <article data-page="not-found" style={{ padding: 'var(--spacing-6)', textAlign: 'center', minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-    <div style={{ fontSize: '120px', fontWeight: 800, color: 'var(--muted)', lineHeight: 1 }}>404</div>
-    <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Page not found</h1>
-    <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)', maxWidth: '400px' }}>Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.</p>
-    <div style={{ display: 'flex', gap: 'var(--spacing-3)' }}>
-      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500 }}>Go Home</button>
-      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontWeight: 500 }}>Contact Support</button>
-    </div>
-    <div style={{ marginTop: 'var(--spacing-8)' }}>
-      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-3)' }}>Popular pages:</p>
-      <div style={{ display: 'flex', gap: 'var(--spacing-4)' }}>
-        <a href="#" style={{ fontSize: 'var(--text-sm)', color: 'var(--primary)' }}>Documentation</a>
-        <a href="#" style={{ fontSize: 'var(--text-sm)', color: 'var(--primary)' }}>Components</a>
-        <a href="#" style={{ fontSize: 'var(--text-sm)', color: 'var(--primary)' }}>Blog</a>
-      </div>
-    </div>
+  <article data-page="not-found">
+    <data value="404">404</data>
+    <h1>Page not found</h1>
+    <p>Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.</p>
+    <menu>
+      <a href="#">Go Home</a>
+      <a href="#">Contact Support</a>
+    </menu>
+    <nav aria-label="Suggestions">
+      <p>Popular pages:</p>
+      <ul>
+        <li><a href="#">Documentation</a></li>
+        <li><a href="#">Components</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+    </nav>
   </article>
 </Preview>
 
@@ -40,16 +40,16 @@ A friendly 404 error page when content is not found.
 
 ```html
 <article data-page="not-found">
-  <div data-error-code>404</div>
+  <data value="404">404</data>
   <h1>Page not found</h1>
   <p>Sorry, we couldn't find the page you're looking for.</p>
 
-  <div data-actions>
-    <a href="/" data-button="primary">Go Home</a>
-    <a href="/contact" data-button="outline">Contact Support</a>
-  </div>
+  <menu>
+    <a href="/">Go Home</a>
+    <a href="/contact">Contact Support</a>
+  </menu>
 
-  <nav data-suggestions>
+  <nav aria-label="Suggestions">
     <p>Popular pages:</p>
     <ul>
       <li><a href="/docs">Documentation</a></li>
@@ -73,11 +73,12 @@ A friendly 404 error page when content is not found.
   justify-content: center;
 }
 
-[data-page="not-found"] [data-error-code] {
+[data-page="not-found"] > data {
   font-size: 120px;
   font-weight: 800;
   color: var(--muted);
   line-height: 1;
+  display: block;
 }
 
 [data-page="not-found"] h1 {
@@ -92,29 +93,45 @@ A friendly 404 error page when content is not found.
   max-width: 400px;
 }
 
-[data-page="not-found"] [data-actions] {
+[data-page="not-found"] menu {
   display: flex;
   gap: var(--spacing-3);
 }
 
-[data-page="not-found"] [data-suggestions] {
+[data-page="not-found"] menu a:first-child {
+  padding: var(--spacing-3) var(--spacing-6);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+[data-page="not-found"] menu a:last-child {
+  padding: var(--spacing-3) var(--spacing-6);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+[data-page="not-found"] nav[aria-label="Suggestions"] {
   margin-top: var(--spacing-8);
 }
 
-[data-page="not-found"] [data-suggestions] p {
+[data-page="not-found"] nav[aria-label="Suggestions"] p {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="not-found"] [data-suggestions] ul {
+[data-page="not-found"] nav[aria-label="Suggestions"] ul {
   display: flex;
   gap: var(--spacing-4);
   list-style: none;
   padding: 0;
 }
 
-[data-page="not-found"] [data-suggestions] a {
+[data-page="not-found"] nav[aria-label="Suggestions"] a {
   font-size: var(--text-sm);
   color: var(--primary);
 }
@@ -136,9 +153,9 @@ A friendly 404 error page when content is not found.
 
 ```html
 <article data-page="not-found" data-variant="illustrated">
-  <img src="/404-illustration.svg" alt="" />
+  <figure><img src="/404-illustration.svg" alt="" /></figure>
   <h1>Oops! Lost in space</h1>
   <p>The page you're looking for has drifted away.</p>
-  <a href="/" data-button="primary">Back to Earth</a>
+  <a href="/">Back to Earth</a>
 </article>
 ```

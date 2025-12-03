@@ -10,84 +10,113 @@ screenshot: /screenshots/views/calendar.png
 A calendar view for scheduling and viewing events.
 
 <Preview>
-  <article data-view="calendar" style={{ padding: 'var(--spacing-6)' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-4)' }}>
-        <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>December 2024</h1>
-        <div style={{ display: 'flex', gap: 'var(--spacing-1)' }}>
-          <button style={{ padding: 'var(--spacing-2)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>←</button>
-          <button style={{ padding: 'var(--spacing-2)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>→</button>
+  <article data-view="calendar">
+    <header>
+      <nav>
+        <h1>December 2024</h1>
+        <div>
+          <button aria-label="Previous month">←</button>
+          <button aria-label="Next month">→</button>
         </div>
-      </div>
-      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>Today</button>
-        <select style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+      </nav>
+      <menu>
+        <button>Today</button>
+        <select>
           <option>Month</option>
           <option>Week</option>
           <option>Day</option>
         </select>
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Add Event</button>
-      </div>
+        <button>Add Event</button>
+      </menu>
     </header>
-    <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', background: 'var(--muted)' }}>
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} style={{ padding: 'var(--spacing-2)', textAlign: 'center', fontWeight: 500, fontSize: 'var(--text-sm)' }}>{day}</div>
-        ))}
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
-        {[...Array(35)].map((_, i) => {
-          const day = i - 5
-          const isCurrentMonth = day >= 1 && day <= 31
-          const isToday = day === 3
-          return (
-            <div key={i} style={{ minHeight: '80px', padding: 'var(--spacing-1)', borderTop: '1px solid var(--border)', borderLeft: i % 7 !== 0 ? '1px solid var(--border)' : 'none', background: isCurrentMonth ? 'var(--background)' : 'var(--muted)', opacity: isCurrentMonth ? 1 : 0.5 }}>
-              <span style={{ display: 'inline-block', width: '24px', height: '24px', borderRadius: '50%', textAlign: 'center', lineHeight: '24px', fontSize: 'var(--text-sm)', background: isToday ? 'var(--primary)' : 'transparent', color: isToday ? 'var(--primary-foreground)' : 'inherit' }}>{isCurrentMonth ? day : ''}</span>
-              {day === 5 && <div style={{ marginTop: '2px', padding: '2px 4px', background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)' }}>Team Sync</div>}
-              {day === 12 && <div style={{ marginTop: '2px', padding: '2px 4px', background: 'green', color: 'white', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)' }}>Launch Day</div>}
-            </div>
-          )
-        })}
-      </div>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Sun</th>
+          <th>Mon</th>
+          <th>Tue</th>
+          <th>Wed</th>
+          <th>Thu</th>
+          <th>Fri</th>
+          <th>Sat</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span>1</span></td>
+          <td><span>2</span></td>
+          <td data-today="true"><span>3</span></td>
+          <td><span>4</span></td>
+          <td><span>5</span><mark>Team Sync</mark></td>
+          <td><span>6</span></td>
+          <td><span>7</span></td>
+        </tr>
+        <tr>
+          <td><span>8</span></td>
+          <td><span>9</span></td>
+          <td><span>10</span></td>
+          <td><span>11</span></td>
+          <td><span>12</span><mark data-color="green">Launch Day</mark></td>
+          <td><span>13</span></td>
+          <td><span>14</span></td>
+        </tr>
+      </tbody>
+    </table>
   </article>
 </Preview>
+
+## When to Use
+
+- Event scheduling
+- Appointment booking
+- Task calendars
+- Project timelines
 
 ## Structure
 
 ```html
 <article data-view="calendar">
   <header>
-    <div data-nav>
+    <nav>
       <h1>December 2024</h1>
-      <button data-action="prev">←</button>
-      <button data-action="next">→</button>
-    </div>
-    <div data-actions>
-      <button data-action="today">Today</button>
-      <select data-view-selector>
+      <div>
+        <button aria-label="Previous month">←</button>
+        <button aria-label="Next month">→</button>
+      </div>
+    </nav>
+    <menu>
+      <button>Today</button>
+      <select>
         <option value="month">Month</option>
         <option value="week">Week</option>
         <option value="day">Day</option>
       </select>
-      <button data-button="primary">Add Event</button>
-    </div>
+      <button>Add Event</button>
+    </menu>
   </header>
 
-  <section data-calendar-grid>
-    <header data-weekdays>
-      <span>Sun</span>
-      <span>Mon</span>
-      <!-- ... -->
-    </header>
-    <div data-days>
-      <div data-day data-date="2024-12-01">
-        <span data-day-number>1</span>
-        <div data-event style="--event-color: blue">Team Sync</div>
-      </div>
-      <!-- ... -->
-    </div>
-  </section>
+  <table>
+    <thead>
+      <tr>
+        <th>Sun</th>
+        <th>Mon</th>
+        <!-- ... -->
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span>1</span></td>
+        <td data-today="true">
+          <span>3</span>
+        </td>
+        <td>
+          <span>5</span>
+          <mark>Team Sync</mark>
+        </td>
+        <!-- ... -->
+      </tr>
+    </tbody>
+  </table>
 </article>
 ```
 
@@ -105,69 +134,152 @@ A calendar view for scheduling and viewing events.
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="calendar"] [data-nav] {
+[data-view="calendar"] > header nav {
   display: flex;
   align-items: center;
   gap: var(--spacing-4);
 }
 
-[data-view="calendar"] [data-calendar-grid] {
+[data-view="calendar"] > header h1 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+[data-view="calendar"] > header nav > div {
+  display: flex;
+  gap: var(--spacing-1);
+}
+
+[data-view="calendar"] > header nav button {
+  padding: var(--spacing-2);
+  background: var(--muted);
+  border: none;
+  border-radius: var(--radius);
+}
+
+[data-view="calendar"] > header menu {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-view="calendar"] > header menu > button:first-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--muted);
+  border: none;
+  border-radius: var(--radius);
+}
+
+[data-view="calendar"] > header menu select {
+  padding: var(--spacing-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-view="calendar"] > header menu > button:last-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+}
+
+[data-view="calendar"] > table {
+  width: 100%;
+  border-collapse: collapse;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
-[data-view="calendar"] [data-weekdays] {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+[data-view="calendar"] thead {
   background: var(--muted);
 }
 
-[data-view="calendar"] [data-weekdays] span {
+[data-view="calendar"] th {
   padding: var(--spacing-2);
   text-align: center;
   font-weight: 500;
+  font-size: var(--text-sm);
 }
 
-[data-view="calendar"] [data-days] {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-}
-
-[data-view="calendar"] [data-day] {
-  min-height: 100px;
+[data-view="calendar"] td {
+  min-height: 80px;
   padding: var(--spacing-1);
   border-top: 1px solid var(--border);
   border-left: 1px solid var(--border);
+  vertical-align: top;
+  height: 80px;
 }
 
-[data-view="calendar"] [data-day]:nth-child(7n+1) {
+[data-view="calendar"] td:first-child {
   border-left: none;
 }
 
-[data-view="calendar"] [data-day-number] {
+[data-view="calendar"] td > span {
   display: inline-block;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   text-align: center;
-  line-height: 28px;
+  line-height: 24px;
+  font-size: var(--text-sm);
   border-radius: 50%;
 }
 
-[data-view="calendar"] [data-day][data-today] [data-day-number] {
+[data-view="calendar"] td[data-today="true"] > span {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-[data-view="calendar"] [data-event] {
+[data-view="calendar"] td mark {
+  display: block;
   margin-top: 4px;
-  padding: 2px 6px;
-  background: var(--event-color, var(--primary));
-  color: white;
+  padding: 2px 4px;
+  background: var(--primary);
+  color: var(--primary-foreground);
   border-radius: var(--radius);
   font-size: var(--text-xs);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+[data-view="calendar"] td mark[data-color="green"] {
+  background: green;
+}
+
+[data-view="calendar"] td mark[data-color="orange"] {
+  background: orange;
+}
+
+[data-view="calendar"] td mark[data-color="red"] {
+  background: red;
+}
+```
+
+## JavaScript
+
+```js
+const calendar = document.querySelector('[data-view="calendar"]')
+const monthYear = calendar.querySelector('header h1')
+const prevBtn = calendar.querySelector('button[aria-label="Previous month"]')
+const nextBtn = calendar.querySelector('button[aria-label="Next month"]')
+
+let currentDate = new Date()
+
+function renderCalendar() {
+  const month = currentDate.toLocaleString('default', { month: 'long' })
+  const year = currentDate.getFullYear()
+  monthYear.textContent = `${month} ${year}`
+  // Update table cells...
+}
+
+prevBtn.addEventListener('click', () => {
+  currentDate.setMonth(currentDate.getMonth() - 1)
+  renderCalendar()
+})
+
+nextBtn.addEventListener('click', () => {
+  currentDate.setMonth(currentDate.getMonth() + 1)
+  renderCalendar()
+})
 ```

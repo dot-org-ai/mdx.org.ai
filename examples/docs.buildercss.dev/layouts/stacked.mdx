@@ -10,22 +10,22 @@ screenshot: /screenshots/layouts/stacked.png
 A simple vertical layout for content-focused pages. Header and footer are optional.
 
 <Preview>
-  <div data-layout="stacked" style={{ minHeight: '400px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
-    <header style={{ padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)', background: 'var(--background)' }}>
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <a href="/" style={{ fontWeight: 700 }}>Brand</a>
-        <div style={{ display: 'flex', gap: 'var(--spacing-4)' }}>
-          <a href="#">Features</a>
-          <a href="#">Pricing</a>
-          <a href="#">Docs</a>
-        </div>
+  <div data-layout="stacked">
+    <header>
+      <nav>
+        <a href="/">Brand</a>
+        <ul>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Docs</a></li>
+        </ul>
       </nav>
     </header>
-    <main style={{ flex: 1, padding: 'var(--spacing-6)' }}>
+    <main>
       <h1>Main Content Area</h1>
       <p>This is where your page content goes.</p>
     </main>
-    <footer style={{ padding: 'var(--spacing-4)', borderTop: '1px solid var(--border)', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+    <footer>
       <p>&copy; 2024 Brand. All rights reserved.</p>
     </footer>
   </div>
@@ -44,7 +44,7 @@ A simple vertical layout for content-focused pages. Header and footer are option
 <body data-layout="stacked">
   <header>
     <nav>
-      <a href="/" data-logo>Brand</a>
+      <a href="/">Brand</a>
       <ul>
         <li><a href="/features">Features</a></li>
         <li><a href="/pricing">Pricing</a></li>
@@ -79,6 +79,25 @@ A simple vertical layout for content-focused pages. Header and footer are option
   border-bottom: 1px solid var(--border);
 }
 
+[data-layout="stacked"] > header nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4);
+  max-width: var(--container-width, 1200px);
+  margin: 0 auto;
+}
+
+[data-layout="stacked"] > header nav > a {
+  font-weight: 700;
+}
+
+[data-layout="stacked"] > header ul {
+  display: flex;
+  gap: var(--spacing-4);
+  list-style: none;
+}
+
 [data-layout="stacked"] > main {
   flex: 1;
   width: 100%;
@@ -90,6 +109,8 @@ A simple vertical layout for content-focused pages. Header and footer are option
 [data-layout="stacked"] > footer {
   border-top: 1px solid var(--border);
   padding: var(--spacing-6) var(--spacing-4);
+  text-align: center;
+  color: var(--muted-foreground);
 }
 ```
 

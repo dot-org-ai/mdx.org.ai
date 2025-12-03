@@ -10,29 +10,29 @@ screenshot: /screenshots/sections/testimonials.png
 Customer quotes and social proof to build trust.
 
 <Preview>
-  <section data-section="testimonials" style={{ padding: 'var(--spacing-16) var(--spacing-4)', background: 'var(--muted)' }}>
-    <header style={{ textAlign: 'center', marginBottom: 'var(--spacing-12)' }}>
-      <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Loved by developers</h2>
-      <p style={{ color: 'var(--muted-foreground)' }}>See what our customers have to say.</p>
+  <section data-section="testimonials">
+    <header>
+      <h2>Loved by developers</h2>
+      <p>See what our customers have to say.</p>
     </header>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--spacing-6)', maxWidth: '900px', margin: '0 auto' }}>
-      <blockquote style={{ background: 'var(--background)', padding: 'var(--spacing-6)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
-        <p style={{ marginBottom: 'var(--spacing-4)', fontStyle: 'italic' }}>"BuilderCSS transformed how we build UIs. The semantic approach just makes sense."</p>
-        <footer style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+    <div>
+      <blockquote>
+        <p>"BuilderCSS transformed how we build UIs. The semantic approach just makes sense."</p>
+        <footer>
+          <figure></figure>
           <div>
-            <cite style={{ fontWeight: 600, fontStyle: 'normal', display: 'block' }}>Jane Doe</cite>
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>CTO at Acme Inc</span>
+            <cite>Jane Doe</cite>
+            <span>CTO at Acme Inc</span>
           </div>
         </footer>
       </blockquote>
-      <blockquote style={{ background: 'var(--background)', padding: 'var(--spacing-6)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
-        <p style={{ marginBottom: 'var(--spacing-4)', fontStyle: 'italic' }}>"Finally, a CSS framework that works with how we think about design."</p>
-        <footer style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+      <blockquote>
+        <p>"Finally, a CSS framework that works with how we think about design."</p>
+        <footer>
+          <figure></figure>
           <div>
-            <cite style={{ fontWeight: 600, fontStyle: 'normal', display: 'block' }}>John Smith</cite>
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Lead Developer at StartupCo</span>
+            <cite>John Smith</cite>
+            <span>Lead Developer at StartupCo</span>
           </div>
         </footer>
       </blockquote>
@@ -56,8 +56,8 @@ Customer quotes and social proof to build trust.
     <p>See what our customers have to say.</p>
   </header>
 
-  <div data-testimonials-grid>
-    <blockquote data-testimonial>
+  <div>
+    <blockquote>
       <p>"BuilderCSS transformed how we build UIs. The semantic approach just makes sense."</p>
       <footer>
         <img src="/avatar.jpg" alt="" />
@@ -68,7 +68,7 @@ Customer quotes and social proof to build trust.
       </footer>
     </blockquote>
 
-    <blockquote data-testimonial>
+    <blockquote>
       <p>"Finally, a CSS framework that works with how we think about design."</p>
       <footer>
         <img src="/avatar2.jpg" alt="" />
@@ -95,7 +95,17 @@ Customer quotes and social proof to build trust.
   margin-bottom: var(--spacing-12);
 }
 
-[data-section="testimonials"] [data-testimonials-grid] {
+[data-section="testimonials"] > header h2 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-section="testimonials"] > header p {
+  color: var(--muted-foreground);
+}
+
+[data-section="testimonials"] > div {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--spacing-6);
@@ -103,37 +113,39 @@ Customer quotes and social proof to build trust.
   margin: 0 auto;
 }
 
-[data-section="testimonials"] [data-testimonial] {
+[data-section="testimonials"] blockquote {
   background: var(--background);
   padding: var(--spacing-6);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
-[data-section="testimonials"] [data-testimonial] p {
+[data-section="testimonials"] blockquote > p {
   margin-bottom: var(--spacing-4);
   font-style: italic;
 }
 
-[data-section="testimonials"] [data-testimonial] footer {
+[data-section="testimonials"] blockquote > footer {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
 }
 
-[data-section="testimonials"] [data-testimonial] img {
+[data-section="testimonials"] blockquote img,
+[data-section="testimonials"] blockquote figure {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  background: var(--muted);
 }
 
-[data-section="testimonials"] [data-testimonial] cite {
+[data-section="testimonials"] blockquote cite {
   font-weight: 600;
   font-style: normal;
   display: block;
 }
 
-[data-section="testimonials"] [data-testimonial] span {
+[data-section="testimonials"] blockquote span {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
@@ -144,8 +156,8 @@ Customer quotes and social proof to build trust.
 ### With Rating Stars
 
 ```html
-<blockquote data-testimonial>
-  <div data-rating="5">★★★★★</div>
+<blockquote>
+  <div>★★★★★</div>
   <p>"Amazing product!"</p>
   <footer>...</footer>
 </blockquote>
@@ -154,8 +166,8 @@ Customer quotes and social proof to build trust.
 ### Featured Testimonial
 
 ```html
-<section data-section="testimonials" data-variant="featured">
-  <blockquote data-testimonial data-featured>
+<section data-section="testimonials">
+  <blockquote aria-current="true">
     <p>"This completely changed how we work..."</p>
     <footer>
       <img src="/avatar.jpg" alt="" />

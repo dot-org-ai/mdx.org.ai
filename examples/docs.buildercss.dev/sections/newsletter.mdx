@@ -10,16 +10,14 @@ screenshot: /screenshots/sections/newsletter.png
 An email signup form for newsletter subscriptions.
 
 <Preview>
-  <section data-section="newsletter" style={{ padding: 'var(--spacing-16) var(--spacing-4)', background: 'var(--muted)', borderRadius: 'var(--radius-lg)' }}>
-    <div style={{ maxWidth: '500px', margin: '0 auto', textAlign: 'center' }}>
-      <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Stay up to date</h2>
-      <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)' }}>Get the latest updates delivered to your inbox.</p>
-      <form style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-        <input type="email" placeholder="Enter your email" style={{ flex: 1, padding: 'var(--spacing-3)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', background: 'var(--background)' }} />
-        <button type="submit" style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer', fontWeight: 500 }}>Subscribe</button>
-      </form>
-      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginTop: 'var(--spacing-4)' }}>No spam. Unsubscribe anytime.</p>
-    </div>
+  <section data-section="newsletter">
+    <h2>Stay up to date</h2>
+    <p>Get the latest updates delivered to your inbox.</p>
+    <form>
+      <input type="email" placeholder="Enter your email" aria-label="Email address" />
+      <button type="submit">Subscribe</button>
+    </form>
+    <small>No spam. Unsubscribe anytime.</small>
   </section>
 </Preview>
 
@@ -37,14 +35,14 @@ An email signup form for newsletter subscriptions.
   <h2>Stay up to date</h2>
   <p>Get the latest updates delivered to your inbox.</p>
 
-  <form data-newsletter-form>
+  <form>
     <input
       type="email"
       placeholder="Enter your email"
       required
       aria-label="Email address"
     />
-    <button type="submit" data-button="primary">Subscribe</button>
+    <button type="submit">Subscribe</button>
   </form>
 
   <small>No spam. Unsubscribe anytime.</small>
@@ -58,6 +56,7 @@ An email signup form for newsletter subscriptions.
   padding: var(--spacing-16) var(--spacing-4);
   background: var(--muted);
   text-align: center;
+  border-radius: var(--radius-lg);
 }
 
 [data-section="newsletter"] > * {
@@ -94,6 +93,16 @@ An email signup form for newsletter subscriptions.
   outline-offset: 2px;
 }
 
+[data-section="newsletter"] button {
+  padding: var(--spacing-3) var(--spacing-6);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+}
+
 [data-section="newsletter"] small {
   display: block;
   font-size: var(--text-sm);
@@ -111,7 +120,7 @@ An email signup form for newsletter subscriptions.
 ## JavaScript
 
 ```js
-const form = document.querySelector('[data-newsletter-form]')
+const form = document.querySelector('[data-section="newsletter"] form')
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault()
@@ -144,7 +153,7 @@ form.addEventListener('submit', async (e) => {
 ### With Categories
 
 ```html
-<section data-section="newsletter" data-variant="categories">
+<section data-section="newsletter">
   <h2>Subscribe to updates</h2>
   <form>
     <fieldset>
@@ -171,9 +180,9 @@ form.addEventListener('submit', async (e) => {
 ### Inline Banner
 
 ```html
-<section data-section="newsletter" data-variant="inline">
+<section data-section="newsletter">
   <p>Stay updated with our newsletter</p>
-  <form data-inline>
+  <form>
     <input type="email" placeholder="Email" />
     <button type="submit">→</button>
   </form>

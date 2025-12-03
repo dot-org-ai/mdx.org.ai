@@ -10,27 +10,29 @@ screenshot: /screenshots/layouts/auth.png
 A centered layout optimized for authentication flows like login, signup, and password reset.
 
 <Preview>
-  <div data-layout="auth" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px', background: 'var(--muted)', borderRadius: 'var(--radius-lg)' }}>
-    <div style={{ background: 'var(--background)', padding: 'var(--spacing-8)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', width: '100%', maxWidth: '400px' }}>
-      <header style={{ textAlign: 'center', marginBottom: 'var(--spacing-6)' }}>
-        <h1 style={{ fontSize: 'var(--text-2xl)', marginBottom: 'var(--spacing-2)' }}>Sign In</h1>
-        <p style={{ color: 'var(--muted-foreground)' }}>Enter your credentials to continue</p>
-      </header>
-      <form style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-4)' }}>
-        <div>
-          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontSize: 'var(--text-sm)' }}>Email</label>
-          <input type="email" placeholder="you@example.com" style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
-        </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontSize: 'var(--text-sm)' }}>Password</label>
-          <input type="password" placeholder="••••••••" style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
-        </div>
-        <button data-button="primary" style={{ padding: 'var(--spacing-2)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Sign In</button>
-      </form>
-      <footer style={{ textAlign: 'center', marginTop: 'var(--spacing-4)', fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>
-        Don't have an account? <a href="#">Sign up</a>
-      </footer>
-    </div>
+  <div data-layout="auth">
+    <main>
+      <article>
+        <header>
+          <h1>Sign In</h1>
+          <p>Enter your credentials to continue</p>
+        </header>
+        <form>
+          <div>
+            <label>Email</label>
+            <input type="email" placeholder="you@example.com" />
+          </div>
+          <div>
+            <label>Password</label>
+            <input type="password" placeholder="••••••••" />
+          </div>
+          <button type="submit">Sign In</button>
+        </form>
+        <footer>
+          <p>Don't have an account? <a href="#">Sign up</a></p>
+        </footer>
+      </article>
+    </main>
   </div>
 </Preview>
 
@@ -47,7 +49,7 @@ A centered layout optimized for authentication flows like login, signup, and pas
 ```html
 <body data-layout="auth">
   <main>
-    <article data-card>
+    <article>
       <header>
         <img src="/logo.svg" alt="Brand" />
         <h1>Sign In</h1>
@@ -55,15 +57,15 @@ A centered layout optimized for authentication flows like login, signup, and pas
       </header>
 
       <form>
-        <div data-field>
+        <div>
           <label for="email">Email</label>
           <input type="email" id="email" required />
         </div>
-        <div data-field>
+        <div>
           <label for="password">Password</label>
           <input type="password" id="password" required />
         </div>
-        <button data-button="primary" type="submit">Sign In</button>
+        <button type="submit">Sign In</button>
       </form>
 
       <footer>
@@ -91,7 +93,7 @@ A centered layout optimized for authentication flows like login, signup, and pas
   max-width: 420px;
 }
 
-[data-layout="auth"] [data-card] {
+[data-layout="auth"] article {
   background: var(--background);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -101,6 +103,15 @@ A centered layout optimized for authentication flows like login, signup, and pas
 [data-layout="auth"] header {
   text-align: center;
   margin-bottom: var(--spacing-6);
+}
+
+[data-layout="auth"] header h1 {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--spacing-2);
+}
+
+[data-layout="auth"] header p {
+  color: var(--muted-foreground);
 }
 
 [data-layout="auth"] header img {
@@ -114,10 +125,37 @@ A centered layout optimized for authentication flows like login, signup, and pas
   gap: var(--spacing-4);
 }
 
+[data-layout="auth"] form > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+[data-layout="auth"] form label {
+  font-size: var(--text-sm);
+}
+
+[data-layout="auth"] form input {
+  width: 100%;
+  padding: var(--spacing-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-layout="auth"] form button {
+  padding: var(--spacing-2);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
 [data-layout="auth"] footer {
   text-align: center;
   margin-top: var(--spacing-4);
   color: var(--muted-foreground);
+  font-size: var(--text-sm);
 }
 ```
 

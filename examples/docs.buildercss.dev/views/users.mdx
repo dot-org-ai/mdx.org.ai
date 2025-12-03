@@ -10,58 +10,64 @@ screenshot: /screenshots/views/users.png
 A user management view for admin users to manage team members.
 
 <Preview>
-  <article data-view="users" style={{ padding: 'var(--spacing-6)' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
+  <article data-view="users">
+    <header>
       <div>
-        <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Team Members</h1>
-        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Manage your team's access and permissions</p>
+        <h1>Team Members</h1>
+        <p>Manage your team's access and permissions</p>
       </div>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Invite Member</button>
+      <button>Invite Member</button>
     </header>
-
-    <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-foreground)', fontWeight: 600 }}>JD</div>
+    <ul>
+      <li>
+        <div>
+          <figure>JD</figure>
           <div>
-            <h3 style={{ fontWeight: 600 }}>John Doe</h3>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>john@example.com</p>
+            <h3>John Doe</h3>
+            <p>john@example.com</p>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-4)' }}>
-          <span style={{ padding: '2px 8px', background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Admin</span>
-          <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>⋮</button>
+        <div>
+          <mark>Admin</mark>
+          <button aria-label="Actions">⋮</button>
         </div>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>JS</div>
+      </li>
+      <li>
+        <div>
+          <figure>JS</figure>
           <div>
-            <h3 style={{ fontWeight: 600 }}>Jane Smith</h3>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>jane@example.com</p>
+            <h3>Jane Smith</h3>
+            <p>jane@example.com</p>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-4)' }}>
-          <span style={{ padding: '2px 8px', background: 'var(--muted)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Editor</span>
-          <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>⋮</button>
+        <div>
+          <mark data-role="editor">Editor</mark>
+          <button aria-label="Actions">⋮</button>
         </div>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>BW</div>
+      </li>
+      <li>
+        <div>
+          <figure>BW</figure>
           <div>
-            <h3 style={{ fontWeight: 600 }}>Bob Wilson</h3>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>bob@example.com</p>
+            <h3>Bob Wilson</h3>
+            <p>bob@example.com</p>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-4)' }}>
-          <span style={{ padding: '2px 8px', background: 'orange', color: 'white', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Pending</span>
-          <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>⋮</button>
+        <div>
+          <mark data-role="pending">Pending</mark>
+          <button aria-label="Actions">⋮</button>
         </div>
-      </div>
-    </div>
+      </li>
+    </ul>
   </article>
 </Preview>
+
+## When to Use
+
+- Team management
+- User administration
+- Access control
+- Role management
 
 ## Structure
 
@@ -72,26 +78,24 @@ A user management view for admin users to manage team members.
       <h1>Team Members</h1>
       <p>Manage your team's access and permissions</p>
     </div>
-    <button data-button="primary">Invite Member</button>
+    <button>Invite Member</button>
   </header>
 
-  <section data-content>
-    <ul data-user-list>
-      <li data-user-item>
-        <div data-user-info>
-          <img src="/avatar.jpg" alt="" data-avatar />
-          <div>
-            <h3>John Doe</h3>
-            <p>john@example.com</p>
-          </div>
+  <ul>
+    <li>
+      <div>
+        <figure><img src="/avatar.jpg" alt="" /></figure>
+        <div>
+          <h3>John Doe</h3>
+          <p>john@example.com</p>
         </div>
-        <div data-user-meta>
-          <span data-badge="primary">Admin</span>
-          <button data-dropdown-trigger>⋮</button>
-        </div>
-      </li>
-    </ul>
-  </section>
+      </div>
+      <div>
+        <mark>Admin</mark>
+        <button aria-label="Actions">⋮</button>
+      </div>
+    </li>
+  </ul>
 </article>
 ```
 
@@ -109,14 +113,32 @@ A user management view for admin users to manage team members.
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="users"] [data-user-list] {
+[data-view="users"] > header h1 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+[data-view="users"] > header p {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+[data-view="users"] > header > button {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+}
+
+[data-view="users"] > ul {
   list-style: none;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
 }
 
-[data-view="users"] [data-user-item] {
+[data-view="users"] > ul > li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -124,25 +146,70 @@ A user management view for admin users to manage team members.
   border-bottom: 1px solid var(--border);
 }
 
-[data-view="users"] [data-user-item]:last-child {
+[data-view="users"] > ul > li:last-child {
   border-bottom: none;
 }
 
-[data-view="users"] [data-user-info] {
+[data-view="users"] > ul > li > div:first-child {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
 }
 
-[data-view="users"] [data-avatar] {
+[data-view="users"] > ul figure {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-foreground);
+  font-weight: 600;
+  margin: 0;
 }
 
-[data-view="users"] [data-user-meta] {
+[data-view="users"] > ul > li > div:nth-child(2) figure {
+  background: var(--muted);
+  color: inherit;
+}
+
+[data-view="users"] > ul h3 {
+  font-weight: 600;
+}
+
+[data-view="users"] > ul p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-view="users"] > ul > li > div:last-child {
   display: flex;
   align-items: center;
   gap: var(--spacing-4);
+}
+
+[data-view="users"] mark {
+  padding: 2px 8px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+}
+
+[data-view="users"] mark[data-role="editor"] {
+  background: var(--muted);
+  color: inherit;
+}
+
+[data-view="users"] mark[data-role="pending"] {
+  background: orange;
+  color: white;
+}
+
+[data-view="users"] > ul button[aria-label="Actions"] {
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 ```

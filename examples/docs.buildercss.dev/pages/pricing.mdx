@@ -10,61 +10,51 @@ screenshot: /screenshots/pages/pricing.png
 A pricing page with comparison tiers and feature lists.
 
 <Preview>
-  <article data-page="pricing" style={{ padding: 'var(--spacing-6)' }}>
-    <header style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto var(--spacing-8)' }}>
-      <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-3)' }}>Simple, transparent pricing</h1>
-      <p style={{ color: 'var(--muted-foreground)' }}>Choose the plan that's right for you</p>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)', marginTop: 'var(--spacing-4)', background: 'var(--muted)', padding: 'var(--spacing-1)', borderRadius: 'var(--radius)', width: 'fit-content', margin: 'var(--spacing-4) auto 0' }}>
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--background)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500 }}>Monthly</button>
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: 'none', borderRadius: 'var(--radius)', color: 'var(--muted-foreground)' }}>Annual (Save 20%)</button>
-      </div>
+  <article data-page="pricing">
+    <header>
+      <h1>Simple, transparent pricing</h1>
+      <p>Choose the plan that's right for you</p>
     </header>
-
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-4)', maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-6)' }}>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>Starter</h3>
-        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>For individuals and small projects</p>
-        <div style={{ marginBottom: 'var(--spacing-4)' }}>
-          <span style={{ fontSize: 'var(--text-3xl)', fontWeight: 700 }}>$0</span>
-          <span style={{ color: 'var(--muted-foreground)' }}>/month</span>
-        </div>
-        <button style={{ width: '100%', padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: 'var(--spacing-4)' }}>Get Started</button>
-        <ul style={{ fontSize: 'var(--text-sm)', listStyle: 'none', padding: 0 }}>
-          {['Up to 3 projects', '1GB storage', 'Community support'].map(feature => (
-            <li key={feature} style={{ padding: 'var(--spacing-1) 0', display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>✓ {feature}</li>
-          ))}
+    <div>
+      <article>
+        <h3>Starter</h3>
+        <p>For individuals</p>
+        <strong>$0</strong>
+        <span>/month</span>
+        <button>Get Started</button>
+        <ul>
+          <li>Up to 3 projects</li>
+          <li>1GB storage</li>
+          <li>Community support</li>
         </ul>
-      </div>
-
-      <div style={{ border: '2px solid var(--primary)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-6)', position: 'relative' }}>
-        <span style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: 'var(--primary)', color: 'var(--primary-foreground)', padding: '2px 12px', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Popular</span>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>Pro</h3>
-        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>For growing teams</p>
-        <div style={{ marginBottom: 'var(--spacing-4)' }}>
-          <span style={{ fontSize: 'var(--text-3xl)', fontWeight: 700 }}>$29</span>
-          <span style={{ color: 'var(--muted-foreground)' }}>/month</span>
-        </div>
-        <button style={{ width: '100%', padding: 'var(--spacing-2)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', marginBottom: 'var(--spacing-4)' }}>Start Free Trial</button>
-        <ul style={{ fontSize: 'var(--text-sm)', listStyle: 'none', padding: 0 }}>
-          {['Unlimited projects', '100GB storage', 'Priority support', 'Advanced analytics'].map(feature => (
-            <li key={feature} style={{ padding: 'var(--spacing-1) 0', display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>✓ {feature}</li>
-          ))}
+      </article>
+      <article aria-current="true">
+        <span>Popular</span>
+        <h3>Pro</h3>
+        <p>For growing teams</p>
+        <strong>$29</strong>
+        <span>/month</span>
+        <button>Start Free Trial</button>
+        <ul>
+          <li>Unlimited projects</li>
+          <li>100GB storage</li>
+          <li>Priority support</li>
+          <li>Advanced analytics</li>
         </ul>
-      </div>
-
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-6)' }}>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>Enterprise</h3>
-        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>For large organizations</p>
-        <div style={{ marginBottom: 'var(--spacing-4)' }}>
-          <span style={{ fontSize: 'var(--text-3xl)', fontWeight: 700 }}>Custom</span>
-        </div>
-        <button style={{ width: '100%', padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: 'var(--spacing-4)' }}>Contact Sales</button>
-        <ul style={{ fontSize: 'var(--text-sm)', listStyle: 'none', padding: 0 }}>
-          {['Everything in Pro', 'Unlimited storage', 'Dedicated support', 'Custom integrations', 'SLA guarantee'].map(feature => (
-            <li key={feature} style={{ padding: 'var(--spacing-1) 0', display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>✓ {feature}</li>
-          ))}
+      </article>
+      <article>
+        <h3>Enterprise</h3>
+        <p>For large organizations</p>
+        <strong>Custom</strong>
+        <button>Contact Sales</button>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Unlimited storage</li>
+          <li>Dedicated support</li>
+          <li>Custom integrations</li>
+          <li>SLA guarantee</li>
         </ul>
-      </div>
+      </article>
     </div>
   </article>
 </Preview>
@@ -80,43 +70,39 @@ A pricing page with comparison tiers and feature lists.
 
 ```html
 <article data-page="pricing">
-  <header data-page-header>
+  <header>
     <h1>Simple, transparent pricing</h1>
     <p>Choose the plan that's right for you</p>
-    <div data-billing-toggle>
-      <button data-active>Monthly</button>
-      <button>Annual (Save 20%)</button>
-    </div>
   </header>
-
-  <section data-pricing-grid>
-    <article data-pricing-card>
+  <div>
+    <article>
       <h3>Starter</h3>
-      <p>For individuals and small projects</p>
-      <div data-price>
-        <span data-amount>$0</span>
-        <span data-period>/month</span>
-      </div>
-      <button data-button="outline">Get Started</button>
-      <ul data-features>
+      <p>For individuals</p>
+      <strong>$0</strong>
+      <span>/month</span>
+      <button>Get Started</button>
+      <ul>
         <li>Up to 3 projects</li>
         <li>1GB storage</li>
       </ul>
     </article>
-
-    <article data-pricing-card data-featured>
-      <span data-badge>Popular</span>
+    <article aria-current="true">
+      <span>Popular</span>
       <h3>Pro</h3>
-      <!-- ... -->
-      <button data-button="primary">Start Free Trial</button>
+      <p>For growing teams</p>
+      <strong>$29</strong>
+      <span>/month</span>
+      <button>Start Free Trial</button>
+      <ul>...</ul>
     </article>
-
-    <article data-pricing-card>
+    <article>
       <h3>Enterprise</h3>
-      <!-- ... -->
-      <button data-button="outline">Contact Sales</button>
+      <p>For large organizations</p>
+      <strong>Custom</strong>
+      <button>Contact Sales</button>
+      <ul>...</ul>
     </article>
-  </section>
+  </div>
 </article>
 ```
 
@@ -127,23 +113,22 @@ A pricing page with comparison tiers and feature lists.
   padding: var(--spacing-6);
 }
 
-[data-page="pricing"] [data-page-header] {
+[data-page="pricing"] > header {
   text-align: center;
-  max-width: 600px;
-  margin: 0 auto var(--spacing-8);
+  margin-bottom: var(--spacing-8);
 }
 
-[data-page="pricing"] [data-billing-toggle] {
-  display: flex;
-  gap: var(--spacing-2);
-  background: var(--muted);
-  padding: var(--spacing-1);
-  border-radius: var(--radius);
-  width: fit-content;
-  margin: var(--spacing-4) auto 0;
+[data-page="pricing"] > header h1 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2);
 }
 
-[data-page="pricing"] [data-pricing-grid] {
+[data-page="pricing"] > header p {
+  color: var(--muted-foreground);
+}
+
+[data-page="pricing"] > div {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-4);
@@ -151,36 +136,80 @@ A pricing page with comparison tiers and feature lists.
   margin: 0 auto;
 }
 
-[data-page="pricing"] [data-pricing-card] {
+[data-page="pricing"] > div > article {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-6);
 }
 
-[data-page="pricing"] [data-pricing-card][data-featured] {
+[data-page="pricing"] > div > article[aria-current] {
   border: 2px solid var(--primary);
   position: relative;
 }
 
-[data-page="pricing"] [data-pricing-card][data-featured] [data-badge] {
+[data-page="pricing"] > div > article[aria-current] > span:first-child {
   position: absolute;
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 2px 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
 }
 
-[data-page="pricing"] [data-price] [data-amount] {
+[data-page="pricing"] article h3 {
+  font-weight: 600;
+  margin-bottom: var(--spacing-1);
+}
+
+[data-page="pricing"] article > p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="pricing"] article strong {
   font-size: var(--text-3xl);
   font-weight: 700;
 }
 
-[data-page="pricing"] [data-features] {
+[data-page="pricing"] article > span {
+  color: var(--muted-foreground);
+}
+
+[data-page="pricing"] article button {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-2);
+  margin: var(--spacing-4) 0;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+[data-page="pricing"] article:not([aria-current]) button {
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+[data-page="pricing"] article[aria-current] button {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+}
+
+[data-page="pricing"] article ul {
   list-style: none;
   padding: 0;
   font-size: var(--text-sm);
 }
 
-[data-page="pricing"] [data-features] li::before {
+[data-page="pricing"] article li {
+  padding: var(--spacing-1) 0;
+}
+
+[data-page="pricing"] article li::before {
   content: "✓ ";
   color: var(--primary);
 }

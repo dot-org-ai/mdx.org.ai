@@ -10,101 +10,20 @@ screenshot: /screenshots/views/settings.png
 Application settings organized into sections.
 
 <Preview>
-  <article data-view="settings" style={{ padding: 'var(--spacing-6)', maxWidth: '800px' }}>
-    <header style={{ marginBottom: 'var(--spacing-6)' }}>
-      <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Settings</h1>
-      <p style={{ color: 'var(--muted-foreground)' }}>Manage your account settings and preferences.</p>
+  <article data-view="settings">
+    <header>
+      <h1>Settings</h1>
+      <p>Manage your account settings and preferences.</p>
     </header>
-
-    <nav style={{ display: 'flex', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-6)', borderBottom: '1px solid var(--border)', paddingBottom: 'var(--spacing-2)' }}>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500 }}>General</button>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: 'none', borderRadius: 'var(--radius)', color: 'var(--muted-foreground)' }}>Notifications</button>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: 'none', borderRadius: 'var(--radius)', color: 'var(--muted-foreground)' }}>Security</button>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: 'none', borderRadius: 'var(--radius)', color: 'var(--muted-foreground)' }}>Billing</button>
+    <nav>
+      <button aria-selected="true">General</button>
+      <button>Notifications</button>
+      <button>Security</button>
+      <button>Billing</button>
     </nav>
-
-    <section style={{ marginBottom: 'var(--spacing-6)' }}>
-      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Appearance</h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-4)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
-          <div>
-            <h3 style={{ fontWeight: 500 }}>Theme</h3>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Select your preferred theme</p>
-          </div>
-          <select style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
-            <option>System</option>
-            <option>Light</option>
-            <option>Dark</option>
-          </select>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
-          <div>
-            <h3 style={{ fontWeight: 500 }}>Compact mode</h3>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Use smaller spacing and font sizes</p>
-          </div>
-          <button style={{ width: '44px', height: '24px', background: 'var(--muted)', borderRadius: '12px', border: 'none', position: 'relative', cursor: 'pointer' }}>
-            <span style={{ position: 'absolute', left: '2px', top: '2px', width: '20px', height: '20px', background: 'white', borderRadius: '50%' }}></span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section style={{ marginBottom: 'var(--spacing-6)' }}>
-      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Language & Region</h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-4)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
-          <div>
-            <h3 style={{ fontWeight: 500 }}>Language</h3>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Choose your preferred language</p>
-          </div>
-          <select style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
-            <option>English</option>
-            <option>Spanish</option>
-            <option>French</option>
-          </select>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
-          <div>
-            <h3 style={{ fontWeight: 500 }}>Timezone</h3>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Set your local timezone</p>
-          </div>
-          <select style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
-            <option>UTC-8 (Pacific)</option>
-            <option>UTC-5 (Eastern)</option>
-            <option>UTC+0 (London)</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <footer style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)', paddingTop: 'var(--spacing-4)', borderTop: '1px solid var(--border)' }}>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Cancel</button>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Save Changes</button>
-    </footer>
-  </article>
-</Preview>
-
-## Structure
-
-```html
-<article data-view="settings">
-  <header>
-    <h1>Settings</h1>
-    <p>Manage your account settings and preferences.</p>
-  </header>
-
-  <nav data-tabs>
-    <button data-tab="general" aria-selected="true">General</button>
-    <button data-tab="notifications">Notifications</button>
-    <button data-tab="security">Security</button>
-    <button data-tab="billing">Billing</button>
-  </nav>
-
-  <section data-tab-content="general">
-    <section data-setting-group>
+    <section>
       <h2>Appearance</h2>
-
-      <article data-setting>
+      <article>
         <div>
           <h3>Theme</h3>
           <p>Select your preferred theme</p>
@@ -115,20 +34,96 @@ Application settings organized into sections.
           <option>Dark</option>
         </select>
       </article>
-
-      <article data-setting>
+      <article>
         <div>
           <h3>Compact mode</h3>
-          <p>Use smaller spacing</p>
+          <p>Use smaller spacing and font sizes</p>
         </div>
-        <button data-switch aria-checked="false"></button>
+        <button role="switch" aria-checked="false"><span></span></button>
       </article>
     </section>
+    <section>
+      <h2>Language & Region</h2>
+      <article>
+        <div>
+          <h3>Language</h3>
+          <p>Choose your preferred language</p>
+        </div>
+        <select>
+          <option>English</option>
+          <option>Spanish</option>
+          <option>French</option>
+        </select>
+      </article>
+      <article>
+        <div>
+          <h3>Timezone</h3>
+          <p>Set your local timezone</p>
+        </div>
+        <select>
+          <option>UTC-8 (Pacific)</option>
+          <option>UTC-5 (Eastern)</option>
+          <option>UTC+0 (London)</option>
+        </select>
+      </article>
+    </section>
+    <footer>
+      <button>Cancel</button>
+      <button>Save Changes</button>
+    </footer>
+  </article>
+</Preview>
+
+## When to Use
+
+- Application settings
+- User preferences
+- Account management
+- Configuration pages
+
+## Structure
+
+```html
+<article data-view="settings">
+  <header>
+    <h1>Settings</h1>
+    <p>Manage your account settings and preferences.</p>
+  </header>
+
+  <nav>
+    <button aria-selected="true">General</button>
+    <button>Notifications</button>
+    <button>Security</button>
+    <button>Billing</button>
+  </nav>
+
+  <section>
+    <h2>Appearance</h2>
+
+    <article>
+      <div>
+        <h3>Theme</h3>
+        <p>Select your preferred theme</p>
+      </div>
+      <select>
+        <option>System</option>
+        <option>Light</option>
+        <option>Dark</option>
+      </select>
+    </article>
+
+    <article>
+      <div>
+        <h3>Compact mode</h3>
+        <p>Use smaller spacing</p>
+      </div>
+      <button role="switch" aria-checked="false"><span></span></button>
+    </article>
   </section>
 
   <footer>
-    <button data-button="ghost">Cancel</button>
-    <button data-button="primary">Save Changes</button>
+    <button>Cancel</button>
+    <button>Save Changes</button>
   </footer>
 </article>
 ```
@@ -141,25 +136,54 @@ Application settings organized into sections.
   max-width: 800px;
 }
 
-[data-view="settings"] [data-tabs] {
+[data-view="settings"] > header {
+  margin-bottom: var(--spacing-6);
+}
+
+[data-view="settings"] > header h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-view="settings"] > header p {
+  color: var(--muted-foreground);
+}
+
+[data-view="settings"] > nav {
   display: flex;
   gap: var(--spacing-2);
-  border-bottom: 1px solid var(--border);
   margin-bottom: var(--spacing-6);
+  border-bottom: 1px solid var(--border);
   padding-bottom: var(--spacing-2);
 }
 
-[data-view="settings"] [data-setting-group] {
+[data-view="settings"] > nav button {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+
+[data-view="settings"] > nav button[aria-selected="true"] {
+  background: var(--muted);
+  color: inherit;
+  font-weight: 500;
+}
+
+[data-view="settings"] > section {
   margin-bottom: var(--spacing-6);
 }
 
-[data-view="settings"] [data-setting-group] h2 {
+[data-view="settings"] > section h2 {
   font-size: var(--text-lg);
   font-weight: 600;
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="settings"] [data-setting] {
+[data-view="settings"] > section > article {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -169,16 +193,22 @@ Application settings organized into sections.
   margin-bottom: var(--spacing-3);
 }
 
-[data-view="settings"] [data-setting] h3 {
+[data-view="settings"] > section > article h3 {
   font-weight: 500;
 }
 
-[data-view="settings"] [data-setting] p {
+[data-view="settings"] > section > article p {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-view="settings"] [data-switch] {
+[data-view="settings"] > section select {
+  padding: var(--spacing-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-view="settings"] button[role="switch"] {
   width: 44px;
   height: 24px;
   background: var(--muted);
@@ -188,8 +218,7 @@ Application settings organized into sections.
   cursor: pointer;
 }
 
-[data-view="settings"] [data-switch]::after {
-  content: '';
+[data-view="settings"] button[role="switch"] span {
   position: absolute;
   left: 2px;
   top: 2px;
@@ -200,11 +229,56 @@ Application settings organized into sections.
   transition: transform 0.2s;
 }
 
-[data-view="settings"] [data-switch][aria-checked="true"] {
+[data-view="settings"] button[role="switch"][aria-checked="true"] {
   background: var(--primary);
 }
 
-[data-view="settings"] [data-switch][aria-checked="true"]::after {
+[data-view="settings"] button[role="switch"][aria-checked="true"] span {
   transform: translateX(20px);
 }
+
+[data-view="settings"] > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--border);
+}
+
+[data-view="settings"] > footer button:first-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-view="settings"] > footer button:last-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+}
+```
+
+## JavaScript
+
+```js
+// Toggle switches
+document.querySelectorAll('[data-view="settings"] button[role="switch"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const checked = btn.getAttribute('aria-checked') === 'true'
+    btn.setAttribute('aria-checked', !checked)
+  })
+})
+
+// Tab navigation
+document.querySelectorAll('[data-view="settings"] > nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-view="settings"] > nav button').forEach(b => {
+      b.removeAttribute('aria-selected')
+    })
+    btn.setAttribute('aria-selected', 'true')
+  })
+})
 ```

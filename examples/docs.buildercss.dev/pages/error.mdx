@@ -10,25 +10,23 @@ screenshot: /screenshots/pages/error.png
 A generic error page for server errors and unexpected issues.
 
 <Preview>
-  <article data-page="error" style={{ padding: 'var(--spacing-6)', textAlign: 'center', minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-    <div style={{ width: '64px', height: '64px', background: 'var(--destructive)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 'var(--spacing-4)' }}>
-      <span style={{ fontSize: 'var(--text-2xl)', color: 'var(--destructive-foreground)' }}>!</span>
-    </div>
-    <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Something went wrong</h1>
-    <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)', maxWidth: '400px' }}>We're sorry, but something unexpected happened. Please try again later or contact support if the problem persists.</p>
+  <article data-page="error">
+    <figure aria-hidden="true">!</figure>
+    <h1>Something went wrong</h1>
+    <p>We're sorry, but something unexpected happened. Please try again later or contact support if the problem persists.</p>
 
-    <div style={{ display: 'flex', gap: 'var(--spacing-3)', marginBottom: 'var(--spacing-6)' }}>
-      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500 }}>Try Again</button>
-      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontWeight: 500 }}>Go Home</button>
-    </div>
+    <menu>
+      <button>Try Again</button>
+      <a href="#">Go Home</a>
+    </menu>
 
-    <details style={{ textAlign: 'left', maxWidth: '500px', width: '100%' }}>
-      <summary style={{ cursor: 'pointer', fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Technical details</summary>
-      <div style={{ background: 'var(--muted)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>
-        <p>Error Code: 500</p>
-        <p>Request ID: abc-123-def-456</p>
-        <p>Timestamp: 2024-12-01T10:30:00Z</p>
-      </div>
+    <details>
+      <summary>Technical details</summary>
+      <pre>
+Error Code: 500
+Request ID: abc-123-def-456
+Timestamp: 2024-12-01T10:30:00Z
+      </pre>
     </details>
   </article>
 </Preview>
@@ -44,22 +42,22 @@ A generic error page for server errors and unexpected issues.
 
 ```html
 <article data-page="error">
-  <div data-error-icon>!</div>
+  <figure aria-hidden="true">!</figure>
   <h1>Something went wrong</h1>
   <p>We're sorry, but something unexpected happened.</p>
 
-  <div data-actions>
-    <button data-button="primary" onclick="location.reload()">Try Again</button>
-    <a href="/" data-button="outline">Go Home</a>
-  </div>
+  <menu>
+    <button onclick="location.reload()">Try Again</button>
+    <a href="/">Go Home</a>
+  </menu>
 
-  <details data-error-details>
+  <details>
     <summary>Technical details</summary>
-    <div data-error-info>
-      <p>Error Code: 500</p>
-      <p>Request ID: abc-123-def-456</p>
-      <p>Timestamp: 2024-12-01T10:30:00Z</p>
-    </div>
+    <pre>
+Error Code: 500
+Request ID: abc-123-def-456
+Timestamp: 2024-12-01T10:30:00Z
+    </pre>
   </details>
 </article>
 ```
@@ -77,7 +75,7 @@ A generic error page for server errors and unexpected issues.
   justify-content: center;
 }
 
-[data-page="error"] [data-error-icon] {
+[data-page="error"] > figure {
   width: 64px;
   height: 64px;
   background: var(--destructive);
@@ -85,7 +83,7 @@ A generic error page for server errors and unexpected issues.
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--spacing-4);
+  margin: 0 0 var(--spacing-4);
   font-size: var(--text-2xl);
   color: var(--destructive-foreground);
 }
@@ -102,26 +100,43 @@ A generic error page for server errors and unexpected issues.
   max-width: 400px;
 }
 
-[data-page="error"] [data-actions] {
+[data-page="error"] menu {
   display: flex;
   gap: var(--spacing-3);
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="error"] [data-error-details] {
+[data-page="error"] menu button {
+  padding: var(--spacing-3) var(--spacing-6);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+[data-page="error"] menu a {
+  padding: var(--spacing-3) var(--spacing-6);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+[data-page="error"] details {
   text-align: left;
   max-width: 500px;
   width: 100%;
 }
 
-[data-page="error"] [data-error-details] summary {
+[data-page="error"] details summary {
   cursor: pointer;
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="error"] [data-error-info] {
+[data-page="error"] details pre {
   background: var(--muted);
   padding: var(--spacing-3);
   border-radius: var(--radius);
@@ -137,10 +152,10 @@ A generic error page for server errors and unexpected issues.
 
 ```html
 <article data-page="error" data-variant="maintenance">
-  <div data-icon>🔧</div>
+  <figure aria-hidden="true">🔧</figure>
   <h1>Under Maintenance</h1>
   <p>We're performing scheduled maintenance. We'll be back shortly.</p>
-  <p data-eta>Estimated time: 30 minutes</p>
+  <p><time>Estimated time: 30 minutes</time></p>
 </article>
 ```
 
@@ -148,9 +163,9 @@ A generic error page for server errors and unexpected issues.
 
 ```html
 <article data-page="error" data-variant="unavailable">
-  <div data-icon>⚡</div>
+  <figure aria-hidden="true">⚡</figure>
   <h1>Service Temporarily Unavailable</h1>
   <p>We're experiencing high traffic. Please try again in a few minutes.</p>
-  <button data-button="primary" onclick="location.reload()">Refresh Page</button>
+  <button onclick="location.reload()">Refresh Page</button>
 </article>
 ```

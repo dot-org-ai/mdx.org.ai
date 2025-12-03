@@ -10,30 +10,29 @@ screenshot: /screenshots/containers/drawer.png
 A bottom sheet that slides up from the bottom of the screen, commonly used on mobile.
 
 <Preview>
-  <div style={{ position: 'relative', height: '500px', background: 'var(--muted)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }}></div>
-    <article style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'var(--background)', borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0', maxHeight: '70%', display: 'flex', flexDirection: 'column' }}>
-      <header style={{ padding: 'var(--spacing-2) var(--spacing-4)', textAlign: 'center' }}>
-        <div style={{ width: '40px', height: '4px', background: 'var(--muted)', borderRadius: '2px', margin: '0 auto var(--spacing-3)' }}></div>
-        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600 }}>Filter Results</h2>
+  <div data-container="drawer">
+    <article>
+      <header>
+        <span></span>
+        <h2>Filter Results</h2>
       </header>
-      <section style={{ flex: 1, padding: 'var(--spacing-4)', overflow: 'auto' }}>
-        <div style={{ marginBottom: 'var(--spacing-4)' }}>
-          <label style={{ display: 'block', marginBottom: 'var(--spacing-2)', fontWeight: 500 }}>Category</label>
-          <div style={{ display: 'flex', gap: 'var(--spacing-2)', flexWrap: 'wrap' }}>
-            <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius-full)' }}>All</button>
-            <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius-full)' }}>Electronics</button>
-            <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius-full)' }}>Clothing</button>
-          </div>
+      <section>
+        <div>
+          <label>Category</label>
+          <nav>
+            <button aria-current="true">All</button>
+            <button>Electronics</button>
+            <button>Clothing</button>
+          </nav>
         </div>
-        <div style={{ marginBottom: 'var(--spacing-4)' }}>
-          <label style={{ display: 'block', marginBottom: 'var(--spacing-2)', fontWeight: 500 }}>Price Range</label>
-          <input type="range" style={{ width: '100%' }} />
+        <div>
+          <label>Price Range</label>
+          <input type="range" />
         </div>
       </section>
-      <footer style={{ padding: 'var(--spacing-4)', borderTop: '1px solid var(--border)', display: 'flex', gap: 'var(--spacing-2)' }}>
-        <button style={{ flex: 1, padding: 'var(--spacing-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Reset</button>
-        <button style={{ flex: 1, padding: 'var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Apply Filters</button>
+      <footer>
+        <button>Reset</button>
+        <button>Apply Filters</button>
       </footer>
     </article>
   </div>
@@ -50,18 +49,18 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
 ## Structure
 
 ```html
-<aside data-drawer aria-modal="true" aria-hidden="true">
+<aside data-container="drawer" aria-modal="true" aria-hidden="true">
   <article>
     <header>
-      <span data-handle></span>
+      <span></span>
       <h2>Filter Results</h2>
     </header>
     <section>
       <!-- Filter options -->
     </section>
     <footer>
-      <button data-button="ghost">Reset</button>
-      <button data-button="primary">Apply Filters</button>
+      <button>Reset</button>
+      <button>Apply Filters</button>
     </footer>
   </article>
 </aside>
@@ -70,7 +69,7 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
 ## CSS
 
 ```css
-[data-drawer] {
+[data-container="drawer"] {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -79,14 +78,14 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
   justify-content: flex-end;
 }
 
-[data-drawer]::before {
+[data-container="drawer"]::before {
   content: '';
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.3);
 }
 
-[data-drawer] > article {
+[data-container="drawer"] > article {
   position: relative;
   background: var(--background);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
@@ -96,12 +95,12 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
   animation: slideUp 0.3s ease;
 }
 
-[data-drawer] > article > header {
+[data-container="drawer"] > article > header {
   padding: var(--spacing-2) var(--spacing-4);
   text-align: center;
 }
 
-[data-drawer] [data-handle] {
+[data-container="drawer"] > article > header > span {
   display: block;
   width: 40px;
   height: 4px;
@@ -110,24 +109,76 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
   margin: 0 auto var(--spacing-3);
 }
 
-[data-drawer] > article > section {
+[data-container="drawer"] > article > header h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+[data-container="drawer"] > article > section {
   flex: 1;
   padding: var(--spacing-4);
   overflow-y: auto;
 }
 
-[data-drawer] > article > footer {
+[data-container="drawer"] > article > section > div {
+  margin-bottom: var(--spacing-4);
+}
+
+[data-container="drawer"] > article > section label {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  font-weight: 500;
+}
+
+[data-container="drawer"] > article > section nav {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+[data-container="drawer"] > article > section nav button {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--muted);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+[data-container="drawer"] > article > section nav button[aria-current] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[data-container="drawer"] > article > section input[type="range"] {
+  width: 100%;
+}
+
+[data-container="drawer"] > article > footer {
   padding: var(--spacing-4);
   border-top: 1px solid var(--border);
   display: flex;
   gap: var(--spacing-2);
 }
 
-[data-drawer] > article > footer button {
+[data-container="drawer"] > article > footer button {
   flex: 1;
+  padding: var(--spacing-3);
+  border-radius: var(--radius);
+  cursor: pointer;
 }
 
-[data-drawer][aria-hidden="true"] {
+[data-container="drawer"] > article > footer button:first-child {
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+[data-container="drawer"] > article > footer button:last-child {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+}
+
+[data-container="drawer"][aria-hidden="true"] {
   display: none;
 }
 
@@ -140,9 +191,9 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
 ## JavaScript (with Gesture Support)
 
 ```js
-const drawer = document.querySelector('[data-drawer]')
+const drawer = document.querySelector('[data-container="drawer"]')
 const article = drawer.querySelector('article')
-const handle = drawer.querySelector('[data-handle]')
+const handle = drawer.querySelector('header > span')
 
 let startY = 0
 let currentY = 0
@@ -186,19 +237,19 @@ drawer.addEventListener('click', (e) => {
 ### Action Sheet
 
 ```html
-<aside data-drawer data-variant="actions">
+<aside data-container="drawer">
   <article>
     <header>
-      <span data-handle></span>
+      <span></span>
     </header>
     <nav>
-      <button data-action="share">Share</button>
-      <button data-action="copy">Copy Link</button>
-      <button data-action="edit">Edit</button>
-      <button data-action="delete" data-destructive>Delete</button>
+      <button>Share</button>
+      <button>Copy Link</button>
+      <button>Edit</button>
+      <button>Delete</button>
     </nav>
     <footer>
-      <button data-action="close">Cancel</button>
+      <button>Cancel</button>
     </footer>
   </article>
 </aside>
@@ -207,7 +258,7 @@ drawer.addEventListener('click', (e) => {
 ### Map/Full Height
 
 ```html
-<aside data-drawer data-height="full">
+<aside data-container="drawer">
   <article>
     <!-- Can be dragged to different snap points -->
   </article>

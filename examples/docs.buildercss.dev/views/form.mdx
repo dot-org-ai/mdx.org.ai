@@ -10,23 +10,23 @@ screenshot: /screenshots/views/form.png
 A form for creating or editing data with validation.
 
 <Preview>
-  <article data-view="form" style={{ padding: 'var(--spacing-6)', maxWidth: '600px' }}>
-    <header style={{ marginBottom: 'var(--spacing-6)' }}>
-      <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Create Project</h1>
+  <article data-view="form">
+    <header>
+      <h1>Create Project</h1>
     </header>
-    <form style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-4)' }}>
+    <form>
       <div>
-        <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Project Name *</label>
-        <input type="text" placeholder="Enter project name" style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
+        <label>Project Name *</label>
+        <input type="text" placeholder="Enter project name" required />
       </div>
       <div>
-        <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Description</label>
-        <textarea rows="4" placeholder="Describe your project..." style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', resize: 'vertical' }}></textarea>
+        <label>Description</label>
+        <textarea rows="4" placeholder="Describe your project..."></textarea>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-4)' }}>
+      <fieldset>
         <div>
-          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Category</label>
-          <select style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+          <label>Category</label>
+          <select>
             <option>Select category</option>
             <option>Development</option>
             <option>Design</option>
@@ -34,27 +34,34 @@ A form for creating or editing data with validation.
           </select>
         </div>
         <div>
-          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Priority</label>
-          <select style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+          <label>Priority</label>
+          <select>
             <option>Low</option>
             <option>Medium</option>
             <option>High</option>
           </select>
         </div>
-      </div>
+      </fieldset>
       <div>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)', cursor: 'pointer' }}>
+        <label>
           <input type="checkbox" />
-          <span style={{ fontSize: 'var(--text-sm)' }}>Make this project public</span>
+          <span>Make this project public</span>
         </label>
       </div>
-      <div style={{ display: 'flex', gap: 'var(--spacing-2)', justifyContent: 'flex-end', marginTop: 'var(--spacing-4)', paddingTop: 'var(--spacing-4)', borderTop: '1px solid var(--border)' }}>
-        <button type="button" style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Cancel</button>
-        <button type="submit" style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Create Project</button>
-      </div>
     </form>
+    <footer>
+      <button type="button">Cancel</button>
+      <button type="submit">Create Project</button>
+    </footer>
   </article>
 </Preview>
+
+## When to Use
+
+- Create/edit forms
+- Settings forms
+- Multi-step wizards
+- Data entry screens
 
 ## Structure
 
@@ -64,51 +71,49 @@ A form for creating or editing data with validation.
     <h1>Create Project</h1>
   </header>
 
-  <section data-content>
-    <form>
-      <div data-field>
-        <label for="name">Project Name *</label>
-        <input type="text" id="name" required />
-        <span data-error>This field is required</span>
-      </div>
+  <form>
+    <div>
+      <label for="name">Project Name *</label>
+      <input type="text" id="name" required />
+      <span role="alert">This field is required</span>
+    </div>
 
-      <div data-field>
-        <label for="description">Description</label>
-        <textarea id="description" rows="4"></textarea>
-        <span data-hint>Optional description of your project</span>
-      </div>
+    <div>
+      <label for="description">Description</label>
+      <textarea id="description" rows="4"></textarea>
+      <small>Optional description of your project</small>
+    </div>
 
-      <div data-field-group>
-        <div data-field>
-          <label for="category">Category</label>
-          <select id="category">
-            <option value="">Select category</option>
-            <option value="dev">Development</option>
-            <option value="design">Design</option>
-          </select>
-        </div>
-        <div data-field>
-          <label for="priority">Priority</label>
-          <select id="priority">
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </div>
+    <fieldset>
+      <div>
+        <label for="category">Category</label>
+        <select id="category">
+          <option value="">Select category</option>
+          <option value="dev">Development</option>
+          <option value="design">Design</option>
+        </select>
       </div>
+      <div>
+        <label for="priority">Priority</label>
+        <select id="priority">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+    </fieldset>
 
-      <div data-field>
-        <label>
-          <input type="checkbox" name="public" />
-          Make this project public
-        </label>
-      </div>
-    </form>
-  </section>
+    <div>
+      <label>
+        <input type="checkbox" name="public" />
+        Make this project public
+      </label>
+    </div>
+  </form>
 
   <footer>
-    <button data-button="ghost">Cancel</button>
-    <button data-button="primary" type="submit">Create Project</button>
+    <button type="button">Cancel</button>
+    <button type="submit">Create Project</button>
   </footer>
 </article>
 ```
@@ -121,51 +126,83 @@ A form for creating or editing data with validation.
   max-width: 600px;
 }
 
+[data-view="form"] > header {
+  margin-bottom: var(--spacing-6);
+}
+
+[data-view="form"] > header h1 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
 [data-view="form"] form {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
 }
 
-[data-view="form"] [data-field] {
+[data-view="form"] form > div {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-1);
 }
 
-[data-view="form"] [data-field] label {
+[data-view="form"] form label {
   font-weight: 500;
   font-size: var(--text-sm);
 }
 
-[data-view="form"] [data-field] input,
-[data-view="form"] [data-field] textarea,
-[data-view="form"] [data-field] select {
+[data-view="form"] form input[type="text"],
+[data-view="form"] form input[type="email"],
+[data-view="form"] form input[type="password"],
+[data-view="form"] form textarea,
+[data-view="form"] form select {
+  width: 100%;
   padding: var(--spacing-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-view="form"] [data-field] input:focus,
-[data-view="form"] [data-field] textarea:focus {
+[data-view="form"] form textarea {
+  resize: vertical;
+}
+
+[data-view="form"] form input:focus,
+[data-view="form"] form textarea:focus,
+[data-view="form"] form select:focus {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 
-[data-view="form"] [data-field] [data-error] {
+[data-view="form"] form fieldset {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+[data-view="form"] form [role="alert"] {
   color: var(--destructive);
   font-size: var(--text-sm);
   display: none;
 }
 
-[data-view="form"] [data-field][data-invalid] [data-error] {
+[data-view="form"] form div:has(:invalid:not(:placeholder-shown)) [role="alert"] {
   display: block;
 }
 
-[data-view="form"] [data-field-group] {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-4);
+[data-view="form"] form small {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+[data-view="form"] form label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
 }
 
 [data-view="form"] > footer {
@@ -175,5 +212,22 @@ A form for creating or editing data with validation.
   margin-top: var(--spacing-4);
   padding-top: var(--spacing-4);
   border-top: 1px solid var(--border);
+}
+
+[data-view="form"] > footer button:first-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+[data-view="form"] > footer button:last-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
 }
 ```

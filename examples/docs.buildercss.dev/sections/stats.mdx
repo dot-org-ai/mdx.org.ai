@@ -10,24 +10,24 @@ screenshot: /screenshots/sections/stats.png
 Display key metrics and impressive numbers.
 
 <Preview>
-  <section data-section="stats" style={{ padding: 'var(--spacing-16) var(--spacing-4)' }}>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--spacing-8)', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
-      <div>
-        <div style={{ fontSize: 'var(--text-4xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--spacing-2)' }}>10K+</div>
-        <div style={{ color: 'var(--muted-foreground)' }}>Active Users</div>
-      </div>
-      <div>
-        <div style={{ fontSize: 'var(--text-4xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--spacing-2)' }}>99.9%</div>
-        <div style={{ color: 'var(--muted-foreground)' }}>Uptime</div>
-      </div>
-      <div>
-        <div style={{ fontSize: 'var(--text-4xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--spacing-2)' }}>50M+</div>
-        <div style={{ color: 'var(--muted-foreground)' }}>API Requests</div>
-      </div>
-      <div>
-        <div style={{ fontSize: 'var(--text-4xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--spacing-2)' }}>24/7</div>
-        <div style={{ color: 'var(--muted-foreground)' }}>Support</div>
-      </div>
+  <section data-section="stats">
+    <div>
+      <article>
+        <data value="10000">10K+</data>
+        <p>Active Users</p>
+      </article>
+      <article>
+        <data value="99.9">99.9%</data>
+        <p>Uptime</p>
+      </article>
+      <article>
+        <data value="50000000">50M+</data>
+        <p>API Requests</p>
+      </article>
+      <article>
+        <data value="24">24/7</data>
+        <p>Support</p>
+      </article>
     </div>
   </section>
 </Preview>
@@ -43,23 +43,23 @@ Display key metrics and impressive numbers.
 
 ```html
 <section data-section="stats">
-  <div data-stats-grid>
-    <article data-stat>
+  <div>
+    <article>
       <data value="10000">10K+</data>
       <p>Active Users</p>
     </article>
 
-    <article data-stat>
+    <article>
       <data value="99.9">99.9%</data>
       <p>Uptime</p>
     </article>
 
-    <article data-stat>
+    <article>
       <data value="50000000">50M+</data>
       <p>API Requests</p>
     </article>
 
-    <article data-stat>
+    <article>
       <data value="24">24/7</data>
       <p>Support</p>
     </article>
@@ -74,7 +74,7 @@ Display key metrics and impressive numbers.
   padding: var(--spacing-16) var(--spacing-4);
 }
 
-[data-section="stats"] [data-stats-grid] {
+[data-section="stats"] > div {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-8);
@@ -83,7 +83,7 @@ Display key metrics and impressive numbers.
   margin: 0 auto;
 }
 
-[data-section="stats"] [data-stat] data {
+[data-section="stats"] article data {
   display: block;
   font-size: var(--text-4xl);
   font-weight: 700;
@@ -91,18 +91,18 @@ Display key metrics and impressive numbers.
   margin-bottom: var(--spacing-2);
 }
 
-[data-section="stats"] [data-stat] p {
+[data-section="stats"] article p {
   color: var(--muted-foreground);
 }
 
 @media (max-width: 768px) {
-  [data-section="stats"] [data-stats-grid] {
+  [data-section="stats"] > div {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
-  [data-section="stats"] [data-stats-grid] {
+  [data-section="stats"] > div {
     grid-template-columns: 1fr;
   }
 }
@@ -113,11 +113,11 @@ Display key metrics and impressive numbers.
 ### With Icons
 
 ```html
-<section data-section="stats" data-variant="icons">
-  <article data-stat>
-    <div data-icon>
+<section data-section="stats">
+  <article>
+    <figure>
       <svg><!-- Users icon --></svg>
-    </div>
+    </figure>
     <data value="10000">10K+</data>
     <p>Active Users</p>
   </article>
@@ -127,9 +127,9 @@ Display key metrics and impressive numbers.
 ### Animated Counters
 
 ```html
-<section data-section="stats" data-animate>
-  <article data-stat>
-    <data value="10000" data-counter>0</data>
+<section data-section="stats">
+  <article>
+    <data value="10000">0</data>
     <p>Active Users</p>
   </article>
 </section>
@@ -137,12 +137,12 @@ Display key metrics and impressive numbers.
 
 ```js
 // Counter animation
-const counters = document.querySelectorAll('[data-counter]')
+const counters = document.querySelectorAll('[data-section="stats"] data')
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       const counter = entry.target
-      const target = parseInt(counter.dataset.value)
+      const target = parseInt(counter.getAttribute('value'))
       animateCounter(counter, target)
     }
   })
@@ -154,20 +154,20 @@ counters.forEach(counter => observer.observe(counter))
 ### With Background
 
 ```html
-<section data-section="stats" data-variant="dark">
-  <div data-stats-grid>
+<section data-section="stats" aria-current="true">
+  <div>
     <!-- Stats with light text -->
   </div>
 </section>
 ```
 
 ```css
-[data-section="stats"][data-variant="dark"] {
+[data-section="stats"][aria-current] {
   background: var(--foreground);
   color: var(--background);
 }
 
-[data-section="stats"][data-variant="dark"] [data-stat] data {
+[data-section="stats"][aria-current] article data {
   color: var(--background);
 }
 ```

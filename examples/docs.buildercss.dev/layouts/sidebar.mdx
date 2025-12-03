@@ -10,18 +10,18 @@ screenshot: /screenshots/layouts/sidebar.png
 A two-column layout with a persistent sidebar for navigation. Best for applications and dashboards.
 
 <Preview>
-  <div data-layout="sidebar" style={{ display: 'grid', gridTemplateColumns: '200px 1fr', minHeight: '400px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-    <aside style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRight: '1px solid var(--border)' }}>
+  <div data-layout="sidebar">
+    <aside>
       <nav>
-        <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>Navigation</h3>
-        <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-1)' }}>
-          <li><a href="#" style={{ display: 'block', padding: 'var(--spacing-2)', borderRadius: 'var(--radius)', background: 'var(--primary)', color: 'var(--primary-foreground)' }}>Dashboard</a></li>
-          <li><a href="#" style={{ display: 'block', padding: 'var(--spacing-2)' }}>Projects</a></li>
-          <li><a href="#" style={{ display: 'block', padding: 'var(--spacing-2)' }}>Settings</a></li>
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="#" aria-current="page">Dashboard</a></li>
+          <li><a href="#">Projects</a></li>
+          <li><a href="#">Settings</a></li>
         </ul>
       </nav>
     </aside>
-    <main style={{ padding: 'var(--spacing-6)' }}>
+    <main>
       <h1>Dashboard</h1>
       <p>Main content area with full width.</p>
     </main>
@@ -39,9 +39,9 @@ A two-column layout with a persistent sidebar for navigation. Best for applicati
 
 ```html
 <body data-layout="sidebar">
-  <aside data-sidebar>
+  <aside>
     <nav>
-      <a href="/" data-logo>Brand</a>
+      <a href="/">Brand</a>
       <ul>
         <li><a href="/dashboard" aria-current="page">Dashboard</a></li>
         <li><a href="/projects">Projects</a></li>
@@ -65,7 +65,7 @@ A two-column layout with a persistent sidebar for navigation. Best for applicati
   min-height: 100vh;
 }
 
-[data-layout="sidebar"] > [data-sidebar] {
+[data-layout="sidebar"] > aside {
   background: var(--muted);
   border-right: 1px solid var(--border);
   padding: var(--spacing-4);
@@ -73,6 +73,31 @@ A two-column layout with a persistent sidebar for navigation. Best for applicati
   top: 0;
   height: 100vh;
   overflow-y: auto;
+}
+
+[data-layout="sidebar"] > aside h3 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-layout="sidebar"] > aside ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+[data-layout="sidebar"] > aside a {
+  display: block;
+  padding: var(--spacing-2);
+  border-radius: var(--radius);
+}
+
+[data-layout="sidebar"] > aside a[aria-current] {
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 [data-layout="sidebar"] > main {
@@ -85,7 +110,7 @@ A two-column layout with a persistent sidebar for navigation. Best for applicati
     grid-template-columns: 1fr;
   }
 
-  [data-layout="sidebar"] > [data-sidebar] {
+  [data-layout="sidebar"] > aside {
     display: none;
   }
 }

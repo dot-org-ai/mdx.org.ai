@@ -10,75 +10,79 @@ screenshot: /screenshots/views/editor.png
 A code or text editor view, typically Monaco-based for rich editing.
 
 <Preview>
-  <article data-view="editor" style={{ display: 'flex', flexDirection: 'column', height: '400px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--muted)', borderBottom: '1px solid var(--border)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>
-        <span style={{ fontSize: 'var(--text-sm)' }}>📄 index.ts</span>
-        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>Modified</span>
+  <article data-view="editor">
+    <header>
+      <div>
+        <span>📄 index.ts</span>
+        <mark>Modified</mark>
       </div>
-      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-        <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Format</button>
-        <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Save</button>
-      </div>
+      <menu>
+        <button>Format</button>
+        <button>Save</button>
+      </menu>
     </header>
-    <div style={{ display: 'flex', flex: 1 }}>
-      <aside style={{ width: '40px', background: 'var(--muted)', borderRight: '1px solid var(--border)', padding: 'var(--spacing-2)', fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', textAlign: 'right' }}>
-        <div>1</div>
-        <div>2</div>
-        <div>3</div>
-        <div>4</div>
-        <div>5</div>
-        <div>6</div>
-        <div>7</div>
-        <div>8</div>
+    <div>
+      <aside>
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>4</span>
+        <span>5</span>
+        <span>6</span>
+        <span>7</span>
+        <span>8</span>
       </aside>
-      <pre style={{ flex: 1, padding: 'var(--spacing-2)', margin: 0, fontFamily: 'monospace', fontSize: 'var(--text-sm)', lineHeight: 1.5, overflow: 'auto' }}>
-{`import { Database } from 'mdxdb'
+      <pre><code>{`import { Database } from 'mdxdb'
 
 export async function handler(req) {
   const db = new Database()
   const items = await db.list()
 
   return Response.json(items)
-}`}
-      </pre>
+}`}</code></pre>
     </div>
-    <footer style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--spacing-1) var(--spacing-4)', background: 'var(--muted)', borderTop: '1px solid var(--border)', fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>
+    <footer>
       <span>TypeScript</span>
       <span>Ln 3, Col 12</span>
     </footer>
   </article>
 </Preview>
 
+## When to Use
+
+- Code editors
+- Text editors
+- Configuration editing
+- Documentation editing
+- JSON/YAML editing
+
 ## Structure
 
 ```html
 <article data-view="editor">
   <header>
-    <div data-file-info>
-      <span data-filename>index.ts</span>
-      <span data-status>Modified</span>
+    <div>
+      <span>📄 index.ts</span>
+      <mark>Modified</mark>
     </div>
-    <div data-actions>
+    <menu>
       <button>Format</button>
-      <button data-button="primary">Save</button>
-    </div>
+      <button>Save</button>
+    </menu>
   </header>
 
-  <div data-editor-container>
-    <aside data-line-numbers>
+  <div>
+    <aside>
       <span>1</span>
       <span>2</span>
-      <!-- ... -->
+      <!-- Line numbers -->
     </aside>
-    <div data-editor>
-      <!-- Monaco or CodeMirror instance -->
-    </div>
+    <pre><code><!-- Editor content --></code></pre>
   </div>
 
-  <footer data-status-bar>
-    <span data-language>TypeScript</span>
-    <span data-position>Ln 3, Col 12</span>
+  <footer>
+    <span>TypeScript</span>
+    <span>Ln 3, Col 12</span>
   </footer>
 </article>
 ```
@@ -90,6 +94,9 @@ export async function handler(req) {
   display: flex;
   flex-direction: column;
   height: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 [data-view="editor"] > header {
@@ -101,13 +108,51 @@ export async function handler(req) {
   border-bottom: 1px solid var(--border);
 }
 
-[data-view="editor"] [data-editor-container] {
+[data-view="editor"] > header > div {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+[data-view="editor"] > header > div span {
+  font-size: var(--text-sm);
+}
+
+[data-view="editor"] > header mark {
+  font-size: var(--text-xs);
+  background: transparent;
+  color: var(--muted-foreground);
+}
+
+[data-view="editor"] > header menu {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-view="editor"] > header menu button:first-child {
+  padding: var(--spacing-1) var(--spacing-3);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+}
+
+[data-view="editor"] > header menu button:last-child {
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+}
+
+[data-view="editor"] > div {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
-[data-view="editor"] [data-line-numbers] {
+[data-view="editor"] > div > aside {
   width: 40px;
   background: var(--muted);
   border-right: 1px solid var(--border);
@@ -116,18 +161,21 @@ export async function handler(req) {
   font-size: var(--text-xs);
   color: var(--muted-foreground);
   text-align: right;
+  display: flex;
+  flex-direction: column;
 }
 
-[data-view="editor"] [data-editor] {
+[data-view="editor"] > div > pre {
   flex: 1;
   padding: var(--spacing-2);
+  margin: 0;
   font-family: monospace;
   font-size: var(--text-sm);
   line-height: 1.5;
   overflow: auto;
 }
 
-[data-view="editor"] [data-status-bar] {
+[data-view="editor"] > footer {
   display: flex;
   justify-content: space-between;
   padding: var(--spacing-1) var(--spacing-4);
@@ -163,6 +211,6 @@ function Editor({ value, language, onChange }) {
     return () => editorRef.current?.dispose()
   }, [])
 
-  return <div ref={containerRef} data-editor />
+  return <div ref={containerRef} />
 }
 ```

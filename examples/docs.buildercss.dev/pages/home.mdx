@@ -10,34 +10,35 @@ screenshot: /screenshots/pages/home.png
 A marketing landing page template combining hero, features, testimonials, and CTA sections.
 
 <Preview>
-  <article data-page="home" style={{ background: 'var(--background)' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4) var(--spacing-6)', borderBottom: '1px solid var(--border)' }}>
-      <span style={{ fontWeight: 700, fontSize: 'var(--text-xl)' }}>Acme</span>
-      <nav style={{ display: 'flex', gap: 'var(--spacing-6)', fontSize: 'var(--text-sm)' }}>
-        <a href="#" style={{ color: 'var(--foreground)' }}>Features</a>
-        <a href="#" style={{ color: 'var(--muted-foreground)' }}>Pricing</a>
-        <a href="#" style={{ color: 'var(--muted-foreground)' }}>Docs</a>
+  <article data-page="home">
+    <header>
+      <a href="/">Acme</a>
+      <nav>
+        <a href="#features" aria-current="page">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#docs">Docs</a>
       </nav>
-      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Get Started</button>
+      <button>Get Started</button>
     </header>
 
-    <section style={{ padding: 'var(--spacing-16) var(--spacing-6)', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
-      <span style={{ display: 'inline-block', padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--muted)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-4)' }}>New: v2.0 Released</span>
-      <h1 style={{ fontSize: 'var(--text-4xl)', fontWeight: 800, marginBottom: 'var(--spacing-4)', lineHeight: 1.1 }}>Build better products with semantic HTML</h1>
-      <p style={{ fontSize: 'var(--text-lg)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)' }}>A design system that uses data attributes instead of utility classes. Clean HTML, powerful styling.</p>
-      <div style={{ display: 'flex', gap: 'var(--spacing-3)', justifyContent: 'center' }}>
-        <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500 }}>Start Building</button>
-        <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontWeight: 500 }}>View Docs</button>
-      </div>
+    <section aria-label="Hero">
+      <mark>New: v2.0 Released</mark>
+      <h1>Build better products with semantic HTML</h1>
+      <p>A design system that uses data attributes instead of utility classes. Clean HTML, powerful styling.</p>
+      <menu>
+        <button>Start Building</button>
+        <button>View Docs</button>
+      </menu>
     </section>
 
-    <section style={{ padding: 'var(--spacing-8) var(--spacing-6)', background: 'var(--muted)' }}>
-      <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>Trusted by teams at</p>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-8)', opacity: 0.5 }}>
-        {['Vercel', 'Stripe', 'Linear', 'Notion'].map(name => (
-          <span key={name} style={{ fontWeight: 600 }}>{name}</span>
-        ))}
-      </div>
+    <section aria-label="Social proof">
+      <p>Trusted by teams at</p>
+      <ul>
+        <li>Vercel</li>
+        <li>Stripe</li>
+        <li>Linear</li>
+        <li>Notion</li>
+      </ul>
     </section>
   </article>
 </Preview>
@@ -53,48 +54,48 @@ A marketing landing page template combining hero, features, testimonials, and CT
 
 ```html
 <article data-page="home">
-  <header data-navbar>
-    <a data-logo href="/">Acme</a>
-    <nav data-nav-links>
+  <header>
+    <a href="/">Acme</a>
+    <nav>
       <a href="#features">Features</a>
       <a href="#pricing">Pricing</a>
       <a href="#docs">Docs</a>
     </nav>
-    <button data-button="primary">Get Started</button>
+    <button>Get Started</button>
   </header>
 
-  <section data-section="hero">
-    <span data-badge>New: v2.0 Released</span>
+  <section aria-label="Hero">
+    <mark>New: v2.0 Released</mark>
     <h1>Build better products with semantic HTML</h1>
     <p>A design system that uses data attributes...</p>
-    <div data-actions>
-      <button data-button="primary">Start Building</button>
-      <button data-button="outline">View Docs</button>
-    </div>
+    <menu>
+      <button>Start Building</button>
+      <button>View Docs</button>
+    </menu>
   </section>
 
-  <section data-section="logos">
+  <section aria-label="Social proof">
     <p>Trusted by teams at</p>
-    <div data-logo-grid>
-      <img src="/logos/vercel.svg" alt="Vercel" />
-      <img src="/logos/stripe.svg" alt="Stripe" />
-    </div>
+    <ul>
+      <li><img src="/logos/vercel.svg" alt="Vercel" /></li>
+      <li><img src="/logos/stripe.svg" alt="Stripe" /></li>
+    </ul>
   </section>
 
-  <section data-section="features">
+  <section aria-label="Features">
     <!-- Feature cards -->
   </section>
 
-  <section data-section="testimonials">
+  <section aria-label="Testimonials">
     <!-- Testimonial cards -->
   </section>
 
-  <section data-section="cta">
+  <section aria-label="Call to action">
     <h2>Ready to get started?</h2>
-    <button data-button="primary">Start Free Trial</button>
+    <button>Start Free Trial</button>
   </section>
 
-  <footer data-footer>
+  <footer>
     <!-- Footer content -->
   </footer>
 </article>
@@ -107,7 +108,7 @@ A marketing landing page template combining hero, features, testimonials, and CT
   min-height: 100vh;
 }
 
-[data-page="home"] [data-navbar] {
+[data-page="home"] > header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -119,23 +120,107 @@ A marketing landing page template combining hero, features, testimonials, and CT
   z-index: 50;
 }
 
-[data-page="home"] [data-section="hero"] {
+[data-page="home"] > header > a:first-child {
+  font-weight: 700;
+  font-size: var(--text-xl);
+}
+
+[data-page="home"] > header nav {
+  display: flex;
+  gap: var(--spacing-6);
+  font-size: var(--text-sm);
+}
+
+[data-page="home"] > header nav a {
+  color: var(--muted-foreground);
+}
+
+[data-page="home"] > header nav a[aria-current="page"] {
+  color: var(--foreground);
+}
+
+[data-page="home"] > header > button {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+}
+
+[data-page="home"] > section[aria-label="Hero"] {
   padding: var(--spacing-16) var(--spacing-6);
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
 }
 
-[data-page="home"] [data-section="hero"] h1 {
+[data-page="home"] > section[aria-label="Hero"] mark {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--muted);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="home"] > section[aria-label="Hero"] h1 {
   font-size: var(--text-4xl);
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="home"] [data-actions] {
+[data-page="home"] > section[aria-label="Hero"] p {
+  font-size: var(--text-lg);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="home"] > section[aria-label="Hero"] menu {
   display: flex;
   gap: var(--spacing-3);
   justify-content: center;
+}
+
+[data-page="home"] > section[aria-label="Hero"] menu button:first-child {
+  padding: var(--spacing-3) var(--spacing-6);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+[data-page="home"] > section[aria-label="Hero"] menu button:last-child {
+  padding: var(--spacing-3) var(--spacing-6);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+[data-page="home"] > section[aria-label="Social proof"] {
+  padding: var(--spacing-8) var(--spacing-6);
+  background: var(--muted);
+}
+
+[data-page="home"] > section[aria-label="Social proof"] p {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="home"] > section[aria-label="Social proof"] ul {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-8);
+  list-style: none;
+  padding: 0;
+  opacity: 0.5;
+}
+
+[data-page="home"] > section[aria-label="Social proof"] li {
+  font-weight: 600;
 }
 ```

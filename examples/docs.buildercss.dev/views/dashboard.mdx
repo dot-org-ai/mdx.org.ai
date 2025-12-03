@@ -10,52 +10,59 @@ screenshot: /screenshots/views/dashboard.png
 An overview dashboard displaying key metrics, charts, and quick actions.
 
 <Preview>
-  <article data-view="dashboard" style={{ padding: 'var(--spacing-6)' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
-      <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700 }}>Dashboard</h1>
-      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Export</button>
-        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Settings</button>
-      </div>
+  <article data-view="dashboard">
+    <header>
+      <h1>Dashboard</h1>
+      <menu>
+        <button>Export</button>
+        <button>Settings</button>
+      </menu>
     </header>
-    <section style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--spacing-4)', marginBottom: 'var(--spacing-6)' }}>
-      <article style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)' }}>
-        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Total Users</span>
-        <p style={{ fontSize: 'var(--text-3xl)', fontWeight: 700 }}>12,345</p>
-        <span style={{ fontSize: 'var(--text-sm)', color: 'green' }}>+12% ↑</span>
+    <section aria-label="Metrics">
+      <article>
+        <header><span>Total Users</span></header>
+        <data value="12345">12,345</data>
+        <footer>+12% from last month</footer>
       </article>
-      <article style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)' }}>
-        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Revenue</span>
-        <p style={{ fontSize: 'var(--text-3xl)', fontWeight: 700 }}>$45.2K</p>
-        <span style={{ fontSize: 'var(--text-sm)', color: 'green' }}>+8% ↑</span>
+      <article>
+        <header><span>Revenue</span></header>
+        <data value="45200">$45.2K</data>
+        <footer>+8% from last month</footer>
       </article>
-      <article style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)' }}>
-        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Active Now</span>
-        <p style={{ fontSize: 'var(--text-3xl)', fontWeight: 700 }}>573</p>
-        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>users online</span>
+      <article>
+        <header><span>Active Now</span></header>
+        <data value="573">573</data>
+        <footer>users online</footer>
       </article>
-      <article style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)' }}>
-        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Conversion</span>
-        <p style={{ fontSize: 'var(--text-3xl)', fontWeight: 700 }}>3.2%</p>
-        <span style={{ fontSize: 'var(--text-sm)', color: 'red' }}>-2% ↓</span>
+      <article>
+        <header><span>Conversion</span></header>
+        <data value="3.2">3.2%</data>
+        <footer>-2% from last month</footer>
       </article>
     </section>
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--spacing-4)' }}>
-      <article style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)' }}>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Revenue Over Time</h3>
-        <div style={{ height: '150px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>[Chart]</div>
+    <div>
+      <article>
+        <header><h3>Revenue Over Time</h3></header>
+        <figure>[Chart]</figure>
       </article>
-      <article style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)' }}>
-        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Recent Activity</h3>
-        <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
-          <li style={{ padding: 'var(--spacing-2) 0', borderBottom: '1px solid var(--border)' }}>New user signed up</li>
-          <li style={{ padding: 'var(--spacing-2) 0', borderBottom: '1px solid var(--border)' }}>Payment received</li>
-          <li style={{ padding: 'var(--spacing-2) 0' }}>Report generated</li>
+      <aside>
+        <header><h3>Recent Activity</h3></header>
+        <ul>
+          <li>New user signed up</li>
+          <li>Payment received</li>
+          <li>Report generated</li>
         </ul>
-      </article>
+      </aside>
     </div>
   </article>
 </Preview>
+
+## When to Use
+
+- Admin dashboards
+- Analytics overview
+- KPI monitoring
+- Quick status checks
 
 ## Structure
 
@@ -70,7 +77,7 @@ An overview dashboard displaying key metrics, charts, and quick actions.
   </header>
 
   <section aria-label="Metrics">
-    <article data-metric>
+    <article>
       <header><span>Total Users</span></header>
       <data value="12345">12,345</data>
       <footer>+12% from last month</footer>
@@ -78,19 +85,17 @@ An overview dashboard displaying key metrics, charts, and quick actions.
     <!-- More metrics -->
   </section>
 
-  <section aria-label="Charts">
+  <div>
     <article>
       <header><h3>Revenue</h3></header>
       <figure><!-- Chart component --></figure>
     </article>
-  </section>
 
-  <section aria-label="Recent activity">
-    <article>
+    <aside>
       <header><h3>Recent Activity</h3></header>
-      <ul data-activity-list><!-- Activity items --></ul>
-    </article>
-  </section>
+      <ul><!-- Activity items --></ul>
+    </aside>
+  </div>
 </article>
 ```
 
@@ -108,6 +113,31 @@ An overview dashboard displaying key metrics, charts, and quick actions.
   margin-bottom: var(--spacing-6);
 }
 
+[data-view="dashboard"] > header h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+[data-view="dashboard"] > header menu {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-view="dashboard"] > header menu button:first-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-view="dashboard"] > header menu button:last-child {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+}
+
 [data-view="dashboard"] [aria-label="Metrics"] {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -115,16 +145,70 @@ An overview dashboard displaying key metrics, charts, and quick actions.
   margin-bottom: var(--spacing-6);
 }
 
-[data-view="dashboard"] [data-metric] {
+[data-view="dashboard"] [aria-label="Metrics"] > article {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-4);
 }
 
-[data-view="dashboard"] [data-metric] data {
+[data-view="dashboard"] [aria-label="Metrics"] header span {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-view="dashboard"] [aria-label="Metrics"] data {
   display: block;
   font-size: var(--text-3xl);
   font-weight: 700;
+}
+
+[data-view="dashboard"] [aria-label="Metrics"] footer {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+[data-view="dashboard"] > div {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--spacing-4);
+}
+
+[data-view="dashboard"] > div > article,
+[data-view="dashboard"] > div > aside {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+}
+
+[data-view="dashboard"] > div h3 {
+  font-weight: 600;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-view="dashboard"] > div figure {
+  height: 150px;
+  background: var(--muted);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+}
+
+[data-view="dashboard"] > div ul {
+  list-style: none;
+  padding: 0;
+}
+
+[data-view="dashboard"] > div ul li {
+  padding: var(--spacing-2) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+
+[data-view="dashboard"] > div ul li:last-child {
+  border-bottom: none;
 }
 ```

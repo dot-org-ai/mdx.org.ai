@@ -10,54 +10,54 @@ screenshot: /screenshots/pages/docs.png
 A documentation page with sidebar navigation and table of contents.
 
 <Preview>
-  <article data-page="docs" style={{ display: 'grid', gridTemplateColumns: '240px 1fr 200px', minHeight: '400px' }}>
-    <aside style={{ padding: 'var(--spacing-4)', borderRight: '1px solid var(--border)' }}>
-      <div style={{ marginBottom: 'var(--spacing-4)' }}>
-        <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Getting Started</h4>
-        <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
-          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Introduction</a></li>
-          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--primary)', fontWeight: 500 }}>Installation</a></li>
-          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Quick Start</a></li>
+  <article data-page="docs">
+    <aside aria-label="Navigation">
+      <nav>
+        <h4>Getting Started</h4>
+        <ul>
+          <li><a href="#">Introduction</a></li>
+          <li><a href="#" aria-current="page">Installation</a></li>
+          <li><a href="#">Quick Start</a></li>
         </ul>
-      </div>
-      <div>
-        <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Components</h4>
-        <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
-          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Buttons</a></li>
-          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Forms</a></li>
-          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Cards</a></li>
+      </nav>
+      <nav>
+        <h4>Components</h4>
+        <ul>
+          <li><a href="#">Buttons</a></li>
+          <li><a href="#">Forms</a></li>
+          <li><a href="#">Cards</a></li>
         </ul>
-      </div>
+      </nav>
     </aside>
 
-    <main style={{ padding: 'var(--spacing-6)' }}>
-      <nav style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>
-        Docs / Getting Started / <span>Installation</span>
+    <main>
+      <nav aria-label="Breadcrumb">
+        <span>Docs</span> / <span>Getting Started</span> / <span>Installation</span>
       </nav>
-      <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Installation</h1>
-      <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)' }}>Get started with Builder CSS in your project.</p>
+      <h1>Installation</h1>
+      <p>Get started with Builder CSS in your project.</p>
 
-      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>Using npm</h2>
-      <div style={{ background: 'var(--muted)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-6)' }}>
-        npm install @builder/css
-      </div>
+      <section>
+        <h2>Using npm</h2>
+        <pre><code>npm install @builder/css</code></pre>
+      </section>
 
-      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>Using CDN</h2>
-      <div style={{ background: 'var(--muted)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-sm)' }}>
-        {'<link href="https://cdn.builder.css" rel="stylesheet" />'}
-      </div>
+      <section>
+        <h2>Using CDN</h2>
+        <pre><code>&lt;link href="https://cdn.builder.css" rel="stylesheet" /&gt;</code></pre>
+      </section>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--spacing-8)', paddingTop: 'var(--spacing-4)', borderTop: '1px solid var(--border)' }}>
-        <a href="#" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>← Introduction</a>
-        <a href="#" style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)' }}>Quick Start →</a>
-      </div>
+      <nav aria-label="Page navigation">
+        <a href="#">← Introduction</a>
+        <a href="#">Quick Start →</a>
+      </nav>
     </main>
 
-    <aside style={{ padding: 'var(--spacing-4)', borderLeft: '1px solid var(--border)' }}>
-      <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>On this page</h4>
-      <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
-        <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--primary)' }}>Using npm</a></li>
-        <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Using CDN</a></li>
+    <aside aria-label="Table of contents">
+      <h4>On this page</h4>
+      <ul>
+        <li><a href="#" aria-current="true">Using npm</a></li>
+        <li><a href="#">Using CDN</a></li>
       </ul>
     </aside>
   </article>
@@ -74,16 +74,16 @@ A documentation page with sidebar navigation and table of contents.
 
 ```html
 <article data-page="docs">
-  <aside data-sidebar>
-    <nav data-nav-section>
+  <aside aria-label="Navigation">
+    <nav>
       <h4>Getting Started</h4>
       <ul>
         <li><a href="/docs/intro">Introduction</a></li>
-        <li><a href="/docs/install" data-active>Installation</a></li>
+        <li><a href="/docs/install" aria-current="page">Installation</a></li>
         <li><a href="/docs/quickstart">Quick Start</a></li>
       </ul>
     </nav>
-    <nav data-nav-section>
+    <nav>
       <h4>Components</h4>
       <ul>
         <li><a href="/docs/buttons">Buttons</a></li>
@@ -92,26 +92,30 @@ A documentation page with sidebar navigation and table of contents.
     </nav>
   </aside>
 
-  <main data-content>
-    <nav data-breadcrumb>
+  <main>
+    <nav aria-label="Breadcrumb">
       Docs / Getting Started / Installation
     </nav>
     <h1>Installation</h1>
-    <p data-lead>Get started with Builder CSS...</p>
+    <p>Get started with Builder CSS...</p>
 
-    <h2 id="npm">Using npm</h2>
-    <pre><code>npm install @builder/css</code></pre>
+    <section>
+      <h2 id="npm">Using npm</h2>
+      <pre><code>npm install @builder/css</code></pre>
+    </section>
 
-    <h2 id="cdn">Using CDN</h2>
-    <pre><code>&lt;link href="..." /&gt;</code></pre>
+    <section>
+      <h2 id="cdn">Using CDN</h2>
+      <pre><code>&lt;link href="..." /&gt;</code></pre>
+    </section>
 
-    <nav data-pagination>
-      <a href="/docs/intro" data-prev>← Introduction</a>
-      <a href="/docs/quickstart" data-next>Quick Start →</a>
+    <nav aria-label="Page navigation">
+      <a href="/docs/intro">← Introduction</a>
+      <a href="/docs/quickstart">Quick Start →</a>
     </nav>
   </main>
 
-  <aside data-toc>
+  <aside aria-label="Table of contents">
     <h4>On this page</h4>
     <ul>
       <li><a href="#npm">Using npm</a></li>
@@ -130,7 +134,7 @@ A documentation page with sidebar navigation and table of contents.
   min-height: 100vh;
 }
 
-[data-page="docs"] [data-sidebar] {
+[data-page="docs"] > aside[aria-label="Navigation"] {
   padding: var(--spacing-4);
   border-right: 1px solid var(--border);
   position: sticky;
@@ -139,36 +143,93 @@ A documentation page with sidebar navigation and table of contents.
   overflow-y: auto;
 }
 
-[data-page="docs"] [data-nav-section] h4 {
+[data-page="docs"] > aside[aria-label="Navigation"] nav {
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="docs"] > aside[aria-label="Navigation"] h4 {
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="docs"] [data-nav-section] ul {
+[data-page="docs"] > aside[aria-label="Navigation"] ul {
   list-style: none;
   padding: 0;
   font-size: var(--text-sm);
 }
 
-[data-page="docs"] [data-nav-section] a {
+[data-page="docs"] > aside[aria-label="Navigation"] a {
   display: block;
   padding: var(--spacing-1) 0;
   color: var(--muted-foreground);
 }
 
-[data-page="docs"] [data-nav-section] a[data-active] {
+[data-page="docs"] > aside[aria-label="Navigation"] a[aria-current="page"] {
   color: var(--primary);
   font-weight: 500;
 }
 
-[data-page="docs"] [data-content] {
+[data-page="docs"] > main {
   padding: var(--spacing-6);
   max-width: 800px;
 }
 
-[data-page="docs"] [data-toc] {
+[data-page="docs"] > main > nav[aria-label="Breadcrumb"] {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="docs"] > main h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="docs"] > main > p {
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="docs"] > main section {
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="docs"] > main section h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-3);
+}
+
+[data-page="docs"] > main pre {
+  background: var(--muted);
+  padding: var(--spacing-3);
+  border-radius: var(--radius);
+  font-family: monospace;
+  font-size: var(--text-sm);
+  overflow-x: auto;
+}
+
+[data-page="docs"] > main > nav[aria-label="Page navigation"] {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--spacing-8);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+
+[data-page="docs"] > main > nav[aria-label="Page navigation"] a:first-child {
+  color: var(--muted-foreground);
+}
+
+[data-page="docs"] > main > nav[aria-label="Page navigation"] a:last-child {
+  color: var(--primary);
+}
+
+[data-page="docs"] > aside[aria-label="Table of contents"] {
   padding: var(--spacing-4);
   border-left: 1px solid var(--border);
   position: sticky;
@@ -176,11 +237,25 @@ A documentation page with sidebar navigation and table of contents.
   height: fit-content;
 }
 
-[data-page="docs"] [data-pagination] {
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--spacing-8);
-  padding-top: var(--spacing-4);
-  border-top: 1px solid var(--border);
+[data-page="docs"] > aside[aria-label="Table of contents"] h4 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--spacing-3);
+}
+
+[data-page="docs"] > aside[aria-label="Table of contents"] ul {
+  list-style: none;
+  padding: 0;
+  font-size: var(--text-sm);
+}
+
+[data-page="docs"] > aside[aria-label="Table of contents"] a {
+  display: block;
+  padding: var(--spacing-1) 0;
+  color: var(--muted-foreground);
+}
+
+[data-page="docs"] > aside[aria-label="Table of contents"] a[aria-current="true"] {
+  color: var(--primary);
 }
 ```
