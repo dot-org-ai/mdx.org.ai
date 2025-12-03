@@ -1,0 +1,54 @@
+{
+  "name": "@mdxld/extract",
+  "version": "0.0.1",
+  "description": "Bi-directional MDX ↔ Markdown translation - extract structured data from rendered content",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./integration": {
+      "types": "./dist/integration.d.ts",
+      "import": "./dist/integration.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts src/integration.ts --format esm --dts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "mdx",
+    "markdown",
+    "extract",
+    "parse",
+    "bidirectional",
+    "round-trip",
+    "template",
+    "cms",
+    "headless",
+    "ai"
+  ],
+  "author": "MDX.org.ai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxld/extract"
+  },
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
