@@ -430,13 +430,9 @@ export function mdxTestPlugin(options: ExtractTestsOptions = {}) {
       if (!id.endsWith('.mdx')) return null
 
       // For *.test.mdx files, always transform
-      // For regular *.mdx files, only transform if they have test blocks
+      // For regular *.mdx files, always transform to prevent parse errors
       const isTestFile = id.endsWith('.test.mdx')
       const tests = extractTests(code, options)
-
-      if (!isTestFile && tests.length === 0) {
-        return null
-      }
 
       const testFile: MDXTestFile = {
         path: id,
