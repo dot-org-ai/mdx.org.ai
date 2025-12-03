@@ -101,3 +101,25 @@ export type {
   ComponentRenderers,
   CreateComponentsOptions,
 } from './factory.js'
+
+// Export type loader for MDX component type definitions
+export {
+  parsePropDef,
+  parsePartDef,
+  parseCSSVariableDef,
+  parseFrontmatter,
+  parseComponentType,
+  loadComponentTypes,
+  getComponentType,
+  getTypesByCategory,
+  getTypeCategories,
+  generateTypeScriptInterface,
+} from './type-loader.js'
+
+export type {
+  PropDef,
+  PartDef,
+  CSSVariableDef,
+  JSONLDMapping,
+  ComponentType,
+} from './type-loader.js'
