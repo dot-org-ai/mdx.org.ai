@@ -10,5 +10,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ['mdxld'],
+  external: ['mdxld', 'ai-database'],
 })

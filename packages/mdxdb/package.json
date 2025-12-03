@@ -45,6 +45,9 @@
     "client"
   ],
   "license": "MIT",
+  "dependencies": {
+    "ai-database": "workspace:*"
+  },
   "peerDependencies": {
     "mdxld": "workspace:*"
   },

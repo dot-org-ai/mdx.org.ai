@@ -19,10 +19,13 @@ yarn add mdxdb
 - **MDX Native** - First-class support for MDX documents with frontmatter
 - **Semantic Search** - Built-in vector search capabilities
 - **Graph Database** - Things + Relationships model
+- **Schema-First** - Automatic bi-directional relationships with ai-database
 - **API Client** - Connect to remote mdxdb servers
 - **Type-Safe** - Full TypeScript support
 
 ## Quick Start
+
+### Traditional Document-Based Interface
 
 ```typescript
 import { createDBClient, MemoryDBClient } from 'mdxdb'
@@ -56,6 +59,49 @@ const results = await db.search({ query: 'john', semantic: true })
 
 // Delete document
 await db.delete('users/john')
+```
+
+### Schema-First Interface (ai-database)
+
+```typescript
+import { DB, createMemoryProvider } from 'mdxdb'
+
+// Define your schema with automatic bi-directional relationships
+const db = DB({
+  Post: {
+    title: 'string',
+    content: 'markdown',
+    author: 'Author.posts',  // Creates Post.author -> Author AND Author.posts -> Post[]
+  },
+  Author: {
+    name: 'string',
+    email: 'string',
+    // posts: Post[] is auto-created from the backref
+  },
+})
+
+// Create entities
+const author = await db.Author.create('alice', {
+  name: 'Alice',
+  email: 'alice@example.com',
+})
+
+const post = await db.Post.create('hello-world', {
+  title: 'Hello World',
+  content: '# Hello\n\nThis is my first post.',
+  author: 'alice',
+})
+
+// Get entities
+const retrievedPost = await db.Post.get('hello-world')
+const retrievedAuthor = await db.Author.get('alice')
+
+// List entities
+const posts = await db.Post.list()
+const authors = await db.Author.list()
+
+// Relationships are automatically handled
+// The author field will resolve to the Author entity
 ```
 
 ## API Reference
@@ -341,6 +387,185 @@ const db = await createClickhouseDatabase({
   url: 'http://localhost:8123',
   database: 'myapp'
 })
+```
+
+## Schema-First Database (ai-database)
+
+mdxdb integrates with ai-database to provide a schema-first approach with automatic bi-directional relationships.
+
+### Basic Usage
+
+```typescript
+import { DB, createMemoryProvider } from 'mdxdb'
+
+// Define your schema
+const db = DB({
+  User: {
+    name: 'string',
+    email: 'string',
+    age: 'number?',  // Optional field
+    tags: 'string[]', // Array field
+  },
+})
+
+// Create entities
+const user = await db.User.create('user-1', {
+  name: 'Alice',
+  email: 'alice@example.com',
+  age: 30,
+  tags: ['admin', 'developer'],
+})
+
+// Get, update, delete
+const retrieved = await db.User.get('user-1')
+await db.User.update('user-1', { age: 31 })
+await db.User.delete('user-1')
+
+// List entities
+const users = await db.User.list()
+```
+
+### Bi-Directional Relationships
+
+One of the key features is automatic bi-directional relationships. When you define a relationship in one direction, the inverse relationship is automatically created.
+
+```typescript
+const db = DB({
+  Post: {
+    title: 'string',
+    content: 'markdown',
+    author: 'Author.posts',  // Forward ref: Post.author -> Author
+                              // Creates backref: Author.posts -> Post[]
+    category: 'Category.posts',
+  },
+  Author: {
+    name: 'string',
+    email: 'string',
+    // posts: Post[] is automatically created
+  },
+  Category: {
+    name: 'string',
+    slug: 'string',
+    // posts: Post[] is automatically created
+  },
+})
+
+// Create author and category
+await db.Author.create('alice', {
+  name: 'Alice',
+  email: 'alice@example.com',
+})
+
+await db.Category.create('tech', {
+  name: 'Technology',
+  slug: 'tech',
+})
+
+// Create post with relationships
+await db.Post.create('hello-world', {
+  title: 'Hello World',
+  content: '# Hello\n\nMy first post.',
+  author: 'alice',    // Links to Author
+  category: 'tech',   // Links to Category
+})
+
+// The relationships are automatically resolved
+// When you access author.posts or category.posts, you'll get the related posts
+```
+
+### Custom Providers
+
+You can use custom providers that implement the `DBProvider` interface:
+
+```typescript
+import { DB, type DBProvider } from 'mdxdb'
+
+// Create a custom provider (e.g., backed by your storage layer)
+const myProvider: DBProvider = {
+  async get(type: string, id: string) {
+    // Your implementation
+  },
+  async list(type: string, options?) {
+    // Your implementation
+  },
+  async search(type: string, query: string, options?) {
+    // Your implementation
+  },
+  async create(type: string, id: string, data: any) {
+    // Your implementation
+  },
+  async update(type: string, id: string, data: any) {
+    // Your implementation
+  },
+  async delete(type: string, id: string) {
+    // Your implementation
+  },
+}
+
+// Use your provider
+const db = DB(schema, myProvider)
+```
+
+### Type Safety
+
+The schema-first approach provides full type inference:
+
+```typescript
+const db = DB({
+  User: {
+    name: 'string',
+    email: 'string',
+    age: 'number',
+  },
+})
+
+// TypeScript knows the exact shape of User
+const user = await db.User.get('user-1')
+if (user) {
+  const name: string = user.name    // ✓ Type-safe
+  const email: string = user.email  // ✓ Type-safe
+  const age: number = user.age      // ✓ Type-safe
+  // const invalid = user.invalid   // ✗ Type error
+}
+```
+
+### Schema Parsing
+
+You can parse schemas to inspect their structure:
+
+```typescript
+import { parseSchema } from 'mdxdb'
+
+const schema = {
+  Post: {
+    title: 'string',
+    content: 'markdown',
+    author: 'Author.posts',
+  },
+  Author: {
+    name: 'string',
+  },
+}
+
+const parsed = parseSchema(schema)
+
+console.log(parsed.Post.fields.author)
+// {
+//   name: 'author',
+//   type: 'Author',
+//   isArray: false,
+//   isOptional: false,
+//   backref: 'posts'
+// }
+
+console.log(parsed.Author.fields.posts)
+// {
+//   name: 'posts',
+//   type: 'Post',
+//   isArray: true,
+//   isOptional: false,
+//   backref: 'author'
+// }
 ```
 
 ## URL Utilities

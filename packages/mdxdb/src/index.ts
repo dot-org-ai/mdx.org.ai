@@ -61,3 +61,27 @@ export { resolveUrl, resolveShortUrl, parseUrl } from './types.js'
 
 // Re-export mdxld types for convenience
 export type { MDXLDDocument, MDXLDData, LDProperties } from 'mdxld'
+
+// Re-export ai-database types and functions
+export {
+  DB,
+  parseSchema,
+  setProvider,
+  MemoryProvider,
+  createMemoryProvider,
+} from 'ai-database'
+export type {
+  DatabaseSchema,
+  EntitySchema,
+  FieldDefinition,
+  PrimitiveType,
+  ParsedSchema,
+  ParsedEntity,
+  ParsedField,
+  TypedDB,
+  EntityOperations,
+  DBProvider,
+  ListOptions as DBListOptions,
+  SearchOptions as DBSearchOptions,
+  InferEntity,
+} from 'ai-database'
