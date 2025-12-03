@@ -6,9 +6,10 @@
  * @packageDocumentation
  */
 
-import { resolve } from 'node:path'
+import { resolve, basename, relative } from 'node:path'
 import { spawn } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
+import { glob } from 'glob'
 import { deploy, detectSourceType } from './commands/deploy.js'
 import type { CloudflareDeployOptions } from './types.js'
 
@@ -28,6 +29,10 @@ export interface CliOptions {
   filter?: string
   coverage: boolean
   ui: boolean
+  // Execution context options
+  context: 'local' | 'remote' | 'all'
+  db: 'memory' | 'fs' | 'sqlite' | 'postgres' | 'clickhouse' | 'mongo'
+  aiMode: 'local' | 'remote'
 }
 
 export const VERSION = '0.0.0'
@@ -51,6 +56,9 @@ Test Options:
   --coverage             Generate coverage report
   --ui                   Open vitest UI
   --verbose, -v          Show detailed output
+  --context, -c <ctx>    Execution context: local | remote | all (default: local)
+  --db <backend>         Database backend: memory | fs | sqlite | postgres | clickhouse | mongo
+  --ai <mode>            AI mode: local | remote (default: local)
 
 Deploy Options:
   --dir, -d <path>       Project directory (default: current directory)
@@ -122,6 +130,9 @@ export function parseArgs(args: string[]): CliOptions {
     watch: false,
     coverage: false,
     ui: false,
+    context: 'local',
+    db: 'memory',
+    aiMode: 'local',
   }
 
   // Parse command
@@ -217,6 +228,35 @@ export function parseArgs(args: string[]): CliOptions {
       case '--ui':
         options.ui = true
         break
+      // Execution context options
+      case '--context':
+      case '-c':
+        if (next === 'local' || next === 'remote' || next === 'all') {
+          options.context = next
+        } else {
+          console.error(`Invalid context: ${next}. Use 'local', 'remote', or 'all'.`)
+          process.exit(1)
+        }
+        i++
+        break
+      case '--db':
+        if (['memory', 'fs', 'sqlite', 'postgres', 'clickhouse', 'mongo'].includes(next)) {
+          options.db = next as CliOptions['db']
+        } else {
+          console.error(`Invalid db backend: ${next}. Use memory, fs, sqlite, postgres, clickhouse, or mongo.`)
+          process.exit(1)
+        }
+        i++
+        break
+      case '--ai':
+        if (next === 'local' || next === 'remote') {
+          options.aiMode = next
+        } else {
+          console.error(`Invalid AI mode: ${next}. Use 'local' or 'remote'.`)
+          process.exit(1)
+        }
+        i++
+        break
     }
   }
 
@@ -281,27 +321,80 @@ export async function runDeploy(options: CliOptions): Promise<void> {
 }
 
 /**
- * Find the vitest MDX config file
+ * Extract test blocks from MDX content
  */
-function findMdxConfig(projectDir: string): string | null {
-  const candidates = [
-    resolve(projectDir, 'vitest.mdx.config.ts'),
-    resolve(projectDir, 'vitest.mdx.config.js'),
-    resolve(projectDir, 'vitest.mdx.config.mts'),
-    resolve(projectDir, 'vitest.mdx.config.mjs'),
-  ]
+function extractTestBlocks(content: string): { name: string; code: string }[] {
+  const tests: { name: string; code: string }[] = []
 
-  for (const candidate of candidates) {
-    if (existsSync(candidate)) {
-      return candidate
-    }
+  // Match code blocks with 'test' in the meta
+  const codeBlockRegex = /```(?:ts|typescript|js|javascript)\s+test(?:\s+name="([^"]*)")?[^\n]*\n([\s\S]*?)```/g
+
+  let match
+  let testIndex = 0
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    testIndex++
+    const name = match[1] || `test ${testIndex}`
+    const code = match[2].trim()
+    tests.push({ name, code })
   }
 
-  return null
+  return tests
 }
 
 /**
- * Run MDX tests using vitest
+ * Generate test code for ai-sandbox from extracted tests
+ */
+function generateTestCode(tests: { name: string; code: string }[]): string {
+  if (tests.length === 0) return ''
+
+  const testCases = tests.map(test => {
+    // Detect if code uses await
+    const isAsync = /\bawait\s+/.test(test.code)
+    const asyncPrefix = isAsync ? 'async ' : ''
+
+    return `
+  it('${test.name.replace(/'/g, "\\'")}', ${asyncPrefix}() => {
+${test.code}
+  });`
+  }).join('\n')
+
+  return `describe('MDX Tests', () => {${testCases}
+});`
+}
+
+/**
+ * Find MDX test files in the project
+ */
+async function findMdxTestFiles(projectDir: string, filter?: string): Promise<string[]> {
+  const patterns = [
+    'tests/**/*.mdx',
+    '**/*.test.mdx',
+  ]
+
+  const files: string[] = []
+
+  for (const pattern of patterns) {
+    const matches = await glob(pattern, {
+      cwd: projectDir,
+      ignore: ['node_modules/**', 'dist/**', '.next/**'],
+      absolute: true,
+    })
+    files.push(...matches)
+  }
+
+  // Remove duplicates
+  const unique = [...new Set(files)]
+
+  // Apply filter if provided
+  if (filter) {
+    return unique.filter(f => basename(f).includes(filter) || f.includes(filter))
+  }
+
+  return unique
+}
+
+/**
+ * Run MDX tests using ai-sandbox
  */
 export async function runTest(options: CliOptions): Promise<void> {
   console.log('🧪 mdxe test\n')
@@ -309,85 +402,142 @@ export async function runTest(options: CliOptions): Promise<void> {
   const projectDir = options.projectDir
   console.log(`📁 Project: ${projectDir}`)
 
-  // Find vitest.mdx.config.ts
-  const configPath = findMdxConfig(projectDir)
+  // Find MDX test files
+  const testFiles = await findMdxTestFiles(projectDir, options.filter)
 
-  if (!configPath) {
-    console.error('❌ No vitest.mdx.config.ts found in project directory')
-    console.error('   Create a vitest.mdx.config.ts file to configure MDX testing.')
-    console.error('')
-    console.error('   Example config:')
-    console.error('   ```')
-    console.error("   import { defineConfig } from 'vitest/config'")
-    console.error("   import { mdxTestPlugin } from '@mdxe/vitest'")
-    console.error('')
-    console.error('   export default defineConfig({')
-    console.error('     plugins: [mdxTestPlugin()],')
-    console.error('     test: {')
-    console.error("       include: ['tests/**/*.mdx', '**/*.test.mdx'],")
-    console.error('     },')
-    console.error('   })')
-    console.error('   ```')
-    process.exit(1)
+  if (testFiles.length === 0) {
+    console.log('⚠️  No MDX test files found')
+    console.log('   Looking for: tests/**/*.mdx, **/*.test.mdx')
+    return
   }
 
-  console.log(`📋 Config: ${configPath}`)
+  console.log(`📋 Found ${testFiles.length} test file(s)`)
 
-  // Build vitest args
-  const vitestArgs = ['vitest']
-
-  // Add run or watch mode
-  if (!options.watch && !options.ui) {
-    vitestArgs.push('run')
+  // Get SDK config from environment and CLI options
+  const sdkConfig = {
+    context: options.context as 'local' | 'remote',
+    rpcUrl: process.env.DO_RPC_URL || 'https://rpc.do',
+    token: process.env.DO_TOKEN || process.env.DO_ADMIN_TOKEN || '',
+    ns: process.env.DO_NS || 'test.example.com',
+    // AI Gateway configuration
+    aiGatewayUrl: process.env.AI_GATEWAY_URL,
+    aiGatewayToken: process.env.AI_GATEWAY_TOKEN,
   }
 
-  // Add config
-  vitestArgs.push('--config', configPath)
-
-  // Add options
-  if (options.filter) {
-    vitestArgs.push('--testNamePattern', options.filter)
-  }
-
-  if (options.coverage) {
-    vitestArgs.push('--coverage')
-  }
-
-  if (options.ui) {
-    vitestArgs.push('--ui')
+  console.log(`⚙️  Context: ${options.context}`)
+  console.log(`💾 Database: ${options.db}`)
+  if (options.context === 'remote') {
+    console.log(`🌐 RPC URL: ${sdkConfig.rpcUrl}`)
   }
 
   if (options.verbose) {
-    vitestArgs.push('--reporter=verbose')
+    console.log(`🔧 SDK RPC URL: ${sdkConfig.rpcUrl}`)
+    console.log(`🔧 SDK Namespace: ${sdkConfig.ns}`)
   }
 
-  console.log(`\n🔧 Running: npx ${vitestArgs.join(' ')}\n`)
-  console.log('─'.repeat(60))
+  console.log('\n' + '─'.repeat(60) + '\n')
 
-  // Spawn vitest
-  return new Promise((resolvePromise, reject) => {
-    const child = spawn('npx', vitestArgs, {
-      cwd: projectDir,
-      stdio: 'inherit',
-      shell: true,
-    })
+  // Import ai-sandbox dynamically
+  const { evaluate } = await import('ai-sandbox')
 
-    child.on('error', (error) => {
-      console.error(`\n❌ Failed to run vitest: ${error.message}`)
-      reject(error)
-    })
+  // Track results
+  const results: {
+    file: string
+    total: number
+    passed: number
+    failed: number
+    skipped: number
+    tests: { name: string; passed: boolean; error?: string; duration: number }[]
+    duration: number
+  }[] = []
 
-    child.on('close', (code) => {
-      console.log('─'.repeat(60))
-      if (code === 0) {
-        console.log('\n✅ Tests passed!')
-        resolvePromise()
-      } else {
-        console.log(`\n❌ Tests failed with exit code ${code}`)
-        process.exit(code ?? 1)
+  let totalTests = 0
+  let totalPassed = 0
+  let totalFailed = 0
+
+  // Run each test file
+  for (const filePath of testFiles) {
+    const fileName = relative(projectDir, filePath)
+    const content = readFileSync(filePath, 'utf-8')
+
+    // Extract test blocks
+    const testBlocks = extractTestBlocks(content)
+
+    if (testBlocks.length === 0) {
+      if (options.verbose) {
+        console.log(`⏭️  ${fileName} (no tests)`)
       }
+      continue
+    }
+
+    // Generate test code
+    const testCode = generateTestCode(testBlocks)
+
+    // Run through ai-sandbox
+    const startTime = Date.now()
+    const result = await evaluate({
+      tests: testCode,
+      sdk: sdkConfig,
     })
-  })
+
+    const duration = Date.now() - startTime
+
+    // Process results
+    if (result.testResults) {
+      const { total, passed, failed, skipped, tests } = result.testResults
+
+      totalTests += total
+      totalPassed += passed
+      totalFailed += failed
+
+      results.push({
+        file: fileName,
+        total,
+        passed,
+        failed,
+        skipped,
+        tests,
+        duration,
+      })
+
+      // Print file result
+      const statusIcon = failed > 0 ? '❌' : '✅'
+      const failedStr = failed > 0 ? ` | ${failed} failed` : ''
+      console.log(`${statusIcon} ${fileName} (${passed}/${total} passed${failedStr}) ${duration}ms`)
+
+      // Print failed test details
+      if (failed > 0 && options.verbose) {
+        for (const test of tests) {
+          if (!test.passed && test.error) {
+            console.log(`   ├─ ✗ ${test.name}`)
+            console.log(`   │    ${test.error}`)
+          }
+        }
+      }
+    } else if (result.error) {
+      console.log(`❌ ${fileName} - Error: ${result.error}`)
+      totalFailed++
+    }
+
+    // Show logs if verbose
+    if (options.verbose && result.logs.length > 0) {
+      for (const log of result.logs) {
+        const icon = log.level === 'error' ? '🔴' : log.level === 'warn' ? '🟡' : '📝'
+        console.log(`   ${icon} ${log.message}`)
+      }
+    }
+  }
+
+  // Summary
+  console.log('\n' + '─'.repeat(60))
+  console.log(`\n📊 Summary: ${totalPassed}/${totalTests} tests passed`)
+
+  if (totalFailed > 0) {
+    console.log(`\n❌ ${totalFailed} test(s) failed`)
+    process.exit(1)
+  } else {
+    console.log('\n✅ All tests passed!')
+  }
 }
 
 export async function main(): Promise<void> {
