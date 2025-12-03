@@ -27,7 +27,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && cp src/hono.d.ts dist/hono.d.ts",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:unit": "vitest run",

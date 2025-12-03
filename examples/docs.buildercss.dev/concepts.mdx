@@ -1,96 +1,288 @@
 ---
 $type: DocsPage
 title: Core Concepts
-description: Understand the philosophy behind BuilderCSS
+description: Pure semantic HTML with CSS pattern-matching
 ---
 
 # Core Concepts
 
-BuilderCSS is built on a few key principles that make it different from other CSS frameworks.
+BuilderCSS is a design system built on a radical idea: **HTML structure IS the styling API**. No classes. No data attributes. Just meaningful HTML and CSS that pattern-matches semantic intent.
 
-## Semantic First
+## The Problem with Other Approaches
 
-Unlike utility-first frameworks, BuilderCSS uses semantic HTML elements and meaningful data attributes:
+### Utility Classes
 
 ```html
-<!-- Utility-first (not BuilderCSS) -->
-<div class="flex items-center justify-between p-4 bg-white shadow-md rounded-lg">
-  <h2 class="text-lg font-semibold">Title</h2>
+<!-- Tailwind-style: HTML becomes unreadable -->
+<div class="flex items-center justify-between p-4 bg-white shadow-md rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+  <h2 class="text-lg font-semibold text-gray-900">Title</h2>
 </div>
+```
 
-<!-- BuilderCSS -->
-<article data-card>
+Problems:
+- HTML is cluttered with styling concerns
+- Styles are not reusable without copy-paste
+- No semantic meaning in the markup
+- AI struggles to understand intent
+
+### Data Attributes
+
+```html
+<!-- Better, but still an abstraction layer -->
+<article data-card data-variant="elevated">
   <h2>Title</h2>
 </article>
 ```
 
-The semantic approach means:
-- **Readable HTML** - Code is self-documenting
-- **Accessible by default** - Proper elements = proper semantics
-- **AI-friendly** - LLMs can understand and generate valid markup
-- **Portable** - Same patterns work across platforms
+Problems:
+- Still requires a naming convention
+- Data attributes are an arbitrary API
+- CSS selectors match attributes, not meaning
+
+## The BuilderCSS Approach
+
+```html
+<!-- Pure semantic HTML -->
+<article>
+  <h2>Title</h2>
+</article>
+```
+
+```css
+/* CSS matches semantic structure */
+article:has(> h2:first-child) {
+  padding: var(--spacing-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+```
+
+The element relationships define what something IS. CSS uses `:has()` to match those patterns.
+
+## Semantic Patterns
+
+### Layouts
+
+Layouts are identified by their structural children:
+
+```css
+/* Stacked: header + main + footer */
+article:has(> header + main + footer) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Sidebar: aside as first child */
+article:has(> aside:first-child) {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+}
+
+/* Split: two main elements */
+article:has(> main + main) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+```
+
+### Sections
+
+Sections are identified by their content pattern:
+
+```css
+/* Hero: section with h1 as first child */
+section:has(> h1:first-child) {
+  text-align: center;
+  padding: var(--spacing-16) var(--spacing-4);
+}
+
+/* Features: section with list of articles */
+section:has(> ul > li > article) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-6);
+}
+
+/* FAQ: section with definition list */
+section:has(> dl) {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Testimonials: section with blockquotes */
+section:has(> blockquote) {
+  background: var(--muted);
+  padding: var(--spacing-12);
+}
+
+/* Stats: section with data elements */
+section:has(> ul > li > data) {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-8);
+}
+```
+
+### Views
+
+Views are identified by their primary content element:
+
+```css
+/* Table view */
+article:has(> table) {
+  overflow-x: auto;
+}
+
+/* Form view */
+article:has(> form) {
+  max-width: 600px;
+}
+
+/* Detail view */
+article:has(> dl:first-of-type) {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+/* List view */
+article:has(> ul[role="listbox"]) {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* Dashboard view */
+article:has(> header + section + div) {
+  padding: var(--spacing-6);
+}
+```
+
+### Containers
+
+Containers use native HTML elements:
+
+```css
+/* Modal */
+dialog {
+  border: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 0;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Popup */
+dialog[popover] {
+  position: fixed;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+/* Disclosure */
+details {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+details > summary {
+  padding: var(--spacing-3);
+  cursor: pointer;
+}
+
+details[open] > summary {
+  border-bottom: 1px solid var(--border);
+}
+```
+
+## States via ARIA
+
+Interactive states use accessibility attributes:
+
+```html
+<!-- Navigation -->
+<nav>
+  <a href="/" aria-current="page">Home</a>
+  <a href="/about">About</a>
+</nav>
+
+<!-- Toggle -->
+<button aria-pressed="true">Dark Mode</button>
+
+<!-- Selection -->
+<ul role="listbox">
+  <li role="option" aria-selected="true">Option 1</li>
+  <li role="option">Option 2</li>
+</ul>
+
+<!-- Loading -->
+<button aria-busy="true">Saving...</button>
+
+<!-- Disabled -->
+<button aria-disabled="true">Submit</button>
+```
+
+```css
+[aria-current="page"] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[aria-pressed="true"] {
+  background: var(--muted);
+}
+
+[aria-selected="true"] {
+  background: var(--accent);
+}
+
+[aria-busy="true"] {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+[aria-disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+```
 
 ## Component Hierarchy
 
 BuilderCSS organizes components into 5 levels:
 
 ```
-Layout (page structure)
-  └── Page / View (content type)
-        └── Section (content blocks)
+Layout (structural pattern)
+  └── Page / View (content container)
+        └── Section (content block)
               └── Container (presentation mode)
-                    └── Elements (atoms)
+                    └── Elements (semantic atoms)
 ```
 
-### Layouts
+### Semantic HTML Elements
 
-Page-level structural patterns that define the overall grid:
+BuilderCSS leverages the full semantic HTML vocabulary:
 
-- **StackedLayout** - Vertical header/main/footer
-- **SidebarLayout** - Two-column with navigation
-- **DocsLayout** - Three-column documentation
-- **DashboardLayout** - App shell with sidebar
-
-### Pages & Views
-
-Content type definitions:
-
-- **Pages** are for websites (Home, About, Pricing)
-- **Views** are for apps (Dashboard, List, Form)
-
-### Sections
-
-Reusable content blocks that compose into pages:
-
-- Hero, Features, Testimonials, FAQ, CTA
-
-### Containers
-
-Presentation modes that wrap content:
-
-- Modal, Slideover, Popup, Drawer, Fullscreen
-
-## Data Attributes
-
-Components are styled using data attributes:
-
-```css
-/* Layout selection */
-[data-layout="stacked"] { ... }
-[data-layout="sidebar"] { ... }
-
-/* Section types */
-[data-section="hero"] { ... }
-[data-section="features"] { ... }
-
-/* Variants */
-[data-button="primary"] { ... }
-[data-button="outline"] { ... }
-
-/* States */
-[data-state="active"] { ... }
-[data-state="loading"] { ... }
-```
+| Element | Purpose |
+|---------|---------|
+| `<article>` | Self-contained content, layouts, views |
+| `<section>` | Thematic content blocks |
+| `<aside>` | Sidebar, complementary content |
+| `<nav>` | Navigation |
+| `<header>` | Introductory content |
+| `<footer>` | Footer content |
+| `<main>` | Main content area |
+| `<menu>` | Action lists, toolbars |
+| `<dialog>` | Modal, popup |
+| `<details>` | Disclosure, accordion |
+| `<figure>` | Media with caption |
+| `<dl>` | Key-value pairs, FAQ |
+| `<data>` | Machine-readable values |
+| `<time>` | Dates and times |
+| `<mark>` | Highlighted text |
+| `<address>` | Contact information |
 
 ## Design Tokens
 
@@ -98,32 +290,34 @@ All visual properties use CSS custom properties:
 
 ```css
 :root {
-  /* Colors (HSL values) */
+  /* Colors (HSL values for flexibility) */
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
   --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
   --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
   --border: 214.3 31.8% 91.4%;
 
   /* Spacing (rem-based scale) */
   --spacing-1: 0.25rem;
   --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
   --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
   --spacing-8: 2rem;
+  --spacing-12: 3rem;
   --spacing-16: 4rem;
 
   /* Typography */
-  --font-sans: system-ui, sans-serif;
+  --font-sans: system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, monospace;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
 
   /* Radii */
+  --radius: 0.375rem;
   --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
-  --radius-xl: 1rem;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
@@ -132,81 +326,10 @@ All visual properties use CSS custom properties:
 }
 ```
 
-## Cross-Platform
+## Why This Works
 
-Every BuilderCSS component has both web and mobile implementations:
-
-### Web (Pure CSS)
-
-```html
-<button data-button="primary">Click me</button>
-```
-
-```css
-[data-button="primary"] {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--spacing-2) var(--spacing-4);
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border-radius: var(--radius-md);
-}
-```
-
-### Mobile (React Native)
-
-```tsx
-<Pressable style={styles.buttonPrimary}>
-  <Text style={styles.buttonText}>Click me</Text>
-</Pressable>
-
-const styles = StyleSheet.create({
-  buttonPrimary: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: colors.primary,
-    borderRadius: 6,
-  },
-  buttonText: {
-    color: colors.primaryForeground,
-  },
-});
-```
-
-## Composability
-
-Components are designed to compose naturally:
-
-```html
-<body data-layout="stacked">
-  <main>
-    <section data-section="hero">
-      <h1>Welcome</h1>
-      <button data-button="primary" data-modal-trigger="demo">
-        Watch Demo
-      </button>
-    </section>
-  </main>
-</body>
-
-<!-- Modal container -->
-<aside data-modal id="demo">
-  <article>
-    <header>
-      <h2>Demo Video</h2>
-      <button data-action="close">&times;</button>
-    </header>
-    <section>
-      <video src="demo.mp4" controls></video>
-    </section>
-  </article>
-</aside>
-```
-
-The same Chat view can appear in different containers:
-
-- Full screen: `<main data-view="chat">...</main>`
-- Slideover: `<aside data-slideover><article data-view="chat">...</article></aside>`
-- Popup: `<aside data-popup><article data-view="chat">...</article></aside>`
+1. **Self-documenting** - The HTML itself describes what something is
+2. **Accessible by default** - Semantic elements provide built-in accessibility
+3. **AI-friendly** - LLMs understand HTML semantics, not arbitrary class names
+4. **No build step** - Pure CSS, works in any browser
+5. **Portable** - Same patterns work everywhere HTML works
