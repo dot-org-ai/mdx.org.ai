@@ -1,0 +1,365 @@
+---
+$type: TestSuite
+title: Core Platform Tests
+description: Core tests for mdxld, mdxe, and mdxui
+---
+
+# Core Platform Tests
+
+Core capabilities of the MDX platform - parsing, execution, and components.
+
+## MDXLD - Document Parsing
+
+### Parse Simple Document
+
+```ts test
+const content = `---
+title: Hello World
+author: Test Author
+---
+
+# Hello World
+
+This is a simple test document.
+`
+
+const doc = parse(content)
+
+expect(doc.data.title).toBe('Hello World')
+expect(doc.data.author).toBe('Test Author')
+expect(doc.content).toContain('# Hello World')
+```
+
+### Parse Typed Document
+
+```ts test
+const content = `---
+$type: BlogPost
+$id: https://example.com/posts/hello
+title: My First Blog Post
+tags:
+  - mdx
+  - testing
+---
+
+# My First Blog Post
+
+Welcome to my blog!
+`
+
+const doc = parse(content)
+
+expect(doc.type).toBe('BlogPost')
+expect(doc.id).toBe('https://example.com/posts/hello')
+expect(doc.data.title).toBe('My First Blog Post')
+expect(doc.data.tags).toEqual(['mdx', 'testing'])
+```
+
+### Stringify and Re-parse
+
+```ts test
+const original = {
+  type: 'Article',
+  data: {
+    title: 'Test Article',
+    status: 'published',
+  },
+  content: '# Test Article\n\nContent here.',
+}
+
+const serialized = stringify(original)
+const reparsed = parse(serialized)
+
+expect(reparsed.type).toBe('Article')
+expect(reparsed.data.title).toBe('Test Article')
+expect(reparsed.data.status).toBe('published')
+expect(reparsed.content).toContain('# Test Article')
+```
+
+### AST Conversion
+
+```ts test
+const content = `---
+title: AST Test
+---
+
+# Heading 1
+
+A paragraph with **bold** and *italic* text.
+
+- Item 1
+- Item 2
+
+\`\`\`javascript
+const x = 1
+\`\`\`
+`
+
+const doc = parse(content)
+const ast = toAst(doc)
+
+expect(ast.type).toBe('root')
+expect(ast.children.length).toBeGreaterThan(0)
+
+const heading = ast.children.find(n => n.type === 'heading')
+expect(heading).toBeDefined()
+expect(heading.depth).toBe(1)
+
+const list = ast.children.find(n => n.type === 'list')
+expect(list).toBeDefined()
+
+const code = ast.children.find(n => n.type === 'code')
+expect(code).toBeDefined()
+expect(code.lang).toBe('javascript')
+```
+
+## MDXUI - Component Factory
+
+### Create Components
+
+```ts test
+const components = createComponents(createElement)
+const names = getComponentNames()
+
+expect(names.length).toBe(28)
+expect(typeof components.Hero).toBe('function')
+expect(typeof components.Features).toBe('function')
+expect(typeof components.Pricing).toBe('function')
+```
+
+### Render Hero Component
+
+```ts test
+const components = createComponents(createElement)
+
+const hero = components.Hero({
+  title: 'Welcome',
+  subtitle: 'Get started today',
+  primaryAction: { label: 'Sign Up', href: '/signup' },
+})
+
+expect(hero).toBeDefined()
+expect(hero.type).toBe('header')
+expect(hero.props['data-component']).toBe('Hero')
+expect(hero.props.title).toBe('Welcome')
+```
+
+### Render Features Component
+
+```ts test
+const components = createComponents(createElement)
+
+const features = components.Features({
+  title: 'Features',
+  items: [
+    { title: 'Fast', description: 'Lightning speed' },
+    { title: 'Secure', description: 'Enterprise security' },
+    { title: 'Scalable', description: 'Grows with you' },
+  ],
+})
+
+expect(features).toBeDefined()
+expect(features.type).toBe('section')
+expect(features.props.items.length).toBe(3)
+```
+
+### Component Metadata
+
+```ts test
+const heroMeta = getComponentMeta('Hero')
+expect(heroMeta.category).toBe('landing')
+expect(heroMeta.requiredProps).toContain('title')
+expect(heroMeta.related).toContain('CTA')
+
+const landingComponents = getComponentsByCategory('landing')
+expect(landingComponents).toContain('Hero')
+expect(landingComponents).toContain('Features')
+expect(landingComponents).toContain('Pricing')
+```
+
+## Markdown Rendering
+
+### Render to Markdown
+
+```ts test
+const doc = parse(`---
+title: Markdown Test
+---
+
+# Hello World
+
+This is **bold** and *italic*.
+
+- Item 1
+- Item 2
+`)
+
+const markdown = renderMarkdown(doc)
+
+expect(markdown).toContain('# Hello World')
+expect(markdown).toContain('**bold**')
+expect(markdown).toContain('*italic*')
+expect(markdown).toContain('- Item 1')
+```
+
+### Render with Frontmatter
+
+```ts test
+const doc = parse(`---
+$type: BlogPost
+title: Test Post
+author: Jane
+---
+
+# Test Post
+`)
+
+const markdown = renderMarkdown(doc, { includeFrontmatter: true })
+
+expect(markdown).toContain('$type: BlogPost')
+expect(markdown).toContain('title: Test Post')
+expect(markdown).toContain('# Test Post')
+```
+
+## Test Extraction
+
+### Extract Tests from MDX Content
+
+```ts test
+const content = `
+# Test Document
+
+\`\`\`ts test
+expect(1 + 1).toBe(2)
+\`\`\`
+
+\`\`\`ts test
+expect(2 * 3).toBe(6)
+\`\`\`
+`
+
+const tests = extractTests(content)
+
+expect(tests.length).toBe(2)
+```
+
+### Parse Meta Strings
+
+```ts test
+const meta1 = parseMeta('test')
+expect(meta1.test).toBe(true)
+
+const meta2 = parseMeta('skip')
+expect(meta2.skip).toBe(true)
+
+const meta3 = parseMeta('test timeout=5000')
+expect(meta3.test).toBe(true)
+expect(meta3.timeout).toBe('5000')
+```
+
+## Cross-Package Integration
+
+### Full Document Lifecycle
+
+```ts test
+// Create document
+const original = {
+  type: 'Article',
+  id: 'https://example.com/article/1',
+  data: {
+    title: 'Integration Test',
+    status: 'draft',
+  },
+  content: '# Integration Test\n\nThis tests the full workflow.',
+}
+
+// Serialize
+const serialized = stringify(original)
+expect(serialized).toContain('$type: Article')
+
+// Re-parse
+const reparsed = parse(serialized)
+expect(reparsed.type).toBe('Article')
+
+// Transform
+const transformed = {
+  ...reparsed,
+  data: { ...reparsed.data, status: 'published' },
+}
+
+// Render
+const markdown = renderMarkdown(transformed, { includeFrontmatter: true })
+expect(markdown).toContain('status: published')
+expect(markdown).toContain('# Integration Test')
+```
+
+### Component + Document Integration
+
+```ts test
+const doc = parse(`---
+$type: LandingPage
+title: Welcome
+hero:
+  headline: Build Amazing Things
+  subheadline: Start your journey today
+features:
+  - title: Fast
+    description: Lightning speed
+  - title: Secure
+    description: Enterprise grade
+---
+
+# Welcome
+`)
+
+const components = createComponents(createElement)
+
+// Use document data to render components
+const hero = components.Hero({
+  title: doc.data.hero.headline,
+  subtitle: doc.data.hero.subheadline,
+})
+
+expect(hero.props.title).toBe('Build Amazing Things')
+expect(hero.props.subtitle).toBe('Start your journey today')
+```
+
+## Edge Cases
+
+### Empty Document
+
+```ts test
+const doc = parse('')
+
+expect(doc.data).toEqual({})
+expect(doc.content).toBe('')
+
+const markdown = renderMarkdown(doc)
+expect(markdown).toBe('')
+```
+
+### Frontmatter Only
+
+```ts test
+const doc = parse(`---
+title: Metadata Only
+status: draft
+---
+`)
+
+expect(doc.data.title).toBe('Metadata Only')
+expect(doc.data.status).toBe('draft')
+expect(doc.content.trim()).toBe('')
+```
+
+### Content Only
+
+```ts test
+const doc = parse(`# Just Content
+
+No frontmatter here.
+`)
+
+expect(doc.data).toEqual({})
+expect(doc.content).toContain('# Just Content')
+```

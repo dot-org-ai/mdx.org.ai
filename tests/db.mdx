@@ -1,0 +1,369 @@
+---
+$type: TestSuite
+title: Database Tests
+description: Tests for database operations (works with any backend)
+---
+
+# Database Tests
+
+These tests work with any database backend - memory, sqlite, clickhouse, or remote RPC.
+The `db` global is configured by the test environment.
+
+## Thing Operations
+
+### Create Thing
+
+```ts test
+const user = await db.Users.create({
+  name: 'Alice',
+  email: 'alice@example.com',
+  active: true
+})
+
+expect(user.type).toBe('Users')
+expect(user.data.name).toBe('Alice')
+expect(user.data.email).toBe('alice@example.com')
+expect(user.url).toBeDefined()
+expect(user.createdAt).toBeDefined()
+```
+
+### Create Thing with ID
+
+```ts test
+const user = await db.Users.create('alice', {
+  name: 'Alice',
+  email: 'alice@example.com'
+})
+
+expect(user.id).toBe('alice')
+expect(user.data.name).toBe('Alice')
+```
+
+### Get Thing by ID
+
+```ts test
+await db.Users.create('bob', {
+  name: 'Bob',
+  email: 'bob@example.com'
+})
+
+const user = await db.Users.get('bob')
+
+expect(user).not.toBeNull()
+expect(user.data.name).toBe('Bob')
+expect(user.data.email).toBe('bob@example.com')
+```
+
+### Get Thing by URL
+
+```ts test
+const created = await db.Users.create({
+  name: 'Charlie',
+  email: 'charlie@example.com'
+})
+
+const user = await db.get(created.url)
+
+expect(user).not.toBeNull()
+expect(user.data.name).toBe('Charlie')
+```
+
+### Get Thing by Type/ID
+
+```ts test
+await db.Users.create('dave', {
+  name: 'Dave'
+})
+
+const user = await db.get('Users/dave')
+
+expect(user).not.toBeNull()
+expect(user.data.name).toBe('Dave')
+```
+
+### Get with Auto-Create
+
+```ts test
+const user = await db.Users.get('auto-user', {
+  create: { name: 'Auto Created', role: 'guest' }
+})
+
+expect(user).not.toBeNull()
+expect(user.data.name).toBe('Auto Created')
+expect(user.data.role).toBe('guest')
+
+// Second call returns same thing
+const again = await db.Users.get('auto-user')
+expect(again.id).toBe(user.id)
+```
+
+### Update Thing
+
+```ts test
+const user = await db.Users.create('update-test', {
+  name: 'Original',
+  status: 'draft'
+})
+
+const updated = await db.Users.update('update-test', {
+  status: 'published',
+  updatedBy: 'admin'
+})
+
+expect(updated.data.name).toBe('Original')
+expect(updated.data.status).toBe('published')
+expect(updated.data.updatedBy).toBe('admin')
+expect(updated.updatedAt).not.toEqual(user.createdAt)
+```
+
+### Upsert Thing
+
+```ts test
+// First upsert creates
+const first = await db.Settings.upsert('theme', {
+  value: 'light'
+})
+expect(first.data.value).toBe('light')
+
+// Second upsert updates
+const second = await db.Settings.upsert('theme', {
+  value: 'dark',
+  contrast: 'high'
+})
+expect(second.data.value).toBe('dark')
+expect(second.data.contrast).toBe('high')
+```
+
+### Delete Thing
+
+```ts test
+await db.Users.create('to-delete', {
+  name: 'Delete Me'
+})
+
+const before = await db.Users.get('to-delete')
+expect(before).not.toBeNull()
+
+const deleted = await db.Users.delete('to-delete')
+expect(deleted).toBe(true)
+
+const after = await db.Users.get('to-delete')
+expect(after).toBeNull()
+```
+
+## Querying
+
+### List Things
+
+```ts test
+await db.Products.create({ name: 'Widget', price: 9.99 })
+await db.Products.create({ name: 'Gadget', price: 19.99 })
+await db.Products.create({ name: 'Doohickey', price: 29.99 })
+
+const products = await db.Products.list()
+
+expect(products.length).toBe(3)
+```
+
+### List with Limit
+
+```ts test
+for (let i = 1; i <= 10; i++) {
+  await db.Items.create({ name: `Item ${i}`, order: i })
+}
+
+const limited = await db.Items.list({ limit: 3 })
+expect(limited.length).toBe(3)
+```
+
+### List with Offset
+
+```ts test
+for (let i = 1; i <= 5; i++) {
+  await db.Pages.create(`page-${i}`, { title: `Page ${i}` })
+}
+
+const offset = await db.Pages.list({ limit: 2, offset: 2 })
+expect(offset.length).toBe(2)
+```
+
+### Find with Where Clause
+
+```ts test
+await db.Products.create({ name: 'Electronics A', category: 'electronics', price: 100 })
+await db.Products.create({ name: 'Electronics B', category: 'electronics', price: 200 })
+await db.Products.create({ name: 'Book A', category: 'books', price: 15 })
+
+const electronics = await db.Products.find({
+  where: { category: 'electronics' }
+})
+
+expect(electronics.length).toBe(2)
+expect(electronics.every(p => p.data.category === 'electronics')).toBe(true)
+```
+
+### Find with Operators
+
+```ts test
+await db.Products.create({ name: 'Cheap', price: 5 })
+await db.Products.create({ name: 'Medium', price: 50 })
+await db.Products.create({ name: 'Expensive', price: 500 })
+
+const expensive = await db.Products.find({
+  where: { price: { $gt: 100 } }
+})
+
+expect(expensive.length).toBe(1)
+expect(expensive[0].data.name).toBe('Expensive')
+
+const affordable = await db.Products.find({
+  where: { price: { $lte: 50 } }
+})
+
+expect(affordable.length).toBe(2)
+```
+
+### Search
+
+```ts test
+await db.Posts.create({ title: 'Introduction to TypeScript', body: 'TypeScript is a typed superset of JavaScript.' })
+await db.Posts.create({ title: 'Getting Started with Python', body: 'Python is great for beginners.' })
+await db.Posts.create({ title: 'JavaScript Best Practices', body: 'Follow these tips.' })
+
+const results = await db.Posts.search({ query: 'javascript' })
+
+expect(results.length).toBe(2)
+```
+
+### Order Results
+
+```ts test
+await db.Tasks.create({ title: 'C Task', priority: 3 })
+await db.Tasks.create({ title: 'A Task', priority: 1 })
+await db.Tasks.create({ title: 'B Task', priority: 2 })
+
+const asc = await db.Tasks.list({ orderBy: 'title', order: 'asc' })
+expect(asc[0].data.title).toBe('A Task')
+expect(asc[2].data.title).toBe('C Task')
+
+const desc = await db.Tasks.list({ orderBy: 'priority', order: 'desc' })
+expect(desc[0].data.priority).toBe(3)
+```
+
+## ForEach Iteration
+
+### Iterate Over Things
+
+```ts test
+await db.Numbers.create({ value: 1 })
+await db.Numbers.create({ value: 2 })
+await db.Numbers.create({ value: 3 })
+
+const collected = []
+await db.Numbers.forEach(thing => {
+  collected.push(thing.data.value)
+})
+
+expect(collected.length).toBe(3)
+expect(collected).toContain(1)
+expect(collected).toContain(2)
+expect(collected).toContain(3)
+```
+
+### ForEach with Options
+
+```ts test
+for (let i = 1; i <= 10; i++) {
+  await db.Values.create({ n: i })
+}
+
+const collected = []
+await db.Values.forEach({ limit: 5 }, thing => {
+  collected.push(thing.data.n)
+})
+
+expect(collected.length).toBe(5)
+```
+
+## URL-First Create
+
+### Create with Full URL
+
+```ts test
+const post = await db.create('https://blog.example.com/posts/hello-world', {
+  $type: 'BlogPost',
+  title: 'Hello World',
+  author: 'Jane'
+})
+
+expect(post.url).toBe('https://blog.example.com/posts/hello-world')
+expect(post.data.title).toBe('Hello World')
+```
+
+### Create with mdxld Syntax
+
+```ts test
+const doc = await db.create('https://docs.example.com/pages/intro', {
+  $type: 'Page',
+  $context: 'https://schema.org',
+  title: 'Introduction',
+  description: 'Getting started guide'
+})
+
+expect(doc.type).toBe('Page')
+expect(doc['@context']).toBe('https://schema.org')
+```
+
+## Error Handling
+
+### Get Non-Existent
+
+```ts test
+const notFound = await db.Users.get('does-not-exist')
+expect(notFound).toBeNull()
+```
+
+### Delete Non-Existent
+
+```ts test
+const result = await db.Users.delete('does-not-exist')
+expect(result).toBe(false)
+```
+
+## Full CRUD Lifecycle
+
+### Complete Lifecycle
+
+```ts test
+// CREATE
+const doc = await db.Documents.create('lifecycle-test', {
+  title: 'Lifecycle Test',
+  version: 1
+})
+expect(doc.id).toBe('lifecycle-test')
+
+// READ
+let fetched = await db.Documents.get('lifecycle-test')
+expect(fetched.data.version).toBe(1)
+
+// UPDATE
+await db.Documents.update('lifecycle-test', {
+  version: 2,
+  updatedAt: new Date().toISOString()
+})
+fetched = await db.Documents.get('lifecycle-test')
+expect(fetched.data.version).toBe(2)
+
+// LIST
+const list = await db.Documents.list()
+expect(list.some(d => d.id === 'lifecycle-test')).toBe(true)
+
+// SEARCH
+const search = await db.Documents.search({ query: 'Lifecycle' })
+expect(search.length).toBeGreaterThan(0)
+
+// DELETE
+await db.Documents.delete('lifecycle-test')
+fetched = await db.Documents.get('lifecycle-test')
+expect(fetched).toBeNull()
+```

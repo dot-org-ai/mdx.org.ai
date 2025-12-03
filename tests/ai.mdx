@@ -1,0 +1,281 @@
+---
+$type: TestSuite
+title: AI Integration Tests
+description: Tests for AI-powered database operations and generation
+---
+
+# AI Integration Tests
+
+These tests demonstrate AI capabilities including generation, semantic search,
+and tool integration. The `ai` and `db` globals are configured by the test environment.
+
+## AI Generation
+
+### Generate Thing
+
+```ts test
+const post = await db.Posts.get('welcome', {
+  generate: {
+    prompt: 'Write a welcome blog post',
+    model: 'claude-3-haiku'
+  }
+})
+
+expect(post).not.toBeNull()
+expect(post.data._generated).toBe(true)
+```
+
+### Generate with Simple Prompt
+
+```ts test
+const intro = await db.generate('pages/intro', {
+  prompt: 'Write an introduction page for a documentation site'
+})
+
+expect(intro).not.toBeNull()
+expect(intro.id).toBe('intro')
+```
+
+### Generate or Get Existing
+
+```ts test
+// First call generates
+const first = await db.Summaries.get('product-overview', {
+  generate: 'Summarize our product features'
+})
+
+expect(first).not.toBeNull()
+
+// Second call returns existing
+const second = await db.Summaries.get('product-overview')
+expect(second.id).toBe(first.id)
+```
+
+## AI Tools
+
+### Create Database Tools
+
+```ts test
+const tools = ai.createDatabaseTools(db)
+
+expect(tools.length).toBe(5)
+
+const toolNames = tools.map(t => t.name)
+expect(toolNames).toContain('mdxdb_list')
+expect(toolNames).toContain('mdxdb_search')
+expect(toolNames).toContain('mdxdb_get')
+expect(toolNames).toContain('mdxdb_set')
+expect(toolNames).toContain('mdxdb_delete')
+```
+
+### Tool Schemas
+
+```ts test
+const tools = ai.createDatabaseTools(db)
+
+for (const tool of tools) {
+  expect(typeof tool.name).toBe('string')
+  expect(tool.name.length).toBeGreaterThan(0)
+  expect(typeof tool.description).toBe('string')
+  expect(typeof tool.handler).toBe('function')
+}
+```
+
+### List Tool
+
+```ts test
+await db.Docs.create('doc1', { title: 'Doc 1' })
+await db.Docs.create('doc2', { title: 'Doc 2' })
+
+const tools = ai.createDatabaseTools(db)
+const listTool = tools.find(t => t.name === 'mdxdb_list')
+
+const result = await listTool.handler({ type: 'Docs' })
+
+expect(result.content[0].type).toBe('text')
+const data = JSON.parse(result.content[0].text)
+expect(data.length).toBe(2)
+```
+
+### Get Tool
+
+```ts test
+await db.Articles.create('my-article', {
+  title: 'My Article',
+  author: 'Test'
+})
+
+const tools = ai.createDatabaseTools(db)
+const getTool = tools.find(t => t.name === 'mdxdb_get')
+
+const result = await getTool.handler({ id: 'Articles/my-article' })
+
+expect(result.content[0].type).toBe('text')
+const data = JSON.parse(result.content[0].text)
+expect(data.data.title).toBe('My Article')
+```
+
+### Set Tool
+
+```ts test
+const tools = ai.createDatabaseTools(db)
+const setTool = tools.find(t => t.name === 'mdxdb_set')
+
+const result = await setTool.handler({
+  url: 'https://example.com/Notes/new-note',
+  data: { title: 'New Note', body: 'Created via tool' }
+})
+
+expect(result.content[0].type).toBe('text')
+const data = JSON.parse(result.content[0].text)
+expect(data.success).toBe(true)
+
+// Verify created
+const note = await db.get('https://example.com/Notes/new-note')
+expect(note.data.title).toBe('New Note')
+```
+
+### Search Tool
+
+```ts test
+await db.Content.create({ title: 'MDX Introduction', body: 'Learn MDX basics' })
+await db.Content.create({ title: 'MDX Guide', body: 'Advanced MDX patterns' })
+await db.Content.create({ title: 'React Guide', body: 'React fundamentals' })
+
+const tools = ai.createDatabaseTools(db)
+const searchTool = tools.find(t => t.name === 'mdxdb_search')
+
+const result = await searchTool.handler({ query: 'MDX' })
+
+const data = JSON.parse(result.content[0].text)
+expect(data.length).toBe(2)
+```
+
+### Delete Tool
+
+```ts test
+await db.Temp.create('to-remove', { data: 'temporary' })
+
+const tools = ai.createDatabaseTools(db)
+const deleteTool = tools.find(t => t.name === 'mdxdb_delete')
+
+const result = await deleteTool.handler({ id: 'Temp/to-remove' })
+
+const data = JSON.parse(result.content[0].text)
+expect(data.deleted).toBe(true)
+
+// Verify deleted
+const gone = await db.Temp.get('to-remove')
+expect(gone).toBeNull()
+```
+
+### Tool Error Handling
+
+```ts test
+const tools = ai.createDatabaseTools(db)
+const getTool = tools.find(t => t.name === 'mdxdb_get')
+
+const result = await getTool.handler({ id: 'NonExistent/missing' })
+
+expect(result.isError).toBe(true)
+expect(result.content[0].text).toContain('not found')
+```
+
+## Tool Response Format
+
+### Text Content Format
+
+```ts test
+await db.Test.create('format-test', { title: 'Format Test' })
+
+const tools = ai.createDatabaseTools(db)
+const getTool = tools.find(t => t.name === 'mdxdb_get')
+
+const result = await getTool.handler({ id: 'Test/format-test' })
+
+// Verify Claude SDK format
+expect(result.content).toBeDefined()
+expect(Array.isArray(result.content)).toBe(true)
+expect(result.content.length).toBeGreaterThan(0)
+expect(result.content[0].type).toBe('text')
+expect(typeof result.content[0].text).toBe('string')
+
+// Verify JSON is parseable
+const parsed = JSON.parse(result.content[0].text)
+expect(parsed).toBeDefined()
+```
+
+## Complete Tool Workflow
+
+### Full CRUD via Tools
+
+```ts test
+const tools = ai.createDatabaseTools(db)
+const setTool = tools.find(t => t.name === 'mdxdb_set')
+const getTool = tools.find(t => t.name === 'mdxdb_get')
+const listTool = tools.find(t => t.name === 'mdxdb_list')
+const searchTool = tools.find(t => t.name === 'mdxdb_search')
+const deleteTool = tools.find(t => t.name === 'mdxdb_delete')
+
+// CREATE
+await setTool.handler({
+  url: 'https://example.com/Posts/first',
+  data: { title: 'First Post', tags: ['intro'] }
+})
+
+await setTool.handler({
+  url: 'https://example.com/Posts/second',
+  data: { title: 'Second Post', tags: ['advanced'] }
+})
+
+// LIST
+const listResult = await listTool.handler({ type: 'Posts' })
+const listData = JSON.parse(listResult.content[0].text)
+expect(listData.length).toBe(2)
+
+// READ
+const getResult = await getTool.handler({ id: 'Posts/first' })
+const getDoc = JSON.parse(getResult.content[0].text)
+expect(getDoc.data.title).toBe('First Post')
+
+// SEARCH
+const searchResult = await searchTool.handler({ query: 'Post' })
+const searchData = JSON.parse(searchResult.content[0].text)
+expect(searchData.length).toBe(2)
+
+// UPDATE
+await setTool.handler({
+  url: 'https://example.com/Posts/first',
+  data: { title: 'First Post (Updated)', tags: ['intro', 'updated'] }
+})
+
+const updatedResult = await getTool.handler({ id: 'Posts/first' })
+const updatedDoc = JSON.parse(updatedResult.content[0].text)
+expect(updatedDoc.data.title).toBe('First Post (Updated)')
+
+// DELETE
+await deleteTool.handler({ id: 'Posts/second' })
+
+const finalList = await listTool.handler({ type: 'Posts' })
+const finalData = JSON.parse(finalList.content[0].text)
+expect(finalData.length).toBe(1)
+```
+
+## Semantic Search
+
+### Semantic Query
+
+```ts test
+await db.Knowledge.create({ topic: 'JavaScript', content: 'A programming language for the web' })
+await db.Knowledge.create({ topic: 'Python', content: 'A versatile programming language' })
+await db.Knowledge.create({ topic: 'Cooking', content: 'The art of preparing food' })
+
+const results = await db.Knowledge.search({
+  query: 'web development',
+  semantic: true
+})
+
+// Should rank JavaScript higher due to semantic relevance
+expect(results.length).toBeGreaterThan(0)
+expect(results[0].data.topic).toBe('JavaScript')
+```

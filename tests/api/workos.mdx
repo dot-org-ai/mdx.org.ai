@@ -1,0 +1,831 @@
+---
+$type: TestSuite
+title: WorkOS API Tests
+description: Full WorkOS SDK - SSO, Directory Sync, Admin Portal, MFA, Audit Logs
+---
+
+# WorkOS API Tests
+
+The full WorkOS SDK is available at `api.workos`.
+Includes SSO, Directory Sync, Admin Portal, MFA, Audit Logs, and more.
+
+## Single Sign-On (SSO)
+
+### Get Authorization URL
+
+```ts test
+const url = api.workos.sso.getAuthorizationUrl({
+  clientId: 'client_xxx',
+  redirectUri: 'https://example.com/callback',
+  provider: 'GoogleOAuth',
+  state: 'custom-state-value'
+})
+
+url.should.contain('api.workos.com')
+url.should.contain('client_id=')
+url.should.contain('redirect_uri=')
+url.should.contain('state=custom-state-value')
+```
+
+### Get Authorization URL with Connection
+
+```ts test
+const url = api.workos.sso.getAuthorizationUrl({
+  clientId: 'client_xxx',
+  redirectUri: 'https://example.com/callback',
+  connection: 'conn_xxx' // Specific SSO connection
+})
+
+url.should.contain('connection=conn_xxx')
+```
+
+### Get Authorization URL with Organization
+
+```ts test
+const url = api.workos.sso.getAuthorizationUrl({
+  clientId: 'client_xxx',
+  redirectUri: 'https://example.com/callback',
+  organization: 'org_xxx' // Organization-based SSO
+})
+
+url.should.contain('organization=org_xxx')
+```
+
+### Get Profile from Code
+
+```ts test
+const { profile, accessToken } = await api.workos.sso.getProfileAndToken({
+  clientId: 'client_xxx',
+  code: 'auth-code-from-callback'
+})
+
+profile.should.have.property('id')
+profile.should.have.property('email')
+profile.should.have.property('firstName')
+profile.should.have.property('lastName')
+profile.should.have.property('organizationId')
+profile.should.have.property('connectionId')
+accessToken.should.be.a('string')
+```
+
+### Get Profile by Access Token
+
+```ts test
+const profile = await api.workos.sso.getProfile('access-token-xxx')
+
+profile.should.have.property('id')
+profile.should.have.property('email')
+profile.should.have.property('idpId')
+profile.should.have.property('connectionType')
+```
+
+### List Connections
+
+```ts test
+const connections = await api.workos.sso.listConnections({
+  organizationId: 'org_xxx',
+  limit: 10
+})
+
+connections.data.should.be.an('array')
+connections.data.forEach(conn => {
+  conn.should.have.property('id')
+  conn.should.have.property('name')
+  conn.should.have.property('connectionType')
+  conn.should.have.property('state')
+})
+```
+
+### Get Connection
+
+```ts test
+const connection = await api.workos.sso.getConnection('conn_xxx')
+
+connection.should.have.property('id')
+connection.should.have.property('organizationId')
+connection.should.have.property('connectionType')
+connection.connectionType.should.be.oneOf(['SAML', 'OIDC', 'GoogleOAuth', 'MicrosoftOAuth'])
+```
+
+### Delete Connection
+
+```ts test
+await api.workos.sso.deleteConnection('conn_xxx')
+
+// Verify deleted
+const error = await api.workos.sso.getConnection('conn_xxx').catch(e => e)
+error.should.have.property('code', 'not_found')
+```
+
+## Directory Sync
+
+### List Directories
+
+```ts test
+const directories = await api.workos.directorySync.listDirectories({
+  organizationId: 'org_xxx'
+})
+
+directories.data.should.be.an('array')
+directories.data.forEach(dir => {
+  dir.should.have.property('id')
+  dir.should.have.property('name')
+  dir.should.have.property('type')
+  dir.should.have.property('state')
+})
+```
+
+### Get Directory
+
+```ts test
+const directory = await api.workos.directorySync.getDirectory('dir_xxx')
+
+directory.should.have.property('id')
+directory.should.have.property('name')
+directory.should.have.property('domain')
+directory.type.should.be.oneOf(['azure_scim', 'okta_scim', 'google', 'workday'])
+```
+
+### List Directory Users
+
+```ts test
+const users = await api.workos.directorySync.listUsers({
+  directory: 'dir_xxx',
+  limit: 50
+})
+
+users.data.should.be.an('array')
+users.data.forEach(user => {
+  user.should.have.property('id')
+  user.should.have.property('email')
+  user.should.have.property('firstName')
+  user.should.have.property('lastName')
+  user.should.have.property('state')
+})
+```
+
+### Get Directory User
+
+```ts test
+const user = await api.workos.directorySync.getUser('dir_user_xxx')
+
+user.should.have.property('id')
+user.should.have.property('idpId')
+user.should.have.property('directoryId')
+user.should.have.property('emails')
+user.emails.should.be.an('array')
+user.emails[0].should.have.property('value')
+user.emails[0].should.have.property('primary')
+```
+
+### List Directory Groups
+
+```ts test
+const groups = await api.workos.directorySync.listGroups({
+  directory: 'dir_xxx'
+})
+
+groups.data.should.be.an('array')
+groups.data.forEach(group => {
+  group.should.have.property('id')
+  group.should.have.property('name')
+  group.should.have.property('directoryId')
+})
+```
+
+### Get Directory Group
+
+```ts test
+const group = await api.workos.directorySync.getGroup('dir_grp_xxx')
+
+group.should.have.property('id')
+group.should.have.property('name')
+group.should.have.property('idpId')
+```
+
+### Directory Sync Webhooks
+
+```ts test
+on('workos.webhook', async (event) => {
+  switch (event.event) {
+    case 'dsync.user.created':
+      await api.db.Users.create({
+        workosId: event.data.id,
+        email: event.data.emails[0].value,
+        firstName: event.data.first_name,
+        lastName: event.data.last_name
+      })
+      break
+
+    case 'dsync.user.updated':
+      await api.db.Users.update(event.data.id, {
+        email: event.data.emails[0].value,
+        firstName: event.data.first_name,
+        lastName: event.data.last_name
+      })
+      break
+
+    case 'dsync.user.deleted':
+      await api.db.Users.delete(event.data.id)
+      break
+
+    case 'dsync.group.user_added':
+      await api.db.GroupMemberships.create({
+        userId: event.data.user.id,
+        groupId: event.data.group.id
+      })
+      break
+
+    case 'dsync.group.user_removed':
+      await api.db.GroupMemberships.delete({
+        userId: event.data.user.id,
+        groupId: event.data.group.id
+      })
+      break
+  }
+})
+```
+
+## Organizations
+
+### Create Organization
+
+```ts test
+const organization = await api.workos.organizations.create({
+  name: 'Acme Inc',
+  domains: ['acme.com'],
+  allowProfilesOutsideOrganization: false
+})
+
+organization.should.have.property('id')
+organization.id.should.match(/^org_/)
+organization.name.should.equal('Acme Inc')
+organization.domains.should.contain('acme.com')
+```
+
+### Get Organization
+
+```ts test
+const organization = await api.workos.organizations.get('org_xxx')
+
+organization.should.have.property('id')
+organization.should.have.property('name')
+organization.should.have.property('domains')
+organization.should.have.property('createdAt')
+```
+
+### Update Organization
+
+```ts test
+const updated = await api.workos.organizations.update('org_xxx', {
+  name: 'Acme Corporation',
+  domains: ['acme.com', 'acme.io']
+})
+
+updated.name.should.equal('Acme Corporation')
+updated.domains.should.have.lengthOf(2)
+```
+
+### List Organizations
+
+```ts test
+const organizations = await api.workos.organizations.list({
+  limit: 10
+})
+
+organizations.data.should.be.an('array')
+organizations.should.have.property('listMetadata')
+```
+
+### Delete Organization
+
+```ts test
+await api.workos.organizations.delete('org_xxx')
+```
+
+## Admin Portal
+
+### Generate Portal Link
+
+```ts test
+const portalLink = await api.workos.portal.generateLink({
+  organization: 'org_xxx',
+  intent: 'sso'
+})
+
+portalLink.should.have.property('link')
+portalLink.link.should.contain('workos.com')
+```
+
+### SSO Portal Link
+
+```ts test
+const ssoPortal = await api.workos.portal.generateLink({
+  organization: 'org_xxx',
+  intent: 'sso',
+  returnUrl: 'https://example.com/settings'
+})
+
+ssoPortal.link.should.be.a('string')
+```
+
+### Directory Sync Portal Link
+
+```ts test
+const dsyncPortal = await api.workos.portal.generateLink({
+  organization: 'org_xxx',
+  intent: 'dsync'
+})
+
+dsyncPortal.link.should.be.a('string')
+```
+
+### Audit Logs Portal Link
+
+```ts test
+const auditPortal = await api.workos.portal.generateLink({
+  organization: 'org_xxx',
+  intent: 'audit_logs'
+})
+
+auditPortal.link.should.be.a('string')
+```
+
+### Domain Verification Portal
+
+```ts test
+const domainPortal = await api.workos.portal.generateLink({
+  organization: 'org_xxx',
+  intent: 'domain_verification'
+})
+
+domainPortal.link.should.be.a('string')
+```
+
+## Multi-Factor Authentication (MFA)
+
+### Enroll Factor
+
+```ts test
+const factor = await api.workos.mfa.enrollFactor({
+  type: 'totp',
+  totpIssuer: 'MyApp',
+  totpUser: 'user@example.com'
+})
+
+factor.should.have.property('id')
+factor.should.have.property('type', 'totp')
+factor.should.have.property('totp')
+factor.totp.should.have.property('qrCode')
+factor.totp.should.have.property('secret')
+factor.totp.should.have.property('uri')
+```
+
+### Enroll SMS Factor
+
+```ts test
+const factor = await api.workos.mfa.enrollFactor({
+  type: 'sms',
+  phoneNumber: '+14155551234'
+})
+
+factor.should.have.property('id')
+factor.should.have.property('type', 'sms')
+factor.should.have.property('sms')
+factor.sms.phoneNumber.should.equal('+14155551234')
+```
+
+### Challenge Factor
+
+```ts test
+const challenge = await api.workos.mfa.challengeFactor({
+  authenticationFactorId: 'auth_factor_xxx'
+})
+
+challenge.should.have.property('id')
+challenge.should.have.property('authenticationFactorId')
+challenge.should.have.property('expiresAt')
+```
+
+### Verify Challenge
+
+```ts test
+const verification = await api.workos.mfa.verifyChallenge({
+  authenticationChallengeId: 'auth_challenge_xxx',
+  code: '123456'
+})
+
+verification.should.have.property('challenge')
+verification.should.have.property('valid')
+verification.valid.should.be.true
+```
+
+### Get Factor
+
+```ts test
+const factor = await api.workos.mfa.getFactor('auth_factor_xxx')
+
+factor.should.have.property('id')
+factor.should.have.property('type')
+factor.should.have.property('createdAt')
+factor.should.have.property('updatedAt')
+```
+
+### Delete Factor
+
+```ts test
+await api.workos.mfa.deleteFactor('auth_factor_xxx')
+```
+
+## Audit Logs
+
+### Create Event
+
+```ts test
+const event = await api.workos.auditLogs.createEvent({
+  organization: 'org_xxx',
+  event: {
+    action: 'user.login',
+    occurredAt: new Date().toISOString(),
+    actor: {
+      type: 'user',
+      id: 'user_xxx',
+      name: 'Alice Smith',
+      metadata: { email: 'alice@example.com' }
+    },
+    targets: [
+      {
+        type: 'team',
+        id: 'team_xxx',
+        name: 'Engineering'
+      }
+    ],
+    context: {
+      location: '192.168.1.1',
+      userAgent: 'Mozilla/5.0...'
+    },
+    metadata: {
+      method: 'sso'
+    }
+  }
+})
+
+event.should.have.property('success', true)
+```
+
+### Create Events (Batch)
+
+```ts test
+const result = await api.workos.auditLogs.createEvents({
+  organization: 'org_xxx',
+  events: [
+    {
+      action: 'document.viewed',
+      occurredAt: new Date().toISOString(),
+      actor: { type: 'user', id: 'user_1' },
+      targets: [{ type: 'document', id: 'doc_1' }]
+    },
+    {
+      action: 'document.edited',
+      occurredAt: new Date().toISOString(),
+      actor: { type: 'user', id: 'user_1' },
+      targets: [{ type: 'document', id: 'doc_1' }]
+    }
+  ]
+})
+
+result.should.have.property('success', true)
+```
+
+### List Events
+
+```ts test
+const events = await api.workos.auditLogs.listEvents({
+  organization: 'org_xxx',
+  limit: 50,
+  rangeStart: '2024-01-01T00:00:00Z',
+  rangeEnd: '2024-12-31T23:59:59Z'
+})
+
+events.data.should.be.an('array')
+events.data.forEach(event => {
+  event.should.have.property('id')
+  event.should.have.property('action')
+  event.should.have.property('occurredAt')
+  event.should.have.property('actor')
+})
+```
+
+### Export Events
+
+```ts test
+const exportJob = await api.workos.auditLogs.createExport({
+  organization: 'org_xxx',
+  rangeStart: '2024-01-01T00:00:00Z',
+  rangeEnd: '2024-01-31T23:59:59Z',
+  targets: ['document'],
+  actions: ['document.viewed', 'document.edited']
+})
+
+exportJob.should.have.property('id')
+exportJob.should.have.property('state')
+```
+
+### Get Export
+
+```ts test
+const exportJob = await api.workos.auditLogs.getExport('audit_log_export_xxx')
+
+exportJob.should.have.property('id')
+exportJob.should.have.property('state')
+if (exportJob.state === 'ready') {
+  exportJob.should.have.property('url')
+}
+```
+
+### Event Schema
+
+```ts test
+const schema = await api.workos.auditLogs.createSchema({
+  organization: 'org_xxx',
+  targets: {
+    document: {
+      type: 'string'
+    }
+  },
+  actions: {
+    'document.viewed': {
+      targets: ['document']
+    },
+    'document.edited': {
+      targets: ['document']
+    },
+    'document.deleted': {
+      targets: ['document']
+    }
+  }
+})
+
+schema.should.have.property('success', true)
+```
+
+## User Management
+
+### Create User
+
+```ts test
+const user = await api.workos.userManagement.createUser({
+  email: 'user@example.com',
+  firstName: 'John',
+  lastName: 'Doe',
+  password: 'securepassword123',
+  emailVerified: true
+})
+
+user.should.have.property('id')
+user.should.have.property('email', 'user@example.com')
+user.should.have.property('firstName', 'John')
+user.should.have.property('lastName', 'Doe')
+```
+
+### Get User
+
+```ts test
+const user = await api.workos.userManagement.getUser('user_xxx')
+
+user.should.have.property('id')
+user.should.have.property('email')
+user.should.have.property('emailVerified')
+user.should.have.property('createdAt')
+```
+
+### Update User
+
+```ts test
+const updated = await api.workos.userManagement.updateUser('user_xxx', {
+  firstName: 'Jonathan',
+  lastName: 'Smith'
+})
+
+updated.firstName.should.equal('Jonathan')
+updated.lastName.should.equal('Smith')
+```
+
+### List Users
+
+```ts test
+const users = await api.workos.userManagement.listUsers({
+  limit: 10
+})
+
+users.data.should.be.an('array')
+```
+
+### Delete User
+
+```ts test
+await api.workos.userManagement.deleteUser('user_xxx')
+```
+
+### Authenticate with Password
+
+```ts test
+const { user, organizationId, accessToken, refreshToken } = await api.workos.userManagement.authenticateWithPassword({
+  clientId: 'client_xxx',
+  email: 'user@example.com',
+  password: 'securepassword123'
+})
+
+user.should.have.property('id')
+accessToken.should.be.a('string')
+refreshToken.should.be.a('string')
+```
+
+### Authenticate with Code
+
+```ts test
+const result = await api.workos.userManagement.authenticateWithCode({
+  clientId: 'client_xxx',
+  code: 'code_xxx'
+})
+
+result.should.have.property('user')
+result.should.have.property('accessToken')
+```
+
+### Send Magic Link
+
+```ts test
+await api.workos.userManagement.sendMagicAuthCode({
+  email: 'user@example.com'
+})
+```
+
+### Authenticate with Magic Link
+
+```ts test
+const result = await api.workos.userManagement.authenticateWithMagicAuth({
+  clientId: 'client_xxx',
+  code: 'magic_auth_code',
+  email: 'user@example.com'
+})
+
+result.should.have.property('user')
+result.should.have.property('accessToken')
+```
+
+### Send Verification Email
+
+```ts test
+await api.workos.userManagement.sendVerificationEmail({
+  userId: 'user_xxx'
+})
+```
+
+### Verify Email
+
+```ts test
+const user = await api.workos.userManagement.verifyEmail({
+  userId: 'user_xxx',
+  code: 'verification_code'
+})
+
+user.emailVerified.should.be.true
+```
+
+### Send Password Reset
+
+```ts test
+await api.workos.userManagement.sendPasswordResetEmail({
+  email: 'user@example.com'
+})
+```
+
+### Reset Password
+
+```ts test
+const user = await api.workos.userManagement.resetPassword({
+  token: 'reset_token',
+  newPassword: 'newsecurepassword456'
+})
+
+user.should.have.property('id')
+```
+
+### Organization Membership
+
+```ts test
+const membership = await api.workos.userManagement.createOrganizationMembership({
+  userId: 'user_xxx',
+  organizationId: 'org_xxx'
+})
+
+membership.should.have.property('id')
+membership.should.have.property('userId')
+membership.should.have.property('organizationId')
+```
+
+### List Organization Memberships
+
+```ts test
+const memberships = await api.workos.userManagement.listOrganizationMemberships({
+  userId: 'user_xxx'
+})
+
+memberships.data.should.be.an('array')
+memberships.data.forEach(m => {
+  m.should.have.property('organizationId')
+})
+```
+
+## Webhooks
+
+### Verify Webhook
+
+```ts test
+const payload = '{"id": "event_xxx", "event": "dsync.user.created"}'
+const signature = 'sig_xxx'
+
+const event = api.workos.webhooks.constructEvent({
+  payload,
+  sigHeader: signature,
+  secret: 'webhook_secret'
+})
+
+event.should.have.property('id')
+event.should.have.property('event')
+event.should.have.property('data')
+```
+
+### Handle Webhook Events
+
+```ts test
+on('workos.webhook', async (event) => {
+  switch (event.event) {
+    case 'connection.activated':
+      await api.db.Integrations.update(event.data.organization_id, {
+        ssoEnabled: true,
+        connectionId: event.data.id
+      })
+      break
+
+    case 'connection.deactivated':
+      await api.db.Integrations.update(event.data.organization_id, {
+        ssoEnabled: false
+      })
+      break
+
+    case 'user.created':
+      await api.db.Users.create({
+        workosId: event.data.id,
+        email: event.data.email
+      })
+      break
+  }
+})
+```
+
+## Integration Example
+
+### Full SSO Flow
+
+```ts test
+// 1. User clicks "Sign in with SSO"
+const authUrl = api.workos.sso.getAuthorizationUrl({
+  clientId: 'client_xxx',
+  redirectUri: 'https://myapp.com/callback',
+  organization: 'org_xxx'
+})
+
+// 2. User is redirected back with code
+// 3. Exchange code for profile
+const { profile, accessToken } = await api.workos.sso.getProfileAndToken({
+  clientId: 'client_xxx',
+  code: 'auth_code_from_callback'
+})
+
+// 4. Find or create user in your database
+let user = await api.db.Users.find({ where: { workosId: profile.id } })
+
+if (user.length === 0) {
+  user = await api.db.Users.create({
+    workosId: profile.id,
+    email: profile.email,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    organizationId: profile.organizationId
+  })
+} else {
+  user = user[0]
+}
+
+// 5. Create session for user
+const session = await api.db.Sessions.create({
+  userId: user.id,
+  accessToken,
+  expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+})
+
+user.should.have.property('id')
+session.should.have.property('accessToken')
+```

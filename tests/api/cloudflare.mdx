@@ -1,0 +1,791 @@
+---
+$type: TestSuite
+title: Cloudflare API Tests
+description: Full Cloudflare SDK - Workers, KV, R2, D1, Queues, Durable Objects
+---
+
+# Cloudflare API Tests
+
+The full Cloudflare API is available at `api.cloudflare`.
+Includes Workers, KV, R2, D1, Queues, Durable Objects, and more.
+
+## Workers
+
+### Deploy Worker
+
+```ts test
+const worker = await api.cloudflare.workers.deploy('my-worker', {
+  script: `
+    export default {
+      async fetch(request, env) {
+        return new Response('Hello from Worker!')
+      }
+    }
+  `,
+  bindings: {
+    KV: { type: 'kv_namespace', namespace_id: 'xxx' },
+    DB: { type: 'd1', database_id: 'yyy' }
+  }
+})
+
+worker.should.have.property('id')
+worker.should.have.property('name', 'my-worker')
+worker.should.have.property('routes')
+```
+
+### Update Worker
+
+```ts test
+const updated = await api.cloudflare.workers.update('my-worker', {
+  script: `
+    export default {
+      async fetch(request, env) {
+        return new Response('Updated Worker!')
+      }
+    }
+  `
+})
+
+updated.should.have.property('id')
+```
+
+### Delete Worker
+
+```ts test
+const result = await api.cloudflare.workers.delete('my-worker')
+
+result.success.should.be.true
+```
+
+### List Workers
+
+```ts test
+const workers = await api.cloudflare.workers.list()
+
+workers.should.be.an('array')
+workers.forEach(w => {
+  w.should.have.property('id')
+  w.should.have.property('name')
+})
+```
+
+### Worker Routes
+
+```ts test
+const route = await api.cloudflare.workers.routes.create({
+  pattern: 'api.example.com/*',
+  script: 'my-worker'
+})
+
+route.should.have.property('id')
+route.pattern.should.equal('api.example.com/*')
+```
+
+### Worker Secrets
+
+```ts test
+await api.cloudflare.workers.secrets.put('my-worker', 'API_KEY', 'secret-value')
+
+const secrets = await api.cloudflare.workers.secrets.list('my-worker')
+secrets.should.be.an('array')
+secrets.map(s => s.name).should.contain('API_KEY')
+```
+
+### Worker Cron Triggers
+
+```ts test
+const triggers = await api.cloudflare.workers.crons.update('my-worker', {
+  crons: [
+    { cron: '0 * * * *' },  // Every hour
+    { cron: '0 0 * * *' }   // Daily at midnight
+  ]
+})
+
+triggers.should.have.lengthOf(2)
+```
+
+### Worker Tail Logs
+
+```ts test
+const tail = api.cloudflare.workers.tail('my-worker')
+
+tail.on('log', (log) => {
+  log.should.have.property('timestamp')
+  log.should.have.property('message')
+})
+
+// Stop tailing after 10 seconds
+setTimeout(() => tail.stop(), 10000)
+```
+
+## KV (Key-Value Store)
+
+### Create Namespace
+
+```ts test
+const namespace = await api.cloudflare.kv.namespaces.create({
+  title: 'MY_KV_NAMESPACE'
+})
+
+namespace.should.have.property('id')
+namespace.title.should.equal('MY_KV_NAMESPACE')
+```
+
+### Write Key
+
+```ts test
+await api.cloudflare.kv.put('MY_NAMESPACE', 'user:123', JSON.stringify({
+  name: 'Alice',
+  email: 'alice@example.com'
+}), {
+  expirationTtl: 3600, // 1 hour
+  metadata: { version: '1' }
+})
+```
+
+### Read Key
+
+```ts test
+const value = await api.cloudflare.kv.get('MY_NAMESPACE', 'user:123')
+
+const user = JSON.parse(value)
+user.name.should.equal('Alice')
+```
+
+### Read with Metadata
+
+```ts test
+const { value, metadata } = await api.cloudflare.kv.getWithMetadata('MY_NAMESPACE', 'user:123')
+
+const user = JSON.parse(value)
+user.should.have.property('name')
+metadata.version.should.equal('1')
+```
+
+### Delete Key
+
+```ts test
+await api.cloudflare.kv.delete('MY_NAMESPACE', 'user:123')
+
+const value = await api.cloudflare.kv.get('MY_NAMESPACE', 'user:123')
+expect(value).toBeNull()
+```
+
+### List Keys
+
+```ts test
+await api.cloudflare.kv.put('MY_NAMESPACE', 'prefix:1', 'value1')
+await api.cloudflare.kv.put('MY_NAMESPACE', 'prefix:2', 'value2')
+await api.cloudflare.kv.put('MY_NAMESPACE', 'other:1', 'value3')
+
+const keys = await api.cloudflare.kv.list('MY_NAMESPACE', {
+  prefix: 'prefix:'
+})
+
+keys.should.have.lengthOf(2)
+keys.every(k => k.name.startsWith('prefix:')).should.be.true
+```
+
+### Bulk Operations
+
+```ts test
+await api.cloudflare.kv.bulk.put('MY_NAMESPACE', [
+  { key: 'bulk:1', value: 'one' },
+  { key: 'bulk:2', value: 'two' },
+  { key: 'bulk:3', value: 'three' }
+])
+
+await api.cloudflare.kv.bulk.delete('MY_NAMESPACE', [
+  'bulk:1', 'bulk:2', 'bulk:3'
+])
+```
+
+## R2 (Object Storage)
+
+### Create Bucket
+
+```ts test
+const bucket = await api.cloudflare.r2.buckets.create({
+  name: 'my-bucket',
+  locationHint: 'wnam' // Western North America
+})
+
+bucket.should.have.property('name', 'my-bucket')
+```
+
+### Upload Object
+
+```ts test
+const object = await api.cloudflare.r2.put('my-bucket', 'documents/report.pdf', pdfBuffer, {
+  contentType: 'application/pdf',
+  customMetadata: { author: 'Alice', version: '1.0' }
+})
+
+object.should.have.property('key', 'documents/report.pdf')
+object.should.have.property('etag')
+object.should.have.property('size')
+```
+
+### Download Object
+
+```ts test
+const { body, contentType, customMetadata } = await api.cloudflare.r2.get('my-bucket', 'documents/report.pdf')
+
+contentType.should.equal('application/pdf')
+customMetadata.author.should.equal('Alice')
+body.should.be.instanceof(Buffer)
+```
+
+### Delete Object
+
+```ts test
+await api.cloudflare.r2.delete('my-bucket', 'documents/report.pdf')
+
+const result = await api.cloudflare.r2.head('my-bucket', 'documents/report.pdf')
+expect(result).toBeNull()
+```
+
+### List Objects
+
+```ts test
+await api.cloudflare.r2.put('my-bucket', 'images/a.png', bufferA)
+await api.cloudflare.r2.put('my-bucket', 'images/b.png', bufferB)
+await api.cloudflare.r2.put('my-bucket', 'docs/c.pdf', bufferC)
+
+const objects = await api.cloudflare.r2.list('my-bucket', {
+  prefix: 'images/',
+  limit: 100
+})
+
+objects.objects.should.have.lengthOf(2)
+objects.objects.every(o => o.key.startsWith('images/')).should.be.true
+```
+
+### Multipart Upload
+
+```ts test
+const upload = await api.cloudflare.r2.createMultipartUpload('my-bucket', 'large-file.zip')
+
+const part1 = await upload.uploadPart(1, chunk1)
+const part2 = await upload.uploadPart(2, chunk2)
+const part3 = await upload.uploadPart(3, chunk3)
+
+const complete = await upload.complete([part1, part2, part3])
+
+complete.should.have.property('key', 'large-file.zip')
+```
+
+### Presigned URLs
+
+```ts test
+const url = await api.cloudflare.r2.getSignedUrl('my-bucket', 'private/file.pdf', {
+  expiresIn: 3600, // 1 hour
+  action: 'get'
+})
+
+url.should.contain('X-Amz-Signature=')
+```
+
+### Object Metadata
+
+```ts test
+const head = await api.cloudflare.r2.head('my-bucket', 'documents/report.pdf')
+
+head.should.have.property('size')
+head.should.have.property('etag')
+head.should.have.property('contentType')
+head.should.have.property('uploaded')
+```
+
+## D1 (SQL Database)
+
+### Create Database
+
+```ts test
+const database = await api.cloudflare.d1.databases.create({
+  name: 'my-database'
+})
+
+database.should.have.property('uuid')
+database.name.should.equal('my-database')
+```
+
+### Execute SQL
+
+```ts test
+const result = await api.cloudflare.d1.execute('my-database', `
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`)
+
+result.success.should.be.true
+```
+
+### Query Database
+
+```ts test
+// Insert
+await api.cloudflare.d1.execute('my-database', `
+  INSERT INTO users (name, email) VALUES (?, ?)
+`, ['Alice', 'alice@example.com'])
+
+// Select
+const result = await api.cloudflare.d1.query('my-database', `
+  SELECT * FROM users WHERE email = ?
+`, ['alice@example.com'])
+
+result.results.should.have.lengthOf(1)
+result.results[0].name.should.equal('Alice')
+```
+
+### Batch Queries
+
+```ts test
+const results = await api.cloudflare.d1.batch('my-database', [
+  { sql: 'INSERT INTO users (name, email) VALUES (?, ?)', params: ['Bob', 'bob@example.com'] },
+  { sql: 'INSERT INTO users (name, email) VALUES (?, ?)', params: ['Charlie', 'charlie@example.com'] },
+  { sql: 'SELECT COUNT(*) as count FROM users' }
+])
+
+results.should.have.lengthOf(3)
+results[2].results[0].count.should.be.above(0)
+```
+
+### Prepared Statements
+
+```ts test
+const stmt = api.cloudflare.d1.prepare('my-database', `
+  SELECT * FROM users WHERE name LIKE ?
+`)
+
+const result = await stmt.bind('%ali%').all()
+
+result.results.forEach(user => {
+  user.name.toLowerCase().should.contain('ali')
+})
+```
+
+### Database Info
+
+```ts test
+const info = await api.cloudflare.d1.databases.get('my-database')
+
+info.should.have.property('uuid')
+info.should.have.property('name')
+info.should.have.property('num_tables')
+info.should.have.property('file_size')
+```
+
+## Queues
+
+### Create Queue
+
+```ts test
+const queue = await api.cloudflare.queues.create({
+  name: 'my-queue'
+})
+
+queue.should.have.property('queue_id')
+queue.queue_name.should.equal('my-queue')
+```
+
+### Send Message
+
+```ts test
+const message = await api.cloudflare.queues.send('my-queue', {
+  body: { orderId: 'order-123', action: 'process' },
+  contentType: 'json'
+})
+
+message.should.have.property('messageId')
+```
+
+### Send Batch
+
+```ts test
+const results = await api.cloudflare.queues.sendBatch('my-queue', [
+  { body: { id: 1 } },
+  { body: { id: 2 } },
+  { body: { id: 3 } }
+])
+
+results.should.have.lengthOf(3)
+results.every(r => r.success).should.be.true
+```
+
+### Consume Messages
+
+```ts test
+const messages = await api.cloudflare.queues.pull('my-queue', {
+  batchSize: 10,
+  visibilityTimeout: 30
+})
+
+messages.should.be.an('array')
+messages.forEach(msg => {
+  msg.should.have.property('id')
+  msg.should.have.property('body')
+})
+```
+
+### Acknowledge Message
+
+```ts test
+const messages = await api.cloudflare.queues.pull('my-queue', { batchSize: 1 })
+
+if (messages.length > 0) {
+  await api.cloudflare.queues.ack('my-queue', messages[0].id)
+}
+```
+
+### Queue Consumer
+
+```ts test
+api.cloudflare.queues.consumer('my-queue', async (batch) => {
+  for (const message of batch.messages) {
+    await processMessage(message.body)
+    message.ack()
+  }
+})
+```
+
+## Durable Objects
+
+### Define Durable Object
+
+```ts test
+const durableObject = api.cloudflare.durableObjects.define('Counter', {
+  async fetch(request, env) {
+    const url = new URL(request.url)
+
+    switch (url.pathname) {
+      case '/increment':
+        this.value = (this.value || 0) + 1
+        return new Response(String(this.value))
+
+      case '/decrement':
+        this.value = (this.value || 0) - 1
+        return new Response(String(this.value))
+
+      case '/value':
+        return new Response(String(this.value || 0))
+
+      default:
+        return new Response('Not found', { status: 404 })
+    }
+  }
+})
+
+durableObject.should.have.property('name', 'Counter')
+```
+
+### Get Durable Object Stub
+
+```ts test
+const id = api.cloudflare.durableObjects.idFromName('Counter', 'my-counter')
+const stub = api.cloudflare.durableObjects.get('Counter', id)
+
+const response = await stub.fetch('https://fake-host/increment')
+const value = await response.text()
+
+value.should.be.a('string')
+```
+
+### Durable Object Storage
+
+```ts test
+const durableObject = api.cloudflare.durableObjects.define('Storage', {
+  async fetch(request, env) {
+    // Access persistent storage
+    const stored = await this.state.storage.get('data')
+
+    if (request.method === 'PUT') {
+      const data = await request.json()
+      await this.state.storage.put('data', data)
+      return new Response('Stored')
+    }
+
+    return new Response(JSON.stringify(stored))
+  }
+})
+```
+
+### Durable Object Alarms
+
+```ts test
+const durableObject = api.cloudflare.durableObjects.define('Scheduled', {
+  async fetch(request, env) {
+    // Set an alarm for 1 minute from now
+    await this.state.storage.setAlarm(Date.now() + 60000)
+    return new Response('Alarm set')
+  },
+
+  async alarm() {
+    // This runs when the alarm fires
+    await this.processScheduledTask()
+  }
+})
+```
+
+## Pages
+
+### Create Project
+
+```ts test
+const project = await api.cloudflare.pages.projects.create({
+  name: 'my-site',
+  production_branch: 'main'
+})
+
+project.should.have.property('name', 'my-site')
+project.should.have.property('subdomain')
+```
+
+### Create Deployment
+
+```ts test
+const deployment = await api.cloudflare.pages.deployments.create('my-site', {
+  branch: 'main',
+  commitHash: 'abc123',
+  commitMessage: 'Update homepage'
+})
+
+deployment.should.have.property('id')
+deployment.should.have.property('url')
+```
+
+### Upload Assets
+
+```ts test
+const result = await api.cloudflare.pages.deployments.upload('my-site', 'deployment-id', {
+  'index.html': '<html>Hello</html>',
+  'styles.css': 'body { margin: 0; }',
+  '_headers': '/*\n  X-Frame-Options: DENY'
+})
+
+result.success.should.be.true
+```
+
+### List Deployments
+
+```ts test
+const deployments = await api.cloudflare.pages.deployments.list('my-site')
+
+deployments.should.be.an('array')
+deployments.forEach(d => {
+  d.should.have.property('id')
+  d.should.have.property('url')
+  d.should.have.property('created_on')
+})
+```
+
+## DNS
+
+### Create Record
+
+```ts test
+const record = await api.cloudflare.dns.records.create('zone-id', {
+  type: 'A',
+  name: 'api',
+  content: '192.0.2.1',
+  ttl: 3600,
+  proxied: true
+})
+
+record.should.have.property('id')
+record.type.should.equal('A')
+record.name.should.contain('api')
+```
+
+### Update Record
+
+```ts test
+const updated = await api.cloudflare.dns.records.update('zone-id', 'record-id', {
+  content: '192.0.2.2'
+})
+
+updated.content.should.equal('192.0.2.2')
+```
+
+### Delete Record
+
+```ts test
+const result = await api.cloudflare.dns.records.delete('zone-id', 'record-id')
+
+result.success.should.be.true
+```
+
+### List Records
+
+```ts test
+const records = await api.cloudflare.dns.records.list('zone-id', {
+  type: 'A'
+})
+
+records.should.be.an('array')
+```
+
+## Zones
+
+### List Zones
+
+```ts test
+const zones = await api.cloudflare.zones.list()
+
+zones.should.be.an('array')
+zones.forEach(z => {
+  z.should.have.property('id')
+  z.should.have.property('name')
+  z.should.have.property('status')
+})
+```
+
+### Purge Cache
+
+```ts test
+const result = await api.cloudflare.zones.purgeCache('zone-id', {
+  files: [
+    'https://example.com/styles.css',
+    'https://example.com/app.js'
+  ]
+})
+
+result.success.should.be.true
+```
+
+### Purge Everything
+
+```ts test
+const result = await api.cloudflare.zones.purgeCache('zone-id', {
+  purge_everything: true
+})
+
+result.success.should.be.true
+```
+
+## Analytics
+
+### Worker Analytics
+
+```ts test
+const analytics = await api.cloudflare.analytics.workers.get('my-worker', {
+  since: '-1d',
+  until: 'now'
+})
+
+analytics.should.have.property('requests')
+analytics.should.have.property('errors')
+analytics.should.have.property('cpuTime')
+```
+
+### Zone Analytics
+
+```ts test
+const analytics = await api.cloudflare.analytics.zones.get('zone-id', {
+  since: '-7d',
+  metrics: ['requests', 'bandwidth', 'threats']
+})
+
+analytics.should.have.property('totals')
+analytics.should.have.property('timeseries')
+```
+
+## AI (Workers AI)
+
+### Text Generation
+
+```ts test
+const response = await api.cloudflare.ai.run('@cf/meta/llama-2-7b-chat-int8', {
+  messages: [
+    { role: 'user', content: 'What is the capital of France?' }
+  ]
+})
+
+response.should.have.property('response')
+response.response.should.contain('Paris')
+```
+
+### Text Embeddings
+
+```ts test
+const embeddings = await api.cloudflare.ai.run('@cf/baai/bge-base-en-v1.5', {
+  text: ['Hello world', 'How are you?']
+})
+
+embeddings.should.have.property('data')
+embeddings.data.should.have.lengthOf(2)
+embeddings.data[0].should.be.an('array')
+```
+
+### Image Classification
+
+```ts test
+const result = await api.cloudflare.ai.run('@cf/microsoft/resnet-50', {
+  image: imageBuffer
+})
+
+result.should.be.an('array')
+result[0].should.have.property('label')
+result[0].should.have.property('score')
+```
+
+### Text to Image
+
+```ts test
+const image = await api.cloudflare.ai.run('@cf/stabilityai/stable-diffusion-xl-base-1.0', {
+  prompt: 'A beautiful sunset over mountains'
+})
+
+image.should.be.instanceof(Buffer)
+```
+
+## Vectorize
+
+### Create Index
+
+```ts test
+const index = await api.cloudflare.vectorize.indexes.create({
+  name: 'my-vectors',
+  dimensions: 768,
+  metric: 'cosine'
+})
+
+index.should.have.property('name', 'my-vectors')
+index.dimensions.should.equal(768)
+```
+
+### Insert Vectors
+
+```ts test
+await api.cloudflare.vectorize.insert('my-vectors', [
+  { id: 'doc-1', values: vector1, metadata: { title: 'Document 1' } },
+  { id: 'doc-2', values: vector2, metadata: { title: 'Document 2' } },
+  { id: 'doc-3', values: vector3, metadata: { title: 'Document 3' } }
+])
+```
+
+### Query Vectors
+
+```ts test
+const results = await api.cloudflare.vectorize.query('my-vectors', {
+  vector: queryVector,
+  topK: 5,
+  filter: { category: 'tech' }
+})
+
+results.matches.should.have.length.at.most(5)
+results.matches.forEach(m => {
+  m.should.have.property('id')
+  m.should.have.property('score')
+})
+```
+
+### Delete Vectors
+
+```ts test
+await api.cloudflare.vectorize.delete('my-vectors', ['doc-1', 'doc-2'])
+```

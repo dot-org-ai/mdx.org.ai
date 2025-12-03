@@ -1,0 +1,1103 @@
+---
+$type: TestSuite
+title: HTTP & Hono Tests
+description: Tests for HTTP serving with Hono framework - app is in global scope
+---
+
+# HTTP & Hono Tests
+
+The `app` global provides a Hono application instance for HTTP routing.
+All Hono features are available including routing, middleware, and context helpers.
+
+## Basic Routes
+
+### GET Route
+
+```ts test
+app.get('/hello', (c) => c.text('Hello World'))
+
+const res = await app.request('/hello')
+
+res.status.should.equal(200)
+const text = await res.text()
+text.should.equal('Hello World')
+```
+
+### POST Route
+
+```ts test
+app.post('/users', async (c) => {
+  const body = await c.req.json()
+  return c.json({ created: true, user: body })
+})
+
+const res = await app.request('/users', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: 'Alice', email: 'alice@example.com' })
+})
+
+res.status.should.equal(200)
+const json = await res.json()
+json.should.have.property('created', true)
+json.user.should.have.property('name', 'Alice')
+```
+
+### PUT Route
+
+```ts test
+app.put('/users/:id', async (c) => {
+  const id = c.req.param('id')
+  const body = await c.req.json()
+  return c.json({ updated: true, id, data: body })
+})
+
+const res = await app.request('/users/123', {
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: 'Alice Updated' })
+})
+
+const json = await res.json()
+json.should.have.property('id', '123')
+json.should.have.property('updated', true)
+```
+
+### DELETE Route
+
+```ts test
+app.delete('/users/:id', (c) => {
+  const id = c.req.param('id')
+  return c.json({ deleted: true, id })
+})
+
+const res = await app.request('/users/456', { method: 'DELETE' })
+
+const json = await res.json()
+json.should.have.property('deleted', true)
+json.should.have.property('id', '456')
+```
+
+## Route Parameters
+
+### Single Parameter
+
+```ts test
+app.get('/posts/:id', (c) => {
+  const id = c.req.param('id')
+  return c.json({ postId: id })
+})
+
+const res = await app.request('/posts/42')
+const json = await res.json()
+json.should.have.property('postId', '42')
+```
+
+### Multiple Parameters
+
+```ts test
+app.get('/users/:userId/posts/:postId', (c) => {
+  const userId = c.req.param('userId')
+  const postId = c.req.param('postId')
+  return c.json({ userId, postId })
+})
+
+const res = await app.request('/users/10/posts/5')
+const json = await res.json()
+json.should.have.property('userId', '10')
+json.should.have.property('postId', '5')
+```
+
+### Wildcard Parameter
+
+```ts test
+app.get('/files/*', (c) => {
+  const path = c.req.param('*')
+  return c.json({ path })
+})
+
+const res = await app.request('/files/docs/readme.md')
+const json = await res.json()
+json.should.have.property('path', 'docs/readme.md')
+```
+
+### Optional Parameter
+
+```ts test
+app.get('/search/:query?', (c) => {
+  const query = c.req.param('query') || 'default'
+  return c.json({ query })
+})
+
+const withQuery = await app.request('/search/test')
+const withQueryJson = await withQuery.json()
+withQueryJson.should.have.property('query', 'test')
+
+const withoutQuery = await app.request('/search')
+const withoutQueryJson = await withoutQuery.json()
+withoutQueryJson.should.have.property('query', 'default')
+```
+
+## Query Parameters
+
+### Single Query Param
+
+```ts test
+app.get('/api/search', (c) => {
+  const q = c.req.query('q')
+  return c.json({ query: q })
+})
+
+const res = await app.request('/api/search?q=hello')
+const json = await res.json()
+json.should.have.property('query', 'hello')
+```
+
+### Multiple Query Params
+
+```ts test
+app.get('/api/filter', (c) => {
+  const page = c.req.query('page')
+  const limit = c.req.query('limit')
+  const sort = c.req.query('sort')
+  return c.json({ page, limit, sort })
+})
+
+const res = await app.request('/api/filter?page=2&limit=10&sort=desc')
+const json = await res.json()
+json.should.have.property('page', '2')
+json.should.have.property('limit', '10')
+json.should.have.property('sort', 'desc')
+```
+
+### All Query Params
+
+```ts test
+app.get('/api/all-params', (c) => {
+  const queries = c.req.queries()
+  return c.json(queries)
+})
+
+const res = await app.request('/api/all-params?a=1&b=2&c=3')
+const json = await res.json()
+json.should.have.property('a')
+json.should.have.property('b')
+json.should.have.property('c')
+```
+
+## Response Types
+
+### JSON Response
+
+```ts test
+app.get('/json', (c) => {
+  return c.json({ message: 'Hello', count: 42 })
+})
+
+const res = await app.request('/json')
+res.headers.get('Content-Type').should.contain('application/json')
+
+const json = await res.json()
+json.should.have.property('message', 'Hello')
+json.should.have.property('count', 42)
+```
+
+### HTML Response
+
+```ts test
+app.get('/html', (c) => {
+  return c.html('<html><body><h1>Hello</h1></body></html>')
+})
+
+const res = await app.request('/html')
+res.headers.get('Content-Type').should.contain('text/html')
+
+const html = await res.text()
+html.should.contain('<h1>Hello</h1>')
+```
+
+### Text Response
+
+```ts test
+app.get('/text', (c) => c.text('Plain text response'))
+
+const res = await app.request('/text')
+res.headers.get('Content-Type').should.contain('text/plain')
+
+const text = await res.text()
+text.should.equal('Plain text response')
+```
+
+### Custom Status Code
+
+```ts test
+app.post('/created', (c) => {
+  return c.json({ id: 'new-123' }, 201)
+})
+
+const res = await app.request('/created', { method: 'POST' })
+res.status.should.equal(201)
+```
+
+### Redirect
+
+```ts test
+app.get('/old-page', (c) => c.redirect('/new-page'))
+
+const res = await app.request('/old-page', { redirect: 'manual' })
+res.status.should.equal(302)
+res.headers.get('Location').should.equal('/new-page')
+```
+
+### Custom Headers
+
+```ts test
+app.get('/custom-headers', (c) => {
+  c.header('X-Custom-Header', 'custom-value')
+  c.header('X-Request-Id', 'req-123')
+  return c.json({ ok: true })
+})
+
+const res = await app.request('/custom-headers')
+res.headers.get('X-Custom-Header').should.equal('custom-value')
+res.headers.get('X-Request-Id').should.equal('req-123')
+```
+
+## Middleware
+
+### Basic Middleware
+
+```ts test
+const logs = []
+
+app.use('/api/*', async (c, next) => {
+  logs.push(`before: ${c.req.path}`)
+  await next()
+  logs.push(`after: ${c.req.path}`)
+})
+
+app.get('/api/test', (c) => c.json({ ok: true }))
+
+await app.request('/api/test')
+
+logs.should.include('before: /api/test')
+logs.should.include('after: /api/test')
+```
+
+### Auth Middleware
+
+```ts test
+const authMiddleware = async (c, next) => {
+  const token = c.req.header('Authorization')
+  if (!token || !token.startsWith('Bearer ')) {
+    return c.json({ error: 'Unauthorized' }, 401)
+  }
+  c.set('token', token.replace('Bearer ', ''))
+  await next()
+}
+
+app.use('/protected/*', authMiddleware)
+
+app.get('/protected/data', (c) => {
+  const token = c.get('token')
+  return c.json({ data: 'secret', token })
+})
+
+// Without auth
+const noAuth = await app.request('/protected/data')
+noAuth.status.should.equal(401)
+
+// With auth
+const withAuth = await app.request('/protected/data', {
+  headers: { Authorization: 'Bearer my-token' }
+})
+withAuth.status.should.equal(200)
+const json = await withAuth.json()
+json.should.have.property('token', 'my-token')
+```
+
+### CORS Middleware
+
+```ts test
+app.use('/cors/*', async (c, next) => {
+  c.header('Access-Control-Allow-Origin', '*')
+  c.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+  await next()
+})
+
+app.get('/cors/data', (c) => c.json({ data: 'cors-enabled' }))
+
+const res = await app.request('/cors/data')
+res.headers.get('Access-Control-Allow-Origin').should.equal('*')
+```
+
+### Timing Middleware
+
+```ts test
+app.use('/timed/*', async (c, next) => {
+  const start = Date.now()
+  await next()
+  const duration = Date.now() - start
+  c.header('X-Response-Time', `${duration}ms`)
+})
+
+app.get('/timed/slow', async (c) => {
+  await delay(10)
+  return c.json({ done: true })
+})
+
+const res = await app.request('/timed/slow')
+res.headers.get('X-Response-Time').should.match(/\d+ms/)
+```
+
+### Error Handling Middleware
+
+```ts test
+app.use('/errors/*', async (c, next) => {
+  try {
+    await next()
+  } catch (err) {
+    return c.json({ error: err.message }, 500)
+  }
+})
+
+app.get('/errors/throw', (c) => {
+  throw new Error('Something went wrong')
+})
+
+const res = await app.request('/errors/throw')
+res.status.should.equal(500)
+const json = await res.json()
+json.should.have.property('error', 'Something went wrong')
+```
+
+## Route Groups
+
+### API Group
+
+```ts test
+const api = app.basePath('/api/v1')
+
+api.get('/users', (c) => c.json([{ id: 1 }, { id: 2 }]))
+api.get('/posts', (c) => c.json([{ id: 1, title: 'Hello' }]))
+
+const usersRes = await app.request('/api/v1/users')
+const users = await usersRes.json()
+users.should.have.lengthOf(2)
+
+const postsRes = await app.request('/api/v1/posts')
+const posts = await postsRes.json()
+posts[0].should.have.property('title', 'Hello')
+```
+
+### Nested Groups
+
+```ts test
+const admin = app.basePath('/admin')
+const adminUsers = admin.basePath('/users')
+const adminPosts = admin.basePath('/posts')
+
+adminUsers.get('/', (c) => c.json({ resource: 'users' }))
+adminPosts.get('/', (c) => c.json({ resource: 'posts' }))
+
+const usersRes = await app.request('/admin/users')
+const users = await usersRes.json()
+users.should.have.property('resource', 'users')
+
+const postsRes = await app.request('/admin/posts')
+const posts = await postsRes.json()
+posts.should.have.property('resource', 'posts')
+```
+
+## MDX Integration
+
+### Serve MDX Content
+
+```ts test
+app.get('/docs/:slug', async (c) => {
+  const slug = c.req.param('slug')
+  const doc = await db.Docs.get(slug)
+
+  if (!doc) {
+    return c.json({ error: 'Not found' }, 404)
+  }
+
+  return c.json(doc.data)
+})
+
+await db.Docs.create('intro', {
+  $type: 'Doc',
+  title: 'Introduction',
+  content: '# Welcome to the docs'
+})
+
+const res = await app.request('/docs/intro')
+const json = await res.json()
+json.should.have.property('title', 'Introduction')
+```
+
+### Serve MDX as HTML
+
+```ts test
+app.get('/pages/:slug', async (c) => {
+  const slug = c.req.param('slug')
+  const doc = await db.Pages.get(slug)
+
+  if (!doc) {
+    return c.notFound()
+  }
+
+  const html = `<!DOCTYPE html>
+<html>
+<head><title>${doc.data.title}</title></head>
+<body>${doc.data.content}</body>
+</html>`
+
+  return c.html(html)
+})
+
+await db.Pages.create('home', {
+  $type: 'Page',
+  title: 'Home',
+  content: '<h1>Welcome Home</h1>'
+})
+
+const res = await app.request('/pages/home')
+const html = await res.text()
+html.should.contain('<title>Home</title>')
+html.should.contain('<h1>Welcome Home</h1>')
+```
+
+### List Resources
+
+```ts test
+app.get('/api/posts', async (c) => {
+  const limit = parseInt(c.req.query('limit') || '10')
+  const posts = await db.Posts.find({ limit })
+  return c.json(posts.map(p => p.data))
+})
+
+await db.Posts.create({ title: 'Post 1' })
+await db.Posts.create({ title: 'Post 2' })
+await db.Posts.create({ title: 'Post 3' })
+
+const res = await app.request('/api/posts?limit=2')
+const json = await res.json()
+json.should.have.lengthOf(2)
+```
+
+## Request Body Handling
+
+### JSON Body
+
+```ts test
+app.post('/api/json', async (c) => {
+  const body = await c.req.json()
+  return c.json({ received: body })
+})
+
+const res = await app.request('/api/json', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ foo: 'bar', num: 42 })
+})
+
+const json = await res.json()
+json.received.should.have.property('foo', 'bar')
+json.received.should.have.property('num', 42)
+```
+
+### Form Data
+
+```ts test
+app.post('/api/form', async (c) => {
+  const body = await c.req.parseBody()
+  return c.json({ received: body })
+})
+
+const formData = new FormData()
+formData.append('name', 'Alice')
+formData.append('email', 'alice@example.com')
+
+const res = await app.request('/api/form', {
+  method: 'POST',
+  body: formData
+})
+
+const json = await res.json()
+json.received.should.have.property('name', 'Alice')
+json.received.should.have.property('email', 'alice@example.com')
+```
+
+### Raw Body
+
+```ts test
+app.post('/api/raw', async (c) => {
+  const body = await c.req.text()
+  return c.json({ length: body.length, body })
+})
+
+const res = await app.request('/api/raw', {
+  method: 'POST',
+  headers: { 'Content-Type': 'text/plain' },
+  body: 'Hello World'
+})
+
+const json = await res.json()
+json.should.have.property('length', 11)
+json.should.have.property('body', 'Hello World')
+```
+
+## Caching
+
+### Cache-Control Headers
+
+```ts test
+app.get('/cached', (c) => {
+  c.header('Cache-Control', 'public, max-age=3600')
+  return c.json({ data: 'cached response' })
+})
+
+const res = await app.request('/cached')
+res.headers.get('Cache-Control').should.equal('public, max-age=3600')
+```
+
+### ETag Support
+
+```ts test
+app.get('/etag', (c) => {
+  const data = { version: 1, content: 'Hello' }
+  const etag = '"abc123"'
+
+  if (c.req.header('If-None-Match') === etag) {
+    return c.body(null, 304)
+  }
+
+  c.header('ETag', etag)
+  return c.json(data)
+})
+
+// First request - gets full response
+const first = await app.request('/etag')
+first.status.should.equal(200)
+first.headers.get('ETag').should.equal('"abc123"')
+
+// Second request with ETag - gets 304
+const second = await app.request('/etag', {
+  headers: { 'If-None-Match': '"abc123"' }
+})
+second.status.should.equal(304)
+```
+
+## Validation
+
+### Query Validation
+
+```ts test
+app.get('/validated', (c) => {
+  const page = parseInt(c.req.query('page') || '1')
+  const limit = parseInt(c.req.query('limit') || '10')
+
+  if (isNaN(page) || page < 1) {
+    return c.json({ error: 'Invalid page parameter' }, 400)
+  }
+
+  if (isNaN(limit) || limit < 1 || limit > 100) {
+    return c.json({ error: 'Invalid limit parameter' }, 400)
+  }
+
+  return c.json({ page, limit })
+})
+
+const valid = await app.request('/validated?page=2&limit=20')
+valid.status.should.equal(200)
+
+const invalidPage = await app.request('/validated?page=-1')
+invalidPage.status.should.equal(400)
+
+const invalidLimit = await app.request('/validated?limit=500')
+invalidLimit.status.should.equal(400)
+```
+
+### Body Validation
+
+```ts test
+app.post('/validate-body', async (c) => {
+  const body = await c.req.json()
+
+  if (!body.email || !body.email.includes('@')) {
+    return c.json({ error: 'Invalid email' }, 400)
+  }
+
+  if (!body.password || body.password.length < 8) {
+    return c.json({ error: 'Password must be at least 8 characters' }, 400)
+  }
+
+  return c.json({ valid: true })
+})
+
+const valid = await app.request('/validate-body', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email: 'test@example.com', password: 'securepass123' })
+})
+valid.status.should.equal(200)
+
+const invalidEmail = await app.request('/validate-body', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email: 'invalid', password: 'securepass123' })
+})
+invalidEmail.status.should.equal(400)
+```
+
+## Error Responses
+
+### 404 Not Found
+
+```ts test
+app.notFound((c) => {
+  return c.json({ error: 'Not found', path: c.req.path }, 404)
+})
+
+const res = await app.request('/nonexistent-path')
+res.status.should.equal(404)
+const json = await res.json()
+json.should.have.property('error', 'Not found')
+```
+
+### 500 Error Handler
+
+```ts test
+app.onError((err, c) => {
+  return c.json({ error: 'Internal server error', message: err.message }, 500)
+})
+
+app.get('/will-error', () => {
+  throw new Error('Oops!')
+})
+
+const res = await app.request('/will-error')
+res.status.should.equal(500)
+const json = await res.json()
+json.should.have.property('message', 'Oops!')
+```
+
+## Context Variables
+
+### Set and Get Variables
+
+```ts test
+app.use('/ctx/*', async (c, next) => {
+  c.set('requestId', 'req-' + Date.now())
+  c.set('user', { id: 1, name: 'Test User' })
+  await next()
+})
+
+app.get('/ctx/data', (c) => {
+  const requestId = c.get('requestId')
+  const user = c.get('user')
+  return c.json({ requestId, user })
+})
+
+const res = await app.request('/ctx/data')
+const json = await res.json()
+json.should.have.property('requestId').that.matches(/^req-/)
+json.user.should.have.property('name', 'Test User')
+```
+
+## Content Negotiation
+
+### Accept Header Routing
+
+```ts test
+app.get('/content/:id', async (c) => {
+  const doc = await db.Content.get(c.req.param('id'))
+  if (!doc) return c.notFound()
+
+  const accept = c.req.header('Accept') || 'application/json'
+
+  if (accept.includes('text/markdown')) {
+    return c.text(doc.data.markdown, 200, {
+      'Content-Type': 'text/markdown; charset=utf-8'
+    })
+  }
+
+  if (accept.includes('text/html')) {
+    return c.html(doc.data.html)
+  }
+
+  return c.json(doc.data)
+})
+
+await db.Content.create('doc-1', {
+  title: 'Test Doc',
+  markdown: '# Hello\n\nThis is **bold** text.',
+  html: '<h1>Hello</h1><p>This is <strong>bold</strong> text.</p>'
+})
+
+// JSON (default)
+const jsonRes = await app.request('/content/doc-1')
+const json = await jsonRes.json()
+json.should.have.property('title', 'Test Doc')
+
+// HTML
+const htmlRes = await app.request('/content/doc-1', {
+  headers: { Accept: 'text/html' }
+})
+htmlRes.headers.get('Content-Type').should.contain('text/html')
+const html = await htmlRes.text()
+html.should.contain('<h1>Hello</h1>')
+
+// Markdown
+const mdRes = await app.request('/content/doc-1', {
+  headers: { Accept: 'text/markdown' }
+})
+mdRes.headers.get('Content-Type').should.contain('text/markdown')
+const md = await mdRes.text()
+md.should.contain('# Hello')
+md.should.contain('**bold**')
+```
+
+### Format Query Parameter
+
+```ts test
+app.get('/docs/:slug', async (c) => {
+  const doc = await db.Docs.get(c.req.param('slug'))
+  if (!doc) return c.notFound()
+
+  const format = c.req.query('format') || 'json'
+
+  switch (format) {
+    case 'md':
+    case 'markdown':
+      return c.text(doc.data.content, 200, {
+        'Content-Type': 'text/markdown; charset=utf-8'
+      })
+    case 'html':
+      return c.html(render(doc.data.content))
+    case 'json':
+    default:
+      return c.json(doc.data)
+  }
+})
+
+await db.Docs.create('readme', {
+  $type: 'Doc',
+  title: 'README',
+  content: '# Project\n\nWelcome to the project.'
+})
+
+const mdRes = await app.request('/docs/readme?format=md')
+mdRes.headers.get('Content-Type').should.contain('text/markdown')
+
+const htmlRes = await app.request('/docs/readme?format=html')
+htmlRes.headers.get('Content-Type').should.contain('text/html')
+
+const jsonRes = await app.request('/docs/readme?format=json')
+jsonRes.headers.get('Content-Type').should.contain('application/json')
+```
+
+## Markdown Rendering
+
+### Render MDX to Markdown
+
+```ts test
+const mdx = `---
+$type: Article
+title: My Article
+author: Alice
+---
+
+# Introduction
+
+This is an **MDX** article with:
+
+- Lists
+- Code blocks
+- Links
+
+\`\`\`ts
+const x = 1
+\`\`\`
+
+[Learn more](https://example.com)
+`
+
+const markdown = render.markdown(mdx)
+
+markdown.should.contain('# Introduction')
+markdown.should.contain('**MDX**')
+markdown.should.contain('- Lists')
+markdown.should.contain('```ts')
+markdown.should.contain('[Learn more](https://example.com)')
+// Frontmatter should be stripped
+markdown.should.not.contain('$type: Article')
+```
+
+### Markdown with Frontmatter
+
+```ts test
+const mdx = `---
+title: Keep Frontmatter
+---
+
+# Content
+`
+
+const withFrontmatter = render.markdown(mdx, { includeFrontmatter: true })
+withFrontmatter.should.contain('---')
+withFrontmatter.should.contain('title: Keep Frontmatter')
+
+const withoutFrontmatter = render.markdown(mdx, { includeFrontmatter: false })
+withoutFrontmatter.should.not.contain('---')
+withoutFrontmatter.should.contain('# Content')
+```
+
+### Markdown Table of Contents
+
+```ts test
+const mdx = `
+# Main Title
+
+## Section One
+
+Content here.
+
+## Section Two
+
+### Subsection
+
+More content.
+
+## Section Three
+`
+
+const toc = render.toc(mdx)
+
+toc.should.have.lengthOf(4)
+toc[0].should.deep.include({ level: 1, text: 'Main Title' })
+toc[1].should.deep.include({ level: 2, text: 'Section One' })
+toc[2].should.deep.include({ level: 2, text: 'Section Two' })
+toc[3].should.deep.include({ level: 3, text: 'Subsection' })
+```
+
+## Client-Side Rendering (hono/jsx/dom)
+
+### Server Component (Default)
+
+```ts test
+// Server components render to static HTML
+// No 'use client' directive = server component
+
+const ServerCard = ({ title, description }) => (
+  <div class="card">
+    <h2>{title}</h2>
+    <p>{description}</p>
+  </div>
+)
+
+app.get('/card', (c) => {
+  return c.html(
+    <ServerCard title="Hello" description="A server-rendered card" />
+  )
+})
+
+const res = await app.request('/card')
+const html = await res.text()
+html.should.contain('<div class="card">')
+html.should.contain('<h2>Hello</h2>')
+```
+
+### Client Component with 'use client'
+
+```ts test
+// 'use client' directive marks component for client-side hydration
+const Counter = () => {
+  'use client'
+
+  const [count, setCount] = useState(0)
+
+  return (
+    <div class="counter">
+      <span>{count}</span>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
+}
+
+// Renders with hydration script
+app.get('/counter', (c) => {
+  return c.html(<Counter />)
+})
+
+const res = await app.request('/counter')
+const html = await res.text()
+
+// Should include hydration marker
+html.should.contain('data-hono-hydrate')
+// Should include client bundle reference
+html.should.contain('script')
+```
+
+### Mixed Server and Client Components
+
+```ts test
+// Server component that contains client islands
+const Page = ({ title, initialCount }) => (
+  <html>
+    <head><title>{title}</title></head>
+    <body>
+      <h1>{title}</h1>
+      <p>This is server-rendered</p>
+
+      {/* Client island */}
+      <Counter initial={initialCount} />
+
+      <footer>Also server-rendered</footer>
+    </body>
+  </html>
+)
+
+const Counter = ({ initial }) => {
+  'use client'
+  const [count, setCount] = useState(initial)
+  return <button onClick={() => setCount(c => c + 1)}>{count}</button>
+}
+
+app.get('/mixed', (c) => {
+  return c.html(<Page title="Mixed Page" initialCount={5} />)
+})
+
+const res = await app.request('/mixed')
+const html = await res.text()
+
+// Server parts rendered
+html.should.contain('<h1>Mixed Page</h1>')
+html.should.contain('<p>This is server-rendered</p>')
+html.should.contain('<footer>Also server-rendered</footer>')
+
+// Client part has hydration
+html.should.contain('data-hono-hydrate')
+```
+
+### Client Component Auto-Detection
+
+```ts test
+// Components using hooks are automatically treated as client components
+const AutoDetectedClient = () => {
+  // No 'use client' needed - useState triggers auto-detection
+  const [value, setValue] = useState('')
+
+  return (
+    <input
+      type="text"
+      value={value}
+      onInput={(e) => setValue(e.target.value)}
+    />
+  )
+}
+
+// Check that component is detected as client
+AutoDetectedClient.isClient.should.be.true
+```
+
+### Explicit Server-Only
+
+```ts test
+// Force server-only even if it looks like it could be client
+const ServerOnly = () => {
+  'use server'
+
+  // This runs only on server
+  const data = db.sync.Settings.get('config')
+
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+
+ServerOnly.isClient.should.be.false
+```
+
+### Client Props Serialization
+
+```ts test
+// Props passed to client components must be serializable
+const ClientList = ({ items, onSelect }) => {
+  'use client'
+
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id} onClick={() => onSelect(item)}>
+          {item.name}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+// Serializable props work
+const validProps = {
+  items: [{ id: 1, name: 'One' }, { id: 2, name: 'Two' }]
+}
+
+// Functions need special handling - converted to RPC calls
+const withCallback = {
+  items: validProps.items,
+  onSelect: (item) => console.log(item) // Becomes RPC
+}
+
+const serialized = serialize.clientProps(withCallback)
+serialized.items.should.deep.equal(validProps.items)
+serialized.onSelect.should.have.property('__rpc')
+```
+
+### Streaming with Suspense
+
+```ts test
+const AsyncData = async () => {
+  const data = await db.SlowQuery.find({ limit: 100 })
+  return <ul>{data.map(d => <li key={d.id}>{d.name}</li>)}</ul>
+}
+
+const StreamingPage = () => (
+  <html>
+    <body>
+      <h1>Data</h1>
+      <Suspense fallback={<p>Loading...</p>}>
+        <AsyncData />
+      </Suspense>
+    </body>
+  </html>
+)
+
+app.get('/streaming', (c) => {
+  return c.stream(async (stream) => {
+    await renderToStream(<StreamingPage />, stream)
+  })
+})
+
+const res = await app.request('/streaming')
+res.headers.get('Content-Type').should.contain('text/html')
+// Streaming response
+res.body.should.have.property('getReader')
+```
+
+## WebSocket (Optional)
+
+### WebSocket Upgrade
+
+```ts test
+app.get('/ws', (c) => {
+  // Check if upgrade is requested
+  const upgrade = c.req.header('Upgrade')
+  if (upgrade === 'websocket') {
+    return c.json({ error: 'WebSocket not supported in test' }, 400)
+  }
+  return c.json({ info: 'Use WebSocket protocol to connect' })
+})
+
+const res = await app.request('/ws')
+const json = await res.json()
+json.should.have.property('info')
+```

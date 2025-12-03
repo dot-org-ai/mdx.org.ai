@@ -1,0 +1,746 @@
+---
+$type: TestSuite
+title: Workflow & Event Tests
+description: Tests for on, every, send, decide, track, experiment, and workflow primitives
+---
+
+# Workflow & Event Tests
+
+Tests for event-driven workflows, scheduling, messaging, decisions,
+tracking, and experimentation primitives.
+
+## Event Handlers (on)
+
+### Basic Event Handler
+
+```ts test
+const events = []
+
+on('user.created', (event) => {
+  events.push(event)
+})
+
+await send('user.created', { id: 'alice', name: 'Alice' })
+
+events.should.have.lengthOf(1)
+events[0].type.should.equal('user.created')
+events[0].data.id.should.equal('alice')
+```
+
+### Multiple Handlers
+
+```ts test
+const log = []
+
+on('order.placed', () => log.push('handler1'))
+on('order.placed', () => log.push('handler2'))
+on('order.placed', () => log.push('handler3'))
+
+await send('order.placed', { orderId: '123' })
+
+log.should.have.lengthOf(3)
+log.should.deep.equal(['handler1', 'handler2', 'handler3'])
+```
+
+### Wildcard Events
+
+```ts test
+const events = []
+
+on('user.*', (event) => {
+  events.push(event.type)
+})
+
+await send('user.created', { id: '1' })
+await send('user.updated', { id: '1' })
+await send('user.deleted', { id: '1' })
+await send('order.created', { id: '2' }) // Should not match
+
+events.should.have.lengthOf(3)
+events.should.contain('user.created')
+events.should.contain('user.updated')
+events.should.contain('user.deleted')
+events.should.not.contain('order.created')
+```
+
+### Async Event Handlers
+
+```ts test
+const results = []
+
+on('process.start', async (event) => {
+  await delay(10)
+  results.push('processed: ' + event.data.id)
+})
+
+await send('process.start', { id: 'job-1' })
+await send('process.start', { id: 'job-2' })
+
+results.should.have.lengthOf(2)
+results.should.contain('processed: job-1')
+results.should.contain('processed: job-2')
+```
+
+### Event Handler with Filter
+
+```ts test
+const highPriority = []
+
+on('task.created', { where: { priority: 'high' } }, (event) => {
+  highPriority.push(event.data.id)
+})
+
+await send('task.created', { id: '1', priority: 'low' })
+await send('task.created', { id: '2', priority: 'high' })
+await send('task.created', { id: '3', priority: 'high' })
+await send('task.created', { id: '4', priority: 'medium' })
+
+highPriority.should.have.lengthOf(2)
+highPriority.should.deep.equal(['2', '3'])
+```
+
+### Once Handler
+
+```ts test
+const events = []
+
+on.once('init', (event) => {
+  events.push(event.data.config)
+})
+
+await send('init', { config: 'first' })
+await send('init', { config: 'second' })
+await send('init', { config: 'third' })
+
+events.should.have.lengthOf(1)
+events[0].should.equal('first')
+```
+
+### Remove Handler
+
+```ts test
+const events = []
+
+const handler = on('ping', () => {
+  events.push('pong')
+})
+
+await send('ping', {})
+events.should.have.lengthOf(1)
+
+handler.off()
+
+await send('ping', {})
+events.should.have.lengthOf(1) // No change
+```
+
+## Scheduling (every)
+
+### Basic Schedule
+
+```ts test
+const ticks = []
+
+const job = every('100ms', () => {
+  ticks.push(Date.now())
+})
+
+await delay(350)
+job.stop()
+
+ticks.length.should.be.within(3, 4)
+```
+
+### Cron Schedule
+
+```ts test
+const runs = []
+
+const job = every('* * * * *', () => { // Every minute
+  runs.push(new Date())
+})
+
+// Just verify it was scheduled
+job.should.have.property('stop')
+job.should.have.property('next')
+job.cron.should.equal('* * * * *')
+
+job.stop()
+```
+
+### Named Schedule
+
+```ts test
+const job = every('daily-cleanup', '0 0 * * *', async () => {
+  await db.Logs.find({ where: { age: { $gt: 30 } } })
+    .forEach(log => db.Logs.delete(log.id))
+})
+
+job.name.should.equal('daily-cleanup')
+job.stop()
+```
+
+### Schedule with Immediate Run
+
+```ts test
+const runs = []
+
+const job = every('1s', { immediate: true }, () => {
+  runs.push(Date.now())
+})
+
+// Should run immediately
+await delay(50)
+runs.should.have.lengthOf(1)
+
+job.stop()
+```
+
+### Schedule Until Condition
+
+```ts test
+let count = 0
+
+const job = every('50ms', { until: () => count >= 3 }, () => {
+  count++
+})
+
+await delay(300)
+
+count.should.equal(3)
+job.stopped.should.be.true
+```
+
+## Messaging (send)
+
+### Send Event
+
+```ts test
+const result = await send('notification.email', {
+  to: 'user@example.com',
+  subject: 'Hello',
+  body: 'Welcome!'
+})
+
+result.should.have.property('id')
+result.should.have.property('timestamp')
+result.type.should.equal('notification.email')
+```
+
+### Send with Correlation
+
+```ts test
+const events = []
+
+on('step.completed', (event) => {
+  events.push(event)
+})
+
+const workflow = await send('workflow.start', { name: 'onboarding' })
+
+await send('step.completed', { step: 1 }, { correlationId: workflow.id })
+await send('step.completed', { step: 2 }, { correlationId: workflow.id })
+
+events.should.have.lengthOf(2)
+events[0].correlationId.should.equal(workflow.id)
+events[1].correlationId.should.equal(workflow.id)
+```
+
+### Send to Channel
+
+```ts test
+const channel1 = []
+const channel2 = []
+
+on('message', { channel: 'support' }, (e) => channel1.push(e))
+on('message', { channel: 'sales' }, (e) => channel2.push(e))
+
+await send('message', { text: 'Help!' }, { channel: 'support' })
+await send('message', { text: 'Buy now' }, { channel: 'sales' })
+await send('message', { text: 'Question' }, { channel: 'support' })
+
+channel1.should.have.lengthOf(2)
+channel2.should.have.lengthOf(1)
+```
+
+### Send with Delay
+
+```ts test
+const received = []
+const start = Date.now()
+
+on('delayed.event', (e) => {
+  received.push(Date.now() - start)
+})
+
+await send('delayed.event', { data: 'test' }, { delay: '100ms' })
+
+received.should.have.lengthOf(1)
+received[0].should.be.above(90)
+```
+
+### Send and Wait for Response
+
+```ts test
+on('math.add', (event, reply) => {
+  const { a, b } = event.data
+  reply({ result: a + b })
+})
+
+const response = await send('math.add', { a: 2, b: 3 }, { wait: true })
+
+response.data.result.should.equal(5)
+```
+
+### Broadcast to Multiple
+
+```ts test
+const received = []
+
+on('broadcast.test', (e) => received.push('a'))
+on('broadcast.test', (e) => received.push('b'))
+on('broadcast.test', (e) => received.push('c'))
+
+await send.broadcast('broadcast.test', { message: 'hello' })
+
+received.should.have.lengthOf(3)
+```
+
+## Decisions (decide)
+
+### Simple Decision
+
+```ts test
+const user = { age: 25, country: 'US', premium: true }
+
+const tier = decide(user)
+  .when({ premium: true }, 'gold')
+  .when({ age: { $gte: 21 }, country: 'US' }, 'standard')
+  .otherwise('basic')
+
+tier.should.equal('gold')
+```
+
+### Decision with Multiple Conditions
+
+```ts test
+const order = { total: 150, items: 3, membership: 'silver' }
+
+const shipping = decide(order)
+  .when({ total: { $gte: 200 } }, 'free')
+  .when({ membership: 'gold' }, 'free')
+  .when({ total: { $gte: 100 } }, 'reduced')
+  .otherwise('standard')
+
+shipping.should.equal('reduced')
+```
+
+### Decision with Functions
+
+```ts test
+const request = { ip: '192.168.1.1', userAgent: 'Bot/1.0', path: '/api' }
+
+const action = decide(request)
+  .when(r => r.userAgent.includes('Bot'), 'block')
+  .when(r => r.path.startsWith('/admin'), 'auth-required')
+  .when(r => r.ip.startsWith('192.168'), 'internal')
+  .otherwise('allow')
+
+action.should.equal('block')
+```
+
+### Async Decision
+
+```ts test
+const userId = 'user-123'
+
+const access = await decide.async(userId)
+  .when(async (id) => {
+    const user = await db.Users.get(id)
+    return user?.data.role === 'admin'
+  }, 'full')
+  .when(async (id) => {
+    const user = await db.Users.get(id)
+    return user?.data.verified === true
+  }, 'standard')
+  .otherwise('restricted')
+
+access.should.be.oneOf(['full', 'standard', 'restricted'])
+```
+
+### Decision Tree
+
+```ts test
+const customer = {
+  orders: 15,
+  totalSpent: 2500,
+  lastOrder: new Date('2024-01-01'),
+  complaints: 0
+}
+
+const segment = decide(customer)
+  .when({ orders: { $gte: 10 }, totalSpent: { $gte: 1000 }, complaints: 0 }, 'vip')
+  .when({ orders: { $gte: 5 }, totalSpent: { $gte: 500 } }, 'loyal')
+  .when({ orders: { $gte: 1 } }, 'active')
+  .otherwise('prospect')
+
+segment.should.equal('vip')
+```
+
+### Decision with Side Effects
+
+```ts test
+const events = []
+
+const result = decide({ status: 'pending', priority: 'high' })
+  .when({ status: 'pending', priority: 'high' }, () => {
+    events.push('escalated')
+    return 'escalate'
+  })
+  .when({ status: 'pending' }, () => {
+    events.push('queued')
+    return 'queue'
+  })
+  .otherwise(() => {
+    events.push('ignored')
+    return 'ignore'
+  })
+
+result.should.equal('escalate')
+events.should.deep.equal(['escalated'])
+```
+
+## Tracking (track)
+
+### Track Event
+
+```ts test
+await track('page.view', {
+  path: '/products',
+  referrer: 'google.com',
+  userId: 'user-123'
+})
+
+const events = await track.query({ type: 'page.view', limit: 1 })
+events.should.have.lengthOf(1)
+events[0].data.path.should.equal('/products')
+```
+
+### Track with User
+
+```ts test
+await track.user('user-456', 'signup.completed', {
+  method: 'email',
+  plan: 'free'
+})
+
+const userEvents = await track.query({
+  userId: 'user-456',
+  type: 'signup.completed'
+})
+
+userEvents.should.have.lengthOf(1)
+userEvents[0].data.method.should.equal('email')
+```
+
+### Track Conversion
+
+```ts test
+// Start funnel
+await track('checkout.started', { cartId: 'cart-1', userId: 'user-1' })
+await track('checkout.payment', { cartId: 'cart-1', userId: 'user-1' })
+await track('checkout.completed', { cartId: 'cart-1', userId: 'user-1', total: 99.99 })
+
+const funnel = await track.funnel([
+  'checkout.started',
+  'checkout.payment',
+  'checkout.completed'
+], { userId: 'user-1' })
+
+funnel.steps.should.have.lengthOf(3)
+funnel.completed.should.be.true
+funnel.conversionRate.should.equal(1)
+```
+
+### Track with Properties
+
+```ts test
+await track('button.click', {
+  buttonId: 'cta-signup',
+  variant: 'blue',
+  position: 'header'
+}, {
+  sessionId: 'session-123',
+  deviceType: 'mobile'
+})
+
+const events = await track.query({
+  type: 'button.click',
+  'data.buttonId': 'cta-signup'
+})
+
+events[0].metadata.deviceType.should.equal('mobile')
+```
+
+### Track Aggregate
+
+```ts test
+await track('purchase', { amount: 100, product: 'A' })
+await track('purchase', { amount: 200, product: 'B' })
+await track('purchase', { amount: 150, product: 'A' })
+
+const stats = await track.aggregate('purchase', {
+  sum: 'amount',
+  count: true,
+  groupBy: 'product'
+})
+
+stats.should.have.property('A')
+stats.A.sum.should.equal(250)
+stats.A.count.should.equal(2)
+stats.B.sum.should.equal(200)
+```
+
+### Track Time Series
+
+```ts test
+await track('api.request', { endpoint: '/users', duration: 45 })
+await track('api.request', { endpoint: '/users', duration: 52 })
+await track('api.request', { endpoint: '/users', duration: 48 })
+
+const timeseries = await track.timeseries('api.request', {
+  field: 'duration',
+  interval: '1m',
+  aggregation: 'avg'
+})
+
+timeseries.should.be.an('array')
+timeseries[0].should.have.property('timestamp')
+timeseries[0].should.have.property('value')
+```
+
+## Experiments (experiment)
+
+### Basic A/B Test
+
+```ts test
+const variant = experiment('signup-button-color')
+  .variant('control', { color: 'blue' })
+  .variant('treatment', { color: 'green' })
+  .assign('user-123')
+
+variant.should.have.property('name')
+variant.name.should.be.oneOf(['control', 'treatment'])
+variant.should.have.property('color')
+```
+
+### Experiment with Weights
+
+```ts test
+const variants = { control: 0, treatment: 0 }
+
+for (let i = 0; i < 100; i++) {
+  const v = experiment('pricing-test')
+    .variant('control', { price: 9.99 }, { weight: 0.9 })
+    .variant('treatment', { price: 7.99 }, { weight: 0.1 })
+    .assign(`user-${i}`)
+
+  variants[v.name]++
+}
+
+// With 90/10 split, control should have significantly more
+variants.control.should.be.above(70)
+variants.treatment.should.be.below(30)
+```
+
+### Experiment with Eligibility
+
+```ts test
+const user = { country: 'US', age: 25, beta: true }
+
+const variant = experiment('new-feature')
+  .variant('control', { enabled: false })
+  .variant('treatment', { enabled: true })
+  .eligible(u => u.beta === true)
+  .assign(user)
+
+variant.should.have.property('enabled')
+```
+
+### Experiment Tracking
+
+```ts test
+const exp = experiment('checkout-flow')
+  .variant('control', { steps: 3 })
+  .variant('streamlined', { steps: 1 })
+
+const variant = exp.assign('user-789')
+
+// Track exposure
+await exp.track.exposure('user-789')
+
+// Track conversion
+await exp.track.conversion('user-789', { revenue: 49.99 })
+
+const results = await exp.results()
+results.should.have.property('control')
+results.should.have.property('streamlined')
+results[variant.name].exposures.should.be.above(0)
+```
+
+### Multi-Variant Test
+
+```ts test
+const variant = experiment('landing-page')
+  .variant('a', { headline: 'Welcome', cta: 'Sign Up' })
+  .variant('b', { headline: 'Get Started', cta: 'Try Free' })
+  .variant('c', { headline: 'Join Now', cta: 'Start Trial' })
+  .variant('d', { headline: 'Hello', cta: 'Begin' })
+  .assign('user-abc')
+
+variant.name.should.be.oneOf(['a', 'b', 'c', 'd'])
+variant.should.have.property('headline')
+variant.should.have.property('cta')
+```
+
+### Experiment Override
+
+```ts test
+const variant = experiment('feature-flags')
+  .variant('off', { enabled: false })
+  .variant('on', { enabled: true })
+  .override('test-user', 'on') // Force this user to 'on'
+  .assign('test-user')
+
+variant.name.should.equal('on')
+variant.enabled.should.be.true
+```
+
+### Experiment Rollout
+
+```ts test
+const exp = experiment('gradual-rollout')
+  .variant('old', { version: 1 })
+  .variant('new', { version: 2 })
+  .rollout('new', 0.25) // 25% get new version
+
+// Consistent assignment
+const v1 = exp.assign('user-x')
+const v2 = exp.assign('user-x')
+v1.name.should.equal(v2.name) // Same user gets same variant
+```
+
+## Workflow Integration
+
+### Event-Driven Workflow
+
+```ts test
+const states = []
+
+on('order.created', async (event) => {
+  states.push('created')
+  await send('order.validate', event.data)
+})
+
+on('order.validate', async (event) => {
+  const valid = event.data.total > 0
+  states.push('validated')
+  if (valid) {
+    await send('order.process', event.data)
+  }
+})
+
+on('order.process', async (event) => {
+  states.push('processed')
+  await send('order.complete', event.data)
+})
+
+on('order.complete', (event) => {
+  states.push('completed')
+})
+
+await send('order.created', { id: 'order-1', total: 100 })
+
+// Wait for async processing
+await delay(100)
+
+states.should.deep.equal(['created', 'validated', 'processed', 'completed'])
+```
+
+### Scheduled Data Sync
+
+```ts test
+let syncCount = 0
+
+const sync = every('sync-job', '*/5 * * * *', async () => {
+  syncCount++
+  const items = await db.Queue.find({ where: { status: 'pending' } })
+
+  for (const item of items) {
+    await send('item.process', item.data)
+    await db.Queue.update(item.id, { status: 'processed' })
+  }
+
+  await track('sync.completed', { count: items.length })
+})
+
+sync.should.have.property('name', 'sync-job')
+sync.stop()
+```
+
+### Decision + Experiment Combo
+
+```ts test
+const user = { id: 'user-test', tier: 'premium', country: 'US' }
+
+// First decide eligibility
+const eligible = decide(user)
+  .when({ tier: 'premium' }, true)
+  .when({ country: 'US' }, true)
+  .otherwise(false)
+
+let features = { newDashboard: false }
+
+if (eligible) {
+  // Then run experiment for eligible users
+  const variant = experiment('dashboard-redesign')
+    .variant('control', { newDashboard: false })
+    .variant('treatment', { newDashboard: true })
+    .assign(user.id)
+
+  features = variant
+}
+
+features.should.have.property('newDashboard')
+```
+
+### Full Analytics Pipeline
+
+```ts test
+// Track user journey
+await track.user('user-journey-test', 'session.start', { source: 'organic' })
+await track.user('user-journey-test', 'page.view', { path: '/pricing' })
+await track.user('user-journey-test', 'button.click', { id: 'start-trial' })
+await track.user('user-journey-test', 'signup.completed', { plan: 'pro' })
+
+// Query journey
+const journey = await track.query({
+  userId: 'user-journey-test',
+  orderBy: 'timestamp',
+  order: 'asc'
+})
+
+journey.should.have.lengthOf(4)
+journey[0].type.should.equal('session.start')
+journey[3].type.should.equal('signup.completed')
+
+// Calculate funnel
+const funnel = await track.funnel([
+  'session.start',
+  'page.view',
+  'button.click',
+  'signup.completed'
+], { userId: 'user-journey-test' })
+
+funnel.completed.should.be.true
+```

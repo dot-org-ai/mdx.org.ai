@@ -1,0 +1,648 @@
+---
+$type: TestSuite
+title: Actions, Context & Queue Tests
+description: Tests for $, actions, actors, queues, and context primitives
+---
+
+# Actions, Context & Queue Tests
+
+Tests for the `$` context accessor, action/actor patterns,
+queue operations, and workflow state management.
+
+## Context Accessor ($)
+
+### Access Current Context
+
+```ts test
+$.should.have.property('ns')
+$.should.have.property('user')
+$.should.have.property('request')
+```
+
+### Context Namespace
+
+```ts test
+$.ns.should.be.a('string')
+
+// Can set namespace
+$.ns = 'test.example.com'
+$.ns.should.equal('test.example.com')
+```
+
+### Context User
+
+```ts test
+$.user = { id: 'user-1', name: 'Alice', role: 'admin' }
+
+$.user.should.have.property('id', 'user-1')
+$.user.should.have.property('name', 'Alice')
+$.user.should.have.property('role', 'admin')
+```
+
+### Context Request
+
+```ts test
+$.request = {
+  method: 'POST',
+  path: '/api/users',
+  headers: { 'content-type': 'application/json' },
+  body: { name: 'Bob' }
+}
+
+$.request.method.should.equal('POST')
+$.request.path.should.equal('/api/users')
+$.request.body.should.have.property('name', 'Bob')
+```
+
+### Context Database
+
+```ts test
+// $ provides access to the current db
+const user = await $.db.Users.create('ctx-user', {
+  name: 'Context User'
+})
+
+user.should.have.property('id', 'ctx-user')
+
+const fetched = await $.db.Users.get('ctx-user')
+fetched.data.name.should.equal('Context User')
+```
+
+### Scoped Context
+
+```ts test
+const results = []
+
+await $.scope({ ns: 'scope-test.com', user: { id: 'scoped' } }, async () => {
+  results.push($.ns)
+  results.push($.user.id)
+})
+
+results.should.deep.equal(['scope-test.com', 'scoped'])
+```
+
+### Context Environment
+
+```ts test
+$.env.should.have.property('NODE_ENV')
+
+// Safe access to env vars
+const apiKey = $.env.API_KEY || 'default'
+apiKey.should.be.a('string')
+```
+
+### Context Config
+
+```ts test
+$.config = {
+  feature: { enabled: true },
+  limits: { maxItems: 100 }
+}
+
+$.config.feature.enabled.should.be.true
+$.config.limits.maxItems.should.equal(100)
+```
+
+## Actions
+
+### Create Action
+
+```ts test
+const action = await $.actions.create({
+  actor: 'user-1',
+  object: 'https://example.com/posts/1',
+  action: 'approve',
+  metadata: { reason: 'Looks good' }
+})
+
+action.should.have.property('id')
+action.should.have.property('status', 'pending')
+action.should.have.property('actor', 'user-1')
+action.should.have.property('action', 'approve')
+action.createdAt.should.be.a('date')
+```
+
+### Start Action
+
+```ts test
+const action = await $.actions.create({
+  actor: 'system',
+  object: 'https://example.com/jobs/1',
+  action: 'process'
+})
+
+const started = await $.actions.start(action.id)
+
+started.status.should.equal('active')
+started.startedAt.should.be.a('date')
+```
+
+### Complete Action
+
+```ts test
+const action = await $.actions.create({
+  actor: 'worker-1',
+  object: 'https://example.com/tasks/1',
+  action: 'execute'
+})
+
+await $.actions.start(action.id)
+
+const completed = await $.actions.complete(action.id, {
+  result: { success: true, output: 'done' }
+})
+
+completed.status.should.equal('completed')
+completed.completedAt.should.be.a('date')
+completed.result.should.have.property('success', true)
+```
+
+### Fail Action
+
+```ts test
+const action = await $.actions.create({
+  actor: 'processor',
+  object: 'https://example.com/items/1',
+  action: 'validate'
+})
+
+await $.actions.start(action.id)
+
+const failed = await $.actions.fail(action.id, 'Validation failed: missing field')
+
+failed.status.should.equal('failed')
+failed.error.should.contain('Validation failed')
+```
+
+### Cancel Action
+
+```ts test
+const action = await $.actions.create({
+  actor: 'user-1',
+  object: 'https://example.com/orders/1',
+  action: 'cancel-order'
+})
+
+const cancelled = await $.actions.cancel(action.id)
+
+cancelled.status.should.equal('cancelled')
+```
+
+### Query Actions
+
+```ts test
+await $.actions.create({ actor: 'user-1', object: 'obj-1', action: 'review' })
+await $.actions.create({ actor: 'user-1', object: 'obj-2', action: 'review' })
+await $.actions.create({ actor: 'user-2', object: 'obj-3', action: 'approve' })
+
+const userActions = await $.actions.query({ actor: 'user-1' })
+userActions.should.have.lengthOf(2)
+
+const reviewActions = await $.actions.query({ action: 'review' })
+reviewActions.should.have.lengthOf(2)
+
+const pendingActions = await $.actions.query({ status: 'pending' })
+pendingActions.length.should.be.above(0)
+```
+
+### Action with Timeout
+
+```ts test
+const action = await $.actions.create({
+  actor: 'system',
+  object: 'https://example.com/long-job',
+  action: 'process',
+  metadata: { timeout: 5000 }
+})
+
+await $.actions.start(action.id)
+
+// Simulate timeout check
+const check = await $.actions.get(action.id)
+check.should.have.property('status')
+```
+
+## Actors
+
+### Define Actor
+
+```ts test
+const orderActor = $.actor('order', {
+  async create(data) {
+    const order = await db.Orders.create(data)
+    await send('order.created', order)
+    return order
+  },
+
+  async approve(orderId) {
+    const order = await db.Orders.update(orderId, { status: 'approved' })
+    await send('order.approved', order)
+    return order
+  },
+
+  async ship(orderId, trackingNumber) {
+    const order = await db.Orders.update(orderId, {
+      status: 'shipped',
+      trackingNumber
+    })
+    await send('order.shipped', order)
+    return order
+  }
+})
+
+orderActor.should.have.property('create')
+orderActor.should.have.property('approve')
+orderActor.should.have.property('ship')
+```
+
+### Use Actor
+
+```ts test
+const userActor = $.actor('user', {
+  async register(data) {
+    const user = await db.Users.create(data)
+    await track.user(user.id, 'user.registered', data)
+    return user
+  },
+
+  async activate(userId) {
+    return db.Users.update(userId, { active: true })
+  }
+})
+
+const user = await userActor.register({
+  email: 'test@example.com',
+  name: 'Test User'
+})
+
+user.should.have.property('id')
+user.data.email.should.equal('test@example.com')
+
+const activated = await userActor.activate(user.id)
+activated.data.active.should.be.true
+```
+
+### Actor with State Machine
+
+```ts test
+const ticketActor = $.actor('ticket', {
+  states: ['open', 'in-progress', 'resolved', 'closed'],
+  initial: 'open',
+
+  transitions: {
+    'open -> in-progress': 'assign',
+    'in-progress -> resolved': 'resolve',
+    'resolved -> closed': 'close',
+    'resolved -> in-progress': 'reopen'
+  },
+
+  async assign(ticketId, assignee) {
+    return db.Tickets.update(ticketId, {
+      status: 'in-progress',
+      assignee
+    })
+  },
+
+  async resolve(ticketId, resolution) {
+    return db.Tickets.update(ticketId, {
+      status: 'resolved',
+      resolution
+    })
+  }
+})
+
+ticketActor.states.should.include('open')
+ticketActor.transitions.should.have.property('open -> in-progress', 'assign')
+```
+
+## Queues
+
+### Enqueue Item
+
+```ts test
+await $.queue('emails').add({
+  to: 'user@example.com',
+  subject: 'Welcome',
+  body: 'Hello!'
+})
+
+const stats = await $.queue('emails').stats()
+stats.pending.should.be.above(0)
+```
+
+### Process Queue
+
+```ts test
+const processed = []
+
+await $.queue('tasks').add({ id: 1, type: 'task' })
+await $.queue('tasks').add({ id: 2, type: 'task' })
+await $.queue('tasks').add({ id: 3, type: 'task' })
+
+await $.queue('tasks').process(async (item) => {
+  processed.push(item.id)
+})
+
+processed.should.have.lengthOf(3)
+processed.should.deep.equal([1, 2, 3])
+```
+
+### Queue with Priority
+
+```ts test
+const processed = []
+
+await $.queue('priority-tasks').add({ name: 'low' }, { priority: 1 })
+await $.queue('priority-tasks').add({ name: 'high' }, { priority: 10 })
+await $.queue('priority-tasks').add({ name: 'medium' }, { priority: 5 })
+
+await $.queue('priority-tasks').process(async (item) => {
+  processed.push(item.name)
+})
+
+// High priority first
+processed[0].should.equal('high')
+processed[1].should.equal('medium')
+processed[2].should.equal('low')
+```
+
+### Queue with Delay
+
+```ts test
+const start = Date.now()
+let processedAt = null
+
+await $.queue('delayed').add(
+  { data: 'delayed-item' },
+  { delay: '100ms' }
+)
+
+await $.queue('delayed').process(async (item) => {
+  processedAt = Date.now()
+})
+
+const elapsed = processedAt - start
+elapsed.should.be.above(90)
+```
+
+### Queue with Retry
+
+```ts test
+let attempts = 0
+
+await $.queue('retryable').add({ data: 'retry-me' })
+
+await $.queue('retryable').process(async (item) => {
+  attempts++
+  if (attempts < 3) {
+    throw new Error('Temporary failure')
+  }
+  return 'success'
+}, { retries: 3, backoff: '50ms' })
+
+attempts.should.equal(3)
+```
+
+### Queue Dead Letter
+
+```ts test
+await $.queue('dlq-test').add({ data: 'will-fail' })
+
+await $.queue('dlq-test').process(async (item) => {
+  throw new Error('Permanent failure')
+}, { retries: 2, deadLetter: 'dlq-test-failed' })
+
+const dlq = await $.queue('dlq-test-failed').stats()
+dlq.pending.should.be.above(0)
+```
+
+### Batch Processing
+
+```ts test
+const batches = []
+
+for (let i = 0; i < 10; i++) {
+  await $.queue('batch').add({ n: i })
+}
+
+await $.queue('batch').processBatch(async (items) => {
+  batches.push(items.map(i => i.n))
+}, { batchSize: 3 })
+
+batches.should.have.lengthOf(4) // 3 + 3 + 3 + 1
+batches[0].should.have.lengthOf(3)
+```
+
+## Events (Immutable Records)
+
+### Record Event
+
+```ts test
+const event = await $.events.record({
+  type: 'order.placed',
+  source: 'checkout-service',
+  data: { orderId: 'order-123', total: 99.99 }
+})
+
+event.should.have.property('id')
+event.should.have.property('timestamp')
+event.type.should.equal('order.placed')
+event.data.orderId.should.equal('order-123')
+```
+
+### Record Event with Correlation
+
+```ts test
+const startEvent = await $.events.record({
+  type: 'workflow.started',
+  source: 'orchestrator',
+  data: { workflowId: 'wf-1' }
+})
+
+const stepEvent = await $.events.record({
+  type: 'workflow.step',
+  source: 'orchestrator',
+  data: { step: 1 },
+  correlationId: startEvent.id
+})
+
+stepEvent.correlationId.should.equal(startEvent.id)
+```
+
+### Query Events
+
+```ts test
+await $.events.record({ type: 'user.action', source: 'app', data: { action: 'click' } })
+await $.events.record({ type: 'user.action', source: 'app', data: { action: 'scroll' } })
+await $.events.record({ type: 'system.error', source: 'api', data: { code: 500 } })
+
+const userEvents = await $.events.query({ type: 'user.action' })
+userEvents.should.have.lengthOf(2)
+
+const appEvents = await $.events.query({ source: 'app' })
+appEvents.should.have.lengthOf(2)
+```
+
+### Events are Immutable
+
+```ts test
+const event = await $.events.record({
+  type: 'immutable.test',
+  source: 'test',
+  data: { value: 'original' }
+})
+
+// Events cannot be modified
+const error = await $.events.update(event.id, { data: { value: 'modified' } })
+  .catch(e => e)
+
+error.should.be.an('error')
+error.message.should.contain('immutable')
+```
+
+## Artifacts (Cached Content)
+
+### Store Artifact
+
+```ts test
+const artifact = await $.artifacts.store({
+  key: 'compiled/page-1',
+  type: 'esm',
+  source: 'https://example.com/pages/1',
+  sourceHash: 'abc123',
+  content: 'export default function Page() { return "Hello" }'
+})
+
+artifact.should.have.property('key', 'compiled/page-1')
+artifact.should.have.property('type', 'esm')
+artifact.should.have.property('createdAt')
+```
+
+### Get Artifact
+
+```ts test
+await $.artifacts.store({
+  key: 'ast/doc-1',
+  type: 'ast',
+  source: 'https://example.com/docs/1',
+  sourceHash: 'def456',
+  content: { type: 'root', children: [] }
+})
+
+const artifact = await $.artifacts.get('ast/doc-1')
+
+artifact.should.not.be.null
+artifact.type.should.equal('ast')
+artifact.content.should.have.property('type', 'root')
+```
+
+### Artifact Cache Invalidation
+
+```ts test
+await $.artifacts.store({
+  key: 'cache/item-1',
+  type: 'html',
+  source: 'https://example.com/items/1',
+  sourceHash: 'v1',
+  content: '<div>Version 1</div>'
+})
+
+// Check if artifact is valid
+const isValid = await $.artifacts.isValid('cache/item-1', 'v1')
+isValid.should.be.true
+
+const isStale = await $.artifacts.isValid('cache/item-1', 'v2')
+isStale.should.be.false
+```
+
+### Artifact with TTL
+
+```ts test
+await $.artifacts.store({
+  key: 'temp/session-data',
+  type: 'bundle',
+  source: 'session',
+  sourceHash: 'sess-1',
+  content: { data: 'temporary' },
+  ttl: 100 // 100ms
+})
+
+let artifact = await $.artifacts.get('temp/session-data')
+artifact.should.not.be.null
+
+await delay(150)
+
+artifact = await $.artifacts.get('temp/session-data')
+artifact.should.be.null // Expired
+```
+
+### Clean Expired Artifacts
+
+```ts test
+await $.artifacts.store({
+  key: 'expire/1',
+  type: 'worker',
+  source: 's1',
+  sourceHash: 'h1',
+  content: 'w1',
+  ttl: 1
+})
+
+await $.artifacts.store({
+  key: 'expire/2',
+  type: 'worker',
+  source: 's2',
+  sourceHash: 'h2',
+  content: 'w2',
+  ttl: 1
+})
+
+await delay(50)
+
+const cleaned = await $.artifacts.cleanExpired()
+cleaned.should.be.above(0)
+```
+
+## Integration
+
+### Full Workflow with Context
+
+```ts test
+// Set up context
+$.user = { id: 'workflow-user', role: 'admin' }
+$.ns = 'workflow.example.com'
+
+// Create action
+const action = await $.actions.create({
+  actor: $.user.id,
+  object: 'https://workflow.example.com/items/1',
+  action: 'process'
+})
+
+// Queue for processing
+await $.queue('work').add({
+  actionId: action.id,
+  data: { value: 42 }
+})
+
+// Record event
+await $.events.record({
+  type: 'work.queued',
+  source: 'workflow',
+  data: { actionId: action.id }
+})
+
+// Track
+await track('workflow.step', {
+  actionId: action.id,
+  step: 'queued',
+  userId: $.user.id
+})
+
+// Verify
+const events = await $.events.query({ type: 'work.queued' })
+events.should.have.lengthOf(1)
+
+const queueStats = await $.queue('work').stats()
+queueStats.pending.should.be.above(0)
+```

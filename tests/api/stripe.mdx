@@ -1,0 +1,671 @@
+---
+$type: TestSuite
+title: Stripe API Tests
+description: Full Stripe SDK available at api.stripe
+---
+
+# Stripe API Tests
+
+The full Stripe Node.js SDK is available at `api.stripe`.
+All Stripe resources and methods work as documented.
+
+## Customers
+
+### Create Customer
+
+```ts test
+const customer = await api.stripe.customers.create({
+  email: 'customer@example.com',
+  name: 'Test Customer',
+  metadata: { userId: 'user-123' }
+})
+
+customer.should.have.property('id')
+customer.id.should.match(/^cus_/)
+customer.email.should.equal('customer@example.com')
+customer.name.should.equal('Test Customer')
+```
+
+### Retrieve Customer
+
+```ts test
+const created = await api.stripe.customers.create({
+  email: 'retrieve@example.com'
+})
+
+const customer = await api.stripe.customers.retrieve(created.id)
+
+customer.id.should.equal(created.id)
+customer.email.should.equal('retrieve@example.com')
+```
+
+### Update Customer
+
+```ts test
+const customer = await api.stripe.customers.create({
+  email: 'update@example.com',
+  name: 'Original Name'
+})
+
+const updated = await api.stripe.customers.update(customer.id, {
+  name: 'Updated Name',
+  metadata: { updated: 'true' }
+})
+
+updated.name.should.equal('Updated Name')
+updated.metadata.updated.should.equal('true')
+```
+
+### List Customers
+
+```ts test
+await api.stripe.customers.create({ email: 'list1@example.com' })
+await api.stripe.customers.create({ email: 'list2@example.com' })
+
+const customers = await api.stripe.customers.list({ limit: 10 })
+
+customers.data.should.be.an('array')
+customers.has_more.should.be.a('boolean')
+```
+
+### Delete Customer
+
+```ts test
+const customer = await api.stripe.customers.create({
+  email: 'delete@example.com'
+})
+
+const deleted = await api.stripe.customers.del(customer.id)
+
+deleted.deleted.should.be.true
+deleted.id.should.equal(customer.id)
+```
+
+### Search Customers
+
+```ts test
+await api.stripe.customers.create({
+  email: 'search@example.com',
+  metadata: { segment: 'enterprise' }
+})
+
+const results = await api.stripe.customers.search({
+  query: "metadata['segment']:'enterprise'"
+})
+
+results.data.should.be.an('array')
+```
+
+## Payment Methods
+
+### Create Payment Method
+
+```ts test
+const paymentMethod = await api.stripe.paymentMethods.create({
+  type: 'card',
+  card: {
+    number: '4242424242424242',
+    exp_month: 12,
+    exp_year: 2025,
+    cvc: '123'
+  }
+})
+
+paymentMethod.should.have.property('id')
+paymentMethod.id.should.match(/^pm_/)
+paymentMethod.type.should.equal('card')
+paymentMethod.card.brand.should.equal('visa')
+paymentMethod.card.last4.should.equal('4242')
+```
+
+### Attach to Customer
+
+```ts test
+const customer = await api.stripe.customers.create({
+  email: 'attach@example.com'
+})
+
+const paymentMethod = await api.stripe.paymentMethods.create({
+  type: 'card',
+  card: { number: '4242424242424242', exp_month: 12, exp_year: 2025, cvc: '123' }
+})
+
+const attached = await api.stripe.paymentMethods.attach(paymentMethod.id, {
+  customer: customer.id
+})
+
+attached.customer.should.equal(customer.id)
+```
+
+### List Customer Payment Methods
+
+```ts test
+const customer = await api.stripe.customers.create({ email: 'methods@example.com' })
+
+const pm1 = await api.stripe.paymentMethods.create({
+  type: 'card',
+  card: { number: '4242424242424242', exp_month: 12, exp_year: 2025, cvc: '123' }
+})
+await api.stripe.paymentMethods.attach(pm1.id, { customer: customer.id })
+
+const methods = await api.stripe.paymentMethods.list({
+  customer: customer.id,
+  type: 'card'
+})
+
+methods.data.length.should.be.above(0)
+```
+
+## Payment Intents
+
+### Create Payment Intent
+
+```ts test
+const paymentIntent = await api.stripe.paymentIntents.create({
+  amount: 2000, // $20.00
+  currency: 'usd',
+  payment_method_types: ['card'],
+  metadata: { orderId: 'order-123' }
+})
+
+paymentIntent.should.have.property('id')
+paymentIntent.id.should.match(/^pi_/)
+paymentIntent.amount.should.equal(2000)
+paymentIntent.currency.should.equal('usd')
+paymentIntent.status.should.equal('requires_payment_method')
+```
+
+### Confirm Payment Intent
+
+```ts test
+const customer = await api.stripe.customers.create({ email: 'confirm@example.com' })
+const pm = await api.stripe.paymentMethods.create({
+  type: 'card',
+  card: { number: '4242424242424242', exp_month: 12, exp_year: 2025, cvc: '123' }
+})
+await api.stripe.paymentMethods.attach(pm.id, { customer: customer.id })
+
+const paymentIntent = await api.stripe.paymentIntents.create({
+  amount: 1000,
+  currency: 'usd',
+  customer: customer.id,
+  payment_method: pm.id
+})
+
+const confirmed = await api.stripe.paymentIntents.confirm(paymentIntent.id)
+
+confirmed.status.should.equal('succeeded')
+```
+
+### Capture Payment Intent
+
+```ts test
+const paymentIntent = await api.stripe.paymentIntents.create({
+  amount: 5000,
+  currency: 'usd',
+  capture_method: 'manual',
+  payment_method_types: ['card']
+})
+
+// After confirmation...
+const captured = await api.stripe.paymentIntents.capture(paymentIntent.id)
+
+captured.should.have.property('amount_captured')
+```
+
+### Cancel Payment Intent
+
+```ts test
+const paymentIntent = await api.stripe.paymentIntents.create({
+  amount: 1000,
+  currency: 'usd'
+})
+
+const canceled = await api.stripe.paymentIntents.cancel(paymentIntent.id)
+
+canceled.status.should.equal('canceled')
+```
+
+## Subscriptions
+
+### Create Subscription
+
+```ts test
+const customer = await api.stripe.customers.create({ email: 'sub@example.com' })
+
+const pm = await api.stripe.paymentMethods.create({
+  type: 'card',
+  card: { number: '4242424242424242', exp_month: 12, exp_year: 2025, cvc: '123' }
+})
+await api.stripe.paymentMethods.attach(pm.id, { customer: customer.id })
+await api.stripe.customers.update(customer.id, {
+  invoice_settings: { default_payment_method: pm.id }
+})
+
+const subscription = await api.stripe.subscriptions.create({
+  customer: customer.id,
+  items: [{ price: 'price_xxx' }] // Use actual price ID
+})
+
+subscription.should.have.property('id')
+subscription.id.should.match(/^sub_/)
+subscription.status.should.be.oneOf(['active', 'trialing', 'incomplete'])
+```
+
+### Update Subscription
+
+```ts test
+const subscription = await api.stripe.subscriptions.retrieve('sub_xxx')
+
+const updated = await api.stripe.subscriptions.update(subscription.id, {
+  metadata: { plan: 'pro' }
+})
+
+updated.metadata.plan.should.equal('pro')
+```
+
+### Cancel Subscription
+
+```ts test
+const canceled = await api.stripe.subscriptions.cancel('sub_xxx')
+
+canceled.status.should.equal('canceled')
+```
+
+### Subscription with Trial
+
+```ts test
+const customer = await api.stripe.customers.create({ email: 'trial@example.com' })
+
+const subscription = await api.stripe.subscriptions.create({
+  customer: customer.id,
+  items: [{ price: 'price_xxx' }],
+  trial_period_days: 14
+})
+
+subscription.status.should.equal('trialing')
+subscription.trial_end.should.be.a('number')
+```
+
+## Products & Prices
+
+### Create Product
+
+```ts test
+const product = await api.stripe.products.create({
+  name: 'Pro Plan',
+  description: 'Professional subscription plan',
+  metadata: { tier: 'pro' }
+})
+
+product.should.have.property('id')
+product.id.should.match(/^prod_/)
+product.name.should.equal('Pro Plan')
+```
+
+### Create Price
+
+```ts test
+const product = await api.stripe.products.create({ name: 'Basic Plan' })
+
+const price = await api.stripe.prices.create({
+  product: product.id,
+  unit_amount: 999, // $9.99
+  currency: 'usd',
+  recurring: { interval: 'month' }
+})
+
+price.should.have.property('id')
+price.id.should.match(/^price_/)
+price.unit_amount.should.equal(999)
+price.recurring.interval.should.equal('month')
+```
+
+### List Prices
+
+```ts test
+const prices = await api.stripe.prices.list({
+  active: true,
+  limit: 10
+})
+
+prices.data.should.be.an('array')
+```
+
+## Invoices
+
+### Create Invoice
+
+```ts test
+const customer = await api.stripe.customers.create({ email: 'invoice@example.com' })
+
+await api.stripe.invoiceItems.create({
+  customer: customer.id,
+  amount: 2500,
+  currency: 'usd',
+  description: 'Consulting services'
+})
+
+const invoice = await api.stripe.invoices.create({
+  customer: customer.id,
+  auto_advance: false
+})
+
+invoice.should.have.property('id')
+invoice.id.should.match(/^in_/)
+invoice.status.should.equal('draft')
+```
+
+### Finalize Invoice
+
+```ts test
+const invoice = await api.stripe.invoices.retrieve('in_xxx')
+
+const finalized = await api.stripe.invoices.finalizeInvoice(invoice.id)
+
+finalized.status.should.equal('open')
+```
+
+### Pay Invoice
+
+```ts test
+const paid = await api.stripe.invoices.pay('in_xxx')
+
+paid.status.should.equal('paid')
+```
+
+### Send Invoice
+
+```ts test
+const sent = await api.stripe.invoices.sendInvoice('in_xxx')
+
+sent.should.have.property('id')
+```
+
+### Void Invoice
+
+```ts test
+const voided = await api.stripe.invoices.voidInvoice('in_xxx')
+
+voided.status.should.equal('void')
+```
+
+## Checkout Sessions
+
+### Create Checkout Session
+
+```ts test
+const session = await api.stripe.checkout.sessions.create({
+  mode: 'payment',
+  line_items: [
+    {
+      price_data: {
+        currency: 'usd',
+        product_data: { name: 'T-Shirt' },
+        unit_amount: 2000
+      },
+      quantity: 1
+    }
+  ],
+  success_url: 'https://example.com/success',
+  cancel_url: 'https://example.com/cancel'
+})
+
+session.should.have.property('id')
+session.id.should.match(/^cs_/)
+session.should.have.property('url')
+session.mode.should.equal('payment')
+```
+
+### Subscription Checkout
+
+```ts test
+const session = await api.stripe.checkout.sessions.create({
+  mode: 'subscription',
+  line_items: [
+    { price: 'price_xxx', quantity: 1 }
+  ],
+  success_url: 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
+  cancel_url: 'https://example.com/cancel'
+})
+
+session.mode.should.equal('subscription')
+```
+
+### Retrieve Session
+
+```ts test
+const session = await api.stripe.checkout.sessions.retrieve('cs_xxx', {
+  expand: ['line_items', 'customer']
+})
+
+session.should.have.property('line_items')
+```
+
+## Webhooks
+
+### Construct Event
+
+```ts test
+const payload = '{"id": "evt_xxx", "type": "payment_intent.succeeded"}'
+const signature = 'whsec_xxx'
+
+const event = api.stripe.webhooks.constructEvent(
+  payload,
+  signature,
+  'whsec_test_secret'
+)
+
+event.should.have.property('id')
+event.should.have.property('type')
+```
+
+### Handle Webhook Event
+
+```ts test
+on('stripe.webhook', async (event) => {
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object
+      await api.db.Payments.create({
+        stripeId: paymentIntent.id,
+        amount: paymentIntent.amount,
+        status: 'succeeded'
+      })
+      break
+
+    case 'customer.subscription.created':
+      const subscription = event.data.object
+      await api.db.Subscriptions.create({
+        stripeId: subscription.id,
+        customerId: subscription.customer,
+        status: subscription.status
+      })
+      break
+  }
+})
+```
+
+## Refunds
+
+### Create Refund
+
+```ts test
+const refund = await api.stripe.refunds.create({
+  payment_intent: 'pi_xxx',
+  amount: 500 // Partial refund of $5.00
+})
+
+refund.should.have.property('id')
+refund.id.should.match(/^re_/)
+refund.amount.should.equal(500)
+refund.status.should.equal('succeeded')
+```
+
+### Full Refund
+
+```ts test
+const refund = await api.stripe.refunds.create({
+  payment_intent: 'pi_xxx'
+  // No amount = full refund
+})
+
+refund.should.have.property('amount')
+```
+
+## Charges
+
+### List Charges
+
+```ts test
+const charges = await api.stripe.charges.list({
+  customer: 'cus_xxx',
+  limit: 10
+})
+
+charges.data.should.be.an('array')
+```
+
+### Retrieve Charge
+
+```ts test
+const charge = await api.stripe.charges.retrieve('ch_xxx')
+
+charge.should.have.property('id')
+charge.should.have.property('amount')
+charge.should.have.property('status')
+```
+
+## Connect (Platforms)
+
+### Create Connected Account
+
+```ts test
+const account = await api.stripe.accounts.create({
+  type: 'express',
+  country: 'US',
+  email: 'seller@example.com',
+  capabilities: {
+    card_payments: { requested: true },
+    transfers: { requested: true }
+  }
+})
+
+account.should.have.property('id')
+account.id.should.match(/^acct_/)
+```
+
+### Create Account Link
+
+```ts test
+const accountLink = await api.stripe.accountLinks.create({
+  account: 'acct_xxx',
+  refresh_url: 'https://example.com/reauth',
+  return_url: 'https://example.com/return',
+  type: 'account_onboarding'
+})
+
+accountLink.should.have.property('url')
+accountLink.should.have.property('expires_at')
+```
+
+### Transfer to Connected Account
+
+```ts test
+const transfer = await api.stripe.transfers.create({
+  amount: 1000,
+  currency: 'usd',
+  destination: 'acct_xxx'
+})
+
+transfer.should.have.property('id')
+transfer.id.should.match(/^tr_/)
+```
+
+## Billing Portal
+
+### Create Portal Session
+
+```ts test
+const session = await api.stripe.billingPortal.sessions.create({
+  customer: 'cus_xxx',
+  return_url: 'https://example.com/account'
+})
+
+session.should.have.property('url')
+```
+
+### Configure Portal
+
+```ts test
+const configuration = await api.stripe.billingPortal.configurations.create({
+  features: {
+    invoice_history: { enabled: true },
+    payment_method_update: { enabled: true },
+    subscription_cancel: { enabled: true },
+    subscription_pause: { enabled: false }
+  },
+  business_profile: {
+    headline: 'Manage your subscription'
+  }
+})
+
+configuration.should.have.property('id')
+```
+
+## Usage-Based Billing
+
+### Report Usage
+
+```ts test
+const usageRecord = await api.stripe.subscriptionItems.createUsageRecord(
+  'si_xxx',
+  {
+    quantity: 100,
+    timestamp: Math.floor(Date.now() / 1000),
+    action: 'increment'
+  }
+)
+
+usageRecord.should.have.property('id')
+usageRecord.quantity.should.equal(100)
+```
+
+### List Usage Records
+
+```ts test
+const records = await api.stripe.subscriptionItems.listUsageRecordSummaries(
+  'si_xxx',
+  { limit: 10 }
+)
+
+records.data.should.be.an('array')
+```
+
+## Tax
+
+### Calculate Tax
+
+```ts test
+const calculation = await api.stripe.tax.calculations.create({
+  currency: 'usd',
+  line_items: [
+    {
+      amount: 1000,
+      reference: 'L1'
+    }
+  ],
+  customer_details: {
+    address: {
+      line1: '123 Main St',
+      city: 'San Francisco',
+      state: 'CA',
+      postal_code: '94111',
+      country: 'US'
+    },
+    address_source: 'billing'
+  }
+})
+
+calculation.should.have.property('tax_amount_exclusive')
+```

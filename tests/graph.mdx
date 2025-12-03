@@ -1,0 +1,385 @@
+---
+$type: TestSuite
+title: Graph Database & Relationship Tests
+description: Tests for relationships, graph traversal, and should-based assertions
+---
+
+# Graph Database & Relationship Tests
+
+Tests for graph database capabilities including relationships,
+backlinks, and the chainable `should` assertion syntax.
+
+## Should-Based Assertions
+
+The `should` property is available on all values for chainable assertions.
+
+### Type Assertions
+
+```ts test
+const greeting = 'hello'
+greeting.should.be.a('string')
+greeting.should.equal('hello')
+greeting.should.have.lengthOf(5)
+
+const count = 42
+count.should.be.a('number')
+count.should.be.above(40)
+count.should.be.below(50)
+count.should.be.within(40, 45)
+
+const isActive = true
+isActive.should.be.true
+isActive.should.be.ok
+```
+
+### Object Property Assertions
+
+```ts test
+const tea = {
+  name: 'Earl Grey',
+  flavors: ['bergamot', 'citrus', 'floral'],
+  caffeine: true,
+  origin: { country: 'UK', year: 1830 }
+}
+
+tea.should.have.property('name')
+tea.should.have.property('flavors')
+tea.should.have.property('name', 'Earl Grey')
+tea.should.have.property('flavors').with.lengthOf(3)
+tea.should.have.keys('name', 'flavors', 'caffeine')
+tea.origin.should.deep.equal({ country: 'UK', year: 1830 })
+```
+
+### Array Assertions
+
+```ts test
+const fruits = ['apple', 'banana', 'cherry']
+
+fruits.should.be.an('array')
+fruits.should.have.lengthOf(3)
+fruits.should.include('banana')
+fruits.should.contain('apple')
+
+const empty = []
+empty.should.be.empty
+fruits.should.not.be.empty
+```
+
+### Negation
+
+```ts test
+const value = 'foo'
+value.should.not.equal('bar')
+value.should.not.be.a('number')
+
+const arr = [1, 2, 3]
+arr.should.not.be.empty
+arr.should.not.include(4)
+```
+
+### Database Should Chains
+
+```ts test
+// Should works on async results too
+const user = await db.Users.create('jane', {
+  name: 'Jane',
+  email: 'jane@example.com',
+  role: 'admin'
+})
+
+user.should.have.property('id', 'jane')
+user.data.should.have.property('name', 'Jane')
+user.data.should.have.property('role', 'admin')
+user.should.have.property('createdAt')
+user.should.have.property('url')
+```
+
+### Chained Assertions on DB Results
+
+```ts test
+// Can chain should directly on promise results
+await db.Products.create('widget', { name: 'Widget', price: 9.99 })
+
+const product = await db.Products.get('widget')
+product.should.not.be.null
+product.data.name.should.equal('Widget')
+product.data.price.should.be.above(0)
+product.data.price.should.be.below(100)
+```
+
+## Relationship Extraction
+
+### Extract Links from Content
+
+```ts test
+const content = `---
+$type: BlogPost
+title: Links Demo
+---
+
+# Links Demo
+
+Check out [our documentation](https://docs.example.com/guide) for more info.
+
+Here's an [internal link](/posts/another-article) to related content.
+
+And an image: ![Logo](https://example.com/logo.png)
+`
+
+const doc = parse(content)
+const links = extractLinks(doc, { baseUrl: 'https://example.com' })
+
+links.should.have.lengthOf(3)
+
+links[0].url.should.equal('https://docs.example.com/guide')
+links[0].text.should.equal('our documentation')
+links[0].type.should.equal('link')
+
+links[1].url.should.equal('https://example.com/posts/another-article')
+links[1].type.should.equal('link')
+
+links[2].url.should.equal('https://example.com/logo.png')
+links[2].type.should.equal('image')
+```
+
+### Extract Relationships
+
+```ts test
+const content = `---
+$type: Article
+title: My Article
+---
+
+# Related Links
+
+See also: [Related Post](https://blog.example.com/posts/related)
+
+Reference: [External Resource](https://external.com/resource)
+`
+
+const doc = parse(content)
+const relationships = extractRelationships(doc, {
+  sourceId: 'https://blog.example.com/posts/my-article',
+  baseUrl: 'https://blog.example.com'
+})
+
+relationships.should.have.lengthOf(2)
+
+relationships[0].from.should.equal('https://blog.example.com/posts/my-article')
+relationships[0].to.should.equal('https://blog.example.com/posts/related')
+relationships[0].type.should.equal('link')
+relationships[0].data.text.should.equal('Related Post')
+
+relationships[1].to.should.equal('https://external.com/resource')
+```
+
+### Document with Relationships
+
+```ts test
+const content = `---
+$type: Wiki
+title: Programming Languages
+---
+
+# Programming Languages
+
+Learn about [JavaScript](/wiki/javascript) and [Python](/wiki/python).
+`
+
+const doc = parse(content)
+const docWithRels = withRelationships(doc, 'https://wiki.example.com/programming', {
+  baseUrl: 'https://wiki.example.com'
+})
+
+docWithRels.relationships.should.have.lengthOf(2)
+
+const targets = docWithRels.relationships.map(r => r.to)
+targets.should.contain('https://wiki.example.com/wiki/javascript')
+targets.should.contain('https://wiki.example.com/wiki/python')
+```
+
+## Graph Database Operations
+
+### Create and Query Relationships
+
+```ts test
+const alice = await db.Users.create('alice', { name: 'Alice' })
+const bob = await db.Users.create('bob', { name: 'Bob' })
+const charlie = await db.Users.create('charlie', { name: 'Charlie' })
+
+// Create relationships
+await db.relate({ type: 'follows', from: alice.url, to: bob.url })
+await db.relate({ type: 'follows', from: alice.url, to: charlie.url })
+await db.relate({ type: 'follows', from: bob.url, to: charlie.url })
+
+// Query outbound relationships (who Alice follows)
+const aliceFollows = await db.related(alice.url, 'follows', 'from')
+aliceFollows.should.have.lengthOf(2)
+
+// Query inbound relationships (who follows Charlie)
+const charlieFollowers = await db.related(charlie.url, 'follows', 'to')
+charlieFollowers.should.have.lengthOf(2)
+
+// Get all relationships for a user
+const aliceRels = await db.relationships(alice.url, 'follows')
+aliceRels.should.have.lengthOf(2)
+```
+
+### References (Backlinks)
+
+```ts test
+const js = await db.Pages.create('javascript', { title: 'JavaScript' })
+const ts = await db.Pages.create('typescript', { title: 'TypeScript' })
+const react = await db.Pages.create('react', { title: 'React' })
+
+// Create reference links
+await db.relate({ type: 'references', from: ts.url, to: js.url })
+await db.relate({ type: 'references', from: react.url, to: js.url })
+
+// Get backlinks to JavaScript
+const backlinks = await db.references(js.url, 'references')
+backlinks.should.have.lengthOf(2)
+
+const titles = backlinks.map(b => b.data.title)
+titles.should.contain('TypeScript')
+titles.should.contain('React')
+```
+
+### Remove Relationship
+
+```ts test
+const user1 = await db.Users.create('user1', { name: 'User 1' })
+const user2 = await db.Users.create('user2', { name: 'User 2' })
+
+await db.relate({ type: 'friends', from: user1.url, to: user2.url })
+
+// Verify relationship exists
+let friends = await db.related(user1.url, 'friends', 'from')
+friends.should.have.lengthOf(1)
+
+// Remove relationship
+await db.unrelate(user1.url, 'friends', user2.url)
+
+// Verify removed
+friends = await db.related(user1.url, 'friends', 'from')
+friends.should.have.lengthOf(0)
+```
+
+### Relationship with Data
+
+```ts test
+const order = await db.Orders.create('order-1', { total: 100 })
+const product = await db.Products.create('product-1', { name: 'Widget' })
+
+await db.relate({
+  type: 'contains',
+  from: order.url,
+  to: product.url,
+  data: { quantity: 3, unitPrice: 33.33 }
+})
+
+const orderRels = await db.relationships(order.url, 'contains')
+orderRels.should.have.lengthOf(1)
+orderRels[0].data.should.have.property('quantity', 3)
+orderRels[0].data.should.have.property('unitPrice', 33.33)
+```
+
+## URL Utilities
+
+### Parse and Resolve URLs
+
+```ts test
+// Resolve URL from entity
+const entity = { ns: 'api.example.com', type: 'User', id: 'alice' }
+const url = resolveUrl(entity)
+url.should.equal('https://api.example.com/User/alice')
+
+// Parse URL back to entity
+const parsed = parseUrl('https://blog.example.com/Post/hello-world')
+parsed.ns.should.equal('blog.example.com')
+parsed.type.should.equal('Post')
+parsed.id.should.equal('hello-world')
+
+// Parse URL with nested path
+const nested = parseUrl('https://docs.example.com/pages/guides/getting-started')
+nested.ns.should.equal('docs.example.com')
+nested.type.should.equal('pages')
+nested.id.should.equal('guides/getting-started')
+```
+
+## Integration Tests
+
+### Store Document with Relationships
+
+```ts test
+const content = `---
+$type: BlogPost
+title: My Journey with MDX
+---
+
+# My Journey with MDX
+
+I started learning from the [MDX documentation](https://mdxjs.com).
+
+Check out my other posts:
+- [Introduction to React](/posts/intro-react)
+- [TypeScript Tips](/posts/typescript-tips)
+`
+
+const doc = parse(content)
+const sourceUrl = 'https://blog.example.com/posts/my-journey'
+
+// Store the document
+const post = await db.create(sourceUrl, {
+  $type: 'BlogPost',
+  ...doc.data,
+  content: doc.content
+})
+
+// Extract and store relationships
+const relationships = extractRelationships(doc, {
+  sourceId: sourceUrl,
+  baseUrl: 'https://blog.example.com'
+})
+
+for (const rel of relationships) {
+  await db.relate({
+    type: rel.type,
+    from: sourceUrl,
+    to: rel.to,
+    data: rel.data
+  })
+}
+
+// Verify
+const storedRels = await db.relationships(sourceUrl, 'link')
+storedRels.should.have.lengthOf(3)
+```
+
+### ForEach with Relationships
+
+```ts test
+await db.Tags.create('javascript', { name: 'JavaScript' })
+await db.Tags.create('typescript', { name: 'TypeScript' })
+await db.Tags.create('react', { name: 'React' })
+
+const post = await db.Posts.create('my-post', { title: 'My Post' })
+
+// Tag the post
+for (const tag of ['javascript', 'typescript', 'react']) {
+  const tagThing = await db.Tags.get(tag)
+  await db.relate({ type: 'tagged', from: post.url, to: tagThing.url })
+}
+
+// Collect tags via forEach
+const tagNames = []
+const tags = await db.related(post.url, 'tagged', 'from')
+for (const tag of tags) {
+  tagNames.push(tag.data.name)
+}
+
+tagNames.should.have.lengthOf(3)
+tagNames.should.contain('JavaScript')
+tagNames.should.contain('TypeScript')
+tagNames.should.contain('React')
+```

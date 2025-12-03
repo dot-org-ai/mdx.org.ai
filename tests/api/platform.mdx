@@ -1,0 +1,619 @@
+---
+$type: TestSuite
+title: Platform API Tests
+description: Tests for api.db, api.fn, api.workflow, api.business, api.agent, api.storage
+---
+
+# Platform API Tests
+
+The `api` object provides unified access to all platform services.
+
+## api.db - Database API
+
+### Database Operations
+
+```ts test
+const user = await api.db.Users.create({
+  name: 'Alice',
+  email: 'alice@example.com'
+})
+
+user.should.have.property('id')
+user.data.name.should.equal('Alice')
+```
+
+### Query with API
+
+```ts test
+await api.db.Products.create({ name: 'Widget', price: 10 })
+await api.db.Products.create({ name: 'Gadget', price: 20 })
+
+const products = await api.db.Products.find({
+  where: { price: { $gte: 15 } }
+})
+
+products.should.have.lengthOf(1)
+products[0].data.name.should.equal('Gadget')
+```
+
+### Namespace Scoping
+
+```ts test
+const tenant1 = api.db.namespace('tenant1.example.com')
+const tenant2 = api.db.namespace('tenant2.example.com')
+
+await tenant1.Users.create('shared-id', { name: 'Tenant 1 User' })
+await tenant2.Users.create('shared-id', { name: 'Tenant 2 User' })
+
+const u1 = await tenant1.Users.get('shared-id')
+const u2 = await tenant2.Users.get('shared-id')
+
+u1.data.name.should.equal('Tenant 1 User')
+u2.data.name.should.equal('Tenant 2 User')
+```
+
+## api.fn - Functions API
+
+### Define Function
+
+```ts test
+const add = api.fn('add', {
+  input: { a: 'number', b: 'number' },
+  output: 'number'
+}, async ({ a, b }) => {
+  return a + b
+})
+
+const result = await add({ a: 2, b: 3 })
+result.should.equal(5)
+```
+
+### Function with Validation
+
+```ts test
+const createUser = api.fn('createUser', {
+  input: {
+    email: { type: 'string', format: 'email' },
+    name: { type: 'string', minLength: 1 },
+    age: { type: 'number', minimum: 0, optional: true }
+  },
+  output: { id: 'string', email: 'string', name: 'string' }
+}, async (data) => {
+  const user = await api.db.Users.create(data)
+  return { id: user.id, email: user.data.email, name: user.data.name }
+})
+
+const user = await createUser({ email: 'test@test.com', name: 'Test' })
+user.should.have.property('id')
+user.email.should.equal('test@test.com')
+```
+
+### Function Error Handling
+
+```ts test
+const divide = api.fn('divide', {
+  input: { a: 'number', b: 'number' },
+  output: 'number'
+}, async ({ a, b }) => {
+  if (b === 0) throw new Error('Division by zero')
+  return a / b
+})
+
+const result = await divide({ a: 10, b: 2 })
+result.should.equal(5)
+
+const error = await divide({ a: 10, b: 0 }).catch(e => e)
+error.should.be.an('error')
+error.message.should.equal('Division by zero')
+```
+
+### List Functions
+
+```ts test
+api.fn('fn1', {}, async () => 'one')
+api.fn('fn2', {}, async () => 'two')
+
+const functions = api.fn.list()
+functions.should.include('fn1')
+functions.should.include('fn2')
+```
+
+### Function Middleware
+
+```ts test
+const logs = []
+
+api.fn.use(async (ctx, next) => {
+  logs.push(`before: ${ctx.name}`)
+  const result = await next()
+  logs.push(`after: ${ctx.name}`)
+  return result
+})
+
+const greet = api.fn('greet', {}, async () => 'hello')
+await greet({})
+
+logs.should.deep.equal(['before: greet', 'after: greet'])
+```
+
+### Remote Function Call
+
+```ts test
+// Call a function on another service
+const result = await api.fn.call('https://other-service.com/rpc', 'processOrder', {
+  orderId: 'order-123'
+})
+
+result.should.have.property('status')
+```
+
+## api.workflow - Workflow API
+
+### Define Workflow
+
+```ts test
+const orderWorkflow = api.workflow('order-processing', {
+  steps: [
+    { name: 'validate', fn: 'validateOrder' },
+    { name: 'charge', fn: 'chargePayment' },
+    { name: 'fulfill', fn: 'fulfillOrder' },
+    { name: 'notify', fn: 'sendNotification' }
+  ]
+})
+
+orderWorkflow.should.have.property('name', 'order-processing')
+orderWorkflow.steps.should.have.lengthOf(4)
+```
+
+### Start Workflow
+
+```ts test
+const workflow = api.workflow('simple-flow', {
+  steps: [
+    { name: 'step1', fn: async (ctx) => ({ ...ctx, step1: true }) },
+    { name: 'step2', fn: async (ctx) => ({ ...ctx, step2: true }) }
+  ]
+})
+
+const instance = await workflow.start({ orderId: '123' })
+
+instance.should.have.property('id')
+instance.should.have.property('status')
+instance.input.orderId.should.equal('123')
+```
+
+### Workflow with Conditions
+
+```ts test
+const approvalWorkflow = api.workflow('approval', {
+  steps: [
+    { name: 'review', fn: 'reviewRequest' },
+    {
+      name: 'route',
+      when: [
+        { if: { amount: { $gt: 1000 } }, goto: 'manager-approval' },
+        { if: { amount: { $gt: 100 } }, goto: 'team-lead-approval' },
+        { else: 'auto-approve' }
+      ]
+    },
+    { name: 'manager-approval', fn: 'getManagerApproval' },
+    { name: 'team-lead-approval', fn: 'getTeamLeadApproval' },
+    { name: 'auto-approve', fn: 'autoApprove' },
+    { name: 'complete', fn: 'completeRequest' }
+  ]
+})
+
+approvalWorkflow.steps.should.have.lengthOf(6)
+```
+
+### Workflow with Parallel Steps
+
+```ts test
+const parallelWorkflow = api.workflow('parallel-processing', {
+  steps: [
+    { name: 'init', fn: 'initialize' },
+    {
+      name: 'parallel-tasks',
+      parallel: [
+        { fn: 'processImages' },
+        { fn: 'processVideos' },
+        { fn: 'processDocuments' }
+      ]
+    },
+    { name: 'aggregate', fn: 'aggregateResults' }
+  ]
+})
+
+parallelWorkflow.steps[1].parallel.should.have.lengthOf(3)
+```
+
+### Query Workflow Instances
+
+```ts test
+const instances = await api.workflow.instances({
+  workflow: 'order-processing',
+  status: 'running',
+  limit: 10
+})
+
+instances.should.be.an('array')
+```
+
+### Workflow Events
+
+```ts test
+const events = []
+
+api.workflow.on('step.completed', (event) => {
+  events.push(event.step)
+})
+
+const wf = api.workflow('tracked', {
+  steps: [
+    { name: 'a', fn: async () => 'a' },
+    { name: 'b', fn: async () => 'b' }
+  ]
+})
+
+await wf.start({})
+
+events.should.contain('a')
+events.should.contain('b')
+```
+
+## api.business - Business Logic API
+
+### Define Entity
+
+```ts test
+const Customer = api.business.entity('Customer', {
+  fields: {
+    name: { type: 'string', required: true },
+    email: { type: 'string', format: 'email', required: true },
+    tier: { type: 'string', enum: ['free', 'pro', 'enterprise'], default: 'free' },
+    balance: { type: 'number', default: 0 }
+  },
+
+  computed: {
+    isPremium: (c) => c.tier !== 'free'
+  },
+
+  methods: {
+    async charge(amount) {
+      if (this.balance < amount) throw new Error('Insufficient balance')
+      this.balance -= amount
+      await this.save()
+    }
+  }
+})
+
+const customer = await Customer.create({
+  name: 'Acme Inc',
+  email: 'billing@acme.com',
+  tier: 'pro'
+})
+
+customer.isPremium.should.be.true
+```
+
+### Business Rules
+
+```ts test
+api.business.rule('order-minimum', {
+  entity: 'Order',
+  when: 'create',
+  validate: (order) => {
+    if (order.total < 10) {
+      throw new Error('Minimum order is $10')
+    }
+  }
+})
+
+api.business.rule('auto-upgrade', {
+  entity: 'Customer',
+  when: 'update',
+  condition: (customer) => customer.totalSpent > 1000,
+  action: (customer) => {
+    customer.tier = 'pro'
+  }
+})
+
+const rules = api.business.rules.list()
+rules.should.include('order-minimum')
+rules.should.include('auto-upgrade')
+```
+
+### Business Process
+
+```ts test
+const invoicing = api.business.process('monthly-invoicing', {
+  schedule: '0 0 1 * *', // First of each month
+
+  async run() {
+    const customers = await api.db.Customers.find({
+      where: { tier: { $ne: 'free' } }
+    })
+
+    for (const customer of customers) {
+      const usage = await this.calculateUsage(customer.id)
+      await this.createInvoice(customer.id, usage)
+      await this.sendInvoiceEmail(customer.id)
+    }
+  },
+
+  async calculateUsage(customerId) {
+    // Calculate usage for billing period
+  },
+
+  async createInvoice(customerId, usage) {
+    // Create invoice record
+  },
+
+  async sendInvoiceEmail(customerId) {
+    // Send invoice email
+  }
+})
+
+invoicing.should.have.property('schedule')
+```
+
+## api.agent - Agent API
+
+### Define Agent
+
+```ts test
+const supportAgent = api.agent('support', {
+  model: 'claude-3-haiku',
+  system: 'You are a helpful customer support agent.',
+
+  tools: [
+    api.agent.tool('lookupOrder', {
+      description: 'Look up an order by ID',
+      input: { orderId: 'string' },
+      fn: async ({ orderId }) => {
+        return api.db.Orders.get(orderId)
+      }
+    }),
+
+    api.agent.tool('refundOrder', {
+      description: 'Process a refund for an order',
+      input: { orderId: 'string', reason: 'string' },
+      fn: async ({ orderId, reason }) => {
+        // Process refund
+      }
+    })
+  ]
+})
+
+supportAgent.should.have.property('name', 'support')
+supportAgent.tools.should.have.lengthOf(2)
+```
+
+### Chat with Agent
+
+```ts test
+const agent = api.agent('assistant', {
+  model: 'claude-3-sonnet',
+  system: 'You are a helpful assistant.'
+})
+
+const response = await agent.chat('What is 2 + 2?')
+
+response.should.have.property('content')
+response.content.should.contain('4')
+```
+
+### Agent with Memory
+
+```ts test
+const agent = api.agent('memory-agent', {
+  model: 'claude-3-haiku',
+  memory: {
+    type: 'conversation',
+    maxMessages: 100
+  }
+})
+
+await agent.chat('My name is Alice')
+const response = await agent.chat('What is my name?')
+
+response.content.should.contain('Alice')
+```
+
+### Agent Workflow
+
+```ts test
+const researchAgent = api.agent('researcher', {
+  model: 'claude-3-opus',
+  workflow: [
+    { step: 'search', tool: 'webSearch' },
+    { step: 'analyze', prompt: 'Analyze the search results' },
+    { step: 'summarize', prompt: 'Summarize findings' }
+  ]
+})
+
+researchAgent.workflow.should.have.lengthOf(3)
+```
+
+### Multi-Agent System
+
+```ts test
+const planner = api.agent('planner', {
+  model: 'claude-3-opus',
+  system: 'You plan and coordinate tasks'
+})
+
+const executor = api.agent('executor', {
+  model: 'claude-3-sonnet',
+  system: 'You execute specific tasks'
+})
+
+const reviewer = api.agent('reviewer', {
+  model: 'claude-3-haiku',
+  system: 'You review and validate work'
+})
+
+const team = api.agent.team('project-team', {
+  agents: [planner, executor, reviewer],
+  coordinator: planner
+})
+
+team.agents.should.have.lengthOf(3)
+```
+
+## api.storage - Storage API
+
+### Upload File
+
+```ts test
+const file = await api.storage.upload('documents/report.pdf', pdfBuffer, {
+  contentType: 'application/pdf',
+  metadata: { author: 'Alice', version: '1.0' }
+})
+
+file.should.have.property('key', 'documents/report.pdf')
+file.should.have.property('url')
+file.should.have.property('size')
+```
+
+### Download File
+
+```ts test
+await api.storage.upload('test/hello.txt', Buffer.from('Hello World'))
+
+const content = await api.storage.download('test/hello.txt')
+content.toString().should.equal('Hello World')
+```
+
+### List Files
+
+```ts test
+await api.storage.upload('folder/file1.txt', Buffer.from('1'))
+await api.storage.upload('folder/file2.txt', Buffer.from('2'))
+await api.storage.upload('folder/sub/file3.txt', Buffer.from('3'))
+
+const files = await api.storage.list('folder/')
+files.should.have.lengthOf(3)
+
+const topLevel = await api.storage.list('folder/', { recursive: false })
+topLevel.should.have.lengthOf(2)
+```
+
+### Delete File
+
+```ts test
+await api.storage.upload('to-delete.txt', Buffer.from('delete me'))
+
+const deleted = await api.storage.delete('to-delete.txt')
+deleted.should.be.true
+
+const exists = await api.storage.exists('to-delete.txt')
+exists.should.be.false
+```
+
+### Signed URLs
+
+```ts test
+await api.storage.upload('private/secret.pdf', pdfBuffer)
+
+const signedUrl = await api.storage.getSignedUrl('private/secret.pdf', {
+  expiresIn: '1h',
+  action: 'read'
+})
+
+signedUrl.should.contain('signature=')
+signedUrl.should.contain('expires=')
+```
+
+### Storage Buckets
+
+```ts test
+const publicBucket = api.storage.bucket('public', {
+  public: true,
+  cors: ['*']
+})
+
+const privateBucket = api.storage.bucket('private', {
+  public: false,
+  encryption: true
+})
+
+await publicBucket.upload('image.png', imageBuffer)
+await privateBucket.upload('secrets.json', secretsBuffer)
+
+const publicUrl = await publicBucket.getUrl('image.png')
+publicUrl.should.not.contain('signature=')
+```
+
+### Storage Events
+
+```ts test
+const uploads = []
+
+api.storage.on('upload', (event) => {
+  uploads.push(event.key)
+})
+
+await api.storage.upload('event-test-1.txt', Buffer.from('1'))
+await api.storage.upload('event-test-2.txt', Buffer.from('2'))
+
+uploads.should.have.lengthOf(2)
+```
+
+## Cross-Service Integration
+
+### Function Calls Database
+
+```ts test
+const getUser = api.fn('getUser', {
+  input: { userId: 'string' }
+}, async ({ userId }) => {
+  const user = await api.db.Users.get(userId)
+  if (!user) throw new Error('User not found')
+  return user.data
+})
+
+await api.db.Users.create('fn-test-user', { name: 'Test', email: 'test@test.com' })
+
+const user = await getUser({ userId: 'fn-test-user' })
+user.name.should.equal('Test')
+```
+
+### Workflow Triggers Storage
+
+```ts test
+api.storage.on('upload', async (event) => {
+  if (event.key.endsWith('.csv')) {
+    await api.workflow('csv-import').start({
+      fileKey: event.key
+    })
+  }
+})
+
+// Upload triggers workflow
+await api.storage.upload('imports/data.csv', csvBuffer)
+```
+
+### Agent Uses All Services
+
+```ts test
+const fullAgent = api.agent('full-service', {
+  model: 'claude-3-sonnet',
+  tools: [
+    api.agent.tool('query', {
+      description: 'Query the database',
+      fn: async ({ type, where }) => api.db[type].find({ where })
+    }),
+    api.agent.tool('upload', {
+      description: 'Upload a file',
+      fn: async ({ key, content }) => api.storage.upload(key, content)
+    }),
+    api.agent.tool('startWorkflow', {
+      description: 'Start a workflow',
+      fn: async ({ name, input }) => api.workflow(name).start(input)
+    })
+  ]
+})
+
+fullAgent.tools.should.have.lengthOf(3)
+```
