@@ -1,0 +1,181 @@
+---
+$type: DocsPage
+title: Newsletter Section
+description: Email signup form
+screenshot: /screenshots/sections/newsletter.png
+---
+
+# Newsletter Section
+
+An email signup form for newsletter subscriptions.
+
+<Preview>
+  <section data-section="newsletter" style={{ padding: 'var(--spacing-16) var(--spacing-4)', background: 'var(--muted)', borderRadius: 'var(--radius-lg)' }}>
+    <div style={{ maxWidth: '500px', margin: '0 auto', textAlign: 'center' }}>
+      <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Stay up to date</h2>
+      <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)' }}>Get the latest updates delivered to your inbox.</p>
+      <form style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+        <input type="email" placeholder="Enter your email" style={{ flex: 1, padding: 'var(--spacing-3)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', background: 'var(--background)' }} />
+        <button type="submit" style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer', fontWeight: 500 }}>Subscribe</button>
+      </form>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginTop: 'var(--spacing-4)' }}>No spam. Unsubscribe anytime.</p>
+    </div>
+  </section>
+</Preview>
+
+## When to Use
+
+- Newsletter signups
+- Product updates
+- Blog subscriptions
+- Marketing lists
+
+## Structure
+
+```html
+<section data-section="newsletter">
+  <h2>Stay up to date</h2>
+  <p>Get the latest updates delivered to your inbox.</p>
+
+  <form data-newsletter-form>
+    <input
+      type="email"
+      placeholder="Enter your email"
+      required
+      aria-label="Email address"
+    />
+    <button type="submit" data-button="primary">Subscribe</button>
+  </form>
+
+  <small>No spam. Unsubscribe anytime.</small>
+</section>
+```
+
+## CSS
+
+```css
+[data-section="newsletter"] {
+  padding: var(--spacing-16) var(--spacing-4);
+  background: var(--muted);
+  text-align: center;
+}
+
+[data-section="newsletter"] > * {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+[data-section="newsletter"] h2 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-section="newsletter"] > p {
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-6);
+}
+
+[data-section="newsletter"] form {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-section="newsletter"] input[type="email"] {
+  flex: 1;
+  padding: var(--spacing-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+}
+
+[data-section="newsletter"] input[type="email"]:focus {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+[data-section="newsletter"] small {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-top: var(--spacing-4);
+}
+
+@media (max-width: 480px) {
+  [data-section="newsletter"] form {
+    flex-direction: column;
+  }
+}
+```
+
+## JavaScript
+
+```js
+const form = document.querySelector('[data-newsletter-form]')
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault()
+
+  const email = form.querySelector('input[type="email"]').value
+  const button = form.querySelector('button[type="submit"]')
+
+  button.disabled = true
+  button.textContent = 'Subscribing...'
+
+  try {
+    await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    })
+
+    button.textContent = 'Subscribed!'
+    form.reset()
+  } catch (error) {
+    button.textContent = 'Try again'
+  } finally {
+    button.disabled = false
+  }
+})
+```
+
+## Variations
+
+### With Categories
+
+```html
+<section data-section="newsletter" data-variant="categories">
+  <h2>Subscribe to updates</h2>
+  <form>
+    <fieldset>
+      <legend>Topics</legend>
+      <label>
+        <input type="checkbox" name="topics" value="product" />
+        Product updates
+      </label>
+      <label>
+        <input type="checkbox" name="topics" value="blog" />
+        Blog posts
+      </label>
+      <label>
+        <input type="checkbox" name="topics" value="events" />
+        Events
+      </label>
+    </fieldset>
+    <input type="email" placeholder="Enter your email" required />
+    <button type="submit">Subscribe</button>
+  </form>
+</section>
+```
+
+### Inline Banner
+
+```html
+<section data-section="newsletter" data-variant="inline">
+  <p>Stay updated with our newsletter</p>
+  <form data-inline>
+    <input type="email" placeholder="Email" />
+    <button type="submit">→</button>
+  </form>
+</section>
+```

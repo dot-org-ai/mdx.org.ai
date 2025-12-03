@@ -1,0 +1,185 @@
+---
+$type: DocsPage
+title: Inline Container
+description: Embedded within page content flow
+screenshot: /screenshots/containers/inline.png
+---
+
+# Inline Container
+
+Content embedded directly within the page flow, always visible without overlays.
+
+<Preview>
+  <div style={{ padding: 'var(--spacing-4)', background: 'var(--background)', borderRadius: 'var(--radius-lg)' }}>
+    <p style={{ marginBottom: 'var(--spacing-4)', color: 'var(--muted-foreground)' }}>Regular page content flows here...</p>
+
+    <article data-container="inline" style={{ background: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-6)', marginBottom: 'var(--spacing-4)' }}>
+      <header style={{ marginBottom: 'var(--spacing-4)' }}>
+        <span style={{ display: 'inline-block', padding: 'var(--spacing-1) var(--spacing-2)', background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)', marginBottom: 'var(--spacing-2)' }}>NEW</span>
+        <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 600 }}>Introducing Dark Mode</h3>
+      </header>
+      <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>Experience our app in a whole new way with our brand new dark mode feature.</p>
+      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Try it now</button>
+        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Learn more</button>
+      </div>
+    </article>
+
+    <p style={{ color: 'var(--muted-foreground)' }}>More content continues below...</p>
+  </div>
+</Preview>
+
+## When to Use
+
+- Feature announcements
+- Inline CTAs
+- Embedded widgets
+- Contextual cards
+- Tip/note boxes
+- Inline forms
+
+## Structure
+
+```html
+<article>
+  <p>Regular content...</p>
+
+  <aside data-container="inline">
+    <header>
+      <span data-badge>NEW</span>
+      <h3>Feature Announcement</h3>
+    </header>
+    <p>Description of the feature...</p>
+    <div data-actions>
+      <a href="/try" data-button="primary">Try it now</a>
+      <a href="/learn" data-button="outline">Learn more</a>
+    </div>
+  </aside>
+
+  <p>More content...</p>
+</article>
+```
+
+## CSS
+
+```css
+[data-container="inline"] {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  margin: var(--spacing-6) 0;
+}
+
+[data-container="inline"] > header {
+  margin-bottom: var(--spacing-4);
+}
+
+[data-container="inline"] > header [data-badge] {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  font-size: var(--text-xs);
+  margin-bottom: var(--spacing-2);
+}
+
+[data-container="inline"] > header h3 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+[data-container="inline"] > p {
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-container="inline"] [data-actions] {
+  display: flex;
+  gap: var(--spacing-2);
+}
+```
+
+## Variations
+
+### Tip Box
+
+```html
+<aside data-container="inline" data-variant="tip">
+  <div data-icon>💡</div>
+  <div data-content>
+    <strong>Pro tip:</strong>
+    <p>You can use keyboard shortcuts to speed up your workflow.</p>
+  </div>
+</aside>
+```
+
+```css
+[data-container="inline"][data-variant="tip"] {
+  display: flex;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: var(--accent);
+  border-left: 4px solid var(--accent-foreground);
+}
+```
+
+### Warning Box
+
+```html
+<aside data-container="inline" data-variant="warning">
+  <div data-icon>⚠️</div>
+  <div data-content>
+    <strong>Warning:</strong>
+    <p>This action cannot be undone.</p>
+  </div>
+</aside>
+```
+
+### Embedded Form
+
+```html
+<aside data-container="inline" data-variant="form">
+  <header>
+    <h3>Subscribe to updates</h3>
+  </header>
+  <form>
+    <input type="email" placeholder="Enter your email" />
+    <button type="submit" data-button="primary">Subscribe</button>
+  </form>
+</aside>
+```
+
+### Dismissible Banner
+
+```html
+<aside data-container="inline" data-dismissible>
+  <p>🎉 New feature available! Check out our latest update.</p>
+  <button data-action="dismiss" aria-label="Dismiss">&times;</button>
+</aside>
+```
+
+```js
+document.querySelectorAll('[data-dismissible] [data-action="dismiss"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const container = btn.closest('[data-container="inline"]')
+    container.remove()
+    // Optionally persist dismissal
+    localStorage.setItem(`dismissed-${container.id}`, 'true')
+  })
+})
+```
+
+### Collapsible Details
+
+```html
+<details data-container="inline" data-variant="collapsible">
+  <summary>
+    <h3>More information</h3>
+  </summary>
+  <div data-content>
+    <p>Additional details that can be expanded...</p>
+  </div>
+</details>
+```

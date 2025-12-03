@@ -1,0 +1,141 @@
+---
+$type: DocsPage
+title: Home Page
+description: Marketing landing page for your product
+screenshot: /screenshots/pages/home.png
+---
+
+# Home Page
+
+A marketing landing page template combining hero, features, testimonials, and CTA sections.
+
+<Preview>
+  <article data-page="home" style={{ background: 'var(--background)' }}>
+    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4) var(--spacing-6)', borderBottom: '1px solid var(--border)' }}>
+      <span style={{ fontWeight: 700, fontSize: 'var(--text-xl)' }}>Acme</span>
+      <nav style={{ display: 'flex', gap: 'var(--spacing-6)', fontSize: 'var(--text-sm)' }}>
+        <a href="#" style={{ color: 'var(--foreground)' }}>Features</a>
+        <a href="#" style={{ color: 'var(--muted-foreground)' }}>Pricing</a>
+        <a href="#" style={{ color: 'var(--muted-foreground)' }}>Docs</a>
+      </nav>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Get Started</button>
+    </header>
+
+    <section style={{ padding: 'var(--spacing-16) var(--spacing-6)', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+      <span style={{ display: 'inline-block', padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--muted)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-4)' }}>New: v2.0 Released</span>
+      <h1 style={{ fontSize: 'var(--text-4xl)', fontWeight: 800, marginBottom: 'var(--spacing-4)', lineHeight: 1.1 }}>Build better products with semantic HTML</h1>
+      <p style={{ fontSize: 'var(--text-lg)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)' }}>A design system that uses data attributes instead of utility classes. Clean HTML, powerful styling.</p>
+      <div style={{ display: 'flex', gap: 'var(--spacing-3)', justifyContent: 'center' }}>
+        <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500 }}>Start Building</button>
+        <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontWeight: 500 }}>View Docs</button>
+      </div>
+    </section>
+
+    <section style={{ padding: 'var(--spacing-8) var(--spacing-6)', background: 'var(--muted)' }}>
+      <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>Trusted by teams at</p>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-8)', opacity: 0.5 }}>
+        {['Vercel', 'Stripe', 'Linear', 'Notion'].map(name => (
+          <span key={name} style={{ fontWeight: 600 }}>{name}</span>
+        ))}
+      </div>
+    </section>
+  </article>
+</Preview>
+
+## When to Use
+
+- Product marketing landing pages
+- SaaS homepage
+- Startup websites
+- Product launches
+
+## Structure
+
+```html
+<article data-page="home">
+  <header data-navbar>
+    <a data-logo href="/">Acme</a>
+    <nav data-nav-links>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#docs">Docs</a>
+    </nav>
+    <button data-button="primary">Get Started</button>
+  </header>
+
+  <section data-section="hero">
+    <span data-badge>New: v2.0 Released</span>
+    <h1>Build better products with semantic HTML</h1>
+    <p>A design system that uses data attributes...</p>
+    <div data-actions>
+      <button data-button="primary">Start Building</button>
+      <button data-button="outline">View Docs</button>
+    </div>
+  </section>
+
+  <section data-section="logos">
+    <p>Trusted by teams at</p>
+    <div data-logo-grid>
+      <img src="/logos/vercel.svg" alt="Vercel" />
+      <img src="/logos/stripe.svg" alt="Stripe" />
+    </div>
+  </section>
+
+  <section data-section="features">
+    <!-- Feature cards -->
+  </section>
+
+  <section data-section="testimonials">
+    <!-- Testimonial cards -->
+  </section>
+
+  <section data-section="cta">
+    <h2>Ready to get started?</h2>
+    <button data-button="primary">Start Free Trial</button>
+  </section>
+
+  <footer data-footer>
+    <!-- Footer content -->
+  </footer>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="home"] {
+  min-height: 100vh;
+}
+
+[data-page="home"] [data-navbar] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4) var(--spacing-6);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--background);
+  z-index: 50;
+}
+
+[data-page="home"] [data-section="hero"] {
+  padding: var(--spacing-16) var(--spacing-6);
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+[data-page="home"] [data-section="hero"] h1 {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="home"] [data-actions] {
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: center;
+}
+```

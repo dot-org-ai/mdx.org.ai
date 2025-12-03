@@ -1,0 +1,144 @@
+---
+$type: DocsPage
+title: 404 Not Found Page
+description: Page not found error
+screenshot: /screenshots/pages/not-found.png
+---
+
+# 404 Not Found Page
+
+A friendly 404 error page when content is not found.
+
+<Preview>
+  <article data-page="not-found" style={{ padding: 'var(--spacing-6)', textAlign: 'center', minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ fontSize: '120px', fontWeight: 800, color: 'var(--muted)', lineHeight: 1 }}>404</div>
+    <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Page not found</h1>
+    <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)', maxWidth: '400px' }}>Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.</p>
+    <div style={{ display: 'flex', gap: 'var(--spacing-3)' }}>
+      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500 }}>Go Home</button>
+      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontWeight: 500 }}>Contact Support</button>
+    </div>
+    <div style={{ marginTop: 'var(--spacing-8)' }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-3)' }}>Popular pages:</p>
+      <div style={{ display: 'flex', gap: 'var(--spacing-4)' }}>
+        <a href="#" style={{ fontSize: 'var(--text-sm)', color: 'var(--primary)' }}>Documentation</a>
+        <a href="#" style={{ fontSize: 'var(--text-sm)', color: 'var(--primary)' }}>Components</a>
+        <a href="#" style={{ fontSize: 'var(--text-sm)', color: 'var(--primary)' }}>Blog</a>
+      </div>
+    </div>
+  </article>
+</Preview>
+
+## When to Use
+
+- 404 error pages
+- Content not found states
+- Broken link handling
+- Missing resource pages
+
+## Structure
+
+```html
+<article data-page="not-found">
+  <div data-error-code>404</div>
+  <h1>Page not found</h1>
+  <p>Sorry, we couldn't find the page you're looking for.</p>
+
+  <div data-actions>
+    <a href="/" data-button="primary">Go Home</a>
+    <a href="/contact" data-button="outline">Contact Support</a>
+  </div>
+
+  <nav data-suggestions>
+    <p>Popular pages:</p>
+    <ul>
+      <li><a href="/docs">Documentation</a></li>
+      <li><a href="/components">Components</a></li>
+      <li><a href="/blog">Blog</a></li>
+    </ul>
+  </nav>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="not-found"] {
+  padding: var(--spacing-6);
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-page="not-found"] [data-error-code] {
+  font-size: 120px;
+  font-weight: 800;
+  color: var(--muted);
+  line-height: 1;
+}
+
+[data-page="not-found"] h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="not-found"] > p {
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-6);
+  max-width: 400px;
+}
+
+[data-page="not-found"] [data-actions] {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+[data-page="not-found"] [data-suggestions] {
+  margin-top: var(--spacing-8);
+}
+
+[data-page="not-found"] [data-suggestions] p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-3);
+}
+
+[data-page="not-found"] [data-suggestions] ul {
+  display: flex;
+  gap: var(--spacing-4);
+  list-style: none;
+  padding: 0;
+}
+
+[data-page="not-found"] [data-suggestions] a {
+  font-size: var(--text-sm);
+  color: var(--primary);
+}
+```
+
+## Variations
+
+### Minimal 404
+
+```html
+<article data-page="not-found" data-variant="minimal">
+  <h1>404</h1>
+  <p>Page not found</p>
+  <a href="/">Return home</a>
+</article>
+```
+
+### Illustrated 404
+
+```html
+<article data-page="not-found" data-variant="illustrated">
+  <img src="/404-illustration.svg" alt="" />
+  <h1>Oops! Lost in space</h1>
+  <p>The page you're looking for has drifted away.</p>
+  <a href="/" data-button="primary">Back to Earth</a>
+</article>
+```

@@ -1,0 +1,160 @@
+---
+$type: DocsPage
+title: List View
+description: Vertical list of items with actions
+screenshot: /screenshots/views/list.png
+---
+
+# List View
+
+A vertical list of items with search, filters, and actions.
+
+<Preview>
+  <article data-view="list" style={{ padding: 'var(--spacing-6)', background: 'var(--background)' }}>
+    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
+      <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Projects</h1>
+      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+        <input type="search" placeholder="Search..." style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', width: '200px' }} />
+        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>New Project</button>
+      </div>
+    </header>
+    <ul style={{ listStyle: 'none', padding: 0, border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+      <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
+        <div>
+          <h3 style={{ fontWeight: 600 }}>Project Alpha</h3>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Web application redesign</p>
+          <div style={{ display: 'flex', gap: 'var(--spacing-2)', marginTop: 'var(--spacing-1)' }}>
+            <span style={{ padding: '2px 8px', background: 'green', color: 'white', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Active</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>Updated 2h ago</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Edit</button>
+          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Delete</button>
+        </div>
+      </li>
+      <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
+        <div>
+          <h3 style={{ fontWeight: 600 }}>Project Beta</h3>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Mobile app development</p>
+          <div style={{ display: 'flex', gap: 'var(--spacing-2)', marginTop: 'var(--spacing-1)' }}>
+            <span style={{ padding: '2px 8px', background: 'orange', color: 'white', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>In Review</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>Updated 1d ago</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Edit</button>
+          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Delete</button>
+        </div>
+      </li>
+      <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)' }}>
+        <div>
+          <h3 style={{ fontWeight: 600 }}>Project Gamma</h3>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>API integration</p>
+          <div style={{ display: 'flex', gap: 'var(--spacing-2)', marginTop: 'var(--spacing-1)' }}>
+            <span style={{ padding: '2px 8px', background: 'var(--muted)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Draft</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>Updated 3d ago</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Edit</button>
+          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Delete</button>
+        </div>
+      </li>
+    </ul>
+    <footer style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--spacing-4)' }}>
+      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Showing 1-3 of 12</span>
+      <nav style={{ display: 'flex', gap: 'var(--spacing-1)' }}>
+        <button disabled style={{ padding: 'var(--spacing-2)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>Previous</button>
+        <button style={{ padding: 'var(--spacing-2)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Next</button>
+      </nav>
+    </footer>
+  </article>
+</Preview>
+
+## Structure
+
+```html
+<article data-view="list">
+  <header>
+    <h1>Projects</h1>
+    <div data-actions>
+      <input type="search" placeholder="Search..." />
+      <select>
+        <option>All Status</option>
+        <option>Active</option>
+        <option>Archived</option>
+      </select>
+      <button data-button="primary">New Project</button>
+    </div>
+  </header>
+
+  <section data-content>
+    <ul data-list>
+      <li data-list-item>
+        <div data-list-item-content>
+          <h3>Project Alpha</h3>
+          <p>Description of the project</p>
+          <div data-meta>
+            <span data-badge="success">Active</span>
+            <span>Updated 2 hours ago</span>
+          </div>
+        </div>
+        <div data-list-item-actions>
+          <button data-button="ghost">Edit</button>
+          <button data-button="ghost">Delete</button>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <footer>
+    <nav data-pagination>
+      <button disabled>Previous</button>
+      <span>Page 1 of 5</span>
+      <button>Next</button>
+    </nav>
+  </footer>
+</article>
+```
+
+## CSS
+
+```css
+[data-view="list"] {
+  padding: var(--spacing-6);
+}
+
+[data-view="list"] > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-view="list"] [data-list] {
+  list-style: none;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+[data-view="list"] [data-list-item] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-view="list"] [data-list-item]:last-child {
+  border-bottom: none;
+}
+
+[data-view="list"] [data-pagination] {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+}
+```

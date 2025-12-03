@@ -1,0 +1,186 @@
+---
+$type: DocsPage
+title: Docs Page
+description: Documentation page with sidebar navigation
+screenshot: /screenshots/pages/docs.png
+---
+
+# Docs Page
+
+A documentation page with sidebar navigation and table of contents.
+
+<Preview>
+  <article data-page="docs" style={{ display: 'grid', gridTemplateColumns: '240px 1fr 200px', minHeight: '400px' }}>
+    <aside style={{ padding: 'var(--spacing-4)', borderRight: '1px solid var(--border)' }}>
+      <div style={{ marginBottom: 'var(--spacing-4)' }}>
+        <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Getting Started</h4>
+        <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
+          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Introduction</a></li>
+          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--primary)', fontWeight: 500 }}>Installation</a></li>
+          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Quick Start</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Components</h4>
+        <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
+          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Buttons</a></li>
+          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Forms</a></li>
+          <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Cards</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main style={{ padding: 'var(--spacing-6)' }}>
+      <nav style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>
+        Docs / Getting Started / <span>Installation</span>
+      </nav>
+      <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Installation</h1>
+      <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)' }}>Get started with Builder CSS in your project.</p>
+
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>Using npm</h2>
+      <div style={{ background: 'var(--muted)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-6)' }}>
+        npm install @builder/css
+      </div>
+
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>Using CDN</h2>
+      <div style={{ background: 'var(--muted)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-sm)' }}>
+        {'<link href="https://cdn.builder.css" rel="stylesheet" />'}
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--spacing-8)', paddingTop: 'var(--spacing-4)', borderTop: '1px solid var(--border)' }}>
+        <a href="#" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>← Introduction</a>
+        <a href="#" style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)' }}>Quick Start →</a>
+      </div>
+    </main>
+
+    <aside style={{ padding: 'var(--spacing-4)', borderLeft: '1px solid var(--border)' }}>
+      <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>On this page</h4>
+      <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
+        <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--primary)' }}>Using npm</a></li>
+        <li style={{ padding: 'var(--spacing-1) 0' }}><a href="#" style={{ color: 'var(--muted-foreground)' }}>Using CDN</a></li>
+      </ul>
+    </aside>
+  </article>
+</Preview>
+
+## When to Use
+
+- Technical documentation
+- API references
+- User guides
+- Knowledge bases
+
+## Structure
+
+```html
+<article data-page="docs">
+  <aside data-sidebar>
+    <nav data-nav-section>
+      <h4>Getting Started</h4>
+      <ul>
+        <li><a href="/docs/intro">Introduction</a></li>
+        <li><a href="/docs/install" data-active>Installation</a></li>
+        <li><a href="/docs/quickstart">Quick Start</a></li>
+      </ul>
+    </nav>
+    <nav data-nav-section>
+      <h4>Components</h4>
+      <ul>
+        <li><a href="/docs/buttons">Buttons</a></li>
+        <li><a href="/docs/forms">Forms</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main data-content>
+    <nav data-breadcrumb>
+      Docs / Getting Started / Installation
+    </nav>
+    <h1>Installation</h1>
+    <p data-lead>Get started with Builder CSS...</p>
+
+    <h2 id="npm">Using npm</h2>
+    <pre><code>npm install @builder/css</code></pre>
+
+    <h2 id="cdn">Using CDN</h2>
+    <pre><code>&lt;link href="..." /&gt;</code></pre>
+
+    <nav data-pagination>
+      <a href="/docs/intro" data-prev>← Introduction</a>
+      <a href="/docs/quickstart" data-next>Quick Start →</a>
+    </nav>
+  </main>
+
+  <aside data-toc>
+    <h4>On this page</h4>
+    <ul>
+      <li><a href="#npm">Using npm</a></li>
+      <li><a href="#cdn">Using CDN</a></li>
+    </ul>
+  </aside>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="docs"] {
+  display: grid;
+  grid-template-columns: 240px 1fr 200px;
+  min-height: 100vh;
+}
+
+[data-page="docs"] [data-sidebar] {
+  padding: var(--spacing-4);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+[data-page="docs"] [data-nav-section] h4 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="docs"] [data-nav-section] ul {
+  list-style: none;
+  padding: 0;
+  font-size: var(--text-sm);
+}
+
+[data-page="docs"] [data-nav-section] a {
+  display: block;
+  padding: var(--spacing-1) 0;
+  color: var(--muted-foreground);
+}
+
+[data-page="docs"] [data-nav-section] a[data-active] {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+[data-page="docs"] [data-content] {
+  padding: var(--spacing-6);
+  max-width: 800px;
+}
+
+[data-page="docs"] [data-toc] {
+  padding: var(--spacing-4);
+  border-left: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: fit-content;
+}
+
+[data-page="docs"] [data-pagination] {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--spacing-8);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--border);
+}
+```

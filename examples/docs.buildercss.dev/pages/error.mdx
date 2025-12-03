@@ -1,0 +1,156 @@
+---
+$type: DocsPage
+title: Error Page
+description: Generic error and 500 pages
+screenshot: /screenshots/pages/error.png
+---
+
+# Error Page
+
+A generic error page for server errors and unexpected issues.
+
+<Preview>
+  <article data-page="error" style={{ padding: 'var(--spacing-6)', textAlign: 'center', minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ width: '64px', height: '64px', background: 'var(--destructive)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 'var(--spacing-4)' }}>
+      <span style={{ fontSize: 'var(--text-2xl)', color: 'var(--destructive-foreground)' }}>!</span>
+    </div>
+    <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Something went wrong</h1>
+    <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)', maxWidth: '400px' }}>We're sorry, but something unexpected happened. Please try again later or contact support if the problem persists.</p>
+
+    <div style={{ display: 'flex', gap: 'var(--spacing-3)', marginBottom: 'var(--spacing-6)' }}>
+      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500 }}>Try Again</button>
+      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontWeight: 500 }}>Go Home</button>
+    </div>
+
+    <details style={{ textAlign: 'left', maxWidth: '500px', width: '100%' }}>
+      <summary style={{ cursor: 'pointer', fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Technical details</summary>
+      <div style={{ background: 'var(--muted)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>
+        <p>Error Code: 500</p>
+        <p>Request ID: abc-123-def-456</p>
+        <p>Timestamp: 2024-12-01T10:30:00Z</p>
+      </div>
+    </details>
+  </article>
+</Preview>
+
+## When to Use
+
+- 500 server error pages
+- Application crash states
+- Unexpected error handling
+- Service unavailable pages
+
+## Structure
+
+```html
+<article data-page="error">
+  <div data-error-icon>!</div>
+  <h1>Something went wrong</h1>
+  <p>We're sorry, but something unexpected happened.</p>
+
+  <div data-actions>
+    <button data-button="primary" onclick="location.reload()">Try Again</button>
+    <a href="/" data-button="outline">Go Home</a>
+  </div>
+
+  <details data-error-details>
+    <summary>Technical details</summary>
+    <div data-error-info>
+      <p>Error Code: 500</p>
+      <p>Request ID: abc-123-def-456</p>
+      <p>Timestamp: 2024-12-01T10:30:00Z</p>
+    </div>
+  </details>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="error"] {
+  padding: var(--spacing-6);
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-page="error"] [data-error-icon] {
+  width: 64px;
+  height: 64px;
+  background: var(--destructive);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-4);
+  font-size: var(--text-2xl);
+  color: var(--destructive-foreground);
+}
+
+[data-page="error"] h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="error"] > p {
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-6);
+  max-width: 400px;
+}
+
+[data-page="error"] [data-actions] {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="error"] [data-error-details] {
+  text-align: left;
+  max-width: 500px;
+  width: 100%;
+}
+
+[data-page="error"] [data-error-details] summary {
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="error"] [data-error-info] {
+  background: var(--muted);
+  padding: var(--spacing-3);
+  border-radius: var(--radius);
+  font-family: monospace;
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+```
+
+## Variations
+
+### Maintenance Mode
+
+```html
+<article data-page="error" data-variant="maintenance">
+  <div data-icon>🔧</div>
+  <h1>Under Maintenance</h1>
+  <p>We're performing scheduled maintenance. We'll be back shortly.</p>
+  <p data-eta>Estimated time: 30 minutes</p>
+</article>
+```
+
+### Service Unavailable
+
+```html
+<article data-page="error" data-variant="unavailable">
+  <div data-icon>⚡</div>
+  <h1>Service Temporarily Unavailable</h1>
+  <p>We're experiencing high traffic. Please try again in a few minutes.</p>
+  <button data-button="primary" onclick="location.reload()">Refresh Page</button>
+</article>
+```

@@ -1,0 +1,184 @@
+---
+$type: DocsPage
+title: Team Section
+description: Team member profiles
+screenshot: /screenshots/sections/team.png
+---
+
+# Team Section
+
+Display team member profiles and roles.
+
+<Preview>
+  <section data-section="team" style={{ padding: 'var(--spacing-16) var(--spacing-4)' }}>
+    <header style={{ textAlign: 'center', marginBottom: 'var(--spacing-12)' }}>
+      <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Meet Our Team</h2>
+      <p style={{ color: 'var(--muted-foreground)' }}>The people behind the product.</p>
+    </header>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-8)', maxWidth: '900px', margin: '0 auto' }}>
+      <article style={{ textAlign: 'center' }}>
+        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'var(--muted)', margin: '0 auto var(--spacing-4)' }}></div>
+        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Sarah Chen</h3>
+        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-2)' }}>CEO & Co-founder</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)' }}>
+          <a href="#" style={{ color: 'var(--muted-foreground)' }}>𝕏</a>
+          <a href="#" style={{ color: 'var(--muted-foreground)' }}>in</a>
+        </div>
+      </article>
+      <article style={{ textAlign: 'center' }}>
+        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'var(--muted)', margin: '0 auto var(--spacing-4)' }}></div>
+        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Alex Rivera</h3>
+        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-2)' }}>CTO & Co-founder</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)' }}>
+          <a href="#" style={{ color: 'var(--muted-foreground)' }}>𝕏</a>
+          <a href="#" style={{ color: 'var(--muted-foreground)' }}>gh</a>
+        </div>
+      </article>
+      <article style={{ textAlign: 'center' }}>
+        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'var(--muted)', margin: '0 auto var(--spacing-4)' }}></div>
+        <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Jordan Lee</h3>
+        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-2)' }}>Head of Design</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)' }}>
+          <a href="#" style={{ color: 'var(--muted-foreground)' }}>𝕏</a>
+          <a href="#" style={{ color: 'var(--muted-foreground)' }}>dr</a>
+        </div>
+      </article>
+    </div>
+  </section>
+</Preview>
+
+## When to Use
+
+- About pages
+- Team introductions
+- Company culture
+- Leadership showcase
+
+## Structure
+
+```html
+<section data-section="team">
+  <header>
+    <h2>Meet Our Team</h2>
+    <p>The people behind the product.</p>
+  </header>
+
+  <div data-team-grid>
+    <article data-team-member>
+      <img src="/team/sarah.jpg" alt="Sarah Chen" />
+      <h3>Sarah Chen</h3>
+      <p>CEO & Co-founder</p>
+      <nav aria-label="Social links">
+        <a href="https://twitter.com/sarah">Twitter</a>
+        <a href="https://linkedin.com/in/sarah">LinkedIn</a>
+      </nav>
+    </article>
+
+    <article data-team-member>
+      <img src="/team/alex.jpg" alt="Alex Rivera" />
+      <h3>Alex Rivera</h3>
+      <p>CTO & Co-founder</p>
+      <nav aria-label="Social links">
+        <a href="https://twitter.com/alex">Twitter</a>
+        <a href="https://github.com/alex">GitHub</a>
+      </nav>
+    </article>
+
+    <article data-team-member>
+      <img src="/team/jordan.jpg" alt="Jordan Lee" />
+      <h3>Jordan Lee</h3>
+      <p>Head of Design</p>
+      <nav aria-label="Social links">
+        <a href="https://twitter.com/jordan">Twitter</a>
+        <a href="https://dribbble.com/jordan">Dribbble</a>
+      </nav>
+    </article>
+  </div>
+</section>
+```
+
+## CSS
+
+```css
+[data-section="team"] {
+  padding: var(--spacing-16) var(--spacing-4);
+}
+
+[data-section="team"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+[data-section="team"] [data-team-grid] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-8);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+[data-section="team"] [data-team-member] {
+  text-align: center;
+}
+
+[data-section="team"] [data-team-member] img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto var(--spacing-4);
+}
+
+[data-section="team"] [data-team-member] h3 {
+  font-weight: 600;
+  margin-bottom: var(--spacing-1);
+}
+
+[data-section="team"] [data-team-member] > p {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-2);
+}
+
+[data-section="team"] [data-team-member] nav {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-2);
+}
+
+[data-section="team"] [data-team-member] nav a {
+  color: var(--muted-foreground);
+  transition: color 0.2s;
+}
+
+[data-section="team"] [data-team-member] nav a:hover {
+  color: var(--foreground);
+}
+```
+
+## Variations
+
+### With Cards
+
+```html
+<section data-section="team" data-variant="cards">
+  <article data-team-member data-card>
+    <img src="/team/sarah.jpg" alt="" />
+    <div data-content>
+      <h3>Sarah Chen</h3>
+      <p>CEO & Co-founder</p>
+      <p data-bio>Building the future of design systems...</p>
+    </div>
+  </article>
+</section>
+```
+
+### Grid Layout
+
+```html
+<section data-section="team" data-variant="grid">
+  <div data-team-grid="4">
+    <!-- More compact grid with 4 columns -->
+  </div>
+</section>
+```

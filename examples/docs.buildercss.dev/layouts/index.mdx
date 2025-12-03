@@ -1,0 +1,144 @@
+---
+$type: DocsPage
+title: Layouts
+description: Page-level structural patterns
+---
+
+# Layouts
+
+Layouts define the overall page structure. They establish the grid, navigation placement, and content flow.
+
+## Available Layouts
+
+<CardGrid>
+  <Card href="/layouts/stacked" title="StackedLayout">
+    Simple vertical flow: header, main, footer. Best for marketing sites.
+  </Card>
+  <Card href="/layouts/sidebar" title="SidebarLayout">
+    Two-column with persistent navigation. Best for apps and dashboards.
+  </Card>
+  <Card href="/layouts/docs" title="DocsLayout">
+    Three-column documentation layout with TOC. Best for documentation.
+  </Card>
+  <Card href="/layouts/auth" title="AuthLayout">
+    Centered card for login/signup flows.
+  </Card>
+  <Card href="/layouts/dashboard" title="DashboardLayout">
+    Full app shell with sidebar and header. Best for SaaS applications.
+  </Card>
+  <Card href="/layouts/fullscreen" title="FullscreenLayout">
+    Edge-to-edge immersive layout. Best for media, games, presentations.
+  </Card>
+  <Card href="/layouts/split" title="SplitLayout">
+    50/50 split layout. Best for comparison, onboarding, or hero sections.
+  </Card>
+</CardGrid>
+
+## Usage
+
+Apply a layout using the `data-layout` attribute on the body or a container:
+
+```html
+<body data-layout="stacked">
+  <header>...</header>
+  <main>...</main>
+  <footer>...</footer>
+</body>
+```
+
+## Common Patterns
+
+### Marketing Site
+
+```html
+<body data-layout="stacked">
+  <header>
+    <nav><!-- Navigation --></nav>
+  </header>
+  <main>
+    <section data-section="hero">...</section>
+    <section data-section="features">...</section>
+    <section data-section="cta">...</section>
+  </main>
+  <footer>...</footer>
+</body>
+```
+
+### Documentation
+
+```html
+<body data-layout="docs">
+  <header>
+    <nav><!-- Top nav --></nav>
+  </header>
+  <aside data-sidebar>
+    <nav><!-- Side navigation --></nav>
+  </aside>
+  <main>
+    <article><!-- Content --></article>
+  </main>
+  <aside data-toc>
+    <nav><!-- Table of contents --></nav>
+  </aside>
+</body>
+```
+
+### Application
+
+```html
+<body data-layout="dashboard">
+  <aside data-sidebar>
+    <nav><!-- App navigation --></nav>
+  </aside>
+  <div data-main>
+    <header><!-- App header with search --></header>
+    <main>
+      <!-- Views go here -->
+    </main>
+  </div>
+</body>
+```
+
+## Responsive Behavior
+
+Layouts automatically adapt to screen size:
+
+| Layout | Mobile | Tablet | Desktop |
+|--------|--------|--------|---------|
+| StackedLayout | Stacked | Stacked | Stacked |
+| SidebarLayout | Sidebar hidden | Collapsed | Full |
+| DocsLayout | Single column | Sidebar visible | Full 3-col |
+| DashboardLayout | Bottom nav | Collapsed sidebar | Full |
+
+## CSS Reference
+
+```css
+[data-layout="stacked"] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+[data-layout="stacked"] > main {
+  flex: 1;
+}
+
+[data-layout="sidebar"] {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+[data-layout="docs"] {
+  display: grid;
+  grid-template-columns: 280px 1fr 200px;
+  min-height: 100vh;
+}
+
+@media (max-width: 1024px) {
+  [data-layout="sidebar"],
+  [data-layout="docs"] {
+    grid-template-columns: 1fr;
+  }
+}
+```

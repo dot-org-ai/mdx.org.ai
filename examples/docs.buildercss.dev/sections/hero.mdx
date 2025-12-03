@@ -1,0 +1,153 @@
+---
+$type: DocsPage
+title: Hero Section
+description: Primary headline with call-to-action
+screenshot: /screenshots/sections/hero.png
+---
+
+# Hero Section
+
+The primary attention-grabbing section with headline, description, and call-to-action.
+
+<Preview>
+  <section data-section="hero" style={{ textAlign: 'center', padding: 'var(--spacing-16) var(--spacing-4)', maxWidth: '800px', margin: '0 auto' }}>
+    <span data-badge style={{ display: 'inline-block', padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-4)' }}>Announcing v2.0</span>
+    <h1 style={{ fontSize: 'var(--text-5xl)', fontWeight: 700, lineHeight: 1.1, marginBottom: 'var(--spacing-4)' }}>Build faster, ship sooner</h1>
+    <p style={{ fontSize: 'var(--text-xl)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-8)' }}>The modern toolkit for building beautiful, accessible web applications.</p>
+    <div style={{ display: 'flex', gap: 'var(--spacing-4)', justifyContent: 'center', marginBottom: 'var(--spacing-6)' }}>
+      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer', fontWeight: 500 }}>Get Started Free</button>
+      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', cursor: 'pointer', fontWeight: 500 }}>Watch Demo</button>
+    </div>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--spacing-2)', color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+      <div style={{ display: 'flex' }}>
+        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--muted)', border: '2px solid var(--background)' }}></div>
+        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--muted)', border: '2px solid var(--background)', marginLeft: '-8px' }}></div>
+        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--muted)', border: '2px solid var(--background)', marginLeft: '-8px' }}></div>
+      </div>
+      <span>Join 10,000+ developers</span>
+    </div>
+  </section>
+</Preview>
+
+## When to Use
+
+- Landing page primary section
+- Product launches
+- Marketing campaigns
+- App homepages
+
+## Structure
+
+```html
+<section data-section="hero">
+  <span data-badge>Announcing v2.0</span>
+  <h1>Build faster, ship sooner</h1>
+  <p>The modern toolkit for building beautiful, accessible web applications.</p>
+  <div data-actions>
+    <a href="/signup" data-button="primary" data-size="lg">Get Started Free</a>
+    <a href="/demo" data-button="outline" data-size="lg">Watch Demo</a>
+  </div>
+  <div data-social-proof>
+    <div data-avatars>
+      <img src="/avatar1.jpg" alt="" />
+      <img src="/avatar2.jpg" alt="" />
+      <img src="/avatar3.jpg" alt="" />
+    </div>
+    <span>Join 10,000+ developers</span>
+  </div>
+</section>
+```
+
+## CSS
+
+```css
+[data-section="hero"] {
+  text-align: center;
+  padding: var(--spacing-16) var(--spacing-4);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+[data-section="hero"] [data-badge] {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-section="hero"] h1 {
+  font-size: var(--text-5xl);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-section="hero"] > p {
+  font-size: var(--text-xl);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-8);
+}
+
+[data-section="hero"] [data-actions] {
+  display: flex;
+  gap: var(--spacing-4);
+  justify-content: center;
+  margin-bottom: var(--spacing-6);
+}
+
+[data-section="hero"] [data-social-proof] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  color: var(--muted-foreground);
+}
+
+[data-section="hero"] [data-avatars] {
+  display: flex;
+}
+
+[data-section="hero"] [data-avatars] img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--background);
+  margin-left: -8px;
+}
+
+[data-section="hero"] [data-avatars] img:first-child {
+  margin-left: 0;
+}
+```
+
+## Variations
+
+### With Email Form
+
+```html
+<section data-section="hero">
+  <h1>Stay in the loop</h1>
+  <p>Get updates on our latest features.</p>
+  <form data-email-form>
+    <input type="email" placeholder="Enter your email" required />
+    <button type="submit" data-button="primary">Subscribe</button>
+  </form>
+</section>
+```
+
+### With Video Background
+
+```html
+<section data-section="hero" data-variant="video">
+  <video autoplay muted loop>
+    <source src="/hero-video.mp4" type="video/mp4" />
+  </video>
+  <div data-content>
+    <h1>Immersive experiences</h1>
+    <a href="/explore" data-button="primary">Explore</a>
+  </div>
+</section>
+```

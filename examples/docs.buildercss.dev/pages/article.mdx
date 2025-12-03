@@ -1,0 +1,188 @@
+---
+$type: DocsPage
+title: Article Page
+description: Individual blog post or article
+screenshot: /screenshots/pages/article.png
+---
+
+# Article Page
+
+A single article or blog post with rich content formatting.
+
+<Preview>
+  <article data-page="article" style={{ padding: 'var(--spacing-6)', maxWidth: '720px', margin: '0 auto' }}>
+    <header style={{ marginBottom: 'var(--spacing-6)' }}>
+      <nav style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>
+        <a href="#" style={{ color: 'var(--primary)' }}>← Back to Blog</a>
+      </nav>
+      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--primary)', fontWeight: 500 }}>Engineering</span>
+      <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginTop: 'var(--spacing-2)', marginBottom: 'var(--spacing-4)', lineHeight: 1.2 }}>Building a Design System from Scratch</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
+        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+        <div>
+          <p style={{ fontWeight: 500 }}>Alex Chen</p>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Dec 1, 2024 · 8 min read</p>
+        </div>
+      </div>
+    </header>
+
+    <div style={{ background: 'var(--muted)', borderRadius: 'var(--radius-lg)', aspectRatio: '16/9', marginBottom: 'var(--spacing-6)' }}></div>
+
+    <div style={{ fontSize: 'var(--text-lg)', lineHeight: 1.8 }}>
+      <p style={{ marginBottom: 'var(--spacing-4)', color: 'var(--muted-foreground)' }}>Design systems have become an essential part of modern web development. In this guide, we'll explore how to build one from scratch using semantic HTML and CSS custom properties.</p>
+
+      <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 600, marginTop: 'var(--spacing-8)', marginBottom: 'var(--spacing-4)' }}>Why Semantic HTML?</h2>
+      <p style={{ marginBottom: 'var(--spacing-4)' }}>Semantic HTML provides meaning to your content, making it more accessible and maintainable. Instead of relying on class names, we use data attributes to style components.</p>
+
+      <blockquote style={{ borderLeft: '3px solid var(--primary)', paddingLeft: 'var(--spacing-4)', margin: 'var(--spacing-6) 0', fontStyle: 'italic', color: 'var(--muted-foreground)' }}>
+        "The best code is code that explains itself."
+      </blockquote>
+
+      <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 600, marginTop: 'var(--spacing-8)', marginBottom: 'var(--spacing-4)' }}>Getting Started</h2>
+      <p style={{ marginBottom: 'var(--spacing-4)' }}>First, establish your design tokens - colors, spacing, typography scales. These form the foundation of your system.</p>
+    </div>
+
+    <footer style={{ marginTop: 'var(--spacing-8)', paddingTop: 'var(--spacing-6)', borderTop: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-4)' }}>
+        {['Design Systems', 'CSS', 'HTML'].map(tag => (
+          <span key={tag} style={{ padding: '4px 12px', background: 'var(--muted)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)' }}>{tag}</span>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 'var(--spacing-3)' }}>
+        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Share on Twitter</button>
+        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Copy Link</button>
+      </div>
+    </footer>
+  </article>
+</Preview>
+
+## When to Use
+
+- Individual blog posts
+- News articles
+- Tutorial pages
+- Long-form content
+
+## Structure
+
+```html
+<article data-page="article">
+  <header data-article-header>
+    <nav data-breadcrumb>
+      <a href="/blog">← Back to Blog</a>
+    </nav>
+    <span data-category>Engineering</span>
+    <h1>Building a Design System from Scratch</h1>
+    <div data-author>
+      <img src="/avatar.jpg" data-avatar />
+      <div>
+        <p data-name>Alex Chen</p>
+        <p data-meta>Dec 1, 2024 · 8 min read</p>
+      </div>
+    </div>
+  </header>
+
+  <img src="/hero.jpg" data-hero-image />
+
+  <div data-content>
+    <p>Design systems have become...</p>
+
+    <h2>Why Semantic HTML?</h2>
+    <p>Semantic HTML provides meaning...</p>
+
+    <blockquote>
+      "The best code is code that explains itself."
+    </blockquote>
+  </div>
+
+  <footer data-article-footer>
+    <div data-tags>
+      <span data-tag>Design Systems</span>
+      <span data-tag>CSS</span>
+    </div>
+    <div data-share-buttons>
+      <button>Share on Twitter</button>
+      <button>Copy Link</button>
+    </div>
+  </footer>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="article"] {
+  padding: var(--spacing-6);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+[data-page="article"] [data-article-header] {
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="article"] [data-category] {
+  font-size: var(--text-sm);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+[data-page="article"] h1 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: var(--spacing-2) 0 var(--spacing-4);
+}
+
+[data-page="article"] [data-author] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+[data-page="article"] [data-hero-image] {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="article"] [data-content] {
+  font-size: var(--text-lg);
+  line-height: 1.8;
+}
+
+[data-page="article"] [data-content] h2 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin: var(--spacing-8) 0 var(--spacing-4);
+}
+
+[data-page="article"] [data-content] blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: var(--spacing-4);
+  margin: var(--spacing-6) 0;
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+[data-page="article"] [data-article-footer] {
+  margin-top: var(--spacing-8);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--border);
+}
+
+[data-page="article"] [data-tags] {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="article"] [data-tag] {
+  padding: 4px 12px;
+  background: var(--muted);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+}
+```

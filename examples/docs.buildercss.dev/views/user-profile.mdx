@@ -1,0 +1,157 @@
+---
+$type: DocsPage
+title: User Profile View
+description: User settings and profile
+screenshot: /screenshots/views/user-profile.png
+---
+
+# User Profile View
+
+A view for managing user profile and account settings.
+
+<Preview>
+  <article data-view="user-profile" style={{ padding: 'var(--spacing-6)', maxWidth: '600px' }}>
+    <header style={{ textAlign: 'center', marginBottom: 'var(--spacing-6)' }}>
+      <div style={{ width: '96px', height: '96px', borderRadius: '50%', background: 'var(--primary)', margin: '0 auto var(--spacing-4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-foreground)', fontSize: 'var(--text-3xl)' }}>JD</div>
+      <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>John Doe</h1>
+      <p style={{ color: 'var(--muted-foreground)' }}>john@example.com</p>
+    </header>
+
+    <section style={{ marginBottom: 'var(--spacing-6)' }}>
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Personal Information</h2>
+      <form style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-4)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-4)' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>First Name</label>
+            <input type="text" value="John" style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Last Name</label>
+            <input type="text" value="Doe" style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
+          </div>
+        </div>
+        <div>
+          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Email</label>
+          <input type="email" value="john@example.com" style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
+        </div>
+        <div>
+          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Bio</label>
+          <textarea rows="3" placeholder="Tell us about yourself..." style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', resize: 'vertical' }}></textarea>
+        </div>
+      </form>
+    </section>
+
+    <section style={{ marginBottom: 'var(--spacing-6)' }}>
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Change Password</h2>
+      <form style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-4)' }}>
+        <div>
+          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Current Password</label>
+          <input type="password" style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
+        </div>
+        <div>
+          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontWeight: 500, fontSize: 'var(--text-sm)' }}>New Password</label>
+          <input type="password" style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
+        </div>
+      </form>
+    </section>
+
+    <footer style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 'var(--spacing-4)', borderTop: '1px solid var(--border)' }}>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--destructive)', color: 'var(--destructive-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Delete Account</button>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Save Changes</button>
+    </footer>
+  </article>
+</Preview>
+
+## Structure
+
+```html
+<article data-view="user-profile">
+  <header>
+    <img src="/avatar.jpg" alt="" data-avatar />
+    <button data-action="change-avatar">Change</button>
+    <h1>John Doe</h1>
+    <p>john@example.com</p>
+  </header>
+
+  <section data-section="personal">
+    <h2>Personal Information</h2>
+    <form>
+      <div data-field-group>
+        <div data-field>
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" value="John" />
+        </div>
+        <div data-field>
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" value="Doe" />
+        </div>
+      </div>
+      <div data-field>
+        <label for="email">Email</label>
+        <input type="email" id="email" value="john@example.com" />
+      </div>
+      <div data-field>
+        <label for="bio">Bio</label>
+        <textarea id="bio" rows="3"></textarea>
+      </div>
+    </form>
+  </section>
+
+  <section data-section="password">
+    <h2>Change Password</h2>
+    <form>
+      <div data-field>
+        <label for="currentPassword">Current Password</label>
+        <input type="password" id="currentPassword" />
+      </div>
+      <div data-field>
+        <label for="newPassword">New Password</label>
+        <input type="password" id="newPassword" />
+      </div>
+    </form>
+  </section>
+
+  <footer>
+    <button data-button="destructive">Delete Account</button>
+    <button data-button="primary">Save Changes</button>
+  </footer>
+</article>
+```
+
+## CSS
+
+```css
+[data-view="user-profile"] {
+  padding: var(--spacing-6);
+  max-width: 600px;
+}
+
+[data-view="user-profile"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-6);
+}
+
+[data-view="user-profile"] [data-avatar] {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  margin: 0 auto var(--spacing-4);
+}
+
+[data-view="user-profile"] section {
+  margin-bottom: var(--spacing-6);
+}
+
+[data-view="user-profile"] section h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-view="user-profile"] > footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--border);
+}
+```

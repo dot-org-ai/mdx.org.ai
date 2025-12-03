@@ -1,0 +1,165 @@
+---
+$type: DocsPage
+title: Chat View
+description: Chat/messaging interface
+screenshot: /screenshots/views/chat.png
+---
+
+# Chat View
+
+A chat/messaging interface for real-time communication.
+
+<Preview>
+  <article data-view="chat" style={{ display: 'flex', flexDirection: 'column', height: '400px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+    <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)' }}></div>
+      <div>
+        <h2 style={{ fontWeight: 600 }}>Support Team</h2>
+        <span style={{ fontSize: 'var(--text-sm)', color: 'green' }}>● Online</span>
+      </div>
+    </header>
+    <section style={{ flex: 1, padding: 'var(--spacing-4)', overflowY: 'auto', background: 'var(--muted)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-3)' }}>
+      <div style={{ maxWidth: '70%', alignSelf: 'flex-start' }}>
+        <div style={{ background: 'var(--background)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius-lg)', borderBottomLeftRadius: 0 }}>
+          <p>Hi! How can I help you today?</p>
+        </div>
+        <time style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', marginTop: '4px', display: 'block' }}>10:30 AM</time>
+      </div>
+      <div style={{ maxWidth: '70%', alignSelf: 'flex-end' }}>
+        <div style={{ background: 'var(--primary)', color: 'var(--primary-foreground)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius-lg)', borderBottomRightRadius: 0 }}>
+          <p>I have a question about my order #12345</p>
+        </div>
+        <time style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', marginTop: '4px', display: 'block', textAlign: 'right' }}>10:31 AM</time>
+      </div>
+      <div style={{ maxWidth: '70%', alignSelf: 'flex-start' }}>
+        <div style={{ background: 'var(--background)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius-lg)', borderBottomLeftRadius: 0 }}>
+          <p>Of course! Let me look that up for you. One moment please...</p>
+        </div>
+        <time style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', marginTop: '4px', display: 'block' }}>10:32 AM</time>
+      </div>
+    </section>
+    <footer style={{ padding: 'var(--spacing-4)', borderTop: '1px solid var(--border)', display: 'flex', gap: 'var(--spacing-2)' }}>
+      <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>📎</button>
+      <input type="text" placeholder="Type a message..." style={{ flex: 1, padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Send</button>
+    </footer>
+  </article>
+</Preview>
+
+## Structure
+
+```html
+<article data-view="chat">
+  <header>
+    <img src="/avatar.jpg" alt="" data-avatar />
+    <div>
+      <h2>Support Team</h2>
+      <span data-status="online">Online</span>
+    </div>
+  </header>
+
+  <section data-messages>
+    <div data-message data-sender="other">
+      <p>Hi! How can I help you today?</p>
+      <time>10:30 AM</time>
+    </div>
+
+    <div data-message data-sender="self">
+      <p>I have a question about my order</p>
+      <time>10:31 AM</time>
+    </div>
+  </section>
+
+  <footer data-input>
+    <button data-action="attach">📎</button>
+    <input type="text" placeholder="Type a message..." />
+    <button data-button="primary">Send</button>
+  </footer>
+</article>
+```
+
+## CSS
+
+```css
+[data-view="chat"] {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+[data-view="chat"] > header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-view="chat"] [data-avatar] {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+[data-view="chat"] [data-status="online"]::before {
+  content: '●';
+  color: green;
+  margin-right: 4px;
+}
+
+[data-view="chat"] [data-messages] {
+  flex: 1;
+  padding: var(--spacing-4);
+  overflow-y: auto;
+  background: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+[data-view="chat"] [data-message] {
+  max-width: 70%;
+}
+
+[data-view="chat"] [data-message][data-sender="self"] {
+  align-self: flex-end;
+}
+
+[data-view="chat"] [data-message][data-sender="other"] {
+  align-self: flex-start;
+}
+
+[data-view="chat"] [data-message] > p {
+  padding: var(--spacing-3);
+  border-radius: var(--radius-lg);
+}
+
+[data-view="chat"] [data-message][data-sender="self"] > p {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-bottom-right-radius: 0;
+}
+
+[data-view="chat"] [data-message][data-sender="other"] > p {
+  background: var(--background);
+  border-bottom-left-radius: 0;
+}
+
+[data-view="chat"] [data-message] time {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-top: 4px;
+  display: block;
+}
+
+[data-view="chat"] [data-input] {
+  display: flex;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  border-top: 1px solid var(--border);
+}
+
+[data-view="chat"] [data-input] input {
+  flex: 1;
+}
+```

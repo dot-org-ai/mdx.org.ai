@@ -1,0 +1,136 @@
+---
+$type: DocsPage
+title: Docs Layout
+description: Three-column documentation layout with TOC
+screenshot: /screenshots/layouts/docs.png
+---
+
+# Docs Layout
+
+A three-column layout optimized for documentation with a sidebar navigation and table of contents.
+
+<Preview>
+  <div data-layout="docs" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 140px', minHeight: '400px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+    <aside style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRight: '1px solid var(--border)' }}>
+      <nav>
+        <h4 style={{ fontSize: 'var(--text-xs)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 'var(--spacing-2)' }}>Getting Started</h4>
+        <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
+          <li><a href="#">Introduction</a></li>
+          <li><a href="#" style={{ color: 'var(--primary)' }}>Installation</a></li>
+          <li><a href="#">Quick Start</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main style={{ padding: 'var(--spacing-6)' }}>
+      <article>
+        <h1>Installation</h1>
+        <p>Learn how to install and configure BuilderCSS.</p>
+        <h2 id="npm">Using npm</h2>
+        <p>Install via package manager:</p>
+        <pre style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius)' }}>npm install buildercss</pre>
+      </article>
+    </main>
+    <aside style={{ padding: 'var(--spacing-4)', borderLeft: '1px solid var(--border)' }}>
+      <nav>
+        <h4 style={{ fontSize: 'var(--text-xs)', fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>On this page</h4>
+        <ul style={{ listStyle: 'none', padding: 0, fontSize: 'var(--text-sm)' }}>
+          <li><a href="#npm">Using npm</a></li>
+          <li><a href="#cdn">Using CDN</a></li>
+        </ul>
+      </nav>
+    </aside>
+  </div>
+</Preview>
+
+## When to Use
+
+- Documentation sites
+- Technical guides
+- API references
+- Knowledge bases
+
+## Structure
+
+```html
+<body data-layout="docs">
+  <header>
+    <nav><!-- Top navigation --></nav>
+  </header>
+
+  <aside data-sidebar>
+    <nav>
+      <section>
+        <h4>Getting Started</h4>
+        <ul>
+          <li><a href="/docs/intro">Introduction</a></li>
+          <li><a href="/docs/install" aria-current="page">Installation</a></li>
+        </ul>
+      </section>
+    </nav>
+  </aside>
+
+  <main>
+    <article>
+      <!-- Documentation content -->
+    </article>
+  </main>
+
+  <aside data-toc>
+    <nav aria-label="Table of contents">
+      <h4>On this page</h4>
+      <ul>
+        <li><a href="#npm">Using npm</a></li>
+        <li><a href="#cdn">Using CDN</a></li>
+      </ul>
+    </nav>
+  </aside>
+</body>
+```
+
+## CSS
+
+```css
+[data-layout="docs"] {
+  display: grid;
+  grid-template-columns: 280px 1fr 200px;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+[data-layout="docs"] > header {
+  grid-column: 1 / -1;
+  border-bottom: 1px solid var(--border);
+}
+
+[data-layout="docs"] > [data-sidebar] {
+  padding: var(--spacing-4);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+
+[data-layout="docs"] > main {
+  padding: var(--spacing-8);
+  max-width: 800px;
+}
+
+[data-layout="docs"] > [data-toc] {
+  padding: var(--spacing-4);
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+}
+
+@media (max-width: 1024px) {
+  [data-layout="docs"] {
+    grid-template-columns: 1fr;
+  }
+
+  [data-layout="docs"] > [data-sidebar],
+  [data-layout="docs"] > [data-toc] {
+    display: none;
+  }
+}
+```

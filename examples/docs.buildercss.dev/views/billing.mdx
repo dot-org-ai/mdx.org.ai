@@ -1,0 +1,185 @@
+---
+$type: DocsPage
+title: Billing View
+description: Subscription and billing management
+screenshot: /screenshots/views/billing.png
+---
+
+# Billing View
+
+A view for managing subscriptions, payment methods, and invoices.
+
+<Preview>
+  <article data-view="billing" style={{ padding: 'var(--spacing-6)' }}>
+    <header style={{ marginBottom: 'var(--spacing-6)' }}>
+      <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Billing</h1>
+      <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Manage your subscription and payment methods</p>
+    </header>
+
+    <section style={{ marginBottom: 'var(--spacing-6)' }}>
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Current Plan</h2>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-1)' }}>
+            <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Pro Plan</h3>
+            <span style={{ padding: '2px 8px', background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Active</span>
+          </div>
+          <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>$29/month • Renews on Jan 1, 2025</p>
+        </div>
+        <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+          <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Change Plan</button>
+          <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--destructive)', color: 'var(--destructive-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <section style={{ marginBottom: 'var(--spacing-6)' }}>
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Payment Method</h2>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
+          <div style={{ width: '48px', height: '32px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-xs)' }}>VISA</div>
+          <div>
+            <p style={{ fontWeight: 500 }}>Visa ending in 4242</p>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Expires 12/26</p>
+          </div>
+        </div>
+        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>Update</button>
+      </div>
+    </section>
+
+    <section>
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Billing History</h2>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 'var(--spacing-4)', padding: 'var(--spacing-3)', background: 'var(--muted)', fontSize: 'var(--text-sm)', fontWeight: 500 }}>
+          <span>Date</span>
+          <span>Description</span>
+          <span>Amount</span>
+          <span>Invoice</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 'var(--spacing-4)', padding: 'var(--spacing-3)', borderTop: '1px solid var(--border)', fontSize: 'var(--text-sm)' }}>
+          <span>Dec 1, 2024</span>
+          <span>Pro Plan - Monthly</span>
+          <span>$29.00</span>
+          <a href="#" style={{ color: 'var(--primary)' }}>Download</a>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 'var(--spacing-4)', padding: 'var(--spacing-3)', borderTop: '1px solid var(--border)', fontSize: 'var(--text-sm)' }}>
+          <span>Nov 1, 2024</span>
+          <span>Pro Plan - Monthly</span>
+          <span>$29.00</span>
+          <a href="#" style={{ color: 'var(--primary)' }}>Download</a>
+        </div>
+      </div>
+    </section>
+  </article>
+</Preview>
+
+## Structure
+
+```html
+<article data-view="billing">
+  <header>
+    <h1>Billing</h1>
+    <p>Manage your subscription and payment methods</p>
+  </header>
+
+  <section data-section="plan">
+    <h2>Current Plan</h2>
+    <article data-plan-card>
+      <div>
+        <h3>Pro Plan <span data-badge="success">Active</span></h3>
+        <p>$29/month • Renews on Jan 1, 2025</p>
+      </div>
+      <div data-actions>
+        <button data-button="outline">Change Plan</button>
+        <button data-button="destructive">Cancel</button>
+      </div>
+    </article>
+  </section>
+
+  <section data-section="payment">
+    <h2>Payment Method</h2>
+    <article data-payment-card>
+      <div data-card-info>
+        <img src="/visa.svg" alt="Visa" />
+        <div>
+          <p>Visa ending in 4242</p>
+          <p>Expires 12/26</p>
+        </div>
+      </div>
+      <button data-button="outline">Update</button>
+    </article>
+  </section>
+
+  <section data-section="history">
+    <h2>Billing History</h2>
+    <table data-invoices>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Invoice</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Dec 1, 2024</td>
+          <td>Pro Plan - Monthly</td>
+          <td>$29.00</td>
+          <td><a href="#">Download</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</article>
+```
+
+## CSS
+
+```css
+[data-view="billing"] {
+  padding: var(--spacing-6);
+}
+
+[data-view="billing"] section {
+  margin-bottom: var(--spacing-6);
+}
+
+[data-view="billing"] section h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-view="billing"] [data-plan-card],
+[data-view="billing"] [data-payment-card] {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+[data-view="billing"] [data-invoices] {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+[data-view="billing"] [data-invoices] th,
+[data-view="billing"] [data-invoices] td {
+  padding: var(--spacing-3);
+  text-align: left;
+}
+
+[data-view="billing"] [data-invoices] thead {
+  background: var(--muted);
+}
+
+[data-view="billing"] [data-invoices] tbody tr {
+  border-top: 1px solid var(--border);
+}
+```

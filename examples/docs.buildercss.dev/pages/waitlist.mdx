@@ -1,0 +1,203 @@
+---
+$type: DocsPage
+title: Waitlist Page
+description: Early access and waitlist signup
+screenshot: /screenshots/pages/waitlist.png
+---
+
+# Waitlist Page
+
+A waitlist page for early access signups and launches.
+
+<Preview>
+  <article data-page="waitlist" style={{ padding: 'var(--spacing-6)', textAlign: 'center', minHeight: '500px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(to bottom, var(--background), var(--muted))' }}>
+    <span style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-4)' }}>Coming Soon</span>
+    <h1 style={{ fontSize: 'var(--text-4xl)', fontWeight: 800, marginBottom: 'var(--spacing-3)', maxWidth: '600px' }}>Be the first to experience Builder CSS 3.0</h1>
+    <p style={{ fontSize: 'var(--text-lg)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-6)', maxWidth: '500px' }}>Join the waitlist to get early access, exclusive updates, and founder pricing.</p>
+
+    <form style={{ display: 'flex', gap: 'var(--spacing-2)', maxWidth: '400px', width: '100%', marginBottom: 'var(--spacing-4)' }}>
+      <input type="email" placeholder="Enter your email" style={{ flex: 1, padding: 'var(--spacing-3)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }} />
+      <button type="submit" style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 500, whiteSpace: 'nowrap' }}>Join Waitlist</button>
+    </form>
+
+    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-8)' }}>
+      <span style={{ fontWeight: 600, color: 'var(--foreground)' }}>2,847</span> people already joined
+    </p>
+
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-6)', maxWidth: '600px' }}>
+      {[
+        { icon: '🚀', title: 'Early Access', desc: 'Get access before public launch' },
+        { icon: '💎', title: 'Founder Pricing', desc: 'Lock in 50% lifetime discount' },
+        { icon: '🎁', title: 'Exclusive Content', desc: 'Design resources and templates' },
+      ].map(perk => (
+        <div key={perk.title} style={{ textAlign: 'center' }}>
+          <span style={{ fontSize: 'var(--text-2xl)', display: 'block', marginBottom: 'var(--spacing-2)' }}>{perk.icon}</span>
+          <h3 style={{ fontWeight: 600, fontSize: 'var(--text-sm)', marginBottom: 'var(--spacing-1)' }}>{perk.title}</h3>
+          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>{perk.desc}</p>
+        </div>
+      ))}
+    </div>
+  </article>
+</Preview>
+
+## When to Use
+
+- Product launch waitlists
+- Early access signups
+- Beta program registration
+- Coming soon pages
+
+## Structure
+
+```html
+<article data-page="waitlist">
+  <span data-badge>Coming Soon</span>
+  <h1>Be the first to experience Builder CSS 3.0</h1>
+  <p>Join the waitlist to get early access...</p>
+
+  <form data-waitlist-form>
+    <input type="email" placeholder="Enter your email" required />
+    <button type="submit" data-button="primary">Join Waitlist</button>
+  </form>
+
+  <p data-waitlist-count>
+    <span data-count>2,847</span> people already joined
+  </p>
+
+  <section data-perks>
+    <div data-perk>
+      <span data-icon>🚀</span>
+      <h3>Early Access</h3>
+      <p>Get access before public launch</p>
+    </div>
+    <div data-perk>
+      <span data-icon>💎</span>
+      <h3>Founder Pricing</h3>
+      <p>Lock in 50% lifetime discount</p>
+    </div>
+    <div data-perk>
+      <span data-icon>🎁</span>
+      <h3>Exclusive Content</h3>
+      <p>Design resources and templates</p>
+    </div>
+  </section>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="waitlist"] {
+  padding: var(--spacing-6);
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, var(--background), var(--muted));
+}
+
+[data-page="waitlist"] [data-badge] {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="waitlist"] h1 {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  margin-bottom: var(--spacing-3);
+  max-width: 600px;
+}
+
+[data-page="waitlist"] > p {
+  font-size: var(--text-lg);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-6);
+  max-width: 500px;
+}
+
+[data-page="waitlist"] [data-waitlist-form] {
+  display: flex;
+  gap: var(--spacing-2);
+  max-width: 400px;
+  width: 100%;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="waitlist"] [data-waitlist-form] input {
+  flex: 1;
+  padding: var(--spacing-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+[data-page="waitlist"] [data-waitlist-count] {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-8);
+}
+
+[data-page="waitlist"] [data-waitlist-count] [data-count] {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+[data-page="waitlist"] [data-perks] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-6);
+  max-width: 600px;
+}
+
+[data-page="waitlist"] [data-perk] {
+  text-align: center;
+}
+
+[data-page="waitlist"] [data-perk] [data-icon] {
+  font-size: var(--text-2xl);
+  display: block;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="waitlist"] [data-perk] h3 {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-1);
+}
+
+[data-page="waitlist"] [data-perk] p {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+```
+
+## JavaScript
+
+```js
+const form = document.querySelector('[data-waitlist-form]')
+const countEl = document.querySelector('[data-count]')
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const email = form.querySelector('input').value
+
+  // Submit to API
+  const res = await fetch('/api/waitlist', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  })
+
+  if (res.ok) {
+    // Update count and show success
+    const { count } = await res.json()
+    countEl.textContent = count.toLocaleString()
+    form.innerHTML = '<p data-success>🎉 You\'re on the list!</p>'
+  }
+})
+```

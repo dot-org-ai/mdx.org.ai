@@ -1,0 +1,141 @@
+---
+$type: DocsPage
+title: Quickstart
+description: Get started with BuilderCSS in 5 minutes
+---
+
+# Quickstart
+
+Get up and running with BuilderCSS in just a few minutes.
+
+## Installation
+
+### CDN (Recommended for prototyping)
+
+Add BuilderCSS directly to your HTML:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Site</title>
+  <link rel="stylesheet" href="https://cdn.buildercss.dev/base.css">
+</head>
+<body data-layout="stacked">
+  <!-- Your content here -->
+</body>
+</html>
+```
+
+### npm
+
+```bash
+npm install buildercss
+```
+
+```js
+import 'buildercss/base.css'
+```
+
+## Your First Page
+
+Here's a complete landing page using BuilderCSS:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome</title>
+  <link rel="stylesheet" href="https://cdn.buildercss.dev/base.css">
+</head>
+<body data-layout="stacked">
+  <header>
+    <nav>
+      <a href="/" data-logo>MyApp</a>
+      <ul>
+        <li><a href="/features">Features</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+        <li><a href="/docs">Docs</a></li>
+      </ul>
+      <a href="/login" data-button="outline">Log in</a>
+    </nav>
+  </header>
+
+  <main>
+    <section data-section="hero">
+      <h1>Build faster with semantic CSS</h1>
+      <p>A design system that works with plain HTML.</p>
+      <div data-actions>
+        <a href="/docs" data-button="primary">Get Started</a>
+        <a href="/demo" data-button="outline">View Demo</a>
+      </div>
+    </section>
+
+    <section data-section="features">
+      <h2>Features</h2>
+      <div data-grid="3">
+        <article>
+          <h3>Pure HTML/CSS</h3>
+          <p>No JavaScript required. Works in any browser.</p>
+        </article>
+        <article>
+          <h3>Semantic</h3>
+          <p>Uses native HTML elements with data attributes.</p>
+        </article>
+        <article>
+          <h3>Cross-platform</h3>
+          <p>Web + React Native implementations.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 MyApp. All rights reserved.</p>
+  </footer>
+</body>
+</html>
+```
+
+## Key Concepts
+
+### Data Attributes
+
+BuilderCSS uses `data-*` attributes for styling:
+
+| Attribute | Purpose | Example |
+|-----------|---------|---------|
+| `data-layout` | Page structure | `data-layout="stacked"` |
+| `data-section` | Content sections | `data-section="hero"` |
+| `data-button` | Button variants | `data-button="primary"` |
+| `data-grid` | Grid layouts | `data-grid="3"` |
+
+### CSS Variables
+
+Customize the theme using CSS custom properties:
+
+```css
+:root {
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --radius-md: 0.5rem;
+}
+```
+
+## Next Steps
+
+<CardGrid>
+  <Card href="/concepts" title="Core Concepts">
+    Learn the philosophy behind BuilderCSS.
+  </Card>
+  <Card href="/layouts" title="Layouts">
+    Explore page-level layout patterns.
+  </Card>
+  <Card href="/sections" title="Sections">
+    Build with reusable content blocks.
+  </Card>
+</CardGrid>

@@ -1,0 +1,164 @@
+---
+$type: DocsPage
+title: Table View
+description: Data table with sorting and filtering
+screenshot: /screenshots/views/table.png
+---
+
+# Table View
+
+A data table with sorting, filtering, and row actions.
+
+<Preview>
+  <article data-view="table" style={{ padding: 'var(--spacing-6)' }}>
+    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
+      <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Users</h1>
+      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+        <input type="search" placeholder="Search users..." style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', width: '200px' }} />
+        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Add User</button>
+      </div>
+    </header>
+    <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr style={{ background: 'var(--muted)' }}>
+            <th style={{ padding: 'var(--spacing-3)', textAlign: 'left', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Name</th>
+            <th style={{ padding: 'var(--spacing-3)', textAlign: 'left', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Email</th>
+            <th style={{ padding: 'var(--spacing-3)', textAlign: 'left', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Role</th>
+            <th style={{ padding: 'var(--spacing-3)', textAlign: 'left', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Status</th>
+            <th style={{ padding: 'var(--spacing-3)', textAlign: 'right', fontWeight: 500, fontSize: 'var(--text-sm)' }}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style={{ borderTop: '1px solid var(--border)' }}>
+            <td style={{ padding: 'var(--spacing-3)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+              <span>John Doe</span>
+            </td>
+            <td style={{ padding: 'var(--spacing-3)', color: 'var(--muted-foreground)' }}>john@example.com</td>
+            <td style={{ padding: 'var(--spacing-3)' }}>Admin</td>
+            <td style={{ padding: 'var(--spacing-3)' }}><span style={{ padding: '2px 8px', background: 'green', color: 'white', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Active</span></td>
+            <td style={{ padding: 'var(--spacing-3)', textAlign: 'right' }}><button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>⋮</button></td>
+          </tr>
+          <tr style={{ borderTop: '1px solid var(--border)' }}>
+            <td style={{ padding: 'var(--spacing-3)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+              <span>Jane Smith</span>
+            </td>
+            <td style={{ padding: 'var(--spacing-3)', color: 'var(--muted-foreground)' }}>jane@example.com</td>
+            <td style={{ padding: 'var(--spacing-3)' }}>Editor</td>
+            <td style={{ padding: 'var(--spacing-3)' }}><span style={{ padding: '2px 8px', background: 'green', color: 'white', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Active</span></td>
+            <td style={{ padding: 'var(--spacing-3)', textAlign: 'right' }}><button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>⋮</button></td>
+          </tr>
+          <tr style={{ borderTop: '1px solid var(--border)' }}>
+            <td style={{ padding: 'var(--spacing-3)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+              <span>Bob Wilson</span>
+            </td>
+            <td style={{ padding: 'var(--spacing-3)', color: 'var(--muted-foreground)' }}>bob@example.com</td>
+            <td style={{ padding: 'var(--spacing-3)' }}>Viewer</td>
+            <td style={{ padding: 'var(--spacing-3)' }}><span style={{ padding: '2px 8px', background: 'var(--muted)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Inactive</span></td>
+            <td style={{ padding: 'var(--spacing-3)', textAlign: 'right' }}><button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>⋮</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <footer style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--spacing-4)' }}>
+      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Showing 1-3 of 50 users</span>
+      <nav style={{ display: 'flex', gap: 'var(--spacing-1)' }}>
+        <button style={{ padding: 'var(--spacing-2)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>← Prev</button>
+        <button style={{ padding: 'var(--spacing-2)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Next →</button>
+      </nav>
+    </footer>
+  </article>
+</Preview>
+
+## Structure
+
+```html
+<article data-view="table">
+  <header>
+    <h1>Users</h1>
+    <div data-actions>
+      <input type="search" placeholder="Search..." />
+      <button data-button="primary">Add User</button>
+    </div>
+  </header>
+
+  <section data-content>
+    <table data-table>
+      <thead>
+        <tr>
+          <th data-sortable>Name</th>
+          <th data-sortable>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div data-user>
+              <img src="/avatar.jpg" alt="" />
+              <span>John Doe</span>
+            </div>
+          </td>
+          <td>john@example.com</td>
+          <td>Admin</td>
+          <td><span data-badge="success">Active</span></td>
+          <td>
+            <button data-dropdown-trigger>⋮</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <span>Showing 1-10 of 100</span>
+    <nav data-pagination>...</nav>
+  </footer>
+</article>
+```
+
+## CSS
+
+```css
+[data-view="table"] {
+  padding: var(--spacing-6);
+}
+
+[data-view="table"] [data-table] {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+[data-view="table"] [data-table] thead {
+  background: var(--muted);
+}
+
+[data-view="table"] [data-table] th {
+  padding: var(--spacing-3);
+  text-align: left;
+  font-weight: 500;
+  font-size: var(--text-sm);
+}
+
+[data-view="table"] [data-table] th[data-sortable] {
+  cursor: pointer;
+}
+
+[data-view="table"] [data-table] th[data-sortable]:hover {
+  background: var(--accent);
+}
+
+[data-view="table"] [data-table] td {
+  padding: var(--spacing-3);
+  border-top: 1px solid var(--border);
+}
+
+[data-view="table"] [data-table] tr:hover {
+  background: var(--accent);
+}
+```

@@ -1,0 +1,148 @@
+---
+$type: DocsPage
+title: Grid View
+description: Card grid for visual browsing
+screenshot: /screenshots/views/grid.png
+---
+
+# Grid View
+
+A card grid layout for visual browsing of items.
+
+<Preview>
+  <article data-view="grid" style={{ padding: 'var(--spacing-6)' }}>
+    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
+      <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Templates</h1>
+      <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+        <input type="search" placeholder="Search..." style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
+        <select style={{ padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+          <option>All Categories</option>
+          <option>Marketing</option>
+          <option>E-commerce</option>
+        </select>
+      </div>
+    </header>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-4)' }}>
+      <article style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <div style={{ height: '120px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}></div>
+        <div style={{ padding: 'var(--spacing-4)' }}>
+          <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Landing Page</h3>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Modern marketing template</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>Free</span>
+            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Use</button>
+          </div>
+        </div>
+      </article>
+      <article style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <div style={{ height: '120px', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}></div>
+        <div style={{ padding: 'var(--spacing-4)' }}>
+          <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>Dashboard</h3>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Analytics dashboard</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>$29</span>
+            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Use</button>
+          </div>
+        </div>
+      </article>
+      <article style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <div style={{ height: '120px', background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}></div>
+        <div style={{ padding: 'var(--spacing-4)' }}>
+          <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>E-commerce</h3>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-2)' }}>Online store template</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)' }}>$49</span>
+            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Use</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </article>
+</Preview>
+
+## Structure
+
+```html
+<article data-view="grid">
+  <header>
+    <h1>Templates</h1>
+    <div data-actions>
+      <input type="search" placeholder="Search..." />
+      <select>
+        <option>All Categories</option>
+      </select>
+    </div>
+  </header>
+
+  <section data-content>
+    <div data-grid="3">
+      <article data-card>
+        <img src="/template-preview.jpg" alt="" data-card-image />
+        <div data-card-content>
+          <h3>Landing Page</h3>
+          <p>Modern marketing template</p>
+          <div data-card-footer>
+            <span data-price>Free</span>
+            <button data-button="primary">Use</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <nav data-pagination>...</nav>
+  </footer>
+</article>
+```
+
+## CSS
+
+```css
+[data-view="grid"] {
+  padding: var(--spacing-6);
+}
+
+[data-view="grid"] > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-view="grid"] [data-grid] {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+[data-view="grid"] [data-grid="3"] {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+[data-view="grid"] [data-card] {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+[data-view="grid"] [data-card]:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+[data-view="grid"] [data-card-image] {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+[data-view="grid"] [data-card-content] {
+  padding: var(--spacing-4);
+}
+
+@media (max-width: 768px) {
+  [data-view="grid"] [data-grid="3"] {
+    grid-template-columns: 1fr;
+  }
+}
+```

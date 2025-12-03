@@ -1,0 +1,218 @@
+---
+$type: DocsPage
+title: Kanban View
+description: Kanban board for tasks
+screenshot: /screenshots/views/kanban.png
+---
+
+# Kanban View
+
+A kanban board for managing tasks and workflows.
+
+<Preview>
+  <article data-view="kanban" style={{ padding: 'var(--spacing-6)', overflowX: 'auto' }}>
+    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
+      <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Project Board</h1>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Add Task</button>
+    </header>
+    <div style={{ display: 'flex', gap: 'var(--spacing-4)', minWidth: 'max-content' }}>
+      <div style={{ width: '280px', background: 'var(--muted)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-3)' }}>
+          <h3 style={{ fontWeight: 600 }}>To Do</h3>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>3</span>
+        </header>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+          <article style={{ background: 'var(--background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 'var(--spacing-3)' }}>
+            <h4 style={{ fontWeight: 500, marginBottom: 'var(--spacing-2)' }}>Design homepage</h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ padding: '2px 6px', background: 'purple', color: 'white', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)' }}>Design</span>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+            </div>
+          </article>
+          <article style={{ background: 'var(--background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 'var(--spacing-3)' }}>
+            <h4 style={{ fontWeight: 500, marginBottom: 'var(--spacing-2)' }}>Setup database</h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ padding: '2px 6px', background: 'blue', color: 'white', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)' }}>Backend</span>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div style={{ width: '280px', background: 'var(--muted)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-3)' }}>
+          <h3 style={{ fontWeight: 600 }}>In Progress</h3>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>2</span>
+        </header>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+          <article style={{ background: 'var(--background)', border: '2px solid var(--primary)', borderRadius: 'var(--radius)', padding: 'var(--spacing-3)' }}>
+            <h4 style={{ fontWeight: 500, marginBottom: 'var(--spacing-2)' }}>Build API endpoints</h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ padding: '2px 6px', background: 'blue', color: 'white', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)' }}>Backend</span>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--primary)' }}></div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div style={{ width: '280px', background: 'var(--muted)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-4)' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-3)' }}>
+          <h3 style={{ fontWeight: 600 }}>Done</h3>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>5</span>
+        </header>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+          <article style={{ background: 'var(--background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 'var(--spacing-3)', opacity: 0.7 }}>
+            <h4 style={{ fontWeight: 500, marginBottom: 'var(--spacing-2)', textDecoration: 'line-through' }}>Project setup</h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ padding: '2px 6px', background: 'green', color: 'white', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)' }}>Setup</span>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </article>
+</Preview>
+
+## Structure
+
+```html
+<article data-view="kanban">
+  <header>
+    <h1>Project Board</h1>
+    <button data-button="primary">Add Task</button>
+  </header>
+
+  <section data-kanban-board>
+    <div data-column data-status="todo">
+      <header>
+        <h3>To Do</h3>
+        <span data-count>3</span>
+      </header>
+      <div data-cards>
+        <article data-card draggable="true">
+          <h4>Design homepage</h4>
+          <div data-card-footer>
+            <span data-tag="design">Design</span>
+            <img src="/avatar.jpg" data-assignee />
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div data-column data-status="in-progress">
+      <header>
+        <h3>In Progress</h3>
+        <span data-count>2</span>
+      </header>
+      <div data-cards>
+        <!-- Cards -->
+      </div>
+    </div>
+
+    <div data-column data-status="done">
+      <header>
+        <h3>Done</h3>
+        <span data-count>5</span>
+      </header>
+      <div data-cards>
+        <!-- Cards -->
+      </div>
+    </div>
+  </section>
+</article>
+```
+
+## CSS
+
+```css
+[data-view="kanban"] {
+  padding: var(--spacing-6);
+  overflow-x: auto;
+}
+
+[data-view="kanban"] [data-kanban-board] {
+  display: flex;
+  gap: var(--spacing-4);
+  min-width: max-content;
+}
+
+[data-view="kanban"] [data-column] {
+  width: 300px;
+  background: var(--muted);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+}
+
+[data-view="kanban"] [data-column] > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-3);
+}
+
+[data-view="kanban"] [data-cards] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  min-height: 200px;
+}
+
+[data-view="kanban"] [data-card] {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-3);
+  cursor: grab;
+  transition: box-shadow 0.2s;
+}
+
+[data-view="kanban"] [data-card]:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-view="kanban"] [data-card][data-dragging] {
+  opacity: 0.5;
+}
+
+[data-view="kanban"] [data-card-footer] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-2);
+}
+
+[data-view="kanban"] [data-tag] {
+  padding: 2px 6px;
+  border-radius: var(--radius);
+  font-size: var(--text-xs);
+  color: white;
+}
+
+[data-view="kanban"] [data-tag="design"] { background: purple; }
+[data-view="kanban"] [data-tag="backend"] { background: blue; }
+[data-view="kanban"] [data-tag="frontend"] { background: green; }
+```
+
+## JavaScript (Drag and Drop)
+
+```js
+const cards = document.querySelectorAll('[data-card]')
+const columns = document.querySelectorAll('[data-cards]')
+
+cards.forEach(card => {
+  card.addEventListener('dragstart', () => {
+    card.dataset.dragging = true
+  })
+
+  card.addEventListener('dragend', () => {
+    delete card.dataset.dragging
+  })
+})
+
+columns.forEach(column => {
+  column.addEventListener('dragover', (e) => {
+    e.preventDefault()
+    const dragging = document.querySelector('[data-dragging]')
+    column.appendChild(dragging)
+  })
+})
+```

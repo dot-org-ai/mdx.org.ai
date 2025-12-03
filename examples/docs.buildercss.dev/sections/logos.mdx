@@ -1,0 +1,145 @@
+---
+$type: DocsPage
+title: Logos Section
+description: Logo cloud of trusted companies
+screenshot: /screenshots/sections/logos.png
+---
+
+# Logos Section
+
+A logo cloud showing trusted companies and partners.
+
+<Preview>
+  <section data-section="logos" style={{ padding: 'var(--spacing-12) var(--spacing-4)', textAlign: 'center' }}>
+    <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-8)', fontSize: 'var(--text-sm)' }}>Trusted by teams at</p>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 'var(--spacing-12)', flexWrap: 'wrap', opacity: 0.6 }}>
+      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 1</div>
+      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 2</div>
+      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 3</div>
+      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 4</div>
+      <div style={{ width: '120px', height: '40px', background: 'var(--muted)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Company 5</div>
+    </div>
+  </section>
+</Preview>
+
+## When to Use
+
+- Social proof after hero
+- Partner showcases
+- Client lists
+- Integration displays
+
+## Structure
+
+```html
+<section data-section="logos">
+  <p>Trusted by teams at</p>
+  <div data-logo-grid>
+    <img src="/logos/company1.svg" alt="Company 1" />
+    <img src="/logos/company2.svg" alt="Company 2" />
+    <img src="/logos/company3.svg" alt="Company 3" />
+    <img src="/logos/company4.svg" alt="Company 4" />
+    <img src="/logos/company5.svg" alt="Company 5" />
+  </div>
+</section>
+```
+
+## CSS
+
+```css
+[data-section="logos"] {
+  padding: var(--spacing-12) var(--spacing-4);
+  text-align: center;
+}
+
+[data-section="logos"] > p {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-8);
+}
+
+[data-section="logos"] [data-logo-grid] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-12);
+  flex-wrap: wrap;
+}
+
+[data-section="logos"] [data-logo-grid] img {
+  height: 32px;
+  width: auto;
+  opacity: 0.6;
+  filter: grayscale(100%);
+  transition: opacity 0.2s, filter 0.2s;
+}
+
+[data-section="logos"] [data-logo-grid] img:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+@media (max-width: 768px) {
+  [data-section="logos"] [data-logo-grid] {
+    gap: var(--spacing-6);
+  }
+
+  [data-section="logos"] [data-logo-grid] img {
+    height: 24px;
+  }
+}
+```
+
+## Variations
+
+### Scrolling Marquee
+
+```html
+<section data-section="logos" data-variant="marquee">
+  <p>Trusted by teams at</p>
+  <div data-marquee>
+    <div data-marquee-content>
+      <img src="/logos/company1.svg" alt="" />
+      <img src="/logos/company2.svg" alt="" />
+      <!-- Duplicate for seamless loop -->
+    </div>
+  </div>
+</section>
+```
+
+```css
+[data-section="logos"][data-variant="marquee"] [data-marquee] {
+  overflow: hidden;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 20%,
+    black 80%,
+    transparent
+  );
+}
+
+[data-section="logos"] [data-marquee-content] {
+  display: flex;
+  gap: var(--spacing-12);
+  animation: marquee 30s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+```
+
+### With Borders
+
+```html
+<section data-section="logos" data-variant="bordered">
+  <div data-logo-grid>
+    <a href="https://company1.com">
+      <img src="/logos/company1.svg" alt="Company 1" />
+    </a>
+    <!-- More logos -->
+  </div>
+</section>
+```

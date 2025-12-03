@@ -1,0 +1,157 @@
+---
+$type: DocsPage
+title: Blog Page
+description: Blog listing page with articles
+screenshot: /screenshots/pages/blog.png
+---
+
+# Blog Page
+
+A blog listing page displaying articles in a grid layout.
+
+<Preview>
+  <article data-page="blog" style={{ padding: 'var(--spacing-6)' }}>
+    <header style={{ marginBottom: 'var(--spacing-8)' }}>
+      <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Blog</h1>
+      <p style={{ color: 'var(--muted-foreground)' }}>Insights, tutorials, and updates from our team</p>
+    </header>
+
+    <div style={{ display: 'flex', gap: 'var(--spacing-4)', marginBottom: 'var(--spacing-6)' }}>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)' }}>All</button>
+      {['Engineering', 'Design', 'Product', 'Company'].map(cat => (
+        <button key={cat} style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)' }}>{cat}</button>
+      ))}
+    </div>
+
+    <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-6)' }}>
+      {[
+        { title: 'Building a Design System from Scratch', category: 'Engineering', date: 'Dec 1, 2024', readTime: '8 min' },
+        { title: 'The Power of Semantic HTML', category: 'Design', date: 'Nov 28, 2024', readTime: '5 min' },
+        { title: 'Announcing Builder CSS v2.0', category: 'Product', date: 'Nov 25, 2024', readTime: '3 min' },
+        { title: 'Our Journey to 50K Users', category: 'Company', date: 'Nov 20, 2024', readTime: '6 min' },
+        { title: 'CSS Custom Properties Deep Dive', category: 'Engineering', date: 'Nov 15, 2024', readTime: '10 min' },
+        { title: 'Designing for Accessibility', category: 'Design', date: 'Nov 10, 2024', readTime: '7 min' },
+      ].map((post, i) => (
+        <article key={i} style={{ cursor: 'pointer' }}>
+          <div style={{ background: 'var(--muted)', borderRadius: 'var(--radius-lg)', aspectRatio: '16/9', marginBottom: 'var(--spacing-3)' }}></div>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--primary)', fontWeight: 500 }}>{post.category}</span>
+          <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-2)', marginTop: 'var(--spacing-1)' }}>{post.title}</h3>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>{post.date} · {post.readTime} read</p>
+        </article>
+      ))}
+    </section>
+
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)', marginTop: 'var(--spacing-8)' }}>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>←</button>
+      {[1, 2, 3].map(n => (
+        <button key={n} style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: n === 1 ? 'var(--primary)' : 'transparent', color: n === 1 ? 'var(--primary-foreground)' : 'inherit', border: n === 1 ? 'none' : '1px solid var(--border)', borderRadius: 'var(--radius)' }}>{n}</button>
+      ))}
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: 'var(--muted)', border: 'none', borderRadius: 'var(--radius)' }}>→</button>
+    </div>
+  </article>
+</Preview>
+
+## When to Use
+
+- Company blog index
+- News archive pages
+- Article listings
+- Content hubs
+
+## Structure
+
+```html
+<article data-page="blog">
+  <header data-page-header>
+    <h1>Blog</h1>
+    <p>Insights, tutorials, and updates from our team</p>
+  </header>
+
+  <nav data-category-filter>
+    <button data-active>All</button>
+    <button>Engineering</button>
+    <button>Design</button>
+    <button>Product</button>
+  </nav>
+
+  <section data-blog-grid>
+    <article data-blog-card>
+      <img src="/post-image.jpg" data-card-image />
+      <span data-category>Engineering</span>
+      <h3>Building a Design System from Scratch</h3>
+      <p data-meta>Dec 1, 2024 · 8 min read</p>
+    </article>
+  </section>
+
+  <nav data-pagination>
+    <button data-prev>←</button>
+    <button data-page data-active>1</button>
+    <button data-page>2</button>
+    <button data-page>3</button>
+    <button data-next>→</button>
+  </nav>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="blog"] {
+  padding: var(--spacing-6);
+}
+
+[data-page="blog"] [data-page-header] {
+  margin-bottom: var(--spacing-8);
+}
+
+[data-page="blog"] [data-category-filter] {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="blog"] [data-category-filter] button {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--muted);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+[data-page="blog"] [data-category-filter] button[data-active] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[data-page="blog"] [data-blog-grid] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-6);
+}
+
+[data-page="blog"] [data-blog-card] {
+  cursor: pointer;
+}
+
+[data-page="blog"] [data-blog-card] [data-card-image] {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-3);
+}
+
+[data-page="blog"] [data-blog-card] [data-category] {
+  font-size: var(--text-xs);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+[data-page="blog"] [data-pagination] {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-8);
+}
+```

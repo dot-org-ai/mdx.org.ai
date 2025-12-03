@@ -875,11 +875,12 @@ More content.
 
 const toc = render.toc(mdx)
 
-toc.should.have.lengthOf(4)
+toc.should.have.lengthOf(5)
 toc[0].should.deep.include({ level: 1, text: 'Main Title' })
 toc[1].should.deep.include({ level: 2, text: 'Section One' })
 toc[2].should.deep.include({ level: 2, text: 'Section Two' })
 toc[3].should.deep.include({ level: 3, text: 'Subsection' })
+toc[4].should.deep.include({ level: 2, text: 'Section Three' })
 ```
 
 ## Client-Side Rendering (hono/jsx/dom)

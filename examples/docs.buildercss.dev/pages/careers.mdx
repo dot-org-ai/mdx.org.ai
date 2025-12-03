@@ -1,0 +1,167 @@
+---
+$type: DocsPage
+title: Careers Page
+description: Job listings and company culture
+screenshot: /screenshots/pages/careers.png
+---
+
+# Careers Page
+
+A careers page showcasing open positions and company culture.
+
+<Preview>
+  <article data-page="careers" style={{ padding: 'var(--spacing-6)' }}>
+    <header style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto var(--spacing-8)' }}>
+      <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-3)' }}>Join Our Team</h1>
+      <p style={{ fontSize: 'var(--text-lg)', color: 'var(--muted-foreground)' }}>Help us build the future of web development</p>
+    </header>
+
+    <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-4)', marginBottom: 'var(--spacing-12)' }}>
+      {[
+        { icon: '🌍', title: 'Remote First', desc: 'Work from anywhere in the world' },
+        { icon: '💰', title: 'Competitive Pay', desc: 'Top-tier salary and equity' },
+        { icon: '🏥', title: 'Great Benefits', desc: 'Health, dental, and vision' },
+        { icon: '📚', title: 'Learning Budget', desc: '$2,000/year for growth' },
+        { icon: '🏖️', title: 'Unlimited PTO', desc: 'Take the time you need' },
+        { icon: '💻', title: 'Equipment', desc: 'Latest tools and setup' },
+      ].map(perk => (
+        <div key={perk.title} style={{ padding: 'var(--spacing-4)', background: 'var(--muted)', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
+          <span style={{ fontSize: 'var(--text-2xl)', display: 'block', marginBottom: 'var(--spacing-2)' }}>{perk.icon}</span>
+          <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>{perk.title}</h3>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>{perk.desc}</p>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 600, marginBottom: 'var(--spacing-4)' }}>Open Positions</h2>
+      <div style={{ display: 'flex', gap: 'var(--spacing-3)', marginBottom: 'var(--spacing-4)' }}>
+        {['All', 'Engineering', 'Design', 'Product'].map(cat => (
+          <button key={cat} style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: cat === 'All' ? 'var(--primary)' : 'var(--muted)', color: cat === 'All' ? 'var(--primary-foreground)' : 'inherit', border: 'none', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)' }}>{cat}</button>
+        ))}
+      </div>
+
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
+        {[
+          { title: 'Senior Frontend Engineer', dept: 'Engineering', location: 'Remote', type: 'Full-time' },
+          { title: 'Product Designer', dept: 'Design', location: 'Remote', type: 'Full-time' },
+          { title: 'Technical Writer', dept: 'Product', location: 'Remote', type: 'Full-time' },
+          { title: 'DevOps Engineer', dept: 'Engineering', location: 'Remote', type: 'Full-time' },
+        ].map((job, i) => (
+          <div key={i} style={{ padding: 'var(--spacing-4)', borderBottom: i < 3 ? '1px solid var(--border)' : 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ fontWeight: 600, marginBottom: 'var(--spacing-1)' }}>{job.title}</h3>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>{job.dept} · {job.location} · {job.type}</p>
+            </div>
+            <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Apply →</button>
+          </div>
+        ))}
+      </div>
+    </section>
+  </article>
+</Preview>
+
+## When to Use
+
+- Company career pages
+- Job listing boards
+- Recruitment pages
+- Team hiring pages
+
+## Structure
+
+```html
+<article data-page="careers">
+  <header data-page-header>
+    <h1>Join Our Team</h1>
+    <p>Help us build the future of web development</p>
+  </header>
+
+  <section data-perks-grid>
+    <div data-perk>
+      <span data-icon>🌍</span>
+      <h3>Remote First</h3>
+      <p>Work from anywhere in the world</p>
+    </div>
+    <!-- More perks -->
+  </section>
+
+  <section data-jobs>
+    <h2>Open Positions</h2>
+    <nav data-department-filter>
+      <button data-active>All</button>
+      <button>Engineering</button>
+      <button>Design</button>
+    </nav>
+
+    <ul data-job-list>
+      <li data-job-item>
+        <div data-job-info>
+          <h3>Senior Frontend Engineer</h3>
+          <p>Engineering · Remote · Full-time</p>
+        </div>
+        <a href="#" data-button="outline">Apply →</a>
+      </li>
+    </ul>
+  </section>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="careers"] {
+  padding: var(--spacing-6);
+}
+
+[data-page="careers"] [data-page-header] {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto var(--spacing-8);
+}
+
+[data-page="careers"] [data-perks-grid] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-12);
+}
+
+[data-page="careers"] [data-perk] {
+  padding: var(--spacing-4);
+  background: var(--muted);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+[data-page="careers"] [data-perk] [data-icon] {
+  font-size: var(--text-2xl);
+  display: block;
+  margin-bottom: var(--spacing-2);
+}
+
+[data-page="careers"] [data-department-filter] {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-page="careers"] [data-job-list] {
+  list-style: none;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+[data-page="careers"] [data-job-item] {
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+[data-page="careers"] [data-job-item]:last-child {
+  border-bottom: none;
+}
+```

@@ -1,0 +1,177 @@
+---
+$type: DocsPage
+title: Changelog Page
+description: Product updates and release notes
+screenshot: /screenshots/pages/changelog.png
+---
+
+# Changelog Page
+
+A changelog page displaying product updates and release history.
+
+<Preview>
+  <article data-page="changelog" style={{ padding: 'var(--spacing-6)', maxWidth: '700px', margin: '0 auto' }}>
+    <header style={{ marginBottom: 'var(--spacing-8)' }}>
+      <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Changelog</h1>
+      <p style={{ color: 'var(--muted-foreground)' }}>New updates and improvements to Builder CSS</p>
+    </header>
+
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-8)' }}>
+      <article style={{ paddingLeft: 'var(--spacing-6)', borderLeft: '2px solid var(--border)', position: 'relative' }}>
+        <div style={{ position: 'absolute', left: '-6px', top: '0', width: '10px', height: '10px', borderRadius: '50%', background: 'var(--primary)' }}></div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-2)' }}>
+          <span style={{ padding: '2px 8px', background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)' }}>v2.0.0</span>
+          <time style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>December 1, 2024</time>
+        </div>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>Major Release: Builder CSS 2.0</h2>
+        <ul style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', paddingLeft: 'var(--spacing-4)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+          <li>Complete rewrite with improved performance</li>
+          <li>New data-attribute based API</li>
+          <li>Dark mode support out of the box</li>
+          <li>50+ new components added</li>
+        </ul>
+      </article>
+
+      <article style={{ paddingLeft: 'var(--spacing-6)', borderLeft: '2px solid var(--border)', position: 'relative' }}>
+        <div style={{ position: 'absolute', left: '-6px', top: '0', width: '10px', height: '10px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-2)' }}>
+          <span style={{ padding: '2px 8px', background: 'var(--muted)', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)' }}>v1.5.0</span>
+          <time style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>November 15, 2024</time>
+        </div>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>New Components & Bug Fixes</h2>
+        <ul style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', paddingLeft: 'var(--spacing-4)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+          <li>Added Calendar component</li>
+          <li>Added Kanban board component</li>
+          <li>Fixed modal focus trap issue</li>
+          <li>Improved accessibility across all components</li>
+        </ul>
+      </article>
+
+      <article style={{ paddingLeft: 'var(--spacing-6)', borderLeft: '2px solid var(--border)', position: 'relative' }}>
+        <div style={{ position: 'absolute', left: '-6px', top: '0', width: '10px', height: '10px', borderRadius: '50%', background: 'var(--muted)' }}></div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-2)' }}>
+          <span style={{ padding: '2px 8px', background: 'var(--muted)', borderRadius: 'var(--radius)', fontSize: 'var(--text-xs)' }}>v1.4.0</span>
+          <time style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>October 30, 2024</time>
+        </div>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>Performance Improvements</h2>
+        <ul style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', paddingLeft: 'var(--spacing-4)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+          <li>30% smaller CSS bundle size</li>
+          <li>Optimized animations for 60fps</li>
+          <li>Reduced JavaScript footprint</li>
+        </ul>
+      </article>
+    </div>
+  </article>
+</Preview>
+
+## When to Use
+
+- Product changelog
+- Release notes pages
+- Update history
+- Version documentation
+
+## Structure
+
+```html
+<article data-page="changelog">
+  <header data-page-header>
+    <h1>Changelog</h1>
+    <p>New updates and improvements to Builder CSS</p>
+  </header>
+
+  <section data-timeline>
+    <article data-release data-latest>
+      <span data-version>v2.0.0</span>
+      <time>December 1, 2024</time>
+      <h2>Major Release: Builder CSS 2.0</h2>
+      <ul>
+        <li>Complete rewrite with improved performance</li>
+        <li>New data-attribute based API</li>
+        <li>Dark mode support out of the box</li>
+      </ul>
+    </article>
+
+    <article data-release>
+      <span data-version>v1.5.0</span>
+      <time>November 15, 2024</time>
+      <h2>New Components & Bug Fixes</h2>
+      <ul>
+        <li>Added Calendar component</li>
+        <li>Added Kanban board component</li>
+      </ul>
+    </article>
+  </section>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="changelog"] {
+  padding: var(--spacing-6);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+[data-page="changelog"] [data-page-header] {
+  margin-bottom: var(--spacing-8);
+}
+
+[data-page="changelog"] [data-timeline] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+[data-page="changelog"] [data-release] {
+  padding-left: var(--spacing-6);
+  border-left: 2px solid var(--border);
+  position: relative;
+}
+
+[data-page="changelog"] [data-release]::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+[data-page="changelog"] [data-release][data-latest]::before {
+  background: var(--primary);
+}
+
+[data-page="changelog"] [data-version] {
+  padding: 2px 8px;
+  background: var(--muted);
+  border-radius: var(--radius);
+  font-size: var(--text-xs);
+}
+
+[data-page="changelog"] [data-release][data-latest] [data-version] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[data-page="changelog"] [data-release] time {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-left: var(--spacing-2);
+}
+
+[data-page="changelog"] [data-release] h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin: var(--spacing-2) 0 var(--spacing-3);
+}
+
+[data-page="changelog"] [data-release] ul {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  padding-left: var(--spacing-4);
+}
+```

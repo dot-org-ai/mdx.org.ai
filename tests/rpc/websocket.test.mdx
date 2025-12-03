@@ -1,0 +1,175 @@
+---
+$type: TestSuite
+$id: https://mdx.org.ai/tests/rpc/websocket
+title: WebSocket Transport Integration Tests
+description: End-to-end tests for WebSocket RPC transport
+---
+
+# WebSocket Transport Integration Tests
+
+High-level integration tests for the WebSocket RPC transport.
+Tests persistent connections, streaming, and reconnection.
+
+## Connection Lifecycle
+
+```ts test name="connect and disconnect"
+const { WebSocketTransport } = await import('ai-functions/rpc')
+
+const transport = new WebSocketTransport({
+  url: 'ws://localhost:3456/rpc',
+  reconnect: false
+})
+
+expect(transport.state).toBe('disconnected')
+
+await transport.connect()
+expect(transport.state).toBe('connected')
+
+transport.close()
+expect(transport.state).toBe('disconnected')
+```
+
+```ts test name="auto-connect on request"
+const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new WebSocketTransport({
+  url: 'ws://localhost:3456/rpc',
+  reconnect: false
+})
+
+// Should auto-connect
+const response = await transport.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'echo',
+  params: ['auto-connect']
+})
+
+expect(response.result).toBe('auto-connect')
+expect(transport.state).toBe('connected')
+
+transport.close()
+```
+
+## Basic Operations
+
+```ts test name="echo via WebSocket"
+const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new WebSocketTransport({
+  url: 'ws://localhost:3456/rpc',
+  reconnect: false
+})
+await transport.connect()
+
+const response = await transport.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'echo',
+  params: ['WebSocket MDX test']
+})
+
+expect(response.result).toBe('WebSocket MDX test')
+transport.close()
+```
+
+```ts test name="multiple requests on same connection"
+const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new WebSocketTransport({
+  url: 'ws://localhost:3456/rpc',
+  reconnect: false
+})
+await transport.connect()
+
+for (let i = 0; i < 5; i++) {
+  const response = await transport.request({
+    id: generateMessageId(),
+    type: 'call',
+    method: 'add',
+    params: [i, 10]
+  })
+  expect(response.result).toBe(i + 10)
+}
+
+expect(transport.state).toBe('connected')
+transport.close()
+```
+
+## Concurrent Requests
+
+```ts test name="handle concurrent WebSocket requests"
+const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new WebSocketTransport({
+  url: 'ws://localhost:3456/rpc',
+  reconnect: false
+})
+await transport.connect()
+
+const count = 20
+const promises = Array.from({ length: count }, (_, i) =>
+  transport.request({
+    id: generateMessageId(),
+    type: 'call',
+    method: 'multiply',
+    params: [i, 2]
+  })
+)
+
+const results = await Promise.all(promises)
+
+for (let i = 0; i < count; i++) {
+  expect(results[i].result).toBe(i * 2)
+}
+
+transport.close()
+```
+
+## Error Handling
+
+```ts test name="handle errors without breaking connection"
+const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new WebSocketTransport({
+  url: 'ws://localhost:3456/rpc',
+  reconnect: false
+})
+await transport.connect()
+
+// Cause error
+const errorResponse = await transport.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'throwError',
+  params: ['ws error']
+})
+expect(errorResponse.type).toBe('error')
+
+// Connection still works
+const successResponse = await transport.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'echo',
+  params: ['still connected']
+})
+expect(successResponse.result).toBe('still connected')
+
+transport.close()
+```
+
+## Run Matrix
+
+```bash
+# Run on Node
+mdxe test --target node --filter rpc/websocket
+
+# Run on Workers
+mdxe test --target workers --filter rpc/websocket
+
+# Run on Bun
+mdxe test --target bun --filter rpc/websocket
+
+# All targets
+mdxe test --target all --filter rpc/websocket
+```

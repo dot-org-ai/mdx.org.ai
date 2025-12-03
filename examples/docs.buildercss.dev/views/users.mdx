@@ -1,0 +1,148 @@
+---
+$type: DocsPage
+title: Users View
+description: User management list
+screenshot: /screenshots/views/users.png
+---
+
+# Users View
+
+A user management view for admin users to manage team members.
+
+<Preview>
+  <article data-view="users" style={{ padding: 'var(--spacing-6)' }}>
+    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
+      <div>
+        <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Team Members</h1>
+        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Manage your team's access and permissions</p>
+      </div>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Invite Member</button>
+    </header>
+
+    <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-foreground)', fontWeight: 600 }}>JD</div>
+          <div>
+            <h3 style={{ fontWeight: 600 }}>John Doe</h3>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>john@example.com</p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-4)' }}>
+          <span style={{ padding: '2px 8px', background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Admin</span>
+          <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>⋮</button>
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>JS</div>
+          <div>
+            <h3 style={{ fontWeight: 600 }}>Jane Smith</h3>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>jane@example.com</p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-4)' }}>
+          <span style={{ padding: '2px 8px', background: 'var(--muted)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Editor</span>
+          <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>⋮</button>
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>BW</div>
+          <div>
+            <h3 style={{ fontWeight: 600 }}>Bob Wilson</h3>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>bob@example.com</p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-4)' }}>
+          <span style={{ padding: '2px 8px', background: 'orange', color: 'white', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-xs)' }}>Pending</span>
+          <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>⋮</button>
+        </div>
+      </div>
+    </div>
+  </article>
+</Preview>
+
+## Structure
+
+```html
+<article data-view="users">
+  <header>
+    <div>
+      <h1>Team Members</h1>
+      <p>Manage your team's access and permissions</p>
+    </div>
+    <button data-button="primary">Invite Member</button>
+  </header>
+
+  <section data-content>
+    <ul data-user-list>
+      <li data-user-item>
+        <div data-user-info>
+          <img src="/avatar.jpg" alt="" data-avatar />
+          <div>
+            <h3>John Doe</h3>
+            <p>john@example.com</p>
+          </div>
+        </div>
+        <div data-user-meta>
+          <span data-badge="primary">Admin</span>
+          <button data-dropdown-trigger>⋮</button>
+        </div>
+      </li>
+    </ul>
+  </section>
+</article>
+```
+
+## CSS
+
+```css
+[data-view="users"] {
+  padding: var(--spacing-6);
+}
+
+[data-view="users"] > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-view="users"] [data-user-list] {
+  list-style: none;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+[data-view="users"] [data-user-item] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-view="users"] [data-user-item]:last-child {
+  border-bottom: none;
+}
+
+[data-view="users"] [data-user-info] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+[data-view="users"] [data-avatar] {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+[data-view="users"] [data-user-meta] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+```

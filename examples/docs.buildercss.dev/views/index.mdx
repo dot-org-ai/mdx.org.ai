@@ -1,0 +1,241 @@
+---
+$type: DocsPage
+title: Views
+description: App interaction patterns
+---
+
+# Views
+
+Views are interaction patterns for applications. They handle data display, user input, and state management.
+
+## Available Views
+
+<CardGrid columns={3}>
+  <Card href="/views/dashboard" title="Dashboard">
+    Overview with metrics, charts, and widgets.
+  </Card>
+  <Card href="/views/list" title="List">
+    Vertical list of items with actions.
+  </Card>
+  <Card href="/views/grid" title="Grid">
+    Card grid for visual browsing.
+  </Card>
+  <Card href="/views/table" title="Table">
+    Data table with sorting and filtering.
+  </Card>
+  <Card href="/views/detail" title="Detail">
+    Single item detail view.
+  </Card>
+  <Card href="/views/form" title="Form">
+    Create/edit form with validation.
+  </Card>
+  <Card href="/views/editor" title="Editor">
+    Code/text editor (Monaco-based).
+  </Card>
+  <Card href="/views/user-profile" title="UserProfile">
+    User settings and profile.
+  </Card>
+  <Card href="/views/users" title="Users">
+    User management list.
+  </Card>
+  <Card href="/views/api-keys" title="APIKeys">
+    API key management.
+  </Card>
+  <Card href="/views/billing" title="Billing">
+    Subscription and billing management.
+  </Card>
+  <Card href="/views/settings" title="Settings">
+    Application settings.
+  </Card>
+  <Card href="/views/chat" title="Chat">
+    Chat/messaging interface.
+  </Card>
+  <Card href="/views/calendar" title="Calendar">
+    Calendar and scheduling.
+  </Card>
+  <Card href="/views/kanban" title="Kanban">
+    Kanban board for tasks.
+  </Card>
+</CardGrid>
+
+## View Structure
+
+Views follow a consistent structure:
+
+```html
+<article data-view="list">
+  <header>
+    <h1>Items</h1>
+    <div data-actions>
+      <input type="search" placeholder="Search...">
+      <button data-button="primary">Add Item</button>
+    </div>
+  </header>
+
+  <section data-content>
+    <!-- View-specific content -->
+  </section>
+
+  <footer>
+    <nav data-pagination>...</nav>
+  </footer>
+</article>
+```
+
+## Views in Containers
+
+Views can appear in different presentation contexts:
+
+| Container | Use Case |
+|-----------|----------|
+| Main area | Primary app view |
+| Modal | Quick actions, confirmations |
+| Slideover | Detail panels, settings |
+| Popup | Chat widgets, notifications |
+| Drawer | Mobile navigation, filters |
+
+### Example: Chat in Different Contexts
+
+```html
+<!-- Full screen chat -->
+<main data-view="chat">
+  <header>...</header>
+  <section data-messages>...</section>
+  <footer data-input>...</footer>
+</main>
+
+<!-- Chat in slideover -->
+<aside data-slideover>
+  <article data-view="chat">
+    <header>...</header>
+    <section data-messages>...</section>
+    <footer data-input>...</footer>
+  </article>
+</aside>
+
+<!-- Chat as popup widget -->
+<aside data-popup>
+  <article data-view="chat">
+    <header>...</header>
+    <section data-messages>...</section>
+    <footer data-input>...</footer>
+  </article>
+</aside>
+```
+
+## Example: List View
+
+```html
+<article data-view="list">
+  <header>
+    <h1>Projects</h1>
+    <div data-actions>
+      <input type="search" placeholder="Search projects...">
+      <select>
+        <option>All Status</option>
+        <option>Active</option>
+        <option>Archived</option>
+      </select>
+      <button data-button="primary">New Project</button>
+    </div>
+  </header>
+
+  <section data-content>
+    <ul data-list>
+      <li data-list-item>
+        <div data-list-item-content>
+          <h3>Project Alpha</h3>
+          <p>Description of the project</p>
+          <div data-meta>
+            <span data-badge="success">Active</span>
+            <span>Updated 2 hours ago</span>
+          </div>
+        </div>
+        <div data-list-item-actions>
+          <button data-button="ghost" data-icon>Edit</button>
+          <button data-button="ghost" data-icon>Delete</button>
+        </div>
+      </li>
+      <!-- More items -->
+    </ul>
+  </section>
+
+  <footer>
+    <nav data-pagination>
+      <button disabled>Previous</button>
+      <span>Page 1 of 5</span>
+      <button>Next</button>
+    </nav>
+  </footer>
+</article>
+```
+
+## Example: Form View
+
+```html
+<article data-view="form">
+  <header>
+    <h1>Create Project</h1>
+  </header>
+
+  <section data-content>
+    <form>
+      <div data-field>
+        <label for="name">Project Name</label>
+        <input type="text" id="name" required>
+      </div>
+
+      <div data-field>
+        <label for="description">Description</label>
+        <textarea id="description" rows="4"></textarea>
+      </div>
+
+      <div data-field>
+        <label for="status">Status</label>
+        <select id="status">
+          <option value="draft">Draft</option>
+          <option value="active">Active</option>
+        </select>
+      </div>
+
+      <div data-field>
+        <label>
+          <input type="checkbox" name="public">
+          Make this project public
+        </label>
+      </div>
+    </form>
+  </section>
+
+  <footer>
+    <button data-button="ghost">Cancel</button>
+    <button data-button="primary" type="submit">Create Project</button>
+  </footer>
+</article>
+```
+
+## Mobile Views
+
+On mobile, views adapt their layout:
+
+```tsx
+// React Native List View
+<View style={styles.view}>
+  <View style={styles.header}>
+    <Text style={styles.title}>Projects</Text>
+    <TouchableOpacity style={styles.addButton}>
+      <Icon name="plus" />
+    </TouchableOpacity>
+  </View>
+
+  <FlatList
+    data={projects}
+    renderItem={({ item }) => (
+      <TouchableOpacity style={styles.listItem}>
+        <Text style={styles.itemTitle}>{item.name}</Text>
+        <Text style={styles.itemMeta}>{item.updatedAt}</Text>
+      </TouchableOpacity>
+    )}
+  />
+</View>
+```

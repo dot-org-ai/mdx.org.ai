@@ -1,0 +1,157 @@
+---
+$type: DocsPage
+title: About Page
+description: Company information and team
+screenshot: /screenshots/pages/about.png
+---
+
+# About Page
+
+A page showcasing company story, mission, and team members.
+
+<Preview>
+  <article data-page="about" style={{ padding: 'var(--spacing-6)' }}>
+    <header style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto var(--spacing-12)' }}>
+      <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>About Us</h1>
+      <p style={{ fontSize: 'var(--text-lg)', color: 'var(--muted-foreground)' }}>We're on a mission to make web development simpler and more accessible for everyone.</p>
+    </header>
+
+    <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-8)', marginBottom: 'var(--spacing-12)' }}>
+      <div style={{ background: 'var(--muted)', borderRadius: 'var(--radius-lg)', aspectRatio: '16/9' }}></div>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 600, marginBottom: 'var(--spacing-3)' }}>Our Story</h2>
+        <p style={{ color: 'var(--muted-foreground)', marginBottom: 'var(--spacing-4)' }}>Founded in 2024, we set out to create a design system that embraces semantic HTML while providing the flexibility developers need.</p>
+        <p style={{ color: 'var(--muted-foreground)' }}>Today, we help thousands of teams build better products faster.</p>
+      </div>
+    </section>
+
+    <section style={{ marginBottom: 'var(--spacing-12)' }}>
+      <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 600, marginBottom: 'var(--spacing-6)', textAlign: 'center' }}>Our Team</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--spacing-6)' }}>
+        {[
+          { name: 'Alex Chen', role: 'CEO', initials: 'AC' },
+          { name: 'Sarah Kim', role: 'CTO', initials: 'SK' },
+          { name: 'Mike Ross', role: 'Design Lead', initials: 'MR' },
+          { name: 'Emma Liu', role: 'Engineering', initials: 'EL' },
+        ].map(member => (
+          <div key={member.name} style={{ textAlign: 'center' }}>
+            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--muted)', margin: '0 auto var(--spacing-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>{member.initials}</div>
+            <h3 style={{ fontWeight: 600 }}>{member.name}</h3>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>{member.role}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-6)', textAlign: 'center' }}>
+      {[
+        { stat: '50K+', label: 'Active Users' },
+        { stat: '120+', label: 'Countries' },
+        { stat: '99.9%', label: 'Uptime' },
+      ].map(item => (
+        <div key={item.label}>
+          <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, color: 'var(--primary)' }}>{item.stat}</div>
+          <div style={{ color: 'var(--muted-foreground)' }}>{item.label}</div>
+        </div>
+      ))}
+    </section>
+  </article>
+</Preview>
+
+## When to Use
+
+- Company "About Us" page
+- Team introduction pages
+- Startup story pages
+- Organization profile
+
+## Structure
+
+```html
+<article data-page="about">
+  <header data-page-header>
+    <h1>About Us</h1>
+    <p>We're on a mission to make web development simpler...</p>
+  </header>
+
+  <section data-section="story">
+    <img src="/office.jpg" alt="Our office" />
+    <div>
+      <h2>Our Story</h2>
+      <p>Founded in 2024...</p>
+    </div>
+  </section>
+
+  <section data-section="team">
+    <h2>Our Team</h2>
+    <ul data-team-grid>
+      <li data-team-member>
+        <img src="/avatar.jpg" alt="" data-avatar />
+        <h3>Alex Chen</h3>
+        <p>CEO</p>
+      </li>
+    </ul>
+  </section>
+
+  <section data-section="stats">
+    <div data-stat>
+      <span data-stat-value>50K+</span>
+      <span data-stat-label>Active Users</span>
+    </div>
+  </section>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="about"] {
+  padding: var(--spacing-6);
+}
+
+[data-page="about"] [data-page-header] {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto var(--spacing-12);
+}
+
+[data-page="about"] [data-section="story"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-8);
+  margin-bottom: var(--spacing-12);
+}
+
+[data-page="about"] [data-team-grid] {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-6);
+  list-style: none;
+  padding: 0;
+}
+
+[data-page="about"] [data-team-member] {
+  text-align: center;
+}
+
+[data-page="about"] [data-team-member] [data-avatar] {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto var(--spacing-3);
+}
+
+[data-page="about"] [data-section="stats"] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-6);
+  text-align: center;
+}
+
+[data-page="about"] [data-stat-value] {
+  display: block;
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--primary);
+}
+```

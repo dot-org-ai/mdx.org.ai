@@ -1,0 +1,126 @@
+---
+$type: DocsPage
+title: CTA Section
+description: Call-to-action to drive conversions
+screenshot: /screenshots/sections/cta.png
+---
+
+# CTA Section
+
+A call-to-action section to drive conversions.
+
+<Preview>
+  <section data-section="cta" style={{ padding: 'var(--spacing-16) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', textAlign: 'center', borderRadius: 'var(--radius-lg)' }}>
+    <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Ready to get started?</h2>
+    <p style={{ marginBottom: 'var(--spacing-8)', opacity: 0.9 }}>Join thousands of happy customers today.</p>
+    <div style={{ display: 'flex', gap: 'var(--spacing-4)', justifyContent: 'center' }}>
+      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'var(--background)', color: 'var(--foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer', fontWeight: 500 }}>Start Free Trial</button>
+      <button style={{ padding: 'var(--spacing-3) var(--spacing-6)', background: 'transparent', border: '1px solid currentColor', borderRadius: 'var(--radius)', cursor: 'pointer', fontWeight: 500, color: 'inherit' }}>Talk to Sales</button>
+    </div>
+  </section>
+</Preview>
+
+## When to Use
+
+- End of landing pages
+- Newsletter signups
+- Trial conversions
+- Contact prompts
+
+## Structure
+
+```html
+<section data-section="cta">
+  <h2>Ready to get started?</h2>
+  <p>Join thousands of happy customers today.</p>
+  <div data-actions>
+    <a href="/signup" data-button="primary" data-size="lg">
+      Start Free Trial
+    </a>
+    <a href="/contact" data-button="outline" data-size="lg">
+      Talk to Sales
+    </a>
+  </div>
+</section>
+```
+
+## CSS
+
+```css
+[data-section="cta"] {
+  padding: var(--spacing-16) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  text-align: center;
+}
+
+[data-section="cta"] h2 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-4);
+}
+
+[data-section="cta"] > p {
+  margin-bottom: var(--spacing-8);
+  opacity: 0.9;
+}
+
+[data-section="cta"] [data-actions] {
+  display: flex;
+  gap: var(--spacing-4);
+  justify-content: center;
+}
+
+[data-section="cta"] [data-button="primary"] {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+[data-section="cta"] [data-button="outline"] {
+  border-color: currentColor;
+  color: inherit;
+}
+
+@media (max-width: 640px) {
+  [data-section="cta"] [data-actions] {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+```
+
+## Variations
+
+### With Background Image
+
+```html
+<section data-section="cta" data-variant="image">
+  <img src="/cta-bg.jpg" alt="" data-background />
+  <div data-content>
+    <h2>Start building today</h2>
+    <a href="/signup" data-button="primary">Get Started</a>
+  </div>
+</section>
+```
+
+### Newsletter CTA
+
+```html
+<section data-section="cta" data-variant="newsletter">
+  <h2>Stay in the loop</h2>
+  <p>Get updates on new features and releases.</p>
+  <form data-email-form>
+    <input type="email" placeholder="Enter your email" required />
+    <button type="submit" data-button="primary">Subscribe</button>
+  </form>
+  <small>No spam, unsubscribe anytime.</small>
+</section>
+```
+
+### Minimal CTA
+
+```html
+<section data-section="cta" data-variant="minimal">
+  <p>Questions? <a href="/contact">Contact us</a></p>
+</section>
+```

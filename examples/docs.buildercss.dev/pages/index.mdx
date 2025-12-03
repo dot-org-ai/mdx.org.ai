@@ -1,0 +1,180 @@
+---
+$type: DocsPage
+title: Pages
+description: Site content page templates
+---
+
+# Pages
+
+Pages are content templates for websites. They combine layouts with sections to create complete page experiences.
+
+## Available Pages
+
+<CardGrid columns={3}>
+  <Card href="/pages/home" title="Home">
+    Landing page with hero, features, testimonials.
+  </Card>
+  <Card href="/pages/about" title="About">
+    Company information and team.
+  </Card>
+  <Card href="/pages/pricing" title="Pricing">
+    Pricing tiers and comparison.
+  </Card>
+  <Card href="/pages/product" title="Product">
+    Product detail with features.
+  </Card>
+  <Card href="/pages/blog" title="Blog">
+    Blog listing with posts grid.
+  </Card>
+  <Card href="/pages/article" title="Article">
+    Individual blog post/article.
+  </Card>
+  <Card href="/pages/docs" title="Docs">
+    Documentation page template.
+  </Card>
+  <Card href="/pages/contact" title="Contact">
+    Contact form and information.
+  </Card>
+  <Card href="/pages/careers" title="Careers">
+    Job listings page.
+  </Card>
+  <Card href="/pages/changelog" title="Changelog">
+    Version history and updates.
+  </Card>
+  <Card href="/pages/privacy" title="PrivacyPolicy">
+    Legal privacy policy.
+  </Card>
+  <Card href="/pages/terms" title="Terms">
+    Terms of service.
+  </Card>
+  <Card href="/pages/404" title="NotFound">
+    404 error page.
+  </Card>
+  <Card href="/pages/error" title="Error">
+    500 error page.
+  </Card>
+  <Card href="/pages/waitlist" title="Waitlist">
+    Pre-launch signup page.
+  </Card>
+</CardGrid>
+
+## Page Structure
+
+Pages follow a consistent structure:
+
+```html
+<body data-layout="stacked" data-page="home">
+  <header>
+    <nav><!-- Navigation --></nav>
+  </header>
+
+  <main>
+    <!-- Page-specific sections -->
+    <section data-section="hero">...</section>
+    <section data-section="features">...</section>
+    <section data-section="testimonials">...</section>
+    <section data-section="cta">...</section>
+  </main>
+
+  <footer>
+    <!-- Footer content -->
+  </footer>
+</body>
+```
+
+## Page vs Section
+
+Some concepts work as both a page AND a section:
+
+| Concept | As Page | As Section |
+|---------|---------|------------|
+| Blog | `/blog` - listing all posts | Blog preview on homepage |
+| Pricing | `/pricing` - full pricing page | Pricing table in landing page |
+| FAQ | `/faq` - dedicated FAQ page | FAQ accordion in any page |
+| Team | `/team` - full team page | Team grid on about page |
+
+This duality lets you reuse content across your site.
+
+## Example: Home Page
+
+```html
+<body data-layout="stacked" data-page="home">
+  <header>
+    <nav>
+      <a href="/" data-logo>Brand</a>
+      <ul>
+        <li><a href="/features">Features</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+        <li><a href="/docs">Docs</a></li>
+      </ul>
+      <div data-actions>
+        <a href="/login" data-button="ghost">Log in</a>
+        <a href="/signup" data-button="primary">Get Started</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section data-section="hero">
+      <span data-badge>New in v2.0</span>
+      <h1>Build something great</h1>
+      <p>The modern way to build websites and apps.</p>
+      <div data-actions>
+        <a href="/signup" data-button="primary" data-size="lg">Start Free</a>
+        <a href="/demo" data-button="outline" data-size="lg">Watch Demo</a>
+      </div>
+    </section>
+
+    <section data-section="logos">
+      <p>Trusted by teams at</p>
+      <div data-logo-grid>
+        <img src="/logos/company1.svg" alt="Company 1">
+        <img src="/logos/company2.svg" alt="Company 2">
+        <!-- More logos -->
+      </div>
+    </section>
+
+    <section data-section="features">
+      <header>
+        <h2>Everything you need</h2>
+        <p>Powerful features to help you ship faster.</p>
+      </header>
+      <div data-grid="3">
+        <article data-card>
+          <span data-icon><!-- Icon --></span>
+          <h3>Feature One</h3>
+          <p>Description of this amazing feature.</p>
+        </article>
+        <!-- More features -->
+      </div>
+    </section>
+
+    <section data-section="cta">
+      <h2>Ready to get started?</h2>
+      <p>Join thousands of happy customers.</p>
+      <a href="/signup" data-button="primary" data-size="lg">Start Free Trial</a>
+    </section>
+  </main>
+
+  <footer>
+    <div data-grid="4">
+      <div>
+        <a href="/" data-logo>Brand</a>
+        <p>Building the future of web development.</p>
+      </div>
+      <nav>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/changelog">Changelog</a></li>
+        </ul>
+      </nav>
+      <!-- More footer columns -->
+    </div>
+    <div data-footer-bottom>
+      <p>&copy; 2024 Brand. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+```

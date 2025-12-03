@@ -1,0 +1,218 @@
+---
+$type: DocsPage
+title: Popup
+description: Small floating widget (Intercom-style)
+screenshot: /screenshots/containers/popup.png
+---
+
+# Popup
+
+A small floating widget in the corner, commonly used for chat interfaces.
+
+<Preview>
+  <div style={{ position: 'relative', height: '450px', background: 'var(--muted)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+    <button style={{ position: 'absolute', bottom: 'var(--spacing-4)', right: 'var(--spacing-4)', width: '56px', height: '56px', borderRadius: '50%', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', cursor: 'pointer', fontSize: 'var(--text-xl)', zIndex: 10 }}>💬</button>
+    <article style={{ position: 'absolute', bottom: 'calc(var(--spacing-4) + 70px)', right: 'var(--spacing-4)', width: '350px', background: 'var(--background)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.15)' }}>
+      <header style={{ padding: 'var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)' }}>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600 }}>Chat with us</h2>
+        <p style={{ fontSize: 'var(--text-sm)', opacity: 0.9 }}>We typically reply within minutes</p>
+      </header>
+      <section style={{ height: '200px', padding: 'var(--spacing-4)', overflow: 'auto', background: 'var(--muted)' }}>
+        <div style={{ background: 'var(--background)', padding: 'var(--spacing-3)', borderRadius: 'var(--radius)', marginBottom: 'var(--spacing-2)', maxWidth: '80%' }}>
+          <p style={{ fontSize: 'var(--text-sm)' }}>Hi! How can we help you today?</p>
+        </div>
+      </section>
+      <footer style={{ padding: 'var(--spacing-3)', borderTop: '1px solid var(--border)', display: 'flex', gap: 'var(--spacing-2)' }}>
+        <input type="text" placeholder="Type a message..." style={{ flex: 1, padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }} />
+        <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Send</button>
+      </footer>
+    </article>
+  </div>
+</Preview>
+
+## When to Use
+
+- Live chat widgets
+- Help/support bubbles
+- Quick feedback forms
+- Notification centers
+
+## Structure
+
+```html
+<!-- Trigger button -->
+<button data-popup-trigger aria-label="Open chat">
+  <svg><!-- Chat icon --></svg>
+</button>
+
+<!-- Popup -->
+<aside data-popup aria-hidden="true">
+  <article>
+    <header>
+      <h2>Chat with us</h2>
+      <button data-action="close">&times;</button>
+    </header>
+    <section data-messages>
+      <!-- Chat messages -->
+    </section>
+    <footer>
+      <input type="text" placeholder="Type a message..." />
+      <button data-button="primary">Send</button>
+    </footer>
+  </article>
+</aside>
+```
+
+## CSS
+
+```css
+[data-popup-trigger] {
+  position: fixed;
+  bottom: var(--spacing-4);
+  right: var(--spacing-4);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  cursor: pointer;
+  z-index: 90;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s;
+}
+
+[data-popup-trigger]:hover {
+  transform: scale(1.05);
+}
+
+[data-popup] {
+  position: fixed;
+  bottom: calc(var(--spacing-4) + 70px);
+  right: var(--spacing-4);
+  width: 380px;
+  max-height: 600px;
+  z-index: 95;
+  animation: popupIn 0.3s ease;
+}
+
+[data-popup] > article {
+  background: var(--background);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+}
+
+[data-popup] header {
+  padding: var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[data-popup] [data-messages] {
+  flex: 1;
+  padding: var(--spacing-4);
+  overflow-y: auto;
+  background: var(--muted);
+}
+
+[data-popup] footer {
+  padding: var(--spacing-3);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-popup][aria-hidden="true"] {
+  display: none;
+}
+
+@keyframes popupIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  [data-popup] {
+    left: var(--spacing-4);
+    right: var(--spacing-4);
+    width: auto;
+    bottom: calc(var(--spacing-4) + 70px);
+  }
+}
+```
+
+## JavaScript
+
+```js
+const trigger = document.querySelector('[data-popup-trigger]')
+const popup = document.querySelector('[data-popup]')
+
+trigger.addEventListener('click', () => {
+  const isHidden = popup.getAttribute('aria-hidden') === 'true'
+  popup.setAttribute('aria-hidden', !isHidden)
+
+  // Animate trigger icon
+  trigger.classList.toggle('active')
+})
+
+// Close button
+popup.querySelector('[data-action="close"]').addEventListener('click', () => {
+  popup.setAttribute('aria-hidden', 'true')
+  trigger.classList.remove('active')
+})
+```
+
+## Variations
+
+### Notification Popup
+
+```html
+<aside data-popup data-variant="notifications">
+  <article>
+    <header>
+      <h2>Notifications</h2>
+      <button data-action="mark-read">Mark all read</button>
+    </header>
+    <ul data-notification-list>
+      <li data-notification data-unread>
+        <img src="/avatar.jpg" alt="" />
+        <div>
+          <p><strong>John</strong> commented on your post</p>
+          <time>2 minutes ago</time>
+        </div>
+      </li>
+    </ul>
+  </article>
+</aside>
+```
+
+### Help Widget
+
+```html
+<aside data-popup data-variant="help">
+  <article>
+    <header>
+      <h2>Help Center</h2>
+    </header>
+    <section>
+      <input type="search" placeholder="Search help articles..." />
+      <nav>
+        <a href="/help/getting-started">Getting Started</a>
+        <a href="/help/faq">FAQ</a>
+        <a href="/help/contact">Contact Support</a>
+      </nav>
+    </section>
+  </article>
+</aside>
+```

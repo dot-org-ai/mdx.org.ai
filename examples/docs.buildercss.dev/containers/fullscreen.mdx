@@ -1,0 +1,212 @@
+---
+$type: DocsPage
+title: Fullscreen Container
+description: Edge-to-edge immersive experience
+screenshot: /screenshots/containers/fullscreen.png
+---
+
+# Fullscreen Container
+
+An edge-to-edge container that takes over the entire viewport for immersive experiences.
+
+<Preview>
+  <div data-container="fullscreen" style={{ position: 'relative', height: '400px', background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ position: 'absolute', top: 'var(--spacing-4)', right: 'var(--spacing-4)', display: 'flex', gap: 'var(--spacing-2)' }}>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 'var(--radius)', color: 'white', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>⚙️ Settings</button>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-3)', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 'var(--radius)', color: 'white', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>✕ Exit</button>
+    </div>
+    <div style={{ textAlign: 'center', color: 'white' }}>
+      <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', margin: '0 auto var(--spacing-6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-4xl)' }}>▶</div>
+      <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 600, marginBottom: 'var(--spacing-2)' }}>Now Playing</h2>
+      <p style={{ opacity: 0.7 }}>Beautiful Sunset - Nature Sounds</p>
+    </div>
+    <div style={{ position: 'absolute', bottom: 'var(--spacing-6)', left: 'var(--spacing-6)', right: 'var(--spacing-6)' }}>
+      <div style={{ height: '4px', background: 'rgba(255,255,255,0.2)', borderRadius: '2px', marginBottom: 'var(--spacing-4)' }}>
+        <div style={{ width: '35%', height: '100%', background: 'white', borderRadius: '2px' }}></div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-4)' }}>
+        <button style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', cursor: 'pointer' }}>⏮</button>
+        <button style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'white', border: 'none', color: 'black', cursor: 'pointer' }}>⏸</button>
+        <button style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', cursor: 'pointer' }}>⏭</button>
+      </div>
+    </div>
+  </div>
+</Preview>
+
+## When to Use
+
+- Video players
+- Photo galleries
+- Media presentations
+- Immersive reading
+- Games
+- Interactive demos
+
+## Structure
+
+```html
+<aside data-container="fullscreen" aria-hidden="true">
+  <main>
+    <video src="/media/video.mp4" autoplay controls></video>
+  </main>
+
+  <nav data-controls aria-label="Media controls">
+    <button data-action="previous">Previous</button>
+    <button data-action="play-pause">Play/Pause</button>
+    <button data-action="next">Next</button>
+  </nav>
+
+  <aside data-overlay>
+    <button data-action="settings">Settings</button>
+    <button data-action="exit">Exit Fullscreen</button>
+  </aside>
+</aside>
+```
+
+## CSS
+
+```css
+[data-container="fullscreen"] {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-container="fullscreen"] > main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-container="fullscreen"] video,
+[data-container="fullscreen"] img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+[data-container="fullscreen"] [data-controls] {
+  position: absolute;
+  bottom: var(--spacing-8);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-full);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+[data-container="fullscreen"]:hover [data-controls] {
+  opacity: 1;
+}
+
+[data-container="fullscreen"] [data-overlay] {
+  position: absolute;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
+  display: flex;
+  gap: var(--spacing-2);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+[data-container="fullscreen"]:hover [data-overlay] {
+  opacity: 1;
+}
+
+[data-container="fullscreen"] [data-overlay] button {
+  padding: var(--spacing-2) var(--spacing-3);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+[data-container="fullscreen"][aria-hidden="true"] {
+  display: none;
+}
+```
+
+## JavaScript
+
+```js
+const fullscreen = document.querySelector('[data-container="fullscreen"]')
+
+// Enter fullscreen
+function enterFullscreen(element) {
+  if (element.requestFullscreen) {
+    element.requestFullscreen()
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen()
+  }
+}
+
+// Exit fullscreen
+function exitFullscreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen()
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen()
+  }
+}
+
+// Exit on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    fullscreen.setAttribute('aria-hidden', 'true')
+  }
+})
+
+// Auto-hide controls
+let hideTimeout
+fullscreen.addEventListener('mousemove', () => {
+  fullscreen.classList.add('show-controls')
+  clearTimeout(hideTimeout)
+  hideTimeout = setTimeout(() => {
+    fullscreen.classList.remove('show-controls')
+  }, 3000)
+})
+```
+
+## Variations
+
+### Photo Gallery
+
+```html
+<aside data-container="fullscreen" data-variant="gallery">
+  <main>
+    <img src="/photo.jpg" alt="Photo" />
+  </main>
+  <nav data-thumbnails>
+    <button data-thumbnail><img src="/thumb1.jpg" alt="" /></button>
+    <button data-thumbnail><img src="/thumb2.jpg" alt="" /></button>
+  </nav>
+</aside>
+```
+
+### Presentation Mode
+
+```html
+<aside data-container="fullscreen" data-variant="presentation">
+  <main>
+    <article data-slide="1">
+      <h1>Slide Title</h1>
+      <p>Slide content...</p>
+    </article>
+  </main>
+  <nav data-slide-nav>
+    <span>Slide 1 of 10</span>
+  </nav>
+</aside>
+```

@@ -1,0 +1,18 @@
+{
+  "name": "docs.buildercss.dev",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "mdxe dev",
+    "build": "mdxe build",
+    "deploy": "mdxe deploy",
+    "test": "vitest run",
+    "test:screenshots": "vitest run --config vitest.screenshots.config.ts",
+    "screenshots": "npm run test:screenshots -- --update"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "vitest": "^2.1.8"
+  }
+}

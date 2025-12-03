@@ -1,0 +1,212 @@
+---
+$type: DocsPage
+title: Core Concepts
+description: Understand the philosophy behind BuilderCSS
+---
+
+# Core Concepts
+
+BuilderCSS is built on a few key principles that make it different from other CSS frameworks.
+
+## Semantic First
+
+Unlike utility-first frameworks, BuilderCSS uses semantic HTML elements and meaningful data attributes:
+
+```html
+<!-- Utility-first (not BuilderCSS) -->
+<div class="flex items-center justify-between p-4 bg-white shadow-md rounded-lg">
+  <h2 class="text-lg font-semibold">Title</h2>
+</div>
+
+<!-- BuilderCSS -->
+<article data-card>
+  <h2>Title</h2>
+</article>
+```
+
+The semantic approach means:
+- **Readable HTML** - Code is self-documenting
+- **Accessible by default** - Proper elements = proper semantics
+- **AI-friendly** - LLMs can understand and generate valid markup
+- **Portable** - Same patterns work across platforms
+
+## Component Hierarchy
+
+BuilderCSS organizes components into 5 levels:
+
+```
+Layout (page structure)
+  └── Page / View (content type)
+        └── Section (content blocks)
+              └── Container (presentation mode)
+                    └── Elements (atoms)
+```
+
+### Layouts
+
+Page-level structural patterns that define the overall grid:
+
+- **StackedLayout** - Vertical header/main/footer
+- **SidebarLayout** - Two-column with navigation
+- **DocsLayout** - Three-column documentation
+- **DashboardLayout** - App shell with sidebar
+
+### Pages & Views
+
+Content type definitions:
+
+- **Pages** are for websites (Home, About, Pricing)
+- **Views** are for apps (Dashboard, List, Form)
+
+### Sections
+
+Reusable content blocks that compose into pages:
+
+- Hero, Features, Testimonials, FAQ, CTA
+
+### Containers
+
+Presentation modes that wrap content:
+
+- Modal, Slideover, Popup, Drawer, Fullscreen
+
+## Data Attributes
+
+Components are styled using data attributes:
+
+```css
+/* Layout selection */
+[data-layout="stacked"] { ... }
+[data-layout="sidebar"] { ... }
+
+/* Section types */
+[data-section="hero"] { ... }
+[data-section="features"] { ... }
+
+/* Variants */
+[data-button="primary"] { ... }
+[data-button="outline"] { ... }
+
+/* States */
+[data-state="active"] { ... }
+[data-state="loading"] { ... }
+```
+
+## Design Tokens
+
+All visual properties use CSS custom properties:
+
+```css
+:root {
+  /* Colors (HSL values) */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --border: 214.3 31.8% 91.4%;
+
+  /* Spacing (rem-based scale) */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-4: 1rem;
+  --spacing-8: 2rem;
+  --spacing-16: 4rem;
+
+  /* Typography */
+  --font-sans: system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+
+  /* Radii */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 1rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+}
+```
+
+## Cross-Platform
+
+Every BuilderCSS component has both web and mobile implementations:
+
+### Web (Pure CSS)
+
+```html
+<button data-button="primary">Click me</button>
+```
+
+```css
+[data-button="primary"] {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-2) var(--spacing-4);
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: var(--radius-md);
+}
+```
+
+### Mobile (React Native)
+
+```tsx
+<Pressable style={styles.buttonPrimary}>
+  <Text style={styles.buttonText}>Click me</Text>
+</Pressable>
+
+const styles = StyleSheet.create({
+  buttonPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: colors.primary,
+    borderRadius: 6,
+  },
+  buttonText: {
+    color: colors.primaryForeground,
+  },
+});
+```
+
+## Composability
+
+Components are designed to compose naturally:
+
+```html
+<body data-layout="stacked">
+  <main>
+    <section data-section="hero">
+      <h1>Welcome</h1>
+      <button data-button="primary" data-modal-trigger="demo">
+        Watch Demo
+      </button>
+    </section>
+  </main>
+</body>
+
+<!-- Modal container -->
+<aside data-modal id="demo">
+  <article>
+    <header>
+      <h2>Demo Video</h2>
+      <button data-action="close">&times;</button>
+    </header>
+    <section>
+      <video src="demo.mp4" controls></video>
+    </section>
+  </article>
+</aside>
+```
+
+The same Chat view can appear in different containers:
+
+- Full screen: `<main data-view="chat">...</main>`
+- Slideover: `<aside data-slideover><article data-view="chat">...</article></aside>`
+- Popup: `<aside data-popup><article data-view="chat">...</article></aside>`

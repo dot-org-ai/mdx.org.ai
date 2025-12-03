@@ -1,0 +1,277 @@
+---
+$type: DocsPage
+title: Containers
+description: Presentation modes for content
+---
+
+# Containers
+
+Containers control how content is presented to users. They handle visibility, animation, and user interaction patterns.
+
+## Available Containers
+
+<CardGrid columns={3}>
+  <Card href="/containers/modal" title="Modal">
+    Centered dialog overlay for focused interactions.
+  </Card>
+  <Card href="/containers/slideover" title="Slideover">
+    Side panel that slides in from the edge.
+  </Card>
+  <Card href="/containers/popup" title="Popup">
+    Small floating widget (Intercom-style).
+  </Card>
+  <Card href="/containers/drawer" title="Drawer">
+    Bottom sheet that slides up (mobile pattern).
+  </Card>
+  <Card href="/containers/fullscreen" title="Fullscreen">
+    Edge-to-edge immersive experience.
+  </Card>
+  <Card href="/containers/inline" title="Inline">
+    Embedded within page content flow.
+  </Card>
+</CardGrid>
+
+## Container Patterns
+
+Containers share common interaction patterns:
+
+| Container | Trigger | Dismiss | Position |
+|-----------|---------|---------|----------|
+| Modal | Click/action | Click outside, Escape | Center |
+| Slideover | Click/action | Click outside, Escape | Left/Right edge |
+| Popup | Toggle button | Toggle button | Corner |
+| Drawer | Click/action | Swipe down, backdrop | Bottom |
+| Fullscreen | Click/action | Close button, Escape | Full viewport |
+| Inline | Always visible | N/A | In content flow |
+
+## Example: Modal
+
+```html
+<!-- Trigger -->
+<button data-modal-trigger="confirm-delete">Delete</button>
+
+<!-- Modal -->
+<aside data-modal id="confirm-delete" aria-hidden="true">
+  <article>
+    <header>
+      <h2>Delete Item?</h2>
+      <button data-action="close" aria-label="Close">&times;</button>
+    </header>
+    <section>
+      <p>This action cannot be undone. Are you sure?</p>
+    </section>
+    <footer>
+      <button data-button="ghost" data-action="close">Cancel</button>
+      <button data-button="destructive">Delete</button>
+    </footer>
+  </article>
+</aside>
+```
+
+```css
+[data-modal] {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-modal]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+[data-modal] > article {
+  position: relative;
+  background: var(--background);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  margin: var(--spacing-4);
+}
+
+[data-modal][aria-hidden="true"] {
+  display: none;
+}
+```
+
+## Example: Slideover
+
+```html
+<!-- Trigger -->
+<button data-slideover-trigger="settings">Settings</button>
+
+<!-- Slideover -->
+<aside data-slideover data-side="right" id="settings" aria-hidden="true">
+  <article>
+    <header>
+      <h2>Settings</h2>
+      <button data-action="close">&times;</button>
+    </header>
+    <section>
+      <!-- Settings form -->
+    </section>
+    <footer>
+      <button data-button="ghost">Cancel</button>
+      <button data-button="primary">Save Changes</button>
+    </footer>
+  </article>
+</aside>
+```
+
+```css
+[data-slideover] {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+}
+
+[data-slideover][data-side="right"] {
+  justify-content: flex-end;
+}
+
+[data-slideover] > article {
+  position: relative;
+  background: var(--background);
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+```
+
+## Example: Popup Widget
+
+```html
+<!-- Trigger button -->
+<button data-popup-trigger aria-label="Open chat">
+  <svg><!-- Chat icon --></svg>
+</button>
+
+<!-- Popup -->
+<aside data-popup aria-hidden="true">
+  <article>
+    <header>
+      <h2>Chat with us</h2>
+      <button data-action="close">&times;</button>
+    </header>
+    <section data-messages>
+      <!-- Chat messages -->
+    </section>
+    <footer>
+      <input type="text" placeholder="Type a message...">
+      <button data-button="primary">Send</button>
+    </footer>
+  </article>
+</aside>
+```
+
+```css
+[data-popup-trigger] {
+  position: fixed;
+  bottom: var(--spacing-4);
+  right: var(--spacing-4);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  z-index: 90;
+}
+
+[data-popup] {
+  position: fixed;
+  bottom: calc(var(--spacing-4) + 70px);
+  right: var(--spacing-4);
+  width: 380px;
+  max-height: 600px;
+  z-index: 95;
+}
+```
+
+## Example: Drawer (Mobile)
+
+```html
+<aside data-drawer aria-modal="true" aria-hidden="true">
+  <article>
+    <header>
+      <span data-handle></span>
+      <h2>Filter Results</h2>
+    </header>
+    <section>
+      <!-- Filter options -->
+    </section>
+  </article>
+</aside>
+```
+
+```css
+[data-drawer] {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+[data-drawer] > article {
+  background: var(--background);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  max-height: 90vh;
+  animation: slideUp 0.3s ease;
+}
+
+[data-drawer] [data-handle] {
+  display: block;
+  width: 40px;
+  height: 4px;
+  background: var(--muted);
+  border-radius: 2px;
+  margin: var(--spacing-2) auto;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+```
+
+## Views in Containers
+
+Any view can be placed inside a container:
+
+```html
+<!-- Chat view in a popup -->
+<aside data-popup>
+  <article data-view="chat">
+    <!-- Chat view content -->
+  </article>
+</aside>
+
+<!-- Form view in a slideover -->
+<aside data-slideover data-side="right">
+  <article data-view="form">
+    <!-- Form view content -->
+  </article>
+</aside>
+
+<!-- Detail view in a modal -->
+<aside data-modal>
+  <article data-view="detail">
+    <!-- Detail view content -->
+  </article>
+</aside>
+```
+
+This composability means you write the view once and can present it in any context.

@@ -1,0 +1,239 @@
+---
+$type: DocsPage
+title: Sections
+description: Reusable content blocks
+---
+
+# Sections
+
+Sections are reusable content blocks that compose together to build pages. They're the building blocks of marketing sites and landing pages.
+
+## Available Sections
+
+<CardGrid columns={3}>
+  <Card href="/sections/hero" title="Hero">
+    Primary headline with call-to-action.
+  </Card>
+  <Card href="/sections/features" title="Features">
+    Feature grid showcasing capabilities.
+  </Card>
+  <Card href="/sections/testimonials" title="Testimonials">
+    Customer quotes and social proof.
+  </Card>
+  <Card href="/sections/logos" title="Logos">
+    Logo cloud of trusted companies.
+  </Card>
+  <Card href="/sections/faq" title="FAQ">
+    Frequently asked questions accordion.
+  </Card>
+  <Card href="/sections/cta" title="CTA">
+    Call-to-action to drive conversions.
+  </Card>
+  <Card href="/sections/stats" title="Stats">
+    Key metrics and numbers.
+  </Card>
+  <Card href="/sections/team" title="Team">
+    Team member profiles.
+  </Card>
+  <Card href="/sections/newsletter" title="Newsletter">
+    Email signup form.
+  </Card>
+</CardGrid>
+
+## Section Structure
+
+All sections follow a consistent pattern:
+
+```html
+<section data-section="[type]">
+  <header>
+    <span data-badge>Optional eyebrow</span>
+    <h2>Section Heading</h2>
+    <p>Section description text.</p>
+  </header>
+
+  <div data-content>
+    <!-- Section-specific content -->
+  </div>
+
+  <footer>
+    <!-- Optional actions -->
+  </footer>
+</section>
+```
+
+## Example: Hero Section
+
+```html
+<section data-section="hero">
+  <span data-badge>Announcing v2.0</span>
+  <h1>Build faster, ship sooner</h1>
+  <p>
+    The modern toolkit for building beautiful,
+    accessible web applications.
+  </p>
+  <div data-actions>
+    <a href="/signup" data-button="primary" data-size="lg">
+      Get Started Free
+    </a>
+    <a href="/demo" data-button="outline" data-size="lg">
+      Watch Demo
+    </a>
+  </div>
+  <div data-social-proof>
+    <div data-avatars>
+      <img src="/avatar1.jpg" alt="">
+      <img src="/avatar2.jpg" alt="">
+      <img src="/avatar3.jpg" alt="">
+    </div>
+    <span>Join 10,000+ developers</span>
+  </div>
+</section>
+```
+
+## Example: Features Section
+
+```html
+<section data-section="features">
+  <header>
+    <span data-badge>Features</span>
+    <h2>Everything you need to build</h2>
+    <p>Powerful features to help you ship faster.</p>
+  </header>
+
+  <div data-grid="3">
+    <article data-feature>
+      <div data-icon>
+        <svg><!-- Icon --></svg>
+      </div>
+      <h3>Lightning Fast</h3>
+      <p>Optimized for performance with zero runtime overhead.</p>
+    </article>
+
+    <article data-feature>
+      <div data-icon>
+        <svg><!-- Icon --></svg>
+      </div>
+      <h3>Fully Accessible</h3>
+      <p>Built with accessibility in mind from day one.</p>
+    </article>
+
+    <article data-feature>
+      <div data-icon>
+        <svg><!-- Icon --></svg>
+      </div>
+      <h3>Type Safe</h3>
+      <p>Full TypeScript support with auto-completion.</p>
+    </article>
+  </div>
+</section>
+```
+
+## Example: Testimonials Section
+
+```html
+<section data-section="testimonials">
+  <header>
+    <h2>Loved by developers</h2>
+    <p>See what our customers have to say.</p>
+  </header>
+
+  <div data-testimonials-grid>
+    <blockquote data-testimonial>
+      <p>
+        "BuilderCSS transformed how we build UIs.
+        The semantic approach just makes sense."
+      </p>
+      <footer>
+        <img src="/avatar.jpg" alt="">
+        <div>
+          <cite>Jane Doe</cite>
+          <span>CTO at Acme Inc</span>
+        </div>
+      </footer>
+    </blockquote>
+
+    <blockquote data-testimonial>
+      <p>
+        "Finally, a CSS framework that works with
+        how we think about design."
+      </p>
+      <footer>
+        <img src="/avatar2.jpg" alt="">
+        <div>
+          <cite>John Smith</cite>
+          <span>Lead Developer at StartupCo</span>
+        </div>
+      </footer>
+    </blockquote>
+  </div>
+</section>
+```
+
+## Example: FAQ Section
+
+```html
+<section data-section="faq">
+  <header>
+    <h2>Frequently Asked Questions</h2>
+    <p>Everything you need to know.</p>
+  </header>
+
+  <dl data-accordion>
+    <div data-accordion-item>
+      <dt>
+        <button aria-expanded="false">
+          How is BuilderCSS different from Tailwind?
+        </button>
+      </dt>
+      <dd>
+        BuilderCSS uses semantic HTML and data attributes
+        instead of utility classes, making code more readable
+        and accessible.
+      </dd>
+    </div>
+
+    <div data-accordion-item>
+      <dt>
+        <button aria-expanded="false">
+          Does it work with React Native?
+        </button>
+      </dt>
+      <dd>
+        Yes! Every component has a React Native implementation
+        using StyleSheet for consistent cross-platform design.
+      </dd>
+    </div>
+
+    <div data-accordion-item>
+      <dt>
+        <button aria-expanded="false">
+          Is it production ready?
+        </button>
+      </dt>
+      <dd>
+        Absolutely. BuilderCSS is used in production by
+        thousands of websites and applications.
+      </dd>
+    </div>
+  </dl>
+</section>
+```
+
+## Composing Sections
+
+Pages are built by stacking sections:
+
+```html
+<main>
+  <section data-section="hero">...</section>
+  <section data-section="logos">...</section>
+  <section data-section="features">...</section>
+  <section data-section="testimonials">...</section>
+  <section data-section="stats">...</section>
+  <section data-section="faq">...</section>
+  <section data-section="cta">...</section>
+</main>
+```
+
+The order and combination of sections creates different page experiences.

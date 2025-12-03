@@ -1,0 +1,149 @@
+---
+$type: DocsPage
+title: API Keys View
+description: API key management
+screenshot: /screenshots/views/api-keys.png
+---
+
+# API Keys View
+
+A view for managing API keys and access tokens.
+
+<Preview>
+  <article data-view="api-keys" style={{ padding: 'var(--spacing-6)' }}>
+    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
+      <div>
+        <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>API Keys</h1>
+        <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Manage your API keys for programmatic access</p>
+      </div>
+      <button style={{ padding: 'var(--spacing-2) var(--spacing-4)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)' }}>Create Key</button>
+    </header>
+
+    <div style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius-lg)', marginBottom: 'var(--spacing-4)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-3)' }}>
+      <span style={{ fontSize: 'var(--text-xl)' }}>⚠️</span>
+      <p style={{ fontSize: 'var(--text-sm)' }}>Keep your API keys secure. Never share them in public repositories or client-side code.</p>
+    </div>
+
+    <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+      <div style={{ padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-2)' }}>
+          <div>
+            <h3 style={{ fontWeight: 600 }}>Production Key</h3>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Created Dec 1, 2024</p>
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Regenerate</button>
+            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--destructive)', color: 'var(--destructive-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Revoke</button>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>
+          <code style={{ flex: 1, padding: 'var(--spacing-2)', background: 'var(--muted)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-sm)' }}>sk_live_••••••••••••••••••••••••abcd</code>
+          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>📋</button>
+        </div>
+      </div>
+      <div style={{ padding: 'var(--spacing-4)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-2)' }}>
+          <div>
+            <h3 style={{ fontWeight: 600 }}>Test Key</h3>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Created Nov 15, 2024</p>
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Regenerate</button>
+            <button style={{ padding: 'var(--spacing-1) var(--spacing-3)', background: 'var(--destructive)', color: 'var(--destructive-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)' }}>Revoke</button>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-2)' }}>
+          <code style={{ flex: 1, padding: 'var(--spacing-2)', background: 'var(--muted)', borderRadius: 'var(--radius)', fontFamily: 'monospace', fontSize: 'var(--text-sm)' }}>sk_test_••••••••••••••••••••••••efgh</code>
+          <button style={{ padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>📋</button>
+        </div>
+      </div>
+    </div>
+  </article>
+</Preview>
+
+## Structure
+
+```html
+<article data-view="api-keys">
+  <header>
+    <div>
+      <h1>API Keys</h1>
+      <p>Manage your API keys for programmatic access</p>
+    </div>
+    <button data-button="primary">Create Key</button>
+  </header>
+
+  <aside data-warning>
+    <span data-icon>⚠️</span>
+    <p>Keep your API keys secure. Never share them publicly.</p>
+  </aside>
+
+  <section data-content>
+    <ul data-api-keys-list>
+      <li data-api-key>
+        <div data-key-info>
+          <h3>Production Key</h3>
+          <time>Created Dec 1, 2024</time>
+        </div>
+        <div data-key-actions>
+          <button>Regenerate</button>
+          <button data-button="destructive">Revoke</button>
+        </div>
+        <div data-key-value>
+          <code>sk_live_••••••••abcd</code>
+          <button data-action="copy">Copy</button>
+        </div>
+      </li>
+    </ul>
+  </section>
+</article>
+```
+
+## CSS
+
+```css
+[data-view="api-keys"] {
+  padding: var(--spacing-6);
+}
+
+[data-view="api-keys"] [data-warning] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: var(--muted);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-4);
+}
+
+[data-view="api-keys"] [data-api-keys-list] {
+  list-style: none;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+[data-view="api-keys"] [data-api-key] {
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-view="api-keys"] [data-api-key]:last-child {
+  border-bottom: none;
+}
+
+[data-view="api-keys"] [data-key-value] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-2);
+}
+
+[data-view="api-keys"] [data-key-value] code {
+  flex: 1;
+  padding: var(--spacing-2);
+  background: var(--muted);
+  border-radius: var(--radius);
+  font-family: monospace;
+}
+```

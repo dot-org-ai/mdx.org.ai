@@ -1,0 +1,181 @@
+---
+$type: DocsPage
+title: FAQ Section
+description: Frequently asked questions accordion
+screenshot: /screenshots/sections/faq.png
+---
+
+# FAQ Section
+
+An accordion of frequently asked questions.
+
+<Preview>
+  <section data-section="faq" style={{ padding: 'var(--spacing-16) var(--spacing-4)', maxWidth: '800px', margin: '0 auto' }}>
+    <header style={{ textAlign: 'center', marginBottom: 'var(--spacing-12)' }}>
+      <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-4)' }}>Frequently Asked Questions</h2>
+      <p style={{ color: 'var(--muted-foreground)' }}>Everything you need to know.</p>
+    </header>
+    <dl style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-4)' }}>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <dt>
+          <button style={{ width: '100%', padding: 'var(--spacing-4)', background: 'transparent', border: 'none', textAlign: 'left', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            How is BuilderCSS different from Tailwind?
+            <span>+</span>
+          </button>
+        </dt>
+        <dd style={{ padding: '0 var(--spacing-4) var(--spacing-4)', color: 'var(--muted-foreground)' }}>
+          BuilderCSS uses semantic HTML and data attributes instead of utility classes, making code more readable and accessible.
+        </dd>
+      </div>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <dt>
+          <button style={{ width: '100%', padding: 'var(--spacing-4)', background: 'transparent', border: 'none', textAlign: 'left', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Does it work with React Native?
+            <span>+</span>
+          </button>
+        </dt>
+        <dd style={{ padding: '0 var(--spacing-4) var(--spacing-4)', color: 'var(--muted-foreground)' }}>
+          Yes! Every component has a React Native implementation using StyleSheet for consistent cross-platform design.
+        </dd>
+      </div>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <dt>
+          <button style={{ width: '100%', padding: 'var(--spacing-4)', background: 'transparent', border: 'none', textAlign: 'left', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Is it production ready?
+            <span>+</span>
+          </button>
+        </dt>
+        <dd style={{ padding: '0 var(--spacing-4) var(--spacing-4)', color: 'var(--muted-foreground)' }}>
+          Absolutely. BuilderCSS is used in production by thousands of websites and applications.
+        </dd>
+      </div>
+    </dl>
+  </section>
+</Preview>
+
+## When to Use
+
+- FAQ pages
+- Product questions
+- Support pages
+- Documentation
+
+## Structure
+
+```html
+<section data-section="faq">
+  <header>
+    <h2>Frequently Asked Questions</h2>
+    <p>Everything you need to know.</p>
+  </header>
+
+  <dl data-accordion>
+    <div data-accordion-item>
+      <dt>
+        <button aria-expanded="false">
+          How is BuilderCSS different from Tailwind?
+        </button>
+      </dt>
+      <dd>
+        BuilderCSS uses semantic HTML and data attributes
+        instead of utility classes, making code more readable
+        and accessible.
+      </dd>
+    </div>
+
+    <div data-accordion-item>
+      <dt>
+        <button aria-expanded="false">
+          Does it work with React Native?
+        </button>
+      </dt>
+      <dd>
+        Yes! Every component has a React Native implementation
+        using StyleSheet for consistent cross-platform design.
+      </dd>
+    </div>
+
+    <div data-accordion-item>
+      <dt>
+        <button aria-expanded="true">
+          Is it production ready?
+        </button>
+      </dt>
+      <dd>
+        Absolutely. BuilderCSS is used in production by
+        thousands of websites and applications.
+      </dd>
+    </div>
+  </dl>
+</section>
+```
+
+## CSS
+
+```css
+[data-section="faq"] {
+  padding: var(--spacing-16) var(--spacing-4);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+[data-section="faq"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+[data-section="faq"] [data-accordion] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+[data-section="faq"] [data-accordion-item] {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+[data-section="faq"] [data-accordion-item] dt button {
+  width: 100%;
+  padding: var(--spacing-4);
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+[data-section="faq"] [data-accordion-item] dt button::after {
+  content: '+';
+  font-size: var(--text-xl);
+}
+
+[data-section="faq"] [data-accordion-item] dt button[aria-expanded="true"]::after {
+  content: '−';
+}
+
+[data-section="faq"] [data-accordion-item] dd {
+  padding: 0 var(--spacing-4) var(--spacing-4);
+  color: var(--muted-foreground);
+  display: none;
+}
+
+[data-section="faq"] [data-accordion-item] dt button[aria-expanded="true"] + dd {
+  display: block;
+}
+```
+
+## JavaScript
+
+```js
+document.querySelectorAll('[data-accordion-item] button').forEach(button => {
+  button.addEventListener('click', () => {
+    const expanded = button.getAttribute('aria-expanded') === 'true'
+    button.setAttribute('aria-expanded', !expanded)
+  })
+})
+```

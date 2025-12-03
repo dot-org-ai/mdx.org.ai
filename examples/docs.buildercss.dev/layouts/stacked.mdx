@@ -1,0 +1,112 @@
+---
+$type: DocsPage
+title: Stacked Layout
+description: Simple vertical flow with header, main, and footer
+screenshot: /screenshots/layouts/stacked.png
+---
+
+# Stacked Layout
+
+A simple vertical layout for content-focused pages. Header and footer are optional.
+
+<Preview>
+  <div data-layout="stacked" style={{ minHeight: '400px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
+    <header style={{ padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)', background: 'var(--background)' }}>
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <a href="/" style={{ fontWeight: 700 }}>Brand</a>
+        <div style={{ display: 'flex', gap: 'var(--spacing-4)' }}>
+          <a href="#">Features</a>
+          <a href="#">Pricing</a>
+          <a href="#">Docs</a>
+        </div>
+      </nav>
+    </header>
+    <main style={{ flex: 1, padding: 'var(--spacing-6)' }}>
+      <h1>Main Content Area</h1>
+      <p>This is where your page content goes.</p>
+    </main>
+    <footer style={{ padding: 'var(--spacing-4)', borderTop: '1px solid var(--border)', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+      <p>&copy; 2024 Brand. All rights reserved.</p>
+    </footer>
+  </div>
+</Preview>
+
+## When to Use
+
+- Marketing sites and landing pages
+- Blog posts and articles
+- Simple content-focused pages
+- Any page that flows vertically
+
+## Structure
+
+```html
+<body data-layout="stacked">
+  <header>
+    <nav>
+      <a href="/" data-logo>Brand</a>
+      <ul>
+        <li><a href="/features">Features</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Page content -->
+  </main>
+
+  <footer>
+    <!-- Footer content -->
+  </footer>
+</body>
+```
+
+## CSS
+
+```css
+[data-layout="stacked"] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+[data-layout="stacked"] > header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-layout="stacked"] > main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--container-width, 1200px);
+  margin: 0 auto;
+  padding: var(--spacing-6) var(--spacing-4);
+}
+
+[data-layout="stacked"] > footer {
+  border-top: 1px solid var(--border);
+  padding: var(--spacing-6) var(--spacing-4);
+}
+```
+
+## React Native
+
+```tsx
+import { SafeAreaView, ScrollView, View } from 'react-native'
+
+export function StackedLayout({ children }) {
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Header />
+      <ScrollView style={{ flex: 1 }}>
+        {children}
+      </ScrollView>
+      <Footer />
+    </SafeAreaView>
+  )
+}
+```

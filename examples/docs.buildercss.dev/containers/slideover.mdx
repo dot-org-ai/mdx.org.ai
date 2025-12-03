@@ -1,0 +1,201 @@
+---
+$type: DocsPage
+title: Slideover
+description: Side panel that slides in from the edge
+screenshot: /screenshots/containers/slideover.png
+---
+
+# Slideover
+
+A side panel that slides in from the left or right edge of the screen.
+
+<Preview>
+  <div style={{ position: 'relative', height: '400px', background: 'var(--muted)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }}></div>
+    <article style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '320px', background: 'var(--background)', display: 'flex', flexDirection: 'column' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-4)', borderBottom: '1px solid var(--border)' }}>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600 }}>Settings</h2>
+        <button style={{ background: 'none', border: 'none', fontSize: 'var(--text-xl)', cursor: 'pointer' }}>&times;</button>
+      </header>
+      <section style={{ flex: 1, padding: 'var(--spacing-4)', overflow: 'auto' }}>
+        <div style={{ marginBottom: 'var(--spacing-4)' }}>
+          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontSize: 'var(--text-sm)' }}>Email notifications</label>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)' }}>Receive email updates about your account.</p>
+        </div>
+        <div style={{ marginBottom: 'var(--spacing-4)' }}>
+          <label style={{ display: 'block', marginBottom: 'var(--spacing-1)', fontSize: 'var(--text-sm)' }}>Theme</label>
+          <select style={{ width: '100%', padding: 'var(--spacing-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+            <option>System</option>
+            <option>Light</option>
+            <option>Dark</option>
+          </select>
+        </div>
+      </section>
+      <footer style={{ padding: 'var(--spacing-4)', borderTop: '1px solid var(--border)', display: 'flex', gap: 'var(--spacing-2)' }}>
+        <button style={{ flex: 1, padding: 'var(--spacing-2)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Cancel</button>
+        <button style={{ flex: 1, padding: 'var(--spacing-2)', background: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}>Save</button>
+      </footer>
+    </article>
+  </div>
+</Preview>
+
+## When to Use
+
+- Settings panels
+- Detail views
+- Filters and facets
+- Secondary navigation
+- Cart sidebars
+
+## Structure
+
+```html
+<!-- Trigger -->
+<button data-slideover-trigger="settings">Settings</button>
+
+<!-- Slideover -->
+<aside data-slideover data-side="right" id="settings" aria-hidden="true">
+  <article>
+    <header>
+      <h2>Settings</h2>
+      <button data-action="close">&times;</button>
+    </header>
+    <section>
+      <!-- Settings content -->
+    </section>
+    <footer>
+      <button data-button="ghost">Cancel</button>
+      <button data-button="primary">Save Changes</button>
+    </footer>
+  </article>
+</aside>
+```
+
+## CSS
+
+```css
+[data-slideover] {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+}
+
+[data-slideover]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+[data-slideover][data-side="right"] {
+  justify-content: flex-end;
+}
+
+[data-slideover][data-side="left"] {
+  justify-content: flex-start;
+}
+
+[data-slideover] > article {
+  position: relative;
+  background: var(--background);
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease;
+}
+
+[data-slideover][data-side="right"] > article {
+  animation-name: slideInRight;
+}
+
+[data-slideover][data-side="left"] > article {
+  animation-name: slideInLeft;
+}
+
+[data-slideover] > article > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-slideover] > article > section {
+  flex: 1;
+  padding: var(--spacing-4);
+  overflow-y: auto;
+}
+
+[data-slideover] > article > footer {
+  padding: var(--spacing-4);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+[data-slideover][aria-hidden="true"] {
+  display: none;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+```
+
+## JavaScript
+
+```js
+// Open slideover
+document.querySelectorAll('[data-slideover-trigger]').forEach(trigger => {
+  trigger.addEventListener('click', () => {
+    const slideoverId = trigger.dataset.slideoverTrigger
+    const slideover = document.getElementById(slideoverId)
+    slideover.setAttribute('aria-hidden', 'false')
+  })
+})
+
+// Close slideover
+document.querySelectorAll('[data-slideover] [data-action="close"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const slideover = btn.closest('[data-slideover]')
+    slideover.setAttribute('aria-hidden', 'true')
+  })
+})
+```
+
+## Variations
+
+### Wide Slideover
+
+```html
+<aside data-slideover data-side="right" data-size="wide">
+  <!-- Max-width: 600px -->
+</aside>
+```
+
+### With Tabs
+
+```html
+<aside data-slideover data-side="right">
+  <article>
+    <header>
+      <nav data-tabs>
+        <button data-tab="details" aria-selected="true">Details</button>
+        <button data-tab="activity">Activity</button>
+      </nav>
+      <button data-action="close">&times;</button>
+    </header>
+    <section data-tab-content="details">...</section>
+    <section data-tab-content="activity" hidden>...</section>
+  </article>
+</aside>
+```

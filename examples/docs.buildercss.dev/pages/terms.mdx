@@ -1,0 +1,149 @@
+---
+$type: DocsPage
+title: Terms of Service Page
+description: Terms of service and legal agreements
+screenshot: /screenshots/pages/terms.png
+---
+
+# Terms of Service Page
+
+A legal page for terms of service documentation.
+
+<Preview>
+  <article data-page="terms" style={{ padding: 'var(--spacing-6)', maxWidth: '800px', margin: '0 auto' }}>
+    <header style={{ marginBottom: 'var(--spacing-6)' }}>
+      <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--spacing-2)' }}>Terms of Service</h1>
+      <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Effective date: December 1, 2024</p>
+    </header>
+
+    <div style={{ background: 'var(--muted)', padding: 'var(--spacing-4)', borderRadius: 'var(--radius-lg)', marginBottom: 'var(--spacing-6)', border: '1px solid var(--border)' }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--foreground)' }}>
+        <strong>Important:</strong> Please read these terms carefully before using our service. By using Builder CSS, you agree to be bound by these terms.
+      </p>
+    </div>
+
+    <div style={{ lineHeight: 1.8, color: 'var(--muted-foreground)' }}>
+      <section style={{ marginBottom: 'var(--spacing-6)' }}>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--foreground)', marginBottom: 'var(--spacing-3)' }}>1. Acceptance of Terms</h2>
+        <p style={{ marginBottom: 'var(--spacing-3)' }}>By accessing and using Builder CSS, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use our service.</p>
+      </section>
+
+      <section style={{ marginBottom: 'var(--spacing-6)' }}>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--foreground)', marginBottom: 'var(--spacing-3)' }}>2. Use License</h2>
+        <p style={{ marginBottom: 'var(--spacing-3)' }}>Permission is granted to temporarily use Builder CSS for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
+        <ul style={{ paddingLeft: 'var(--spacing-6)', marginTop: 'var(--spacing-2)' }}>
+          <li>Modify or copy the materials</li>
+          <li>Use the materials for any commercial purpose</li>
+          <li>Attempt to decompile or reverse engineer any software</li>
+          <li>Remove any copyright or other proprietary notations</li>
+        </ul>
+      </section>
+
+      <section style={{ marginBottom: 'var(--spacing-6)' }}>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--foreground)', marginBottom: 'var(--spacing-3)' }}>3. Disclaimer</h2>
+        <p>The materials on Builder CSS are provided on an "as is" basis. Builder CSS makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties.</p>
+      </section>
+
+      <section style={{ marginBottom: 'var(--spacing-6)' }}>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--foreground)', marginBottom: 'var(--spacing-3)' }}>4. Limitations</h2>
+        <p>In no event shall Builder CSS or its suppliers be liable for any damages arising out of the use or inability to use the materials on Builder CSS.</p>
+      </section>
+
+      <section>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--foreground)', marginBottom: 'var(--spacing-3)' }}>5. Contact</h2>
+        <p>Questions about the Terms of Service should be sent to us at <a href="#" style={{ color: 'var(--primary)' }}>legal@example.com</a></p>
+      </section>
+    </div>
+  </article>
+</Preview>
+
+## When to Use
+
+- Terms of service pages
+- User agreements
+- Legal terms and conditions
+- Service agreements
+
+## Structure
+
+```html
+<article data-page="terms">
+  <header data-page-header>
+    <h1>Terms of Service</h1>
+    <p data-effective-date>Effective date: December 1, 2024</p>
+  </header>
+
+  <aside data-important-notice>
+    <p><strong>Important:</strong> Please read these terms carefully...</p>
+  </aside>
+
+  <div data-content>
+    <section>
+      <h2>1. Acceptance of Terms</h2>
+      <p>By accessing and using Builder CSS...</p>
+    </section>
+
+    <section>
+      <h2>2. Use License</h2>
+      <p>Permission is granted to temporarily use...</p>
+      <ul>
+        <li>Modify or copy the materials</li>
+        <li>Use the materials for any commercial purpose</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. Disclaimer</h2>
+      <p>The materials on Builder CSS are provided...</p>
+    </section>
+  </div>
+</article>
+```
+
+## CSS
+
+```css
+[data-page="terms"] {
+  padding: var(--spacing-6);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+[data-page="terms"] [data-page-header] {
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="terms"] [data-effective-date] {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+[data-page="terms"] [data-important-notice] {
+  background: var(--muted);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-6);
+  border: 1px solid var(--border);
+}
+
+[data-page="terms"] [data-content] {
+  line-height: 1.8;
+  color: var(--muted-foreground);
+}
+
+[data-page="terms"] [data-content] section {
+  margin-bottom: var(--spacing-6);
+}
+
+[data-page="terms"] [data-content] h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: var(--spacing-3);
+}
+
+[data-page="terms"] [data-content] ul {
+  padding-left: var(--spacing-6);
+  margin-top: var(--spacing-2);
+}
+```

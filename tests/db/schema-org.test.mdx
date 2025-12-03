@@ -1,0 +1,244 @@
+---
+$type: TestSuite
+$id: https://mdx.org.ai/tests/schema-org
+title: Schema.org Ingestion Tests
+description: Ingest schema.org types from JSON-LD, transform, and generate embeddings
+---
+
+# Schema.org Ingestion Tests
+
+Test ingesting schema.org types and properties, transforming from JSON-LD,
+and generating embeddings for semantic search.
+
+## Schema Definition
+
+```ts
+const schema = {
+  SchemaType: {
+    label: 'string',
+    comment: 'string',
+    subClassOf: 'string?',
+    properties: 'json',
+    embedding: 'json?',
+  },
+  SchemaProperty: {
+    label: 'string',
+    comment: 'string',
+    domainIncludes: ['SchemaType.properties'],
+    rangeIncludes: 'string',
+    embedding: 'json?',
+  },
+}
+
+const db = DB(schema)
+```
+
+## Ingest Core Types
+
+```ts test name="ingest Thing type"
+const db = DB({
+  SchemaType: {
+    label: 'string',
+    comment: 'string',
+    subClassOf: 'string?',
+  },
+})
+
+// Root type
+await db.SchemaType.create('Thing', {
+  label: 'Thing',
+  comment: 'The most generic type of item.',
+  subClassOf: null,
+})
+
+const thing = await db.SchemaType.get('Thing')
+expect(thing.label).toBe('Thing')
+expect(thing.subClassOf).toBeNull()
+```
+
+```ts test name="ingest type hierarchy"
+const db = DB({
+  SchemaType: {
+    label: 'string',
+    comment: 'string',
+    subClassOf: 'string?',
+  },
+})
+
+// Build hierarchy: Thing -> CreativeWork -> Article -> BlogPosting
+const types = [
+  { id: 'Thing', label: 'Thing', comment: 'The most generic type.', subClassOf: null },
+  { id: 'CreativeWork', label: 'CreativeWork', comment: 'A creative work.', subClassOf: 'Thing' },
+  { id: 'Article', label: 'Article', comment: 'An article.', subClassOf: 'CreativeWork' },
+  { id: 'BlogPosting', label: 'BlogPosting', comment: 'A blog post.', subClassOf: 'Article' },
+]
+
+for (const type of types) {
+  await db.SchemaType.create(type.id, {
+    label: type.label,
+    comment: type.comment,
+    subClassOf: type.subClassOf,
+  })
+}
+
+const blogPosting = await db.SchemaType.get('BlogPosting')
+expect(blogPosting.subClassOf).toBe('Article')
+
+const article = await db.SchemaType.get('Article')
+expect(article.subClassOf).toBe('CreativeWork')
+```
+
+```ts test name="ingest common types"
+const db = DB({
+  SchemaType: {
+    label: 'string',
+    comment: 'string',
+    subClassOf: 'string?',
+  },
+})
+
+const commonTypes = [
+  'Thing', 'Action', 'CreativeWork', 'Event', 'Intangible',
+  'Organization', 'Person', 'Place', 'Product',
+  'Article', 'BlogPosting', 'WebPage', 'WebSite',
+  'LocalBusiness', 'Restaurant', 'Hotel',
+  'ImageObject', 'VideoObject', 'AudioObject',
+  'Offer', 'AggregateOffer', 'Review', 'Rating',
+  'PostalAddress', 'ContactPoint', 'GeoCoordinates',
+]
+
+for (const typeName of commonTypes) {
+  await db.SchemaType.create(typeName, {
+    label: typeName,
+    comment: `The ${typeName} type from schema.org`,
+    subClassOf: 'Thing',
+  })
+}
+
+const all = await db.SchemaType.list()
+expect(all.length).toBe(commonTypes.length)
+
+const person = await db.SchemaType.get('Person')
+expect(person.label).toBe('Person')
+```
+
+## Transform from JSON-LD
+
+```ts test name="transform JSON-LD to entity"
+const db = DB({
+  SchemaType: {
+    label: 'string',
+    comment: 'string',
+    subClassOf: 'string?',
+  },
+})
+
+// Simulated JSON-LD response from schema.org
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'rdfs:Class',
+  '@id': 'schema:Person',
+  'rdfs:label': 'Person',
+  'rdfs:comment': 'A person (alive, dead, undead, or fictional).',
+  'rdfs:subClassOf': { '@id': 'schema:Thing' },
+}
+
+// Transform
+const entity = {
+  label: jsonld['rdfs:label'],
+  comment: jsonld['rdfs:comment'],
+  subClassOf: jsonld['rdfs:subClassOf']?.['@id']?.replace('schema:', ''),
+}
+
+await db.SchemaType.create('Person', entity)
+
+const person = await db.SchemaType.get('Person')
+expect(person.label).toBe('Person')
+expect(person.subClassOf).toBe('Thing')
+```
+
+## Search Types
+
+```ts test name="search schema types"
+const db = DB({
+  SchemaType: {
+    label: 'string',
+    comment: 'string',
+  },
+})
+
+await db.SchemaType.create('Person', {
+  label: 'Person',
+  comment: 'A person (alive, dead, undead, or fictional).',
+})
+await db.SchemaType.create('Organization', {
+  label: 'Organization',
+  comment: 'An organization such as a school, NGO, corporation, club, etc.',
+})
+await db.SchemaType.create('Place', {
+  label: 'Place',
+  comment: 'Entities that have a physical location.',
+})
+
+const personResults = await db.SchemaType.search('person')
+expect(personResults.length).toBe(1)
+expect(personResults[0].label).toBe('Person')
+
+const orgResults = await db.SchemaType.search('organization')
+expect(orgResults.length).toBe(1)
+```
+
+## Properties
+
+```ts test name="ingest properties with domain/range"
+const db = DB({
+  SchemaType: { label: 'string' },
+  SchemaProperty: {
+    label: 'string',
+    comment: 'string',
+    domainIncludes: 'string',
+    rangeIncludes: 'string',
+  },
+})
+
+await db.SchemaType.create('Person', { label: 'Person' })
+
+await db.SchemaProperty.create('name', {
+  label: 'name',
+  comment: 'The name of the item.',
+  domainIncludes: 'Thing',
+  rangeIncludes: 'Text',
+})
+
+await db.SchemaProperty.create('email', {
+  label: 'email',
+  comment: 'Email address.',
+  domainIncludes: 'Person',
+  rangeIncludes: 'Text',
+})
+
+await db.SchemaProperty.create('birthDate', {
+  label: 'birthDate',
+  comment: 'Date of birth.',
+  domainIncludes: 'Person',
+  rangeIncludes: 'Date',
+})
+
+const personProps = await db.SchemaProperty.find({ domainIncludes: 'Person' })
+expect(personProps.length).toBe(2) // email and birthDate
+```
+
+## Full Matrix Test
+
+Run across all providers to verify consistent behavior:
+
+```bash
+# Test on all Node providers
+mdxe test --target node --db all --filter schema-org
+
+# Test on Workers providers
+mdxe test --target workers --db all --filter schema-org
+
+# Full matrix
+mdxe test --target all --db all --filter schema-org
+```

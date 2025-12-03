@@ -1,0 +1,135 @@
+---
+$type: TestSuite
+$id: https://mdx.org.ai/tests/rpc/http
+title: HTTP Transport Integration Tests
+description: End-to-end tests for HTTP RPC transport
+---
+
+# HTTP Transport Integration Tests
+
+High-level integration tests for the HTTP RPC transport.
+These tests run via `mdxe test` with global scope injection.
+
+## Basic Operations
+
+```ts test name="echo via HTTP"
+const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new HTTPTransport({
+  url: 'http://localhost:3456/rpc'
+})
+
+const response = await transport.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'echo',
+  params: ['hello from MDX']
+})
+
+expect(response.type).toBe('result')
+expect(response.result).toBe('hello from MDX')
+```
+
+```ts test name="arithmetic operations"
+const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new HTTPTransport({
+  url: 'http://localhost:3456/rpc'
+})
+
+const addResponse = await transport.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'add',
+  params: [10, 20]
+})
+expect(addResponse.result).toBe(30)
+
+const multiplyResponse = await transport.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'multiply',
+  params: [5, 6]
+})
+expect(multiplyResponse.result).toBe(30)
+```
+
+```ts test name="error handling"
+const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new HTTPTransport({
+  url: 'http://localhost:3456/rpc'
+})
+
+const response = await transport.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'throwError',
+  params: ['MDX error test']
+})
+
+expect(response.type).toBe('error')
+expect(response.error?.message).toContain('MDX error test')
+```
+
+## Batching
+
+```ts test name="batch concurrent requests"
+const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new HTTPTransport({
+  url: 'http://localhost:3456/rpc',
+  batchDelay: 0
+})
+
+const promises = Array.from({ length: 5 }, (_, i) =>
+  transport.request({
+    id: generateMessageId(),
+    type: 'call',
+    method: 'add',
+    params: [i, 1]
+  })
+)
+
+const results = await Promise.all(promises)
+const values = results.map(r => r.result)
+
+expect(values).toEqual([1, 2, 3, 4, 5])
+```
+
+## Complex Data
+
+```ts test name="object results"
+const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
+
+const transport = new HTTPTransport({
+  url: 'http://localhost:3456/rpc'
+})
+
+const response = await transport.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'getUser',
+  params: ['mdx-user']
+})
+
+expect(response.result.id).toBe('mdx-user')
+expect(response.result.name).toBe('User mdx-user')
+expect(response.result.profile.email).toBe('usermdx-user@example.com')
+```
+
+## Run Matrix
+
+```bash
+# Run on Node
+mdxe test --target node --filter rpc/http
+
+# Run on Workers
+mdxe test --target workers --filter rpc/http
+
+# Run on Bun
+mdxe test --target bun --filter rpc/http
+
+# All targets
+mdxe test --target all --filter rpc/http
+```

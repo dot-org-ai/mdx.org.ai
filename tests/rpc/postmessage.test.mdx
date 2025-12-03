@@ -1,0 +1,230 @@
+---
+$type: TestSuite
+$id: https://mdx.org.ai/tests/rpc/postmessage
+title: postMessage Transport Integration Tests
+description: End-to-end tests for postMessage RPC transport using MessageChannel
+---
+
+# postMessage Transport Integration Tests
+
+High-level integration tests for the postMessage RPC transport.
+Uses MessageChannel API for cross-runtime compatibility.
+
+## Setup Helper
+
+```ts
+// Create a MessageChannel-based RPC pair for testing
+async function createRPCChannel() {
+  const { PostMessageTransport, generateMessageId } = await import('ai-functions/rpc')
+
+  const channel = new MessageChannel()
+
+  const client = new PostMessageTransport({
+    target: channel.port1
+  })
+
+  // Simple echo server on port2
+  channel.port2.onmessage = async (event) => {
+    const msg = event.data
+    if (msg.type === 'call') {
+      let result
+      let error
+
+      try {
+        switch (msg.method) {
+          case 'echo':
+            result = msg.params?.[0]
+            break
+          case 'add':
+            result = (msg.params?.[0] || 0) + (msg.params?.[1] || 0)
+            break
+          case 'multiply':
+            result = (msg.params?.[0] || 0) * (msg.params?.[1] || 0)
+            break
+          case 'throwError':
+            throw new Error(msg.params?.[0] || 'error')
+          case 'getUser':
+            result = {
+              id: msg.params?.[0],
+              name: `User ${msg.params?.[0]}`,
+              email: `${msg.params?.[0]}@example.com`
+            }
+            break
+          default:
+            error = { message: `Unknown method: ${msg.method}` }
+        }
+      } catch (e) {
+        error = { message: e.message }
+      }
+
+      channel.port2.postMessage({
+        id: msg.id,
+        type: error ? 'error' : 'result',
+        result,
+        error
+      })
+    }
+  }
+
+  channel.port1.start()
+  channel.port2.start()
+
+  return { client, channel, generateMessageId }
+}
+```
+
+## Basic Operations
+
+```ts test name="echo via MessageChannel"
+const { client, channel, generateMessageId } = await createRPCChannel()
+
+const response = await client.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'echo',
+  params: ['postMessage test']
+})
+
+expect(response.result).toBe('postMessage test')
+
+channel.port1.close()
+channel.port2.close()
+```
+
+```ts test name="arithmetic via MessageChannel"
+const { client, channel, generateMessageId } = await createRPCChannel()
+
+const addResponse = await client.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'add',
+  params: [25, 75]
+})
+expect(addResponse.result).toBe(100)
+
+const multiplyResponse = await client.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'multiply',
+  params: [12, 12]
+})
+expect(multiplyResponse.result).toBe(144)
+
+channel.port1.close()
+channel.port2.close()
+```
+
+## Error Handling
+
+```ts test name="handle errors via MessageChannel"
+const { client, channel, generateMessageId } = await createRPCChannel()
+
+const response = await client.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'throwError',
+  params: ['postMessage error']
+})
+
+expect(response.type).toBe('error')
+expect(response.error?.message).toContain('postMessage error')
+
+channel.port1.close()
+channel.port2.close()
+```
+
+```ts test name="handle unknown methods"
+const { client, channel, generateMessageId } = await createRPCChannel()
+
+const response = await client.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'unknownMethod',
+  params: []
+})
+
+expect(response.type).toBe('error')
+expect(response.error?.message).toContain('unknownMethod')
+
+channel.port1.close()
+channel.port2.close()
+```
+
+## Concurrent Requests
+
+```ts test name="concurrent MessageChannel requests"
+const { client, channel, generateMessageId } = await createRPCChannel()
+
+const promises = Array.from({ length: 10 }, (_, i) =>
+  client.request({
+    id: generateMessageId(),
+    type: 'call',
+    method: 'add',
+    params: [i, i]
+  })
+)
+
+const results = await Promise.all(promises)
+
+for (let i = 0; i < 10; i++) {
+  expect(results[i].result).toBe(i + i)
+}
+
+channel.port1.close()
+channel.port2.close()
+```
+
+## Complex Data
+
+```ts test name="object results via MessageChannel"
+const { client, channel, generateMessageId } = await createRPCChannel()
+
+const response = await client.request({
+  id: generateMessageId(),
+  type: 'call',
+  method: 'getUser',
+  params: ['alice']
+})
+
+expect(response.result.id).toBe('alice')
+expect(response.result.name).toBe('User alice')
+expect(response.result.email).toBe('alice@example.com')
+
+channel.port1.close()
+channel.port2.close()
+```
+
+## Connection State
+
+```ts test name="connection state tracking"
+const { PostMessageTransport } = await import('ai-functions/rpc')
+
+const channel = new MessageChannel()
+const transport = new PostMessageTransport({
+  target: channel.port1
+})
+
+expect(transport.state).toBe('connected')
+
+transport.close()
+expect(transport.state).toBe('disconnected')
+
+channel.port1.close()
+channel.port2.close()
+```
+
+## Run Matrix
+
+```bash
+# Run on Node
+mdxe test --target node --filter rpc/postmessage
+
+# Run on Workers
+mdxe test --target workers --filter rpc/postmessage
+
+# Run on Bun
+mdxe test --target bun --filter rpc/postmessage
+
+# All targets
+mdxe test --target all --filter rpc/postmessage
+```
