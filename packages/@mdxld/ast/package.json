@@ -1,0 +1,46 @@
+{
+  "name": "@mdxld/ast",
+  "version": "0.1.0",
+  "description": "AST manipulation for MDXLD documents",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.9"
+  },
+  "keywords": [
+    "mdx",
+    "mdxld",
+    "ast",
+    "parse",
+    "transform"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxld/ast"
+  }
+}

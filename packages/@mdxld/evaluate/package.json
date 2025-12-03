@@ -1,0 +1,50 @@
+{
+  "name": "@mdxld/evaluate",
+  "version": "0.1.0",
+  "description": "Evaluate and execute MDXLD documents",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "mdxld": "workspace:*",
+    "@mdxld/compile": "workspace:*"
+  },
+  "optionalDependencies": {
+    "ai-sandbox": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.9"
+  },
+  "keywords": [
+    "mdx",
+    "mdxld",
+    "evaluate",
+    "execute",
+    "runtime"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxld/evaluate"
+  }
+}
