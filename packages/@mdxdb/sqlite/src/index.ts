@@ -1,8 +1,16 @@
 /**
- * @mdxdb/sqlite - SQLite adapter for mdxdb
+ * @mdxdb/sqlite - libSQL adapter for mdxdb
  *
- * A SQLite-based implementation of the mdxdb Database interface.
- * Stores MDX documents in a SQLite database with full-text search support.
+ * A libSQL-based implementation with:
+ * - Things: Graph nodes following ai-database conventions
+ * - Relationships: Graph edges between things
+ * - Search: Chunked content with vector embeddings for semantic search
+ *
+ * Supports:
+ * - Local SQLite files
+ * - In-memory databases
+ * - Remote Turso databases
+ * - Vector embeddings and similarity search
  *
  * @packageDocumentation
  */
@@ -13,20 +21,40 @@ export const name = '@mdxdb/sqlite'
 export { SqliteDatabase, createSqliteDatabase } from './database.js'
 
 // Types
-export type { SqliteDatabaseConfig, DocumentRow } from './types.js'
+export type {
+  SqliteDatabaseConfig,
+  ThingRow,
+  RelationshipRow,
+  SearchRow,
+  SearchResultRow,
+  VectorSearchOptions,
+  VectorSearchResult,
+  ChunkOptions,
+  Chunk,
+  EventRow,
+  ActionRow,
+  ArtifactRow,
+  ActionStatus,
+  ArtifactType,
+} from './types.js'
 
 // Re-export mdxdb types for convenience
 export type {
-  Database,
-  ListOptions,
-  ListResult,
-  SearchOptions,
-  SearchResult,
-  GetOptions,
-  SetOptions,
-  SetResult,
-  DeleteOptions,
-  DeleteResult,
+  DBClient,
+  DBClientExtended,
+  Thing,
+  QueryOptions,
+  ThingSearchOptions,
+  CreateOptions,
+  UpdateOptions,
+  RelateOptions,
+  Relationship,
+  Event,
+  Action,
+  Artifact,
+  CreateEventOptions,
+  CreateActionOptions,
+  StoreArtifactOptions,
+  EventQueryOptions,
+  ActionQueryOptions,
 } from 'mdxdb'
-
-export type { MDXLDDocument, MDXLDData } from 'mdxld'

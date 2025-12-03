@@ -33,3 +33,19 @@ export { stringify } from './stringify.js'
 export { toAst, fromAst, parseWithAst, stringifyAst } from './ast.js'
 export { compile, compileFromString, evaluate } from './compile.js'
 export type { CompileOptions } from './compile.js'
+
+// Relationship extraction
+export {
+  extractLinks,
+  extractRelationships,
+  relationships,
+  withRelationships,
+} from './relationships.js'
+export type {
+  Relationship,
+  RelationshipType,
+  ExtractedLink,
+  ExtractOptions,
+  Reference,
+  MDXLDDocumentWithRelationships,
+} from './relationships.js'

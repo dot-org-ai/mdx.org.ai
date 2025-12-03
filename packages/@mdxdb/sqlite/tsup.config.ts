@@ -10,5 +10,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ['mdxdb', 'mdxld', 'better-sqlite3'],
+  external: ['mdxdb', '@libsql/client'],
 })

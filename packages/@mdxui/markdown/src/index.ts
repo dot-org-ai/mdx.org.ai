@@ -525,5 +525,8 @@ function renderEsm(node: MDXLDAstNode, opts: Required<RenderOptions>): string {
   }
 }
 
+// Alias for backward compatibility
+export { render as renderMarkdown }
+
 // Re-export types from mdxld for convenience
 export type { MDXLDDocument, MDXLDAst, MDXLDAstNode } from 'mdxld'

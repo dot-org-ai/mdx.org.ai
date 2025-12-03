@@ -7,11 +7,13 @@
  */
 
 import { resolve } from 'node:path'
+import { spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import { deploy, detectSourceType } from './commands/deploy.js'
 import type { CloudflareDeployOptions } from './types.js'
 
 export interface CliOptions {
-  command: 'deploy' | 'help' | 'version'
+  command: 'deploy' | 'test' | 'help' | 'version'
   projectDir: string
   platform: 'cloudflare' | 'vercel' | 'netlify'
   mode?: 'static' | 'opennext'
@@ -21,6 +23,11 @@ export interface CliOptions {
   verbose: boolean
   env: Record<string, string>
   help: boolean
+  // Test options
+  watch: boolean
+  filter?: string
+  coverage: boolean
+  ui: boolean
 }
 
 export const VERSION = '0.0.0'
@@ -32,9 +39,18 @@ Usage:
   mdxe <command> [options]
 
 Commands:
+  test                Run MDX tests with vitest
   deploy              Deploy to Cloudflare Workers
   help                Show this help message
   version             Show version
+
+Test Options:
+  --dir, -d <path>       Directory containing tests (default: current directory)
+  --watch, -w            Run tests in watch mode
+  --filter, -f <pattern> Filter tests by name pattern
+  --coverage             Generate coverage report
+  --ui                   Open vitest UI
+  --verbose, -v          Show detailed output
 
 Deploy Options:
   --dir, -d <path>       Project directory (default: current directory)
@@ -103,12 +119,17 @@ export function parseArgs(args: string[]): CliOptions {
     verbose: false,
     env: {},
     help: false,
+    watch: false,
+    coverage: false,
+    ui: false,
   }
 
   // Parse command
   if (args.length > 0 && !args[0].startsWith('-')) {
     const cmd = args[0].toLowerCase()
-    if (cmd === 'deploy') {
+    if (cmd === 'test') {
+      options.command = 'test'
+    } else if (cmd === 'deploy') {
       options.command = 'deploy'
     } else if (cmd === 'version' || cmd === '-v' || cmd === '--version') {
       options.command = 'version'
@@ -180,6 +201,22 @@ export function parseArgs(args: string[]): CliOptions {
       case '--version':
         options.command = 'version'
         break
+      // Test options
+      case '--watch':
+      case '-w':
+        options.watch = true
+        break
+      case '--filter':
+      case '-f':
+        options.filter = next
+        i++
+        break
+      case '--coverage':
+        options.coverage = true
+        break
+      case '--ui':
+        options.ui = true
+        break
     }
   }
 
@@ -243,11 +280,124 @@ export async function runDeploy(options: CliOptions): Promise<void> {
   }
 }
 
+/**
+ * Find the vitest MDX config file
+ */
+function findMdxConfig(projectDir: string): string | null {
+  const candidates = [
+    resolve(projectDir, 'vitest.mdx.config.ts'),
+    resolve(projectDir, 'vitest.mdx.config.js'),
+    resolve(projectDir, 'vitest.mdx.config.mts'),
+    resolve(projectDir, 'vitest.mdx.config.mjs'),
+  ]
+
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) {
+      return candidate
+    }
+  }
+
+  return null
+}
+
+/**
+ * Run MDX tests using vitest
+ */
+export async function runTest(options: CliOptions): Promise<void> {
+  console.log('🧪 mdxe test\n')
+
+  const projectDir = options.projectDir
+  console.log(`📁 Project: ${projectDir}`)
+
+  // Find vitest.mdx.config.ts
+  const configPath = findMdxConfig(projectDir)
+
+  if (!configPath) {
+    console.error('❌ No vitest.mdx.config.ts found in project directory')
+    console.error('   Create a vitest.mdx.config.ts file to configure MDX testing.')
+    console.error('')
+    console.error('   Example config:')
+    console.error('   ```')
+    console.error("   import { defineConfig } from 'vitest/config'")
+    console.error("   import { mdxTestPlugin } from '@mdxe/vitest'")
+    console.error('')
+    console.error('   export default defineConfig({')
+    console.error('     plugins: [mdxTestPlugin()],')
+    console.error('     test: {')
+    console.error("       include: ['tests/**/*.mdx', '**/*.test.mdx'],")
+    console.error('     },')
+    console.error('   })')
+    console.error('   ```')
+    process.exit(1)
+  }
+
+  console.log(`📋 Config: ${configPath}`)
+
+  // Build vitest args
+  const vitestArgs = ['vitest']
+
+  // Add run or watch mode
+  if (!options.watch && !options.ui) {
+    vitestArgs.push('run')
+  }
+
+  // Add config
+  vitestArgs.push('--config', configPath)
+
+  // Add options
+  if (options.filter) {
+    vitestArgs.push('--testNamePattern', options.filter)
+  }
+
+  if (options.coverage) {
+    vitestArgs.push('--coverage')
+  }
+
+  if (options.ui) {
+    vitestArgs.push('--ui')
+  }
+
+  if (options.verbose) {
+    vitestArgs.push('--reporter=verbose')
+  }
+
+  console.log(`\n🔧 Running: npx ${vitestArgs.join(' ')}\n`)
+  console.log('─'.repeat(60))
+
+  // Spawn vitest
+  return new Promise((resolvePromise, reject) => {
+    const child = spawn('npx', vitestArgs, {
+      cwd: projectDir,
+      stdio: 'inherit',
+      shell: true,
+    })
+
+    child.on('error', (error) => {
+      console.error(`\n❌ Failed to run vitest: ${error.message}`)
+      reject(error)
+    })
+
+    child.on('close', (code) => {
+      console.log('─'.repeat(60))
+      if (code === 0) {
+        console.log('\n✅ Tests passed!')
+        resolvePromise()
+      } else {
+        console.log(`\n❌ Tests failed with exit code ${code}`)
+        process.exit(code ?? 1)
+      }
+    })
+  })
+}
+
 export async function main(): Promise<void> {
   const args = process.argv.slice(2)
   const options = parseArgs(args)
 
   switch (options.command) {
+    case 'test':
+      await runTest(options)
+      break
     case 'deploy':
       await runDeploy(options)
       break
