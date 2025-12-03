@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import {
+  toVocabulary,
+  relationshipsFrom,
+  relationshipsTo,
+  typeHierarchy,
+  allRelationshipsFor,
+  // Legacy
   extractType,
   extractProperty,
   extractPropertiesForType,
@@ -9,7 +15,7 @@ import {
 import { extractRefs } from './utils.js'
 
 // Mock schema.org vocabulary (subset)
-const mockVocabulary = {
+const mockVocab = {
   '@context': 'https://schema.org',
   '@graph': [
     {
@@ -72,9 +78,130 @@ const mockVocabulary = {
   ],
 }
 
+describe('toVocabulary', () => {
+  it('converts vocabulary to Things + Relationships', () => {
+    const vocab = toVocabulary(mockVocab)
+
+    expect(vocab.$context).toBe('https://schema.org')
+    expect(vocab.things.size).toBe(3) // Thing, Person, Organization
+    expect(vocab.relationships.size).toBe(4) // name, email, knows, givenName
+  })
+
+  it('extracts Things with correct structure', () => {
+    const vocab = toVocabulary(mockVocab)
+    const person = vocab.things.get('Person')
+
+    expect(person).toEqual({
+      $type: 'Class',
+      $id: 'https://schema.org/Person',
+      name: 'Person',
+      description: 'A person (alive, dead, undead, or fictional).',
+      subClassOf: ['Thing'],
+    })
+  })
+
+  it('extracts Relationships with correct structure', () => {
+    const vocab = toVocabulary(mockVocab)
+    const email = vocab.relationships.get('email')
+
+    expect(email).toEqual({
+      $type: 'Property',
+      $id: 'https://schema.org/email',
+      name: 'email',
+      description: 'Email address.',
+      from: ['Person', 'Organization'],
+      to: ['Text'],
+      subPropertyOf: undefined,
+      inverseOf: undefined,
+      supersededBy: undefined,
+    })
+  })
+
+  it('extracts relationship with inverseOf', () => {
+    const vocab = toVocabulary(mockVocab)
+    const knows = vocab.relationships.get('knows')
+
+    expect(knows?.inverseOf).toBe('knows')
+  })
+
+  it('extracts relationship with subPropertyOf', () => {
+    const vocab = toVocabulary(mockVocab)
+    const givenName = vocab.relationships.get('givenName')
+
+    expect(givenName?.subPropertyOf).toBe('name')
+  })
+})
+
+describe('relationshipsFrom', () => {
+  it('gets relationships that can originate from a type', () => {
+    const vocab = toVocabulary(mockVocab)
+    const rels = relationshipsFrom(vocab, 'Person')
+
+    expect(rels.map(r => r.name)).toContain('email')
+    expect(rels.map(r => r.name)).toContain('knows')
+    expect(rels.map(r => r.name)).toContain('givenName')
+  })
+
+  it('gets relationships from Thing (inherited by all)', () => {
+    const vocab = toVocabulary(mockVocab)
+    const rels = relationshipsFrom(vocab, 'Thing')
+
+    expect(rels).toHaveLength(1)
+    expect(rels[0].name).toBe('name')
+  })
+})
+
+describe('relationshipsTo', () => {
+  it('gets relationships that can target a type', () => {
+    const vocab = toVocabulary(mockVocab)
+    const rels = relationshipsTo(vocab, 'Person')
+
+    expect(rels.map(r => r.name)).toContain('knows')
+  })
+
+  it('gets relationships targeting Text', () => {
+    const vocab = toVocabulary(mockVocab)
+    const rels = relationshipsTo(vocab, 'Text')
+
+    expect(rels.map(r => r.name)).toContain('name')
+    expect(rels.map(r => r.name)).toContain('email')
+  })
+})
+
+describe('typeHierarchy', () => {
+  it('gets parent types', () => {
+    const vocab = toVocabulary(mockVocab)
+    const hierarchy = typeHierarchy(vocab, 'Person')
+
+    expect(hierarchy).toEqual(['Thing'])
+  })
+
+  it('returns empty for root type', () => {
+    const vocab = toVocabulary(mockVocab)
+    const hierarchy = typeHierarchy(vocab, 'Thing')
+
+    expect(hierarchy).toEqual([])
+  })
+})
+
+describe('allRelationshipsFor', () => {
+  it('gets relationships including inherited', () => {
+    const vocab = toVocabulary(mockVocab)
+    const rels = allRelationshipsFor(vocab, 'Person')
+
+    // Person has: email, knows, givenName
+    // Inherits from Thing: name
+    expect(rels.map(r => r.name)).toContain('email')
+    expect(rels.map(r => r.name)).toContain('knows')
+    expect(rels.map(r => r.name)).toContain('givenName')
+    expect(rels.map(r => r.name)).toContain('name')
+  })
+})
+
+// Legacy tests (deprecated functions)
 describe('extractType', () => {
   it('extracts a type definition', () => {
-    const result = extractType(mockVocabulary, 'Person', { includeProperties: false })
+    const result = extractType(mockVocab, 'Person', { includeProperties: false })
 
     expect(result).toEqual({
       $type: 'Class',
@@ -86,7 +213,7 @@ describe('extractType', () => {
   })
 
   it('extracts type with properties', () => {
-    const result = extractType(mockVocabulary, 'Person')
+    const result = extractType(mockVocab, 'Person')
 
     expect(result?.label).toBe('Person')
     expect(result?.properties).toHaveLength(3) // email, knows, givenName
@@ -96,12 +223,12 @@ describe('extractType', () => {
   })
 
   it('returns undefined for non-existent type', () => {
-    const result = extractType(mockVocabulary, 'NonExistent')
+    const result = extractType(mockVocab, 'NonExistent')
     expect(result).toBeUndefined()
   })
 
   it('handles root type without subClassOf', () => {
-    const result = extractType(mockVocabulary, 'Thing', { includeProperties: false })
+    const result = extractType(mockVocab, 'Thing', { includeProperties: false })
 
     expect(result).toEqual({
       $type: 'Class',
@@ -115,7 +242,7 @@ describe('extractType', () => {
 
 describe('extractProperty', () => {
   it('extracts a property definition', () => {
-    const result = extractProperty(mockVocabulary, 'name')
+    const result = extractProperty(mockVocab, 'name')
 
     expect(result).toEqual({
       $type: 'Property',
@@ -131,32 +258,32 @@ describe('extractProperty', () => {
   })
 
   it('extracts property with multiple domains', () => {
-    const result = extractProperty(mockVocabulary, 'email')
+    const result = extractProperty(mockVocab, 'email')
 
     expect(result?.domainIncludes).toEqual(['Person', 'Organization'])
   })
 
   it('extracts property with inverseOf', () => {
-    const result = extractProperty(mockVocabulary, 'knows')
+    const result = extractProperty(mockVocab, 'knows')
 
     expect(result?.inverseOf).toBe('knows')
   })
 
   it('extracts property with subPropertyOf', () => {
-    const result = extractProperty(mockVocabulary, 'givenName')
+    const result = extractProperty(mockVocab, 'givenName')
 
     expect(result?.subPropertyOf).toBe('name')
   })
 
   it('returns undefined for non-existent property', () => {
-    const result = extractProperty(mockVocabulary, 'nonExistent')
+    const result = extractProperty(mockVocab, 'nonExistent')
     expect(result).toBeUndefined()
   })
 })
 
 describe('extractPropertiesForType', () => {
   it('extracts properties for a type', () => {
-    const result = extractPropertiesForType(mockVocabulary, 'Person')
+    const result = extractPropertiesForType(mockVocab, 'Person')
 
     expect(result).toHaveLength(3)
     expect(result.map(p => p.name)).toContain('email')
@@ -165,7 +292,7 @@ describe('extractPropertiesForType', () => {
   })
 
   it('extracts properties for Thing (inherited by all)', () => {
-    const result = extractPropertiesForType(mockVocabulary, 'Thing')
+    const result = extractPropertiesForType(mockVocab, 'Thing')
 
     expect(result).toHaveLength(1)
     expect(result[0].name).toBe('name')
@@ -184,7 +311,7 @@ describe('extractPropertiesForType', () => {
 
 describe('extractAllTypes', () => {
   it('extracts all types from vocabulary', () => {
-    const result = extractAllTypes(mockVocabulary)
+    const result = extractAllTypes(mockVocab)
 
     expect(result).toHaveLength(3)
     expect(result.map(t => t.label)).toContain('Thing')
@@ -195,7 +322,7 @@ describe('extractAllTypes', () => {
 
 describe('extractAllProperties', () => {
   it('extracts all properties from vocabulary', () => {
-    const result = extractAllProperties(mockVocabulary)
+    const result = extractAllProperties(mockVocab)
 
     expect(result).toHaveLength(4)
     expect(result.map(p => p.name)).toContain('name')

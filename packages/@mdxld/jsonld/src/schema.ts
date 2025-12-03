@@ -1,13 +1,61 @@
 /**
- * Schema.org specific helpers for working with schema.org vocabulary
+ * Schema.org vocabulary conversion
+ *
+ * Converts JSON-LD vocabulary into MDXLD Things + Relationships structure.
+ * Instead of extracting one type/property at a time, convert the whole
+ * vocabulary and query it as needed.
  */
 
-import { fromJsonLD, findByType, filterGraph } from './convert.js'
+import { fromJsonLD } from './convert.js'
 import { extractLocalName, extractRefs } from './utils.js'
 import type { JsonLDDocument, JsonLDNode, MDXLDNode, ConversionOptions } from './types.js'
 
 /**
- * Schema.org type definition
+ * A Thing in the vocabulary (type/class definition)
+ */
+export interface Thing {
+  $type: 'Class'
+  $id: string
+  name: string
+  description: string
+  subClassOf?: string[]
+}
+
+/**
+ * A Relationship definition in the vocabulary (property)
+ * Defines what edges can exist between Things
+ */
+export interface RelationshipDef {
+  $type: 'Property'
+  $id: string
+  name: string
+  description: string
+  /** Source types (what Things can have this relationship) */
+  from: string[]
+  /** Target types (what Things this can point to) */
+  to: string[]
+  /** Parent property */
+  subPropertyOf?: string
+  /** Inverse relationship name */
+  inverseOf?: string
+  /** Deprecated in favor of */
+  supersededBy?: string
+}
+
+/**
+ * Complete vocabulary as Things + Relationships
+ */
+export interface Vocabulary {
+  $context: string
+  /** All type definitions indexed by name */
+  things: Map<string, Thing>
+  /** All property/relationship definitions indexed by name */
+  relationships: Map<string, RelationshipDef>
+}
+
+/**
+ * Schema.org type definition (legacy - use Thing instead)
+ * @deprecated Use Thing interface instead
  */
 export interface SchemaType {
   $type: string
@@ -19,7 +67,8 @@ export interface SchemaType {
 }
 
 /**
- * Schema.org property definition
+ * Schema.org property definition (legacy - use RelationshipDef instead)
+ * @deprecated Use RelationshipDef interface instead
  */
 export interface SchemaProperty {
   $type: string
@@ -37,6 +86,137 @@ const SCHEMA_OPTIONS: ConversionOptions = {
   simplifyProperties: true,
   extractRefs: true,
   removeEmpty: true,
+}
+
+/**
+ * Convert a JSON-LD vocabulary to MDXLD Things + Relationships
+ *
+ * @example
+ * ```ts
+ * const vocab = await fetch('https://schema.org/version/latest/schemaorg-current-https.jsonld')
+ * const { things, relationships } = toVocabulary(await vocab.json())
+ *
+ * // Get a specific type
+ * const person = things.get('Person')
+ * // { $type: 'Class', name: 'Person', subClassOf: ['Thing'], ... }
+ *
+ * // Get a specific relationship
+ * const knows = relationships.get('knows')
+ * // { $type: 'Property', name: 'knows', from: ['Person'], to: ['Person'], ... }
+ *
+ * // Find all relationships for a type
+ * const personRelationships = [...relationships.values()]
+ *   .filter(r => r.from.includes('Person'))
+ * ```
+ */
+export function toVocabulary(doc: JsonLDDocument): Vocabulary {
+  const graph = doc['@graph'] || []
+  const context = (doc['@context'] as string) || 'https://schema.org'
+
+  const things = new Map<string, Thing>()
+  const relationships = new Map<string, RelationshipDef>()
+
+  for (const node of graph) {
+    const nodeType = node['@type']
+    const isClass = nodeType === 'rdfs:Class' ||
+      (Array.isArray(nodeType) && nodeType.includes('rdfs:Class'))
+    const isProperty = nodeType === 'rdf:Property' ||
+      (Array.isArray(nodeType) && nodeType.includes('rdf:Property'))
+
+    if (isClass) {
+      const id = node['@id'] as string
+      const name = extractLocalName(id)
+      const subClassOf = extractRefs(node['rdfs:subClassOf'])
+
+      things.set(name, {
+        $type: 'Class',
+        $id: id,
+        name,
+        description: (node['rdfs:comment'] as string) || '',
+        subClassOf: subClassOf.length > 0 ? subClassOf : undefined,
+      })
+    }
+
+    if (isProperty) {
+      const id = node['@id'] as string
+      const name = (node['rdfs:label'] as string) || extractLocalName(id)
+      const from = extractRefs(node['schema:domainIncludes'])
+      const to = extractRefs(node['schema:rangeIncludes'])
+
+      relationships.set(name, {
+        $type: 'Property',
+        $id: id,
+        name,
+        description: (node['rdfs:comment'] as string) || '',
+        from,
+        to,
+        subPropertyOf: node['rdfs:subPropertyOf']
+          ? extractLocalName((node['rdfs:subPropertyOf'] as { '@id': string })['@id'])
+          : undefined,
+        inverseOf: node['schema:inverseOf']
+          ? extractLocalName((node['schema:inverseOf'] as { '@id': string })['@id'])
+          : undefined,
+        supersededBy: node['schema:supersededBy']
+          ? extractLocalName((node['schema:supersededBy'] as { '@id': string })['@id'])
+          : undefined,
+      })
+    }
+  }
+
+  return { $context: context, things, relationships }
+}
+
+/**
+ * Get all relationships that can originate from a Thing type
+ */
+export function relationshipsFrom(vocab: Vocabulary, typeName: string): RelationshipDef[] {
+  return [...vocab.relationships.values()].filter(r => r.from.includes(typeName))
+}
+
+/**
+ * Get all relationships that can target a Thing type
+ */
+export function relationshipsTo(vocab: Vocabulary, typeName: string): RelationshipDef[] {
+  return [...vocab.relationships.values()].filter(r => r.to.includes(typeName))
+}
+
+/**
+ * Get the type hierarchy (all ancestors) for a Thing
+ */
+export function typeHierarchy(vocab: Vocabulary, typeName: string): string[] {
+  const result: string[] = []
+  let current = vocab.things.get(typeName)
+
+  while (current?.subClassOf) {
+    for (const parent of current.subClassOf) {
+      if (!result.includes(parent)) {
+        result.push(parent)
+      }
+      current = vocab.things.get(parent)
+    }
+  }
+
+  return result
+}
+
+/**
+ * Get all relationships for a type including inherited ones
+ */
+export function allRelationshipsFor(vocab: Vocabulary, typeName: string): RelationshipDef[] {
+  const types = [typeName, ...typeHierarchy(vocab, typeName)]
+  const seen = new Set<string>()
+  const result: RelationshipDef[] = []
+
+  for (const type of types) {
+    for (const rel of relationshipsFrom(vocab, type)) {
+      if (!seen.has(rel.name)) {
+        seen.add(rel.name)
+        result.push(rel)
+      }
+    }
+  }
+
+  return result
 }
 
 /**

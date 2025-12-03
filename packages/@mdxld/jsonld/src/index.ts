@@ -49,8 +49,17 @@ export {
   removeEmptyValues,
 } from './utils.js'
 
-// Schema.org specific helpers
+// Vocabulary conversion (Things + Relationships)
 export {
+  toVocabulary,
+  relationshipsFrom,
+  relationshipsTo,
+  typeHierarchy,
+  allRelationshipsFor,
+  type Thing,
+  type RelationshipDef,
+  type Vocabulary,
+  // Legacy exports (deprecated)
   extractType,
   extractProperty,
   extractPropertiesForType,
