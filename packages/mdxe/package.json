@@ -54,8 +54,11 @@
     "mdxld": "workspace:*"
   },
   "dependencies": {
+    "@mdxe/hono": "workspace:*",
+    "ai-sandbox": "file:../../primitives/packages/ai-sandbox",
+    "esbuild": "^0.27.0",
     "glob": "^10.4.5",
-    "ai-sandbox": "file:../../primitives/packages/ai-sandbox"
+    "hono": "^4.6.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.9",

@@ -3,9 +3,6 @@ import { defineConfig } from 'tsup'
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
-    ast: 'src/ast.ts',
-    compile: 'src/compile.ts',
-    validate: 'src/validate.ts',
     types: 'src/types.ts',
   },
   format: ['esm', 'cjs'],
@@ -14,5 +11,4 @@ export default defineConfig({
   sourcemap: true,
   splitting: true,
   treeshake: true,
-  external: ['arktype'],
 })

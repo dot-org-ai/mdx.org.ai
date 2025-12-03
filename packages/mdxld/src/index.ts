@@ -1,5 +1,15 @@
 /**
- * MDXLD - Parse, Stringify, Validate, and Compile MDXLD Documents
+ * MDXLD - Lightweight MDX + Linked Data parser and stringifier
+ *
+ * This is the core package providing:
+ * - parse: Parse MDXLD content with YAML frontmatter
+ * - stringify: Convert MDXLD documents back to string
+ *
+ * For additional functionality, use:
+ * - @mdxld/ast: AST manipulation and analysis
+ * - @mdxld/compile: JSX compilation with esbuild
+ * - @mdxld/evaluate: MDX execution and rendering
+ * - @mdxld/validate: Schema validation
  *
  * @packageDocumentation
  */
@@ -28,24 +38,3 @@ export { isType, isOneOfTypes, createTypedDocument } from './types.js'
 // Core functions
 export { parse } from './parse.js'
 export { stringify } from './stringify.js'
-
-// Re-export for convenience (tree-shakable via submodules)
-export { toAst, fromAst, parseWithAst, stringifyAst } from './ast.js'
-export { compile, compileFromString, evaluate } from './compile.js'
-export type { CompileOptions } from './compile.js'
-
-// Relationship extraction
-export {
-  extractLinks,
-  extractRelationships,
-  relationships,
-  withRelationships,
-} from './relationships.js'
-export type {
-  Relationship,
-  RelationshipType,
-  ExtractedLink,
-  ExtractOptions,
-  Reference,
-  MDXLDDocumentWithRelationships,
-} from './relationships.js'

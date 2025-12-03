@@ -10,11 +10,12 @@ import { resolve, basename, relative } from 'node:path'
 import { spawn } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { glob } from 'glob'
+import { transform } from 'esbuild'
 import { deploy, detectSourceType } from './commands/deploy.js'
 import type { CloudflareDeployOptions } from './types.js'
 
 export interface CliOptions {
-  command: 'deploy' | 'test' | 'help' | 'version'
+  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'help' | 'version'
   projectDir: string
   platform: 'cloudflare' | 'vercel' | 'netlify'
   mode?: 'static' | 'opennext'
@@ -31,8 +32,12 @@ export interface CliOptions {
   ui: boolean
   // Execution context options
   context: 'local' | 'remote' | 'all'
-  db: 'memory' | 'fs' | 'sqlite' | 'postgres' | 'clickhouse' | 'mongo'
+  target: 'node' | 'bun' | 'workers' | 'all'
+  db: 'memory' | 'fs' | 'sqlite' | 'sqlite-do' | 'chdb' | 'clickhouse' | 'all'
   aiMode: 'local' | 'remote'
+  // Server options
+  port: number
+  host: string
 }
 
 export const VERSION = '0.0.0'
@@ -41,13 +46,22 @@ const HELP_TEXT = `
 mdxe - Execute, Test, & Deploy MDX-based Agents, Apps, APIs, and Sites
 
 Usage:
-  mdxe <command> [options]
+  mdxe [command] [options]
 
 Commands:
+  dev                 Start development server (default)
+  build               Build for production
+  start               Start production server
   test                Run MDX tests with vitest
   deploy              Deploy to Cloudflare Workers
   help                Show this help message
   version             Show version
+
+Server Options:
+  --dir, -d <path>       Project directory (default: current directory)
+  --port <port>          Server port (default: 3000)
+  --host <host>          Server host (default: localhost)
+  --verbose, -v          Show detailed output
 
 Test Options:
   --dir, -d <path>       Directory containing tests (default: current directory)
@@ -57,8 +71,31 @@ Test Options:
   --ui                   Open vitest UI
   --verbose, -v          Show detailed output
   --context, -c <ctx>    Execution context: local | remote | all (default: local)
-  --db <backend>         Database backend: memory | fs | sqlite | postgres | clickhouse | mongo
+  --target <runtime>     Target runtime: node | bun | workers | all (default: node)
+  --db <backend>         Database backend: memory | fs | sqlite | sqlite-do | chdb | clickhouse | all
   --ai <mode>            AI mode: local | remote (default: local)
+
+Test Matrix Examples:
+  # Run tests with filesystem db on Node
+  mdxe test --target node --db fs
+
+  # Run tests with SQLite on Node
+  mdxe test --target node --db sqlite
+
+  # Run tests with ClickHouse (chDB) on Node
+  mdxe test --target node --db chdb
+
+  # Run tests on Bun runtime
+  mdxe test --target bun --db sqlite
+
+  # Run tests with SQLite Durable Objects on Workers
+  mdxe test --target workers --db sqlite-do
+
+  # Run tests with remote ClickHouse on Workers
+  mdxe test --target workers --db clickhouse
+
+  # Run ALL combinations (full matrix)
+  mdxe test --target all --db all
 
 Deploy Options:
   --dir, -d <path>       Project directory (default: current directory)
@@ -119,7 +156,7 @@ Environment:
 
 export function parseArgs(args: string[]): CliOptions {
   const options: CliOptions = {
-    command: 'help',
+    command: 'dev', // Default to dev
     projectDir: process.cwd(),
     platform: 'cloudflare',
     dryRun: false,
@@ -131,14 +168,23 @@ export function parseArgs(args: string[]): CliOptions {
     coverage: false,
     ui: false,
     context: 'local',
+    target: 'node',
     db: 'memory',
     aiMode: 'local',
+    port: 3000,
+    host: 'localhost',
   }
 
   // Parse command
   if (args.length > 0 && !args[0].startsWith('-')) {
     const cmd = args[0].toLowerCase()
-    if (cmd === 'test') {
+    if (cmd === 'dev') {
+      options.command = 'dev'
+    } else if (cmd === 'build') {
+      options.command = 'build'
+    } else if (cmd === 'start') {
+      options.command = 'start'
+    } else if (cmd === 'test') {
       options.command = 'test'
     } else if (cmd === 'deploy') {
       options.command = 'deploy'
@@ -239,11 +285,20 @@ export function parseArgs(args: string[]): CliOptions {
         }
         i++
         break
+      case '--target':
+        if (next === 'node' || next === 'bun' || next === 'workers' || next === 'all') {
+          options.target = next
+        } else {
+          console.error(`Invalid target: ${next}. Use 'node', 'bun', 'workers', or 'all'.`)
+          process.exit(1)
+        }
+        i++
+        break
       case '--db':
-        if (['memory', 'fs', 'sqlite', 'postgres', 'clickhouse', 'mongo'].includes(next)) {
+        if (['memory', 'fs', 'sqlite', 'sqlite-do', 'chdb', 'clickhouse', 'all'].includes(next)) {
           options.db = next as CliOptions['db']
         } else {
-          console.error(`Invalid db backend: ${next}. Use memory, fs, sqlite, postgres, clickhouse, or mongo.`)
+          console.error(`Invalid db backend: ${next}. Use memory, fs, sqlite, sqlite-do, chdb, clickhouse, or all.`)
           process.exit(1)
         }
         i++
@@ -255,6 +310,15 @@ export function parseArgs(args: string[]): CliOptions {
           console.error(`Invalid AI mode: ${next}. Use 'local' or 'remote'.`)
           process.exit(1)
         }
+        i++
+        break
+      // Server options
+      case '--port':
+        options.port = parseInt(next, 10) || 3000
+        i++
+        break
+      case '--host':
+        options.host = next || 'localhost'
         i++
         break
     }
@@ -321,30 +385,180 @@ export async function runDeploy(options: CliOptions): Promise<void> {
 }
 
 /**
- * Extract test blocks from MDX content
+ * Extract imports from code
  */
-function extractTestBlocks(content: string): { name: string; code: string }[] {
-  const tests: { name: string; code: string }[] = []
+function extractImports(code: string): { imports: string[]; codeWithoutImports: string } {
+  const imports: string[] = []
+  const lines = code.split('\n')
+  const nonImportLines: string[] = []
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    // Match import statements (including multiline)
+    if (trimmed.startsWith('import ') || trimmed.startsWith('import{')) {
+      imports.push(trimmed)
+    } else if (trimmed.startsWith('export ')) {
+      // Skip export statements in test blocks
+      continue
+    } else {
+      nonImportLines.push(line)
+    }
+  }
+
+  return {
+    imports,
+    codeWithoutImports: nonImportLines.join('\n').trim()
+  }
+}
+
+/**
+ * Extract file-level imports from MDX content (outside code blocks)
+ */
+function extractMdxImports(content: string): string[] {
+  const imports: string[] = []
+  // Match import statements at MDX level (not inside code blocks)
+  // Look for imports before the first code block or between frontmatter and content
+  const frontmatterEnd = content.indexOf('---', 3)
+  const firstCodeBlock = content.indexOf('```')
+
+  const searchArea = frontmatterEnd > 0 && firstCodeBlock > 0
+    ? content.slice(frontmatterEnd + 3, firstCodeBlock)
+    : content.slice(0, firstCodeBlock > 0 ? firstCodeBlock : 500)
+
+  const importRegex = /^import\s+.+$/gm
+  let match
+  while ((match = importRegex.exec(searchArea)) !== null) {
+    imports.push(match[0].trim())
+  }
+
+  return imports
+}
+
+/**
+ * Extract test blocks from MDX content
+ * Uses line-start anchoring to avoid matching backticks inside code
+ */
+function extractTestBlocks(content: string): { name: string; code: string; imports: string[] }[] {
+  const tests: { name: string; code: string; imports: string[] }[] = []
 
   // Match code blocks with 'test' in the meta
-  const codeBlockRegex = /```(?:ts|typescript|js|javascript)\s+test(?:\s+name="([^"]*)")?[^\n]*\n([\s\S]*?)```/g
+  // Use multiline mode and anchor to line start to avoid matching backticks inside code
+  const codeBlockRegex = /^```(?:ts|typescript|js|javascript)\s+test(?:\s+name="([^"]*)")?[^\n]*\n([\s\S]*?)^```$/gm
 
   let match
   let testIndex = 0
   while ((match = codeBlockRegex.exec(content)) !== null) {
     testIndex++
     const name = match[1] || `test ${testIndex}`
-    const code = match[2].trim()
-    tests.push({ name, code })
+    const rawCode = match[2].trim()
+
+    // Extract imports from this test block
+    const { imports, codeWithoutImports } = extractImports(rawCode)
+
+    tests.push({ name, code: codeWithoutImports, imports })
   }
 
   return tests
 }
 
 /**
- * Generate test code for ai-sandbox from extracted tests
+ * Check if an import is a local file import (starts with . or /)
  */
-function generateTestCode(tests: { name: string; code: string }[]): string {
+function isLocalImport(imp: string): boolean {
+  // Match imports like: import X from './path' or import X from '../path' or import X from '/path'
+  return /from\s+['"][.\/]/.test(imp)
+}
+
+/**
+ * Collect all imports from tests and MDX content
+ * Filters out local file imports since Miniflare can't resolve them
+ */
+function collectImports(
+  tests: { name: string; code: string; imports: string[] }[],
+  mdxImports: string[] = []
+): string[] {
+  const allImports = new Set<string>()
+
+  // Add MDX imports, filtering out local file imports
+  for (const imp of mdxImports) {
+    if (!isLocalImport(imp)) {
+      allImports.add(imp)
+    }
+  }
+
+  // Add test imports, filtering out local file imports
+  for (const test of tests) {
+    for (const imp of test.imports) {
+      if (!isLocalImport(imp)) {
+        allImports.add(imp)
+      }
+    }
+  }
+
+  return Array.from(allImports)
+}
+
+/**
+ * Transform TypeScript/JSX code to plain JavaScript
+ * Only transforms if actual JSX syntax is detected (not just HTML in strings)
+ */
+async function transformCode(code: string, hasImports: boolean): Promise<string> {
+  // Don't transform if there are external imports - esbuild will fail trying to bundle them
+  if (hasImports) {
+    return code
+  }
+
+  // More conservative JSX detection:
+  // - Must have JSX-style opening tag with capital letter (component) OR
+  // - Self-closing tag outside of a string literal
+  // - Avoid matching HTML in strings like '<h1>Hello</h1>'
+
+  // Look for JSX component pattern: <ComponentName or <Component.Name
+  const hasJsxComponent = /<[A-Z][a-zA-Z0-9.]*[\s/>]/.test(code)
+
+  // Look for JSX expression pattern: {expression} inside what looks like JSX
+  // This pattern: <tag {...} > or <tag prop={...} >
+  const hasJsxExpression = /<[a-zA-Z][a-zA-Z0-9]*[^>]*\{[^}]+\}[^>]*>/.test(code)
+
+  if (!hasJsxComponent && !hasJsxExpression) {
+    return code
+  }
+
+  try {
+    const result = await transform(code, {
+      loader: 'tsx',
+      jsx: 'transform',
+      jsxFactory: 'jsx',
+      jsxFragment: 'Fragment',
+      target: 'es2022',
+    })
+    // The transformed code expects jsx/Fragment to be in scope
+    // Prepend declarations that work with Hono's JSX
+    const jsxRuntime = `
+const jsx = (type, props, ...children) => {
+  if (typeof type === 'function') return type({ ...props, children });
+  const element = { type, props: { ...props, children: children.flat() } };
+  return element;
+};
+const Fragment = ({ children }) => children;
+const jsxs = jsx;
+`
+    return jsxRuntime + result.code
+  } catch (e: unknown) {
+    // If transformation fails, return original code
+    // The sandbox will report the actual error
+    console.warn('JSX transform warning:', (e as Error).message)
+    return code
+  }
+}
+
+/**
+ * Generate test code for ai-sandbox from extracted tests
+ * Imports are now passed separately to be hoisted at module top level
+ */
+function generateTestCode(
+  tests: { name: string; code: string; imports: string[] }[]
+): string {
   if (tests.length === 0) return ''
 
   const testCases = tests.map(test => {
@@ -394,6 +608,54 @@ async function findMdxTestFiles(projectDir: string, filter?: string): Promise<st
 }
 
 /**
+ * Get database provider config for the SDK
+ * The SDK injects DB, db, etc. as globals based on this config
+ */
+function getDbConfig(db: CliOptions['db'], target: CliOptions['target']): { provider: string; config: Record<string, unknown> } {
+  switch (db) {
+    case 'memory':
+      return { provider: 'memory', config: {} }
+    case 'fs':
+      return { provider: 'fs', config: { root: './content' } }
+    case 'sqlite':
+      return { provider: 'sqlite', config: { url: ':memory:' } }
+    case 'sqlite-do':
+      return { provider: 'sqlite-do', config: {} }
+    case 'chdb':
+      return { provider: 'chdb', config: { path: './.db/clickhouse' } }
+    case 'clickhouse':
+      return { provider: 'clickhouse', config: { url: process.env.CLICKHOUSE_URL || 'http://localhost:8123' } }
+    default:
+      return { provider: 'memory', config: {} }
+  }
+}
+
+/**
+ * Generate test matrix from target and db options
+ */
+function generateTestMatrix(target: CliOptions['target'], db: CliOptions['db']): Array<{ target: string; db: string }> {
+  const targets = target === 'all' ? ['node', 'bun', 'workers'] : [target]
+  const dbs = db === 'all'
+    ? ['memory', 'fs', 'sqlite', 'sqlite-do', 'chdb', 'clickhouse']
+    : [db]
+
+  const matrix: Array<{ target: string; db: string }> = []
+
+  for (const t of targets) {
+    for (const d of dbs) {
+      // Skip invalid combinations
+      if (t === 'workers' && (d === 'fs' || d === 'chdb')) continue // fs and chdb not available on workers
+      if (t === 'node' && d === 'sqlite-do') continue // Durable Objects only on workers
+      if (t === 'bun' && d === 'sqlite-do') continue // Durable Objects only on workers
+
+      matrix.push({ target: t, db: d })
+    }
+  }
+
+  return matrix
+}
+
+/**
  * Run MDX tests using ai-sandbox
  */
 export async function runTest(options: CliOptions): Promise<void> {
@@ -413,6 +675,16 @@ export async function runTest(options: CliOptions): Promise<void> {
 
   console.log(`📋 Found ${testFiles.length} test file(s)`)
 
+  // Generate test matrix
+  const matrix = generateTestMatrix(options.target, options.db)
+
+  if (matrix.length > 1) {
+    console.log(`\n📊 Test Matrix: ${matrix.length} combinations`)
+    for (const combo of matrix) {
+      console.log(`   • ${combo.target} + ${combo.db}`)
+    }
+  }
+
   // Get SDK config from environment and CLI options
   const sdkConfig = {
     context: options.context as 'local' | 'remote',
@@ -424,7 +696,8 @@ export async function runTest(options: CliOptions): Promise<void> {
     aiGatewayToken: process.env.AI_GATEWAY_TOKEN,
   }
 
-  console.log(`⚙️  Context: ${options.context}`)
+  console.log(`\n⚙️  Context: ${options.context}`)
+  console.log(`🎯 Target: ${options.target}`)
   console.log(`💾 Database: ${options.db}`)
   if (options.context === 'remote') {
     console.log(`🌐 RPC URL: ${sdkConfig.rpcUrl}`)
@@ -443,6 +716,8 @@ export async function runTest(options: CliOptions): Promise<void> {
   // Track results
   const results: {
     file: string
+    target: string
+    db: string
     total: number
     passed: number
     failed: number
@@ -455,10 +730,23 @@ export async function runTest(options: CliOptions): Promise<void> {
   let totalPassed = 0
   let totalFailed = 0
 
+  // Run each matrix combination
+  for (const combo of matrix) {
+    if (matrix.length > 1) {
+      console.log(`\n🔄 Running: ${combo.target} + ${combo.db}`)
+      console.log('─'.repeat(40))
+    }
+
+    // Get db config for this combination
+    const dbConfig = getDbConfig(combo.db as CliOptions['db'], combo.target as CliOptions['target'])
+
   // Run each test file
   for (const filePath of testFiles) {
     const fileName = relative(projectDir, filePath)
     const content = readFileSync(filePath, 'utf-8')
+
+    // Extract MDX-level imports
+    const mdxImports = extractMdxImports(content)
 
     // Extract test blocks
     const testBlocks = extractTestBlocks(content)
@@ -470,14 +758,24 @@ export async function runTest(options: CliOptions): Promise<void> {
       continue
     }
 
-    // Generate test code
-    const testCode = generateTestCode(testBlocks)
+    // Collect imports and generate test code
+    const imports = collectImports(testBlocks, mdxImports)
+    const rawTestCode = generateTestCode(testBlocks)
 
-    // Run through ai-sandbox
+    // Transform JSX/TypeScript to plain JavaScript
+    // Skip transformation if external imports exist (esbuild can't bundle them)
+    const testCode = await transformCode(rawTestCode, imports.length > 0)
+
+    // Run through ai-sandbox with hoisted imports and db config
     const startTime = Date.now()
     const result = await evaluate({
       tests: testCode,
-      sdk: sdkConfig,
+      sdk: {
+        ...sdkConfig,
+        db: dbConfig,
+        target: combo.target,
+      },
+      imports,
     })
 
     const duration = Date.now() - startTime
@@ -492,6 +790,8 @@ export async function runTest(options: CliOptions): Promise<void> {
 
       results.push({
         file: fileName,
+        target: combo.target,
+        db: combo.db,
         total,
         passed,
         failed,
@@ -527,10 +827,28 @@ export async function runTest(options: CliOptions): Promise<void> {
       }
     }
   }
+  } // End matrix loop
 
   // Summary
-  console.log('\n' + '─'.repeat(60))
+  console.log('\n' + '═'.repeat(60))
   console.log(`\n📊 Summary: ${totalPassed}/${totalTests} tests passed`)
+
+  if (matrix.length > 1) {
+    console.log(`\n📋 Matrix Results:`)
+    // Group by combo
+    const byCombo = new Map<string, { passed: number; failed: number }>()
+    for (const r of results) {
+      const key = `${r.target} + ${r.db}`
+      const existing = byCombo.get(key) || { passed: 0, failed: 0 }
+      existing.passed += r.passed
+      existing.failed += r.failed
+      byCombo.set(key, existing)
+    }
+    for (const [key, counts] of byCombo) {
+      const icon = counts.failed > 0 ? '❌' : '✅'
+      console.log(`   ${icon} ${key}: ${counts.passed} passed, ${counts.failed} failed`)
+    }
+  }
 
   if (totalFailed > 0) {
     console.log(`\n❌ ${totalFailed} test(s) failed`)
@@ -540,11 +858,75 @@ export async function runTest(options: CliOptions): Promise<void> {
   }
 }
 
+/**
+ * Run dev server
+ */
+export async function runDev(options: CliOptions): Promise<void> {
+  console.log('🚀 mdxe dev\n')
+  console.log(`📁 Project: ${options.projectDir}`)
+  console.log(`🌐 Server: http://${options.host}:${options.port}`)
+  console.log('')
+
+  // Dynamic import of @mdxe/hono server
+  const { createDevServer } = await import('@mdxe/hono/server')
+  await createDevServer({
+    projectDir: options.projectDir,
+    port: options.port,
+    host: options.host,
+    verbose: options.verbose,
+  })
+}
+
+/**
+ * Build for production
+ */
+export async function runBuild(options: CliOptions): Promise<void> {
+  console.log('📦 mdxe build\n')
+  console.log(`📁 Project: ${options.projectDir}`)
+
+  // Dynamic import of @mdxe/hono build
+  const { build } = await import('@mdxe/hono/server')
+  await build({
+    projectDir: options.projectDir,
+    verbose: options.verbose,
+  })
+
+  console.log('\n✅ Build complete!')
+}
+
+/**
+ * Start production server
+ */
+export async function runStart(options: CliOptions): Promise<void> {
+  console.log('🚀 mdxe start\n')
+  console.log(`📁 Project: ${options.projectDir}`)
+  console.log(`🌐 Server: http://${options.host}:${options.port}`)
+  console.log('')
+
+  // Dynamic import of @mdxe/hono server
+  const { createServer } = await import('@mdxe/hono/server')
+  await createServer({
+    projectDir: options.projectDir,
+    port: options.port,
+    host: options.host,
+    verbose: options.verbose,
+  })
+}
+
 export async function main(): Promise<void> {
   const args = process.argv.slice(2)
   const options = parseArgs(args)
 
   switch (options.command) {
+    case 'dev':
+      await runDev(options)
+      break
+    case 'build':
+      await runBuild(options)
+      break
+    case 'start':
+      await runStart(options)
+      break
     case 'test':
       await runTest(options)
       break
