@@ -30,5 +30,3 @@ export {
   extractTOC,
 } from '@mdxui/fumadocs/hono'
 
-// Re-export for backwards compatibility as DocContent
-export { DocsBody as DocContent } from '@mdxui/fumadocs/hono'
