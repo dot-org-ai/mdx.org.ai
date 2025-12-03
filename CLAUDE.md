@@ -148,6 +148,29 @@ AI primitives packages (submodule) providing core functionality:
 
 ## Key Concepts
 
+### URL-Based File System
+
+MDXLD uses a URL-based file system where every resource can be both a file AND a folder simultaneously—unlike traditional file systems where something must be one or the other. This mirrors how URLs work on the web: `https://example.com/posts` can return content AND `https://example.com/posts/hello` can exist as a child resource.
+
+In practice:
+- Folder name = domain/namespace (e.g., `assistant.md/`, `headless.ly/`)
+- `README.mdx` = the `/` endpoint for that namespace (technical docs, like GitHub)
+- `index.mdx` = the website/public-facing page (if different from README)
+- Everything is MDX—combining data (YAML-LD frontmatter), content (Markdown), code (TypeScript), and UI (JSX) in a single file
+
+For simple projects, `README.mdx` alone serves as both docs and website. When you need them separate:
+- `index.mdx` → marketing site, landing page, public UI
+- `README.mdx` → technical documentation, API reference, developer docs
+
+```
+examples/
+├── assistant.md/           # Domain: https://assistant.md
+│   ├── README.mdx          # Technical docs (/ endpoint if no index.mdx)
+│   ├── index.mdx           # Website/landing page (/ endpoint if present)
+│   ├── docs/               # https://assistant.md/docs
+│   └── [Assistant].mdx     # https://assistant.md/{slug} (dynamic route)
+```
+
 ### MDXLD Documents
 
 Documents have YAML frontmatter with JSON-LD properties:

@@ -7,35 +7,267 @@ description: Example MDX applications demonstrating MDXLD patterns for AI-powere
 
 # MDX Examples
 
-This collection showcases example MDX applications built with the mdx.org.ai stack. Each example demonstrates different patterns for building AI-powered sites, APIs, databases, and agents.
+Build AI-powered applications with Markdown. Each example is a working product you can run, customize, and deploy.
 
-## What's Here
+MDXLD uses a URL-based file system where every resource can be both a file AND a folder—unlike traditional file systems. The folder name is the domain (e.g., `assistant.md/`), and everything is MDX, combining data, content, code, and UI in a single format.
 
-These examples show how to build:
+For simple projects, `README.mdx` serves as both the `/` endpoint and documentation. When you need them separate, add `index.mdx` for the public website while `README.mdx` remains the technical docs (like GitHub).
 
-- **AI-powered APIs** - REST and GraphQL endpoints defined in MDX
-- **Database interfaces** - Schema-first data access with automatic relationships
-- **Content sites** - Documentation, blogs, and marketing pages
-- **Agent workflows** - Multi-step AI workflows with human-in-the-loop
-- **MCP servers** - Model Context Protocol integrations
-
-## Getting Started
-
-Run the development server to explore these examples:
+## Quick Start
 
 ```bash
-pnpm mdxe:dev
+# Clone and install
+git clone https://github.com/mdx-org/mdx.org.ai
+cd mdx.org.ai
+pnpm install
+
+# Run any example
+pnpm mdxe dev examples/assistant.md
 ```
 
-Then open http://localhost:3000 to browse the examples.
+---
+
+## AI Tools
+
+Tools that enhance your development workflow with AI.
+
+| Product | Description | Install |
+|---------|-------------|---------|
+| [**assistant.md**](./assistant.md) | Personal AI assistant in Markdown | `npm i assistant.md` |
+| [**workflow.md**](./workflow.md) | Automation workflows in Markdown | `npm i workflow.md` |
+| [**writer.md**](./writer.md) | AI content writing and editing | `npm i writer.md` |
+| [**scrape.md**](./scrape.md) | Web scrapers defined in Markdown | `npm i scrape.md` |
+| [**agents.mdx**](./agents.mdx.org.ai) | Multi-platform agent configs | `npm i agents.mdx` |
+| [**agentic.md**](./agentic.md) | Build AI agents with Markdown | `npm i agentic.md` |
+
+### assistant.md
+
+Design personal AI assistants with Markdown. Define personality, tools, and routines.
+
+```bash
+npx assistant chat alex.mdx --voice
+```
+
+### workflow.md
+
+Automation workflows with triggers, steps, and human-in-the-loop approvals.
+
+```bash
+npx workflow deploy onboarding.md
+```
+
+### writer.md
+
+AI-powered content generation, editing, and SEO optimization.
+
+```bash
+npx writer generate "GraphQL Tutorial" --type blogPost
+npx writer improve README.md --tone professional
+```
+
+### scrape.md
+
+Define web scrapers in Markdown with selectors and transforms.
+
+```bash
+npx scrape run products.md -o data.json
+```
+
+---
+
+## Platforms
+
+Full-featured applications and services.
+
+| Product | Description | Install |
+|---------|-------------|---------|
+| [**headless.ly**](./headless.ly) | Headless CMS powered by MDX | `npm i headless.ly` |
+| [**markt.ng**](./markt.ng) | AI marketing automation | `npm i markt.ng` |
+| [**advertis.ng**](./advertis.ng) | AI-powered ad generation | `npm i advertis.ng` |
+
+### headless.ly
+
+Git-based headless CMS with AI content generation and typed APIs.
+
+```bash
+npx headless init my-blog
+npx headless dev
+```
+
+### markt.ng
+
+AI-powered marketing: campaigns, email sequences, A/B testing.
+
+```bash
+npx markt generate email "Product Launch" --product "SaaS Tool"
+npx markt sequence create --trigger signup --length 7
+```
+
+### advertis.ng
+
+Generate and optimize ads for Google, Meta, LinkedIn, and TikTok.
+
+```bash
+npx ads generate google search "Analytics Platform"
+npx ads optimize ad_abc123
+```
+
+---
+
+## Developer Tools
+
+Utilities for code and documentation.
+
+| Product | Description | Install |
+|---------|-------------|---------|
+| [**todo.mdx**](./todo.mdx.org.ai) | Task sync across GitHub/Linear | `npm i todo.mdx` |
+| [**readme.mdx**](./readme.mdx.org.ai) | Multi-target README generation | `npm i readme.mdx` |
+
+### todo.mdx
+
+Sync tasks between local MDX files, GitHub Issues, and Linear.
+
+```bash
+npx todo scan        # Find TODOs in code
+npx todo sync        # Sync with GitHub/Linear
+```
+
+### readme.mdx
+
+Generate READMEs for GitHub, npm, docs sites, and landing pages from a single source.
+
+```bash
+npx readme render              # Generate README.md
+npx readme render --template docs
+```
+
+---
+
+## Data Sources
+
+Real-time data via REST API wrappers.
+
+| Source | Description | Data |
+|--------|-------------|------|
+| [**hacker.news.org.ai**](./hacker.news.org.ai) | Hacker News API | Stories, users, comments |
+| [**yc.startups.org.ai**](./yc.startups.org.ai) | YC Company Directory | Companies, batches, industries |
+| [**schema.org.ai**](./schema.org.ai) | Schema.org browser | Types, properties, examples |
+
+```ts
+import { sources } from '@mdxdb/sources'
+
+// Hacker News
+const hn = sources.get('https://hacker.news.org.ai')
+const stories = await hn.endpoint('topStories')
+const story = await hn.endpoint('item', { id: '12345' })
+
+// YC Startups
+const yc = sources.get('https://yc.startups.org.ai')
+const companies = await yc.endpoint('search', {}, { query: 'AI' })
+```
+
+---
+
+## API Patterns
+
+Reference implementations for API design.
+
+| Example | Description |
+|---------|-------------|
+| [**api.ht**](./api.ht) | HyperText API - URL-native REST |
+| [**db.ht**](./db.ht) | Database interface API |
+| [**example.com.ai**](./example.com.ai) | Modern example.com for AI |
+
+### api.ht
+
+Self-documenting REST APIs with link relations (HATEOAS).
+
+```bash
+GET https://api.ht/
+# Returns discoverable API with $ref links
+```
+
+---
+
+## Entity Templates
+
+Reusable entity types for common patterns.
+
+| Template | Description |
+|----------|-------------|
+| `[BlogPost].mdx` | Blog posts with author, tags |
+| `[User].mdx` | User profiles |
+| `[Product].mdx` | E-commerce products |
+| `[Task].mdx` | Task management |
+| `[APIEndpoint].mdx` | API endpoint definitions |
+| `[Webhook].mdx` | Webhook handlers |
+| `[Assistant].mdx` | AI assistant configs |
+| `[Workflow].mdx` | Automation workflows |
+
+---
 
 ## Structure
 
-Each subdirectory is a self-contained example application with:
+Each example folder IS the domain. `README.mdx` is the `/` endpoint (or `index.mdx` if you need separate website vs docs):
 
-- `README.mdx` - Overview and documentation
-- `app.mdx` - Application configuration
-- `api.mdx` - API endpoint definitions
-- `mcp.mdx` - MCP server configuration
-- `docs/` - Documentation pages
-- `[Type].mdx` - Dynamic route templates
+```
+domain.tld/              # Folder name = domain = namespace
+├── README.mdx           # Technical docs (/ endpoint if no index.mdx)
+├── index.mdx            # Website/landing page (/ endpoint if present)
+├── app.mdx              # Application layout
+├── api.mdx              # API reference
+├── mcp.mdx              # MCP server config
+├── [Type].mdx           # Dynamic route templates (e.g., /users/{id})
+└── docs/                # Nested routes (/docs/*)
+    └── index.mdx        # /docs endpoint
+```
+
+## Running Examples
+
+```bash
+# Development server
+pnpm mdxe dev examples/assistant.md
+
+# Build for production
+pnpm mdxe build examples/assistant.md
+
+# Deploy to Cloudflare
+pnpm mdxe deploy examples/assistant.md
+```
+
+## Creating New Examples
+
+```bash
+# Create folder named after your domain
+mkdir examples/my-product.dev
+cd examples/my-product.dev
+
+# Create README.mdx as the / endpoint
+cat > README.mdx << 'EOF'
+---
+$type: https://mdx.org.ai/Package
+$id: https://my-product.dev
+$context: https://my-product.dev
+name: my-product.dev
+version: 0.1.0
+---
+
+export const config = {
+  // Configuration
+}
+
+export async function main() {
+  // Implementation
+}
+
+# my-product.dev
+
+Description and documentation...
+EOF
+```
+
+---
+
+## License
+
+MIT - Use these examples as starting points for your own products.
