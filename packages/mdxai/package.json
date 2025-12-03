@@ -48,7 +48,9 @@
     "@mdxdb/fs": "workspace:*",
     "@mdxdb/sqlite": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.23.0",
+    "ai-database": "workspace:*",
     "ai-functions": "workspace:*",
+    "ai-workflows": "workspace:*",
     "zod": "^3.24.0"
   },
   "devDependencies": {

@@ -8,7 +8,7 @@
 
 import { createFsDatabase } from '@mdxdb/fs'
 import { createSqliteDatabase } from '@mdxdb/sqlite'
-import type { Database } from 'mdxdb'
+import type { AnyDatabase } from './index.js'
 import { resolve } from 'node:path'
 import { runMcpServer } from './server.js'
 
@@ -129,16 +129,15 @@ export function parseArgs(args: string[]): CliOptions {
   return options
 }
 
-export function createDatabase(options: CliOptions): Database {
+export async function createDatabase(options: CliOptions): Promise<AnyDatabase> {
   if (options.database === 'sqlite') {
-    return createSqliteDatabase({
-      filename: options.path === ':memory:' ? ':memory:' : resolve(options.path),
-    })
+    const url = options.path === ':memory:' ? ':memory:' : `file:${resolve(options.path)}`
+    return createSqliteDatabase({ url }) as unknown as AnyDatabase
   }
 
   return createFsDatabase({
     root: resolve(options.path),
-  })
+  }) as unknown as AnyDatabase
 }
 
 /**
@@ -198,7 +197,7 @@ async function main(): Promise<void> {
   console.error(`  Name: ${options.name}`)
 
   // Create database
-  const db = createDatabase(options)
+  const db = await createDatabase(options)
 
   // Handle graceful shutdown
   const shutdown = async () => {
@@ -213,7 +212,7 @@ async function main(): Promise<void> {
   // Run MCP server with stdio transport
   await runMcpServer({
     name: options.name,
-    database: db,
+    database: db as unknown as import('mdxdb').Database,
   })
 }
 

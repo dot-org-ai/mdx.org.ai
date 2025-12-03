@@ -57,7 +57,7 @@ function definitionToTool<TArgs = unknown, TReturn = unknown>(
     description: definition.description ?? `Function: ${definition.name}`,
     parameters: {
       type: 'object',
-      properties: definition.args as Record<string, unknown>,
+      properties: definition.args as Record<string, import('ai-functions').JSONSchema>,
       required: Object.keys(definition.args as object || {}),
     },
     handler: createCallable(definition),
@@ -187,16 +187,18 @@ export class PersistentFunctionRegistry implements FunctionRegistry {
    */
   async setAsync(name: string, fn: DefinedFunction): Promise<void> {
     const definition = fn.definition
+    // Extract properties to avoid duplicate 'name' and 'type' keys
+    const { name: defName, type: defType, ...restDefinition } = definition
 
     await this.db.set(this.docId(name), {
       type: 'AIFunction',
       data: {
         $type: 'AIFunction',
-        name: definition.name,
-        functionType: definition.type,
-        ...definition,
+        name: defName,
+        functionType: defType,
+        ...restDefinition,
       },
-      content: `# ${definition.name}\n\n${definition.description ?? ''}\n\nType: ${definition.type}`,
+      content: `# ${defName}\n\n${definition.description ?? ''}\n\nType: ${defType}`,
     })
 
     // Update cache
