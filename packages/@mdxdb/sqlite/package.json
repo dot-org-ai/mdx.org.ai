@@ -1,7 +1,7 @@
 {
   "name": "@mdxdb/sqlite",
   "version": "0.0.0",
-  "description": "SQLite adapter for mdxdb - stores MDX documents in SQLite",
+  "description": "SQLite/libSQL adapter for mdxdb - stores MDX documents with vector search support",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -29,20 +29,24 @@
   "keywords": [
     "mdxdb",
     "sqlite",
+    "libsql",
+    "turso",
     "database",
     "adapter",
-    "mdx"
+    "mdx",
+    "vector",
+    "embeddings"
   ],
   "license": "MIT",
   "dependencies": {
-    "better-sqlite3": "^11.7.0"
+    "@libsql/client": "^0.14.0"
   },
   "peerDependencies": {
     "mdxdb": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.12",
+    "@mdxld/tsconfig": "workspace:^",
     "mdxdb": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",

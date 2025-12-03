@@ -1,7 +1,7 @@
 {
   "name": "@mdxdb/clickhouse",
   "version": "0.0.0",
-  "description": "ClickHouse adapter for mdxdb",
+  "description": "ClickHouse adapter for mdxdb - optimized for analytics and event sourcing",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -29,12 +29,28 @@
   "keywords": [
     "mdxdb",
     "clickhouse",
+    "chdb",
     "analytics",
     "database",
-    "adapter"
+    "adapter",
+    "event-sourcing",
+    "cloudflare-workers"
   ],
   "license": "MIT",
+  "dependencies": {
+    "mdxdb": "workspace:^"
+  },
+  "peerDependencies": {
+    "chdb": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "chdb": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@mdxld/tsconfig": "workspace:^",
+    "chdb": "^1.2.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

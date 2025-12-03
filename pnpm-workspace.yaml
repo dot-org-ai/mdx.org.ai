@@ -1,6 +1,9 @@
 packages:
   - 'packages/*'
+  - 'packages/@config/*'
   - 'packages/@mdxe/*'
   - 'packages/@mdxai/*'
   - 'packages/@mdxdb/*'
+  - 'packages/@mdxld/*'
   - 'packages/@mdxui/*'
+  - 'primitives/packages/*'

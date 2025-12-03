@@ -1,5 +1,5 @@
 {
-  "extends": "../../../tsconfig.json",
+  "extends": "@mdxld/tsconfig/react.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src"

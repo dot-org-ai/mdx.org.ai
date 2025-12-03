@@ -1,0 +1,17 @@
+{
+  "name": "@mdxld/tsconfig",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "base.json",
+  "exports": {
+    ".": "./base.json",
+    "./base": "./base.json",
+    "./base.json": "./base.json",
+    "./library": "./library.json",
+    "./library.json": "./library.json",
+    "./react": "./react.json",
+    "./react.json": "./react.json"
+  },
+  "files": ["*.json"]
+}

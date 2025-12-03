@@ -48,6 +48,7 @@
     "mdxld": "workspace:*"
   },
   "devDependencies": {
+    "@mdxld/tsconfig": "workspace:^",
     "@mdxdb/fs": "workspace:*",
     "@mdxdb/sqlite": "workspace:*",
     "mdxdb": "workspace:*",

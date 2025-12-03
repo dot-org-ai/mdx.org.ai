@@ -9,8 +9,7 @@
     "dev": "turbo run dev",
     "test": "turbo run test",
     "test:unit": "turbo run test:unit",
-    "test:integration": "vitest run --config vitest.integration.config.ts",
-    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "test:mdx": "vitest run --config vitest.mdx.config.ts",
     "lint": "turbo run lint",
     "lint:root": "eslint .",
     "typecheck": "turbo run typecheck",
@@ -20,6 +19,8 @@
     "mdxai": "node packages/mdxai/dist/cli.js"
   },
   "devDependencies": {
+    "@config/eslint": "workspace:*",
+    "@mdxld/tsconfig": "workspace:*",
     "@eslint/js": "^9.16.0",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.0",
