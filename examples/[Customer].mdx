@@ -1,0 +1,87 @@
+---
+$type: Customer
+$id: https://shop.example.com/customers/{id}
+id: string
+email: string
+name: string
+phone: string?
+addresses: Address[]
+defaultAddress: Address?
+stripeCustomerId: string?
+tags: string[]?
+notes: string?
+totalOrders: number = 0
+totalSpent: number = 0
+createdAt: datetime
+updatedAt: datetime
+---
+
+# {name}
+
+<CustomerAvatar name={name} />
+
+## Contact
+
+- Email: [{email}](mailto:{email})
+- Phone: {phone}
+
+## Addresses
+
+```ts
+<AddressList addresses={addresses} default={defaultAddress} />
+```
+
+## Orders
+
+```ts
+const orders = await db.Orders.find({
+  where: { customer: $id },
+  orderBy: { createdAt: 'desc' },
+  limit: 10
+})
+```
+
+<OrderList orders={orders} />
+
+**Total Orders:** {totalOrders} | **Total Spent:** <Money amount={totalSpent} />
+
+## Subscriptions
+
+```ts
+if (stripeCustomerId) {
+  const subscriptions = await api.stripe.subscriptions.list({
+    customer: stripeCustomerId,
+    status: 'active'
+  })
+  return <SubscriptionList subscriptions={subscriptions.data} />
+}
+```
+
+## Activity
+
+```ts
+const events = await $.events.query({
+  type: { $startsWith: 'customer.' },
+  data: { customerId: id }
+})
+```
+
+<ActivityTimeline events={events} />
+
+## Segment
+
+```ts
+// Auto-segment based on behavior
+decide('customer.segment', {
+  when: { totalSpent: { $gte: 1000 } },
+  then: { segment: 'vip' }
+}, {
+  when: { totalOrders: { $gte: 5 } },
+  then: { segment: 'loyal' }
+}, {
+  when: { totalOrders: { $eq: 0 } },
+  then: { segment: 'prospect' }
+}, {
+  default: { segment: 'standard' }
+})
+```

@@ -1,0 +1,74 @@
+---
+$type: Product
+$id: https://shop.example.com/products/{sku}
+sku: string
+name: string
+description: markdown
+price: number
+compareAtPrice: number?
+currency: string = 'USD'
+images: url[]
+category: Category
+inventory: number
+status: active | draft | archived
+variants: ProductVariant[]?
+metadata: object?
+createdAt: datetime
+updatedAt: datetime
+---
+
+# {name}
+
+<ProductGallery images={images} />
+
+<PriceDisplay price={price} compareAt={compareAtPrice} currency={currency} />
+
+{description}
+
+## Variants
+
+```ts
+if (variants?.length) {
+  return <VariantSelector variants={variants} />
+}
+```
+
+## Add to Cart
+
+```tsx
+const AddToCart = () => {
+  'use client'
+  const [quantity, setQuantity] = useState(1)
+  const [adding, setAdding] = useState(false)
+
+  const handleAdd = async () => {
+    setAdding(true)
+    await api.cart.add({ product: $id, quantity })
+    setAdding(false)
+    send('cart.updated')
+  }
+
+  return (
+    <div>
+      <QuantitySelector value={quantity} onChange={setQuantity} max={inventory} />
+      <button onClick={handleAdd} disabled={adding || inventory === 0}>
+        {inventory === 0 ? 'Out of Stock' : adding ? 'Adding...' : 'Add to Cart'}
+      </button>
+    </div>
+  )
+}
+```
+
+<AddToCart />
+
+## You May Also Like
+
+```ts
+const recommendations = await ai.recommend('products', {
+  similar: $id,
+  limit: 4,
+  exclude: [$id]
+})
+```
+
+<ProductGrid products={recommendations} />

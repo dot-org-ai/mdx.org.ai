@@ -1,0 +1,201 @@
+---
+$type: LandingPage
+$id: https://example.com/{slug}
+slug: string
+title: string
+description: string
+ogImage: url?
+hero: HeroSection
+features: Feature[]
+pricing: PricingSection?
+testimonials: Testimonial[]?
+faq: FAQ[]?
+cta: CTASection
+published: boolean = false
+publishedAt: datetime?
+createdAt: datetime
+updatedAt: datetime
+---
+
+<SEO title={title} description={description} image={ogImage} />
+
+# {hero.headline}
+
+{hero.subheadline}
+
+```tsx
+const HeroActions = () => {
+  'use client'
+
+  return (
+    <div class="hero-actions">
+      <Button href={hero.primaryCta.url} size="large">
+        {hero.primaryCta.label}
+      </Button>
+      {hero.secondaryCta && (
+        <Button href={hero.secondaryCta.url} variant="outline">
+          {hero.secondaryCta.label}
+        </Button>
+      )}
+    </div>
+  )
+}
+```
+
+<HeroActions />
+
+```ts
+if (hero.image) {
+  return <HeroImage src={hero.image} alt={hero.headline} />
+}
+```
+
+## Features
+
+```ts
+<FeatureGrid>
+  {features.map(feature => (
+    <FeatureCard
+      key={feature.title}
+      icon={feature.icon}
+      title={feature.title}
+      description={feature.description}
+    />
+  ))}
+</FeatureGrid>
+```
+
+## Pricing
+
+```ts
+if (pricing) {
+  return (
+    <PricingSection>
+      {pricing.plans.map(plan => (
+        <PricingCard
+          key={plan.name}
+          name={plan.name}
+          price={plan.price}
+          interval={plan.interval}
+          features={plan.features}
+          cta={plan.cta}
+          highlighted={plan.highlighted}
+        />
+      ))}
+    </PricingSection>
+  )
+}
+```
+
+## Testimonials
+
+```ts
+if (testimonials?.length) {
+  return (
+    <TestimonialCarousel>
+      {testimonials.map(t => (
+        <Testimonial
+          key={t.author}
+          quote={t.quote}
+          author={t.author}
+          role={t.role}
+          company={t.company}
+          avatar={t.avatar}
+        />
+      ))}
+    </TestimonialCarousel>
+  )
+}
+```
+
+## FAQ
+
+```ts
+if (faq?.length) {
+  return (
+    <FAQAccordion>
+      {faq.map(item => (
+        <FAQItem key={item.question} question={item.question}>
+          {item.answer}
+        </FAQItem>
+      ))}
+    </FAQAccordion>
+  )
+}
+```
+
+## {cta.headline}
+
+{cta.subheadline}
+
+```tsx
+const CTAForm = () => {
+  'use client'
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+
+  const submit = async () => {
+    setLoading(true)
+
+    await db.Leads.create({
+      $type: 'Lead',
+      email,
+      source: slug,
+      createdAt: new Date()
+    })
+
+    track('landing.signup', { page: slug, email })
+
+    await send('lead.created', { email, source: slug })
+
+    setLoading(false)
+    setSubmitted(true)
+  }
+
+  if (submitted) {
+    return <p>Thanks! We'll be in touch soon.</p>
+  }
+
+  return (
+    <form onSubmit={e => { e.preventDefault(); submit() }}>
+      <input
+        type="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        placeholder="Enter your email"
+        required
+      />
+      <button disabled={loading}>
+        {loading ? 'Submitting...' : cta.buttonLabel}
+      </button>
+    </form>
+  )
+}
+```
+
+<CTAForm />
+
+## Analytics
+
+```ts
+// Track page views
+track('landing.view', { page: slug })
+
+// Track scroll depth
+on('scroll.depth', async ({ depth }) => {
+  if (depth === 50 || depth === 100) {
+    track('landing.scroll', { page: slug, depth })
+  }
+})
+
+// A/B test hero
+experiment('hero-headline', {
+  page: slug,
+  variants: [
+    { id: 'control', headline: hero.headline },
+    { id: 'variant-a', headline: 'Alternative headline here' }
+  ],
+  metric: 'landing.signup'
+})
+```

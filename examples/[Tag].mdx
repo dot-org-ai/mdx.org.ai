@@ -1,0 +1,41 @@
+---
+$type: Tag
+$id: https://blog.example.com/tags/{slug}
+slug: string
+name: string
+description: string?
+color: string?
+icon: string?
+---
+
+# {name}
+
+{description}
+
+## Posts tagged "{name}"
+
+```ts
+const posts = await db.BlogPosts.find({
+  where: {
+    tags: { $contains: $id },
+    status: 'published'
+  },
+  orderBy: { publishedAt: 'desc' }
+})
+```
+
+<PostList posts={posts} />
+
+## Related Tags
+
+```ts
+const related = await db.Tags.find({
+  where: {
+    $id: { $in: await db.BlogPosts.distinct('tags', { tags: { $contains: $id } }) },
+    $id: { $ne: $id }
+  },
+  limit: 5
+})
+```
+
+<TagCloud tags={related} />

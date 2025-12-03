@@ -1,0 +1,151 @@
+---
+$type: Conversation
+$id: https://ai.example.com/conversations/{id}
+id: string
+assistant: Assistant
+user: User?
+messages: Message[]
+status: active | archived
+metadata: object?
+startedAt: datetime
+lastMessageAt: datetime
+---
+
+# Conversation
+
+<ConversationHeader assistant={assistant} user={user} />
+
+## Messages
+
+```tsx
+const MessageThread = () => {
+  'use client'
+  const [msgs, setMsgs] = useState(messages)
+  const [input, setInput] = useState('')
+  const [streaming, setStreaming] = useState(false)
+
+  const sendMessage = async () => {
+    if (!input.trim() || streaming) return
+
+    const userMsg = { role: 'user', content: input, timestamp: new Date() }
+    setMsgs(prev => [...prev, userMsg])
+    setInput('')
+    setStreaming(true)
+
+    // Save user message
+    await db.Conversations.update($id, {
+      messages: [...msgs, userMsg],
+      lastMessageAt: new Date()
+    })
+
+    // Stream AI response
+    let assistantContent = ''
+    const assistantMsg = { role: 'assistant', content: '', timestamp: new Date() }
+    setMsgs(prev => [...prev, assistantMsg])
+
+    for await (const chunk of ai.stream({
+      model: assistant.model,
+      system: assistant.systemPrompt,
+      messages: [...msgs, userMsg].map(m => ({ role: m.role, content: m.content })),
+      tools: assistant.tools
+    })) {
+      assistantContent += chunk.content
+      setMsgs(prev => {
+        const updated = [...prev]
+        updated[updated.length - 1] = { ...assistantMsg, content: assistantContent }
+        return updated
+      })
+    }
+
+    // Save assistant message
+    await db.Conversations.update($id, {
+      messages: [...msgs, userMsg, { ...assistantMsg, content: assistantContent }],
+      lastMessageAt: new Date()
+    })
+
+    setStreaming(false)
+    track('conversation.message', { conversation: id, assistant: assistant.slug })
+  }
+
+  return (
+    <div>
+      <div class="messages">
+        {msgs.map((msg, i) => (
+          <Message key={i} message={msg} />
+        ))}
+      </div>
+      <form onSubmit={e => { e.preventDefault(); sendMessage() }}>
+        <textarea value={input} onChange={e => setInput(e.target.value)} />
+        <button disabled={streaming}>
+          {streaming ? 'Thinking...' : 'Send'}
+        </button>
+      </form>
+    </div>
+  )
+}
+```
+
+<MessageThread />
+
+## Context
+
+```ts
+// Inject relevant context based on conversation
+const context = await ai.search(db.Knowledge, {
+  query: messages.slice(-3).map(m => m.content).join(' '),
+  filter: { assistant: assistant.$id },
+  limit: 5
+})
+```
+
+## Actions Taken
+
+```ts
+const actions = messages
+  .filter(m => m.toolCalls?.length > 0)
+  .flatMap(m => m.toolCalls)
+```
+
+<ActionList actions={actions} />
+
+## Feedback
+
+```tsx
+const FeedbackForm = () => {
+  'use client'
+  const [rating, setRating] = useState(null)
+  const [comment, setComment] = useState('')
+
+  const submit = async () => {
+    await db.ChatFeedback.create({
+      conversation: $id,
+      rating,
+      comment,
+      createdAt: new Date()
+    })
+    track('conversation.feedback', { conversation: id, rating })
+  }
+
+  return (
+    <div>
+      <StarRating value={rating} onChange={setRating} />
+      <textarea value={comment} onChange={e => setComment(e.target.value)} />
+      <button onClick={submit}>Submit Feedback</button>
+    </div>
+  )
+}
+```
+
+<FeedbackForm />
+
+## Export
+
+```ts
+const exportTranscript = async (format = 'markdown') => {
+  const content = messages.map(m =>
+    `**${m.role}** (${m.timestamp.toLocaleString()}):\n${m.content}`
+  ).join('\n\n---\n\n')
+
+  return format === 'markdown' ? content : render.html(content)
+}
+```

@@ -1,0 +1,174 @@
+---
+$type: Notification
+$id: https://app.example.com/notifications/{id}
+id: string
+user: User
+type: info | success | warning | error | action
+title: string
+message: string
+link: url?
+read: boolean = false
+actionLabel: string?
+actionUrl: url?
+metadata: object?
+expiresAt: datetime?
+createdAt: datetime
+readAt: datetime?
+---
+
+# Notification
+
+<NotificationIcon type={type} />
+
+## {title}
+
+{message}
+
+```ts
+if (link) {
+  return <a href={link}>View Details</a>
+}
+```
+
+```ts
+if (actionLabel && actionUrl) {
+  return <ActionButton label={actionLabel} url={actionUrl} />
+}
+```
+
+## Actions
+
+```tsx
+const NotificationActions = () => {
+  'use client'
+
+  const markRead = async () => {
+    await db.Notifications.update($id, {
+      read: true,
+      readAt: new Date()
+    })
+  }
+
+  const dismiss = async () => {
+    await db.Notifications.delete($id)
+  }
+
+  return (
+    <div>
+      {!read && <button onClick={markRead}>Mark as Read</button>}
+      <button onClick={dismiss}>Dismiss</button>
+    </div>
+  )
+}
+```
+
+<NotificationActions />
+
+## Notification System
+
+```ts
+// Create notification helper
+const notify = async (userId, notification) => {
+  const notif = await db.Notifications.create({
+    $type: 'Notification',
+    user: userId,
+    ...notification,
+    createdAt: new Date()
+  })
+
+  // Real-time push if user is online
+  await send('notification.new', { user: userId, notification: notif.id })
+
+  // Email for important notifications
+  if (notification.type === 'action' || notification.type === 'error') {
+    const user = await db.Users.get(userId)
+    await api.email.send({
+      to: user.data.email,
+      template: 'notification',
+      data: { title: notification.title, message: notification.message }
+    })
+  }
+
+  return notif
+}
+
+// Notification triggers
+on('order.shipped', async ({ order, tracking }) => {
+  const orderData = await db.Orders.get(order)
+  await notify(orderData.data.customer, {
+    type: 'success',
+    title: 'Order Shipped!',
+    message: `Your order #${orderData.data.number} has been shipped.`,
+    link: `https://app.example.com/orders/${orderData.data.number}`,
+    actionLabel: 'Track Package',
+    actionUrl: `https://tracking.example.com/${tracking}`
+  })
+})
+
+on('task.assigned', async ({ task, assignee }) => {
+  const taskData = await db.Tasks.get(task)
+  await notify(assignee, {
+    type: 'action',
+    title: 'New Task Assigned',
+    message: `You have been assigned: ${taskData.data.title}`,
+    link: `https://pm.example.com/tasks/${taskData.id}`,
+    actionLabel: 'View Task',
+    actionUrl: `https://pm.example.com/tasks/${taskData.id}`
+  })
+})
+
+on('subscription.expiring', async ({ subscription, daysLeft }) => {
+  const sub = await db.Subscriptions.get(subscription)
+  const org = await db.Organizations.get(sub.data.organization)
+
+  for (const member of org.data.members) {
+    if (member.role === 'admin') {
+      await notify(member.$id, {
+        type: 'warning',
+        title: 'Subscription Expiring',
+        message: `Your subscription expires in ${daysLeft} days.`,
+        actionLabel: 'Renew Now',
+        actionUrl: `https://app.example.com/orgs/${org.data.slug}/billing`
+      })
+    }
+  }
+})
+
+// Cleanup expired notifications
+every('hour', async () => {
+  const expired = await db.Notifications.find({
+    where: {
+      expiresAt: { $lt: new Date() }
+    }
+  })
+
+  for (const notif of expired) {
+    await db.Notifications.delete(notif.id)
+  }
+})
+
+// Digest for unread notifications
+every('day at 6pm', async () => {
+  const users = await db.Users.find({
+    where: { 'preferences.emailDigest': true }
+  })
+
+  for (const user of users) {
+    const unread = await db.Notifications.find({
+      where: {
+        user: user.$id,
+        read: false,
+        createdAt: { $gte: daysAgo(1) }
+      }
+    })
+
+    if (unread.length > 0) {
+      await api.email.send({
+        to: user.data.email,
+        template: 'notification-digest',
+        data: { notifications: unread.map(n => n.data) }
+      })
+    }
+  }
+})
+```

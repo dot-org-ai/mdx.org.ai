@@ -1,0 +1,114 @@
+---
+$type: Subscription
+$id: https://app.example.com/subscriptions/{id}
+id: string
+organization: Organization
+plan: Plan
+status: active | trialing | past_due | canceled | unpaid
+stripeSubscriptionId: string
+currentPeriodStart: datetime
+currentPeriodEnd: datetime
+cancelAtPeriodEnd: boolean?
+trialEnd: datetime?
+createdAt: datetime
+---
+
+# Subscription
+
+<SubscriptionStatusBadge status={status} />
+
+## Current Plan
+
+```ts
+const plan = await db.Plans.get(plan)
+```
+
+<PlanCard plan={plan} />
+
+**Period:** {currentPeriodStart.toLocaleDateString()} - {currentPeriodEnd.toLocaleDateString()}
+
+```ts
+if (trialEnd && new Date() < trialEnd) {
+  return <TrialBanner endsAt={trialEnd} />
+}
+```
+
+## Usage This Period
+
+```ts
+const usage = await db.Usage.aggregate({
+  where: {
+    organization: organization,
+    date: { $gte: currentPeriodStart, $lte: currentPeriodEnd }
+  },
+  sum: ['apiCalls', 'storage', 'seats']
+})
+
+const limits = plan.limits
+```
+
+<UsageMeters usage={usage} limits={limits} />
+
+## Invoices
+
+```ts
+const invoices = await api.stripe.invoices.list({
+  subscription: stripeSubscriptionId,
+  limit: 12
+})
+```
+
+<InvoiceList invoices={invoices.data} />
+
+## Payment Method
+
+```ts
+const subscription = await api.stripe.subscriptions.retrieve(stripeSubscriptionId, {
+  expand: ['default_payment_method']
+})
+const pm = subscription.default_payment_method
+```
+
+<PaymentMethodCard method={pm} />
+
+## Manage
+
+```ts
+const openPortal = async () => {
+  const session = await api.stripe.billingPortal.sessions.create({
+    customer: organization.stripeCustomerId,
+    return_url: `https://app.example.com/orgs/${organization.slug}/billing`
+  })
+  window.location.href = session.url
+}
+```
+
+## Lifecycle Events
+
+```ts
+on('stripe.webhook', async (event) => {
+  if (event.data.object.id !== stripeSubscriptionId) return
+
+  switch (event.type) {
+    case 'customer.subscription.updated':
+      await db.Subscriptions.update($id, {
+        status: event.data.object.status,
+        currentPeriodEnd: new Date(event.data.object.current_period_end * 1000)
+      })
+      break
+
+    case 'customer.subscription.deleted':
+      await db.Subscriptions.update($id, { status: 'canceled' })
+      await send('subscription.canceled', { subscription: $id })
+      break
+
+    case 'invoice.payment_failed':
+      await db.Subscriptions.update($id, { status: 'past_due' })
+      await api.email.send({
+        to: organization.billingEmail,
+        template: 'payment-failed'
+      })
+      break
+  }
+})
+```

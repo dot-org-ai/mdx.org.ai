@@ -1,0 +1,174 @@
+---
+$type: Invoice
+$id: https://billing.example.com/invoices/{number}
+number: string
+customer: Customer
+organization: Organization?
+items: InvoiceItem[]
+subtotal: number
+tax: number
+total: number
+currency: string = 'USD'
+status: draft | sent | paid | overdue | cancelled | refunded
+dueDate: date
+paidAt: datetime?
+stripeInvoiceId: string?
+paymentLink: url?
+notes: string?
+createdAt: datetime
+updatedAt: datetime
+---
+
+# Invoice #{number}
+
+<InvoiceStatusBadge status={status} />
+
+## Bill To
+
+<CustomerCard customer={customer} />
+
+## Items
+
+| Description | Qty | Unit Price | Amount |
+|-------------|----:|----------:|-------:|
+```ts
+{items.map(item => (
+  <tr key={item.id}>
+    <td>{item.description}</td>
+    <td>{item.quantity}</td>
+    <td><Money amount={item.unitPrice} currency={currency} /></td>
+    <td><Money amount={item.quantity * item.unitPrice} currency={currency} /></td>
+  </tr>
+))}
+```
+
+## Summary
+
+| | |
+|---|---:|
+| Subtotal | <Money amount={subtotal} currency={currency} /> |
+| Tax | <Money amount={tax} currency={currency} /> |
+| **Total Due** | **<Money amount={total} currency={currency} />** |
+
+**Due Date:** {dueDate.toLocaleDateString()}
+
+```ts
+if (notes) {
+  return <div class="notes">{notes}</div>
+}
+```
+
+## Payment
+
+```ts
+if (status === 'paid') {
+  return <PaidBadge paidAt={paidAt} />
+}
+
+if (paymentLink) {
+  return <PayButton url={paymentLink} amount={total} currency={currency} />
+}
+```
+
+## Actions
+
+```ts
+// Send invoice
+const sendInvoice = async () => {
+  // Create Stripe invoice if needed
+  if (!stripeInvoiceId) {
+    const stripeInvoice = await api.stripe.invoices.create({
+      customer: customer.stripeCustomerId,
+      auto_advance: false
+    })
+
+    for (const item of items) {
+      await api.stripe.invoiceItems.create({
+        customer: customer.stripeCustomerId,
+        invoice: stripeInvoice.id,
+        description: item.description,
+        quantity: item.quantity,
+        unit_amount: Math.round(item.unitPrice * 100)
+      })
+    }
+
+    await api.stripe.invoices.finalizeInvoice(stripeInvoice.id)
+
+    await db.Invoices.update($id, {
+      stripeInvoiceId: stripeInvoice.id,
+      paymentLink: stripeInvoice.hosted_invoice_url,
+      status: 'sent'
+    })
+  }
+
+  // Send email
+  await api.email.send({
+    to: customer.email,
+    template: 'invoice',
+    data: {
+      invoiceNumber: number,
+      total,
+      currency,
+      dueDate,
+      paymentLink
+    }
+  })
+
+  track('invoice.sent', { invoice: number, customer: customer.id })
+}
+
+// Mark as paid (manual)
+const markPaid = async () => {
+  await db.Invoices.update($id, {
+    status: 'paid',
+    paidAt: new Date()
+  })
+  await send('invoice.paid', { invoice: $id })
+}
+
+// Handle Stripe webhook
+on('stripe.webhook', async (event) => {
+  if (event.type === 'invoice.paid' && event.data.object.id === stripeInvoiceId) {
+    await db.Invoices.update($id, {
+      status: 'paid',
+      paidAt: new Date()
+    })
+    await send('invoice.paid', { invoice: $id })
+  }
+})
+
+// Overdue check
+every('day at 9am', async () => {
+  if (status !== 'sent') return
+  if (new Date() <= dueDate) return
+
+  await db.Invoices.update($id, { status: 'overdue' })
+
+  await api.email.send({
+    to: customer.email,
+    template: 'invoice-overdue',
+    data: { invoiceNumber: number, total, dueDate }
+  })
+
+  track('invoice.overdue', { invoice: number })
+})
+```
+
+## Render
+
+```ts
+// PDF export
+const generatePDF = async () => {
+  const html = render.html(<InvoiceTemplate invoice={$this} />)
+  const pdf = await api.pdf.generate(html)
+  return api.storage.upload(`invoices/${number}.pdf`, pdf)
+}
+
+// Email-safe HTML
+const renderEmail = () => {
+  return render.html(<EmailInvoice invoice={$this} />, {
+    inline: true,
+    emailSafe: true
+  })
+}
+```

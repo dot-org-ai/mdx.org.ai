@@ -1,0 +1,83 @@
+---
+$type: User
+$id: https://app.example.com/users/{id}
+id: string
+email: string
+name: string
+avatar: url?
+role: admin | member | viewer
+organization: Organization
+preferences: UserPreferences?
+lastLoginAt: datetime?
+createdAt: datetime
+updatedAt: datetime
+---
+
+# {name}
+
+<Avatar src={avatar} name={name} />
+
+## Profile
+
+```tsx
+const ProfileForm = () => {
+  'use client'
+  const [name, setName] = useState('{name}')
+  const [saving, setSaving] = useState(false)
+
+  const save = async () => {
+    setSaving(true)
+    await db.Users.update($id, { name, updatedAt: new Date() })
+    setSaving(false)
+    track('user.profile.updated', { userId: id })
+  }
+
+  return (
+    <form onSubmit={e => { e.preventDefault(); save() }}>
+      <input value={name} onChange={e => setName(e.target.value)} />
+      <button disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
+    </form>
+  )
+}
+```
+
+<ProfileForm />
+
+## Organizations
+
+```ts
+const orgs = await db.Organizations.find({
+  where: { members: { $contains: $id } }
+})
+```
+
+<OrgList organizations={orgs} />
+
+## Activity
+
+```ts
+const activity = await track.query({
+  userId: id,
+  limit: 20
+})
+```
+
+<ActivityFeed activity={activity} />
+
+## Sessions
+
+```ts
+const sessions = await api.workos.userManagement.listSessions({ userId: id })
+```
+
+<SessionList sessions={sessions} />
+
+## Danger Zone
+
+```ts
+const deleteAccount = async () => {
+  await api.stripe.customers.del(stripeCustomerId)
+  await db.Users.delete($id)
+  track('user.deleted', { userId: id })
+}
+```

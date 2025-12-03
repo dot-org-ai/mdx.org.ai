@@ -1,0 +1,44 @@
+---
+$type: BlogPost
+$id: https://blog.example.com/posts/{slug}
+slug: string
+title: string
+excerpt: string
+content: markdown
+author: Author
+tags: Tag[]
+publishedAt: datetime?
+status: draft | published | archived
+featured: boolean?
+readingTime: number?
+views: number?
+---
+
+# {title}
+
+<PostMeta author={author} date={publishedAt} readingTime={readingTime} />
+
+{content}
+
+<TagList tags={tags} />
+
+## Comments
+
+```ts
+const comments = await db.Comments.find({
+  where: { post: $id, status: 'approved' },
+  orderBy: { createdAt: 'asc' }
+})
+```
+
+<CommentList comments={comments} />
+
+<CommentForm post={$id} />
+
+## Related Posts
+
+```ts
+const related = await ai.similar(db.BlogPosts, $id, { limit: 3 })
+```
+
+<PostGrid posts={related} />

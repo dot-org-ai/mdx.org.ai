@@ -1,0 +1,192 @@
+---
+$type: Approval
+$id: https://app.example.com/approvals/{id}
+id: string
+type: expense | purchase | leave | document | access
+title: string
+description: string?
+requester: User
+approvers: User[]
+currentApprover: User?
+status: pending | approved | rejected | cancelled
+amount: number?
+currency: string?
+attachments: Attachment[]?
+comments: Comment[]?
+decision: ApprovalDecision?
+dueDate: datetime?
+createdAt: datetime
+updatedAt: datetime
+completedAt: datetime?
+---
+
+# {title}
+
+<ApprovalStatusBadge status={status} />
+
+## Request Details
+
+**Type:** {type}
+**Requester:** <UserLink user={requester} />
+**Submitted:** {createdAt.toLocaleDateString()}
+
+{description}
+
+```ts
+if (amount) {
+  return <AmountDisplay amount={amount} currency={currency} />
+}
+```
+
+## Attachments
+
+<AttachmentList attachments={attachments} />
+
+## Approval Chain
+
+```ts
+<ApprovalChain
+  approvers={approvers}
+  currentApprover={currentApprover}
+  status={status}
+/>
+```
+
+## Decision
+
+```tsx
+const ApprovalActions = () => {
+  'use client'
+  const [comment, setComment] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  const canApprove = currentApprover?.$id === $.user.$id && status === 'pending'
+
+  const decide = async (approved) => {
+    setSubmitting(true)
+
+    await db.Approvals.update($id, {
+      status: approved ? 'approved' : 'rejected',
+      decision: {
+        by: $.user.$id,
+        at: new Date(),
+        approved,
+        comment
+      },
+      completedAt: new Date()
+    })
+
+    await send(approved ? 'approval.approved' : 'approval.rejected', {
+      approval: $id,
+      requester: requester.$id,
+      approver: $.user.$id
+    })
+
+    track('approval.decided', { approval: id, decision: approved ? 'approved' : 'rejected' })
+    setSubmitting(false)
+  }
+
+  if (!canApprove) {
+    return <p>Waiting for {currentApprover?.name || 'approver'}...</p>
+  }
+
+  return (
+    <div>
+      <textarea
+        value={comment}
+        onChange={e => setComment(e.target.value)}
+        placeholder="Add a comment (optional)"
+      />
+      <div>
+        <button onClick={() => decide(true)} disabled={submitting}>
+          Approve
+        </button>
+        <button onClick={() => decide(false)} disabled={submitting}>
+          Reject
+        </button>
+      </div>
+    </div>
+  )
+}
+```
+
+<ApprovalActions />
+
+## Comments
+
+<CommentThread comments={comments} entityId={$id} />
+
+## Workflow
+
+```ts
+// Define approval routing
+decide('approval.route', {
+  when: { type: 'expense', amount: { $gt: 10000 } },
+  then: { approvers: ['finance-director', 'cfo'] }
+}, {
+  when: { type: 'expense', amount: { $gt: 1000 } },
+  then: { approvers: ['manager', 'finance'] }
+}, {
+  when: { type: 'expense' },
+  then: { approvers: ['manager'] }
+}, {
+  when: { type: 'leave' },
+  then: { approvers: ['manager', 'hr'] }
+}, {
+  default: { approvers: ['manager'] }
+})
+
+// Handle approval events
+on('approval.approved', async ({ approval }) => {
+  if (approval !== $id) return
+
+  // Move to next approver or complete
+  const currentIndex = approvers.findIndex(a => a.$id === currentApprover.$id)
+  const nextApprover = approvers[currentIndex + 1]
+
+  if (nextApprover) {
+    await db.Approvals.update($id, { currentApprover: nextApprover })
+    await api.email.send({
+      to: nextApprover.email,
+      template: 'approval-requested',
+      data: { approval: title, requester: requester.name }
+    })
+  } else {
+    // All approved - execute the action
+    await send('approval.completed', { approval: $id, type })
+  }
+})
+
+on('approval.rejected', async ({ approval }) => {
+  if (approval !== $id) return
+
+  await api.email.send({
+    to: requester.email,
+    template: 'approval-rejected',
+    data: { approval: title, comment: decision?.comment }
+  })
+})
+
+// Reminder for pending approvals
+every('day at 9am', async () => {
+  if (status !== 'pending') return
+  if (!dueDate || new Date() < dueDate) return
+
+  await api.email.send({
+    to: currentApprover.email,
+    template: 'approval-reminder',
+    data: { approval: title, requester: requester.name }
+  })
+})
+```
+
+## Audit Trail
+
+```ts
+const events = await $.events.query({
+  type: { $startsWith: 'approval.' },
+  data: { approval: id }
+})
+```
+
+<AuditTimeline events={events} />

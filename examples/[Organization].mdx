@@ -1,0 +1,114 @@
+---
+$type: Organization
+$id: https://app.example.com/orgs/{slug}
+slug: string
+name: string
+logo: url?
+plan: free | pro | enterprise
+stripeCustomerId: string?
+stripeSubscriptionId: string?
+members: User[]
+settings: OrgSettings?
+domain: string?
+ssoEnabled: boolean?
+createdAt: datetime
+updatedAt: datetime
+---
+
+# {name}
+
+<OrgLogo src={logo} name={name} />
+
+<PlanBadge plan={plan} />
+
+## Members
+
+```ts
+const members = await db.Users.find({
+  where: { organization: $id }
+})
+```
+
+<MemberList members={members} />
+
+### Invite Member
+
+```tsx
+const InviteForm = () => {
+  'use client'
+  const [email, setEmail] = useState('')
+
+  const invite = async () => {
+    await api.workos.userManagement.sendInvitation({
+      email,
+      organizationId: slug
+    })
+    track('org.member.invited', { org: slug, email })
+  }
+
+  return (
+    <form onSubmit={e => { e.preventDefault(); invite() }}>
+      <input type="email" value={email} onChange={e => setEmail(e.target.value)} />
+      <button>Invite</button>
+    </form>
+  )
+}
+```
+
+<InviteForm />
+
+## Billing
+
+```ts
+if (stripeSubscriptionId) {
+  const subscription = await api.stripe.subscriptions.retrieve(stripeSubscriptionId)
+  return <SubscriptionCard subscription={subscription} />
+}
+```
+
+### Upgrade
+
+```ts
+const upgrade = async (newPlan) => {
+  const session = await api.stripe.checkout.sessions.create({
+    customer: stripeCustomerId,
+    mode: 'subscription',
+    line_items: [{ price: prices[newPlan], quantity: members.length }],
+    success_url: `https://app.example.com/orgs/${slug}/billing?success=true`,
+    cancel_url: `https://app.example.com/orgs/${slug}/billing`
+  })
+  return session.url
+}
+```
+
+## SSO Configuration
+
+```ts
+if (plan === 'enterprise' && ssoEnabled) {
+  const connection = await api.workos.sso.getConnection({ organization: slug })
+  return <SSOConfig connection={connection} />
+}
+```
+
+## Usage
+
+```ts
+const usage = await db.Usage.find({
+  where: { organization: $id },
+  orderBy: { date: 'desc' },
+  limit: 30
+})
+```
+
+<UsageChart data={usage} />
+
+## Audit Log
+
+```ts
+const logs = await api.workos.auditLogs.listEvents({
+  organizationId: slug,
+  limit: 50
+})
+```
+
+<AuditLogTable logs={logs} />

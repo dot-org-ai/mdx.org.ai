@@ -1,0 +1,32 @@
+---
+$type: Author
+$id: https://blog.example.com/authors/{slug}
+slug: string
+name: string
+email: string
+bio: string?
+avatar: url?
+twitter: string?
+github: string?
+createdAt: datetime
+---
+
+# {name}
+
+{bio}
+
+## Posts by {name}
+
+```ts
+const posts = await db.BlogPosts.find({
+  where: { author: $id },
+  orderBy: { publishedAt: 'desc' }
+})
+```
+
+<PostList posts={posts} />
+
+## Connect
+
+- Twitter: [@{twitter}](https://twitter.com/{twitter})
+- GitHub: [@{github}](https://github.com/{github})

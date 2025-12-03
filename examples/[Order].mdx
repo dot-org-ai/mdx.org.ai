@@ -1,0 +1,88 @@
+---
+$type: Order
+$id: https://shop.example.com/orders/{number}
+number: string
+customer: Customer
+items: OrderItem[]
+subtotal: number
+tax: number
+shipping: number
+total: number
+currency: string = 'USD'
+status: pending | paid | fulfilled | shipped | delivered | cancelled | refunded
+shippingAddress: Address
+billingAddress: Address
+paymentMethod: PaymentMethod?
+stripePaymentIntent: string?
+trackingNumber: string?
+notes: string?
+createdAt: datetime
+updatedAt: datetime
+---
+
+# Order #{number}
+
+<OrderStatusBadge status={status} />
+
+## Items
+
+```ts
+<table>
+  <thead>
+    <tr><th>Product</th><th>Qty</th><th>Price</th></tr>
+  </thead>
+  <tbody>
+    {items.map(item => (
+      <tr key={item.product}>
+        <td><ProductLink id={item.product} /></td>
+        <td>{item.quantity}</td>
+        <td><Money amount={item.price * item.quantity} currency={currency} /></td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+```
+
+## Summary
+
+| | |
+|---|---:|
+| Subtotal | <Money amount={subtotal} /> |
+| Tax | <Money amount={tax} /> |
+| Shipping | <Money amount={shipping} /> |
+| **Total** | **<Money amount={total} />** |
+
+## Shipping
+
+<AddressCard address={shippingAddress} />
+
+```ts
+if (trackingNumber) {
+  return <TrackingInfo number={trackingNumber} />
+}
+```
+
+## Actions
+
+```ts
+on('order.paid', async (order) => {
+  if (order.$id === $id) {
+    await db.Orders.update($id, { status: 'fulfilled' })
+    await send('order.fulfill', { order: $id })
+  }
+})
+
+on('order.shipped', async ({ order, tracking }) => {
+  if (order === $id) {
+    await db.Orders.update($id, {
+      status: 'shipped',
+      trackingNumber: tracking
+    })
+    await api.email.send({
+      to: customer.email,
+      template: 'order-shipped',
+      data: { order: $id, tracking }
+    })
+  }
+})
+```

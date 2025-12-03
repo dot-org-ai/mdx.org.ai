@@ -1,5 +1,5 @@
 {
-  "extends": "@mdxld/tsconfig/base.json",
+  "extends": "@mdxld/config/typescript/base.json",
   "compilerOptions": {
     "noEmit": true
   },

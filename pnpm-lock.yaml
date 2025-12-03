@@ -8,15 +8,12 @@ importers:
 
   .:
     devDependencies:
-      '@config/eslint':
-        specifier: workspace:*
-        version: link:packages/@config/eslint
       '@eslint/js':
         specifier: ^9.16.0
         version: 9.39.1
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:*
-        version: link:packages/@mdxld/tsconfig
+        version: link:packages/@mdxld/config
       '@types/node':
         specifier: ^22.10.1
         version: 22.19.1
@@ -57,23 +54,11 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.19.1)
 
-  packages/@config/eslint:
-    dependencies:
-      '@eslint/js':
-        specifier: ^9.16.0
-        version: 9.39.1
-      eslint:
-        specifier: ^9.0.0
-        version: 9.39.1(jiti@1.21.7)
-      typescript-eslint:
-        specifier: ^8.17.0
-        version: 8.48.0(eslint@9.39.1(jiti@1.21.7))(typescript@5.9.3)
-
   packages/@mdxai/agentkit:
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -96,9 +81,9 @@ importers:
         specifier: ^3.24.0
         version: 3.25.76
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       mdxdb:
         specifier: workspace:*
         version: link:../../mdxdb
@@ -120,9 +105,9 @@ importers:
 
   packages/@mdxai/mastra:
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -135,9 +120,9 @@ importers:
 
   packages/@mdxai/vapi:
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -160,9 +145,9 @@ importers:
       '@mdxdb/sqlite':
         specifier: workspace:*
         version: link:../sqlite
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       mdxdb:
         specifier: workspace:*
         version: link:../../mdxdb
@@ -185,9 +170,9 @@ importers:
         specifier: workspace:^
         version: link:../../mdxdb
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       chdb:
         specifier: ^1.2.0
         version: 1.6.0
@@ -203,9 +188,9 @@ importers:
 
   packages/@mdxdb/fs:
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       mdxdb:
         specifier: workspace:*
         version: link:../../mdxdb
@@ -231,9 +216,9 @@ importers:
         specifier: workspace:*
         version: link:../../mdxld
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       fumadocs-core:
         specifier: ^14.7.7
         version: 14.7.7(@types/react@19.2.7)(next@15.5.6(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -252,9 +237,9 @@ importers:
 
   packages/@mdxdb/mongo:
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -267,9 +252,9 @@ importers:
 
   packages/@mdxdb/postgres:
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -286,9 +271,9 @@ importers:
         specifier: ^0.14.0
         version: 0.14.0
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       mdxdb:
         specifier: workspace:*
         version: link:../../mdxdb
@@ -314,9 +299,9 @@ importers:
         specifier: workspace:*
         version: link:../../mdxld
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.27
@@ -367,9 +352,9 @@ importers:
         specifier: workspace:*
         version: link:../../mdxld
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.27
@@ -404,9 +389,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20241127.0
         version: 4.20251128.0
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -426,9 +411,9 @@ importers:
         specifier: '>=13.0.0'
         version: 15.5.6(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -464,9 +449,9 @@ importers:
         specifier: workspace:*
         version: link:../../mdxld
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -502,13 +487,23 @@ importers:
         specifier: ^4.21.0
         version: 4.51.0(@cloudflare/workers-types@4.20251128.0)
 
-  packages/@mdxld/tsconfig: {}
+  packages/@mdxld/config:
+    dependencies:
+      '@eslint/js':
+        specifier: ^9.16.0
+        version: 9.39.1
+      eslint:
+        specifier: ^9.0.0
+        version: 9.39.1(jiti@1.21.7)
+      typescript-eslint:
+        specifier: ^8.17.0
+        version: 8.48.0(eslint@9.39.1(jiti@1.21.7))(typescript@5.9.3)
 
   packages/@mdxui/html:
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -521,9 +516,9 @@ importers:
 
   packages/@mdxui/json:
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -540,9 +535,9 @@ importers:
         specifier: workspace:*
         version: link:../../mdxld
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
@@ -685,9 +680,9 @@ importers:
         specifier: ^3.24.0
         version: 3.25.76
     devDependencies:
-      '@mdxld/tsconfig':
+      '@mdxld/config':
         specifier: workspace:^
-        version: link:../../@mdxld/tsconfig
+        version: link:../../@mdxld/config
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.27

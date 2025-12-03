@@ -49,7 +49,7 @@
     }
   },
   "devDependencies": {
-    "@mdxld/tsconfig": "workspace:^",
+    "@mdxld/config": "workspace:^",
     "chdb": "^1.2.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

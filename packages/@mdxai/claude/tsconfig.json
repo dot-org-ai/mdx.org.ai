@@ -1,5 +1,5 @@
 {
-  "extends": "@mdxld/tsconfig/library.json",
+  "extends": "@mdxld/config/typescript/library.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src"

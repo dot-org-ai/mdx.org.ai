@@ -1,0 +1,187 @@
+---
+$type: Assistant
+$id: https://ai.example.com/assistants/{slug}
+slug: string
+name: string
+description: string
+model: string = 'claude-3-sonnet'
+systemPrompt: string
+temperature: number = 0.7
+maxTokens: number?
+tools: Tool[]?
+knowledge: KnowledgeBase[]?
+persona: Persona?
+createdBy: User
+createdAt: datetime
+updatedAt: datetime
+---
+
+# {name}
+
+{description}
+
+## Configuration
+
+**Model:** {model}
+**Temperature:** {temperature}
+
+### System Prompt
+
+```
+{systemPrompt}
+```
+
+## Tools
+
+```ts
+const tools = [
+  api.agent.tool('searchDocs', {
+    description: 'Search the documentation',
+    input: { query: 'string' },
+    fn: async ({ query }) => {
+      const results = await ai.search(db.Docs, query, { limit: 5 })
+      return results.map(r => ({ title: r.data.title, content: r.data.content }))
+    }
+  }),
+
+  api.agent.tool('createTicket', {
+    description: 'Create a support ticket',
+    input: {
+      title: 'string',
+      description: 'string',
+      priority: 'low | medium | high'
+    },
+    fn: async (data) => {
+      const ticket = await db.Tickets.create({
+        $type: 'Ticket',
+        ...data,
+        status: 'open',
+        createdAt: new Date()
+      })
+      return { ticketId: ticket.id, message: 'Ticket created successfully' }
+    }
+  }),
+
+  api.agent.tool('lookupOrder', {
+    description: 'Look up an order by number',
+    input: { orderNumber: 'string' },
+    fn: async ({ orderNumber }) => {
+      const order = await db.Orders.findOne({ where: { number: orderNumber } })
+      if (!order) return { error: 'Order not found' }
+      return {
+        number: order.data.number,
+        status: order.data.status,
+        total: order.data.total,
+        items: order.data.items.length
+      }
+    }
+  })
+]
+```
+
+<ToolList tools={tools} />
+
+## Knowledge Base
+
+```ts
+const knowledgeBases = await db.KnowledgeBases.find({
+  where: { $id: { $in: knowledge } }
+})
+```
+
+<KnowledgeBaseList items={knowledgeBases} />
+
+### Add Knowledge
+
+```ts
+const addDocument = async (content, metadata) => {
+  const embedding = await ai.embed(content)
+  await db.Knowledge.create({
+    assistant: $id,
+    content,
+    embedding,
+    metadata
+  })
+}
+```
+
+## Chat Interface
+
+```tsx
+const Chat = () => {
+  'use client'
+  const [messages, setMessages] = useState([])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const send = async () => {
+    if (!input.trim()) return
+    setLoading(true)
+
+    const userMessage = { role: 'user', content: input }
+    setMessages(prev => [...prev, userMessage])
+    setInput('')
+
+    const response = await ai.chat({
+      model: '{model}',
+      system: `{systemPrompt}`,
+      messages: [...messages, userMessage],
+      tools,
+      temperature: {temperature}
+    })
+
+    setMessages(prev => [...prev, { role: 'assistant', content: response.content }])
+    setLoading(false)
+
+    track('assistant.message', { assistant: '{slug}', tokens: response.usage.total })
+  }
+
+  return (
+    <div>
+      <MessageList messages={messages} />
+      <form onSubmit={e => { e.preventDefault(); send() }}>
+        <input value={input} onChange={e => setInput(e.target.value)} />
+        <button disabled={loading}>{loading ? 'Thinking...' : 'Send'}</button>
+      </form>
+    </div>
+  )
+}
+```
+
+<Chat />
+
+## Analytics
+
+```ts
+const stats = await db.ChatSessions.aggregate({
+  where: { assistant: $id },
+  count: true,
+  avg: ['messageCount', 'duration', 'satisfaction']
+})
+```
+
+<AssistantStats stats={stats} />
+
+## Training
+
+```ts
+// Fine-tune on conversation feedback
+every('day', async () => {
+  const feedback = await db.ChatFeedback.find({
+    where: {
+      assistant: $id,
+      createdAt: { $gte: daysAgo(1) }
+    }
+  })
+
+  if (feedback.length > 100) {
+    await ai.finetune({
+      model: model,
+      examples: feedback.map(f => ({
+        input: f.data.userMessage,
+        output: f.data.improvedResponse
+      }))
+    })
+  }
+})
+```

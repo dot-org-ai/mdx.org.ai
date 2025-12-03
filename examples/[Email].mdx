@@ -1,0 +1,179 @@
+---
+$type: EmailTemplate
+$id: https://app.example.com/emails/{slug}
+slug: string
+name: string
+subject: string
+preview: string?
+from: string?
+replyTo: string?
+category: transactional | marketing | notification
+variables: Variable[]
+createdAt: datetime
+updatedAt: datetime
+---
+
+# {name}
+
+**Subject:** {subject}
+**Category:** {category}
+
+## Template
+
+```tsx
+const EmailContent = ({ user, data }) => (
+  <Email>
+    <Head>
+      <title>{subject}</title>
+      <Preview>{preview}</Preview>
+    </Head>
+    <Body style={styles.body}>
+      <Container style={styles.container}>
+        <Logo src="https://example.com/logo.png" />
+
+        <Heading style={styles.heading}>
+          Hello {user.name}!
+        </Heading>
+
+        <Text style={styles.text}>
+          {children}
+        </Text>
+
+        {data.ctaUrl && (
+          <Button href={data.ctaUrl} style={styles.button}>
+            {data.ctaLabel || 'Take Action'}
+          </Button>
+        )}
+
+        <Hr style={styles.hr} />
+
+        <Footer style={styles.footer}>
+          <Text>
+            You're receiving this because you signed up at Example.com
+          </Text>
+          <Link href="{{{unsubscribeUrl}}}">Unsubscribe</Link>
+        </Footer>
+      </Container>
+    </Body>
+  </Email>
+)
+
+const styles = {
+  body: { backgroundColor: '#f6f9fc', fontFamily: 'sans-serif' },
+  container: { margin: '0 auto', padding: '40px 20px', maxWidth: '600px' },
+  heading: { fontSize: '24px', fontWeight: 'bold', color: '#1a1a1a' },
+  text: { fontSize: '16px', lineHeight: '24px', color: '#4a4a4a' },
+  button: {
+    backgroundColor: '#5046e5',
+    color: '#ffffff',
+    padding: '12px 24px',
+    borderRadius: '6px',
+    textDecoration: 'none'
+  },
+  hr: { borderColor: '#e6e6e6', margin: '32px 0' },
+  footer: { fontSize: '12px', color: '#8898aa', textAlign: 'center' }
+}
+```
+
+## Variables
+
+```ts
+const variables = [
+  { name: 'user.name', type: 'string', required: true },
+  { name: 'user.email', type: 'string', required: true },
+  { name: 'data.ctaUrl', type: 'url', required: false },
+  { name: 'data.ctaLabel', type: 'string', required: false },
+  { name: 'unsubscribeUrl', type: 'url', required: true, auto: true }
+]
+```
+
+<VariableList variables={variables} />
+
+## Preview
+
+```tsx
+const EmailPreview = () => {
+  'use client'
+  const [testData, setTestData] = useState({
+    user: { name: 'John Doe', email: 'john@example.com' },
+    data: { ctaUrl: 'https://example.com', ctaLabel: 'Get Started' }
+  })
+
+  const preview = render.email(<EmailContent {...testData} />)
+
+  return (
+    <div>
+      <form>
+        <input
+          value={testData.user.name}
+          onChange={e => setTestData({
+            ...testData,
+            user: { ...testData.user, name: e.target.value }
+          })}
+        />
+      </form>
+      <iframe srcDoc={preview} />
+    </div>
+  )
+}
+```
+
+<EmailPreview />
+
+## Send
+
+```ts
+const sendEmail = async (to, data) => {
+  const html = render.email(<EmailContent {...data} />, { inline: true })
+  const text = render.text(<EmailContent {...data} />)
+
+  await api.email.send({
+    from: from || 'hello@example.com',
+    replyTo: replyTo,
+    to,
+    subject: interpolate(subject, data),
+    html,
+    text,
+    category,
+    tags: [slug]
+  })
+
+  track('email.sent', { template: slug, to, category })
+}
+
+// Batch send for marketing
+const sendBatch = async (recipients, data) => {
+  for (const recipient of recipients) {
+    await $.queue('emails').add({
+      template: slug,
+      to: recipient.email,
+      data: { ...data, user: recipient }
+    }, { priority: category === 'transactional' ? 10 : 1 })
+  }
+}
+```
+
+## Analytics
+
+```ts
+const stats = await api.email.stats({
+  template: slug,
+  since: daysAgo(30)
+})
+```
+
+<EmailStats stats={stats} />
+
+## A/B Testing
+
+```ts
+experiment('email-subject', {
+  variants: [
+    { id: 'a', subject: 'Welcome to Example!' },
+    { id: 'b', subject: 'Get started with Example' },
+    { id: 'c', subject: '{user.name}, your account is ready' }
+  ],
+  metric: 'email.opened',
+  traffic: 1.0
+})
+```

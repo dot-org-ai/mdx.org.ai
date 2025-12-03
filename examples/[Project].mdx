@@ -1,0 +1,121 @@
+---
+$type: Project
+$id: https://pm.example.com/projects/{slug}
+slug: string
+name: string
+description: markdown?
+owner: User
+team: User[]
+status: planning | active | on_hold | completed | archived
+priority: low | medium | high | critical
+startDate: date?
+dueDate: date?
+completedAt: datetime?
+tags: string[]?
+settings: ProjectSettings?
+createdAt: datetime
+updatedAt: datetime
+---
+
+# {name}
+
+<ProjectStatusBadge status={status} priority={priority} />
+
+{description}
+
+## Progress
+
+```ts
+const tasks = await db.Tasks.find({ where: { project: $id } })
+const completed = tasks.filter(t => t.data.status === 'done').length
+const total = tasks.length
+const progress = total > 0 ? (completed / total) * 100 : 0
+```
+
+<ProgressBar value={progress} />
+
+**{completed} of {total} tasks completed**
+
+## Tasks
+
+```tsx
+const TaskBoard = () => {
+  'use client'
+  const [tasks, setTasks] = useState([])
+
+  useEffect(() => {
+    db.Tasks.find({ where: { project: '{$id}' } }).then(setTasks)
+  }, [])
+
+  const moveTask = async (taskId, newStatus) => {
+    await db.Tasks.update(taskId, { status: newStatus })
+    track('task.moved', { task: taskId, status: newStatus })
+  }
+
+  return <KanbanBoard tasks={tasks} onMove={moveTask} />
+}
+```
+
+<TaskBoard />
+
+### Add Task
+
+```ts
+const addTask = async (title) => {
+  const task = await db.Tasks.create({
+    $type: 'Task',
+    title,
+    project: $id,
+    status: 'todo',
+    createdBy: $.user.id
+  })
+  track('task.created', { task: task.id, project: slug })
+  return task
+}
+```
+
+## Team
+
+```ts
+<TeamGrid members={team} owner={owner} />
+```
+
+## Timeline
+
+```ts
+const milestones = await db.Milestones.find({
+  where: { project: $id },
+  orderBy: { dueDate: 'asc' }
+})
+```
+
+<Timeline milestones={milestones} />
+
+## Activity
+
+```ts
+const events = await $.events.query({
+  source: 'project',
+  data: { project: slug }
+})
+```
+
+<ActivityFeed events={events} />
+
+## Integrations
+
+```ts
+// Sync with GitHub
+on('github.issue.opened', async (event) => {
+  if (event.repository === settings?.githubRepo) {
+    await db.Tasks.create({
+      $type: 'Task',
+      title: event.issue.title,
+      description: event.issue.body,
+      project: $id,
+      externalId: `github:${event.issue.number}`,
+      status: 'todo'
+    })
+  }
+})
+```

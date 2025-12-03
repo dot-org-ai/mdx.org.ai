@@ -64,7 +64,7 @@
     "mdxld": "workspace:*"
   },
   "devDependencies": {
-    "@mdxld/tsconfig": "workspace:^",
+    "@mdxld/config": "workspace:^",
     "mdxdb": "workspace:*",
     "mdxe": "workspace:*",
     "mdxld": "workspace:*",

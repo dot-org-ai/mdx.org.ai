@@ -1,0 +1,150 @@
+---
+$type: Task
+$id: https://pm.example.com/tasks/{id}
+id: string
+title: string
+description: markdown?
+project: Project
+assignee: User?
+status: todo | in_progress | review | done
+priority: low | medium | high | critical
+dueDate: date?
+estimate: number?
+timeSpent: number?
+labels: string[]?
+subtasks: Subtask[]?
+comments: Comment[]?
+attachments: Attachment[]?
+createdBy: User
+createdAt: datetime
+updatedAt: datetime
+completedAt: datetime?
+---
+
+# {title}
+
+<TaskStatusBadge status={status} priority={priority} />
+
+{description}
+
+## Details
+
+| Field | Value |
+|-------|-------|
+| Project | <ProjectLink project={project} /> |
+| Assignee | <UserAvatar user={assignee} /> |
+| Due Date | {dueDate?.toLocaleDateString() ?? 'No due date'} |
+| Estimate | {estimate ? `${estimate}h` : 'Not estimated'} |
+| Time Spent | {timeSpent ? `${timeSpent}h` : '0h'} |
+
+## Subtasks
+
+```tsx
+const SubtaskList = () => {
+  'use client'
+  const [items, setItems] = useState(subtasks || [])
+
+  const toggle = async (index) => {
+    const updated = [...items]
+    updated[index].done = !updated[index].done
+    setItems(updated)
+    await db.Tasks.update($id, { subtasks: updated })
+  }
+
+  const add = async (title) => {
+    const updated = [...items, { title, done: false }]
+    setItems(updated)
+    await db.Tasks.update($id, { subtasks: updated })
+  }
+
+  return (
+    <div>
+      {items.map((st, i) => (
+        <label key={i}>
+          <input type="checkbox" checked={st.done} onChange={() => toggle(i)} />
+          {st.title}
+        </label>
+      ))}
+      <AddSubtaskForm onAdd={add} />
+    </div>
+  )
+}
+```
+
+<SubtaskList />
+
+## Time Tracking
+
+```tsx
+const TimeTracker = () => {
+  'use client'
+  const [tracking, setTracking] = useState(false)
+  const [startTime, setStartTime] = useState(null)
+
+  const toggle = async () => {
+    if (tracking) {
+      const elapsed = (Date.now() - startTime) / 3600000
+      await db.Tasks.update($id, {
+        timeSpent: (timeSpent || 0) + elapsed
+      })
+      track('task.time.logged', { task: id, hours: elapsed })
+    } else {
+      setStartTime(Date.now())
+    }
+    setTracking(!tracking)
+  }
+
+  return (
+    <button onClick={toggle}>
+      {tracking ? 'Stop Timer' : 'Start Timer'}
+    </button>
+  )
+}
+```
+
+<TimeTracker />
+
+## Comments
+
+```ts
+<CommentThread comments={comments} taskId={$id} />
+```
+
+## Attachments
+
+```ts
+const uploadAttachment = async (file) => {
+  const key = `tasks/${id}/${file.name}`
+  const uploaded = await api.storage.upload(key, file)
+  await db.Tasks.update($id, {
+    attachments: [...(attachments || []), {
+      name: file.name,
+      url: uploaded.url,
+      size: file.size
+    }]
+  })
+}
+```
+
+<AttachmentList attachments={attachments} onUpload={uploadAttachment} />
+
+## Workflow
+
+```ts
+on('task.status.changed', async ({ task, from, to }) => {
+  if (task !== $id) return
+
+  if (to === 'done') {
+    await db.Tasks.update($id, { completedAt: new Date() })
+    await send('task.completed', { task: $id, project: project })
+  }
+
+  if (to === 'review' && assignee) {
+    await api.email.send({
+      to: project.owner.email,
+      template: 'task-ready-for-review',
+      data: { task: title, assignee: assignee.name }
+    })
+  }
+})
+```

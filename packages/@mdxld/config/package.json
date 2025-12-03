@@ -1,0 +1,26 @@
+{
+  "name": "@mdxld/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./typescript": "./typescript/base.json",
+    "./typescript/base": "./typescript/base.json",
+    "./typescript/base.json": "./typescript/base.json",
+    "./typescript/library": "./typescript/library.json",
+    "./typescript/library.json": "./typescript/library.json",
+    "./typescript/react": "./typescript/react.json",
+    "./typescript/react.json": "./typescript/react.json",
+    "./eslint": "./eslint/index.js",
+    "./eslint/base": "./eslint/base.js",
+    "./eslint/react": "./eslint/react.js"
+  },
+  "files": ["typescript/*.json", "eslint/*.js"],
+  "dependencies": {
+    "@eslint/js": "^9.16.0",
+    "typescript-eslint": "^8.17.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0"
+  }
+}
