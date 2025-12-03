@@ -1,0 +1,189 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Sidebar
+name: Sidebar
+category: layout
+description: Collapsible sidebar navigation for apps and documentation
+semanticElement: aside
+outputs: [html, markdown, json, svg, png]
+related: [Layout, Nav, Docs, Dashboard, Header]
+
+# Props
+title: string?
+logo: Media?
+nav: NavItem[]
+footer: ReactNode?
+collapsed: boolean = false
+collapsible: boolean = true
+position: 'left' | 'right' = 'left'
+width: number = 280
+collapsedWidth: number = 64
+variant: 'default' | 'floating' | 'inset' = 'default'
+overlay: boolean = false
+breakpoint: number = 1024
+children: ReactNode?
+
+# Parts
+root: aside
+header: div?
+header-logo: a
+header-title: span
+toggle: button
+content: div
+nav: nav
+nav-section: div
+nav-section-title: h4
+nav-list: ul
+nav-item: li
+nav-link: a
+nav-link-icon: span?
+nav-link-label: span
+nav-link-badge: span?
+nav-nested: ul
+footer: div?
+overlay-backdrop: div?
+
+# CSS Variables
+--sidebar-width: 280px
+--sidebar-collapsed-width: 64px
+--sidebar-bg: var(--color-surface)
+--sidebar-border: var(--color-border)
+--sidebar-header-height: 64px
+--sidebar-padding: 1rem
+--sidebar-transition: 0.2s ease
+---
+
+# Sidebar
+
+Collapsible sidebar navigation for documentation sites and dashboards.
+
+## Structure
+
+### Expanded State
+
+```
+┌─────────────────────────────┐
+│ root                        │
+│ ┌─────────────────────────┐ │
+│ │ header                  │ │
+│ │ ┌─────┐ ┌─────────────┐ │ │
+│ │ │logo │ │ title       │ │ │
+│ │ └─────┘ └─────────────┘ │ │
+│ │                   [◀]   │ │
+│ └─────────────────────────┘ │
+│ ┌─────────────────────────┐ │
+│ │ content                 │ │
+│ │ ┌─────────────────────┐ │ │
+│ │ │ nav-section         │ │ │
+│ │ │ GETTING STARTED     │ │ │
+│ │ │ ┌─────────────────┐ │ │ │
+│ │ │ │ 📖 Introduction │ │ │ │
+│ │ │ │ ⚡ Quick Start  │ │ │ │
+│ │ │ │ 📦 Installation │ │ │ │
+│ │ │ └─────────────────┘ │ │ │
+│ │ └─────────────────────┘ │ │
+│ │ ┌─────────────────────┐ │ │
+│ │ │ nav-section         │ │ │
+│ │ │ GUIDES              │ │ │
+│ │ │ ┌─────────────────┐ │ │ │
+│ │ │ │ 📝 Components   │ │ │ │
+│ │ │ │ 🎨 Theming      │ │ │ │
+│ │ │ │ 🔧 Configuration│ │ │ │
+│ │ │ └─────────────────┘ │ │ │
+│ │ └─────────────────────┘ │ │
+│ └─────────────────────────┘ │
+│ ┌─────────────────────────┐ │
+│ │ footer                  │ │
+│ │ [⚙️ Settings] [🌙 Theme] │ │
+│ └─────────────────────────┘ │
+└─────────────────────────────┘
+```
+
+### Collapsed State
+
+```
+┌─────────┐
+│ root    │
+│ ┌─────┐ │
+│ │logo │ │
+│ │[▶]  │ │
+│ └─────┘ │
+│ ┌─────┐ │
+│ │ 📖  │ │
+│ │ ⚡  │ │
+│ │ 📦  │ │
+│ │ ─── │ │
+│ │ 📝  │ │
+│ │ 🎨  │ │
+│ │ 🔧  │ │
+│ └─────┘ │
+│ ┌─────┐ │
+│ │ ⚙️  │ │
+│ └─────┘ │
+└─────────┘
+```
+
+## Usage
+
+```mdx
+<Sidebar
+  logo={{ src: '/logo.svg', alt: 'Company' }}
+  title="Documentation"
+  nav={[
+    {
+      title: 'Getting Started',
+      items: [
+        { label: 'Introduction', href: '/docs', icon: 'book' },
+        { label: 'Quick Start', href: '/docs/quickstart', icon: 'zap' },
+        { label: 'Installation', href: '/docs/install', icon: 'package' },
+      ],
+    },
+    {
+      title: 'Guides',
+      items: [
+        { label: 'Components', href: '/docs/components', icon: 'layers' },
+        { label: 'Theming', href: '/docs/theming', icon: 'palette' },
+        { label: 'Configuration', href: '/docs/config', icon: 'settings' },
+      ],
+    },
+  ]}
+  collapsible
+/>
+```
+
+## With Footer Actions
+
+```mdx
+<Sidebar
+  nav={navItems}
+  footer={
+    <div className="flex gap-2">
+      <Button icon="settings" />
+      <ThemeToggle />
+    </div>
+  }
+/>
+```
+
+## Dashboard Sidebar
+
+```mdx
+<Sidebar
+  logo={{ src: '/logo.svg' }}
+  nav={[
+    { label: 'Dashboard', href: '/', icon: 'home' },
+    { label: 'Analytics', href: '/analytics', icon: 'chart', badge: 'New' },
+    { label: 'Users', href: '/users', icon: 'users' },
+    { label: 'Settings', href: '/settings', icon: 'cog' },
+  ]}
+  variant="floating"
+/>
+```
+
+## Variants
+
+```mdx
+<Sidebar variant="default" />   // Attached to edge
+<Sidebar variant="floating" />  // With margin/shadow
+<Sidebar variant="inset" />     // Inside container
+```

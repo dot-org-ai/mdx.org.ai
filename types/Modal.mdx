@@ -1,0 +1,166 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Modal
+name: Modal
+category: component
+description: Modal dialog for confirmations, forms, and focused interactions
+semanticElement: dialog
+outputs: [html, markdown, json, svg, png]
+related: [Card, FormView, Section, Page]
+
+# Props
+open: boolean = false
+title: string?
+description: string?
+size: 'sm' | 'md' | 'lg' | 'xl' | 'full' = 'md'
+closeOnOverlay: boolean = true
+closeOnEscape: boolean = true
+showClose: boolean = true
+centered: boolean = true
+scrollBehavior: 'inside' | 'outside' = 'inside'
+preventScroll: boolean = true
+onClose: () => void
+footer: ReactNode?
+children: ReactNode
+
+# Parts
+root: div
+backdrop: div
+container: div
+dialog: dialog
+header: div?
+header-title: h2
+header-description: p?
+close: button
+body: div
+footer: div?
+footer-actions: div
+
+# CSS Variables
+--modal-max-width-sm: 400px
+--modal-max-width-md: 500px
+--modal-max-width-lg: 700px
+--modal-max-width-xl: 900px
+--modal-padding: 1.5rem
+--modal-radius: 0.75rem
+--modal-bg: var(--color-background)
+--modal-shadow: 0 25px 50px -12px rgba(0,0,0,0.25)
+--modal-backdrop: rgba(0,0,0,0.5)
+---
+
+# Modal
+
+Modal dialog for confirmations, forms, and focused user interactions.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ backdrop                                            │
+│                                                     │
+│     ┌───────────────────────────────────────┐       │
+│     │ dialog                                │       │
+│     │ ┌───────────────────────────────────┐ │       │
+│     │ │ header                            │ │       │
+│     │ │ ┌───────────────────────────┐ [×] │ │       │
+│     │ │ │ title                     │     │ │       │
+│     │ │ │ Modal Title               │     │ │       │
+│     │ │ └───────────────────────────┘     │ │       │
+│     │ │ description                       │ │       │
+│     │ └───────────────────────────────────┘ │       │
+│     │ ┌───────────────────────────────────┐ │       │
+│     │ │ body                              │ │       │
+│     │ │                                   │ │       │
+│     │ │ Modal content goes here...        │ │       │
+│     │ │                                   │ │       │
+│     │ │ Can include forms, information,   │ │       │
+│     │ │ or any other content.             │ │       │
+│     │ │                                   │ │       │
+│     │ └───────────────────────────────────┘ │       │
+│     │ ┌───────────────────────────────────┐ │       │
+│     │ │ footer                            │ │       │
+│     │ │         [Cancel] [Confirm]        │ │       │
+│     │ └───────────────────────────────────┘ │       │
+│     └───────────────────────────────────────┘       │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+### Basic Modal
+
+```mdx
+<Modal
+  open={isOpen}
+  onClose={() => setIsOpen(false)}
+  title="Confirm Action"
+  description="Are you sure you want to proceed?"
+  footer={
+    <>
+      <Button variant="ghost" onClick={handleCancel}>Cancel</Button>
+      <Button variant="primary" onClick={handleConfirm}>Confirm</Button>
+    </>
+  }
+>
+  <p>This action cannot be undone.</p>
+</Modal>
+```
+
+### Form Modal
+
+```mdx
+<Modal
+  open={showForm}
+  onClose={handleClose}
+  title="Create New Project"
+  size="lg"
+>
+  <form onSubmit={handleSubmit}>
+    <Input label="Project Name" name="name" required />
+    <Textarea label="Description" name="description" />
+    <Select label="Team" name="team" options={teams} />
+  </form>
+</Modal>
+```
+
+### Full-Screen Modal
+
+```mdx
+<Modal
+  size="full"
+  open={showPreview}
+  onClose={handleClose}
+  title="Document Preview"
+>
+  <DocumentViewer document={doc} />
+</Modal>
+```
+
+## Size Variants
+
+```mdx
+<Modal size="sm" />   // 400px - confirmations
+<Modal size="md" />   // 500px - standard dialogs
+<Modal size="lg" />   // 700px - forms
+<Modal size="xl" />   // 900px - complex content
+<Modal size="full" /> // Full viewport
+```
+
+## Confirmation Dialog Pattern
+
+```mdx
+<Modal
+  open={showDeleteConfirm}
+  onClose={() => setShowDeleteConfirm(false)}
+  title="Delete Item"
+  description="This will permanently delete the item."
+  size="sm"
+  footer={
+    <>
+      <Button variant="ghost">Cancel</Button>
+      <Button variant="destructive">Delete</Button>
+    </>
+  }
+/>
+```

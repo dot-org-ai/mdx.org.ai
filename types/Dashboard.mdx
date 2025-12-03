@@ -1,0 +1,115 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Dashboard
+name: Dashboard
+category: app
+description: Application dashboard with sidebar navigation, header, and widget grid
+semanticElement: div
+outputs: [html, markdown, json, svg, png]
+related: [App, DeveloperDashboard, Stats, Table]
+
+# Props
+title: string
+description: string?
+user: User?
+nav: NavItem[]
+actions: Action[]?
+breadcrumbs: Breadcrumb[]?
+notifications: Notification[]?
+stats: Stat[]?
+children: ReactNode
+
+# Parts
+root: div
+sidebar: aside
+sidebar-header: div
+sidebar-nav: nav
+sidebar-nav-item: a
+sidebar-nav-group: div
+sidebar-footer: div
+header: header
+header-title: h1
+header-actions: div
+header-search: div?
+header-notifications: div?
+header-user: div
+breadcrumbs: nav?
+content: main
+widgets: div?
+widget: article
+footer: footer?
+
+# CSS Variables
+--dashboard-sidebar-width: 280px
+--dashboard-sidebar-collapsed-width: 64px
+--dashboard-header-height: 64px
+--dashboard-content-padding: 1.5rem
+--dashboard-widget-gap: 1rem
+---
+
+# Dashboard
+
+Application dashboard layout with sidebar navigation, header bar, and content area for widgets and data display.
+
+## Structure
+
+```
+┌──────────┬──────────────────────────────────┐
+│ sidebar  │ header                           │
+│ ┌──────┐ │ ┌──────────────────────────────┐ │
+│ │header│ │ │ title        actions  user   │ │
+│ └──────┘ │ └──────────────────────────────┘ │
+│ ┌──────┐ ├──────────────────────────────────┤
+│ │ nav  │ │ breadcrumbs                      │
+│ │      │ ├──────────────────────────────────┤
+│ │      │ │ content                          │
+│ │      │ │ ┌────────┐ ┌────────┐ ┌────────┐ │
+│ │      │ │ │ widget │ │ widget │ │ widget │ │
+│ │      │ │ └────────┘ └────────┘ └────────┘ │
+│ └──────┘ │ ┌────────────────────────────────┤
+│ ┌──────┐ │ │ widget (full width)            │
+│ │footer│ │ └────────────────────────────────┤
+│ └──────┘ │                                  │
+└──────────┴──────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Dashboard
+  title="Overview"
+  user={{ name: 'Alice', avatar: '/alice.jpg' }}
+  nav={[
+    { label: 'Overview', href: '/', icon: 'home' },
+    { label: 'Analytics', href: '/analytics', icon: 'chart' },
+    { label: 'Users', href: '/users', icon: 'users' },
+    { label: 'Settings', href: '/settings', icon: 'settings' },
+  ]}
+  stats={[
+    { label: 'Total Users', value: '12,345' },
+    { label: 'Revenue', value: '$45,678' },
+    { label: 'Active Sessions', value: '234' },
+  ]}
+>
+  <Widget title="Recent Activity">
+    <Table data={recentActivity} />
+  </Widget>
+  <Widget title="Performance">
+    <Chart data={performanceData} />
+  </Widget>
+</Dashboard>
+```
+
+## CSS Parts
+
+```css
+Dashboard::part(root) { }
+Dashboard::part(sidebar) { }
+Dashboard::part(sidebar-nav) { }
+Dashboard::part(sidebar-nav-item) { }
+Dashboard::part(header) { }
+Dashboard::part(header-title) { }
+Dashboard::part(content) { }
+Dashboard::part(widgets) { }
+Dashboard::part(widget) { }
+```

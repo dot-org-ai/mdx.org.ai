@@ -1,0 +1,143 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Layout
+name: Layout
+category: layout
+description: Abstract layout container that can be used for Sites or Apps
+semanticElement: div
+outputs: [html, markdown, json, svg, png]
+related: [Site, App, Page, View]
+
+# Props
+variant: 'site' | 'app' | 'dashboard' | 'docs' | 'minimal' = 'site'
+header: HeaderProps?
+sidebar: SidebarProps?
+footer: FooterProps?
+nav: NavItem[]?
+theme: 'light' | 'dark' | 'system' = 'system'
+stickyHeader: boolean = true
+collapsibleSidebar: boolean = true
+children: ReactNode
+
+# Parts
+root: div
+skip-link: a
+header: header?
+header-container: div
+header-logo: a
+header-nav: nav
+header-actions: div
+sidebar: aside?
+sidebar-header: div
+sidebar-nav: nav
+sidebar-footer: div
+main: main
+main-container: div
+footer: footer?
+footer-container: div
+
+# CSS Variables
+--layout-header-height: 64px
+--layout-sidebar-width: 280px
+--layout-sidebar-collapsed: 64px
+--layout-footer-height: auto
+--layout-max-width: 1440px
+--layout-content-max-width: 1200px
+--layout-gutter: 1.5rem
+---
+
+# Layout
+
+Abstract layout container that provides consistent structure for both marketing sites and applications.
+
+## Structure
+
+### Site Layout (Marketing)
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+│ ┌──────┐ ┌──────────────────────────┐ ┌──────────┐ │
+│ │ logo │ │ nav                      │ │ actions  │ │
+│ └──────┘ └──────────────────────────┘ └──────────┘ │
+├─────────────────────────────────────────────────────┤
+│ main                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ main-container                                  │ │
+│ │                                                 │ │
+│ │   {children} - Pages, Sections                  │ │
+│ │                                                 │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ footer                                              │
+└─────────────────────────────────────────────────────┘
+```
+
+### App Layout (Dashboard)
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+├──────────┬──────────────────────────────────────────┤
+│ sidebar  │ main                                     │
+│ ┌──────┐ │ ┌──────────────────────────────────────┐ │
+│ │header│ │ │ main-container                       │ │
+│ ├──────┤ │ │                                      │ │
+│ │ nav  │ │ │   {children} - Views                 │ │
+│ │      │ │ │                                      │ │
+│ │      │ │ │                                      │ │
+│ ├──────┤ │ │                                      │ │
+│ │footer│ │ │                                      │ │
+│ └──────┘ │ └──────────────────────────────────────┘ │
+└──────────┴──────────────────────────────────────────┘
+```
+
+### Docs Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+├──────────┬────────────────────────────┬─────────────┤
+│ sidebar  │ main                       │ toc         │
+│ ┌──────┐ │ ┌────────────────────────┐ │ ┌─────────┐ │
+│ │search│ │ │ {children}             │ │ │ On this │ │
+│ ├──────┤ │ │                        │ │ │ page    │ │
+│ │ nav  │ │ │                        │ │ │ • Intro │ │
+│ │ tree │ │ │                        │ │ │ • Usage │ │
+│ │      │ │ │                        │ │ │ • API   │ │
+│ └──────┘ │ └────────────────────────┘ │ └─────────┘ │
+└──────────┴────────────────────────────┴─────────────┘
+```
+
+## Usage
+
+```mdx
+<Layout variant="site" nav={siteNav}>
+  <Page>
+    <Hero title="Welcome" />
+    <Features items={features} />
+  </Page>
+</Layout>
+
+<Layout variant="app" sidebar={{ nav: appNav }}>
+  <View title="Dashboard">
+    <Stats items={stats} />
+  </View>
+</Layout>
+
+<Layout variant="docs" sidebar={{ nav: docsNav }}>
+  <DocsPage toc={toc}>
+    {content}
+  </DocsPage>
+</Layout>
+```
+
+## Variants
+
+| Variant | Header | Sidebar | Footer | Use Case |
+|---------|--------|---------|--------|----------|
+| `site` | ✓ | ✗ | ✓ | Marketing sites |
+| `app` | ✓ | ✓ | ✗ | Applications |
+| `dashboard` | ✓ | ✓ | ✗ | Admin dashboards |
+| `docs` | ✓ | ✓ | ✗ | Documentation |
+| `minimal` | ✗ | ✗ | ✗ | Auth pages, landing |

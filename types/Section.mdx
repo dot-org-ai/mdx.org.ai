@@ -1,0 +1,100 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Section
+name: Section
+category: layout
+description: Content section with optional heading, background, and padding
+semanticElement: section
+outputs: [html, markdown, json, svg, png]
+related: [Page, Container, Hero, Features]
+
+# Props
+id: string?
+title: string?
+subtitle: string?
+description: string?
+background: 'default' | 'muted' | 'accent' | 'dark' | 'light' | 'gradient' | 'image' = 'default'
+backgroundImage: string?
+padding: 'none' | 'sm' | 'md' | 'lg' | 'xl' = 'md'
+align: 'left' | 'center' | 'right' = 'left'
+container: boolean | 'sm' | 'md' | 'lg' | 'xl' = true
+children: ReactNode
+
+# Parts
+root: section
+background: div?
+container: div
+header: header?
+header-title: h2
+header-subtitle: p?
+header-description: p?
+content: div
+
+# CSS Variables
+--section-padding-sm: 2rem 0
+--section-padding-md: 4rem 0
+--section-padding-lg: 6rem 0
+--section-padding-xl: 8rem 0
+--section-bg-default: transparent
+--section-bg-muted: var(--color-muted)
+--section-bg-accent: var(--color-accent)
+--section-bg-dark: var(--color-dark)
+---
+
+# Section
+
+A content section that provides consistent spacing, backgrounds, and optional headings.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ background (optional overlay/image)             │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ container                                       │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ header                                      │ │ │
+│ │ │ ┌─────────────────────────────────────────┐ │ │ │
+│ │ │ │ title                                   │ │ │ │
+│ │ │ │ subtitle                                │ │ │ │
+│ │ │ │ description                             │ │ │ │
+│ │ │ └─────────────────────────────────────────┘ │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ content                                     │ │ │
+│ │ │                                             │ │ │
+│ │ │   {children}                                │ │ │
+│ │ │                                             │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Section
+  id="features"
+  title="Features"
+  subtitle="Everything you need"
+  background="muted"
+  padding="lg"
+  align="center"
+>
+  <Features items={features} />
+</Section>
+```
+
+## Background Variants
+
+```mdx
+<Section background="default">Default (transparent)</Section>
+<Section background="muted">Muted gray</Section>
+<Section background="accent">Brand accent color</Section>
+<Section background="dark">Dark background</Section>
+<Section background="gradient">Gradient background</Section>
+<Section background="image" backgroundImage="/pattern.svg">Image</Section>
+```

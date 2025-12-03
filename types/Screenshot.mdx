@@ -1,0 +1,152 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Screenshot
+name: Screenshot
+category: media
+description: App screenshot renderer that can output to SVG, PNG, or HTML
+semanticElement: figure
+outputs: [html, svg, png, jpg, webp]
+related: [Dashboard, Video, Image]
+
+# Props
+component: ComponentSpec
+props: Record<string, unknown>
+width: number = 1200
+height: number = 800
+scale: number = 1
+deviceFrame: 'none' | 'browser' | 'desktop' | 'mobile' | 'tablet' = 'none'
+theme: 'light' | 'dark' = 'light'
+background: string?
+padding: number = 0
+borderRadius: number = 0
+shadow: 'none' | 'sm' | 'md' | 'lg' | 'xl' = 'none'
+format: 'svg' | 'png' | 'jpg' | 'webp' = 'png'
+quality: number = 90
+alt: string?
+caption: string?
+
+# Parts
+root: figure
+frame: div?
+frame-toolbar: div?
+frame-toolbar-buttons: div?
+frame-toolbar-title: span?
+frame-toolbar-url: span?
+viewport: div
+content: div
+caption: figcaption?
+
+# CSS Variables
+--screenshot-background: #f5f5f5
+--screenshot-border-radius: 8px
+--screenshot-shadow: 0 4px 24px rgba(0,0,0,0.1)
+--screenshot-frame-toolbar-height: 40px
+---
+
+# Screenshot
+
+Renders any component to a static image (SVG, PNG, etc.) for use in documentation, social cards, or marketing materials.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ frame (optional device frame)                   │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ frame-toolbar                               │ │ │
+│ │ │ ● ● ●            title           ↔         │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ viewport                                    │ │ │
+│ │ │ ┌─────────────────────────────────────────┐ │ │ │
+│ │ │ │ content                                 │ │ │ │
+│ │ │ │                                         │ │ │ │
+│ │ │ │   <Dashboard {...props} />              │ │ │ │
+│ │ │ │                                         │ │ │ │
+│ │ │ │                                         │ │ │ │
+│ │ │ └─────────────────────────────────────────┘ │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ caption                                         │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+### Basic Screenshot
+
+```mdx
+<Screenshot
+  component={Dashboard}
+  props={{
+    title: 'Analytics Dashboard',
+    stats: [
+      { label: 'Users', value: '12,345' },
+      { label: 'Revenue', value: '$45,678' },
+    ],
+  }}
+  width={1200}
+  height={800}
+  format="png"
+/>
+```
+
+### With Browser Frame
+
+```mdx
+<Screenshot
+  component={Site}
+  props={{
+    siteName: 'Acme Corp',
+    nav: [{ label: 'Home', href: '/' }],
+    children: <LandingPage {...landingProps} />,
+  }}
+  deviceFrame="browser"
+  shadow="lg"
+  borderRadius={12}
+  caption="Homepage design"
+/>
+```
+
+### Mobile Screenshot
+
+```mdx
+<Screenshot
+  component={App}
+  props={mobileAppProps}
+  width={390}
+  height={844}
+  deviceFrame="mobile"
+  theme="dark"
+/>
+```
+
+### Social Card / OG Image
+
+```mdx
+<Screenshot
+  component={SocialCard}
+  props={{
+    title: 'How to Build Better APIs',
+    author: { name: 'Alice', avatar: '/alice.jpg' },
+    date: '2024-03-15',
+  }}
+  width={1200}
+  height={630}
+  format="png"
+  alt="Blog post social card"
+/>
+```
+
+## Output Formats
+
+| Format | Use Case |
+|--------|----------|
+| `svg` | Scalable, editable, web |
+| `png` | Screenshots, transparency |
+| `jpg` | Photos, smaller files |
+| `webp` | Modern web, best compression |

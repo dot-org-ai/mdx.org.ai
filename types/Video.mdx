@@ -1,0 +1,143 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Video
+name: Video
+category: media
+description: Video player with chapters, transcripts, and interactive elements
+semanticElement: figure
+outputs: [html, markdown, json, svg, png]
+related: [Slides, Screenshot, Media]
+
+# Props
+src: string | VideoSource[]
+title: string?
+description: string?
+poster: string?
+aspectRatio: '16:9' | '4:3' | '21:9' | '1:1' = '16:9'
+autoPlay: boolean = false
+muted: boolean = false
+loop: boolean = false
+controls: boolean = true
+chapters: Chapter[]?
+transcript: TranscriptLine[]?
+captions: Caption[]?
+startTime: number = 0
+endTime: number?
+playbackRates: number[] = [0.5, 1, 1.5, 2]
+quality: 'auto' | '1080p' | '720p' | '480p' = 'auto'
+children: ReactNode?
+
+# Parts
+root: figure
+container: div
+player: video
+poster: img?
+play-button: button
+controls: div
+controls-play: button
+controls-progress: div
+controls-progress-bar: div
+controls-progress-buffered: div
+controls-progress-played: div
+controls-progress-handle: div
+controls-time: div
+controls-time-current: span
+controls-time-duration: span
+controls-volume: div
+controls-volume-button: button
+controls-volume-slider: input
+controls-settings: button
+controls-fullscreen: button
+controls-pip: button?
+chapters: nav?
+chapter: button
+transcript: aside?
+transcript-line: p
+transcript-timestamp: time
+captions: div?
+caption-text: p
+settings-menu: div?
+quality-options: div
+
+# CSS Variables
+--video-border-radius: 0.5rem
+--video-controls-height: 48px
+--video-progress-height: 4px
+--video-chapter-width: 240px
+--video-transcript-width: 320px
+---
+
+# Video
+
+Rich video player with chapters, transcripts, captions, and interactive timeline.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ container                                           │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ player                                          │ │
+│ │                                                 │ │
+│ │                    ▶                            │ │
+│ │               (play-button)                     │ │
+│ │                                                 │ │
+│ │ ┌───────────────────────────────────────────┐   │ │
+│ │ │ captions                                  │   │ │
+│ │ │ "This is the caption text"                │   │ │
+│ │ └───────────────────────────────────────────┘   │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ controls                                            │
+│ ┌──┐ ┌──────────────────────────────────────┐ ┌───┐│
+│ │▶ │ │███████████░░░░░░░░░░░░░░░░░░░░░░░░│ │⚙ ⛶││
+│ └──┘ └──────────────────────────────────────┘ └───┘│
+│       2:34 / 10:00            🔊━━━━━○              │
+└─────────────────────────────────────────────────────┘
+│ chapters (optional sidebar)                         │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ ► 0:00  Introduction                            │ │
+│ │   2:30  Getting Started                         │ │
+│ │   5:00  Main Content                            │ │
+│ │   8:30  Conclusion                              │ │
+│ └─────────────────────────────────────────────────┘ │
+│ transcript (optional sidebar)                       │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ 0:00  Welcome to this video...                  │ │
+│ │ 0:05  Today we'll cover...                      │ │
+│ │ 0:12  Let's start with...                       │ │
+│ └─────────────────────────────────────────────────┘ │
+```
+
+## Usage
+
+```mdx
+<Video
+  src="/videos/demo.mp4"
+  title="Product Demo"
+  poster="/thumbnails/demo.jpg"
+  aspectRatio="16:9"
+  chapters={[
+    { title: 'Introduction', time: 0 },
+    { title: 'Setup', time: 120 },
+    { title: 'Features', time: 300 },
+    { title: 'Conclusion', time: 540 },
+  ]}
+  transcript={transcriptData}
+  captions={[
+    { lang: 'en', src: '/captions/demo-en.vtt', label: 'English' },
+    { lang: 'es', src: '/captions/demo-es.vtt', label: 'Español' },
+  ]}
+/>
+```
+
+## Multiple Sources
+
+```mdx
+<Video
+  src={[
+    { src: '/video.webm', type: 'video/webm' },
+    { src: '/video.mp4', type: 'video/mp4' },
+  ]}
+/>
+```

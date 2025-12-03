@@ -1,0 +1,122 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Marketplace
+name: Marketplace
+category: app
+description: Product marketplace with listings, categories, cart, and checkout
+semanticElement: div
+outputs: [html, markdown, json, svg, png]
+related: [Directory, Dashboard, Pricing, Card]
+
+# Props
+title: string?
+description: string?
+products: Product[]
+categories: Category[]?
+filters: Filter[]?
+cart: CartItem[]?
+user: User?
+featured: Product[]?
+deals: Product[]?
+search: boolean = true
+pagination: Pagination?
+children: ReactNode?
+
+# Parts
+root: div
+header: header
+header-title: h1
+header-search: div
+header-cart: button
+header-user: div
+hero: section?
+hero-banner: div
+hero-featured: div
+categories: nav
+category: a
+toolbar: div
+toolbar-filters: div
+toolbar-sort: select
+content: main
+products: div
+product-card: article
+product-image: img
+product-badge: span?
+product-title: h2
+product-price: div
+product-rating: div
+product-actions: div
+sidebar: aside?
+sidebar-filters: div
+cart-drawer: aside?
+cart-items: div
+cart-item: div
+cart-total: div
+cart-checkout: button
+pagination: nav
+
+# CSS Variables
+--marketplace-grid-columns: 4
+--marketplace-card-gap: 1.5rem
+--marketplace-sidebar-width: 280px
+--marketplace-cart-width: 400px
+---
+
+# Marketplace
+
+A product marketplace with browsing, filtering, cart, and checkout functionality.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+│ ┌────────┐ ┌─────────────────┐ ┌────────┐ ┌──────┐ │
+│ │ title  │ │ 🔍 search       │ │ 🛒 cart│ │ user │ │
+│ └────────┘ └─────────────────┘ └────────┘ └──────┘ │
+├─────────────────────────────────────────────────────┤
+│ hero                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ banner / featured products                      │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ categories                                          │
+│ │ All │ Electronics │ Clothing │ Home │ ...        │
+├───────────┬─────────────────────────────────────────┤
+│ sidebar   │ products                                │
+│ ┌───────┐ │ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
+│ │filters│ │ │ product  │ │ product  │ │ product  │ │
+│ │       │ │ │ ┌──────┐ │ │ ┌──────┐ │ │ ┌──────┐ │ │
+│ │Price  │ │ │ │image │ │ │ │image │ │ │ │image │ │ │
+│ │ ○ $   │ │ │ │badge?│ │ │ │badge?│ │ │ │badge?│ │ │
+│ │ ○ $$  │ │ │ ├──────┤ │ │ ├──────┤ │ │ ├──────┤ │ │
+│ │ ○ $$$ │ │ │ │title │ │ │ │title │ │ │ │title │ │ │
+│ │       │ │ │ │price │ │ │ │price │ │ │ │price │ │ │
+│ │Rating │ │ │ │rating│ │ │ │rating│ │ │ │rating│ │ │
+│ │ ⭐⭐⭐+ │ │ │ │ [Add]│ │ │ │ [Add]│ │ │ │ [Add]│ │ │
+│ │       │ │ │ └──────┘ │ │ └──────┘ │ │ └──────┘ │ │
+│ └───────┘ │ └──────────┘ └──────────┘ └──────────┘ │
+└───────────┴─────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Marketplace
+  title="Shop"
+  products={products}
+  categories={[
+    { label: 'All', slug: 'all' },
+    { label: 'Electronics', slug: 'electronics' },
+    { label: 'Clothing', slug: 'clothing' },
+  ]}
+  filters={[
+    { name: 'price', label: 'Price', type: 'range', min: 0, max: 1000 },
+    { name: 'rating', label: 'Rating', type: 'rating', min: 3 },
+    { name: 'brand', label: 'Brand', options: ['Apple', 'Samsung', 'Sony'] },
+  ]}
+  featured={featuredProducts}
+  cart={cartItems}
+  user={currentUser}
+/>
+```

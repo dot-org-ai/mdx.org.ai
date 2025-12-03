@@ -1,0 +1,106 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Blog
+name: Blog
+category: content
+description: Blog listing and layout with posts, categories, and pagination
+semanticElement: section
+outputs: [html, markdown, json, svg, png]
+related: [BlogPost, Site, Docs, Directory]
+
+# Props
+title: string?
+description: string?
+posts: BlogPost[]
+categories: Category[]?
+tags: string[]?
+featured: BlogPost[]?
+pagination: Pagination?
+layout: 'grid' | 'list' | 'magazine' = 'grid'
+sidebar: boolean = false
+children: ReactNode?
+
+# Parts
+root: section
+header: header?
+header-title: h1
+header-description: p
+featured: div?
+featured-post: article
+posts: div
+post-card: article
+post-image: img
+post-title: h2
+post-excerpt: p
+post-meta: div
+post-author: span
+post-date: time
+post-tags: div
+sidebar: aside?
+sidebar-categories: nav
+sidebar-tags: div
+sidebar-newsletter: div?
+pagination: nav
+pagination-prev: a
+pagination-next: a
+pagination-pages: div
+
+# CSS Variables
+--blog-grid-columns: 3
+--blog-card-gap: 2rem
+--blog-sidebar-width: 300px
+---
+
+# Blog
+
+Blog listing layout with support for featured posts, categories, tags, and multiple layout options.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ title                           description     │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ featured                                            │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ featured-post (hero)                            │ │
+│ └─────────────────────────────────────────────────┘ │
+├───────────────────────────────────────┬─────────────┤
+│ posts                                 │ sidebar     │
+│ ┌──────────┐ ┌──────────┐ ┌────────┐ │ ┌─────────┐ │
+│ │ post-card│ │ post-card│ │post-...│ │ │categorie│ │
+│ │ ┌──────┐ │ │ ┌──────┐ │ │        │ │ │   tags  │ │
+│ │ │image │ │ │ │image │ │ │        │ │ │newsletter│
+│ │ ├──────┤ │ │ ├──────┤ │ │        │ │ └─────────┘ │
+│ │ │title │ │ │ │title │ │ │        │ │             │
+│ │ │excerpt│ │ │ │excerpt│ │        │ │             │
+│ │ │meta  │ │ │ │meta  │ │ │        │ │             │
+│ │ └──────┘ │ │ └──────┘ │ │        │ │             │
+│ └──────────┘ └──────────┘ └────────┘ │             │
+├───────────────────────────────────────┴─────────────┤
+│ pagination                                          │
+│ ← prev   1  2  3  ...  10   next →                  │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Blog
+  title="Engineering Blog"
+  description="Technical articles from our team"
+  posts={posts}
+  categories={[
+    { label: 'Engineering', slug: 'engineering' },
+    { label: 'Product', slug: 'product' },
+    { label: 'Design', slug: 'design' },
+  ]}
+  featured={[posts[0]]}
+  pagination={{ page: 1, totalPages: 10 }}
+  layout="grid"
+  sidebar
+/>
+```

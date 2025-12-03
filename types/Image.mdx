@@ -1,0 +1,148 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Image
+name: Image
+category: media
+description: Optimized image with responsive sources, lazy loading, and placeholder
+semanticElement: figure
+outputs: [html, markdown, json, svg]
+related: [Screenshot, Video, Media]
+
+# Props
+src: string | ImageSource[]
+alt: string
+width: number?
+height: number?
+aspectRatio: string?
+sizes: string?
+srcSet: string?
+loading: 'lazy' | 'eager' = 'lazy'
+decoding: 'async' | 'sync' | 'auto' = 'async'
+placeholder: 'blur' | 'empty' | 'color' | string = 'empty'
+blurDataURL: string?
+priority: boolean = false
+quality: number = 75
+fit: 'cover' | 'contain' | 'fill' | 'none' = 'cover'
+position: string = 'center'
+caption: string?
+credit: string?
+link: string?
+zoom: boolean = false
+children: ReactNode?
+
+# Parts
+root: figure
+container: div
+picture: picture
+source: source
+img: img
+placeholder: div?
+caption: figcaption?
+credit: span?
+zoom-overlay: div?
+
+# CSS Variables
+--image-border-radius: 0
+--image-aspect-ratio: auto
+--image-placeholder-color: #e5e5e5
+--image-caption-padding: 0.5rem
+---
+
+# Image
+
+Optimized responsive image component with lazy loading, placeholders, and optional zoom.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ container                                       │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ picture                                     │ │ │
+│ │ │ ┌─────────────────────────────────────────┐ │ │ │
+│ │ │ │ img                                     │ │ │ │
+│ │ │ │                                         │ │ │ │
+│ │ │ │          [image content]                │ │ │ │
+│ │ │ │                                         │ │ │ │
+│ │ │ └─────────────────────────────────────────┘ │ │ │
+│ │ │ placeholder (while loading)                 │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ caption                          credit: Photo │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+### Basic Image
+
+```mdx
+<Image
+  src="/hero.jpg"
+  alt="Hero image"
+  width={1200}
+  height={600}
+/>
+```
+
+### Responsive Image
+
+```mdx
+<Image
+  src="/photo.jpg"
+  alt="Landscape photo"
+  sizes="(max-width: 768px) 100vw, 50vw"
+  srcSet="/photo-400.jpg 400w, /photo-800.jpg 800w, /photo-1200.jpg 1200w"
+/>
+```
+
+### With Blur Placeholder
+
+```mdx
+<Image
+  src="/product.jpg"
+  alt="Product shot"
+  placeholder="blur"
+  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+  width={800}
+  height={600}
+/>
+```
+
+### With Caption and Credit
+
+```mdx
+<Image
+  src="/landscape.jpg"
+  alt="Mountain landscape"
+  caption="View from Mount Everest base camp"
+  credit="Photo by John Doe"
+/>
+```
+
+### Multiple Sources (Art Direction)
+
+```mdx
+<Image
+  src={[
+    { src: '/hero-mobile.jpg', media: '(max-width: 767px)' },
+    { src: '/hero-tablet.jpg', media: '(max-width: 1023px)' },
+    { src: '/hero-desktop.jpg', media: '(min-width: 1024px)' },
+  ]}
+  alt="Responsive hero image"
+/>
+```
+
+### With Zoom on Click
+
+```mdx
+<Image
+  src="/detailed-chart.png"
+  alt="Analytics chart"
+  zoom
+/>
+```

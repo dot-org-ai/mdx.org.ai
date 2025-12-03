@@ -1,0 +1,148 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Header
+name: Header
+category: layout
+description: Site header with logo, navigation, search, and actions
+semanticElement: header
+outputs: [html, markdown, json, svg, png]
+related: [Site, Nav, Footer, Layout]
+
+# Props
+logo: Media?
+logoText: string?
+nav: NavItem[]?
+actions: Action[]?
+search: boolean = false
+searchPlaceholder: string = 'Search...'
+sticky: boolean = true
+transparent: boolean = false
+variant: 'default' | 'centered' | 'split' | 'minimal' = 'default'
+mobileBreakpoint: number = 768
+children: ReactNode?
+
+# Parts
+root: header
+container: div
+brand: a
+brand-logo: img?
+brand-text: span?
+nav: nav
+nav-item: a
+nav-dropdown: div
+nav-dropdown-trigger: button
+nav-dropdown-content: div
+nav-dropdown-item: a
+search: div?
+search-input: input
+search-button: button
+actions: div
+action: button | a
+mobile-toggle: button
+mobile-menu: div
+mobile-nav: nav
+mobile-actions: div
+
+# CSS Variables
+--header-height: 64px
+--header-padding-x: 1.5rem
+--header-bg: var(--color-background)
+--header-border: var(--color-border)
+--header-sticky-shadow: 0 1px 3px rgba(0,0,0,0.1)
+---
+
+# Header
+
+Site header with logo, navigation, search, and action buttons.
+
+## Structure
+
+### Default Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ container                                       │ │
+│ │ ┌───────┐ ┌───────────────────────┐ ┌─────────┐ │ │
+│ │ │ brand │ │ nav                   │ │ actions │ │ │
+│ │ │ ┌───┐ │ │ Home Blog Pricing [▼] │ │ [🔍][⬇] │ │ │
+│ │ │ │ 🏠│ │ │                       │ │         │ │ │
+│ │ │ └───┘ │ │                       │ │         │ │ │
+│ │ └───────┘ └───────────────────────┘ └─────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+### Mobile Menu
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌───────┐                               ┌─────────┐ │
+│ │ brand │                               │ toggle ☰│ │
+│ └───────┘                               └─────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ mobile-menu (expanded)                          │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ mobile-nav                                  │ │ │
+│ │ │ Home                                        │ │ │
+│ │ │ Blog                                        │ │ │
+│ │ │ Pricing                                     │ │ │
+│ │ │ Resources ▼                                 │ │ │
+│ │ │   Documentation                             │ │ │
+│ │ │   API Reference                             │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ mobile-actions                              │ │ │
+│ │ │ [Sign In] [Get Started]                     │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Header
+  logo={{ src: '/logo.svg', alt: 'Company' }}
+  nav={[
+    { label: 'Home', href: '/' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Pricing', href: '/pricing' },
+    {
+      label: 'Resources',
+      children: [
+        { label: 'Documentation', href: '/docs' },
+        { label: 'API Reference', href: '/api' },
+        { label: 'Support', href: '/support' },
+      ],
+    },
+  ]}
+  actions={[
+    { label: 'Sign In', href: '/login', variant: 'ghost' },
+    { label: 'Get Started', href: '/signup', variant: 'primary' },
+  ]}
+  search
+  sticky
+/>
+```
+
+## Variants
+
+```mdx
+<Header variant="default" />   // Logo left, nav center, actions right
+<Header variant="centered" />  // Everything centered
+<Header variant="split" />     // Logo center, nav split left/right
+<Header variant="minimal" />   // Logo + hamburger only
+```
+
+## With Search
+
+```mdx
+<Header
+  search
+  searchPlaceholder="Search docs..."
+  onSearch={(query) => handleSearch(query)}
+/>
+```

@@ -1,0 +1,178 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Stats
+name: Stats
+category: landing
+description: Statistics section for showcasing metrics and key numbers
+semanticElement: section
+outputs: [html, markdown, json, svg, png]
+related: [LandingPage, Features, Hero, Dashboard]
+
+# Props
+title: string?
+subtitle: string?
+items: Stat[]
+layout: 'row' | 'grid' | 'cards' = 'row'
+columns: 2 | 3 | 4 = 4
+animated: boolean = true
+animationDuration: number = 2000
+prefix: string?
+suffix: string?
+variant: 'default' | 'cards' | 'minimal' | 'bordered' = 'default'
+background: 'default' | 'muted' | 'primary' | 'gradient' = 'default'
+children: ReactNode?
+
+# Parts
+root: section
+container: div
+header: header?
+header-title: h2
+header-subtitle: p?
+stats: div
+stat: div
+stat-value: span
+stat-prefix: span?
+stat-suffix: span?
+stat-label: span
+stat-change: span?
+stat-icon: span?
+
+# CSS Variables
+--stats-gap: 2rem
+--stats-padding: 3rem
+--stat-value-size: 3rem
+--stat-value-weight: 700
+--stat-value-color: var(--color-primary)
+--stat-label-size: 0.875rem
+--stat-label-color: var(--color-muted-foreground)
+---
+
+# Stats
+
+Statistics section for showcasing impressive metrics and key performance indicators.
+
+## Structure
+
+### Row Layout (Default)
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ header                                          │ │
+│ │              title                              │ │
+│ │             subtitle                            │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ stats                                           │ │
+│ │ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ │ │
+│ │ │  stat   │ │  stat   │ │  stat   │ │  stat   │ │ │
+│ │ │         │ │         │ │         │ │         │ │ │
+│ │ │  10K+   │ │  99.9%  │ │  500+   │ │  24/7   │ │ │
+│ │ │ Users   │ │ Uptime  │ │Partners │ │ Support │ │ │
+│ │ │         │ │         │ │         │ │         │ │ │
+│ │ └─────────┘ └─────────┘ └─────────┘ └─────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+### Cards Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│ stats                                               │
+│ ┌───────────────────────┐ ┌───────────────────────┐ │
+│ │ stat (card)           │ │ stat (card)           │ │
+│ │ ┌───────────────────┐ │ │ ┌───────────────────┐ │ │
+│ │ │  📈               │ │ │ │  👥               │ │ │
+│ │ │  $2.5M            │ │ │ │  50,000+          │ │ │
+│ │ │  Revenue          │ │ │ │  Active Users     │ │ │
+│ │ │  ↑ 23% this month │ │ │ │  ↑ 12% this week  │ │ │
+│ │ └───────────────────┘ │ │ └───────────────────┘ │ │
+│ └───────────────────────┘ └───────────────────────┘ │
+│ ┌───────────────────────┐ ┌───────────────────────┐ │
+│ │ stat (card)           │ │ stat (card)           │ │
+│ │ ┌───────────────────┐ │ │ ┌───────────────────┐ │ │
+│ │ │  🌍               │ │ │ │  ⭐               │ │ │
+│ │ │  120+             │ │ │ │  4.9/5            │ │ │
+│ │ │  Countries        │ │ │ │  Customer Rating  │ │ │
+│ │ └───────────────────┘ │ │ └───────────────────┘ │ │
+│ └───────────────────────┘ └───────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Stats
+  title="Trusted by developers worldwide"
+  subtitle="Join thousands of teams shipping better software"
+  items={[
+    { value: '10K+', label: 'Active Users' },
+    { value: '99.9%', label: 'Uptime' },
+    { value: '500+', label: 'Enterprise Clients' },
+    { value: '24/7', label: 'Support' },
+  ]}
+/>
+```
+
+## With Icons and Changes
+
+```mdx
+<Stats
+  layout="cards"
+  items={[
+    {
+      value: 2500000,
+      label: 'Revenue',
+      prefix: '$',
+      icon: 'chart-up',
+      change: '+23%',
+      changeType: 'positive',
+    },
+    {
+      value: 50000,
+      label: 'Active Users',
+      suffix: '+',
+      icon: 'users',
+      change: '+12%',
+      changeType: 'positive',
+    },
+    {
+      value: 120,
+      label: 'Countries',
+      suffix: '+',
+      icon: 'globe',
+    },
+    {
+      value: 4.9,
+      label: 'Customer Rating',
+      suffix: '/5',
+      icon: 'star',
+    },
+  ]}
+  animated
+/>
+```
+
+## Variants
+
+```mdx
+<Stats variant="default" />   // Simple inline stats
+<Stats variant="cards" />     // Each stat in a card
+<Stats variant="minimal" />   // Just numbers and labels
+<Stats variant="bordered" />  // Dividers between stats
+```
+
+## Animated Counting
+
+```mdx
+<Stats
+  animated
+  animationDuration={2000}
+  items={[
+    { value: 10000, label: 'Downloads', suffix: '+' },
+    { value: 99.9, label: 'Uptime', suffix: '%' },
+  ]}
+/>
+```

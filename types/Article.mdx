@@ -1,0 +1,161 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Article
+name: Article
+category: thing
+description: Article/blog post card for content listings and feeds
+semanticElement: article
+outputs: [html, markdown, json, svg, png]
+related: [Blog, BlogPost, Person, Card]
+
+# JSON-LD mapping
+jsonld:
+  $type: schema:Article
+  headline: schema:headline
+  description: schema:description
+  image: schema:image
+  author: schema:author
+  datePublished: schema:datePublished
+  dateModified: schema:dateModified
+  url: schema:url
+
+# Props
+title: string
+excerpt: string?
+content: string?
+image: Media?
+author: Person?
+date: string
+dateModified: string?
+category: string?
+tags: string[]?
+url: string?
+readingTime: number?
+featured: boolean = false
+draft: boolean = false
+layout: 'card' | 'horizontal' | 'compact' | 'featured' = 'card'
+children: ReactNode?
+
+# Parts
+root: article
+image-container: div?
+image: img
+content: div
+category: a?
+title: h3
+excerpt: p?
+meta: div
+author: div
+author-avatar: img
+author-name: span
+date: time
+reading-time: span?
+tags: div?
+tag: a
+footer: footer?
+actions: div?
+
+# CSS Variables
+--article-card-padding: 1.5rem
+--article-image-aspect: 16/9
+--article-image-radius: 0.5rem
+--article-title-lines: 2
+--article-excerpt-lines: 3
+---
+
+# Article
+
+Article card for displaying blog posts, news items, and content feeds.
+
+## Structure
+
+### Card Layout (Default)
+
+```
+┌─────────────────────────────────────┐
+│ root                                │
+│ ┌─────────────────────────────────┐ │
+│ │ image-container                 │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ image                       │ │ │
+│ │ │                             │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │
+│ │ content                         │ │
+│ │ category                        │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ title                       │ │ │
+│ │ │ Article Title Here          │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ excerpt                     │ │ │
+│ │ │ Brief description of the    │ │ │
+│ │ │ article content...          │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ meta                        │ │ │
+│ │ │ ┌────┐ Jane Doe · Jan 15    │ │ │
+│ │ │ │ 👤 │ 5 min read           │ │ │
+│ │ │ └────┘                      │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ tags                        │ │ │
+│ │ │ │React│ │TypeScript│        │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+### Horizontal Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌───────────┐ ┌───────────────────────────────────┐ │
+│ │ image     │ │ content                           │ │
+│ │           │ │ category                          │ │
+│ │           │ │ title                             │ │
+│ │           │ │ excerpt...                        │ │
+│ │           │ │ author · date · reading time      │ │
+│ └───────────┘ └───────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Article
+  title="Getting Started with TypeScript"
+  excerpt="Learn the basics of TypeScript and how to set up your first project."
+  image={{ src: '/blog/typescript.jpg', alt: 'TypeScript logo' }}
+  author={{ name: 'Jane Doe', avatar: '/avatars/jane.jpg' }}
+  date="2024-03-15"
+  category="Engineering"
+  tags={['TypeScript', 'JavaScript', 'Tutorial']}
+  readingTime={5}
+  url="/blog/getting-started-typescript"
+/>
+```
+
+## In Blog Grid
+
+```mdx
+<Blog
+  posts={posts.map(post => (
+    <Article key={post.slug} {...post} />
+  ))}
+/>
+```
+
+## Featured Article
+
+```mdx
+<Article
+  layout="featured"
+  featured
+  title="The Future of Web Development"
+  image={heroImage}
+  author={author}
+/>
+```

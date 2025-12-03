@@ -1,0 +1,154 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Team
+name: Team
+category: content
+description: Team section displaying team members in various layouts
+semanticElement: section
+outputs: [html, markdown, json, svg, png]
+related: [Person, Organization, Section, Grid]
+
+# Props
+title: string?
+subtitle: string?
+description: string?
+members: Person[]
+layout: 'grid' | 'list' | 'featured' | 'compact' = 'grid'
+columns: 2 | 3 | 4 | 5 = 4
+showBio: boolean = true
+showSocial: boolean = true
+showEmail: boolean = false
+featured: Person[]?
+departments: Department[]?
+children: ReactNode?
+
+# Parts
+root: section
+container: div
+header: header?
+header-title: h2
+header-subtitle: p?
+header-description: p?
+featured: div?
+featured-member: article
+departments: div?
+department: div
+department-title: h3
+department-members: div
+members: div
+member: article
+
+# CSS Variables
+--team-grid-gap: 2rem
+--team-member-padding: 1.5rem
+--team-avatar-size: 120px
+---
+
+# Team
+
+Team section for displaying company or organization team members.
+
+## Structure
+
+### Grid Layout (Default)
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ header                                          │ │
+│ │              title                              │ │
+│ │             subtitle                            │ │
+│ │            description                          │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ featured (optional leadership)                  │ │
+│ │ ┌─────────────────┐ ┌─────────────────┐         │ │
+│ │ │ CEO             │ │ CTO             │         │ │
+│ │ │ (larger cards)  │ │ (larger cards)  │         │ │
+│ │ └─────────────────┘ └─────────────────┘         │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ members                                         │ │
+│ │ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ │ │
+│ │ │ ┌─────┐ │ │ ┌─────┐ │ │ ┌─────┐ │ │ ┌─────┐ │ │ │
+│ │ │ │     │ │ │ │     │ │ │ │     │ │ │ │     │ │ │ │
+│ │ │ └─────┘ │ │ └─────┘ │ │ └─────┘ │ │ └─────┘ │ │ │
+│ │ │  Name   │ │  Name   │ │  Name   │ │  Name   │ │ │
+│ │ │  Role   │ │  Role   │ │  Role   │ │  Role   │ │ │
+│ │ │ [social]│ │ [social]│ │ [social]│ │ [social]│ │ │
+│ │ └─────────┘ └─────────┘ └─────────┘ └─────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+### By Department
+
+```
+┌─────────────────────────────────────────────────────┐
+│ departments                                         │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ department: Engineering                         │ │
+│ │ ┌─────────┐ ┌─────────┐ ┌─────────┐             │ │
+│ │ │ member  │ │ member  │ │ member  │             │ │
+│ │ └─────────┘ └─────────┘ └─────────┘             │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ department: Design                              │ │
+│ │ ┌─────────┐ ┌─────────┐                         │ │
+│ │ │ member  │ │ member  │                         │ │
+│ │ └─────────┘ └─────────┘                         │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Team
+  title="Meet our team"
+  subtitle="The people behind the product"
+  description="Our diverse team brings together experts from around the world."
+  featured={[
+    {
+      name: 'Jane Smith',
+      role: 'CEO & Founder',
+      avatar: '/team/jane.jpg',
+      bio: 'Building companies for 15 years.',
+      social: [{ platform: 'twitter', url: '...' }],
+    },
+    {
+      name: 'John Doe',
+      role: 'CTO',
+      avatar: '/team/john.jpg',
+      bio: 'Former Google engineer.',
+      social: [{ platform: 'github', url: '...' }],
+    },
+  ]}
+  members={teamMembers}
+  layout="grid"
+  columns={4}
+/>
+```
+
+## By Department
+
+```mdx
+<Team
+  title="Our Team"
+  departments={[
+    {
+      name: 'Engineering',
+      members: engineeringTeam,
+    },
+    {
+      name: 'Design',
+      members: designTeam,
+    },
+    {
+      name: 'Marketing',
+      members: marketingTeam,
+    },
+  ]}
+/>
+```

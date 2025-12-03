@@ -1,0 +1,174 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Nav
+name: Nav
+category: component
+description: Navigation component for menus, sidebars, and breadcrumbs
+semanticElement: nav
+outputs: [html, markdown, json, svg, png]
+related: [Header, Footer, Sidebar, Docs]
+
+# Props
+items: NavItem[]
+label: string?
+orientation: 'horizontal' | 'vertical' = 'horizontal'
+variant: 'default' | 'pills' | 'underline' | 'bordered' = 'default'
+size: 'sm' | 'md' | 'lg' = 'md'
+collapsible: boolean = false
+defaultExpanded: boolean = true
+activeItem: string?
+showIcons: boolean = true
+indent: number = 16
+children: ReactNode?
+
+# Parts
+root: nav
+list: ul
+item: li
+link: a
+link-icon: span?
+link-label: span
+link-badge: span?
+link-chevron: span?
+group: div
+group-label: span
+group-items: ul
+divider: hr
+nested: ul
+nested-item: li
+
+# CSS Variables
+--nav-gap: 0.25rem
+--nav-item-padding: 0.5rem 0.75rem
+--nav-item-radius: 0.375rem
+--nav-item-color: var(--color-text)
+--nav-item-hover-bg: var(--color-muted)
+--nav-item-active-bg: var(--color-primary-muted)
+--nav-item-active-color: var(--color-primary)
+--nav-indent: 1rem
+---
+
+# Nav
+
+Navigation component for building menus, sidebars, and navigation lists.
+
+## Structure
+
+### Horizontal Navigation
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ list                                            │ │
+│ │ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ │ │
+│ │ │  link   │ │  link   │ │  link   │ │  link   │ │ │
+│ │ │ 🏠 Home │ │ 📄 Docs │ │ 📝 Blog │ │ 💰 Price│ │ │
+│ │ └─────────┘ └─────────┘ └─────────┘ └─────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+### Vertical Navigation (Sidebar)
+
+```
+┌─────────────────────────────┐
+│ root                        │
+│ ┌─────────────────────────┐ │
+│ │ list                    │ │
+│ │ ┌─────────────────────┐ │ │
+│ │ │ link (active)       │ │ │
+│ │ │ 🏠 Dashboard        │ │ │
+│ │ └─────────────────────┘ │ │
+│ │ ┌─────────────────────┐ │ │
+│ │ │ group               │ │ │
+│ │ │ Analytics       ▼   │ │ │
+│ │ │ ┌─────────────────┐ │ │ │
+│ │ │ │ nested          │ │ │ │
+│ │ │ │ • Overview      │ │ │ │
+│ │ │ │ • Reports       │ │ │ │
+│ │ │ │ • Real-time     │ │ │ │
+│ │ │ └─────────────────┘ │ │ │
+│ │ └─────────────────────┘ │ │
+│ │ ─────── divider ─────── │ │
+│ │ ┌─────────────────────┐ │ │
+│ │ │ link                │ │ │
+│ │ │ ⚙️ Settings         │ │ │
+│ │ └─────────────────────┘ │ │
+│ └─────────────────────────┘ │
+└─────────────────────────────┘
+```
+
+## Usage
+
+### Simple Navigation
+
+```mdx
+<Nav
+  items={[
+    { label: 'Home', href: '/', icon: 'home' },
+    { label: 'Documentation', href: '/docs', icon: 'book' },
+    { label: 'Blog', href: '/blog', icon: 'pencil' },
+    { label: 'Pricing', href: '/pricing', icon: 'tag' },
+  ]}
+/>
+```
+
+### Sidebar with Groups
+
+```mdx
+<Nav
+  orientation="vertical"
+  items={[
+    { label: 'Dashboard', href: '/dashboard', icon: 'home' },
+    {
+      label: 'Analytics',
+      icon: 'chart',
+      children: [
+        { label: 'Overview', href: '/analytics' },
+        { label: 'Reports', href: '/analytics/reports' },
+        { label: 'Real-time', href: '/analytics/realtime', badge: 'Live' },
+      ],
+    },
+    { type: 'divider' },
+    { label: 'Settings', href: '/settings', icon: 'cog' },
+  ]}
+  collapsible
+/>
+```
+
+### With Badges
+
+```mdx
+<Nav
+  items={[
+    { label: 'Inbox', href: '/inbox', icon: 'mail', badge: '12' },
+    { label: 'Notifications', href: '/notifications', icon: 'bell', badge: '3' },
+    { label: 'Tasks', href: '/tasks', icon: 'check-square' },
+  ]}
+/>
+```
+
+## Variants
+
+```mdx
+<Nav variant="default" />    // Simple links
+<Nav variant="pills" />      // Rounded pill background
+<Nav variant="underline" />  // Underline active state
+<Nav variant="bordered" />   // Border around items
+```
+
+## Breadcrumb Style
+
+```mdx
+<Nav
+  orientation="horizontal"
+  items={[
+    { label: 'Home', href: '/' },
+    { label: 'Products', href: '/products' },
+    { label: 'Electronics', href: '/products/electronics' },
+    { label: 'Phones', href: '/products/electronics/phones', active: true },
+  ]}
+  separator="/"
+/>
+```

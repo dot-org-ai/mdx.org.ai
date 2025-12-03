@@ -1,0 +1,102 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Page
+name: Page
+category: layout
+description: Generic page wrapper with title, SEO, and layout options
+semanticElement: main
+outputs: [html, markdown, json, svg, png]
+related: [Site, Section, Hero, Docs]
+
+# Props
+title: string?
+description: string?
+seo: SEO?
+layout: 'default' | 'wide' | 'narrow' | 'full' | 'centered' = 'default'
+header: boolean = true
+footer: boolean = true
+breadcrumbs: Breadcrumb[]?
+actions: Action[]?
+children: ReactNode
+
+# Parts
+root: main
+header: header?
+header-breadcrumbs: nav?
+header-title: h1
+header-description: p?
+header-actions: div?
+content: div
+footer: footer?
+
+# CSS Variables
+--page-max-width: 1200px
+--page-narrow-width: 768px
+--page-wide-width: 1440px
+--page-padding-x: 1.5rem
+--page-padding-y: 2rem
+---
+
+# Page
+
+Generic page wrapper that provides consistent structure, SEO metadata, and layout options.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ header                                          │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ breadcrumbs: Home / Products / Widget       │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ │ ┌───────────────────────────────┐ ┌───────────┐ │ │
+│ │ │ title                         │ │  actions  │ │ │
+│ │ │ description                   │ │  [Edit]   │ │ │
+│ │ └───────────────────────────────┘ └───────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ content                                         │ │
+│ │                                                 │ │
+│ │   {children}                                    │ │
+│ │                                                 │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ footer (optional)                               │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Page
+  title="Product Details"
+  description="View and manage your product"
+  breadcrumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Products', href: '/products' },
+    { label: 'Widget', href: '/products/widget' },
+  ]}
+  actions={[
+    { label: 'Edit', href: '/products/widget/edit' },
+    { label: 'Delete', action: 'delete', variant: 'outline' },
+  ]}
+  layout="default"
+>
+  <Section>
+    <ProductCard product={product} />
+  </Section>
+</Page>
+```
+
+## Layout Variants
+
+| Layout | Max Width | Use Case |
+|--------|-----------|----------|
+| `default` | 1200px | Standard content pages |
+| `narrow` | 768px | Blog posts, articles |
+| `wide` | 1440px | Dashboards, tables |
+| `full` | 100% | Full-bleed layouts |
+| `centered` | 768px | Forms, auth pages |

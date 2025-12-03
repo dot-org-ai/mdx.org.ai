@@ -1,0 +1,162 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/FormView
+name: FormView
+category: app
+description: Form view for creating or editing items with validation and sections
+semanticElement: div
+outputs: [html, markdown, json, svg, png]
+related: [View, DetailView, Form, Modal]
+
+# Props
+title: string
+description: string?
+mode: 'create' | 'edit' = 'create'
+breadcrumbs: Breadcrumb[]?
+sections: FormSection[]
+fields: FormField[]?
+values: Record<string, unknown>?
+errors: Record<string, string>?
+submitLabel: string?
+cancelLabel: string = 'Cancel'
+cancelHref: string?
+showReset: boolean = false
+autosave: boolean = false
+sidebar: SidebarContent?
+loading: boolean = false
+submitting: boolean = false
+onSubmit: (values: Record<string, unknown>) => void
+onCancel: () => void?
+children: ReactNode?
+
+# Parts
+root: div
+header: header
+header-breadcrumbs: nav?
+header-title: h1
+header-description: p?
+body: div
+form: form
+main: div
+section: section
+section-title: h2
+section-description: p?
+section-fields: div
+field: div
+field-label: label
+field-input: input | select | textarea
+field-help: p?
+field-error: p?
+sidebar: aside?
+sidebar-section: div
+sidebar-preview: div?
+footer: footer
+footer-actions: div
+footer-cancel: button
+footer-reset: button?
+footer-submit: button
+autosave-indicator: div?
+
+# CSS Variables
+--form-view-max-width: 768px
+--form-view-section-gap: 2rem
+--form-view-field-gap: 1.5rem
+--form-view-sidebar-width: 320px
+---
+
+# FormView
+
+Form view for creating or editing items with sections, validation, and optional preview.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ breadcrumbs: Users / New User                   │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ title: Create New User                          │ │
+│ │ description                                     │ │
+│ └─────────────────────────────────────────────────┘ │
+├───────────────────────────────────────┬─────────────┤
+│ main                                  │ sidebar     │
+│ ┌───────────────────────────────────┐ │ ┌─────────┐ │
+│ │ section: Basic Info               │ │ │ Preview │ │
+│ │ ┌───────────────────────────────┐ │ │ │         │ │
+│ │ │ Name *                        │ │ │ │ ┌─────┐ │ │
+│ │ │ ┌───────────────────────────┐ │ │ │ │ │     │ │ │
+│ │ │ │ John Doe                  │ │ │ │ │ │     │ │ │
+│ │ │ └───────────────────────────┘ │ │ │ │ └─────┘ │ │
+│ │ │ Email *                       │ │ │ │ John    │ │
+│ │ │ ┌───────────────────────────┐ │ │ │ │ Doe     │ │
+│ │ │ │ john@example.com          │ │ │ │ │         │ │
+│ │ │ └───────────────────────────┘ │ │ │ └─────────┘ │
+│ │ │ ⚠️ Please enter a valid email │ │ │ ┌─────────┐ │
+│ │ └───────────────────────────────┘ │ │ │ Tips    │ │
+│ └───────────────────────────────────┘ │ │ • Tip 1 │ │
+│ ┌───────────────────────────────────┐ │ │ • Tip 2 │ │
+│ │ section: Permissions              │ │ └─────────┘ │
+│ │ ...                               │ │             │
+│ └───────────────────────────────────┘ │             │
+├───────────────────────────────────────┴─────────────┤
+│ footer                                              │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │           [Cancel]  [Reset]  [Create User]      │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<FormView
+  title="Create New User"
+  description="Add a new team member to your organization"
+  mode="create"
+  breadcrumbs={[
+    { label: 'Users', href: '/users' },
+    { label: 'New User' },
+  ]}
+  sections={[
+    {
+      title: 'Basic Information',
+      description: 'Enter the user\'s basic details',
+      fields: [
+        { name: 'name', label: 'Full Name', type: 'text', required: true },
+        { name: 'email', label: 'Email', type: 'email', required: true },
+        { name: 'role', label: 'Role', type: 'select', options: roles },
+      ],
+    },
+    {
+      title: 'Permissions',
+      fields: [
+        { name: 'permissions', label: 'Permissions', type: 'checkbox-group', options: permissions },
+      ],
+    },
+  ]}
+  values={formValues}
+  errors={formErrors}
+  submitLabel="Create User"
+  cancelHref="/users"
+  sidebar={{
+    sections: [
+      { title: 'Preview', content: <UserPreview values={formValues} /> },
+    ],
+  }}
+  onSubmit={handleSubmit}
+/>
+```
+
+## Edit Mode
+
+```mdx
+<FormView
+  title="Edit User"
+  mode="edit"
+  values={existingUser}
+  submitLabel="Save Changes"
+  autosave
+/>
+```

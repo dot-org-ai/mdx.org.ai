@@ -1,0 +1,142 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Slides
+name: Slides
+category: media
+description: Slide deck presentation with navigation, speaker notes, and export options
+semanticElement: div
+outputs: [html, markdown, json, svg, png, pdf]
+related: [Video, Page, Hero]
+
+# Props
+title: string
+description: string?
+author: Person?
+date: string?
+slides: Slide[]
+theme: 'light' | 'dark' | 'auto' = 'auto'
+aspectRatio: '16:9' | '4:3' | '1:1' = '16:9'
+showProgress: boolean = true
+showSlideNumber: boolean = true
+showNotes: boolean = false
+loop: boolean = false
+autoPlay: boolean = false
+autoPlayInterval: number = 5000
+children: ReactNode?
+
+# Parts
+root: div
+container: div
+slide: section
+slide-content: div
+slide-title: h1
+slide-subtitle: h2
+slide-body: div
+slide-image: img?
+slide-code: pre?
+slide-notes: aside?
+navigation: nav
+nav-prev: button
+nav-next: button
+progress: div
+progress-bar: div
+slide-number: div
+controls: div
+controls-fullscreen: button
+controls-overview: button
+controls-notes: button?
+overview: div?
+overview-thumbnail: button
+notes-panel: aside?
+speaker-view: div?
+
+# CSS Variables
+--slides-width: 100vw
+--slides-height: 100vh
+--slides-padding: 4rem
+--slides-font-size: 2rem
+--slides-title-size: 4rem
+--slides-transition: 0.3s ease
+---
+
+# Slides
+
+Presentation slide deck with keyboard navigation, speaker notes, and multiple export formats.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ container                                           │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ slide                                           │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ slide-title                                 │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ slide-subtitle                              │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ slide-body                                  │ │ │
+│ │ │   • Bullet point                            │ │ │
+│ │ │   • Another point                           │ │ │
+│ │ │   • And more                                │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ slide-image                                 │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ navigation                                          │
+│ ┌────┐                    ┌─────────────┐   ┌────┐ │
+│ │ ←  │   ███████░░░░░░    │  3 / 12     │   │ →  │ │
+│ └────┘   progress          slide-number     └────┘ │
+├─────────────────────────────────────────────────────┤
+│ controls                                            │
+│ │ ⛶ fullscreen │ ▦ overview │ 📝 notes │           │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Slides
+  title="Product Launch 2024"
+  author={{ name: 'Alice Smith', title: 'CEO' }}
+  theme="dark"
+  aspectRatio="16:9"
+  slides={[
+    {
+      title: 'Welcome',
+      subtitle: 'Product Launch 2024',
+      layout: 'title',
+    },
+    {
+      title: 'Agenda',
+      body: [
+        'Introduction',
+        'New Features',
+        'Demo',
+        'Q&A',
+      ],
+      layout: 'bullets',
+    },
+    {
+      title: 'New Features',
+      image: '/feature-screenshot.png',
+      notes: 'Emphasize the 3x performance improvement',
+      layout: 'image-right',
+    },
+  ]}
+/>
+```
+
+## Keyboard Shortcuts
+
+- `→` / `Space` - Next slide
+- `←` - Previous slide
+- `f` - Toggle fullscreen
+- `o` - Toggle overview
+- `s` - Toggle speaker notes
+- `Home` - First slide
+- `End` - Last slide

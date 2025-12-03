@@ -1,0 +1,63 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/App
+name: App
+category: layout
+description: Root application wrapper with theme, locale, and global providers
+semanticElement: div
+outputs: [html, markdown, json, svg, png]
+related: [Site, Page, Dashboard]
+
+# Props
+appName: string?
+theme: 'light' | 'dark' | 'system' = 'system'
+locale: string = 'en'
+seo: SEO?
+providers: Provider[]?
+children: ReactNode
+
+# Parts
+root: div
+providers: div?
+error-boundary: div?
+loading: div?
+
+# CSS Variables
+--app-font-family: system-ui, sans-serif
+--app-font-size: 16px
+--app-line-height: 1.5
+--app-color-scheme: light dark
+---
+
+# App
+
+Root application wrapper that provides global context, theme, and error boundaries.
+
+## Structure
+
+```
+┌─────────────────────────────────────────┐
+│ root                                    │
+│ ┌─────────────────────────────────────┐ │
+│ │ providers                           │ │
+│ │ ┌─────────────────────────────────┐ │ │
+│ │ │ error-boundary                  │ │ │
+│ │ │                                 │ │ │
+│ │ │   {children}                    │ │ │
+│ │ │                                 │ │ │
+│ │ └─────────────────────────────────┘ │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<App appName="My Application" theme="system" locale="en">
+  <Site>
+    <Page>
+      <Hero title="Welcome" />
+    </Page>
+  </Site>
+</App>
+```

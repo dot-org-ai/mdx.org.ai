@@ -1,0 +1,158 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Person
+name: Person
+category: thing
+description: Person/profile card component for team pages, testimonials, and author info
+semanticElement: article
+outputs: [html, markdown, json, svg, png]
+related: [Team, Testimonials, BlogPost, Card]
+
+# JSON-LD mapping
+jsonld:
+  $type: schema:Person
+  name: schema:name
+  role: schema:jobTitle
+  email: schema:email
+  url: schema:url
+  avatar: schema:image
+  bio: schema:description
+  organization: schema:worksFor
+
+# Props
+name: string
+role: string?
+email: string?
+url: string?
+avatar: Media?
+bio: string?
+organization: Organization?
+social: SocialLink[]?
+skills: string[]?
+stats: Stat[]?
+contact: ContactInfo?
+layout: 'card' | 'horizontal' | 'compact' | 'featured' = 'card'
+children: ReactNode?
+
+# Parts
+root: article
+header: header
+avatar: img
+avatar-placeholder: div
+info: div
+name: h3
+role: p
+organization: p?
+bio: p?
+contact: div?
+contact-email: a
+contact-phone: a?
+contact-location: span?
+social: div
+social-link: a
+skills: div
+skill: span
+stats: div
+stat: div
+stat-value: span
+stat-label: span
+actions: div?
+
+# CSS Variables
+--person-card-padding: 1.5rem
+--person-avatar-size: 80px
+--person-avatar-size-compact: 48px
+--person-avatar-size-featured: 120px
+--person-card-gap: 1rem
+---
+
+# Person
+
+Person component for displaying profile information, used in team pages, testimonials, and author sections.
+
+## Structure
+
+### Card Layout (Default)
+
+```
+┌─────────────────────────────────────┐
+│ root                                │
+│ ┌─────────────────────────────────┐ │
+│ │ header                          │ │
+│ │ ┌─────────┐                     │ │
+│ │ │ avatar  │                     │ │
+│ │ │  (img)  │                     │ │
+│ │ └─────────┘                     │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ info                        │ │ │
+│ │ │ name                        │ │ │
+│ │ │ role                        │ │ │
+│ │ │ organization                │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │
+│ │ bio                             │ │
+│ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │
+│ │ social                          │ │
+│ │ [🐦] [📧] [🔗] [💼]             │ │
+│ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │
+│ │ skills                          │ │
+│ │ │React│ │TypeScript│ │Node│     │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+### Horizontal Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────┐ ┌─────────────────────────────────────┐ │
+│ │ avatar  │ │ info                                │ │
+│ │         │ │ name              social            │ │
+│ │         │ │ role              [🐦][📧][🔗]      │ │
+│ │         │ │ bio                                 │ │
+│ └─────────┘ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Person
+  name="Jane Smith"
+  role="CEO & Founder"
+  avatar={{ src: '/team/jane.jpg', alt: 'Jane Smith' }}
+  bio="Building the future of web development with 15+ years of experience."
+  organization={{ name: 'Acme Corp', url: 'https://acme.com' }}
+  social={[
+    { platform: 'twitter', url: 'https://twitter.com/jane' },
+    { platform: 'linkedin', url: 'https://linkedin.com/in/jane' },
+    { platform: 'github', url: 'https://github.com/jane' },
+  ]}
+  skills={['Leadership', 'Strategy', 'Engineering']}
+/>
+```
+
+## Layout Variants
+
+```mdx
+<Person layout="card" />      // Default centered card
+<Person layout="horizontal" /> // Side-by-side
+<Person layout="compact" />    // Small inline
+<Person layout="featured" />   // Large hero-style
+```
+
+## In Team Grid
+
+```mdx
+<Section title="Our Team">
+  <Grid cols={3}>
+    <Person name="Jane" role="CEO" avatar="/jane.jpg" />
+    <Person name="John" role="CTO" avatar="/john.jpg" />
+    <Person name="Sarah" role="COO" avatar="/sarah.jpg" />
+  </Grid>
+</Section>
+```

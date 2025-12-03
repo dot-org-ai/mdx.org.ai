@@ -1,0 +1,151 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Hero
+name: Hero
+category: landing
+description: Hero section with headline, subtitle, CTAs, and optional media
+semanticElement: header
+outputs: [html, markdown, json, svg, png]
+related: [LandingPage, CTA, Features, Section]
+
+# Props
+title: string
+subtitle: string?
+description: string?
+primaryAction: Action?
+secondaryAction: Action?
+media: Media?
+mediaPosition: 'right' | 'left' | 'bottom' | 'background' = 'right'
+layout: 'centered' | 'split' | 'stacked' = 'split'
+background: 'default' | 'gradient' | 'image' | 'video' = 'default'
+backgroundMedia: Media?
+badge: string?
+rating: Rating?
+logos: Logo[]?
+size: 'sm' | 'md' | 'lg' | 'xl' = 'lg'
+children: ReactNode?
+
+# Parts
+root: header
+background: div?
+background-media: video | img?
+background-overlay: div?
+container: div
+content: div
+badge: span?
+title: h1
+subtitle: p?
+description: p?
+actions: div
+action-primary: a | button
+action-secondary: a | button
+rating: div?
+rating-stars: div
+rating-count: span
+logos: div?
+logo: img
+media-container: div?
+media: img | video
+
+# CSS Variables
+--hero-padding-sm: 4rem 0
+--hero-padding-md: 6rem 0
+--hero-padding-lg: 8rem 0
+--hero-padding-xl: 12rem 0
+--hero-title-size-sm: 2.5rem
+--hero-title-size-md: 3rem
+--hero-title-size-lg: 4rem
+--hero-title-size-xl: 5rem
+--hero-max-width: 1200px
+--hero-content-max-width: 640px
+---
+
+# Hero
+
+Hero section for landing pages with headline, supporting text, call-to-action buttons, and optional media.
+
+## Structure
+
+### Split Layout (default)
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ container                                       │ │
+│ │ ┌──────────────────────┐ ┌────────────────────┐ │ │
+│ │ │ content              │ │ media-container    │ │ │
+│ │ │ ┌──────────────────┐ │ │ ┌────────────────┐ │ │ │
+│ │ │ │ badge            │ │ │ │                │ │ │ │
+│ │ │ └──────────────────┘ │ │ │                │ │ │ │
+│ │ │ ┌──────────────────┐ │ │ │    media       │ │ │ │
+│ │ │ │ title            │ │ │ │    (image/     │ │ │ │
+│ │ │ │                  │ │ │ │     video)     │ │ │ │
+│ │ │ └──────────────────┘ │ │ │                │ │ │ │
+│ │ │ ┌──────────────────┐ │ │ │                │ │ │ │
+│ │ │ │ subtitle         │ │ │ └────────────────┘ │ │ │
+│ │ │ └──────────────────┘ │ │                    │ │ │
+│ │ │ ┌──────────────────┐ │ │                    │ │ │
+│ │ │ │ actions          │ │ │                    │ │ │
+│ │ │ │ [Primary] [Sec]  │ │ │                    │ │ │
+│ │ │ └──────────────────┘ │ │                    │ │ │
+│ │ │ ┌──────────────────┐ │ │                    │ │ │
+│ │ │ │ logos            │ │ │                    │ │ │
+│ │ │ └──────────────────┘ │ │                    │ │ │
+│ │ └──────────────────────┘ └────────────────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+### Centered Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │                    badge                        │ │
+│ │                    title                        │ │
+│ │                   subtitle                      │ │
+│ │              [Primary] [Secondary]              │ │
+│ │                    logos                        │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │                    media                        │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Hero
+  badge="New in v2.0"
+  title="Build faster with modern tools"
+  subtitle="The complete platform for building web applications. Ship in days, not months."
+  primaryAction={{ label: 'Get Started', href: '/signup' }}
+  secondaryAction={{ label: 'View Demo', href: '/demo' }}
+  media={{ src: '/hero-screenshot.png', alt: 'Product screenshot' }}
+  logos={[
+    { src: '/logos/company1.svg', alt: 'Company 1' },
+    { src: '/logos/company2.svg', alt: 'Company 2' },
+  ]}
+  rating={{ value: 4.9, count: 2500 }}
+/>
+```
+
+## Layout Variants
+
+```mdx
+<Hero layout="split" mediaPosition="right">Split with media right</Hero>
+<Hero layout="split" mediaPosition="left">Split with media left</Hero>
+<Hero layout="centered">Centered text, media below</Hero>
+<Hero layout="stacked">Full-width stacked sections</Hero>
+```
+
+## Background Variants
+
+```mdx
+<Hero background="gradient">Gradient background</Hero>
+<Hero background="image" backgroundMedia={{ src: '/bg.jpg' }}>Image background</Hero>
+<Hero background="video" backgroundMedia={{ src: '/bg.mp4' }}>Video background</Hero>
+```

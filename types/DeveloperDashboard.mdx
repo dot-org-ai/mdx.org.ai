@@ -1,0 +1,149 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/DeveloperDashboard
+name: DeveloperDashboard
+category: app
+description: Developer portal dashboard with API keys, usage metrics, logs, and settings
+semanticElement: div
+outputs: [html, markdown, json, svg, png]
+related: [Dashboard, API, Docs, Stats]
+
+# Props
+title: string = 'Developer Dashboard'
+user: User
+organization: Organization?
+apiKeys: APIKey[]
+usage: UsageMetrics
+logs: LogEntry[]?
+webhooks: Webhook[]?
+nav: NavItem[]?
+quickActions: Action[]?
+children: ReactNode?
+
+# Parts
+root: div
+sidebar: aside
+sidebar-nav: nav
+sidebar-nav-item: a
+sidebar-org-selector: select?
+header: header
+header-title: h1
+header-user: div
+header-actions: div
+content: main
+overview: section
+overview-stats: div
+overview-stat: div
+overview-chart: div
+api-keys: section
+api-keys-title: h2
+api-keys-list: div
+api-key: div
+api-key-name: span
+api-key-value: code
+api-key-actions: div
+api-key-create: button
+usage: section
+usage-title: h2
+usage-chart: div
+usage-table: table
+usage-breakdown: div
+logs: section?
+logs-title: h2
+logs-filters: div
+logs-list: div
+log-entry: div
+log-timestamp: time
+log-method: span
+log-path: code
+log-status: span
+webhooks: section?
+webhooks-title: h2
+webhooks-list: div
+webhook: div
+webhook-url: code
+webhook-events: div
+webhook-status: span
+settings: section?
+
+# CSS Variables
+--dev-dashboard-sidebar-width: 240px
+--dev-dashboard-header-height: 64px
+--dev-dashboard-content-padding: 2rem
+--dev-dashboard-stat-gap: 1.5rem
+---
+
+# DeveloperDashboard
+
+Developer portal dashboard for managing API keys, monitoring usage, viewing logs, and configuring webhooks.
+
+## Structure
+
+```
+┌──────────┬──────────────────────────────────────────┐
+│ sidebar  │ header                                   │
+│ ┌──────┐ │ ┌──────────────────────────────────────┐ │
+│ │ org  │ │ │ Developer Dashboard      user  [+]  │ │
+│ │  ▾   │ │ └──────────────────────────────────────┘ │
+│ └──────┘ ├──────────────────────────────────────────┤
+│ ┌──────┐ │ overview                                 │
+│ │ nav  │ │ ┌────────┐ ┌────────┐ ┌────────┐        │
+│ │      │ │ │API Calls│ │ Errors │ │Latency │        │
+│ │•Overv│ │ │ 1.2M   │ │ 0.02%  │ │ 45ms   │        │
+│ │•Keys │ │ └────────┘ └────────┘ └────────┘        │
+│ │•Usage│ │ ┌──────────────────────────────────────┐ │
+│ │•Logs │ │ │ usage-chart                          │ │
+│ │•Hooks│ │ │ ▁▂▃▅▆▇█▆▅▄▃▂▁▂▃▄▅▆▇█▇▆▅▄            │ │
+│ │•Setti│ │ └──────────────────────────────────────┘ │
+│ └──────┘ ├──────────────────────────────────────────┤
+│          │ api-keys                                 │
+│          │ ┌──────────────────────────────────────┐ │
+│          │ │ Production    sk-***abc   [⟲] [🗑]   │ │
+│          │ │ Development   sk-***xyz   [⟲] [🗑]   │ │
+│          │ │              [+ Create New Key]      │ │
+│          │ └──────────────────────────────────────┘ │
+│          ├──────────────────────────────────────────┤
+│          │ logs                                     │
+│          │ ┌──────────────────────────────────────┐ │
+│          │ │ 12:34  POST /api/users    201  45ms  │ │
+│          │ │ 12:33  GET  /api/users    200  23ms  │ │
+│          │ │ 12:32  GET  /api/users/1  404  12ms  │ │
+│          │ └──────────────────────────────────────┘ │
+└──────────┴──────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<DeveloperDashboard
+  user={currentUser}
+  organization={currentOrg}
+  apiKeys={[
+    { name: 'Production', key: 'sk-prod-***', created: '2024-01-01' },
+    { name: 'Development', key: 'sk-dev-***', created: '2024-02-15' },
+  ]}
+  usage={{
+    period: 'month',
+    requests: 1234567,
+    errors: 234,
+    errorRate: 0.02,
+    latency: { p50: 45, p95: 120, p99: 250 },
+    breakdown: [
+      { endpoint: '/api/users', count: 500000 },
+      { endpoint: '/api/posts', count: 400000 },
+    ],
+  }}
+  logs={recentLogs}
+  webhooks={[
+    { url: 'https://example.com/webhook', events: ['user.created'], active: true },
+  ]}
+/>
+```
+
+## Features
+
+- **API Key Management** - Create, rotate, and revoke API keys
+- **Usage Metrics** - Real-time API usage with charts and breakdowns
+- **Request Logs** - Searchable log viewer with filters
+- **Webhooks** - Configure and test webhook endpoints
+- **Organization Switching** - Multi-org support

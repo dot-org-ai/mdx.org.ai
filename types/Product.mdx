@@ -1,0 +1,171 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Product
+name: Product
+category: thing
+description: Product card component for e-commerce, marketplaces, and product showcases
+semanticElement: article
+outputs: [html, markdown, json, svg, png]
+related: [Marketplace, Directory, Card, Pricing]
+
+# JSON-LD mapping
+jsonld:
+  $type: schema:Product
+  name: schema:name
+  description: schema:description
+  image: schema:image
+  price: schema:offers.price
+  currency: schema:offers.priceCurrency
+  url: schema:url
+  brand: schema:brand
+  rating: schema:aggregateRating
+
+# Props
+name: string
+description: string?
+image: Media?
+images: Media[]?
+price: Price
+comparePrice: Price?
+currency: string = 'USD'
+url: string?
+brand: string?
+category: string?
+rating: Rating?
+reviews: number?
+badge: string?
+tags: string[]?
+inStock: boolean = true
+quantity: number?
+variants: ProductVariant[]?
+features: string[]?
+actions: Action[]?
+layout: 'card' | 'horizontal' | 'compact' | 'detailed' = 'card'
+children: ReactNode?
+
+# Parts
+root: article
+image-container: div
+image: img
+image-gallery: div?
+badge: span
+wishlist: button?
+content: div
+brand: span?
+category: span?
+name: h3
+description: p?
+rating: div
+rating-stars: div
+rating-count: span
+price: div
+price-current: span
+price-compare: span?
+price-discount: span?
+stock: span?
+variants: div?
+variant: button
+features: ul?
+feature: li
+tags: div?
+tag: span
+actions: div
+action-primary: button
+action-secondary: button?
+quantity: div?
+
+# CSS Variables
+--product-card-padding: 1rem
+--product-image-aspect: 1
+--product-image-radius: 0.5rem
+--product-badge-bg: var(--color-accent)
+--product-price-color: var(--color-primary)
+--product-compare-color: var(--color-muted)
+---
+
+# Product
+
+Product card for displaying items in e-commerce, marketplaces, and product catalogs.
+
+## Structure
+
+### Card Layout (Default)
+
+```
+┌─────────────────────────────────────┐
+│ root                                │
+│ ┌─────────────────────────────────┐ │
+│ │ image-container                 │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ image                       │ │ │
+│ │ │                             │ │ │
+│ │ │                             │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌──────┐              ┌──────┐  │ │
+│ │ │ badge│              │  ♡   │  │ │
+│ │ │ NEW  │              │wish  │  │ │
+│ │ └──────┘              └──────┘  │ │
+│ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │
+│ │ content                         │ │
+│ │ brand / category                │ │
+│ │ name                            │ │
+│ │ ⭐⭐⭐⭐⭐ (123 reviews)          │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ price                       │ │ │
+│ │ │ $99.00  $149.00  -33%       │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ actions                     │ │ │
+│ │ │ [Add to Cart]   [Details]   │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Product
+  name="Wireless Headphones"
+  description="Premium noise-cancelling wireless headphones"
+  image={{ src: '/products/headphones.jpg', alt: 'Headphones' }}
+  price={{ amount: 99, currency: 'USD' }}
+  comparePrice={{ amount: 149, currency: 'USD' }}
+  brand="AudioTech"
+  category="Electronics"
+  rating={{ value: 4.5, count: 123 }}
+  badge="Sale"
+  inStock
+  variants={[
+    { name: 'Black', value: 'black', image: '/black.jpg' },
+    { name: 'White', value: 'white', image: '/white.jpg' },
+  ]}
+  actions={[
+    { label: 'Add to Cart', action: 'addToCart', variant: 'primary' },
+    { label: 'Quick View', action: 'quickView', variant: 'outline' },
+  ]}
+/>
+```
+
+## In Product Grid
+
+```mdx
+<Section title="Featured Products">
+  <Grid cols={4}>
+    {products.map(product => (
+      <Product key={product.id} {...product} />
+    ))}
+  </Grid>
+</Section>
+```
+
+## Detailed Layout
+
+```mdx
+<Product
+  layout="detailed"
+  images={productImages}
+  features={['Noise cancelling', '30hr battery', 'Bluetooth 5.0']}
+/>
+```

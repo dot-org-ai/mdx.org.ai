@@ -1,0 +1,163 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Organization
+name: Organization
+category: thing
+description: Organization/company card for directories, partners, and about pages
+semanticElement: article
+outputs: [html, markdown, json, svg, png]
+related: [Directory, Person, Card, Footer]
+
+# JSON-LD mapping
+jsonld:
+  $type: schema:Organization
+  name: schema:name
+  description: schema:description
+  logo: schema:logo
+  url: schema:url
+  email: schema:email
+  telephone: schema:telephone
+  address: schema:address
+  foundingDate: schema:foundingDate
+
+# Props
+name: string
+description: string?
+logo: Media?
+url: string?
+email: string?
+phone: string?
+address: Address?
+founded: string?
+employees: string?
+industry: string?
+social: SocialLink[]?
+stats: Stat[]?
+tags: string[]?
+verified: boolean = false
+featured: boolean = false
+layout: 'card' | 'horizontal' | 'compact' | 'detailed' = 'card'
+children: ReactNode?
+
+# Parts
+root: article
+logo-container: div
+logo: img
+logo-placeholder: div
+verified-badge: span?
+content: div
+name: h3
+industry: span?
+description: p?
+meta: div
+founded: span?
+employees: span?
+location: span?
+contact: div?
+contact-email: a
+contact-phone: a
+contact-website: a
+social: div?
+social-link: a
+stats: div?
+stat: div
+tags: div?
+tag: span
+actions: div?
+
+# CSS Variables
+--org-card-padding: 1.5rem
+--org-logo-size: 64px
+--org-logo-radius: 0.5rem
+--org-verified-color: var(--color-success)
+---
+
+# Organization
+
+Organization/company card for directories, partner pages, and company information.
+
+## Structure
+
+### Card Layout (Default)
+
+```
+┌─────────────────────────────────────┐
+│ root                                │
+│ ┌─────────────────────────────────┐ │
+│ │ logo-container                  │ │
+│ │ ┌───────────┐                   │ │
+│ │ │   logo    │  ✓ verified       │ │
+│ │ └───────────┘                   │ │
+│ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │
+│ │ content                         │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ name                        │ │ │
+│ │ │ Acme Corporation            │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ industry                        │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ description                 │ │ │
+│ │ │ Building the future of...   │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ meta                        │ │ │
+│ │ │ Founded 2020 · 50-100 emp   │ │ │
+│ │ │ 📍 San Francisco, CA        │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ social                      │ │ │
+│ │ │ [🐦] [💼] [🔗]              │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ tags                        │ │ │
+│ │ │ │SaaS│ │B2B│ │Enterprise│   │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Organization
+  name="Acme Corporation"
+  description="Building the future of web development with innovative tools."
+  logo={{ src: '/logos/acme.svg', alt: 'Acme' }}
+  url="https://acme.com"
+  industry="Software"
+  founded="2020"
+  employees="50-100"
+  address={{ city: 'San Francisco', state: 'CA', country: 'USA' }}
+  social={[
+    { platform: 'twitter', url: 'https://twitter.com/acme' },
+    { platform: 'linkedin', url: 'https://linkedin.com/company/acme' },
+  ]}
+  tags={['SaaS', 'B2B', 'Enterprise']}
+  verified
+/>
+```
+
+## In Directory
+
+```mdx
+<Directory
+  title="Partner Directory"
+  items={partners.map(partner => (
+    <Organization key={partner.id} {...partner} />
+  ))}
+/>
+```
+
+## Detailed Layout
+
+```mdx
+<Organization
+  layout="detailed"
+  stats={[
+    { label: 'Employees', value: '500+' },
+    { label: 'Countries', value: '20' },
+    { label: 'Customers', value: '10K+' },
+  ]}
+/>
+```

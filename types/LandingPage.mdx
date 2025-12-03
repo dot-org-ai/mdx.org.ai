@@ -1,0 +1,132 @@
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/LandingPage
+name: LandingPage
+category: landing
+description: Complete landing page layout with hero, features, testimonials, pricing, and CTA
+semanticElement: div
+outputs: [html, markdown, json, svg, png]
+related: [Site, Hero, Features, Pricing, Testimonials, FAQ, CTA]
+
+# Props
+hero: HeroProps
+features: FeaturesProps?
+testimonials: TestimonialsProps?
+pricing: PricingProps?
+faq: FAQProps?
+cta: CTAProps?
+stats: StatsProps?
+logos: LogosProps?
+sections: Section[]?
+children: ReactNode?
+
+# Parts
+root: div
+hero-section: section
+features-section: section?
+stats-section: section?
+testimonials-section: section?
+logos-section: section?
+pricing-section: section?
+faq-section: section?
+cta-section: section?
+custom-sections: div?
+
+# CSS Variables
+--landing-section-gap: 6rem
+--landing-max-width: 1200px
+---
+
+# LandingPage
+
+Complete landing page composition that combines Hero, Features, Testimonials, Pricing, FAQ, and CTA sections.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ hero-section                                        │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ <Hero />                                        │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ logos-section (optional)                            │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ Trusted by: [logo] [logo] [logo] [logo]         │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ features-section                                    │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ <Features />                                    │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ stats-section (optional)                            │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ <Stats />                                       │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ testimonials-section                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ <Testimonials />                                │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ pricing-section                                     │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ <Pricing />                                     │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ faq-section                                         │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ <FAQ />                                         │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ cta-section                                         │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ <CTA />                                         │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<LandingPage
+  hero={{
+    title: 'Build something amazing',
+    subtitle: 'The complete platform for modern web development',
+    primaryAction: { label: 'Get Started', href: '/signup' },
+    secondaryAction: { label: 'Learn More', href: '/features' },
+  }}
+  features={{
+    title: 'Everything you need',
+    items: [
+      { title: 'Fast', description: 'Optimized for speed', icon: 'zap' },
+      { title: 'Secure', description: 'Enterprise-grade security', icon: 'shield' },
+      { title: 'Scalable', description: 'Grows with you', icon: 'trending-up' },
+    ],
+  }}
+  testimonials={{
+    title: 'Loved by developers',
+    items: [
+      { quote: 'Best tool ever!', author: { name: 'Jane', title: 'CTO' } },
+    ],
+  }}
+  pricing={{
+    title: 'Simple pricing',
+    tiers: [
+      { name: 'Starter', price: 'Free', features: ['1 project', 'Basic support'] },
+      { name: 'Pro', price: '$29/mo', features: ['Unlimited', 'Priority support'], featured: true },
+    ],
+  }}
+  faq={{
+    title: 'Questions?',
+    items: [
+      { question: 'How do I get started?', answer: 'Sign up and follow the guide.' },
+    ],
+  }}
+  cta={{
+    title: 'Ready to build?',
+    primaryAction: { label: 'Start Free', href: '/signup' },
+  }}
+/>
+```
