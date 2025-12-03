@@ -1,7 +1,7 @@
 {
   "name": "@mdxe/next",
   "version": "0.0.0",
-  "description": "Next.js integration for mdxe",
+  "description": "Next.js integration for mdxe - App Router, widgets, and content loading",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -11,6 +11,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./widgets": {
+      "types": "./dist/widgets.d.ts",
+      "import": "./dist/widgets.js",
+      "require": "./dist/widgets.cjs"
+    },
+    "./app": {
+      "types": "./dist/app.d.ts",
+      "import": "./dist/app.js",
+      "require": "./dist/app.cjs"
     }
   },
   "files": [
@@ -30,9 +40,12 @@
     "mdxe",
     "next",
     "nextjs",
+    "app-router",
+    "server-components",
     "framework",
     "mdx",
-    "mdxld"
+    "mdxld",
+    "widgets"
   ],
   "license": "MIT",
   "dependencies": {
@@ -48,6 +61,7 @@
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
+    "@types/node": "^22.10.1",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

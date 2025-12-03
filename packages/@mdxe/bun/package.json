@@ -1,7 +1,7 @@
 {
-  "name": "@mdxe/hono",
+  "name": "@mdxe/bun",
   "version": "0.0.0",
-  "description": "Serve and render MDXLD documents with Hono",
+  "description": "Bun runtime for mdxe - fast MDX server with native Bun APIs",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -33,22 +33,27 @@
   },
   "keywords": [
     "mdxe",
-    "mdxld",
-    "hono",
-    "web",
+    "bun",
     "server",
-    "edge"
+    "mdx",
+    "mdxld",
+    "runtime"
   ],
   "license": "MIT",
   "dependencies": {
-    "@hono/node-server": "^1.13.0",
-    "mdxld": "workspace:*"
-  },
-  "peerDependencies": {
+    "mdxld": "workspace:*",
     "hono": "^4.0.0"
   },
+  "peerDependencies": {
+    "bun": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "bun": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "hono": "^4.6.0",
+    "@types/bun": "^1.1.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

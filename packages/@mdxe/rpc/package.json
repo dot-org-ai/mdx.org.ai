@@ -1,7 +1,7 @@
 {
-  "name": "@mdxe/hono",
-  "version": "0.0.0",
-  "description": "Serve and render MDXLD documents with Hono",
+  "name": "@mdxe/rpc",
+  "version": "0.0.1",
+  "description": "RPC protocol for MDX functions using capnweb",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -16,6 +16,11 @@
       "types": "./dist/server.d.ts",
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "require": "./dist/client.cjs"
     }
   },
   "files": [
@@ -25,7 +30,6 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
-    "test:unit": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
@@ -33,24 +37,22 @@
   },
   "keywords": [
     "mdxe",
-    "mdxld",
-    "hono",
-    "web",
-    "server",
-    "edge"
+    "rpc",
+    "capnweb",
+    "ai-functions",
+    "mdxld"
   ],
   "license": "MIT",
   "dependencies": {
-    "@hono/node-server": "^1.13.0",
-    "mdxld": "workspace:*"
-  },
-  "peerDependencies": {
-    "hono": "^4.0.0"
+    "ai-functions": "workspace:^"
   },
   "devDependencies": {
-    "hono": "^4.6.0",
+    "@mdxld/config": "workspace:^",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
+  },
+  "peerDependencies": {
+    "mdxld": "workspace:^"
   }
 }

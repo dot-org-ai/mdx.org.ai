@@ -2,7 +2,8 @@
  * @mdxe/next - Next.js integration for mdxe
  *
  * Provides utilities for building Next.js applications with mdxld documents,
- * including configuration helpers, route handlers, and server components support.
+ * including configuration helpers, route handlers, App Router support,
+ * widgets, and server components support.
  *
  * @packageDocumentation
  */
@@ -12,6 +13,35 @@ import { parse } from 'mdxld'
 
 export { parse } from 'mdxld'
 export type { MDXLDDocument, MDXLDData } from 'mdxld'
+
+// Re-export widgets
+export {
+  getWidgetCSS,
+  getWidgetJS,
+  getAllWidgetCSS,
+  getAllWidgetJS,
+  parseWidgetQuery,
+  createWidgetCSSHandler,
+  createWidgetJSHandler,
+  type WidgetName,
+  type WidgetConfig,
+} from './widgets.js'
+
+// Re-export App Router utilities
+export {
+  ContentLoader,
+  createContentLoader,
+  getLayoutConfig,
+  extractToc,
+  generateSitemap,
+  renderSitemapXML,
+  createSitemapHandler,
+  type ContentSource,
+  type LayoutType,
+  type LayoutConfig,
+  type TocItem,
+  type SitemapEntry,
+} from './app.js'
 
 /**
  * Next.js MDX configuration options

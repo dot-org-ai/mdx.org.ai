@@ -1,7 +1,7 @@
 {
-  "name": "@mdxe/fumadocs",
-  "version": "0.0.0",
-  "description": "Next.js integration for MDX with Fumadocs",
+  "name": "@mdxe/mcp",
+  "version": "0.0.1",
+  "description": "Model Context Protocol server for MDX tools and resources",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -12,10 +12,20 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./components": {
-      "types": "./dist/components.d.ts",
-      "import": "./dist/components.js",
-      "require": "./dist/components.cjs"
+    "./stdio": {
+      "types": "./dist/stdio.d.ts",
+      "import": "./dist/stdio.js",
+      "require": "./dist/stdio.cjs"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js",
+      "require": "./dist/http.cjs"
+    },
+    "./tools": {
+      "types": "./dist/tools.d.ts",
+      "import": "./dist/tools.js",
+      "require": "./dist/tools.cjs"
     }
   },
   "files": [
@@ -25,7 +35,6 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
-    "test:unit": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
@@ -33,32 +42,23 @@
   },
   "keywords": [
     "mdxe",
-    "fumadocs",
-    "nextjs",
-    "mdx",
-    "documentation",
-    "react"
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "ai-tools",
+    "mdxld"
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxdb/fumadocs": "workspace:*",
-    "mdxld": "workspace:*"
-  },
-  "peerDependencies": {
-    "fumadocs-core": ">=14.0.0",
-    "fumadocs-ui": ">=14.0.0",
-    "next": ">=14.0.0",
-    "react": ">=18.0.0"
+    "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
-    "@types/react": "^18.3.0",
-    "fumadocs-core": "^14.0.0",
-    "fumadocs-ui": "^14.0.0",
-    "next": "^15.0.0",
-    "react": "^18.3.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
+  },
+  "peerDependencies": {
+    "mdxld": "workspace:^"
   }
 }

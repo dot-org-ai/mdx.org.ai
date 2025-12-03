@@ -1,0 +1,6 @@
+{
+  "name": "sample-site",
+  "version": "0.0.1",
+  "description": "A sample MDX site for testing",
+  "private": true
+}

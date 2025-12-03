@@ -1,11 +1,34 @@
 /**
- * @mdxe/workers - Securely evaluate MDX in Cloudflare Workers
+ * @mdxe/workers - Build, publish, and evaluate MDX in Cloudflare Workers
  *
- * Uses the Dynamic Worker Loader API to run compiled MDX code in isolated
- * workerd instances with configurable sandboxing.
+ * This package provides:
+ * - Build: Bundle MDX projects into Workers-compatible bundles
+ * - Publish: Deploy bundles to Cloudflare Workers for Platforms
+ * - Evaluate: Run compiled MDX code in isolated workerd instances
  *
  * @packageDocumentation
  */
+
+// Build and publish exports
+export { build, buildWorker } from './build.js'
+export { publish, buildAndPublish } from './publish.js'
+export type {
+  BuildOptions,
+  BuildResult,
+  NamespaceBundle,
+  WorkerBundle,
+  ContentBundle,
+  ContentDocument,
+  ContentFunction,
+  AssetBundle,
+  AssetFile,
+  NamespaceMeta,
+  WorkerConfig as WorkerMetaConfig,
+  BindingConfig,
+  BuildInfo,
+  PublishOptions,
+  PublishResult,
+} from './types.js'
 
 import {
   compileToModule,

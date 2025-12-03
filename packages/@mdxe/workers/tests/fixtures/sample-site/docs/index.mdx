@@ -1,0 +1,32 @@
+---
+$type: Docs
+title: Documentation
+description: API documentation and guides
+---
+
+# Documentation
+
+Welcome to the documentation.
+
+## API Reference
+
+Here's a simple function:
+
+```ts
+export function greet(name: string): string {
+  return `Hello, ${name}!`
+}
+
+export function add(a: number, b: number): number {
+  return a + b
+}
+```
+
+## Usage
+
+Call these functions via RPC:
+
+```ts
+const greeting = await $.greet('World')
+const sum = await $.add(2, 3)
+```

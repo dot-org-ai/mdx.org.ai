@@ -8,9 +8,26 @@
  * @packageDocumentation
  */
 
-import { parse, toAst, type MDXLDDocument, type MDXLDAstNode } from 'mdxld'
+import { parse, type MDXLDDocument, type MDXLDAstNode } from 'mdxld'
+import { toAst } from '@mdxld/ast'
 import * as fs from 'fs'
 import * as path from 'path'
+
+// Lazy import for @mdxld/compile to avoid circular dependencies
+let transformTestCode: ((code: string) => Promise<string>) | null = null
+
+async function getTransformTestCode(): Promise<(code: string) => Promise<string>> {
+  if (!transformTestCode) {
+    try {
+      const compile = await import('@mdxld/compile')
+      transformTestCode = compile.transformTestCode
+    } catch {
+      // Fallback: return code as-is if @mdxld/compile not available
+      transformTestCode = async (code: string) => code
+    }
+  }
+  return transformTestCode
+}
 
 /**
  * Test block extracted from MDX content
@@ -252,6 +269,46 @@ export function findMDXTestFiles(
 }
 
 /**
+ * Check if code contains JSX syntax
+ */
+function containsJSX(code: string): boolean {
+  // Look for JSX patterns:
+  // - Opening tags: <Component or <div
+  // - Self-closing tags: <Component /> or <br />
+  // - Fragment syntax: <> or </>
+  // Exclude comparison operators and arrow functions by checking context
+
+  // Match JSX opening tags: <TagName or <tag-name
+  const jsxPattern = /<[A-Z][a-zA-Z0-9]*[\s/>]|<[a-z][a-z0-9-]*[\s/>]|<>|<\/>/
+
+  // Also check for JSX in return statements or parentheses
+  const jsxReturnPattern = /return\s*\(\s*<|return\s+<[A-Za-z]/
+
+  return jsxPattern.test(code) || jsxReturnPattern.test(code)
+}
+
+/**
+ * Check if code needs sandbox features (app, Hono, JSX rendering)
+ */
+function needsSandbox(code: string): boolean {
+  // Check for features that require the sandbox
+  return (
+    // Hono app usage
+    /\bapp\.(?:get|post|put|delete|patch|request|use|on|route)\s*\(/.test(code) ||
+    // JSX syntax
+    containsJSX(code) ||
+    // useState/useEffect hooks
+    /\buseState\s*\(/.test(code) ||
+    /\buseEffect\s*\(/.test(code) ||
+    // render functions
+    /\bc\.html\s*\(/.test(code) ||
+    /\bc\.stream\s*\(/.test(code) ||
+    // 'use client' directive
+    /['"]use client['"]/.test(code)
+  )
+}
+
+/**
  * Detect imports needed based on code content
  */
 function detectImports(code: string): {
@@ -262,6 +319,7 @@ function detectImports(code: string): {
   needsDb: boolean
   needsAi: boolean
   needsCreateElement: boolean
+  needsSandbox: boolean
 } {
   const mdxld: string[] = []
   const mdxui: string[] = []
@@ -287,13 +345,25 @@ function detectImports(code: string): {
   if (/\bparseMeta\s*\(/.test(code)) mdxeVitest.push('parseMeta')
 
   // Check for db and ai globals
-  const needsDb = /\bdb\./.test(code)
-  const needsAi = /\bai\./.test(code)
+  const needsDbFlag = /\bdb\./.test(code)
+  const needsAiFlag = /\bai\./.test(code)
 
   // Check if createElement is needed (for component rendering)
-  const needsCreateElement = /\bcreateElement\b/.test(code) || mdxui.includes('createComponents')
+  const needsCreateElementFlag = /\bcreateElement\b/.test(code) || mdxui.includes('createComponents')
 
-  return { mdxld, mdxui, mdxuiMarkdown, mdxeVitest, needsDb, needsAi, needsCreateElement }
+  // Check if sandbox is needed
+  const needsSandboxFlag = needsSandbox(code)
+
+  return {
+    mdxld,
+    mdxui,
+    mdxuiMarkdown,
+    mdxeVitest,
+    needsDb: needsDbFlag,
+    needsAi: needsAiFlag,
+    needsCreateElement: needsCreateElementFlag,
+    needsSandbox: needsSandboxFlag
+  }
 }
 
 /**
@@ -301,6 +371,16 @@ function detectImports(code: string): {
  */
 function containsAwait(code: string): boolean {
   return /\bawait\s+/.test(code)
+}
+
+/**
+ * Escape string for use in JavaScript template literal
+ */
+function escapeForTemplate(code: string): string {
+  return code
+    .replace(/\\/g, '\\\\')
+    .replace(/`/g, '\\`')
+    .replace(/\$\{/g, '\\${')
 }
 
 /**
@@ -313,13 +393,30 @@ export function generateTestCode(testFile: MDXTestFile): string {
   const lines: string[] = []
   const fileName = path.basename(testFile.path)
 
-  // Collect all code to detect imports
-  const allCode = testFile.tests.map((t) => t.code).join('\n')
-  const imports = detectImports(allCode)
+  // Check each test for sandbox requirements
+  const testsWithMeta = testFile.tests.map((test) => ({
+    ...test,
+    needsSandbox: needsSandbox(test.code),
+  }))
+
+  // Check if any tests need sandbox
+  const anySandboxTests = testsWithMeta.some((t) => t.needsSandbox)
+
+  // Collect all non-sandbox code to detect imports
+  const nonSandboxCode = testsWithMeta
+    .filter((t) => !t.needsSandbox)
+    .map((t) => t.code)
+    .join('\n')
+  const imports = detectImports(nonSandboxCode)
 
   lines.push(`// Generated from: ${fileName}`)
   lines.push(`import { describe, it, expect, vi } from 'vitest'`)
   lines.push(`import { should, assert } from '@mdxe/vitest'`)
+
+  // Add sandbox import if needed
+  if (anySandboxTests) {
+    lines.push(`import { evaluate } from 'ai-sandbox'`)
+  }
 
   // Add detected imports
   if (imports.mdxld.length > 0) {
@@ -349,17 +446,31 @@ export function generateTestCode(testFile: MDXTestFile): string {
 
   lines.push(`describe('${fileName}', () => {`)
 
-  for (const test of testFile.tests) {
+  for (const test of testsWithMeta) {
     const isSkipped = test.meta['skip'] === true
     const itFn = isSkipped ? 'it.skip' : 'it'
-    // Auto-detect async if code contains await, or if explicitly marked async
-    const needsAsync = test.async || containsAwait(test.code)
-    const asyncKeyword = needsAsync ? 'async ' : ''
 
-    lines.push(`  ${itFn}('${test.name.replace(/'/g, "\\'")}', ${asyncKeyword}() => {`)
-    // Don't indent the test code to preserve template literal content (e.g., YAML)
-    lines.push(test.code)
-    lines.push('  })')
+    if (test.needsSandbox) {
+      // Wrap sandbox-needing tests in evaluate call
+      const escapedCode = escapeForTemplate(test.code)
+      lines.push(`  ${itFn}('${test.name.replace(/'/g, "\\'")}', async () => {`)
+      lines.push(`    const result = await evaluate({`)
+      lines.push(`      tests: \`${escapedCode}\`,`)
+      lines.push(`    })`)
+      lines.push(`    if (!result.success) {`)
+      lines.push(`      throw new Error(result.error || 'Test failed in sandbox')`)
+      lines.push(`    }`)
+      lines.push(`  })`)
+    } else {
+      // Run non-sandbox tests directly
+      const needsAsync = test.async || containsAwait(test.code)
+      const asyncKeyword = needsAsync ? 'async ' : ''
+
+      lines.push(`  ${itFn}('${test.name.replace(/'/g, "\\'")}', ${asyncKeyword}() => {`)
+      // Don't indent the test code to preserve template literal content (e.g., YAML)
+      lines.push(test.code)
+      lines.push('  })')
+    }
     lines.push('')
   }
 
@@ -663,7 +774,8 @@ function createSimpleExpect() {
 }
 
 // Re-export from mdxld for convenience
-export { parse, toAst, type MDXLDDocument, type MDXLDAstNode } from 'mdxld'
+export { parse, type MDXLDDocument, type MDXLDAstNode } from 'mdxld'
+export { toAst } from '@mdxld/ast'
 
 // =============================================================================
 // Should-based assertion syntax (Chai-style)
