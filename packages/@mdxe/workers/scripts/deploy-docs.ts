@@ -24,11 +24,13 @@ async function main() {
   console.log(`  Documents: ${buildResult.bundle!.content.count}`)
   console.log(`  Worker size: ${buildResult.bundle!.worker.main.length} bytes`)
 
-  // Deploy
+  // Deploy with static assets
   console.log('\n--- Deploying to docs.mdx.org.ai ---')
+  console.log(`Static assets: ${Object.keys(buildResult.bundle!.assets?.files || {}).length} files`)
   const deployResult = await publish(buildResult.bundle!, {
     namespace: 'mdx-org-ai-docs',
     accountId: 'b6641681fe423910342b9ffa1364c76d',
+    contentStorage: 'assets',
     verbose: true,
   })
 

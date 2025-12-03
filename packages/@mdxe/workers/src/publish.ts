@@ -1,287 +1,92 @@
 /**
  * @mdxe/workers Publish
  *
- * Publish namespace bundles to Cloudflare Workers for Platforms
+ * Publish namespace bundles to Cloudflare Workers using wrangler
  *
  * @packageDocumentation
  */
 
-import { existsSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
-import { homedir } from 'node:os'
+import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
+import { join, dirname } from 'node:path'
+import { tmpdir } from 'node:os'
+import { spawn } from 'node:child_process'
 import type { NamespaceBundle, PublishOptions, PublishResult } from './types.js'
 
-const DEFAULT_API_BASE_URL = 'https://api.cloudflare.com/client/v4'
-
 /**
- * Read OAuth token from wrangler's config file
+ * Run a command and return stdout/stderr
  */
-function getWranglerOAuthToken(): string | undefined {
-  // macOS: ~/Library/Preferences/.wrangler/config/default.toml
-  // Linux: ~/.config/.wrangler/config/default.toml
-  const macPath = join(homedir(), 'Library', 'Preferences', '.wrangler', 'config', 'default.toml')
-  const linuxPath = join(homedir(), '.config', '.wrangler', 'config', 'default.toml')
-
-  const configPath = existsSync(macPath) ? macPath : existsSync(linuxPath) ? linuxPath : undefined
-
-  if (!configPath) return undefined
-
-  try {
-    const content = readFileSync(configPath, 'utf-8')
-    // Simple TOML parsing for oauth_token
-    const match = content.match(/oauth_token\s*=\s*"([^"]+)"/)
-    if (match?.[1]) {
-      // Check if token is expired
-      const expirationMatch = content.match(/expiration_time\s*=\s*"([^"]+)"/)
-      if (expirationMatch?.[1]) {
-        const expiration = new Date(expirationMatch[1])
-        if (expiration < new Date()) {
-          console.warn('Wrangler OAuth token is expired. Run `wrangler login` to refresh.')
-          return undefined
-        }
-      }
-      return match[1]
-    }
-  } catch {
-    // Ignore read errors
-  }
-
-  return undefined
-}
-
-/**
- * Cloudflare API client for Workers deployment
- */
-class CloudflareAPI {
-  private baseUrl: string
-  private token: string
-  private accountId?: string
-
-  constructor(options: { token: string; baseUrl?: string; accountId?: string }) {
-    this.token = options.token
-    this.baseUrl = options.baseUrl || DEFAULT_API_BASE_URL
-    this.accountId = options.accountId
-  }
-
-  private async request<T>(
-    path: string,
-    options: RequestInit = {}
-  ): Promise<{ success: boolean; result?: T; errors?: Array<{ message: string }> }> {
-    const url = `${this.baseUrl}${path}`
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-        ...options.headers,
-      },
+function runCommand(
+  command: string,
+  args: string[],
+  options: { cwd: string; env?: Record<string, string> }
+): Promise<{ code: number; stdout: string; stderr: string }> {
+  return new Promise((resolve) => {
+    const proc = spawn(command, args, {
+      cwd: options.cwd,
+      env: { ...process.env, ...options.env },
+      stdio: ['pipe', 'pipe', 'pipe'],
     })
 
-    return response.json() as Promise<{ success: boolean; result?: T; errors?: Array<{ message: string }> }>
-  }
+    let stdout = ''
+    let stderr = ''
 
-  /**
-   * Get account ID from token (whoami)
-   */
-  async getAccountId(): Promise<string | undefined> {
-    if (this.accountId) return this.accountId
+    proc.stdout?.on('data', (data) => {
+      stdout += data.toString()
+    })
 
-    const result = await this.request<{ id: string }>('/user')
-    if (result.success && result.result) {
-      // Get first account
-      const accounts = await this.request<Array<{ id: string }>>('/accounts')
-      if (accounts.success && accounts.result?.[0]) {
-        this.accountId = accounts.result[0].id
-        return this.accountId
-      }
-    }
-    return undefined
-  }
+    proc.stderr?.on('data', (data) => {
+      stderr += data.toString()
+    })
 
-  /**
-   * Upload worker script to a dispatch namespace
-   */
-  async uploadToNamespace(
-    dispatchNamespace: string,
-    scriptName: string,
-    code: string,
-    metadata: {
-      compatibilityDate?: string
-      compatibilityFlags?: string[]
-      bindings?: Array<{ type: string; name: string; [key: string]: unknown }>
-    } = {}
-  ): Promise<{ success: boolean; scriptId?: string; error?: string }> {
-    const accountId = await this.getAccountId()
-    if (!accountId) {
-      return { success: false, error: 'Could not determine account ID' }
-    }
+    proc.on('close', (code) => {
+      resolve({ code: code ?? 1, stdout, stderr })
+    })
 
-    // Prepare multipart form data
-    const formData = new FormData()
-
-    // Worker module - use application/javascript+module for ESM
-    const blob = new Blob([code], { type: 'application/javascript+module' })
-    formData.append('worker.js', blob, 'worker.js')
-
-    // Metadata - specify main_module for ESM format
-    const metadataBlob = new Blob(
-      [
-        JSON.stringify({
-          main_module: 'worker.js',
-          compatibility_date: metadata.compatibilityDate || new Date().toISOString().split('T')[0],
-          compatibility_flags: metadata.compatibilityFlags,
-          bindings: metadata.bindings,
-        }),
-      ],
-      { type: 'application/json' }
-    )
-    formData.append('metadata', metadataBlob, 'metadata.json')
-
-    const result = await this.request<{ id: string }>(
-      `/accounts/${accountId}/workers/dispatch/namespaces/${dispatchNamespace}/scripts/${scriptName}`,
-      {
-        method: 'PUT',
-        body: formData,
-      }
-    )
-
-    if (result.success && result.result) {
-      return { success: true, scriptId: result.result.id }
-    }
-
-    return {
-      success: false,
-      error: result.errors?.map((e) => e.message).join(', ') || 'Upload failed',
-    }
-  }
-
-  /**
-   * Upload worker script (standalone, not dispatch namespace)
-   */
-  async uploadWorker(
-    scriptName: string,
-    code: string,
-    metadata: {
-      compatibilityDate?: string
-      compatibilityFlags?: string[]
-      bindings?: Array<{ type: string; name: string; [key: string]: unknown }>
-    } = {}
-  ): Promise<{ success: boolean; scriptId?: string; error?: string }> {
-    const accountId = await this.getAccountId()
-    if (!accountId) {
-      return { success: false, error: 'Could not determine account ID' }
-    }
-
-    // Prepare multipart form data
-    const formData = new FormData()
-
-    // Worker module - use application/javascript+module for ESM
-    const blob = new Blob([code], { type: 'application/javascript+module' })
-    formData.append('worker.js', blob, 'worker.js')
-
-    // Metadata - specify main_module for ESM format
-    const metadataBlob = new Blob(
-      [
-        JSON.stringify({
-          main_module: 'worker.js',
-          compatibility_date: metadata.compatibilityDate || new Date().toISOString().split('T')[0],
-          compatibility_flags: metadata.compatibilityFlags,
-          bindings: metadata.bindings,
-        }),
-      ],
-      { type: 'application/json' }
-    )
-    formData.append('metadata', metadataBlob, 'metadata.json')
-
-    const result = await this.request<{ id: string }>(
-      `/accounts/${accountId}/workers/scripts/${scriptName}`,
-      {
-        method: 'PUT',
-        body: formData,
-      }
-    )
-
-    if (result.success && result.result) {
-      return { success: true, scriptId: result.result.id }
-    }
-
-    return {
-      success: false,
-      error: result.errors?.map((e) => e.message).join(', ') || 'Upload failed',
-    }
-  }
-
-  /**
-   * Write content to KV namespace
-   */
-  async writeKV(
-    namespaceId: string,
-    entries: Array<{ key: string; value: string }>
-  ): Promise<{ success: boolean; error?: string }> {
-    const accountId = await this.getAccountId()
-    if (!accountId) {
-      return { success: false, error: 'Could not determine account ID' }
-    }
-
-    // Bulk write
-    const result = await this.request(
-      `/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/bulk`,
-      {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(entries),
-      }
-    )
-
-    return {
-      success: result.success,
-      error: result.errors?.map((e) => e.message).join(', '),
-    }
-  }
-
-  /**
-   * Create or get KV namespace
-   */
-  async ensureKVNamespace(title: string): Promise<{ success: boolean; namespaceId?: string; error?: string }> {
-    const accountId = await this.getAccountId()
-    if (!accountId) {
-      return { success: false, error: 'Could not determine account ID' }
-    }
-
-    // List existing namespaces
-    const listResult = await this.request<Array<{ id: string; title: string }>>(
-      `/accounts/${accountId}/storage/kv/namespaces`
-    )
-
-    if (listResult.success && listResult.result) {
-      const existing = listResult.result.find((ns) => ns.title === title)
-      if (existing) {
-        return { success: true, namespaceId: existing.id }
-      }
-    }
-
-    // Create new namespace
-    const createResult = await this.request<{ id: string }>(
-      `/accounts/${accountId}/storage/kv/namespaces`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title }),
-      }
-    )
-
-    if (createResult.success && createResult.result) {
-      return { success: true, namespaceId: createResult.result.id }
-    }
-
-    return {
-      success: false,
-      error: createResult.errors?.map((e) => e.message).join(', ') || 'Failed to create KV namespace',
-    }
-  }
+    proc.on('error', (err) => {
+      resolve({ code: 1, stdout, stderr: err.message })
+    })
+  })
 }
 
 /**
- * Publish a namespace bundle to Cloudflare Workers
+ * Generate wrangler.jsonc configuration
+ */
+function generateWranglerConfig(options: {
+  name: string
+  accountId?: string
+  compatibilityDate: string
+  compatibilityFlags?: string[]
+  hasAssets: boolean
+  env?: Record<string, string>
+}): string {
+  const config: Record<string, unknown> = {
+    $schema: 'https://cdn.jsdelivr.net/npm/wrangler@latest/config-schema.json',
+    name: options.name,
+    main: 'worker.js',
+    compatibility_date: options.compatibilityDate,
+  }
+
+  if (options.accountId) {
+    config.account_id = options.accountId
+  }
+
+  if (options.compatibilityFlags?.length) {
+    config.compatibility_flags = options.compatibilityFlags
+  }
+
+  if (options.hasAssets) {
+    config.assets = { directory: './public' }
+  }
+
+  if (options.env && Object.keys(options.env).length > 0) {
+    config.vars = options.env
+  }
+
+  return JSON.stringify(config, null, 2)
+}
+
+/**
+ * Publish a namespace bundle to Cloudflare Workers using wrangler
  *
  * @example
  * ```ts
@@ -290,11 +95,11 @@ class CloudflareAPI {
  * // Build the project
  * const buildResult = await build({ projectDir: './my-site' })
  *
- * // Publish to Workers for Platforms
+ * // Publish to Cloudflare Workers
  * const publishResult = await publish(buildResult.bundle!, {
  *   namespace: 'my-site',
- *   token: process.env.CLOUDFLARE_API_TOKEN!,
- *   dispatchNamespace: 'sites',
+ *   accountId: 'your-account-id',
+ *   contentStorage: 'assets',
  * })
  * ```
  */
@@ -302,36 +107,69 @@ export async function publish(bundle: NamespaceBundle, options: PublishOptions):
   const startTime = Date.now()
   const logs: string[] = []
 
-  const { namespace, dispatchNamespace, accountId, apiBaseUrl, kvNamespaceId, contentStorage = 'embedded', dryRun, verbose } = options
-
-  // Use provided token or fall back to wrangler OAuth
-  let token = options.token
-  if (!token) {
-    token = getWranglerOAuthToken()
-    if (token) {
-      logs.push('Using wrangler OAuth token')
-    }
-  }
-
-  if (!token) {
-    return {
-      success: false,
-      error: 'No authentication token. Provide a token or run `wrangler login`.',
-      logs,
-      duration: Date.now() - startTime,
-    }
-  }
+  const { namespace, accountId, contentStorage = 'embedded', dryRun, verbose } = options
 
   try {
-    logs.push(`Publishing to namespace: ${namespace}`)
+    // Create temp directory for deployment
+    const deployDir = join(tmpdir(), `mdxe-deploy-${namespace}-${Date.now()}`)
+    mkdirSync(deployDir, { recursive: true })
+
+    logs.push(`Preparing deployment in ${deployDir}`)
+
+    // Write worker code
+    const workerPath = join(deployDir, 'worker.js')
+    writeFileSync(workerPath, bundle.worker.main)
+    logs.push(`Worker: ${bundle.worker.main.length} bytes`)
+
+    // Write assets if using static assets
+    const hasAssets = contentStorage === 'assets' && bundle.assets
+    if (hasAssets && bundle.assets) {
+      const publicDir = join(deployDir, 'public')
+      mkdirSync(publicDir, { recursive: true })
+
+      let assetCount = 0
+      for (const [path, file] of Object.entries(bundle.assets.files)) {
+        // Remove leading slash for file path
+        const filePath = path.startsWith('/') ? path.slice(1) : path
+        const fullPath = join(publicDir, filePath)
+
+        // Ensure directory exists
+        const dir = dirname(fullPath)
+        if (!existsSync(dir)) {
+          mkdirSync(dir, { recursive: true })
+        }
+
+        writeFileSync(fullPath, file.content)
+        assetCount++
+      }
+
+      logs.push(`Assets: ${assetCount} files`)
+    }
+
+    // Generate wrangler.jsonc
+    const wranglerConfig = generateWranglerConfig({
+      name: namespace,
+      accountId,
+      compatibilityDate: bundle.meta.config.compatibilityDate,
+      compatibilityFlags: bundle.meta.config.compatibilityFlags,
+      hasAssets: !!hasAssets,
+      env: options.env,
+    })
+
+    const configPath = join(deployDir, 'wrangler.jsonc')
+    writeFileSync(configPath, wranglerConfig)
+
+    if (verbose) {
+      logs.push(`Config: ${wranglerConfig}`)
+    }
 
     if (dryRun) {
-      logs.push('[DRY RUN] Would publish worker...')
+      logs.push('[DRY RUN] Would run: wrangler deploy')
       logs.push(`[DRY RUN] Worker size: ${bundle.worker.main.length} bytes`)
       logs.push(`[DRY RUN] Content documents: ${bundle.content.count}`)
-      if (contentStorage !== 'embedded') {
-        logs.push(`[DRY RUN] Would upload content to ${contentStorage}`)
-      }
+
+      // Clean up
+      rmSync(deployDir, { recursive: true, force: true })
 
       return {
         success: true,
@@ -341,110 +179,44 @@ export async function publish(bundle: NamespaceBundle, options: PublishOptions):
       }
     }
 
-    // Initialize API client
-    const api = new CloudflareAPI({
-      token,
-      baseUrl: apiBaseUrl,
-      accountId,
+    // Run wrangler deploy
+    logs.push('Running wrangler deploy...')
+
+    const result = await runCommand('npx', ['wrangler', 'deploy'], {
+      cwd: deployDir,
     })
 
-    // Prepare bindings
-    const bindings: Array<{ type: string; name: string; [key: string]: unknown }> = []
-
-    // Handle content storage
-    if (contentStorage === 'kv') {
-      logs.push('Setting up KV storage for content...')
-
-      // Ensure KV namespace exists
-      const kvTitle = kvNamespaceId || `mdxe-content-${namespace}`
-      const kvResult = await api.ensureKVNamespace(kvTitle)
-
-      if (!kvResult.success) {
-        return {
-          success: false,
-          error: `Failed to setup KV: ${kvResult.error}`,
-          logs,
-          duration: Date.now() - startTime,
-        }
-      }
-
-      logs.push(`Using KV namespace: ${kvResult.namespaceId}`)
-
-      // Upload content to KV
-      const entries = Object.entries(bundle.content.documents).map(([path, doc]) => ({
-        key: path,
-        value: JSON.stringify(doc),
-      }))
-
-      const writeResult = await api.writeKV(kvResult.namespaceId!, entries)
-      if (!writeResult.success) {
-        return {
-          success: false,
-          error: `Failed to write content to KV: ${writeResult.error}`,
-          logs,
-          duration: Date.now() - startTime,
-        }
-      }
-
-      logs.push(`Uploaded ${entries.length} documents to KV`)
-
-      // Add KV binding
-      bindings.push({
-        type: 'kv_namespace',
-        name: 'CONTENT',
-        namespace_id: kvResult.namespaceId,
-      })
+    if (verbose || result.code !== 0) {
+      if (result.stdout) logs.push(`stdout: ${result.stdout}`)
+      if (result.stderr) logs.push(`stderr: ${result.stderr}`)
     }
 
-    // Add environment variables
-    if (options.env) {
-      for (const [name, value] of Object.entries(options.env)) {
-        bindings.push({ type: 'plain_text', name, text: value })
-      }
-    }
+    // Clean up temp directory
+    rmSync(deployDir, { recursive: true, force: true })
 
-    // Upload worker
-    logs.push('Uploading worker...')
-
-    let uploadResult: { success: boolean; scriptId?: string; error?: string }
-
-    if (dispatchNamespace) {
-      // Upload to dispatch namespace (Workers for Platforms)
-      logs.push(`Using dispatch namespace: ${dispatchNamespace}`)
-      uploadResult = await api.uploadToNamespace(dispatchNamespace, namespace, bundle.worker.main, {
-        compatibilityDate: bundle.meta.config.compatibilityDate,
-        compatibilityFlags: bundle.meta.config.compatibilityFlags,
-        bindings,
-      })
-    } else {
-      // Upload as standalone worker
-      uploadResult = await api.uploadWorker(namespace, bundle.worker.main, {
-        compatibilityDate: bundle.meta.config.compatibilityDate,
-        compatibilityFlags: bundle.meta.config.compatibilityFlags,
-        bindings,
-      })
-    }
-
-    if (!uploadResult.success) {
+    if (result.code !== 0) {
       return {
         success: false,
-        error: uploadResult.error,
+        error: `wrangler deploy failed with code ${result.code}`,
         logs,
         duration: Date.now() - startTime,
       }
     }
 
-    logs.push(`Worker uploaded successfully`)
-    if (verbose) {
-      logs.push(`Script ID: ${uploadResult.scriptId}`)
-    }
+    // Extract URL from wrangler output
+    const urlMatch = result.stdout.match(/https:\/\/[^\s]+\.workers\.dev/)
+    const url = urlMatch?.[0]
 
     const duration = Date.now() - startTime
     logs.push(`Published in ${duration}ms`)
+    if (url) {
+      logs.push(`URL: ${url}`)
+    }
 
     return {
       success: true,
-      scriptId: uploadResult.scriptId,
+      url,
+      scriptId: namespace,
       contentHash: bundle.content.hash,
       logs,
       duration,
@@ -473,6 +245,7 @@ export async function buildAndPublish(
     projectDir,
     minify: options.minify ?? true,
     sourceMaps: options.sourceMaps ?? false,
+    contentStorage: options.contentStorage,
   })
 
   if (!buildResult.success || !buildResult.bundle) {

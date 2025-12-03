@@ -224,7 +224,7 @@ export interface BuildOptions {
   sourceMaps?: boolean
 
   /** Content storage strategy */
-  contentStorage?: 'embedded' | 'kv' | 'r2'
+  contentStorage?: 'embedded' | 'kv' | 'r2' | 'assets'
 
   /** Include static assets */
   includeAssets?: boolean
@@ -276,7 +276,7 @@ export interface PublishOptions {
   token?: string
 
   /** Content storage strategy */
-  contentStorage?: 'embedded' | 'kv' | 'r2'
+  contentStorage?: 'embedded' | 'kv' | 'r2' | 'assets'
 
   /** Workers for Platforms dispatch namespace */
   dispatchNamespace?: string
