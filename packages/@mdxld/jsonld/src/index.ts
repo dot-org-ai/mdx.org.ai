@@ -42,11 +42,23 @@ export {
 export {
   extractLocalName,
   extractRef,
+  extractRefs,
   simplifyPropertyName,
   stripBaseUrl,
   ensureArray,
   removeEmptyValues,
 } from './utils.js'
+
+// Schema.org specific helpers
+export {
+  extractType,
+  extractProperty,
+  extractPropertiesForType,
+  extractAllTypes,
+  extractAllProperties,
+  type SchemaType,
+  type SchemaProperty,
+} from './schema.js'
 
 export {
   JSON_LD_KEYWORDS,

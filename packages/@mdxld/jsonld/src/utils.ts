@@ -29,14 +29,22 @@ export function extractLocalName(uri: string): string {
 }
 
 /**
- * Extract reference from a JSON-LD reference object
+ * Extract reference from a JSON-LD reference object (single object only)
  * e.g., { '@id': 'https://schema.org/Person' } → 'Person'
+ *
+ * Note: This only handles single reference objects. For arrays, use extractRefs()
+ * or let convertValue handle the recursion.
  */
-export function extractRef(value: unknown, extractRefs: boolean = true): unknown {
-  if (!extractRefs) return value
+export function extractRef(value: unknown, doExtract: boolean = true): unknown {
+  if (!doExtract) return value
   if (value === null || value === undefined) return value
 
-  if (typeof value === 'object' && !Array.isArray(value)) {
+  // Don't handle arrays here - let convertValue handle recursion
+  if (Array.isArray(value)) {
+    return value
+  }
+
+  if (typeof value === 'object') {
     const obj = value as Record<string, unknown>
     // If it's a reference object with only @id, extract the local name
     if ('@id' in obj && Object.keys(obj).length === 1) {
@@ -49,6 +57,35 @@ export function extractRef(value: unknown, extractRefs: boolean = true): unknown
   }
 
   return value
+}
+
+/**
+ * Extract references from a value that may be a single ref or array of refs
+ * Always returns an array of local names
+ * e.g., { '@id': 'schema:Person' } → ['Person']
+ * e.g., [{ '@id': 'schema:Person' }, { '@id': 'schema:Thing' }] → ['Person', 'Thing']
+ */
+export function extractRefs(value: unknown): string[] {
+  if (value === null || value === undefined) return []
+
+  const items = Array.isArray(value) ? value : [value]
+  return items
+    .map((item) => {
+      if (typeof item === 'string') {
+        return extractLocalName(item)
+      }
+      if (typeof item === 'object' && item !== null) {
+        const obj = item as Record<string, unknown>
+        if ('@id' in obj) {
+          return extractLocalName(obj['@id'] as string)
+        }
+        if ('$id' in obj) {
+          return extractLocalName(obj['$id'] as string)
+        }
+      }
+      return null
+    })
+    .filter((x): x is string => x !== null)
 }
 
 /**
