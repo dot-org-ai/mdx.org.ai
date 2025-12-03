@@ -20,6 +20,9 @@ export const name = '@mdxdb/sqlite'
 // Main exports
 export { SqliteDatabase, createSqliteDatabase } from './database.js'
 
+// Provider (schema-first interface)
+export { SqliteProvider, createSqliteProvider } from './provider.js'
+
 // Types
 export type {
   SqliteDatabaseConfig,

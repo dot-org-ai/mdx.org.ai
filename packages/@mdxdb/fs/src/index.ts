@@ -12,6 +12,9 @@ export const name = '@mdxdb/fs'
 // Main exports
 export { FsDatabase, createFsDatabase } from './database.js'
 
+// Provider (schema-first interface)
+export { FsProvider, createFsProvider } from './provider.js'
+
 // Types
 export type { FsDatabaseConfig } from './types.js'
 

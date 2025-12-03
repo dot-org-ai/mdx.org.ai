@@ -1354,3 +1354,6 @@ export type {
   ArtifactType,
   ActionStatus,
 }
+
+// Provider (schema-first interface)
+export { ClickHouseProvider, createClickhouseProvider } from './provider.js'
