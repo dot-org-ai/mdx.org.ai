@@ -11,6 +11,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./products": {
+      "types": "./dist/products.d.ts",
+      "import": "./dist/products.js",
+      "require": "./dist/products.cjs"
     }
   },
   "files": [
@@ -34,8 +39,17 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "digital-products": "workspace:^",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
+  },
+  "peerDependencies": {
+    "digital-products": "*"
+  },
+  "peerDependenciesMeta": {
+    "digital-products": {
+      "optional": true
+    }
   }
 }

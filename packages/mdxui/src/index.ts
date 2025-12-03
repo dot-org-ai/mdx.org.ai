@@ -123,3 +123,7 @@ export type {
   JSONLDMapping,
   ComponentType,
 } from './type-loader.js'
+
+// Export products integration (requires digital-products peer dependency)
+// Import from 'mdxui/products' to use these features
+export * from './products.js'

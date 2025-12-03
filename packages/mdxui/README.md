@@ -683,6 +683,267 @@ interface ComponentMeta {
 }
 ```
 
+## Digital Products Integration
+
+mdxui integrates with the `digital-products` primitive to bridge product definitions to component props. This allows you to define products (Sites, Apps, APIs, Content) using the digital-products primitives and automatically convert them to mdxui component props.
+
+### Installation
+
+```bash
+npm install mdxui digital-products
+# or
+pnpm add mdxui digital-products
+```
+
+### Usage
+
+```typescript
+import { Site, App, API, Content, Nav } from 'digital-products'
+import { siteToProps, appToProps, apiToProps, contentToProps } from 'mdxui/products'
+
+// Define a site using digital-products
+const docsSite = Site({
+  id: 'docs',
+  name: 'My Documentation',
+  description: 'Product documentation',
+  version: '1.0.0',
+  navigation: [
+    Nav('Home', '/'),
+    Nav('Docs', '/docs', {
+      children: [
+        Nav('Getting Started', '/docs/getting-started'),
+        Nav('API Reference', '/docs/api'),
+      ],
+    }),
+  ],
+  seo: {
+    titleTemplate: '%s | My Docs',
+    description: 'Official documentation',
+    keywords: ['docs', 'api'],
+  },
+})
+
+// Convert to mdxui SiteProps
+const siteProps = siteToProps(docsSite)
+
+// Use with mdxui Site component
+// <Site {...siteProps}>{children}</Site>
+```
+
+### Converter Functions
+
+#### `siteToProps(site: SiteDefinition): SiteProps`
+
+Converts a digital-products `Site` definition to mdxui `SiteProps`.
+
+```typescript
+import { Site, Nav, SEO, Analytics } from 'digital-products'
+import { siteToProps } from 'mdxui/products'
+
+const site = Site({
+  id: 'marketing',
+  name: 'My Product',
+  description: 'Marketing site',
+  version: '1.0.0',
+  navigation: [
+    Nav('Features', '/features'),
+    Nav('Pricing', '/pricing'),
+    Nav('Docs', '/docs'),
+  ],
+  seo: SEO({
+    titleTemplate: '%s | My Product',
+    description: 'An amazing product',
+    ogImage: '/og-image.png',
+  }),
+  analytics: Analytics('plausible', 'example.com'),
+})
+
+const props = siteToProps(site)
+```
+
+#### `appToProps(app: AppDefinition): AppProps`
+
+Converts a digital-products `App` definition to mdxui `AppProps`.
+
+```typescript
+import { App, Route, State, Auth } from 'digital-products'
+import { appToProps } from 'mdxui/products'
+
+const app = App({
+  id: 'dashboard',
+  name: 'Dashboard App',
+  description: 'Admin dashboard',
+  version: '1.0.0',
+  framework: 'react',
+  routes: [
+    Route('/', 'Home'),
+    Route('/dashboard', 'Dashboard'),
+    Route('/users/:id', 'UserDetail'),
+  ],
+  state: State({
+    library: 'zustand',
+    schema: {
+      user: 'Current user',
+      settings: 'App settings',
+    },
+  }),
+  auth: Auth({
+    provider: 'clerk',
+    protectedRoutes: ['/dashboard'],
+  }),
+})
+
+const props = appToProps(app)
+```
+
+#### `apiToProps(api: APIDefinition): APIProps`
+
+Converts a digital-products `API` definition to mdxui `APIProps`.
+
+```typescript
+import { API, Endpoint, APIAuth, RateLimit } from 'digital-products'
+import { apiToProps } from 'mdxui/products'
+
+const api = API({
+  id: 'rest-api',
+  name: 'My API',
+  description: 'RESTful API',
+  version: '1.0.0',
+  style: 'rest',
+  baseUrl: 'https://api.example.com',
+  endpoints: [
+    Endpoint('GET', '/users', 'List all users', {
+      response: {
+        users: ['Array of user objects'],
+        total: 'Total count',
+      },
+    }),
+    Endpoint('POST', '/users', 'Create a user', {
+      request: {
+        name: 'string',
+        email: 'string',
+      },
+      auth: true,
+    }),
+  ],
+  auth: APIAuth({
+    type: 'bearer',
+    header: 'Authorization',
+  }),
+  rateLimit: RateLimit({
+    requests: 100,
+    window: 60,
+  }),
+})
+
+const props = apiToProps(api)
+```
+
+#### `contentToProps(content: ContentDefinition): { type: 'blog' | 'docs', props: BlogProps | DocsProps }`
+
+Converts a digital-products `Content` definition to either `BlogProps` or `DocsProps`.
+
+```typescript
+import { Content, Workflow } from 'digital-products'
+import { contentToProps, isBlogContent, isDocsContent } from 'mdxui/products'
+
+// Blog content
+const blog = Content({
+  id: 'blog',
+  name: 'Blog Posts',
+  description: 'Company blog',
+  version: '1.0.0',
+  format: 'mdx',
+  categories: ['Blog', 'Technology'],
+  workflow: Workflow({
+    states: ['draft', 'review', 'published'],
+    initialState: 'draft',
+    transitions: [
+      { from: 'draft', to: 'review', action: 'submit' },
+      { from: 'review', to: 'published', action: 'approve' },
+    ],
+  }),
+})
+
+const result = contentToProps(blog)
+
+if (isBlogContent(result)) {
+  // Use with Blog component
+  // <Blog {...result.props} />
+} else if (isDocsContent(result)) {
+  // Use with Docs component
+  // <Docs {...result.props}>{children}</Docs>
+}
+```
+
+#### `productToProps(product: ProductDefinition): Props`
+
+Generic converter that dispatches to the appropriate converter based on product type.
+
+```typescript
+import { registry } from 'digital-products'
+import { productToProps } from 'mdxui/products'
+
+const product = registry.get('my-product')
+const props = productToProps(product)
+```
+
+#### `productsToProps(products: ProductDefinition[]): Props[]`
+
+Batch convert multiple products to props.
+
+```typescript
+import { registry } from 'digital-products'
+import { productsToProps } from 'mdxui/products'
+
+const allProducts = registry.list()
+const allProps = productsToProps(allProducts)
+```
+
+### Type Guards
+
+The package provides type guards for narrowing content types:
+
+```typescript
+import { contentToProps, isBlogContent, isDocsContent } from 'mdxui/products'
+
+const result = contentToProps(content)
+
+if (isBlogContent(result)) {
+  // result.props is BlogProps
+  console.log(result.props.posts)
+}
+
+if (isDocsContent(result)) {
+  // result.props is DocsProps
+  console.log(result.props.nav)
+}
+```
+
+### Re-exported Types
+
+All digital-products types are re-exported from `mdxui/products` for convenience:
+
+```typescript
+import type {
+  SiteDefinition,
+  AppDefinition,
+  APIDefinition,
+  ContentDefinition,
+  DataDefinition,
+  DatasetDefinition,
+  MCPDefinition,
+  SDKDefinition,
+  ProductDefinition,
+  NavigationDefinition,
+  SEOConfig,
+  AnalyticsConfig,
+  RouteDefinition,
+  EndpointDefinition,
+  WorkflowDefinition,
+} from 'mdxui/products'
+```
+
 ## Related Packages
 
 ### Rendering Packages
