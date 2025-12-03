@@ -4,17 +4,19 @@ $id: https://hacker.news.org.ai/user/${params.id}
 source:
   endpoint: user
   params: { id: params.id }
-  transform: |
-    (data) => ({
-      $type: 'User',
-      $id: `https://hacker.news.org.ai/user/${data.id}`,
-      ...data,
-      profileUrl: `https://news.ycombinator.com/user?id=${data.id}`,
-      karma: data.karma || 0,
-      createdAt: new Date(data.created * 1000).toISOString(),
-    })
 layout: user
 ---
+
+export function transform(data) {
+  return {
+    $type: 'User',
+    $id: `https://hacker.news.org.ai/user/${data.id}`,
+    ...data,
+    profileUrl: `https://news.ycombinator.com/user?id=${data.id}`,
+    karma: data.karma || 0,
+    createdAt: new Date(data.created * 1000).toISOString(),
+  }
+}
 
 export async function getStaticProps({ params }) {
   const hn = sources.get('https://hacker.news.org.ai')

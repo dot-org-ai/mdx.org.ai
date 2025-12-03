@@ -4,20 +4,24 @@ $id: https://hacker.news.org.ai/item/${params.id}
 source:
   endpoint: item
   params: { id: params.id }
-  transform: |
-    (data) => ({
-      $type: data.type === 'story' ? 'Story'
-           : data.type === 'comment' ? 'Comment'
-           : data.type === 'job' ? 'Job'
-           : data.type === 'poll' ? 'Poll'
-           : 'Item',
-      $id: `https://hacker.news.org.ai/item/${data.id}`,
-      ...data,
-      url: data.url || `https://news.ycombinator.com/item?id=${data.id}`,
-      hnUrl: `https://news.ycombinator.com/item?id=${data.id}`,
-    })
 layout: item
 ---
+
+export function transform(data) {
+  const typeMap = {
+    story: 'Story',
+    comment: 'Comment',
+    job: 'Job',
+    poll: 'Poll',
+  }
+  return {
+    $type: typeMap[data.type] || 'Item',
+    $id: `https://hacker.news.org.ai/item/${data.id}`,
+    ...data,
+    url: data.url || `https://news.ycombinator.com/item?id=${data.id}`,
+    hnUrl: `https://news.ycombinator.com/item?id=${data.id}`,
+  }
+}
 
 export async function getStaticProps({ params }) {
   const hn = sources.get('https://hacker.news.org.ai')

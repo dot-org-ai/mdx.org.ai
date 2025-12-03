@@ -8,18 +8,20 @@ source:
     filters: batch:${params.batch}
     hitsPerPage: 100
     facets: ['industries', 'status']
-  transform: |
-    (data) => ({
-      $type: 'Batch',
-      $id: `https://yc.startups.org.ai/batch/${params.batch}`,
-      batch: params.batch,
-      companies: data.hits,
-      total: data.nbHits,
-      industries: data.facets?.industries || {},
-      statuses: data.facets?.status || {},
-    })
 layout: batch
 ---
+
+export function transform(data, { params }) {
+  return {
+    $type: 'Batch',
+    $id: `https://yc.startups.org.ai/batch/${params.batch}`,
+    batch: params.batch,
+    companies: data.hits,
+    total: data.nbHits,
+    industries: data.facets?.industries || {},
+    statuses: data.facets?.status || {},
+  }
+}
 
 export async function getStaticProps({ params }) {
   const yc = sources.get('https://yc.startups.org.ai')

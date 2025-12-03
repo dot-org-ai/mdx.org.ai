@@ -4,43 +4,46 @@ $id: https://schema.org.ai/property/${params.property}
 $context: https://schema.org
 source:
   endpoint: vocabulary
-  transform: |
-    (data) => {
-      const graph = data['@graph'] || []
-      const prop = graph.find(n =>
-        n['@type'] === 'rdf:Property' &&
-        n['rdfs:label'] === params.property
-      )
-      if (!prop) return null
-      const getDomains = (p) => {
-        const domains = p['schema:domainIncludes']
-        if (!domains) return []
-        return (Array.isArray(domains) ? domains : [domains])
-          .map(d => d['@id']?.split('/').pop())
-          .filter(Boolean)
-      }
-      const getRanges = (p) => {
-        const ranges = p['schema:rangeIncludes']
-        if (!ranges) return []
-        return (Array.isArray(ranges) ? ranges : [ranges])
-          .map(r => r['@id']?.split('/').pop())
-          .filter(Boolean)
-      }
-      return {
-        $type: 'SchemaProperty',
-        $id: `https://schema.org.ai/property/${params.property}`,
-        $context: 'https://schema.org',
-        name: prop['rdfs:label'],
-        description: prop['rdfs:comment'],
-        domainIncludes: getDomains(prop),
-        rangeIncludes: getRanges(prop),
-        subPropertyOf: prop['rdfs:subPropertyOf']?.['@id']?.split('/').pop(),
-        inverseOf: prop['schema:inverseOf']?.['@id']?.split('/').pop(),
-        supersededBy: prop['schema:supersededBy']?.['@id']?.split('/').pop(),
-      }
-    }
 layout: property
 ---
+
+export function transform(data, { params }) {
+  const graph = data['@graph'] || []
+  const prop = graph.find(n =>
+    n['@type'] === 'rdf:Property' &&
+    n['rdfs:label'] === params.property
+  )
+  if (!prop) return null
+
+  const getDomains = (p) => {
+    const domains = p['schema:domainIncludes']
+    if (!domains) return []
+    return (Array.isArray(domains) ? domains : [domains])
+      .map(d => d['@id']?.split('/').pop())
+      .filter(Boolean)
+  }
+
+  const getRanges = (p) => {
+    const ranges = p['schema:rangeIncludes']
+    if (!ranges) return []
+    return (Array.isArray(ranges) ? ranges : [ranges])
+      .map(r => r['@id']?.split('/').pop())
+      .filter(Boolean)
+  }
+
+  return {
+    $type: 'SchemaProperty',
+    $id: `https://schema.org.ai/property/${params.property}`,
+    $context: 'https://schema.org',
+    name: prop['rdfs:label'],
+    description: prop['rdfs:comment'],
+    domainIncludes: getDomains(prop),
+    rangeIncludes: getRanges(prop),
+    subPropertyOf: prop['rdfs:subPropertyOf']?.['@id']?.split('/').pop(),
+    inverseOf: prop['schema:inverseOf']?.['@id']?.split('/').pop(),
+    supersededBy: prop['schema:supersededBy']?.['@id']?.split('/').pop(),
+  }
+}
 
 export async function getStaticProps({ params }) {
   const schema = sources.get('https://schema.org.ai')

@@ -9,19 +9,21 @@ source:
       - - industries:${params.industry}
     hitsPerPage: 100
     facets: ['batch', 'status', 'regions']
-  transform: |
-    (data) => ({
-      $type: 'Industry',
-      $id: `https://yc.startups.org.ai/industry/${params.industry}`,
-      industry: params.industry,
-      companies: data.hits,
-      total: data.nbHits,
-      batches: data.facets?.batch || {},
-      statuses: data.facets?.status || {},
-      regions: data.facets?.regions || {},
-    })
 layout: industry
 ---
+
+export function transform(data, { params }) {
+  return {
+    $type: 'Industry',
+    $id: `https://yc.startups.org.ai/industry/${params.industry}`,
+    industry: params.industry,
+    companies: data.hits,
+    total: data.nbHits,
+    batches: data.facets?.batch || {},
+    statuses: data.facets?.status || {},
+    regions: data.facets?.regions || {},
+  }
+}
 
 export async function getStaticProps({ params }) {
   const yc = sources.get('https://yc.startups.org.ai')

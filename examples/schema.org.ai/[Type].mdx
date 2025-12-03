@@ -5,31 +5,40 @@ $context: https://schema.org
 source:
   endpoint: type
   params: { type: params.Type }
-  transform: |
-    (data) => {
-      const graph = data['@graph'] || [data]
-      const type = graph.find(n => n['@id']?.endsWith(`/${params.Type}`))
-      if (!type) return null
-      return {
-        $type: 'SchemaType',
-        $id: `https://schema.org.ai/${params.Type}`,
-        $context: 'https://schema.org',
-        label: type['rdfs:label'],
-        comment: type['rdfs:comment'],
-        subClassOf: Array.isArray(type['rdfs:subClassOf'])
-          ? type['rdfs:subClassOf'].map(s => s['@id']?.split('/').pop())
-          : type['rdfs:subClassOf']?.['@id']?.split('/').pop(),
-        properties: graph
-          .filter(n => n['schema:domainIncludes']?.['@id']?.endsWith(`/${params.Type}`))
-          .map(p => ({
-            name: p['rdfs:label'],
-            description: p['rdfs:comment'],
-            expectedType: p['schema:rangeIncludes']?.['@id']?.split('/').pop()
-          }))
-      }
-    }
 layout: type
 ---
+
+export function transform(data, { params }) {
+  const graph = data['@graph'] || [data]
+  const type = graph.find(n => n['@id']?.endsWith(`/${params.Type}`))
+  if (!type) return null
+
+  const getSubClassOf = () => {
+    const subClass = type['rdfs:subClassOf']
+    if (Array.isArray(subClass)) {
+      return subClass.map(s => s['@id']?.split('/').pop())
+    }
+    return subClass?.['@id']?.split('/').pop()
+  }
+
+  const properties = graph
+    .filter(n => n['schema:domainIncludes']?.['@id']?.endsWith(`/${params.Type}`))
+    .map(p => ({
+      name: p['rdfs:label'],
+      description: p['rdfs:comment'],
+      expectedType: p['schema:rangeIncludes']?.['@id']?.split('/').pop()
+    }))
+
+  return {
+    $type: 'SchemaType',
+    $id: `https://schema.org.ai/${params.Type}`,
+    $context: 'https://schema.org',
+    label: type['rdfs:label'],
+    comment: type['rdfs:comment'],
+    subClassOf: getSubClassOf(),
+    properties,
+  }
+}
 
 export async function getStaticProps({ params }) {
   const schema = sources.get('https://schema.org.ai')
