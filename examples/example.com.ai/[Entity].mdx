@@ -1,0 +1,54 @@
+---
+$type: ExampleEntity
+$id: $params.slug
+title: Example Entity
+description: Example data entity
+---
+
+# {frontmatter.name || params.slug}
+
+<EntityView entity={params.slug}>
+  <EntityHeader>
+    <EntityType type={entity.type} />
+    <EntityId id={entity.id} />
+  </EntityHeader>
+
+  <DataDisplay data={entity} format="json" />
+
+  <Tabs>
+    <Tab label="JSON">
+      <CodeBlock language="json">
+        {JSON.stringify(entity, null, 2)}
+      </CodeBlock>
+    </Tab>
+    <Tab label="YAML">
+      <CodeBlock language="yaml">
+        {toYaml(entity)}
+      </CodeBlock>
+    </Tab>
+    <Tab label="TypeScript">
+      <CodeBlock language="typescript">
+        {`const ${entity.type.toLowerCase()} = ${JSON.stringify(entity, null, 2)}`}
+      </CodeBlock>
+    </Tab>
+  </Tabs>
+
+  <CopyButtons data={entity} />
+</EntityView>
+
+## Usage
+
+```ts
+// Fetch this entity
+const entity = await example.get('{params.slug}')
+
+// Use in tests
+test('user creation', async () => {
+  const user = await example.get('user_alice123')
+  // ...
+})
+```
+
+## Related
+
+<RelatedEntities entity={params.slug} />

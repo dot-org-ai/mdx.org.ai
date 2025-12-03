@@ -1,10 +1,10 @@
-# example.org.ai
+# example.com.ai
 
 Modern Examples for the AI Era.
 
 ## Overview
 
-A superset of example.org, modernized for AI-native development. Browse examples, copy code, and see how things work in practice.
+A superset of example.com, modernized for AI-native development. Browse examples, copy code, and see how things work in practice.
 
 ## Examples
 
@@ -12,10 +12,10 @@ A superset of example.org, modernized for AI-native development. Browse examples
 
 | Domain | Description |
 |--------|-------------|
-| `example.org.ai` | This site |
-| `user.example.org.ai` | Example user profiles |
-| `api.example.org.ai` | Example API endpoints |
-| `app.example.org.ai` | Example application |
+| `example.com.ai` | This site |
+| `user.example.com.ai` | Example user profiles |
+| `api.example.com.ai` | Example API endpoints |
+| `app.example.com.ai` | Example application |
 
 ### Placeholders
 
@@ -25,7 +25,7 @@ Use these in your tests and documentation:
 // Users
 const user = {
   id: 'user_example123',
-  email: 'alice@example.org.ai',
+  email: 'alice@example.com.ai',
   name: 'Alice Example'
 }
 
@@ -33,8 +33,8 @@ const user = {
 const apiKey = 'sk_example_abc123'
 
 // URLs
-const apiUrl = 'https://api.example.org.ai'
-const webhookUrl = 'https://webhooks.example.org.ai/hook'
+const apiUrl = 'https://api.example.com.ai'
+const webhookUrl = 'https://webhooks.example.com.ai/hook'
 
 // IDs
 const orderId = 'order_example456'
@@ -45,23 +45,23 @@ const productId = 'prod_example789'
 
 ```ts
 // Authentication
-const auth = await fetch('https://api.example.org.ai/auth', {
+const auth = await fetch('https://api.example.com.ai/auth', {
   method: 'POST',
   body: JSON.stringify({
-    email: 'alice@example.org.ai',
+    email: 'alice@example.com.ai',
     password: 'example123'
   })
 })
 
 // API Request
-const users = await fetch('https://api.example.org.ai/users', {
+const users = await fetch('https://api.example.com.ai/users', {
   headers: { 'Authorization': 'Bearer sk_example_abc123' }
 })
 
 // Webhook
 app.post('/webhooks/example', (req) => {
   const event = req.body
-  console.log(`Received ${event.type} from example.org.ai`)
+  console.log(`Received ${event.type} from example.com.ai`)
 })
 ```
 
@@ -70,9 +70,9 @@ app.post('/webhooks/example', (req) => {
 ```json
 {
   "users": [
-    { "id": "user_1", "name": "Alice", "email": "alice@example.org.ai" },
-    { "id": "user_2", "name": "Bob", "email": "bob@example.org.ai" },
-    { "id": "user_3", "name": "Charlie", "email": "charlie@example.org.ai" }
+    { "id": "user_1", "name": "Alice", "email": "alice@example.com.ai" },
+    { "id": "user_2", "name": "Bob", "email": "bob@example.com.ai" },
+    { "id": "user_3", "name": "Charlie", "email": "charlie@example.com.ai" }
   ],
   "products": [
     { "id": "prod_1", "name": "Example Widget", "price": 9.99 },
@@ -94,5 +94,5 @@ app.post('/webhooks/example', (req) => {
 ## Getting Started
 
 ```bash
-npx mdxe dev examples/example.org.ai
+npx mdxe dev examples/example.com.ai
 ```

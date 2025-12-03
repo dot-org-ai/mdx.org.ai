@@ -1,0 +1,106 @@
+---
+$type: MCPServer
+title: MCP Server
+description: AI-powered API testing for agents
+---
+
+# MCP Server
+
+Let AI agents test and validate APIs.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "apiqa": {
+      "command": "npx",
+      "args": ["@api.qa/mcp"]
+    }
+  }
+}
+```
+
+## Tools
+
+### `test_api`
+
+Run tests against an API.
+
+```ts
+{
+  name: "test_api",
+  description: "Test an API endpoint",
+  inputSchema: {
+    type: "object",
+    properties: {
+      method: { enum: ["GET", "POST", "PUT", "DELETE"] },
+      url: { type: "string" },
+      body: { type: "object" },
+      expectations: { type: "array", items: { type: "string" } }
+    },
+    required: ["method", "url"]
+  }
+}
+```
+
+### `generate_tests`
+
+Generate tests from API spec.
+
+```ts
+{
+  name: "generate_tests",
+  description: "Generate test cases from OpenAPI spec",
+  inputSchema: {
+    type: "object",
+    properties: {
+      openapi: { type: "string", description: "OpenAPI spec URL" },
+      coverage: { type: "array", items: { enum: ["happy-path", "edge-cases", "security"] } }
+    },
+    required: ["openapi"]
+  }
+}
+```
+
+### `discover_edge_cases`
+
+Find edge cases AI thinks you missed.
+
+```ts
+{
+  name: "discover_edge_cases",
+  description: "Discover potential edge cases",
+  inputSchema: {
+    type: "object",
+    properties: {
+      endpoint: { type: "string" },
+      schema: { type: "object" }
+    },
+    required: ["endpoint"]
+  }
+}
+```
+
+## Usage Example
+
+```
+User: Test the user creation endpoint
+
+Agent: I'll test the POST /users endpoint.
+
+[test_api: method="POST", url="/users", body={ name: "Test", email: "test@example.com" }, expectations=["status 201", "returns user id"]]
+
+✅ Passed: Creates user successfully
+✅ Passed: Returns user ID
+
+[discover_edge_cases: endpoint="POST /users"]
+
+Found potential edge cases to test:
+- Unicode characters in name
+- Very long email addresses
+- SQL injection attempts
+- Missing required fields
+
+Want me to run these additional tests?
+```

@@ -1,0 +1,64 @@
+---
+$type: App
+name: writer.md
+title: AI Writing Assistant
+description: Write Markdown content with AI
+---
+
+# writer.md
+
+<App
+  name="writer.md"
+  title="AI Writing Assistant"
+  description="Generate, edit, and improve Markdown content"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/templates">Templates</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/writer.md">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Configuration
+
+```ts
+export default {
+  name: 'writer.md',
+
+  // AI Model
+  model: {
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514',
+    temperature: 0.7
+  },
+
+  // Writing defaults
+  defaults: {
+    tone: 'professional',
+    audience: 'general',
+    format: 'markdown'
+  },
+
+  // Templates
+  templates: './templates/',
+
+  // Output
+  output: {
+    directory: './content/',
+    frontmatter: true
+  }
+}
+```

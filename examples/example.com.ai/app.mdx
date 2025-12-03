@@ -1,0 +1,97 @@
+---
+$type: App
+name: example.com.ai
+title: Modern Examples for the AI Era
+description: Placeholder data and code examples for AI-native development
+---
+
+# example.com.ai
+
+<App
+  name="example.com.ai"
+  title="Modern Examples"
+  description="Example data that actually works"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/users">Users</NavLink>
+    <NavLink href="/products">Products</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://example.com">example.com</Link>
+      <Link href="https://github.com/mdx-org/example.com.ai">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Example Domains
+
+| Domain | Description |
+|--------|-------------|
+| `example.com.ai` | This site |
+| `user.example.com.ai` | User profiles |
+| `api.example.com.ai` | Example API |
+| `app.example.com.ai` | Example app |
+| `cdn.example.com.ai` | Example CDN |
+
+## Placeholder Data
+
+```yaml
+# Users
+user_alice:
+  id: user_alice123
+  email: alice@example.com.ai
+  name: Alice Example
+
+user_bob:
+  id: user_bob456
+  email: bob@example.com.ai
+  name: Bob Example
+
+# API Keys
+api_key_test: sk_test_example123
+api_key_live: sk_live_example456
+
+# Webhooks
+webhook_url: https://webhooks.example.com.ai/hook
+```
+
+## Configuration
+
+```ts
+export default {
+  name: 'example.com.ai',
+
+  // Domains
+  domains: {
+    main: 'example.com.ai',
+    api: 'api.example.com.ai',
+    cdn: 'cdn.example.com.ai',
+    webhooks: 'webhooks.example.com.ai'
+  },
+
+  // Data generation
+  generation: {
+    users: { count: 100, locale: 'en' },
+    products: { count: 50, categories: ['tech', 'home', 'fashion'] },
+    orders: { count: 200 }
+  },
+
+  // API simulation
+  api: {
+    latency: '50-200ms',
+    errorRate: 0.01,
+    rateLimit: 1000
+  }
+}
+```

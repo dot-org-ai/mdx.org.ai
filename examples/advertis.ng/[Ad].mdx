@@ -1,0 +1,61 @@
+---
+$type: Ad
+$id: $params.slug
+title: Ad
+description: Ad campaign details
+---
+
+# {frontmatter.name || 'Ad Campaign'}
+
+<AdView ad={params.slug}>
+  <AdHeader>
+    <Platform platform={ad.platform} />
+    <Status status={ad.status} />
+    <Budget spent={ad.spent} total={ad.budget} />
+  </AdHeader>
+
+  <Metrics>
+    <Metric label="Impressions" value={ad.impressions} />
+    <Metric label="Clicks" value={ad.clicks} />
+    <Metric label="CTR" value={ad.ctr} />
+    <Metric label="Conversions" value={ad.conversions} />
+    <Metric label="CPA" value={ad.cpa} />
+    <Metric label="ROAS" value={ad.roas} />
+  </Metrics>
+
+  <Tabs>
+    <Tab label="Creative">
+      <AdCreative
+        headline={ad.headline}
+        body={ad.body}
+        image={ad.image}
+        cta={ad.cta}
+      />
+    </Tab>
+    <Tab label="Targeting">
+      <TargetingSettings targeting={ad.targeting} />
+    </Tab>
+    <Tab label="Performance">
+      <PerformanceChart data={ad.performance} />
+    </Tab>
+    <Tab label="Variants">
+      <VariantComparison variants={ad.variants} />
+    </Tab>
+  </Tabs>
+</AdView>
+
+## Actions
+
+```ts
+// Duplicate ad
+await advertis.duplicate(ad.id)
+
+// Pause ad
+await advertis.pause(ad.id)
+
+// Scale budget
+await advertis.scale(ad.id, { budget: ad.budget * 2 })
+
+// Create variants
+await advertis.createVariants(ad.id, { count: 5 })
+```

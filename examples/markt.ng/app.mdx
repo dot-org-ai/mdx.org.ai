@@ -1,0 +1,93 @@
+---
+$type: App
+name: markt.ng
+title: AI Marketing Services
+description: Generate campaigns, analyze audiences, and optimize messaging with AI
+---
+
+# markt.ng
+
+<App
+  name="markt.ng"
+  title="AI Marketing Services"
+  description="Marketing automation that thinks for you"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/templates">Templates</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/markt.ng">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+      <Link href="/pricing">Pricing</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Services
+
+```mdx
+---
+$type: Campaign
+name: Q4 Product Launch
+channel: email
+audience: startup_founders
+---
+
+# Q4 Product Launch
+
+## Goals
+- Awareness
+- Trial signups
+
+## Variants
+- Subject A: "Boost your metrics today"
+- Subject B: "Analytics that actually help"
+
+## Schedule
+- Send: Monday 9am PST
+- Duration: 2 weeks
+- A/B Split: 50/50
+```
+
+## Configuration
+
+```ts
+export default {
+  name: 'markt.ng',
+
+  // AI Models
+  models: {
+    generation: 'claude-sonnet-4-20250514',
+    analysis: 'claude-haiku',
+    optimization: 'claude-sonnet-4-20250514'
+  },
+
+  // Channels
+  channels: {
+    email: {
+      provider: 'sendgrid',
+      apiKey: process.env.SENDGRID_API_KEY
+    },
+    social: {
+      meta: process.env.META_ACCESS_TOKEN,
+      linkedin: process.env.LINKEDIN_TOKEN
+    }
+  },
+
+  // Analytics
+  analytics: {
+    provider: 'mixpanel',
+    projectId: process.env.MIXPANEL_PROJECT
+  }
+}
+```

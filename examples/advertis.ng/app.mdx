@@ -1,0 +1,101 @@
+---
+$type: App
+name: advertis.ng
+title: AI Advertising Platform
+description: Generate, test, and optimize ads with AI
+---
+
+# advertis.ng
+
+<App
+  name="advertis.ng"
+  title="AI Advertising Platform"
+  description="Ads that optimize themselves"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/templates">Templates</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/advertis.ng">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+      <Link href="/pricing">Pricing</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Ad Structure
+
+```mdx
+---
+$type: Ad
+platform: meta
+objective: conversions
+---
+
+# Summer Sale Campaign
+
+## Target Audience
+- Age: 25-45
+- Interests: technology, productivity
+- Location: US, UK, CA
+
+## Variants
+### Variant A
+**Headline**: "50% Off Premium Plans"
+**Body**: "Limited time offer. Upgrade today."
+**CTA**: "Shop Now"
+
+### Variant B
+**Headline**: "Your Best Work Starts Here"
+**Body**: "Join 100,000+ professionals."
+**CTA**: "Start Free"
+```
+
+## Configuration
+
+```ts
+export default {
+  name: 'advertis.ng',
+
+  // AI Models
+  models: {
+    copywriting: 'claude-sonnet-4-20250514',
+    images: 'dall-e-3',
+    optimization: 'claude-sonnet-4-20250514'
+  },
+
+  // Platforms
+  platforms: {
+    meta: {
+      appId: process.env.META_APP_ID,
+      appSecret: process.env.META_APP_SECRET,
+      accessToken: process.env.META_ACCESS_TOKEN
+    },
+    google: {
+      credentials: process.env.GOOGLE_ADS_CREDENTIALS,
+      developerToken: process.env.GOOGLE_DEVELOPER_TOKEN
+    },
+    linkedin: {
+      clientId: process.env.LINKEDIN_CLIENT_ID,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET
+    }
+  },
+
+  // Budgets
+  budgets: {
+    daily: 100,
+    monthly: 3000,
+    perExperiment: 500
+  }
+}
+```

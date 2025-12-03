@@ -1,0 +1,223 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Example data and testing tools for AI agents
+---
+
+# MCP Server
+
+Let AI agents use realistic example data for testing and demos.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "example": {
+      "command": "npx",
+      "args": ["@example.com.ai/mcp"]
+    }
+  }
+}
+```
+
+## Tools
+
+### `get_example_user`
+
+Get realistic user data for testing.
+
+```ts
+{
+  name: "get_example_user",
+  description: "Get example user data",
+  inputSchema: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "User ID or 'random'" },
+      fields: {
+        type: "array",
+        items: { enum: ["id", "email", "name", "avatar", "address", "phone"] }
+      }
+    }
+  }
+}
+```
+
+### `get_example_product`
+
+Get realistic product data.
+
+```ts
+{
+  name: "get_example_product",
+  description: "Get example product data",
+  inputSchema: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "Product ID or 'random'" },
+      category: { enum: ["tech", "home", "fashion", "food"] }
+    }
+  }
+}
+```
+
+### `generate_test_data`
+
+Generate bulk test data.
+
+```ts
+{
+  name: "generate_test_data",
+  description: "Generate test data for an entity type",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: { enum: ["users", "products", "orders", "events"] },
+      count: { type: "number", default: 10 },
+      locale: { type: "string", default: "en" }
+    },
+    required: ["type"]
+  }
+}
+```
+
+### `test_api_call`
+
+Make a test API call with example data.
+
+```ts
+{
+  name: "test_api_call",
+  description: "Make a test API call",
+  inputSchema: {
+    type: "object",
+    properties: {
+      method: { enum: ["GET", "POST", "PUT", "DELETE"] },
+      endpoint: { type: "string" },
+      body: { type: "object" },
+      delay: { type: "number", description: "Simulated latency in ms" }
+    },
+    required: ["method", "endpoint"]
+  }
+}
+```
+
+### `get_placeholder`
+
+Get placeholder values for common fields.
+
+```ts
+{
+  name: "get_placeholder",
+  description: "Get placeholder value for a field type",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: {
+        enum: [
+          "email", "url", "api_key", "webhook_url",
+          "user_id", "product_id", "order_id",
+          "credit_card", "phone", "address"
+        ]
+      }
+    },
+    required: ["type"]
+  }
+}
+```
+
+### `simulate_webhook`
+
+Simulate a webhook event.
+
+```ts
+{
+  name: "simulate_webhook",
+  description: "Simulate a webhook event",
+  inputSchema: {
+    type: "object",
+    properties: {
+      event: {
+        enum: [
+          "user.created", "user.updated", "user.deleted",
+          "order.created", "order.paid", "order.shipped",
+          "product.created", "product.updated"
+        ]
+      },
+      target_url: { type: "string" }
+    },
+    required: ["event"]
+  }
+}
+```
+
+## Usage Example
+
+```
+User: I need to test my user creation flow
+
+Agent: I'll help test your user creation flow with realistic example data.
+
+[get_example_user: id="random", fields=["email", "name", "address"]]
+
+Here's example user data:
+- Email: alice.johnson@example.com.ai
+- Name: Alice Johnson
+- Address: 123 Main St, San Francisco, CA 94102
+
+[test_api_call: method="POST", endpoint="/users", body={email: "alice.johnson@example.com.ai", name: "Alice Johnson"}]
+
+API Response (201 Created):
+```json
+{
+  "id": "user_abc123",
+  "email": "alice.johnson@example.com.ai",
+  "name": "Alice Johnson"
+}
+```
+
+[simulate_webhook: event="user.created", target_url="https://your-app.com/webhooks"]
+
+Webhook delivered successfully to your endpoint.
+
+Your user creation flow is working correctly. Want me to test edge cases?
+```
+
+## Resources
+
+### `users://`
+
+Access example user data.
+
+```ts
+{
+  uri: "users://all",
+  name: "All Example Users",
+  mimeType: "application/json"
+}
+```
+
+### `products://`
+
+Access example product data.
+
+```ts
+{
+  uri: "products://tech",
+  name: "Tech Products",
+  mimeType: "application/json"
+}
+```
+
+### `placeholders://`
+
+Access placeholder values.
+
+```ts
+{
+  uri: "placeholders://api_keys",
+  name: "Example API Keys",
+  mimeType: "application/json"
+}
+```

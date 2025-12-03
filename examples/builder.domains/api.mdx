@@ -1,0 +1,177 @@
+---
+$type: APIReference
+title: API Reference
+description: Domain registration API
+---
+
+# API Reference
+
+Register and manage domains for your AI agents.
+
+## Base URL
+
+```
+https://builder.domains
+```
+
+## Check Availability
+
+```bash
+GET https://builder.domains/api/check?name=myagent
+```
+
+```json
+{
+  "name": "myagent",
+  "available": {
+    "myagent.builder.domains": { "available": true, "price": 0, "tier": "free" },
+    "myagent.ai": { "available": true, "price": 70, "period": "year" },
+    "myagent.dev": { "available": true, "price": 12, "period": "year" },
+    "myagent.com": { "available": false }
+  }
+}
+```
+
+## Register Free Subdomain
+
+```bash
+POST https://builder.domains/api/register
+Content-Type: application/json
+Authorization: Bearer YOUR_API_KEY
+
+{
+  "subdomain": "myagent"
+}
+```
+
+```json
+{
+  "id": "dom_abc123",
+  "domain": "myagent.builder.domains",
+  "status": "active",
+  "dns": {
+    "nameservers": ["ns1.builder.domains", "ns2.builder.domains"]
+  },
+  "ssl": { "status": "provisioning" },
+  "createdAt": "2024-01-15T10:00:00Z"
+}
+```
+
+## Purchase Premium Domain
+
+```bash
+POST https://builder.domains/api/purchase
+Content-Type: application/json
+Authorization: Bearer YOUR_API_KEY
+
+{
+  "domain": "myagent.ai",
+  "years": 1,
+  "autoRenew": true
+}
+```
+
+```json
+{
+  "id": "dom_def456",
+  "domain": "myagent.ai",
+  "status": "active",
+  "expiresAt": "2025-01-15T10:00:00Z",
+  "autoRenew": true
+}
+```
+
+## List Domains
+
+```bash
+GET https://builder.domains/api/domains
+Authorization: Bearer YOUR_API_KEY
+```
+
+```json
+{
+  "domains": [
+    { "id": "dom_abc", "domain": "myagent.builder.domains", "status": "active" },
+    { "id": "dom_def", "domain": "myagent.ai", "status": "active", "expiresAt": "2025-01-15" }
+  ],
+  "usage": { "free": 1, "limit": 3 }
+}
+```
+
+## Configure DNS
+
+```bash
+PUT https://builder.domains/api/domains/dom_abc/dns
+Content-Type: application/json
+
+{
+  "records": [
+    { "type": "A", "name": "@", "value": "192.0.2.1" },
+    { "type": "CNAME", "name": "www", "value": "myagent.builder.domains" },
+    { "type": "TXT", "name": "@", "value": "v=spf1 include:_spf.google.com ~all" }
+  ]
+}
+```
+
+## Deploy Site
+
+```bash
+POST https://builder.domains/api/domains/dom_abc/deploy
+Content-Type: application/json
+
+{
+  "source": {
+    "type": "github",
+    "repo": "user/repo",
+    "branch": "main"
+  },
+  "build": {
+    "command": "npm run build",
+    "output": "dist"
+  }
+}
+```
+
+## SDK
+
+```ts
+import { domains } from 'builder.domains'
+
+// Check availability
+const available = await domains.check('myagent')
+
+// Register free
+const free = await domains.register('myagent')
+
+// Purchase premium
+const premium = await domains.purchase('myagent.ai', { years: 1 })
+
+// Configure DNS
+await domains.dns('dom_abc').set([
+  { type: 'A', name: '@', value: '192.0.2.1' }
+])
+
+// Deploy
+await domains.deploy('dom_abc', {
+  source: { type: 'github', repo: 'user/repo' }
+})
+```
+
+## CLI
+
+```bash
+# Check availability
+npx builder.domains check myagent
+
+# Register free subdomain
+npx builder.domains register myagent
+
+# Purchase domain
+npx builder.domains buy myagent.ai
+
+# List domains
+npx builder.domains list
+
+# Configure DNS
+npx builder.domains dns myagent.builder.domains add A @ 192.0.2.1
+```

@@ -1,0 +1,253 @@
+---
+$type: APIReference
+title: API Reference
+description: advertis.ng REST API
+---
+
+# API Reference
+
+Programmatic access to AI advertising tools.
+
+## Generate Ads
+
+```bash
+POST https://advertis.ng/api/generate
+Content-Type: application/json
+
+{
+  "product": {
+    "name": "CloudSync Pro",
+    "description": "Real-time file synchronization",
+    "price": "$9/mo",
+    "url": "https://cloudsync.pro"
+  },
+  "platform": "meta",
+  "objective": "conversions",
+  "audience": {
+    "interests": ["technology", "productivity"],
+    "demographics": { "age": "25-45", "income": "high" }
+  },
+  "variants": 10
+}
+```
+
+```json
+{
+  "id": "adgen_abc123",
+  "variants": [
+    {
+      "id": "var_1",
+      "headline": "Sync Files Instantly",
+      "body": "Stop waiting. Start shipping. CloudSync Pro syncs in real-time.",
+      "cta": "Try Free",
+      "imagePrompt": "Professional workspace with glowing sync icons, modern minimal style"
+    },
+    {
+      "id": "var_2",
+      "headline": "Your Files, Everywhere",
+      "body": "Access your work from any device. Real-time sync, zero hassle.",
+      "cta": "Get Started",
+      "imagePrompt": "Multiple devices showing synced files, clean tech aesthetic"
+    }
+  ],
+  "targeting": {
+    "suggested": {
+      "interests": ["cloud storage", "remote work", "productivity apps"],
+      "behaviors": ["tech early adopters", "small business owners"]
+    }
+  }
+}
+```
+
+## Generate Images
+
+```bash
+POST https://advertis.ng/api/images
+Content-Type: application/json
+
+{
+  "product": "CloudSync Pro",
+  "style": "modern-minimal",
+  "dimensions": [
+    { "width": 1200, "height": 628, "name": "feed" },
+    { "width": 1080, "height": 1080, "name": "square" },
+    { "width": 1080, "height": 1920, "name": "story" }
+  ],
+  "variants": 5
+}
+```
+
+```json
+{
+  "id": "imggen_def456",
+  "images": [
+    {
+      "id": "img_1",
+      "url": "https://cdn.advertis.ng/img_1.png",
+      "dimensions": "1200x628",
+      "name": "feed"
+    }
+  ]
+}
+```
+
+## Run Experiment
+
+```bash
+POST https://advertis.ng/api/experiment
+Content-Type: application/json
+
+{
+  "name": "Q4 Launch Test",
+  "variants": ["var_1", "var_2", "var_3"],
+  "platform": "meta",
+  "budget": 1000,
+  "duration": "7d",
+  "metrics": ["ctr", "cpa", "roas"],
+  "autoOptimize": true
+}
+```
+
+```json
+{
+  "id": "exp_ghi789",
+  "status": "running",
+  "startedAt": "2024-01-15T10:00:00Z",
+  "budget": {
+    "total": 1000,
+    "spent": 0,
+    "remaining": 1000
+  },
+  "variants": [
+    { "id": "var_1", "budget": 333, "status": "active" },
+    { "id": "var_2", "budget": 333, "status": "active" },
+    { "id": "var_3", "budget": 334, "status": "active" }
+  ],
+  "resultsUrl": "https://advertis.ng/results/exp_ghi789"
+}
+```
+
+## Get Results
+
+```bash
+GET https://advertis.ng/api/results/exp_ghi789
+```
+
+```json
+{
+  "id": "exp_ghi789",
+  "status": "completed",
+  "winner": "var_2",
+  "variants": [
+    {
+      "id": "var_1",
+      "impressions": 15000,
+      "clicks": 450,
+      "ctr": "3.0%",
+      "conversions": 12,
+      "cpa": "$27.78",
+      "spend": "$333.33"
+    },
+    {
+      "id": "var_2",
+      "impressions": 15000,
+      "clicks": 600,
+      "ctr": "4.0%",
+      "conversions": 22,
+      "cpa": "$15.15",
+      "spend": "$333.33"
+    }
+  ],
+  "insights": [
+    "Variant 2 outperformed by 83% on conversions",
+    "Productivity-focused messaging resonated better",
+    "Recommend scaling budget to var_2"
+  ]
+}
+```
+
+## Optimize
+
+```bash
+POST https://advertis.ng/api/optimize
+Content-Type: application/json
+
+{
+  "campaign": "exp_ghi789",
+  "goal": "maximize_roas",
+  "constraints": {
+    "budget": 5000,
+    "cpa_max": 20
+  }
+}
+```
+
+```json
+{
+  "recommendations": [
+    {
+      "action": "scale",
+      "variant": "var_2",
+      "budget": 4000,
+      "expectedRoas": "4.2x"
+    },
+    {
+      "action": "pause",
+      "variant": "var_1",
+      "reason": "CPA above target"
+    },
+    {
+      "action": "create_similar",
+      "basedOn": "var_2",
+      "variants": 3,
+      "reason": "Test messaging variations"
+    }
+  ]
+}
+```
+
+## SDK
+
+```ts
+import { advertis } from 'advertis.ng'
+
+// Generate ads
+const ads = await advertis.generate({
+  product: { name: 'My SaaS', price: '$29/mo' },
+  platform: 'meta',
+  variants: 10
+})
+
+// Generate images
+const images = await advertis.images({
+  product: 'My SaaS',
+  style: 'modern-minimal',
+  variants: 5
+})
+
+// Run experiment
+const experiment = await advertis.experiment({
+  variants: ads.variants,
+  budget: 1000,
+  duration: '7d'
+})
+
+// Get results
+const results = await advertis.results(experiment.id)
+```
+
+## CLI
+
+```bash
+# Generate ads
+npx advertis.ng generate --product "My SaaS" --platform meta
+
+# Generate images
+npx advertis.ng images --product "My SaaS" --style modern
+
+# Run experiment
+npx advertis.ng experiment --variants var_1,var_2 --budget 1000
+
+# Get results
+npx advertis.ng results exp_abc123
+```

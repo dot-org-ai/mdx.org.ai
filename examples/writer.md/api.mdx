@@ -1,0 +1,213 @@
+---
+$type: APIReference
+title: API Reference
+description: AI writing API
+---
+
+# API Reference
+
+Generate and improve Markdown content.
+
+## Base URL
+
+```
+https://writer.md
+```
+
+## Generate Content
+
+```bash
+POST https://writer.md/generate
+Content-Type: application/json
+
+{
+  "topic": "Introduction to GraphQL",
+  "type": "blog",
+  "length": "medium",
+  "tone": "technical",
+  "audience": "developers"
+}
+```
+
+```json
+{
+  "id": "doc_abc123",
+  "content": "# Introduction to GraphQL\n\nGraphQL is a query language...",
+  "metadata": {
+    "title": "Introduction to GraphQL",
+    "description": "Learn the basics of GraphQL...",
+    "keywords": ["graphql", "api", "query language"],
+    "readingTime": "5 min"
+  },
+  "tokens": { "input": 50, "output": 1200 }
+}
+```
+
+## Content Types
+
+### Blog Post
+
+```bash
+POST /generate
+{
+  "type": "blog",
+  "topic": "AI in Healthcare",
+  "sections": ["introduction", "benefits", "challenges", "future"],
+  "includeCode": false
+}
+```
+
+### Documentation
+
+```bash
+POST /generate
+{
+  "type": "docs",
+  "topic": "Authentication API",
+  "sourceCode": "// paste code here",
+  "includeExamples": true
+}
+```
+
+### README
+
+```bash
+POST /generate
+{
+  "type": "readme",
+  "projectName": "my-package",
+  "description": "A utility library for...",
+  "features": ["Fast", "Type-safe", "Zero dependencies"]
+}
+```
+
+### Email
+
+```bash
+POST /generate
+{
+  "type": "email",
+  "purpose": "follow-up",
+  "context": "Met at conference, discussed potential partnership",
+  "tone": "professional"
+}
+```
+
+## Edit Content
+
+```bash
+POST https://writer.md/edit
+Content-Type: application/json
+
+{
+  "content": "# My Article\n\nThis is my artcle about...",
+  "instructions": "Fix grammar and improve clarity",
+  "preserve": ["structure", "code-blocks"]
+}
+```
+
+```json
+{
+  "content": "# My Article\n\nThis is my article about...",
+  "changes": [
+    { "type": "spelling", "from": "artcle", "to": "article" }
+  ]
+}
+```
+
+## Improve Content
+
+```bash
+POST https://writer.md/improve
+Content-Type: application/json
+
+{
+  "content": "...",
+  "aspects": ["clarity", "engagement", "seo"],
+  "targetAudience": "beginners"
+}
+```
+
+## Expand Section
+
+```bash
+POST https://writer.md/expand
+Content-Type: application/json
+
+{
+  "content": "# Full Article\n\n## Section to Expand\n\nBrief intro.\n\n## Next Section",
+  "section": "Section to Expand",
+  "targetLength": 500,
+  "addExamples": true
+}
+```
+
+## Summarize
+
+```bash
+POST https://writer.md/summarize
+Content-Type: application/json
+
+{
+  "content": "...",
+  "length": "short",
+  "format": "bullets"
+}
+```
+
+```json
+{
+  "summary": "- Key point 1\n- Key point 2\n- Key point 3",
+  "originalLength": 2500,
+  "summaryLength": 150
+}
+```
+
+## SDK
+
+```ts
+import { writer } from 'writer.md'
+
+// Generate
+const post = await writer.generate({
+  topic: 'Intro to MDX',
+  type: 'blog'
+})
+
+// Edit
+const fixed = await writer.edit(content, {
+  instructions: 'Fix grammar'
+})
+
+// Improve
+const better = await writer.improve(content, {
+  aspects: ['clarity', 'seo']
+})
+
+// Expand
+const expanded = await writer.expand(content, {
+  section: 'Getting Started',
+  addExamples: true
+})
+
+// Summarize
+const summary = await writer.summarize(content, {
+  length: 'short'
+})
+```
+
+## CLI
+
+```bash
+# Generate
+npx writer.md generate "Intro to TypeScript" --type blog -o post.md
+
+# Edit
+npx writer.md edit article.md --fix grammar,spelling
+
+# Improve
+npx writer.md improve article.md --aspects clarity,seo
+
+# Expand
+npx writer.md expand article.md --section "Getting Started"
+```

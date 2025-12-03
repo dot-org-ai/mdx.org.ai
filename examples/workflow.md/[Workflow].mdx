@@ -1,0 +1,64 @@
+---
+$type: Workflow
+$id: /workflows/{id}
+name: string
+trigger: string
+status: active | paused | draft
+steps: Step[]
+runs: number?
+lastRun: datetime?
+---
+
+# {name}
+
+<WorkflowStatus status={status} runs={runs} lastRun={lastRun} />
+
+## Trigger
+
+**Type:** {trigger}
+
+```ts
+// Trigger this workflow via:
+if (trigger.startsWith('cron')) {
+  return <CronDisplay cron={trigger} />
+} else if (trigger === 'webhook') {
+  return <WebhookUrl url={`https://workflow.md/${$id}/trigger`} />
+} else {
+  return <EventTrigger event={trigger} />
+}
+```
+
+## Steps
+
+<WorkflowDiagram steps={steps} />
+
+```ts
+steps.map((step, i) => (
+  <StepCard key={i} step={step} />
+))
+```
+
+## Recent Runs
+
+```ts
+const runs = await workflow.runs.list({ limit: 10 })
+```
+
+<RunsTable runs={runs} />
+
+## Trigger Manually
+
+<TriggerForm workflow={$id} />
+
+## Configuration
+
+```bash
+# Deploy
+npx workflow.md deploy {name}.md
+
+# Trigger
+npx workflow.md trigger {$id} --data '{"key": "value"}'
+
+# Logs
+npx workflow.md logs {$id}
+```

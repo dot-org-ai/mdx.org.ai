@@ -1,0 +1,202 @@
+---
+$type: APIReference
+title: API Reference
+description: markt.ng REST API
+---
+
+# API Reference
+
+Programmatic access to AI marketing services.
+
+## Generate Campaign
+
+```bash
+POST https://markt.ng/api/generate
+Content-Type: application/json
+
+{
+  "type": "email-campaign",
+  "product": {
+    "name": "CloudSync Pro",
+    "description": "Real-time file sync",
+    "url": "https://cloudsync.pro"
+  },
+  "audience": "startup_founders",
+  "tone": "professional",
+  "goals": ["awareness", "trial-signup"],
+  "variants": 5
+}
+```
+
+```json
+{
+  "id": "campaign_abc123",
+  "variants": [
+    {
+      "id": "var_1",
+      "subject": "Your files, everywhere, instantly",
+      "preview": "Stop waiting for sync. Start shipping.",
+      "body": "...",
+      "cta": "Start Free Trial"
+    },
+    {
+      "id": "var_2",
+      "subject": "What if your files just worked?",
+      "preview": "CloudSync Pro syncs in real-time.",
+      "body": "...",
+      "cta": "Try It Free"
+    }
+  ],
+  "recommendations": {
+    "sendTime": "Tuesday 10am",
+    "audience": "tech-savvy founders, 25-45"
+  }
+}
+```
+
+## Run A/B Test
+
+```bash
+POST https://markt.ng/api/test
+Content-Type: application/json
+
+{
+  "campaign": "campaign_abc123",
+  "variants": ["var_1", "var_2"],
+  "audience": "segment_founders",
+  "split": [50, 50],
+  "metric": "open_rate",
+  "duration": "7d",
+  "autoOptimize": true
+}
+```
+
+```json
+{
+  "id": "test_xyz789",
+  "status": "running",
+  "startedAt": "2024-01-15T10:00:00Z",
+  "endsAt": "2024-01-22T10:00:00Z",
+  "resultsUrl": "https://markt.ng/results/test_xyz789"
+}
+```
+
+## Analyze Audience
+
+```bash
+POST https://markt.ng/api/analyze
+Content-Type: application/json
+
+{
+  "audience": "existing_customers",
+  "dimensions": ["behavior", "preferences", "churn_risk", "lifetime_value"]
+}
+```
+
+```json
+{
+  "id": "analysis_def456",
+  "segments": [
+    {
+      "name": "Power Users",
+      "size": 1250,
+      "characteristics": ["daily usage", "multiple integrations"],
+      "churnRisk": "low",
+      "ltv": "$2,400"
+    },
+    {
+      "name": "At Risk",
+      "size": 340,
+      "characteristics": ["declining usage", "no recent logins"],
+      "churnRisk": "high",
+      "recommendedAction": "re-engagement campaign"
+    }
+  ]
+}
+```
+
+## Optimize Campaign
+
+```bash
+POST https://markt.ng/api/optimize
+Content-Type: application/json
+
+{
+  "campaign": "summer_launch",
+  "budget": 10000,
+  "goals": { "conversions": 500 },
+  "constraints": { "cpa": 20 }
+}
+```
+
+```json
+{
+  "id": "opt_ghi789",
+  "recommendations": [
+    {
+      "action": "increase_budget",
+      "channel": "email",
+      "amount": 2000,
+      "expectedLift": "+15% conversions"
+    },
+    {
+      "action": "pause",
+      "variant": "var_3",
+      "reason": "underperforming (0.5% CTR)"
+    }
+  ],
+  "projectedResults": {
+    "conversions": 580,
+    "cpa": 17.24,
+    "roi": "3.2x"
+  }
+}
+```
+
+## SDK
+
+```ts
+import { markt } from 'markt.ng'
+
+// Generate campaign content
+const campaign = await markt.generate({
+  type: 'email-campaign',
+  product: 'SaaS Analytics Tool',
+  audience: 'startup founders',
+  goals: ['awareness', 'trial-signup']
+})
+
+// Run A/B test
+const test = await markt.test({
+  variants: campaign.variants,
+  audience: 'segment_founders',
+  metric: 'open_rate',
+  duration: '7d'
+})
+
+// Analyze results
+const results = await markt.results(test.id)
+
+// Optimize
+const optimized = await markt.optimize({
+  campaign: campaign.id,
+  budget: 10000,
+  goals: { conversions: 500 }
+})
+```
+
+## CLI
+
+```bash
+# Generate campaign
+npx markt.ng generate --type email --audience founders --product "My SaaS"
+
+# Run test
+npx markt.ng test --campaign campaign_abc --metric open_rate
+
+# Get results
+npx markt.ng results test_xyz
+
+# Optimize
+npx markt.ng optimize --campaign summer_launch --budget 10000
+```

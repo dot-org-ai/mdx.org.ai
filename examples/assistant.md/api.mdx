@@ -1,0 +1,182 @@
+---
+$type: APIReference
+title: API Reference
+description: Interact with your personal assistant
+---
+
+# API Reference
+
+Deploy and interact with your personal assistant.
+
+## Base URL
+
+```
+https://assistant.md
+```
+
+## Chat
+
+### Send Message
+
+```bash
+POST https://assistant.md/chat
+Content-Type: application/json
+
+{
+  "message": "What's on my calendar today?",
+  "conversation_id": "conv_abc"
+}
+```
+
+```json
+{
+  "response": "You have 3 meetings today:\n\n1. **9:00 AM** - Team standup\n2. **2:00 PM** - Product review\n3. **4:00 PM** - 1:1 with Sarah",
+  "conversation_id": "conv_abc",
+  "tools_used": ["calendar"]
+}
+```
+
+### Voice Message
+
+```bash
+POST https://assistant.md/voice
+Content-Type: multipart/form-data
+
+audio: @message.wav
+conversation_id: conv_abc
+```
+
+```json
+{
+  "transcript": "What's on my calendar today?",
+  "response": "You have 3 meetings today...",
+  "audio_url": "https://assistant.md/audio/resp_xyz.mp3"
+}
+```
+
+### Stream Response
+
+```bash
+POST https://assistant.md/chat/stream
+Content-Type: application/json
+
+{
+  "message": "Summarize my unread emails",
+  "stream": true
+}
+```
+
+## Proactive Notifications
+
+### Get Pending
+
+```bash
+GET https://assistant.md/notifications
+```
+
+```json
+{
+  "notifications": [
+    {
+      "id": "notif_123",
+      "type": "reminder",
+      "message": "Team standup in 15 minutes",
+      "priority": "high",
+      "createdAt": "2024-01-15T08:45:00Z"
+    },
+    {
+      "id": "notif_124",
+      "type": "digest",
+      "message": "You have 5 unread important emails",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+### Configure Notifications
+
+```bash
+PUT https://assistant.md/notifications/config
+Content-Type: application/json
+
+{
+  "dailyBriefing": { "enabled": true, "time": "08:00" },
+  "meetingReminders": { "enabled": true, "before": "15m" },
+  "emailDigest": { "enabled": true, "frequency": "hourly" }
+}
+```
+
+## Memory
+
+### Get Context
+
+```bash
+GET https://assistant.md/memory?topic=projects
+```
+
+```json
+{
+  "memories": [
+    {
+      "content": "Working on mobile app redesign, deadline March 1st",
+      "timestamp": "2024-01-10T14:00:00Z",
+      "relevance": 0.95
+    }
+  ]
+}
+```
+
+### Add Memory
+
+```bash
+POST https://assistant.md/memory
+Content-Type: application/json
+
+{
+  "content": "Prefers morning meetings, no calls after 5pm",
+  "category": "preferences"
+}
+```
+
+## Routines
+
+### Trigger Routine
+
+```bash
+POST https://assistant.md/routines/morning-briefing/run
+```
+
+### Schedule Routine
+
+```bash
+POST https://assistant.md/routines
+Content-Type: application/json
+
+{
+  "name": "end-of-day",
+  "schedule": "0 17 * * 1-5",
+  "actions": ["summarize-day", "prepare-tomorrow", "send-digest"]
+}
+```
+
+## SDK
+
+```ts
+import { Assistant } from 'assistant.md'
+
+// Load assistant
+const alex = await Assistant.load('./alex.md')
+
+// Chat
+const response = await alex.chat('What should I focus on today?')
+
+// Voice
+const voiceResponse = await alex.voice(audioBuffer)
+
+// Run routine
+await alex.routine('morning-briefing')
+
+// Deploy
+await alex.deploy()
+```

@@ -1,0 +1,247 @@
+---
+$type: APIReference
+title: API Reference
+description: headless.ly Content API
+---
+
+# API Reference
+
+RESTful and GraphQL APIs for your content.
+
+## REST API
+
+### List Content
+
+```bash
+GET https://api.headless.ly/content/BlogPost
+Authorization: Bearer sk_live_xxx
+```
+
+```json
+{
+  "data": [
+    {
+      "$type": "BlogPost",
+      "$id": "hello-world",
+      "title": "Hello World",
+      "slug": "hello-world",
+      "author": { "$ref": "Author/alice" },
+      "publishedAt": "2024-01-15T00:00:00Z",
+      "tags": [
+        { "$ref": "Tag/intro" },
+        { "$ref": "Tag/welcome" }
+      ]
+    }
+  ],
+  "meta": {
+    "total": 42,
+    "page": 1,
+    "perPage": 10
+  }
+}
+```
+
+### Get Content
+
+```bash
+GET https://api.headless.ly/content/BlogPost/hello-world
+Authorization: Bearer sk_live_xxx
+```
+
+```json
+{
+  "$type": "BlogPost",
+  "$id": "hello-world",
+  "title": "Hello World",
+  "slug": "hello-world",
+  "author": {
+    "$type": "Author",
+    "$id": "alice",
+    "name": "Alice Smith",
+    "avatar": "https://cdn.headless.ly/avatars/alice.jpg"
+  },
+  "publishedAt": "2024-01-15T00:00:00Z",
+  "tags": [
+    { "$type": "Tag", "$id": "intro", "name": "Introduction" }
+  ],
+  "body": "# Hello World\n\nWelcome to my blog..."
+}
+```
+
+### Create Content
+
+```bash
+POST https://api.headless.ly/content/BlogPost
+Authorization: Bearer sk_live_xxx
+Content-Type: application/json
+
+{
+  "title": "New Post",
+  "slug": "new-post",
+  "author": "alice",
+  "body": "# New Post\n\nContent here..."
+}
+```
+
+```json
+{
+  "$type": "BlogPost",
+  "$id": "new-post",
+  "title": "New Post",
+  "slug": "new-post",
+  "status": "draft",
+  "createdAt": "2024-01-20T10:00:00Z"
+}
+```
+
+### Update Content
+
+```bash
+PUT https://api.headless.ly/content/BlogPost/new-post
+Authorization: Bearer sk_live_xxx
+Content-Type: application/json
+
+{
+  "title": "Updated Post Title",
+  "status": "published",
+  "publishedAt": "2024-01-20T12:00:00Z"
+}
+```
+
+### Delete Content
+
+```bash
+DELETE https://api.headless.ly/content/BlogPost/new-post
+Authorization: Bearer sk_live_xxx
+```
+
+## Query Content
+
+```bash
+GET https://api.headless.ly/content/BlogPost?filter[author]=alice&filter[status]=published&sort=-publishedAt&limit=10
+```
+
+### Filters
+
+| Filter | Description |
+|--------|-------------|
+| `filter[field]=value` | Exact match |
+| `filter[field][$gt]=value` | Greater than |
+| `filter[field][$lt]=value` | Less than |
+| `filter[field][$in]=a,b,c` | In array |
+| `filter[field][$contains]=text` | Contains text |
+
+### Sorting
+
+| Sort | Description |
+|------|-------------|
+| `sort=field` | Ascending |
+| `sort=-field` | Descending |
+
+## AI Endpoints
+
+### Generate Content
+
+```bash
+POST https://api.headless.ly/ai/generate
+Authorization: Bearer sk_live_xxx
+Content-Type: application/json
+
+{
+  "type": "BlogPost",
+  "prompt": "Write a blog post about the benefits of headless CMS",
+  "tone": "professional",
+  "length": "medium"
+}
+```
+
+```json
+{
+  "$type": "BlogPost",
+  "title": "5 Benefits of Headless CMS Architecture",
+  "body": "# 5 Benefits of Headless CMS...",
+  "suggestedTags": ["cms", "architecture", "web-development"],
+  "seo": {
+    "metaDescription": "Discover the key benefits of...",
+    "keywords": ["headless cms", "content management"]
+  }
+}
+```
+
+### Translate Content
+
+```bash
+POST https://api.headless.ly/ai/translate
+Authorization: Bearer sk_live_xxx
+Content-Type: application/json
+
+{
+  "content": "BlogPost/hello-world",
+  "targetLanguage": "es"
+}
+```
+
+### Summarize Content
+
+```bash
+POST https://api.headless.ly/ai/summarize
+Authorization: Bearer sk_live_xxx
+Content-Type: application/json
+
+{
+  "content": "BlogPost/hello-world",
+  "length": "short"
+}
+```
+
+## SDK
+
+```ts
+import { headless } from 'headless.ly'
+
+const client = headless({ apiKey: 'sk_live_xxx' })
+
+// List content
+const posts = await client.content('BlogPost').list({
+  filter: { status: 'published' },
+  sort: '-publishedAt',
+  limit: 10
+})
+
+// Get content
+const post = await client.content('BlogPost').get('hello-world')
+
+// Create content
+const draft = await client.content('BlogPost').create({
+  title: 'New Post',
+  body: '# New Post...'
+})
+
+// AI generation
+const generated = await client.ai.generate({
+  type: 'BlogPost',
+  prompt: 'Write about headless CMS'
+})
+
+// Publish
+await client.content('BlogPost').publish('new-post')
+```
+
+## CLI
+
+```bash
+# List content
+npx headless.ly content list BlogPost
+
+# Get content
+npx headless.ly content get BlogPost/hello-world
+
+# Create content
+npx headless.ly content create BlogPost --file ./post.mdx
+
+# Generate with AI
+npx headless.ly ai generate BlogPost --prompt "Write about..."
+
+# Publish
+npx headless.ly content publish BlogPost/new-post
+```

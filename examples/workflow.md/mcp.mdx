@@ -1,0 +1,187 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Let AI agents trigger and manage workflows
+---
+
+# MCP Server
+
+Enable AI agents to orchestrate complex multi-step processes.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "workflow": {
+      "command": "npx",
+      "args": ["@workflow.md/mcp", "./workflows/"]
+    }
+  }
+}
+```
+
+## Tools
+
+### `trigger_workflow`
+
+Trigger a workflow with input data.
+
+```ts
+{
+  name: "trigger_workflow",
+  description: "Trigger a workflow",
+  inputSchema: {
+    type: "object",
+    properties: {
+      workflow: { type: "string", description: "Workflow name or ID" },
+      data: { type: "object", description: "Input data for the workflow" }
+    },
+    required: ["workflow"]
+  }
+}
+```
+
+**Example:**
+
+```
+User: Onboard the new customer alice@startup.com
+
+Agent: I'll trigger the customer onboarding workflow.
+
+[trigger_workflow: workflow="customer-onboarding", data={ email: "alice@startup.com" }]
+
+Started onboarding workflow for alice@startup.com.
+The workflow will:
+1. Send welcome email
+2. Create support channel
+3. Schedule onboarding call
+```
+
+### `get_workflow_status`
+
+Check the status of a workflow run.
+
+```ts
+{
+  name: "get_workflow_status",
+  description: "Get the status of a workflow run",
+  inputSchema: {
+    type: "object",
+    properties: {
+      run_id: { type: "string" }
+    },
+    required: ["run_id"]
+  }
+}
+```
+
+### `list_pending_approvals`
+
+List approvals waiting for action.
+
+```ts
+{
+  name: "list_pending_approvals",
+  description: "List pending approval requests",
+  inputSchema: {
+    type: "object",
+    properties: {
+      assignee: { type: "string", description: "Filter by assignee email" }
+    }
+  }
+}
+```
+
+### `approve`
+
+Approve or reject a pending approval.
+
+```ts
+{
+  name: "approve",
+  description: "Approve or reject a pending request",
+  inputSchema: {
+    type: "object",
+    properties: {
+      approval_id: { type: "string" },
+      decision: { enum: ["approved", "rejected"] },
+      comment: { type: "string" }
+    },
+    required: ["approval_id", "decision"]
+  }
+}
+```
+
+### `cancel_workflow`
+
+Cancel a running workflow.
+
+```ts
+{
+  name: "cancel_workflow",
+  description: "Cancel a running workflow",
+  inputSchema: {
+    type: "object",
+    properties: {
+      run_id: { type: "string" }
+    },
+    required: ["run_id"]
+  }
+}
+```
+
+## Usage Patterns
+
+### Automated Processing
+
+```
+User: Process all pending refund requests
+
+Agent:
+[list_pending_approvals: assignee="refunds@company.com"]
+
+Found 5 pending refund requests. Processing...
+
+[approve: approval_id="apr_1", decision="approved", comment="Auto-approved: amount under $50"]
+[approve: approval_id="apr_2", decision="approved", comment="Auto-approved: loyal customer"]
+[approve: approval_id="apr_3", decision="rejected", comment="Outside return window"]
+
+Processed 5 refunds: 4 approved, 1 rejected.
+```
+
+### Orchestration
+
+```
+User: Set up the new project "Mobile App Redesign"
+
+Agent:
+[trigger_workflow: workflow="project-setup", data={ name: "Mobile App Redesign", team: ["alice", "bob"] }]
+
+Project setup workflow started. This will:
+1. Create Slack channel #mobile-app-redesign
+2. Create GitHub repository
+3. Set up Linear project
+4. Schedule kickoff meeting
+5. Send team notifications
+
+I'll monitor progress and let you know when complete.
+```
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "workflow": {
+      "command": "npx",
+      "args": ["@workflow.md/mcp", "./workflows/"],
+      "env": {
+        "SLACK_TOKEN": "xoxb-...",
+        "GITHUB_TOKEN": "ghp_...",
+        "AUTO_APPROVE_LIMIT": "100"
+      }
+    }
+  }
+}
+```

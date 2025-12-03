@@ -1,0 +1,69 @@
+---
+$type: App
+name: builder.domains
+title: Free Domains for AI Agents
+description: Give your AI agents a home on the web
+---
+
+# builder.domains
+
+<App
+  name="builder.domains"
+  title="Free Domains for AI Agents"
+  description="Domain registration for the AI era"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/pricing">Pricing</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/builder.domains">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Domain Tiers
+
+| Tier | Subdomains | Features | Price |
+|------|------------|----------|-------|
+| Free | 3 | *.builder.domains | $0 |
+| Pro | Unlimited | Premium names, DNS, SSL | $9/mo |
+| Enterprise | Unlimited | Custom TLDs, API priority | Custom |
+
+## Configuration
+
+```ts
+export default {
+  name: 'builder.domains',
+
+  // Free tier limits
+  free: {
+    maxDomains: 3,
+    allowedSuffixes: ['.builder.domains']
+  },
+
+  // Pro features
+  pro: {
+    customDNS: true,
+    ssl: 'automatic',
+    analytics: true
+  },
+
+  // Registrar integrations
+  registrars: {
+    cloudflare: true,
+    namecheap: true,
+    godaddy: true
+  }
+}
+```

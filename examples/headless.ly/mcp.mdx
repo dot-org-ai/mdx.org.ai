@@ -1,0 +1,238 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Headless CMS tools for AI agents
+---
+
+# MCP Server
+
+Let AI agents manage and create content.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "headless": {
+      "command": "npx",
+      "args": ["@headless.ly/mcp"],
+      "env": {
+        "HEADLESS_API_KEY": "sk_live_xxx"
+      }
+    }
+  }
+}
+```
+
+## Tools
+
+### `list_content`
+
+List content of a specific type.
+
+```ts
+{
+  name: "list_content",
+  description: "List content entries",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: { type: "string", description: "Content type (e.g., BlogPost, Author)" },
+      filter: { type: "object", description: "Filter criteria" },
+      sort: { type: "string", description: "Sort field (prefix with - for descending)" },
+      limit: { type: "number", default: 10 }
+    },
+    required: ["type"]
+  }
+}
+```
+
+### `get_content`
+
+Get a specific content entry.
+
+```ts
+{
+  name: "get_content",
+  description: "Get content by type and ID",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: { type: "string" },
+      id: { type: "string" }
+    },
+    required: ["type", "id"]
+  }
+}
+```
+
+### `create_content`
+
+Create new content.
+
+```ts
+{
+  name: "create_content",
+  description: "Create new content entry",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: { type: "string" },
+      data: { type: "object", description: "Content fields" },
+      status: { enum: ["draft", "published"], default: "draft" }
+    },
+    required: ["type", "data"]
+  }
+}
+```
+
+### `update_content`
+
+Update existing content.
+
+```ts
+{
+  name: "update_content",
+  description: "Update content entry",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: { type: "string" },
+      id: { type: "string" },
+      data: { type: "object" }
+    },
+    required: ["type", "id", "data"]
+  }
+}
+```
+
+### `generate_content`
+
+Generate content with AI.
+
+```ts
+{
+  name: "generate_content",
+  description: "Generate content using AI",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: { type: "string", description: "Content type to generate" },
+      prompt: { type: "string", description: "Description of content to generate" },
+      tone: { enum: ["professional", "casual", "technical", "friendly"] },
+      length: { enum: ["short", "medium", "long"] }
+    },
+    required: ["type", "prompt"]
+  }
+}
+```
+
+### `publish_content`
+
+Publish content.
+
+```ts
+{
+  name: "publish_content",
+  description: "Publish a draft content entry",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: { type: "string" },
+      id: { type: "string" },
+      scheduledFor: { type: "string", description: "ISO datetime for scheduled publishing" }
+    },
+    required: ["type", "id"]
+  }
+}
+```
+
+### `search_content`
+
+Search across all content.
+
+```ts
+{
+  name: "search_content",
+  description: "Search content",
+  inputSchema: {
+    type: "object",
+    properties: {
+      query: { type: "string" },
+      types: { type: "array", items: { type: "string" } },
+      limit: { type: "number", default: 10 }
+    },
+    required: ["query"]
+  }
+}
+```
+
+## Usage Example
+
+```
+User: Write a blog post about AI in content management
+
+Agent: I'll create a blog post about AI in content management.
+
+[generate_content: type="BlogPost", prompt="Write a comprehensive blog post about how AI is transforming content management systems", tone="professional", length="medium"]
+
+Generated blog post:
+
+**Title**: How AI is Revolutionizing Content Management
+
+**Preview**: Discover how artificial intelligence is transforming the way we create, organize, and deliver content...
+
+[create_content: type="BlogPost", data={title: "How AI is Revolutionizing Content Management", body: "...", tags: ["ai", "cms", "content"]}, status="draft"]
+
+Created draft: BlogPost/how-ai-is-revolutionizing-content-management
+
+Would you like me to:
+1. Review and edit the content?
+2. Add images or media?
+3. Publish immediately or schedule?
+
+User: Publish it now
+
+[publish_content: type="BlogPost", id="how-ai-is-revolutionizing-content-management"]
+
+Published! Your post is now live at:
+https://yourblog.com/posts/how-ai-is-revolutionizing-content-management
+```
+
+## Resources
+
+### `content://`
+
+Access content entries.
+
+```ts
+{
+  uri: "content://BlogPost/hello-world",
+  name: "Hello World Post",
+  mimeType: "application/json"
+}
+```
+
+### `schema://`
+
+Access content type schemas.
+
+```ts
+{
+  uri: "schema://BlogPost",
+  name: "BlogPost Schema",
+  mimeType: "application/json"
+}
+```
+
+### `media://`
+
+Access media library.
+
+```ts
+{
+  uri: "media://images",
+  name: "Image Library",
+  mimeType: "application/json"
+}
+```

@@ -1,0 +1,49 @@
+---
+$type: App
+name: api.qa
+title: AI-Powered API Testing
+description: Test APIs with natural language
+---
+
+# api.qa
+
+<App
+  name="api.qa"
+  title="AI-Powered API Testing"
+  description="Write tests in English, let AI handle the rest"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+</App>
+
+## Test Structure
+
+```mdx
+---
+$type: TestSuite
+name: User API Tests
+baseUrl: https://api.example.com
+auth:
+  type: bearer
+  token: $API_KEY
+---
+
+# User API Tests
+
+## Create User
+- Valid data should return 201
+- Invalid email should return 400
+- Duplicate email should return 409
+
+## Get User
+- Existing user returns 200
+- Non-existent user returns 404
+```

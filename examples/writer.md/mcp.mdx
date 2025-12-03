@@ -1,0 +1,159 @@
+---
+$type: MCPServer
+title: MCP Server
+description: AI writing capabilities for agents
+---
+
+# MCP Server
+
+Give AI agents the ability to create and edit written content.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "writer": {
+      "command": "npx",
+      "args": ["@writer.md/mcp"]
+    }
+  }
+}
+```
+
+## Tools
+
+### `write`
+
+Generate new content.
+
+```ts
+{
+  name: "write",
+  description: "Generate written content",
+  inputSchema: {
+    type: "object",
+    properties: {
+      topic: { type: "string" },
+      type: { enum: ["blog", "docs", "readme", "email", "social"] },
+      length: { enum: ["short", "medium", "long"] },
+      tone: { type: "string" },
+      outline: { type: "array", items: { type: "string" } }
+    },
+    required: ["topic", "type"]
+  }
+}
+```
+
+### `edit`
+
+Edit and fix content.
+
+```ts
+{
+  name: "edit",
+  description: "Edit and improve existing content",
+  inputSchema: {
+    type: "object",
+    properties: {
+      content: { type: "string" },
+      instructions: { type: "string" },
+      fix: { type: "array", items: { enum: ["grammar", "spelling", "punctuation", "style"] } }
+    },
+    required: ["content"]
+  }
+}
+```
+
+### `improve`
+
+Enhance content quality.
+
+```ts
+{
+  name: "improve",
+  description: "Improve content quality",
+  inputSchema: {
+    type: "object",
+    properties: {
+      content: { type: "string" },
+      aspects: { type: "array", items: { enum: ["clarity", "engagement", "seo", "readability"] } },
+      audience: { type: "string" }
+    },
+    required: ["content", "aspects"]
+  }
+}
+```
+
+### `summarize`
+
+Create summaries.
+
+```ts
+{
+  name: "summarize",
+  description: "Summarize content",
+  inputSchema: {
+    type: "object",
+    properties: {
+      content: { type: "string" },
+      length: { enum: ["tweet", "short", "medium"] },
+      format: { enum: ["paragraph", "bullets", "tldr"] }
+    },
+    required: ["content"]
+  }
+}
+```
+
+## Usage Example
+
+```
+User: Write a blog post about the benefits of TypeScript
+
+Agent: I'll write a blog post about TypeScript benefits.
+
+[write: topic="Benefits of TypeScript", type="blog", length="medium"]
+
+Here's your blog post:
+
+# Why TypeScript is Worth the Investment
+
+TypeScript has become the go-to choice for modern JavaScript development...
+
+Would you like me to:
+1. Expand any section?
+2. Add code examples?
+3. Optimize for SEO?
+```
+
+```
+User: Make it more engaging and add a catchy introduction
+
+Agent: I'll improve the engagement and rewrite the intro.
+
+[improve: aspects=["engagement"], audience="developers"]
+
+Here's the improved version with a catchier intro:
+
+# Stop Fighting Your Code: Why TypeScript Changes Everything
+
+Every developer knows the pain of hunting down that one undefined bug at 2 AM...
+```
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "writer": {
+      "command": "npx",
+      "args": ["@writer.md/mcp"],
+      "env": {
+        "ANTHROPIC_API_KEY": "sk-ant-...",
+        "DEFAULT_TONE": "professional",
+        "OUTPUT_DIR": "./content"
+      }
+    }
+  }
+}
+```

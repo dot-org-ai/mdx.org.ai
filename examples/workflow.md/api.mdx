@@ -1,0 +1,189 @@
+---
+$type: APIReference
+title: API Reference
+description: Deploy and manage workflows
+---
+
+# API Reference
+
+Deploy, trigger, and monitor workflows.
+
+## Base URL
+
+```
+https://workflow.md
+```
+
+## Deploy Workflow
+
+```bash
+POST https://workflow.md/deploy
+Content-Type: multipart/form-data
+
+file: @my-workflow.md
+```
+
+```json
+{
+  "id": "wf_abc123",
+  "name": "Customer Onboarding",
+  "trigger": "customer.created",
+  "status": "active",
+  "url": "https://workflow.md/wf_abc123"
+}
+```
+
+## Trigger Workflow
+
+### Via Webhook
+
+```bash
+POST https://workflow.md/wf_abc123/trigger
+Content-Type: application/json
+
+{
+  "customer": {
+    "id": "cust_123",
+    "email": "alice@example.com"
+  }
+}
+```
+
+### Via Event
+
+```bash
+POST https://workflow.md/events
+Content-Type: application/json
+
+{
+  "type": "customer.created",
+  "data": {
+    "id": "cust_123",
+    "email": "alice@example.com"
+  }
+}
+```
+
+## Workflow Runs
+
+### List Runs
+
+```bash
+GET https://workflow.md/wf_abc123/runs
+```
+
+```json
+{
+  "runs": [
+    {
+      "id": "run_xyz",
+      "status": "completed",
+      "startedAt": "2024-01-15T10:00:00Z",
+      "completedAt": "2024-01-15T10:00:05Z",
+      "steps": 4
+    }
+  ]
+}
+```
+
+### Get Run Details
+
+```bash
+GET https://workflow.md/runs/run_xyz
+```
+
+```json
+{
+  "id": "run_xyz",
+  "workflow": "wf_abc123",
+  "status": "completed",
+  "trigger": { "type": "webhook", "data": { ... } },
+  "steps": [
+    { "name": "Send Welcome Email", "status": "completed", "duration": "1.2s" },
+    { "name": "Create Slack Channel", "status": "completed", "duration": "0.8s" },
+    { "name": "Schedule Call", "status": "completed", "duration": "2.1s" }
+  ],
+  "output": { ... }
+}
+```
+
+### Cancel Run
+
+```bash
+POST https://workflow.md/runs/run_xyz/cancel
+```
+
+## Approvals
+
+### Pending Approvals
+
+```bash
+GET https://workflow.md/approvals?status=pending
+```
+
+```json
+{
+  "approvals": [
+    {
+      "id": "apr_123",
+      "workflow": "Purchase Approval",
+      "run": "run_xyz",
+      "message": "Approve purchase of $5,000?",
+      "assignee": "manager@company.com",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "expiresAt": "2024-01-16T10:00:00Z"
+    }
+  ]
+}
+```
+
+### Approve/Reject
+
+```bash
+POST https://workflow.md/approvals/apr_123
+Content-Type: application/json
+
+{
+  "decision": "approved",
+  "comment": "Looks good"
+}
+```
+
+## Schedules
+
+### Create Schedule
+
+```bash
+POST https://workflow.md/wf_abc123/schedule
+Content-Type: application/json
+
+{
+  "cron": "0 9 * * 1-5",
+  "timezone": "America/New_York",
+  "data": { "type": "daily-report" }
+}
+```
+
+### List Schedules
+
+```bash
+GET https://workflow.md/wf_abc123/schedules
+```
+
+## SDK
+
+```ts
+import { Workflow } from 'workflow.md'
+
+// Load workflow
+const workflow = await Workflow.load('./onboarding.md')
+
+// Trigger
+const run = await workflow.trigger({ customer: { id: 'cust_123' } })
+
+// Wait for completion
+const result = await run.wait()
+
+// Deploy
+await workflow.deploy()
+```

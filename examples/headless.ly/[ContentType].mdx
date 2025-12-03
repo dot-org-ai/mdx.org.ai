@@ -1,0 +1,62 @@
+---
+$type: ContentType
+$id: $params.slug
+title: Content Type
+description: Content type definition
+---
+
+# {frontmatter.name || params.slug}
+
+<ContentTypeView type={params.slug}>
+  <TypeHeader>
+    <TypeIcon type={params.slug} />
+    <TypeStats count={type.count} />
+  </TypeHeader>
+
+  <SchemaDisplay schema={type.schema} />
+
+  <Tabs>
+    <Tab label="Fields">
+      <FieldTable fields={type.fields} />
+    </Tab>
+    <Tab label="Content">
+      <ContentList type={params.slug} limit={10} />
+    </Tab>
+    <Tab label="API">
+      <APIExamples type={params.slug} />
+    </Tab>
+  </Tabs>
+</ContentTypeView>
+
+## Fields
+
+<FieldTable fields={type.fields} />
+
+## Example
+
+```mdx
+---
+$type: {params.slug}
+$id: example-entry
+# ... fields
+---
+
+# Example {params.slug}
+
+Content here...
+```
+
+## API
+
+```ts
+// List all
+const items = await headless.content('{params.slug}').list()
+
+// Get one
+const item = await headless.content('{params.slug}').get('example-entry')
+
+// Create
+const created = await headless.content('{params.slug}').create({
+  // ... fields
+})
+```

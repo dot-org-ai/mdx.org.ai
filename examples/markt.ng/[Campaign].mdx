@@ -1,0 +1,48 @@
+---
+$type: Campaign
+$id: $params.slug
+title: Campaign
+description: Marketing campaign
+---
+
+# {frontmatter.name || 'Campaign'}
+
+<CampaignView campaign={params.slug}>
+  <CampaignHeader>
+    <Status status={campaign.status} />
+    <Metrics>
+      <Metric label="Sent" value={campaign.sent} />
+      <Metric label="Opens" value={campaign.opens} rate={campaign.openRate} />
+      <Metric label="Clicks" value={campaign.clicks} rate={campaign.clickRate} />
+      <Metric label="Conversions" value={campaign.conversions} />
+    </Metrics>
+  </CampaignHeader>
+
+  <Tabs>
+    <Tab label="Content">
+      <CampaignContent variants={campaign.variants} />
+    </Tab>
+    <Tab label="Audience">
+      <AudienceBreakdown audience={campaign.audience} />
+    </Tab>
+    <Tab label="Results">
+      <ResultsChart data={campaign.results} />
+    </Tab>
+    <Tab label="Settings">
+      <CampaignSettings campaign={campaign} />
+    </Tab>
+  </Tabs>
+</CampaignView>
+
+## Actions
+
+```ts
+// Duplicate campaign
+await markt.duplicate(campaign.id)
+
+// Pause campaign
+await markt.pause(campaign.id)
+
+// Export results
+await markt.export(campaign.id, 'csv')
+```

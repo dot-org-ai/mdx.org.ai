@@ -1,0 +1,101 @@
+---
+$type: App
+name: workflow.md
+title: Workflows in Markdown
+description: Design and run automation workflows with Markdown
+---
+
+# workflow.md
+
+<App
+  name="workflow.md"
+  title="Workflows in Markdown"
+  description="Automation that reads like documentation"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/templates">Templates</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/workflow.md">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+      <Link href="/templates">Templates</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Workflow Structure
+
+```mdx
+---
+$type: Workflow
+name: My Workflow
+trigger: event.type
+---
+
+# Workflow Name
+
+Description of what this workflow does.
+
+## Step 1
+
+```ts
+// Step implementation
+const result = await doSomething()
+```
+
+## Step 2
+
+```ts
+// Next step
+if (condition) {
+  goto('step-3')
+} else {
+  goto('step-4')
+}
+```
+```
+
+## Configuration
+
+```ts
+export default {
+  name: 'workflow.md',
+
+  // Execution
+  execution: {
+    timeout: '5m',
+    retries: 3,
+    backoff: 'exponential'
+  },
+
+  // Triggers
+  triggers: {
+    webhook: true,
+    schedule: true,
+    events: true
+  },
+
+  // Integrations
+  integrations: {
+    slack: process.env.SLACK_TOKEN,
+    github: process.env.GITHUB_TOKEN,
+    stripe: process.env.STRIPE_KEY
+  },
+
+  // Storage
+  storage: {
+    provider: 'sqlite',
+    path: './workflows.db'
+  }
+}
+```

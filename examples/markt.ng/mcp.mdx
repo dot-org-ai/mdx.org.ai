@@ -1,0 +1,197 @@
+---
+$type: MCPServer
+title: MCP Server
+description: AI marketing tools for agents
+---
+
+# MCP Server
+
+Let AI agents run marketing campaigns.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "markt": {
+      "command": "npx",
+      "args": ["@markt.ng/mcp"]
+    }
+  }
+}
+```
+
+## Tools
+
+### `generate_campaign`
+
+Generate marketing content with AI.
+
+```ts
+{
+  name: "generate_campaign",
+  description: "Generate marketing campaign content",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: {
+        enum: ["email", "social", "ad", "landing-page"],
+        description: "Campaign type"
+      },
+      product: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          description: { type: "string" },
+          url: { type: "string" }
+        }
+      },
+      audience: { type: "string", description: "Target audience" },
+      tone: { enum: ["professional", "casual", "urgent", "friendly"] },
+      goals: { type: "array", items: { type: "string" } }
+    },
+    required: ["type", "product"]
+  }
+}
+```
+
+### `analyze_audience`
+
+Get insights about an audience segment.
+
+```ts
+{
+  name: "analyze_audience",
+  description: "Analyze audience characteristics and behavior",
+  inputSchema: {
+    type: "object",
+    properties: {
+      audience: { type: "string", description: "Audience identifier or description" },
+      dimensions: {
+        type: "array",
+        items: { enum: ["behavior", "preferences", "churn_risk", "ltv"] }
+      }
+    },
+    required: ["audience"]
+  }
+}
+```
+
+### `run_ab_test`
+
+Start an A/B test experiment.
+
+```ts
+{
+  name: "run_ab_test",
+  description: "Run A/B test on campaign variants",
+  inputSchema: {
+    type: "object",
+    properties: {
+      variants: {
+        type: "array",
+        items: { type: "object" },
+        description: "Content variants to test"
+      },
+      audience: { type: "string" },
+      metric: { enum: ["open_rate", "click_rate", "conversion_rate"] },
+      duration: { type: "string", description: "Test duration (e.g., '7d')" }
+    },
+    required: ["variants", "metric"]
+  }
+}
+```
+
+### `optimize_campaign`
+
+Get AI-powered optimization recommendations.
+
+```ts
+{
+  name: "optimize_campaign",
+  description: "Get optimization recommendations for a campaign",
+  inputSchema: {
+    type: "object",
+    properties: {
+      campaign: { type: "string", description: "Campaign ID" },
+      budget: { type: "number" },
+      goals: { type: "object" },
+      constraints: { type: "object" }
+    },
+    required: ["campaign"]
+  }
+}
+```
+
+### `send_campaign`
+
+Deploy a campaign to recipients.
+
+```ts
+{
+  name: "send_campaign",
+  description: "Send campaign to audience",
+  inputSchema: {
+    type: "object",
+    properties: {
+      campaign: { type: "string" },
+      audience: { type: "string" },
+      schedule: { type: "string", description: "ISO datetime or 'now'" }
+    },
+    required: ["campaign", "audience"]
+  }
+}
+```
+
+## Usage Example
+
+```
+User: Create an email campaign for our new feature launch
+
+Agent: I'll help create a marketing campaign for your feature launch.
+
+[generate_campaign: type="email", product={name: "Smart Reports", description: "AI-powered analytics reports"}, audience="existing customers", goals=["adoption", "engagement"]]
+
+Generated 5 email variants:
+
+1. "Your reports just got smarter" - Focus on AI capabilities
+2. "Save 2 hours every week" - Productivity angle
+3. "Smart Reports is here" - Announcement style
+
+[analyze_audience: audience="existing customers", dimensions=["behavior", "preferences"]]
+
+Audience insights:
+- 60% prefer morning emails (8-10am)
+- High engagement with feature announcements
+- Respond well to productivity messaging
+
+Recommendation: Use variant 2 ("Save 2 hours") sent Tuesday 9am.
+
+Want me to set up an A/B test or send directly?
+```
+
+## Resources
+
+### `campaign://`
+
+Access campaign data and results.
+
+```ts
+{
+  uri: "campaign://summer_launch",
+  name: "Summer Launch Campaign",
+  mimeType: "application/json"
+}
+```
+
+### `audience://`
+
+Access audience segment information.
+
+```ts
+{
+  uri: "audience://startup_founders",
+  name: "Startup Founders Segment",
+  mimeType: "application/json"
+}
+```

@@ -1,0 +1,108 @@
+---
+$type: App
+name: headless.ly
+title: Headless CMS
+description: Content management powered by MDX and AI
+---
+
+# headless.ly
+
+<App
+  name="headless.ly"
+  title="Headless CMS"
+  description="Content is code"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/content">Content</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/headless.ly">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+      <Link href="/pricing">Pricing</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Content Types
+
+```mdx
+---
+$type: BlogPost
+$id: hello-world
+title: Hello World
+author: alice
+publishedAt: 2024-01-15
+tags: [intro, welcome]
+---
+
+# Hello World
+
+Welcome to my blog built with headless.ly!
+```
+
+## Configuration
+
+```ts
+export default {
+  name: 'headless.ly',
+
+  // Content types
+  content: {
+    BlogPost: {
+      fields: {
+        title: { type: 'string', required: true },
+        slug: { type: 'string', unique: true },
+        author: { type: 'reference', to: 'Author' },
+        publishedAt: { type: 'datetime' },
+        tags: { type: 'array', of: 'reference', to: 'Tag' },
+        body: { type: 'mdx' }
+      }
+    },
+    Author: {
+      fields: {
+        name: { type: 'string', required: true },
+        email: { type: 'string' },
+        bio: { type: 'text' },
+        avatar: { type: 'image' }
+      }
+    },
+    Tag: {
+      fields: {
+        name: { type: 'string', required: true },
+        slug: { type: 'string', unique: true }
+      }
+    }
+  },
+
+  // AI features
+  ai: {
+    generation: true,
+    seo: true,
+    translation: true,
+    summarization: true
+  },
+
+  // Storage
+  storage: {
+    provider: 'git',
+    repository: 'github:org/content'
+  },
+
+  // Publishing
+  publishing: {
+    preview: true,
+    scheduled: true,
+    workflows: true
+  }
+}
+```

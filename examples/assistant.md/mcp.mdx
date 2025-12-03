@@ -1,0 +1,158 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Run your assistant as an MCP server
+---
+
+# MCP Server
+
+Use your personal assistant as an MCP server in Claude Desktop.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "assistant": {
+      "command": "npx",
+      "args": ["assistant.md", "mcp", "./my-assistant.md"]
+    }
+  }
+}
+```
+
+## Tools
+
+Your assistant's tools become available to Claude:
+
+### `ask_assistant`
+
+Ask your personal assistant a question.
+
+```ts
+{
+  name: "ask_assistant",
+  description: "Ask your personal assistant",
+  inputSchema: {
+    type: "object",
+    properties: {
+      message: { type: "string" }
+    },
+    required: ["message"]
+  }
+}
+```
+
+### `get_calendar`
+
+Get calendar events.
+
+```ts
+{
+  name: "get_calendar",
+  description: "Get calendar events",
+  inputSchema: {
+    type: "object",
+    properties: {
+      date: { type: "string", description: "Date (YYYY-MM-DD) or 'today', 'tomorrow'" },
+      days: { type: "number", default: 1 }
+    }
+  }
+}
+```
+
+### `get_tasks`
+
+Get tasks and todos.
+
+```ts
+{
+  name: "get_tasks",
+  description: "Get tasks from your task manager",
+  inputSchema: {
+    type: "object",
+    properties: {
+      status: { enum: ["all", "pending", "completed"] },
+      priority: { enum: ["all", "high", "medium", "low"] }
+    }
+  }
+}
+```
+
+### `send_message`
+
+Send a message via configured channels.
+
+```ts
+{
+  name: "send_message",
+  description: "Send a message via Slack, email, etc.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      channel: { enum: ["slack", "email", "sms"] },
+      to: { type: "string" },
+      message: { type: "string" }
+    },
+    required: ["channel", "to", "message"]
+  }
+}
+```
+
+## Usage with Claude
+
+```
+User: What do I have going on today?
+
+Claude: Let me check with your assistant.
+
+[ask_assistant: "What's on my schedule today and what are my priority tasks?"]
+
+Based on your assistant's response:
+
+📅 **Calendar:**
+- 9:00 AM - Team standup (30 min)
+- 2:00 PM - Product review (1 hour)
+- 4:00 PM - 1:1 with Sarah (30 min)
+
+✅ **Priority Tasks:**
+1. Review PR #234 (high)
+2. Finish design spec (high)
+3. Reply to vendor email (medium)
+
+Would you like me to help you prepare for any of these?
+```
+
+## Context Sharing
+
+Your assistant maintains context across conversations:
+
+```
+User: Remind me what we discussed about the mobile project
+
+Claude: [ask_assistant: "What do you remember about the mobile project discussions?"]
+
+Your assistant recalls:
+- Mobile app redesign started Jan 5th
+- Deadline is March 1st
+- Key stakeholders: Sarah (design), Mike (engineering)
+- Last discussed: focusing on onboarding flow
+```
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "assistant": {
+      "command": "npx",
+      "args": ["assistant.md", "mcp", "./assistant.md"],
+      "env": {
+        "GOOGLE_CREDENTIALS": "path/to/credentials.json",
+        "SLACK_TOKEN": "xoxb-...",
+        "LINEAR_API_KEY": "lin_..."
+      }
+    }
+  }
+}
+```

@@ -1,0 +1,116 @@
+---
+$type: App
+name: assistant.md
+title: Personal AI Assistant
+description: Design your personal assistant in Markdown
+---
+
+# assistant.md
+
+<App
+  name="assistant.md"
+  title="Personal AI Assistant"
+  description="Your AI assistant, defined in Markdown"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/gallery">Gallery</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/assistant.md">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Assistant Structure
+
+```mdx
+---
+$type: Assistant
+name: Alex
+model: claude-sonnet-4-20250514
+voice: alloy
+---
+
+# Alex
+
+You are Alex, my personal assistant.
+
+## About Me
+
+- My name is [Your Name]
+- I work as [Your Role]
+- My priorities are [...]
+
+## Personality
+
+- Friendly but professional
+- Proactive and helpful
+- Remembers context
+
+## Daily Routine
+
+Every morning at 8am:
+1. Weather forecast
+2. Calendar events
+3. Priority tasks
+
+## Tools
+
+### calendar
+Access my Google Calendar.
+
+### email
+Read and send emails.
+
+### tasks
+Manage my task list.
+```
+
+## Configuration
+
+```ts
+export default {
+  name: 'assistant.md',
+
+  // Model
+  model: {
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514'
+  },
+
+  // Voice
+  voice: {
+    provider: 'openai',
+    voice: 'alloy',
+    speed: 1.0
+  },
+
+  // Memory
+  memory: {
+    enabled: true,
+    provider: 'sqlite',
+    retention: '30d'
+  },
+
+  // Integrations
+  integrations: {
+    google: {
+      calendar: true,
+      gmail: true
+    },
+    slack: true,
+    linear: true
+  }
+}
+```

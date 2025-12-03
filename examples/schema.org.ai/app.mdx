@@ -1,0 +1,114 @@
+---
+$type: App
+name: schema.org.ai
+title: AI-Enhanced Semantic Vocabulary
+description: Schema.org superset with AI-native extensions
+---
+
+# schema.org.ai
+
+<App
+  name="schema.org.ai"
+  title="AI-Enhanced Semantic Vocabulary"
+  description="Schema.org for the AI era"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/types">Types</NavLink>
+    <NavLink href="/properties">Properties</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://schema.org">Schema.org</Link>
+      <Link href="https://github.com/mdx-org/schema.org.ai">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Core Concepts
+
+```mdx
+---
+$type: Agent
+$id: https://agents.ai/assistant
+name: Research Assistant
+capabilities: [search, summarize, analyze]
+model: claude-sonnet-4-20250514
+---
+
+# Research Assistant
+
+An AI agent that helps with research.
+
+## Tools
+- web_search
+- read_file
+- analyze_data
+```
+
+## New Types
+
+### Agent
+Autonomous AI that performs tasks.
+
+### Tool
+A capability an Agent can use.
+
+### Workflow
+Sequence of steps performed by Agents.
+
+### Business
+AI-enhanced business entity.
+
+## The `digital` Property
+
+Every Thing has a `digital` twin:
+
+```json
+{
+  "@type": "Person",
+  "name": "Alice",
+  "digital": {
+    "@type": "Agent",
+    "capabilities": ["email", "calendar"]
+  }
+}
+```
+
+## Configuration
+
+```ts
+export default {
+  name: 'schema.org.ai',
+
+  // Schema sources
+  sources: {
+    base: 'https://schema.org',
+    extensions: [
+      'https://schema.org.ai/extensions/ai.jsonld',
+      'https://schema.org.ai/extensions/digital.jsonld'
+    ]
+  },
+
+  // Validation
+  validation: {
+    strict: false,
+    allowExtensions: true
+  },
+
+  // Cache
+  cache: {
+    ttl: '24h',
+    staleWhileRevalidate: true
+  }
+}
+```

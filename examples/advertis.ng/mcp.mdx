@@ -1,0 +1,218 @@
+---
+$type: MCPServer
+title: MCP Server
+description: AI advertising tools for agents
+---
+
+# MCP Server
+
+Let AI agents create and optimize ad campaigns.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "advertis": {
+      "command": "npx",
+      "args": ["@advertis.ng/mcp"]
+    }
+  }
+}
+```
+
+## Tools
+
+### `generate_ads`
+
+Create ad copy and targeting suggestions.
+
+```ts
+{
+  name: "generate_ads",
+  description: "Generate ad variants for a product",
+  inputSchema: {
+    type: "object",
+    properties: {
+      product: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          description: { type: "string" },
+          price: { type: "string" },
+          url: { type: "string" }
+        },
+        required: ["name"]
+      },
+      platform: { enum: ["meta", "google", "linkedin", "tiktok"] },
+      objective: { enum: ["awareness", "traffic", "conversions", "leads"] },
+      audience: { type: "object" },
+      variants: { type: "number", default: 5 }
+    },
+    required: ["product", "platform"]
+  }
+}
+```
+
+### `generate_images`
+
+Create ad images with AI.
+
+```ts
+{
+  name: "generate_images",
+  description: "Generate ad images",
+  inputSchema: {
+    type: "object",
+    properties: {
+      product: { type: "string" },
+      style: { enum: ["modern-minimal", "bold", "lifestyle", "product-focus"] },
+      dimensions: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            width: { type: "number" },
+            height: { type: "number" }
+          }
+        }
+      },
+      variants: { type: "number", default: 3 }
+    },
+    required: ["product"]
+  }
+}
+```
+
+### `run_experiment`
+
+Launch an A/B test experiment.
+
+```ts
+{
+  name: "run_experiment",
+  description: "Run A/B test experiment on ad variants",
+  inputSchema: {
+    type: "object",
+    properties: {
+      name: { type: "string" },
+      variants: { type: "array", items: { type: "string" } },
+      platform: { type: "string" },
+      budget: { type: "number" },
+      duration: { type: "string" },
+      autoOptimize: { type: "boolean", default: true }
+    },
+    required: ["variants", "platform", "budget"]
+  }
+}
+```
+
+### `get_performance`
+
+Get campaign performance metrics.
+
+```ts
+{
+  name: "get_performance",
+  description: "Get performance metrics for a campaign or experiment",
+  inputSchema: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "Campaign or experiment ID" },
+      metrics: {
+        type: "array",
+        items: { enum: ["impressions", "clicks", "ctr", "conversions", "cpa", "roas"] }
+      },
+      period: { type: "string", default: "7d" }
+    },
+    required: ["id"]
+  }
+}
+```
+
+### `optimize_campaign`
+
+Get AI optimization recommendations.
+
+```ts
+{
+  name: "optimize_campaign",
+  description: "Get optimization recommendations",
+  inputSchema: {
+    type: "object",
+    properties: {
+      campaign: { type: "string" },
+      goal: { enum: ["maximize_roas", "minimize_cpa", "maximize_conversions"] },
+      constraints: {
+        type: "object",
+        properties: {
+          budget: { type: "number" },
+          cpa_max: { type: "number" }
+        }
+      }
+    },
+    required: ["campaign", "goal"]
+  }
+}
+```
+
+## Usage Example
+
+```
+User: Create ads for our new product launch on Meta
+
+Agent: I'll create ad variants for your product launch on Meta.
+
+[generate_ads: product={name: "CloudSync Pro", description: "Real-time file sync", price: "$9/mo"}, platform="meta", objective="conversions", variants=5]
+
+Generated 5 ad variants:
+
+1. "Sync Instantly" - Productivity focus
+2. "Your Files, Everywhere" - Accessibility angle
+3. "Stop Waiting for Sync" - Pain point messaging
+4. "Work From Anywhere" - Remote work theme
+5. "Real-Time, Real Simple" - Simplicity focus
+
+[generate_images: product="CloudSync Pro", style="modern-minimal", variants=5]
+
+Generated 5 images with modern minimal style.
+
+Want me to run an A/B test experiment with these variants?
+
+User: Yes, with $500 budget
+
+[run_experiment: name="CloudSync Launch", variants=["var_1","var_2","var_3","var_4","var_5"], platform="meta", budget=500, duration="7d", autoOptimize=true]
+
+Experiment started:
+- Budget: $500 over 7 days
+- Auto-optimization enabled
+- Expected reach: 50,000 impressions
+
+I'll monitor performance and the system will automatically shift budget to winning variants.
+```
+
+## Resources
+
+### `campaign://`
+
+Access campaign data.
+
+```ts
+{
+  uri: "campaign://q4_launch",
+  name: "Q4 Launch Campaign",
+  mimeType: "application/json"
+}
+```
+
+### `experiment://`
+
+Access experiment results.
+
+```ts
+{
+  uri: "experiment://exp_abc123",
+  name: "A/B Test Results",
+  mimeType: "application/json"
+}
+```

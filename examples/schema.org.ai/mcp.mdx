@@ -1,0 +1,216 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Schema vocabulary tools for AI agents
+---
+
+# MCP Server
+
+Let AI agents work with structured data and schemas.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "schema": {
+      "command": "npx",
+      "args": ["@schema.org.ai/mcp"]
+    }
+  }
+}
+```
+
+## Tools
+
+### `get_type`
+
+Get information about a schema type.
+
+```ts
+{
+  name: "get_type",
+  description: "Get schema type definition and properties",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: { type: "string", description: "Type name (e.g., Person, Organization)" },
+      includeParent: { type: "boolean", default: true },
+      includeChildren: { type: "boolean", default: false }
+    },
+    required: ["type"]
+  }
+}
+```
+
+### `get_property`
+
+Get information about a schema property.
+
+```ts
+{
+  name: "get_property",
+  description: "Get schema property definition",
+  inputSchema: {
+    type: "object",
+    properties: {
+      property: { type: "string", description: "Property name (e.g., name, email)" },
+      includeDomains: { type: "boolean", default: true }
+    },
+    required: ["property"]
+  }
+}
+```
+
+### `validate_schema`
+
+Validate structured data against schema.
+
+```ts
+{
+  name: "validate_schema",
+  description: "Validate JSON-LD or structured data",
+  inputSchema: {
+    type: "object",
+    properties: {
+      data: { type: "object", description: "The data to validate" },
+      strict: { type: "boolean", default: false }
+    },
+    required: ["data"]
+  }
+}
+```
+
+### `generate_schema`
+
+Generate schema from a description.
+
+```ts
+{
+  name: "generate_schema",
+  description: "Generate structured data schema from description",
+  inputSchema: {
+    type: "object",
+    properties: {
+      description: { type: "string", description: "Description of the entity" },
+      type: { type: "string", description: "Hint for the type to generate" },
+      format: { enum: ["json-ld", "yaml", "mdx"], default: "json-ld" }
+    },
+    required: ["description"]
+  }
+}
+```
+
+### `search_vocabulary`
+
+Search the schema vocabulary.
+
+```ts
+{
+  name: "search_vocabulary",
+  description: "Search for types and properties",
+  inputSchema: {
+    type: "object",
+    properties: {
+      query: { type: "string" },
+      filter: { enum: ["types", "properties", "all"], default: "all" }
+    },
+    required: ["query"]
+  }
+}
+```
+
+### `suggest_properties`
+
+Suggest properties for a type.
+
+```ts
+{
+  name: "suggest_properties",
+  description: "Suggest relevant properties for a type",
+  inputSchema: {
+    type: "object",
+    properties: {
+      type: { type: "string" },
+      context: { type: "string", description: "Context for suggestions" }
+    },
+    required: ["type"]
+  }
+}
+```
+
+## Usage Example
+
+```
+User: Create structured data for my restaurant
+
+Agent: I'll help create structured data for your restaurant.
+
+[search_vocabulary: query="restaurant"]
+
+Found relevant types:
+- Restaurant (LocalBusiness > Organization)
+- FoodEstablishment
+- Menu, MenuItem
+
+[get_type: type="Restaurant", includeParent=true]
+
+Restaurant properties include:
+- name, address, telephone
+- servesCuisine, menu, acceptsReservations
+- openingHours, priceRange
+- digital (AI extension)
+
+[generate_schema: description="Italian restaurant in downtown SF with outdoor seating", type="Restaurant", format="json-ld"]
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "Restaurant Name",
+  "servesCuisine": "Italian",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "San Francisco",
+    "addressRegion": "CA"
+  },
+  "amenityFeature": {
+    "@type": "LocationFeatureSpecification",
+    "name": "Outdoor seating",
+    "value": true
+  },
+  "digital": {
+    "@type": "Agent",
+    "capabilities": ["reservations", "menu-questions"]
+  }
+}
+```
+
+Want me to validate this or add more details?
+```
+
+## Resources
+
+### `schema://`
+
+Access schema definitions.
+
+```ts
+{
+  uri: "schema://Person",
+  name: "Person Type",
+  mimeType: "application/json"
+}
+```
+
+### `vocabulary://`
+
+Access full vocabulary.
+
+```ts
+{
+  uri: "vocabulary://all",
+  name: "Full Schema.org Vocabulary",
+  mimeType: "application/json"
+}
+```

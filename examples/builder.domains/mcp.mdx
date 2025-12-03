@@ -1,0 +1,162 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Let AI agents manage their own domains
+---
+
+# MCP Server
+
+Give AI agents the ability to register and manage domains.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "domains": {
+      "command": "npx",
+      "args": ["@builder.domains/mcp"],
+      "env": {
+        "BUILDER_DOMAINS_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+## Tools
+
+### `check_domain`
+
+Check if a domain is available.
+
+```ts
+{
+  name: "check_domain",
+  description: "Check domain availability",
+  inputSchema: {
+    type: "object",
+    properties: {
+      name: { type: "string", description: "Domain name to check" },
+      tlds: { type: "array", items: { type: "string" }, description: "TLDs to check" }
+    },
+    required: ["name"]
+  }
+}
+```
+
+### `register_domain`
+
+Register a free subdomain.
+
+```ts
+{
+  name: "register_domain",
+  description: "Register a free subdomain on builder.domains",
+  inputSchema: {
+    type: "object",
+    properties: {
+      subdomain: { type: "string" }
+    },
+    required: ["subdomain"]
+  }
+}
+```
+
+### `configure_dns`
+
+Configure DNS records.
+
+```ts
+{
+  name: "configure_dns",
+  description: "Configure DNS records for a domain",
+  inputSchema: {
+    type: "object",
+    properties: {
+      domain: { type: "string" },
+      records: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            type: { enum: ["A", "AAAA", "CNAME", "TXT", "MX"] },
+            name: { type: "string" },
+            value: { type: "string" }
+          }
+        }
+      }
+    },
+    required: ["domain", "records"]
+  }
+}
+```
+
+### `list_domains`
+
+List all registered domains.
+
+```ts
+{
+  name: "list_domains",
+  description: "List your registered domains",
+  inputSchema: {
+    type: "object",
+    properties: {}
+  }
+}
+```
+
+## Usage Example
+
+```
+User: I need a domain for my new project "AIHelper"
+
+Agent: Let me check what's available.
+
+[check_domain: name="aihelper"]
+
+Here are the available options:
+
+**Free:**
+- aihelper.builder.domains ✓
+
+**Premium:**
+- aihelper.ai - $70/year
+- aihelper.dev - $12/year
+- aihelper.com - Taken
+
+Would you like me to register the free subdomain?
+```
+
+```
+User: Yes, register the free one
+
+Agent: [register_domain: subdomain="aihelper"]
+
+Done! Your domain is ready:
+
+🌐 **aihelper.builder.domains**
+
+SSL certificate is being provisioned (usually takes 2-3 minutes).
+
+Would you like me to configure DNS or deploy a site?
+```
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "domains": {
+      "command": "npx",
+      "args": ["@builder.domains/mcp"],
+      "env": {
+        "BUILDER_DOMAINS_KEY": "bd_...",
+        "DEFAULT_DNS_PROVIDER": "cloudflare",
+        "AUTO_SSL": "true"
+      }
+    }
+  }
+}
+```

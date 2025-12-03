@@ -1,0 +1,88 @@
+---
+$type: APIReference
+title: API Reference
+description: API testing service
+---
+
+# API Reference
+
+Run AI-powered API tests.
+
+## Run Tests
+
+```bash
+POST https://api.qa/run
+Content-Type: application/json
+
+{
+  "suite": "user-api-tests",
+  "baseUrl": "https://api.example.com",
+  "auth": { "type": "bearer", "token": "..." }
+}
+```
+
+```json
+{
+  "id": "run_abc",
+  "status": "running",
+  "tests": 12,
+  "resultsUrl": "https://api.qa/results/run_abc"
+}
+```
+
+## Generate Tests
+
+```bash
+POST https://api.qa/generate
+Content-Type: application/json
+
+{
+  "openapi": "https://api.example.com/openapi.json",
+  "coverage": ["happy-path", "edge-cases", "security"]
+}
+```
+
+## Results
+
+```bash
+GET https://api.qa/results/run_abc
+```
+
+```json
+{
+  "id": "run_abc",
+  "status": "completed",
+  "passed": 10,
+  "failed": 2,
+  "tests": [
+    { "name": "Create user with valid data", "status": "passed", "duration": "120ms" },
+    { "name": "Invalid email returns 400", "status": "failed", "error": "Expected 400, got 500" }
+  ]
+}
+```
+
+## SDK
+
+```ts
+import { apiqa } from 'api.qa'
+
+// Run tests
+const results = await apiqa.run('./tests/', {
+  baseUrl: 'https://api.example.com'
+})
+
+// Generate tests from OpenAPI
+const tests = await apiqa.generate({
+  openapi: 'https://api.example.com/openapi.json'
+})
+```
+
+## CLI
+
+```bash
+# Run tests
+npx api.qa run ./tests --base-url https://api.example.com
+
+# Generate tests
+npx api.qa generate https://api.example.com/openapi.json -o ./tests
+```

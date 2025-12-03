@@ -1,0 +1,240 @@
+---
+$type: APIReference
+title: API Reference
+description: example.com.ai API
+---
+
+# API Reference
+
+A working example API for testing and documentation.
+
+## Users
+
+### List Users
+
+```bash
+GET https://api.example.com.ai/users
+Authorization: Bearer sk_test_example123
+```
+
+```json
+{
+  "data": [
+    {
+      "id": "user_alice123",
+      "email": "alice@example.com.ai",
+      "name": "Alice Example",
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user_bob456",
+      "email": "bob@example.com.ai",
+      "name": "Bob Example",
+      "createdAt": "2024-01-02T00:00:00Z"
+    }
+  ],
+  "hasMore": true,
+  "total": 100
+}
+```
+
+### Get User
+
+```bash
+GET https://api.example.com.ai/users/user_alice123
+Authorization: Bearer sk_test_example123
+```
+
+```json
+{
+  "id": "user_alice123",
+  "email": "alice@example.com.ai",
+  "name": "Alice Example",
+  "avatar": "https://cdn.example.com.ai/avatars/alice.png",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "metadata": {}
+}
+```
+
+### Create User
+
+```bash
+POST https://api.example.com.ai/users
+Authorization: Bearer sk_test_example123
+Content-Type: application/json
+
+{
+  "email": "charlie@example.com.ai",
+  "name": "Charlie Example"
+}
+```
+
+```json
+{
+  "id": "user_charlie789",
+  "email": "charlie@example.com.ai",
+  "name": "Charlie Example",
+  "createdAt": "2024-01-15T10:00:00Z"
+}
+```
+
+## Products
+
+### List Products
+
+```bash
+GET https://api.example.com.ai/products
+```
+
+```json
+{
+  "data": [
+    {
+      "id": "prod_widget123",
+      "name": "Example Widget",
+      "price": 999,
+      "currency": "usd",
+      "description": "A high-quality example widget"
+    },
+    {
+      "id": "prod_gadget456",
+      "name": "Sample Gadget",
+      "price": 1999,
+      "currency": "usd",
+      "description": "An excellent sample gadget"
+    }
+  ]
+}
+```
+
+### Get Product
+
+```bash
+GET https://api.example.com.ai/products/prod_widget123
+```
+
+```json
+{
+  "id": "prod_widget123",
+  "name": "Example Widget",
+  "price": 999,
+  "currency": "usd",
+  "description": "A high-quality example widget",
+  "images": [
+    "https://cdn.example.com.ai/products/widget-1.png",
+    "https://cdn.example.com.ai/products/widget-2.png"
+  ],
+  "metadata": {
+    "category": "tech",
+    "sku": "WDG-001"
+  }
+}
+```
+
+## Orders
+
+### Create Order
+
+```bash
+POST https://api.example.com.ai/orders
+Authorization: Bearer sk_test_example123
+Content-Type: application/json
+
+{
+  "user": "user_alice123",
+  "items": [
+    { "product": "prod_widget123", "quantity": 2 }
+  ]
+}
+```
+
+```json
+{
+  "id": "order_abc123",
+  "user": "user_alice123",
+  "items": [
+    { "product": "prod_widget123", "quantity": 2, "price": 999 }
+  ],
+  "total": 1998,
+  "currency": "usd",
+  "status": "pending",
+  "createdAt": "2024-01-15T10:00:00Z"
+}
+```
+
+## Webhooks
+
+### Test Webhook
+
+```bash
+POST https://webhooks.example.com.ai/test
+Content-Type: application/json
+
+{
+  "url": "https://your-site.com/webhook",
+  "event": "user.created"
+}
+```
+
+```json
+{
+  "id": "evt_test123",
+  "type": "user.created",
+  "data": {
+    "id": "user_test789",
+    "email": "test@example.com.ai",
+    "name": "Test User"
+  },
+  "delivered": true,
+  "response": { "status": 200 }
+}
+```
+
+## Authentication
+
+All authenticated endpoints accept:
+
+```
+Authorization: Bearer sk_test_example123
+```
+
+Test API keys start with `sk_test_`, live keys with `sk_live_`.
+
+## SDK
+
+```ts
+import { example } from 'example.com.ai'
+
+// Configure
+const client = example({ apiKey: 'sk_test_example123' })
+
+// Users
+const users = await client.users.list()
+const user = await client.users.get('user_alice123')
+const newUser = await client.users.create({ email: 'new@example.com.ai' })
+
+// Products
+const products = await client.products.list()
+
+// Orders
+const order = await client.orders.create({
+  user: 'user_alice123',
+  items: [{ product: 'prod_widget123', quantity: 1 }]
+})
+```
+
+## CLI
+
+```bash
+# List users
+npx example.com.ai users list
+
+# Get user
+npx example.com.ai users get user_alice123
+
+# List products
+npx example.com.ai products list
+
+# Create order
+npx example.com.ai orders create --user user_alice123 --product prod_widget123
+```
