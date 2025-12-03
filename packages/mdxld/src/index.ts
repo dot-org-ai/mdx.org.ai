@@ -11,6 +11,11 @@
  * - @mdxld/evaluate: MDX execution and rendering
  * - @mdxld/validate: Schema validation
  *
+ * Optional primitives integration:
+ * - mdxld/functions: AI functions, RPC, generation (requires ai-functions)
+ * - mdxld/database: Schema-first DB with bi-directional relationships (requires ai-database)
+ * - mdxld/workflows: Event-driven workflows with $ context (requires ai-workflows)
+ *
  * @packageDocumentation
  */
 

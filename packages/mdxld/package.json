@@ -16,6 +16,21 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/types.js",
       "require": "./dist/types.cjs"
+    },
+    "./functions": {
+      "types": "./dist/functions.d.ts",
+      "import": "./dist/functions.js",
+      "require": "./dist/functions.cjs"
+    },
+    "./database": {
+      "types": "./dist/database.d.ts",
+      "import": "./dist/database.js",
+      "require": "./dist/database.cjs"
+    },
+    "./workflows": {
+      "types": "./dist/workflows.d.ts",
+      "import": "./dist/workflows.js",
+      "require": "./dist/workflows.cjs"
     }
   },
   "files": [
@@ -43,7 +58,26 @@
   "dependencies": {
     "arktype": "^2.0.0"
   },
+  "peerDependencies": {
+    "ai-functions": "workspace:*",
+    "ai-database": "workspace:*",
+    "ai-workflows": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "ai-functions": {
+      "optional": true
+    },
+    "ai-database": {
+      "optional": true
+    },
+    "ai-workflows": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "ai-functions": "workspace:*",
+    "ai-database": "workspace:*",
+    "ai-workflows": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

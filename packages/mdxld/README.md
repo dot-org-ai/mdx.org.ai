@@ -212,6 +212,119 @@ interface StringifyOptions {
 }
 ```
 
+## Primitives Integration
+
+mdxld provides optional re-exports of AI primitives packages for convenient access:
+
+### AI Functions
+
+```typescript
+import { RPC, AI, generateText, generateObject } from 'mdxld/functions'
+
+// Use RPC primitives with capnweb promise pipelining
+const rpc = RPC({
+  functions: {
+    hello: () => 'world',
+    greet: (name: string) => `Hello, ${name}!`,
+  },
+})
+
+// Use AI function constructors
+const summarize = AI('Generate a summary', {
+  input: schema({ text: 'string' }),
+  output: schema({ summary: 'string' }),
+})
+
+// Use generation utilities
+const result = await generateText({
+  model: 'claude-3-5-sonnet-20241022',
+  prompt: 'Write a haiku about MDX',
+})
+```
+
+**Installation:** `pnpm add ai-functions` (optional peer dependency)
+
+### AI Database
+
+```typescript
+import { DB } from 'mdxld/database'
+
+// Schema-first database with automatic bi-directional relationships
+const db = DB({
+  Post: {
+    title: 'string',
+    content: 'markdown',
+    author: 'Author.posts', // Creates Post.author -> Author AND Author.posts -> Post[]
+  },
+  Author: {
+    name: 'string',
+    email: 'string',
+    // posts: Post[] auto-created from backref
+  },
+})
+
+// Typed, provider-agnostic access
+const post = await db.Post.get('hello-world')
+const author = await post.author // Resolved Author
+const posts = await db.Author.get('john').posts // Post[]
+```
+
+**Installation:** `pnpm add ai-database` (optional peer dependency)
+
+Provider resolved from `DATABASE_URL`:
+- `./content` - Filesystem
+- `sqlite://./content` - SQLite
+- `libsql://your-db.turso.io` - Turso
+- `chdb://./content` - ClickHouse (local)
+
+### AI Workflows
+
+```typescript
+import { Workflow, on, every } from 'mdxld/workflows'
+
+// Create a workflow with $ context
+const workflow = Workflow($ => {
+  // Register event handlers
+  $.on.Customer.created(async (customer, $) => {
+    $.log('New customer:', customer.name)
+    await $.send('Email.welcome', { to: customer.email })
+  })
+
+  $.on.Order.completed(async (order, $) => {
+    $.log('Order completed:', order.id)
+  })
+
+  // Register scheduled tasks
+  $.every.hour(async ($) => {
+    $.log('Hourly check')
+  })
+
+  $.every.Monday.at9am(async ($) => {
+    $.log('Weekly standup reminder')
+  })
+
+  $.every.minutes(30)(async ($) => {
+    $.log('Every 30 minutes')
+  })
+
+  // Natural language scheduling
+  $.every('first Monday of the month', async ($) => {
+    $.log('Monthly report')
+  })
+})
+
+// Start the workflow
+await workflow.start()
+
+// Emit events
+await workflow.send('Customer.created', {
+  name: 'John',
+  email: 'john@example.com',
+})
+```
+
+**Installation:** `pnpm add ai-workflows` (optional peer dependency)
+
 ## Related Packages
 
 For additional functionality, use these companion packages:
@@ -222,6 +335,14 @@ For additional functionality, use these companion packages:
 | [@mdxld/compile](https://www.npmjs.com/package/@mdxld/compile) | JSX compilation with esbuild |
 | [@mdxld/evaluate](https://www.npmjs.com/package/@mdxld/evaluate) | MDX execution and rendering |
 | [@mdxld/validate](https://www.npmjs.com/package/@mdxld/validate) | Schema validation |
+
+### AI Primitives (Optional Peer Dependencies)
+
+| Package | Description | Import |
+|---------|-------------|--------|
+| [ai-functions](https://npmjs.com/package/ai-functions) | RPC, AI functions, generation | `mdxld/functions` |
+| [ai-database](https://npmjs.com/package/ai-database) | Schema-first DB with bi-directional relationships | `mdxld/database` |
+| [ai-workflows](https://npmjs.com/package/ai-workflows) | Event-driven workflows with $ context | `mdxld/workflows` |
 
 ## Examples
 
