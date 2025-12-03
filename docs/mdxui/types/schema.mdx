@@ -1,0 +1,345 @@
+---
+title: Schema Format
+description: Component type definition syntax and structure
+---
+
+# Schema Format
+
+Component types use a structured MDX format with frontmatter sections for metadata, props, parts, and CSS variables.
+
+## File Structure
+
+```mdx
+---
+# Metadata
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/ComponentName
+name: ComponentName
+category: layout | landing | content | app | media | thing | component
+description: Brief description of the component
+semanticElement: header | section | article | div | ...
+outputs: [html, markdown, json, svg, png]
+related: [RelatedComponent1, RelatedComponent2]
+
+# Props
+propName: type
+optionalProp: type?
+propWithDefault: type = defaultValue
+
+# Parts
+partName: htmlElement
+optionalPart: htmlElement?
+
+# CSS Variables
+--component-variable: value
+
+# JSON-LD mapping (for Thing components)
+jsonld:
+  $type: schema:TypeName
+  propName: schema:property
+---
+
+# ComponentName
+
+Markdown documentation with usage examples...
+```
+
+## Metadata Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `$type` | Yes | Always `https://mdx.org.ai/ComponentSpec` |
+| `$id` | Yes | Unique URI identifier |
+| `name` | Yes | Component name (PascalCase) |
+| `category` | Yes | Component category |
+| `description` | Yes | Brief description |
+| `semanticElement` | No | Primary HTML element |
+| `outputs` | No | Supported output formats |
+| `related` | No | Related component names |
+
+## Props Section
+
+Props use **ai-functions schema syntax** - a concise format for defining typed properties.
+
+### Basic Syntax
+
+```yaml
+# Props
+propertyName: type
+```
+
+### Types
+
+| Syntax | TypeScript Equivalent | Example |
+|--------|----------------------|---------|
+| `string` | `string` | `title: string` |
+| `number` | `number` | `columns: number` |
+| `boolean` | `boolean` | `sticky: boolean` |
+| `Type[]` | `Type[]` | `items: Feature[]` |
+| `Type?` | `Type \| undefined` | `subtitle: string?` |
+| `'a' \| 'b'` | `'a' \| 'b'` | `layout: 'grid' \| 'list'` |
+
+### Optional Props
+
+Append `?` to make a prop optional:
+
+```yaml
+# Props
+title: string          # required
+subtitle: string?      # optional
+```
+
+### Default Values
+
+Use `= value` to specify defaults:
+
+```yaml
+# Props
+layout: 'grid' | 'list' = 'grid'
+columns: number = 3
+sticky: boolean = true
+```
+
+### Complex Types
+
+Reference other types by name:
+
+```yaml
+# Props
+author: Person              # single reference
+items: Feature[]            # array of references
+social: SocialLink[]?       # optional array
+primaryAction: Action?      # optional reference
+```
+
+### Union Types
+
+Use `|` for enum-like values:
+
+```yaml
+# Props
+variant: 'default' | 'outline' | 'ghost' | 'elevated' = 'default'
+size: 'sm' | 'md' | 'lg' = 'md'
+columns: 2 | 3 | 4 = 3
+```
+
+## Parts Section
+
+Parts define **semantic CSS slots** - named regions of the component that can be styled.
+
+### Basic Syntax
+
+```yaml
+# Parts
+partName: htmlElement
+optionalPart: htmlElement?
+```
+
+### Examples
+
+```yaml
+# Parts
+root: section              # Root container
+container: div             # Inner container
+header: header?            # Optional header
+header-title: h2           # Nested part
+header-subtitle: p?        # Optional nested part
+content: div               # Main content area
+footer: footer?            # Optional footer
+```
+
+### Naming Conventions
+
+- Use **kebab-case** for multi-word parts: `header-title`, `nav-item`
+- Prefix nested parts with parent: `header-title` (title inside header)
+- Mark optional parts with `?`
+
+### Semantic Elements
+
+Choose elements that convey meaning:
+
+| Element | Use For |
+|---------|---------|
+| `header` | Component header sections |
+| `footer` | Component footer sections |
+| `nav` | Navigation containers |
+| `section` | Thematic groupings |
+| `article` | Self-contained content |
+| `aside` | Sidebar/supplementary content |
+| `main` | Primary content |
+| `div` | Generic containers |
+| `h1-h6` | Headings |
+| `p` | Paragraphs |
+| `a` | Links |
+| `button` | Interactive buttons |
+| `img` | Images |
+| `form` | Forms |
+| `input` | Form inputs |
+
+## CSS Variables Section
+
+CSS variables define **theming customization points**.
+
+### Basic Syntax
+
+```yaml
+# CSS Variables
+--component-property: value
+```
+
+### Examples
+
+```yaml
+# CSS Variables
+--hero-padding: 4rem
+--hero-max-width: 1200px
+--hero-title-size: 3rem
+--hero-bg: var(--color-background)
+--hero-text: var(--color-foreground)
+```
+
+### Naming Conventions
+
+- Prefix with component name: `--hero-`, `--card-`, `--nav-`
+- Use descriptive suffixes: `-padding`, `-margin`, `-size`, `-color`, `-bg`
+- Reference design tokens: `var(--color-primary)`
+
+### Common Patterns
+
+```yaml
+# Spacing
+--component-padding: 1.5rem
+--component-gap: 1rem
+--component-margin: 2rem
+
+# Sizing
+--component-max-width: 1200px
+--component-min-height: 400px
+
+# Typography
+--component-title-size: 2rem
+--component-text-size: 1rem
+--component-line-height: 1.5
+
+# Colors
+--component-bg: var(--color-surface)
+--component-text: var(--color-text)
+--component-border: var(--color-border)
+
+# Effects
+--component-radius: 0.5rem
+--component-shadow: 0 2px 4px rgba(0,0,0,0.1)
+```
+
+## JSON-LD Mapping
+
+For **Thing components** (Person, Product, Organization, Article), map props to Schema.org:
+
+```yaml
+# JSON-LD mapping
+jsonld:
+  $type: schema:Person
+  name: schema:name
+  email: schema:email
+  url: schema:url
+  avatar: schema:image
+  role: schema:jobTitle
+  bio: schema:description
+```
+
+This enables automatic generation of structured data for SEO.
+
+## Documentation Content
+
+After the frontmatter, include markdown documentation:
+
+```markdown
+# ComponentName
+
+Brief description of the component and its purpose.
+
+## Structure
+
+ASCII diagram showing component layout:
+
+```
+┌─────────────────────────────────────┐
+│ root                                │
+│ ┌─────────────────────────────────┐ │
+│ │ header                          │ │
+│ │ title                           │ │
+│ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │
+│ │ content                         │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<ComponentName
+  prop="value"
+  anotherProp={data}
+/>
+```
+
+## Variants
+
+Document layout/style variants...
+```
+
+## Complete Example
+
+```mdx
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Card
+name: Card
+category: component
+description: Versatile card for content display
+semanticElement: article
+outputs: [html, markdown, json, svg, png]
+related: [Article, Product, Person]
+
+# Props
+title: string?
+description: string?
+image: Media?
+href: string?
+variant: 'default' | 'outline' | 'elevated' = 'default'
+size: 'sm' | 'md' | 'lg' = 'md'
+children: ReactNode?
+
+# Parts
+root: article
+image-container: div?
+image: img
+content: div
+title: h3?
+description: p?
+footer: div?
+
+# CSS Variables
+--card-padding: 1.5rem
+--card-radius: 0.75rem
+--card-bg: var(--color-surface)
+--card-border: var(--color-border)
+--card-shadow: 0 1px 3px rgba(0,0,0,0.1)
+---
+
+# Card
+
+Versatile card component for displaying content.
+
+## Usage
+
+```mdx
+<Card
+  title="Getting Started"
+  description="Learn the basics"
+  image={{ src: '/guide.jpg', alt: 'Guide' }}
+  href="/docs/getting-started"
+/>
+```
+```

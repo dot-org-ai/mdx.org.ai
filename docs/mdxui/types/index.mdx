@@ -1,0 +1,119 @@
+---
+title: Component Types
+description: Semantic component type definitions for MDX
+---
+
+# Component Types
+
+mdxui provides a comprehensive system of **component type definitions** that describe the semantic structure, props, styling hooks, and output formats for UI components.
+
+## Overview
+
+Component types are defined in MDX files with structured frontmatter that specifies:
+
+- **Props** - Input properties using ai-functions schema syntax
+- **Parts** - Semantic CSS slots for styling
+- **CSS Variables** - Theming customization points
+- **JSON-LD Mapping** - Schema.org mappings for Thing components
+
+```mdx
+---
+$type: https://mdx.org.ai/ComponentSpec
+$id: https://mdx.org.ai/types/Hero
+name: Hero
+category: landing
+description: Hero section with headline and CTAs
+
+# Props
+title: string
+subtitle: string?
+layout: 'centered' | 'split' = 'centered'
+
+# Parts
+root: header
+content: div
+title: h1
+
+# CSS Variables
+--hero-padding: 4rem
+---
+```
+
+## Categories
+
+Components are organized into categories:
+
+| Category | Components | Purpose |
+|----------|------------|---------|
+| **layout** | App, Site, Page, Section, Layout, Header, Footer, Sidebar | Page structure and navigation |
+| **landing** | Hero, Features, Pricing, CTA, LandingPage, Testimonials, Stats, FAQ | Marketing pages |
+| **content** | Docs, Blog, BlogPost, Directory, API, Article | Content presentation |
+| **app** | Dashboard, Marketplace, DeveloperDashboard, View, ListView, DetailView, FormView | Application interfaces |
+| **media** | Slides, Video, Screenshot, Image | Media content |
+| **thing** | Person, Product, Article, Organization | Schema.org entities |
+| **component** | Card, Nav, Modal, Table, Team | Reusable UI components |
+
+## Usage
+
+### Loading Types
+
+```typescript
+import { loadComponentTypes, getComponentType } from 'mdxui'
+
+// Load all component types
+const types = loadComponentTypes('./types')
+
+// Get specific type
+const hero = getComponentType('./types', 'Hero')
+console.log(hero.props)  // PropDef[]
+console.log(hero.parts)  // PartDef[]
+```
+
+### Filtering by Category
+
+```typescript
+import { loadComponentTypes, getTypesByCategory } from 'mdxui'
+
+const types = loadComponentTypes('./types')
+const landingComponents = getTypesByCategory(types, 'landing')
+// [Hero, Features, Pricing, CTA, LandingPage, ...]
+```
+
+### Generating TypeScript
+
+```typescript
+import { getComponentType, generateTypeScriptInterface } from 'mdxui'
+
+const hero = getComponentType('./types', 'Hero')
+const tsInterface = generateTypeScriptInterface(hero)
+// export interface HeroProps { title: string; subtitle?: string; ... }
+```
+
+## Output Formats
+
+Component types can render to multiple formats:
+
+- **html** - Standard HTML output
+- **markdown** - Markdown representation
+- **json** - Structured JSON data
+- **svg** - Vector graphics (for screenshots/diagrams)
+- **png** - Raster images
+
+```yaml
+outputs: [html, markdown, json, svg, png]
+```
+
+## Relationship to buildercss
+
+Component types complement [buildercss](/packages/buildercss) document templates:
+
+- **buildercss** provides page-level templates (Website, Blog, Docs, App)
+- **Component types** provide granular component definitions within pages
+
+The CSS parts and variables defined in component types align with buildercss's semantic CSS approach.
+
+## Next Steps
+
+- [Schema Format](/docs/mdxui/types/schema) - Detailed syntax reference
+- [Type Loader API](/docs/mdxui/types/loader) - Programmatic access
+- [Component Reference](/docs/mdxui/types/components) - All available components

@@ -1,0 +1,487 @@
+---
+title: Component Reference
+description: All available component types organized by category
+---
+
+# Component Reference
+
+Complete reference of all component types organized by category.
+
+## Layout Components
+
+Structural components for page organization and navigation.
+
+### App
+
+Root application wrapper with theme and routing support.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `name` | `string?` | - | Application name |
+| `theme` | `'light' \| 'dark' \| 'system'` | `'system'` | Theme mode |
+| `nav` | `NavItem[]?` | - | Navigation items |
+| `sidebar` | `boolean` | `true` | Show sidebar |
+
+### Site
+
+Website wrapper with header, navigation, and footer.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `siteName` | `string` | - | Site name |
+| `logo` | `Media?` | - | Site logo |
+| `nav` | `NavItem[]` | - | Navigation items |
+| `footerNav` | `NavItem[]?` | - | Footer navigation |
+| `theme` | `'light' \| 'dark' \| 'system'` | `'system'` | Theme mode |
+
+### Page
+
+Generic page wrapper with SEO and layout options.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | - | Page title |
+| `description` | `string?` | - | Page description |
+| `layout` | `'default' \| 'wide' \| 'narrow' \| 'full'` | `'default'` | Layout variant |
+| `seo` | `SEO?` | - | SEO metadata |
+
+### Section
+
+Content section with optional heading and background.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `id` | `string?` | - | Section ID for anchoring |
+| `title` | `string?` | - | Section title |
+| `subtitle` | `string?` | - | Section subtitle |
+| `background` | `'default' \| 'muted' \| 'accent' \| 'dark'` | `'default'` | Background variant |
+| `padding` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'lg'` | Padding size |
+
+### Header
+
+Site header with logo, navigation, and actions.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `logo` | `Media?` | - | Logo image |
+| `nav` | `NavItem[]?` | - | Navigation items |
+| `actions` | `Action[]?` | - | Action buttons |
+| `sticky` | `boolean` | `true` | Sticky header |
+| `variant` | `'default' \| 'centered' \| 'split' \| 'minimal'` | `'default'` | Layout variant |
+
+### Footer
+
+Site footer with columns, social links, and newsletter.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `logo` | `Media?` | - | Footer logo |
+| `columns` | `FooterColumn[]?` | - | Navigation columns |
+| `social` | `SocialLink[]?` | - | Social media links |
+| `newsletter` | `NewsletterProps?` | - | Newsletter signup |
+| `copyright` | `string?` | - | Copyright text |
+
+### Sidebar
+
+Collapsible sidebar navigation.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `nav` | `NavItem[]` | - | Navigation items |
+| `collapsed` | `boolean` | `false` | Collapsed state |
+| `collapsible` | `boolean` | `true` | Allow collapsing |
+| `width` | `number` | `280` | Sidebar width |
+
+---
+
+## Landing Components
+
+Marketing page sections for product and company websites.
+
+### Hero
+
+Hero section with headline, subtitle, and CTAs.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | - | Main headline |
+| `subtitle` | `string?` | - | Supporting text |
+| `primaryAction` | `Action?` | - | Primary CTA button |
+| `secondaryAction` | `Action?` | - | Secondary CTA |
+| `media` | `Media?` | - | Hero image/video |
+| `layout` | `'centered' \| 'split' \| 'stacked'` | `'split'` | Layout variant |
+| `background` | `'default' \| 'gradient' \| 'image' \| 'video'` | `'default'` | Background type |
+
+### Features
+
+Feature showcase section with grid layout.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Section title |
+| `subtitle` | `string?` | - | Section subtitle |
+| `items` | `Feature[]` | - | Feature items |
+| `layout` | `'grid' \| 'list' \| 'alternating' \| 'cards'` | `'grid'` | Layout variant |
+| `columns` | `2 \| 3 \| 4` | `3` | Grid columns |
+
+### Pricing
+
+Pricing table with tier comparison.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Section title |
+| `tiers` | `PricingTier[]` | - | Pricing tiers |
+| `billingPeriod` | `'monthly' \| 'yearly'` | `'monthly'` | Default period |
+| `showToggle` | `boolean` | `true` | Show billing toggle |
+
+### Testimonials
+
+Customer testimonials and social proof.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Section title |
+| `items` | `Testimonial[]` | - | Testimonial items |
+| `layout` | `'grid' \| 'carousel' \| 'masonry'` | `'grid'` | Layout variant |
+| `showRating` | `boolean` | `true` | Show star ratings |
+
+### Stats
+
+Statistics display with animated counters.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Section title |
+| `items` | `Stat[]` | - | Stat items |
+| `layout` | `'row' \| 'grid' \| 'cards'` | `'row'` | Layout variant |
+| `animated` | `boolean` | `true` | Animate counting |
+
+### CTA
+
+Call-to-action section.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | - | Headline |
+| `description` | `string?` | - | Supporting text |
+| `primaryAction` | `Action?` | - | Primary button |
+| `secondaryAction` | `Action?` | - | Secondary button |
+| `background` | `'default' \| 'accent' \| 'gradient'` | `'accent'` | Background |
+
+### FAQ
+
+Frequently asked questions accordion.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Section title |
+| `items` | `FAQItem[]` | - | FAQ items |
+| `layout` | `'accordion' \| 'grid' \| 'two-column'` | `'accordion'` | Layout variant |
+| `allowMultiple` | `boolean` | `false` | Allow multiple open |
+
+### LandingPage
+
+Complete landing page with all sections.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `hero` | `HeroProps` | - | Hero section |
+| `features` | `FeaturesProps?` | - | Features section |
+| `testimonials` | `TestimonialsProps?` | - | Testimonials |
+| `pricing` | `PricingProps?` | - | Pricing section |
+| `faq` | `FAQProps?` | - | FAQ section |
+| `cta` | `CTAProps?` | - | CTA section |
+
+---
+
+## Content Components
+
+Documentation and content presentation components.
+
+### Docs
+
+Documentation layout with sidebar navigation.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Page title |
+| `nav` | `NavItem[]` | - | Sidebar navigation |
+| `toc` | `TOCItem[]?` | - | Table of contents |
+| `prev` | `NavLink?` | - | Previous page |
+| `next` | `NavLink?` | - | Next page |
+| `editUrl` | `string?` | - | Edit on GitHub URL |
+
+### Blog
+
+Blog listing page.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Blog title |
+| `posts` | `Article[]` | - | Blog posts |
+| `layout` | `'grid' \| 'list' \| 'featured'` | `'grid'` | Layout variant |
+| `pagination` | `Pagination?` | - | Pagination config |
+
+### BlogPost
+
+Full blog post page.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | - | Post title |
+| `content` | `MDXContent` | - | Post content |
+| `author` | `Person` | - | Author info |
+| `date` | `string` | - | Publish date |
+| `toc` | `boolean` | `true` | Show table of contents |
+| `share` | `boolean` | `true` | Show share buttons |
+| `related` | `Article[]?` | - | Related posts |
+
+### Directory
+
+Directory/listing page.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | - | Directory title |
+| `items` | `DirectoryItem[]` | - | Directory items |
+| `layout` | `'grid' \| 'list' \| 'table'` | `'grid'` | Layout variant |
+| `filters` | `Filter[]?` | - | Filter options |
+| `searchable` | `boolean` | `true` | Enable search |
+
+### API
+
+API documentation page.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | - | API title |
+| `baseUrl` | `string?` | - | Base URL |
+| `version` | `string?` | - | API version |
+| `endpoints` | `APIEndpoint[]` | - | API endpoints |
+| `auth` | `AuthConfig?` | - | Authentication info |
+
+---
+
+## App Components
+
+Application interface components.
+
+### Dashboard
+
+Dashboard layout with metrics and widgets.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | - | Dashboard title |
+| `stats` | `Stat[]?` | - | Key metrics |
+| `widgets` | `Widget[]?` | - | Dashboard widgets |
+| `nav` | `NavItem[]?` | - | Navigation |
+| `layout` | `'default' \| 'compact' \| 'wide'` | `'default'` | Layout |
+
+### ListView
+
+List view for data display.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | View title |
+| `items` | `any[]` | - | Data items |
+| `columns` | `Column[]` | - | Column definitions |
+| `selectable` | `boolean` | `false` | Enable selection |
+| `pagination` | `Pagination?` | - | Pagination |
+
+### DetailView
+
+Detail view for single item display.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | - | Item title |
+| `data` | `Record<string, any>` | - | Item data |
+| `sections` | `DetailSection[]?` | - | Content sections |
+| `actions` | `Action[]?` | - | Action buttons |
+
+### FormView
+
+Form view for data entry.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Form title |
+| `fields` | `FormField[]` | - | Form fields |
+| `submitLabel` | `string` | `'Submit'` | Submit button text |
+| `onSubmit` | `(data) => void` | - | Submit handler |
+
+---
+
+## Media Components
+
+Media content components.
+
+### Slides
+
+Presentation/slideshow component.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Presentation title |
+| `slides` | `Slide[]` | - | Slide content |
+| `aspectRatio` | `'16:9' \| '4:3' \| '1:1'` | `'16:9'` | Slide ratio |
+| `showControls` | `boolean` | `true` | Show navigation |
+
+### Video
+
+Video player component.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `src` | `string` | - | Video source URL |
+| `poster` | `string?` | - | Poster image |
+| `autoPlay` | `boolean` | `false` | Auto-play |
+| `controls` | `boolean` | `true` | Show controls |
+| `aspectRatio` | `'16:9' \| '4:3' \| '21:9'` | `'16:9'` | Aspect ratio |
+
+### Screenshot
+
+Screenshot/image with device frame.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `src` | `string` | - | Image source |
+| `alt` | `string` | - | Alt text |
+| `device` | `'browser' \| 'phone' \| 'tablet' \| 'none'` | `'browser'` | Device frame |
+| `caption` | `string?` | - | Image caption |
+
+### Image
+
+Responsive image component.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `src` | `string` | - | Image source |
+| `alt` | `string` | - | Alt text |
+| `width` | `number?` | - | Image width |
+| `height` | `number?` | - | Image height |
+| `caption` | `string?` | - | Image caption |
+| `loading` | `'lazy' \| 'eager'` | `'lazy'` | Loading strategy |
+
+---
+
+## Thing Components
+
+Schema.org entity components with JSON-LD support.
+
+### Person
+
+Person/author card.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `name` | `string` | - | Person name |
+| `role` | `string?` | - | Job title/role |
+| `avatar` | `Media?` | - | Profile image |
+| `bio` | `string?` | - | Biography |
+| `email` | `string?` | - | Email address |
+| `social` | `SocialLink[]?` | - | Social links |
+
+### Product
+
+Product card with pricing.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `name` | `string` | - | Product name |
+| `description` | `string?` | - | Description |
+| `price` | `string` | - | Price |
+| `image` | `Media?` | - | Product image |
+| `rating` | `number?` | - | Rating (1-5) |
+| `inStock` | `boolean` | `true` | Availability |
+
+### Organization
+
+Company/organization card.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `name` | `string` | - | Organization name |
+| `logo` | `Media?` | - | Logo |
+| `description` | `string?` | - | Description |
+| `url` | `string?` | - | Website URL |
+| `industry` | `string?` | - | Industry |
+| `employees` | `string?` | - | Employee count |
+
+### Article
+
+Article/blog post card.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | - | Article title |
+| `excerpt` | `string?` | - | Summary |
+| `image` | `Media?` | - | Featured image |
+| `author` | `Person?` | - | Author |
+| `date` | `string` | - | Publish date |
+| `url` | `string?` | - | Article URL |
+
+---
+
+## UI Components
+
+Reusable interface components.
+
+### Card
+
+Versatile content card.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Card title |
+| `description` | `string?` | - | Description |
+| `image` | `Media?` | - | Card image |
+| `href` | `string?` | - | Link URL |
+| `variant` | `'default' \| 'outline' \| 'elevated'` | `'default'` | Style variant |
+
+### Nav
+
+Navigation component.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `items` | `NavItem[]` | - | Navigation items |
+| `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout |
+| `variant` | `'default' \| 'pills' \| 'underline'` | `'default'` | Style variant |
+
+### Modal
+
+Modal dialog.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `open` | `boolean` | `false` | Open state |
+| `title` | `string?` | - | Modal title |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` | Modal size |
+| `onClose` | `() => void` | - | Close handler |
+
+### Table
+
+Data table with sorting and filtering.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `columns` | `Column[]` | - | Column definitions |
+| `data` | `any[]` | - | Table data |
+| `sortable` | `boolean` | `true` | Enable sorting |
+| `selectable` | `boolean` | `false` | Enable selection |
+| `pagination` | `boolean` | `true` | Enable pagination |
+
+### Team
+
+Team section displaying members.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string?` | - | Section title |
+| `members` | `Person[]` | - | Team members |
+| `layout` | `'grid' \| 'list' \| 'featured'` | `'grid'` | Layout variant |
+| `columns` | `2 \| 3 \| 4 \| 5` | `4` | Grid columns |

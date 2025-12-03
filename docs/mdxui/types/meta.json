@@ -1,0 +1,5 @@
+{
+  "title": "Component Types",
+  "defaultOpen": true,
+  "pages": ["index", "schema", "loader", "components"]
+}

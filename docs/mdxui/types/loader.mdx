@@ -1,0 +1,458 @@
+---
+title: Type Loader API
+description: Programmatic access to component type definitions
+---
+
+# Type Loader API
+
+The type loader provides utilities for loading, parsing, and working with component type definitions from MDX files.
+
+## Installation
+
+```bash
+npm install mdxui
+```
+
+## Importing
+
+```typescript
+import {
+  // Loading functions
+  loadComponentTypes,
+  getComponentType,
+
+  // Filtering functions
+  getTypesByCategory,
+  getTypeCategories,
+
+  // Parsing functions
+  parseComponentType,
+  parseFrontmatter,
+  parsePropDef,
+  parsePartDef,
+  parseCSSVariableDef,
+
+  // Code generation
+  generateTypeScriptInterface,
+
+  // Types
+  type ComponentType,
+  type PropDef,
+  type PartDef,
+  type CSSVariableDef,
+  type JSONLDMapping,
+} from 'mdxui'
+```
+
+## Types
+
+### ComponentType
+
+The parsed representation of a component type definition.
+
+```typescript
+interface ComponentType {
+  /** Component name */
+  name: string
+  /** Schema type URI */
+  $type: string
+  /** Schema ID URI */
+  $id: string
+  /** Component category */
+  category: string
+  /** Description */
+  description: string
+  /** Semantic HTML element */
+  semanticElement?: string
+  /** Output formats supported */
+  outputs: string[]
+  /** Related component names */
+  related: string[]
+  /** Prop definitions */
+  props: PropDef[]
+  /** CSS part definitions */
+  parts: PartDef[]
+  /** CSS variable definitions */
+  cssVariables: CSSVariableDef[]
+  /** JSON-LD mapping (for Thing components) */
+  jsonld?: JSONLDMapping
+  /** Raw frontmatter */
+  frontmatter: Record<string, unknown>
+  /** Markdown content (after frontmatter) */
+  content: string
+}
+```
+
+### PropDef
+
+A parsed property definition.
+
+```typescript
+interface PropDef {
+  /** Property name */
+  name: string
+  /** Type expression (e.g., 'string', 'Media?', "'grid' | 'list'") */
+  type: string
+  /** Whether the prop is required */
+  required: boolean
+  /** Default value if specified */
+  default?: string
+  /** Whether this is an array type */
+  isArray: boolean
+  /** Base type without modifiers */
+  baseType: string
+}
+```
+
+### PartDef
+
+A parsed CSS part definition.
+
+```typescript
+interface PartDef {
+  /** Part name (CSS class/selector) */
+  name: string
+  /** Semantic HTML element */
+  element: string
+  /** Whether this part is optional */
+  optional: boolean
+}
+```
+
+### CSSVariableDef
+
+A parsed CSS variable definition.
+
+```typescript
+interface CSSVariableDef {
+  /** Variable name (e.g., '--hero-padding') */
+  name: string
+  /** Default value */
+  value: string
+}
+```
+
+### JSONLDMapping
+
+Schema.org mapping for Thing components.
+
+```typescript
+interface JSONLDMapping {
+  /** Schema.org type (e.g., 'schema:Article') */
+  $type?: string
+  /** Field mappings (prop name -> schema.org property) */
+  [key: string]: string | undefined
+}
+```
+
+## Loading Functions
+
+### loadComponentTypes
+
+Load all component types from a directory.
+
+```typescript
+function loadComponentTypes(typesDir: string): ComponentType[]
+```
+
+**Example:**
+
+```typescript
+import { loadComponentTypes } from 'mdxui'
+
+const types = loadComponentTypes('./types')
+console.log(`Loaded ${types.length} component types`)
+
+for (const type of types) {
+  console.log(`${type.name}: ${type.description}`)
+}
+```
+
+### getComponentType
+
+Get a single component type by name.
+
+```typescript
+function getComponentType(typesDir: string, name: string): ComponentType | undefined
+```
+
+**Example:**
+
+```typescript
+import { getComponentType } from 'mdxui'
+
+const hero = getComponentType('./types', 'Hero')
+if (hero) {
+  console.log(hero.name)        // 'Hero'
+  console.log(hero.category)    // 'landing'
+  console.log(hero.props)       // PropDef[]
+}
+```
+
+## Filtering Functions
+
+### getTypesByCategory
+
+Filter types by category.
+
+```typescript
+function getTypesByCategory(types: ComponentType[], category: string): ComponentType[]
+```
+
+**Example:**
+
+```typescript
+import { loadComponentTypes, getTypesByCategory } from 'mdxui'
+
+const types = loadComponentTypes('./types')
+
+const landingTypes = getTypesByCategory(types, 'landing')
+// [Hero, Features, Pricing, CTA, LandingPage, ...]
+
+const layoutTypes = getTypesByCategory(types, 'layout')
+// [App, Site, Page, Section, Layout, Header, Footer, Sidebar]
+```
+
+### getTypeCategories
+
+Get all unique categories from types.
+
+```typescript
+function getTypeCategories(types: ComponentType[]): string[]
+```
+
+**Example:**
+
+```typescript
+import { loadComponentTypes, getTypeCategories } from 'mdxui'
+
+const types = loadComponentTypes('./types')
+const categories = getTypeCategories(types)
+// ['app', 'component', 'content', 'landing', 'layout', 'media', 'thing']
+```
+
+## Parsing Functions
+
+### parseComponentType
+
+Parse MDX content into a ComponentType.
+
+```typescript
+function parseComponentType(content: string, filename?: string): ComponentType
+```
+
+**Example:**
+
+```typescript
+import { parseComponentType } from 'mdxui'
+
+const mdx = `---
+name: MyComponent
+category: component
+description: A custom component
+
+# Props
+title: string
+active: boolean = false
+---
+
+# MyComponent
+
+Documentation here.
+`
+
+const type = parseComponentType(mdx, 'MyComponent.mdx')
+console.log(type.props[0])  // { name: 'title', type: 'string', required: true, ... }
+```
+
+### parseFrontmatter
+
+Parse frontmatter from MDX content.
+
+```typescript
+function parseFrontmatter(content: string): {
+  frontmatter: Record<string, unknown>
+  body: string
+}
+```
+
+**Example:**
+
+```typescript
+import { parseFrontmatter } from 'mdxui'
+
+const { frontmatter, body } = parseFrontmatter(mdxContent)
+console.log(frontmatter.name)  // Component name
+console.log(body)              // Markdown content
+```
+
+### parsePropDef
+
+Parse a single prop definition line.
+
+```typescript
+function parsePropDef(line: string): PropDef | null
+```
+
+**Example:**
+
+```typescript
+import { parsePropDef } from 'mdxui'
+
+parsePropDef('title: string')
+// { name: 'title', type: 'string', required: true, isArray: false, baseType: 'string' }
+
+parsePropDef('items: Feature[]?')
+// { name: 'items', type: 'Feature[]', required: false, isArray: true, baseType: 'Feature' }
+
+parsePropDef("layout: 'grid' | 'list' = 'grid'")
+// { name: 'layout', type: "'grid' | 'list'", required: false, default: "'grid'", ... }
+```
+
+### parsePartDef
+
+Parse a CSS part definition line.
+
+```typescript
+function parsePartDef(line: string): PartDef | null
+```
+
+**Example:**
+
+```typescript
+import { parsePartDef } from 'mdxui'
+
+parsePartDef('root: section')
+// { name: 'root', element: 'section', optional: false }
+
+parsePartDef('sidebar: aside?')
+// { name: 'sidebar', element: 'aside', optional: true }
+```
+
+### parseCSSVariableDef
+
+Parse a CSS variable definition line.
+
+```typescript
+function parseCSSVariableDef(line: string): CSSVariableDef | null
+```
+
+**Example:**
+
+```typescript
+import { parseCSSVariableDef } from 'mdxui'
+
+parseCSSVariableDef('--hero-padding: 4rem')
+// { name: '--hero-padding', value: '4rem' }
+
+parseCSSVariableDef('--card-bg: var(--color-surface)')
+// { name: '--card-bg', value: 'var(--color-surface)' }
+```
+
+## Code Generation
+
+### generateTypeScriptInterface
+
+Generate a TypeScript interface from a component type.
+
+```typescript
+function generateTypeScriptInterface(componentType: ComponentType): string
+```
+
+**Example:**
+
+```typescript
+import { getComponentType, generateTypeScriptInterface } from 'mdxui'
+
+const hero = getComponentType('./types', 'Hero')
+const ts = generateTypeScriptInterface(hero)
+
+console.log(ts)
+// /**
+//  * Hero section with headline, subtitle, CTAs, and optional media
+//  * @semanticElement header
+//  */
+// export interface HeroProps {
+//   /** title */
+//   title: string
+//   /** subtitle */
+//   subtitle?: string
+//   ...
+// }
+```
+
+## Use Cases
+
+### Generate Documentation
+
+```typescript
+import { loadComponentTypes } from 'mdxui'
+import { writeFileSync } from 'fs'
+
+const types = loadComponentTypes('./types')
+
+let docs = '# Component Reference\n\n'
+
+for (const type of types) {
+  docs += `## ${type.name}\n\n`
+  docs += `${type.description}\n\n`
+  docs += `**Category:** ${type.category}\n\n`
+
+  if (type.props.length > 0) {
+    docs += `### Props\n\n`
+    docs += `| Name | Type | Required | Default |\n`
+    docs += `|------|------|----------|---------||\n`
+    for (const prop of type.props) {
+      docs += `| ${prop.name} | \`${prop.type}\` | ${prop.required ? 'Yes' : 'No'} | ${prop.default || '-'} |\n`
+    }
+    docs += '\n'
+  }
+}
+
+writeFileSync('COMPONENTS.md', docs)
+```
+
+### Validate Component Props
+
+```typescript
+import { getComponentType } from 'mdxui'
+
+function validateProps(componentName: string, props: Record<string, unknown>) {
+  const type = getComponentType('./types', componentName)
+  if (!type) throw new Error(`Unknown component: ${componentName}`)
+
+  const errors: string[] = []
+
+  for (const propDef of type.props) {
+    if (propDef.required && !(propDef.name in props)) {
+      errors.push(`Missing required prop: ${propDef.name}`)
+    }
+  }
+
+  return errors
+}
+
+validateProps('Hero', { subtitle: 'Hello' })
+// ['Missing required prop: title']
+```
+
+### Generate CSS Custom Properties
+
+```typescript
+import { loadComponentTypes } from 'mdxui'
+
+const types = loadComponentTypes('./types')
+
+let css = ':root {\n'
+for (const type of types) {
+  if (type.cssVariables.length > 0) {
+    css += `  /* ${type.name} */\n`
+    for (const v of type.cssVariables) {
+      css += `  ${v.name}: ${v.value};\n`
+    }
+  }
+}
+css += '}\n'
+
+console.log(css)
+```
