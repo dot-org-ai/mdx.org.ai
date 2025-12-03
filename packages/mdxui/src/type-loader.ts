@@ -136,7 +136,10 @@ export function parsePropDef(line: string): PropDef | null {
   let baseType = type
   if (baseType.includes('|')) {
     // For union types, extract first type or leave as-is
-    baseType = baseType.split('|')[0].trim().replace(/^'|'$/g, '')
+    const firstPart = baseType.split('|')[0]
+    if (firstPart) {
+      baseType = firstPart.trim().replace(/^'|'$/g, '')
+    }
   }
   baseType = baseType.replace('[]', '').trim()
 
@@ -162,6 +165,7 @@ export function parsePartDef(line: string): PartDef | null {
   if (!match) return null
 
   const [, name, element, optional] = match
+  if (!name || !element) return null
   return {
     name,
     element,
@@ -176,7 +180,7 @@ export function parsePartDef(line: string): PartDef | null {
  */
 export function parseCSSVariableDef(line: string): CSSVariableDef | null {
   const match = line.match(/^(--[\w-]+):\s*(.+)$/)
-  if (!match) return null
+  if (!match || !match[1] || !match[2]) return null
 
   return {
     name: match[1],
@@ -193,7 +197,10 @@ export function parseFrontmatter(content: string): { frontmatter: Record<string,
     return { frontmatter: {}, body: content }
   }
 
-  const [, frontmatterStr, body] = frontmatterMatch
+  const [, frontmatterStr, body = ''] = frontmatterMatch
+  if (!frontmatterStr) {
+    return { frontmatter: {}, body: content }
+  }
   const frontmatter: Record<string, unknown> = {}
   const lines = frontmatterStr.split('\n')
 
@@ -208,7 +215,7 @@ export function parseFrontmatter(content: string): { frontmatter: Record<string,
 
     // Check for section header (# Props, # Parts, # CSS Variables, # JSON-LD mapping)
     const sectionMatch = line.match(/^#\s+(.+)$/)
-    if (sectionMatch) {
+    if (sectionMatch && sectionMatch[1]) {
       // Save previous section
       if (currentSection && currentSectionItems.length > 0) {
         frontmatter[currentSection] = currentSectionItems
@@ -229,7 +236,7 @@ export function parseFrontmatter(content: string): { frontmatter: Record<string,
     // If in JSON-LD section, parse as key-value pairs
     if (currentJsonldSection) {
       const jsonldMatch = line.match(/^\s*(\$?\w+):\s*(.+)$/)
-      if (jsonldMatch) {
+      if (jsonldMatch && jsonldMatch[1] && jsonldMatch[2]) {
         jsonldObj[jsonldMatch[1]] = jsonldMatch[2]
       }
       continue
@@ -240,6 +247,7 @@ export function parseFrontmatter(content: string): { frontmatter: Record<string,
       const kvMatch = line.match(/^(\$?[\w-]+):\s*(.*)$/)
       if (kvMatch) {
         const [, key, value] = kvMatch
+        if (!key || value === undefined) continue
         // Parse array values like [html, markdown, json]
         if (value.startsWith('[') && value.endsWith(']')) {
           frontmatter[key] = value.slice(1, -1).split(',').map((s) => s.trim())
