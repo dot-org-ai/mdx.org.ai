@@ -120,7 +120,7 @@ describe('Database Creation', () => {
     await rm(tempDir, { recursive: true, force: true })
   })
 
-  it('should create SQLite database with in-memory path', () => {
+  it('should create SQLite database with in-memory path', async () => {
     const options: CliOptions = {
       database: 'sqlite',
       path: ':memory:',
@@ -129,14 +129,14 @@ describe('Database Creation', () => {
       help: false,
     }
 
-    const db = createDatabase(options)
+    const db = await createDatabase(options)
     expect(db).toBeDefined()
     expect(typeof db.list).toBe('function')
     expect(typeof db.get).toBe('function')
     expect(typeof db.set).toBe('function')
   })
 
-  it('should create filesystem database', () => {
+  it('should create filesystem database', async () => {
     const options: CliOptions = {
       database: 'fs',
       path: tempDir,
@@ -145,7 +145,7 @@ describe('Database Creation', () => {
       help: false,
     }
 
-    const db = createDatabase(options)
+    const db = await createDatabase(options)
     expect(db).toBeDefined()
     expect(typeof db.list).toBe('function')
   })
