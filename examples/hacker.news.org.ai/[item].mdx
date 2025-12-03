@@ -1,0 +1,78 @@
+---
+$type: Item
+$id: https://hacker.news.org.ai/item/${params.id}
+source:
+  endpoint: item
+  params: { id: params.id }
+  transform: |
+    (data) => ({
+      $type: data.type === 'story' ? 'Story'
+           : data.type === 'comment' ? 'Comment'
+           : data.type === 'job' ? 'Job'
+           : data.type === 'poll' ? 'Poll'
+           : 'Item',
+      $id: `https://hacker.news.org.ai/item/${data.id}`,
+      ...data,
+      url: data.url || `https://news.ycombinator.com/item?id=${data.id}`,
+      hnUrl: `https://news.ycombinator.com/item?id=${data.id}`,
+    })
+layout: item
+---
+
+export async function getStaticProps({ params }) {
+  const hn = sources.get('https://hacker.news.org.ai')
+  const item = await hn.endpoint('item', { id: params.id })
+  return { props: { item } }
+}
+
+export async function getStaticPaths() {
+  const hn = sources.get('https://hacker.news.org.ai')
+  const topIds = await hn.endpoint('topStories')
+  return {
+    paths: topIds.slice(0, 100).map(id => ({ params: { id: String(id) } })),
+    fallback: 'blocking'
+  }
+}
+
+# {item.title || `Item ${item.id}`}
+
+{item.type === 'story' && (
+  <StoryHeader
+    title={item.title}
+    url={item.url}
+    by={item.by}
+    score={item.score}
+    time={item.time}
+    descendants={item.descendants}
+  />
+)}
+
+{item.type === 'job' && (
+  <JobPosting
+    title={item.title}
+    url={item.url}
+    time={item.time}
+  />
+)}
+
+{item.text && (
+  <div className="item-text" dangerouslySetInnerHTML={{ __html: item.text }} />
+)}
+
+{item.type === 'poll' && item.parts && (
+  <PollOptions parts={item.parts} />
+)}
+
+## Comments
+
+{item.kids && (
+  <CommentThread ids={item.kids} />
+)}
+
+---
+
+<ItemMeta item={item} />
+
+<a href={item.hnUrl} target="_blank" rel="noopener">
+  View on Hacker News →
+</a>

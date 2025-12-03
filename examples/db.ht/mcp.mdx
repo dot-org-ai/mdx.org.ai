@@ -1,0 +1,197 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Use db.ht as an MCP server for AI agents
+---
+
+# MCP Server
+
+Give your AI agents direct database access through a simple, safe interface.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "db-ht": {
+      "command": "npx",
+      "args": ["@db.ht/mcp"],
+      "env": {
+        "DATABASE_URL": "your-database-url"
+      }
+    }
+  }
+}
+```
+
+## Tools
+
+### `list`
+
+List items in a collection.
+
+```ts
+{
+  name: "list",
+  description: "List items in a collection",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string", description: "Collection name" },
+      limit: { type: "number", description: "Max items to return" },
+      filter: { type: "object", description: "Filter criteria" }
+    },
+    required: ["collection"]
+  }
+}
+```
+
+### `search`
+
+Search for items.
+
+```ts
+{
+  name: "search",
+  description: "Search for items in a collection",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string" },
+      query: { type: "string", description: "Search query" },
+      filter: { type: "object", description: "Additional filters" }
+    },
+    required: ["collection", "query"]
+  }
+}
+```
+
+### `get`
+
+Get a single item by ID.
+
+```ts
+{
+  name: "get",
+  description: "Get an item by ID",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string" },
+      id: { type: "string", description: "Item ID" }
+    },
+    required: ["collection", "id"]
+  }
+}
+```
+
+### `create`
+
+Create a new item.
+
+```ts
+{
+  name: "create",
+  description: "Create a new item",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string" },
+      data: { type: "object", description: "Item data" }
+    },
+    required: ["collection", "data"]
+  }
+}
+```
+
+### `update`
+
+Update an existing item.
+
+```ts
+{
+  name: "update",
+  description: "Update an item",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string" },
+      id: { type: "string" },
+      data: { type: "object", description: "Updated fields" }
+    },
+    required: ["collection", "id", "data"]
+  }
+}
+```
+
+### `delete`
+
+Delete an item.
+
+```ts
+{
+  name: "delete",
+  description: "Delete an item",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string" },
+      id: { type: "string" }
+    },
+    required: ["collection", "id"]
+  }
+}
+```
+
+## Usage Example
+
+```
+User: Show me all admin users
+
+Agent: I'll search the users collection for admins.
+
+[Uses list tool with filter: { role: "admin" }]
+
+Found 3 admin users:
+1. Alice (u_abc) - alice@example.com
+2. Bob (u_def) - bob@example.com
+3. Charlie (u_ghi) - charlie@example.com
+```
+
+```
+User: Update Alice's email to alice.smith@example.com
+
+Agent: I'll update Alice's record.
+
+[Uses update tool: collection="users", id="u_abc", data={ email: "alice.smith@example.com" }]
+
+Done! Alice's email has been updated.
+```
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "db-ht": {
+      "command": "npx",
+      "args": ["@db.ht/mcp"],
+      "env": {
+        "DATABASE_URL": "libsql://your-db.turso.io",
+        "DATABASE_TOKEN": "your-token",
+        "READONLY": "false",
+        "COLLECTIONS": "users,products,orders"
+      }
+    }
+  }
+}
+```
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Database connection URL |
+| `DATABASE_TOKEN` | Auth token (for Turso) |
+| `READONLY` | Set to "true" for read-only access |
+| `COLLECTIONS` | Comma-separated list of allowed collections |

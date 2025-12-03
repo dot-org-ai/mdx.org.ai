@@ -1,0 +1,90 @@
+---
+$type: Collection
+$id: /{name}
+name: string
+schema: Schema
+count: number?
+---
+
+# {name}
+
+<CollectionStats collection={name} count={count} />
+
+## Schema
+
+<SchemaTable schema={schema} />
+
+## Browse
+
+```ts
+const items = await db.collection('{name}').list({ limit: 10 })
+```
+
+<DataTable collection={name} limit={10} />
+
+## Search
+
+<SearchBox collection={name} />
+
+## Operations
+
+### List
+
+```bash
+GET /{name}
+GET /{name}?limit=20&cursor=abc
+```
+
+### Search
+
+```bash
+GET /{name}?q=search+term
+```
+
+### Create
+
+```bash
+POST /{name}
+Content-Type: application/json
+
+{ "field": "value" }
+```
+
+### Read
+
+```bash
+GET /{name}/{id}
+```
+
+### Update
+
+```bash
+PUT /{name}/{id}
+Content-Type: application/json
+
+{ "field": "new value" }
+```
+
+### Delete
+
+```bash
+DELETE /{name}/{id}
+```
+
+## SDK
+
+```ts
+import { db } from '@db.ht/client'
+
+// List
+const items = await db.{name}.list()
+
+// Search
+const results = await db.{name}.search('query')
+
+// CRUD
+const item = await db.{name}.create({ ... })
+const single = await db.{name}.get('id')
+await db.{name}.update('id', { ... })
+await db.{name}.delete('id')
+```

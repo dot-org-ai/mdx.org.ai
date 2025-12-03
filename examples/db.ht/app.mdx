@@ -1,0 +1,81 @@
+---
+$type: App
+name: db.ht
+title: HyperText Database
+description: Click Your Data
+---
+
+# db.ht
+
+<App
+  name="db.ht"
+  title="HyperText Database"
+  description="A database you can browse"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/collections">Collections</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/db.ht">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+      <Link href="/api">API Reference</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Configuration
+
+```ts
+export default {
+  name: 'db.ht',
+
+  // Database connection
+  database: {
+    provider: 'sqlite',  // or 'postgres', 'turso'
+    url: process.env.DATABASE_URL
+  },
+
+  // URL generation
+  baseUrl: 'https://db.ht',
+
+  // ID format
+  id: {
+    prefix: true,      // u_abc123 vs abc123
+    format: 'nanoid'   // or 'uuid', 'cuid'
+  },
+
+  // Response format
+  format: {
+    id: '$id',
+    ref: '$ref',
+    type: '$type'
+  },
+
+  // Pagination
+  pagination: {
+    defaultLimit: 20,
+    maxLimit: 100
+  }
+}
+```
+
+## Collections
+
+```ts
+// Auto-discovered from [Collection].mdx files
+export const collections = {
+  users: '/users',
+  products: '/products',
+  orders: '/orders'
+}
+```

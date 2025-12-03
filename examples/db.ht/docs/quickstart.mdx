@@ -1,0 +1,103 @@
+---
+$type: Doc
+title: Quickstart
+description: Get up and running in 2 minutes
+---
+
+# Quickstart
+
+Set up db.ht in 2 minutes.
+
+## Install
+
+```bash
+npm install @db.ht/core
+```
+
+## Define a Collection
+
+Create `collections/[User].mdx`:
+
+```mdx
+---
+$type: Collection
+name: users
+---
+
+# Users
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | string | Auto-generated |
+| name | string | User's name |
+| email | string | Email address |
+| role | string | User role |
+| createdAt | datetime | Auto-generated |
+```
+
+## Create the Server
+
+```ts
+import { createDatabase } from '@db.ht/core'
+
+const db = createDatabase({
+  collections: './collections',
+  database: {
+    provider: 'sqlite',
+    filename: 'data.db'
+  }
+})
+
+db.listen(3000)
+```
+
+## Use It
+
+```bash
+# Create a user
+curl -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice", "email": "alice@example.com"}'
+
+# List users
+curl http://localhost:3000/users
+
+# Search users
+curl "http://localhost:3000/users?q=alice"
+
+# Get a user
+curl http://localhost:3000/users/u_abc123
+
+# Update a user
+curl -X PUT http://localhost:3000/users/u_abc123 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice Smith"}'
+
+# Delete a user
+curl -X DELETE http://localhost:3000/users/u_abc123
+```
+
+## Use the SDK
+
+```ts
+import { db } from '@db.ht/client'
+
+// Connect
+const client = db('http://localhost:3000')
+
+// CRUD
+const user = await client.users.create({ name: 'Alice' })
+const users = await client.users.list()
+const alice = await client.users.get('u_abc123')
+await client.users.update('u_abc123', { name: 'Alice Smith' })
+await client.users.delete('u_abc123')
+
+// Search
+const results = await client.users.search('alice')
+```
+
+## Next Steps
+
+- [Core Concepts](/docs/concepts)
+- [Defining Collections](/docs/collections)
+- [Search & Filtering](/docs/search)

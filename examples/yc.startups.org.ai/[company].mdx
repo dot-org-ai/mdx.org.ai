@@ -1,0 +1,101 @@
+---
+$type: Startup
+$id: https://yc.startups.org.ai/company/${params.slug}
+source:
+  endpoint: search
+  body:
+    filters: slug:${params.slug}
+    hitsPerPage: 1
+  transform: |
+    (data) => {
+      const company = data.hits[0]
+      if (!company) return null
+      return {
+        $type: 'Startup',
+        $id: `https://yc.startups.org.ai/company/${company.slug}`,
+        ...company,
+        ycUrl: `https://www.ycombinator.com/companies/${company.slug}`,
+      }
+    }
+layout: company
+---
+
+export async function getStaticProps({ params }) {
+  const yc = sources.get('https://yc.startups.org.ai')
+  const results = await yc.endpoint('search', {}, {
+    filters: `slug:${params.slug}`,
+    hitsPerPage: 1
+  })
+  const company = results.hits[0]
+  if (!company) return { notFound: true }
+  return { props: { company } }
+}
+
+export async function getStaticPaths() {
+  const yc = sources.get('https://yc.startups.org.ai')
+  const results = await yc.endpoint('browse')
+  return {
+    paths: results.hits.slice(0, 500).map(c => ({
+      params: { slug: c.slug }
+    })),
+    fallback: 'blocking'
+  }
+}
+
+# {company.name}
+
+<CompanyHeader
+  name={company.name}
+  logo={company.logo_url}
+  oneLiner={company.one_liner}
+  batch={company.batch}
+  status={company.status}
+  website={company.website}
+/>
+
+## About
+
+{company.long_description || company.one_liner}
+
+## Details
+
+| | |
+|---|---|
+| **Batch** | [{company.batch}](/batch/{company.batch}) |
+| **Status** | {company.status} |
+| **Team Size** | {company.team_size || 'N/A'} |
+| **Stage** | {company.stage || 'N/A'} |
+| **Location** | {company.all_locations?.join(', ') || 'N/A'} |
+
+## Industries
+
+<TagList tags={company.industries} basePath="/industry" />
+
+## Founders
+
+<FounderList founders={company.founders} />
+
+{company.isHiring && company.jobs?.length > 0 && (
+  <>
+    ## Open Positions
+
+    <JobList jobs={company.jobs} />
+  </>
+)}
+
+## Links
+
+- [Website]({company.website})
+- [YC Profile]({company.ycUrl})
+{company.linkedin_url && `- [LinkedIn](${company.linkedin_url})`}
+{company.twitter_url && `- [Twitter](${company.twitter_url})`}
+{company.facebook_url && `- [Facebook](${company.facebook_url})`}
+
+## Related Companies
+
+<RelatedCompanies
+  industries={company.industries}
+  batch={company.batch}
+  exclude={company.slug}
+  limit={6}
+/>

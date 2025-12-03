@@ -1,0 +1,109 @@
+---
+$type: Doc
+title: Quickstart
+description: Build your first HyperText API in 5 minutes
+---
+
+# Quickstart
+
+Build a HyperText API in 5 minutes.
+
+## Install
+
+```bash
+npm install @api.ht/core
+```
+
+## Define a Resource
+
+Create `resources/[User].mdx`:
+
+```mdx
+---
+$type: Resource
+$id: /users/{id}
+---
+
+# User
+
+A user in the system.
+
+## Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | string | Unique identifier |
+| name | string | User's name |
+| email | string | Email address |
+
+## Links
+
+- `orders` → /users/{id}/orders
+- `profile` → /users/{id}/profile
+```
+
+## Create the Server
+
+```ts
+import { createServer } from '@api.ht/core'
+
+const server = createServer({
+  resources: './resources',
+  data: {
+    users: [
+      { id: 'u_1', name: 'Alice', email: 'alice@example.com' },
+      { id: 'u_2', name: 'Bob', email: 'bob@example.com' }
+    ]
+  }
+})
+
+server.listen(3000)
+```
+
+## Test It
+
+```bash
+# Get the root
+curl http://localhost:3000/
+
+# Response
+{
+  "$id": "http://localhost:3000/",
+  "users": { "$ref": "http://localhost:3000/users" }
+}
+```
+
+```bash
+# List users
+curl http://localhost:3000/users
+
+# Response
+{
+  "$id": "http://localhost:3000/users",
+  "items": [
+    { "$ref": "http://localhost:3000/users/u_1", "name": "Alice" },
+    { "$ref": "http://localhost:3000/users/u_2", "name": "Bob" }
+  ]
+}
+```
+
+```bash
+# Get a user
+curl http://localhost:3000/users/u_1
+
+# Response
+{
+  "$id": "http://localhost:3000/users/u_1",
+  "$type": "User",
+  "name": "Alice",
+  "email": "alice@example.com",
+  "orders": { "$ref": "http://localhost:3000/users/u_1/orders" },
+  "profile": { "$ref": "http://localhost:3000/users/u_1/profile" }
+}
+```
+
+## Next Steps
+
+- [Core Concepts](/docs/concepts) - Understand HyperText principles
+- [Defining Resources](/docs/resources) - Learn the resource format
+- [Link Relations](/docs/links) - Connect resources together

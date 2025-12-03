@@ -1,0 +1,80 @@
+---
+$type: Batch
+$id: https://yc.startups.org.ai/batch/${params.batch}
+source:
+  endpoint: search
+  body:
+    query: ''
+    filters: batch:${params.batch}
+    hitsPerPage: 100
+    facets: ['industries', 'status']
+  transform: |
+    (data) => ({
+      $type: 'Batch',
+      $id: `https://yc.startups.org.ai/batch/${params.batch}`,
+      batch: params.batch,
+      companies: data.hits,
+      total: data.nbHits,
+      industries: data.facets?.industries || {},
+      statuses: data.facets?.status || {},
+    })
+layout: batch
+---
+
+export async function getStaticProps({ params }) {
+  const yc = sources.get('https://yc.startups.org.ai')
+  const results = await yc.endpoint('search', {}, {
+    filters: `batch:${params.batch}`,
+    hitsPerPage: 200,
+    facets: ['industries', 'status']
+  })
+  return {
+    props: {
+      batch: params.batch,
+      companies: results.hits,
+      total: results.nbHits,
+      facets: results.facets
+    }
+  }
+}
+
+export async function getStaticPaths() {
+  const batches = [
+    'S24', 'W24', 'S23', 'W23', 'S22', 'W22',
+    'S21', 'W21', 'S20', 'W20', 'S19', 'W19',
+    'S18', 'W18', 'S17', 'W17', 'S16', 'W16',
+    'S15', 'W15', 'S14', 'W14', 'S13', 'W13',
+    'S12', 'W12', 'S11', 'W11', 'S10', 'W10',
+    'S09', 'W09', 'S08', 'W08', 'S07', 'W07',
+    'S06', 'W06', 'S05'
+  ]
+  return {
+    paths: batches.map(batch => ({ params: { batch } })),
+    fallback: 'blocking'
+  }
+}
+
+# YC {batch}
+
+<BatchHeader
+  batch={batch}
+  total={total}
+  season={batch.startsWith('S') ? 'Summer' : 'Winter'}
+  year={`20${batch.slice(1)}`}
+/>
+
+## Statistics
+
+<BatchStats total={total} facets={facets} />
+
+## Companies by Industry
+
+<IndustryBreakdown industries={facets.industries} batch={batch} />
+
+## All Companies ({total})
+
+<CompanyGrid companies={companies} />
+
+## Related Batches
+
+<BatchNavigation current={batch} />

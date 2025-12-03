@@ -1,0 +1,101 @@
+---
+$type: RestSource
+$id: https://hacker.news.org.ai
+name: Hacker News
+description: Real-time Hacker News data via Firebase API
+baseUrl: https://hacker-news.firebaseio.com/v0
+headers:
+  Accept: application/json
+cache:
+  ttl: 60
+  staleWhileRevalidate: 30
+  tags:
+    - hackernews
+    - news
+endpoints:
+  topStories:
+    method: GET
+    path: /topstories.json
+    cache: { ttl: 120 }
+  newStories:
+    method: GET
+    path: /newstories.json
+    cache: { ttl: 60 }
+  bestStories:
+    method: GET
+    path: /beststories.json
+    cache: { ttl: 300 }
+  askStories:
+    method: GET
+    path: /askstories.json
+  showStories:
+    method: GET
+    path: /showstories.json
+  jobStories:
+    method: GET
+    path: /jobstories.json
+  item:
+    method: GET
+    path: /item/:id.json
+    cache: { ttl: 300 }
+  user:
+    method: GET
+    path: /user/:id.json
+    cache: { ttl: 600 }
+  maxItem:
+    method: GET
+    path: /maxitem.json
+  updates:
+    method: GET
+    path: /updates.json
+    cache: { ttl: 30 }
+routes:
+  /: { page: index, data: topStories }
+  /new: { page: list, data: newStories }
+  /best: { page: list, data: bestStories }
+  /ask: { page: list, data: askStories }
+  /show: { page: list, data: showStories }
+  /jobs: { page: list, data: jobStories }
+  /item/:id: { page: '[item]', data: item }
+  /user/:id: { page: '[user]', data: user }
+---
+
+# Hacker News
+
+Real-time access to [Hacker News](https://news.ycombinator.com) data.
+
+## Top Stories
+
+<Stories endpoint="topStories" limit={30} />
+
+## Navigation
+
+- [Top](/top) - Top ranked stories
+- [New](/new) - Newest stories
+- [Best](/best) - Best stories
+- [Ask HN](/ask) - Questions to the community
+- [Show HN](/show) - Projects and demos
+- [Jobs](/jobs) - YC startup jobs
+
+## API
+
+This site is powered by the [Hacker News Firebase API](https://github.com/HackerNews/API).
+
+```ts
+import { sources } from '@mdxdb/sources'
+
+const hn = sources.get('https://hacker.news.org.ai')
+
+// Get top stories
+const topIds = await hn.endpoint('topStories')
+
+// Get story details
+const story = await hn.endpoint('item', { id: '12345' })
+
+// Get user profile
+const user = await hn.endpoint('user', { id: 'pg' })
+```
+
+## Recent Updates
+
+<Updates />

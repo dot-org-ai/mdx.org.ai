@@ -1,0 +1,167 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Use api.ht as an MCP server for AI agents
+---
+
+# MCP Server
+
+Give your AI agents the ability to browse and interact with HyperText APIs.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "api-ht": {
+      "command": "npx",
+      "args": ["@api.ht/mcp"]
+    }
+  }
+}
+```
+
+## Tools
+
+### `browse`
+
+Start at any URL and explore linked resources.
+
+```ts
+{
+  name: "browse",
+  description: "Browse a HyperText API starting from a URL",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "URL to browse" }
+    },
+    required: ["url"]
+  }
+}
+```
+
+**Example:**
+
+```
+Agent: Browse the users API
+
+MCP: Browsing https://api.ht/users...
+
+Found 2 users:
+- Alice (https://api.ht/users/u_abc)
+- Bob (https://api.ht/users/u_def)
+
+Available actions:
+- View user details: follow $ref link
+- Create user: POST to collection
+- Next page: follow "next" link
+```
+
+### `follow`
+
+Follow a link reference to get the resource.
+
+```ts
+{
+  name: "follow",
+  description: "Follow a $ref link to get the resource",
+  inputSchema: {
+    type: "object",
+    properties: {
+      ref: { type: "string", description: "The $ref URL to follow" }
+    },
+    required: ["ref"]
+  }
+}
+```
+
+### `create`
+
+Create a new resource in a collection.
+
+```ts
+{
+  name: "create",
+  description: "Create a new resource",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string", description: "Collection URL" },
+      data: { type: "object", description: "Resource data" }
+    },
+    required: ["collection", "data"]
+  }
+}
+```
+
+### `update`
+
+Update an existing resource.
+
+```ts
+{
+  name: "update",
+  description: "Update a resource",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "Resource URL" },
+      data: { type: "object", description: "Updated data" }
+    },
+    required: ["url", "data"]
+  }
+}
+```
+
+### `delete`
+
+Delete a resource.
+
+```ts
+{
+  name: "delete",
+  description: "Delete a resource",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "Resource URL to delete" }
+    },
+    required: ["url"]
+  }
+}
+```
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "api-ht": {
+      "command": "npx",
+      "args": ["@api.ht/mcp"],
+      "env": {
+        "API_KEY": "your-api-key",
+        "BASE_URL": "https://api.example.com"
+      }
+    }
+  }
+}
+```
+
+## Usage Example
+
+```
+User: Find all users and show me Alice's orders
+
+Agent: I'll browse the users API and find Alice's orders.
+
+[Uses browse tool on /users]
+[Follows $ref to /users/u_abc]
+[Follows orders link to /users/u_abc/orders]
+
+Alice has 3 orders:
+1. Order #1234 - $99.00 (completed)
+2. Order #1235 - $149.00 (pending)
+3. Order #1236 - $29.00 (shipped)
+```

@@ -1,0 +1,93 @@
+---
+$type: App
+name: db4.ai
+title: AI-Native Database
+description: Hybrid Search, Auto Embeddings, Get or Generate
+---
+
+# db4.ai
+
+<App
+  name="db4.ai"
+  title="AI-Native Database"
+  description="The database built for AI"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/playground">Playground</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/db4.ai">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+      <Link href="/api">API Reference</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Configuration
+
+```ts
+export default {
+  name: 'db4.ai',
+
+  // Database
+  database: {
+    provider: 'turso',  // or 'postgres', 'sqlite'
+    url: process.env.DATABASE_URL
+  },
+
+  // Embeddings
+  embeddings: {
+    provider: 'openai',  // or 'anthropic', 'cohere'
+    model: 'text-embedding-3-small',
+    dimensions: 1536
+  },
+
+  // AI Generation
+  generation: {
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514'
+  },
+
+  // Search
+  search: {
+    mode: 'hybrid',  // 'vector', 'fulltext', 'hybrid'
+    vectorWeight: 0.7,
+    fulltextWeight: 0.3
+  },
+
+  // Get or Generate
+  getOrGenerate: {
+    enabled: true,
+    cache: true,
+    ttl: '24h'
+  }
+}
+```
+
+## Collections
+
+```ts
+// Collections with AI capabilities
+export const collections = {
+  articles: {
+    embedding: ['title', 'content'],
+    search: { fullText: true, vector: true },
+    generate: true
+  },
+  products: {
+    embedding: ['name', 'description'],
+    search: { fullText: true, vector: true },
+    enrich: ['description', 'features']
+  }
+}
+```

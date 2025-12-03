@@ -1,0 +1,151 @@
+---
+$type: SchemaProperty
+$id: https://schema.org.ai/property/${params.property}
+$context: https://schema.org
+source:
+  endpoint: vocabulary
+  transform: |
+    (data) => {
+      const graph = data['@graph'] || []
+      const prop = graph.find(n =>
+        n['@type'] === 'rdf:Property' &&
+        n['rdfs:label'] === params.property
+      )
+      if (!prop) return null
+      const getDomains = (p) => {
+        const domains = p['schema:domainIncludes']
+        if (!domains) return []
+        return (Array.isArray(domains) ? domains : [domains])
+          .map(d => d['@id']?.split('/').pop())
+          .filter(Boolean)
+      }
+      const getRanges = (p) => {
+        const ranges = p['schema:rangeIncludes']
+        if (!ranges) return []
+        return (Array.isArray(ranges) ? ranges : [ranges])
+          .map(r => r['@id']?.split('/').pop())
+          .filter(Boolean)
+      }
+      return {
+        $type: 'SchemaProperty',
+        $id: `https://schema.org.ai/property/${params.property}`,
+        $context: 'https://schema.org',
+        name: prop['rdfs:label'],
+        description: prop['rdfs:comment'],
+        domainIncludes: getDomains(prop),
+        rangeIncludes: getRanges(prop),
+        subPropertyOf: prop['rdfs:subPropertyOf']?.['@id']?.split('/').pop(),
+        inverseOf: prop['schema:inverseOf']?.['@id']?.split('/').pop(),
+        supersededBy: prop['schema:supersededBy']?.['@id']?.split('/').pop(),
+      }
+    }
+layout: property
+---
+
+export async function getStaticProps({ params }) {
+  const schema = sources.get('https://schema.org.ai')
+  const vocab = await schema.endpoint('vocabulary')
+  // Extract property from vocabulary
+  const graph = vocab.documents?.[0]?.['@graph'] || vocab['@graph'] || []
+  const prop = graph.find(n =>
+    n['@type'] === 'rdf:Property' &&
+    n['rdfs:label'] === params.property
+  )
+  if (!prop) return { notFound: true }
+  return { props: { property: prop } }
+}
+
+export async function getStaticPaths() {
+  const commonProperties = [
+    'name', 'description', 'url', 'image',
+    'email', 'telephone', 'address',
+    'author', 'creator', 'publisher',
+    'datePublished', 'dateModified', 'dateCreated',
+    'price', 'priceCurrency', 'availability',
+    'latitude', 'longitude', 'streetAddress',
+    'headline', 'articleBody', 'keywords'
+  ]
+  return {
+    paths: commonProperties.map(property => ({ params: { property } })),
+    fallback: 'blocking'
+  }
+}
+
+# {property.name}
+
+<PropertyBadge
+  property={property.name}
+  schemaUrl={`https://schema.org/${params.property}`}
+/>
+
+## Description
+
+{property.description}
+
+## Domain & Range
+
+### Used On (Domain)
+
+These types can use this property:
+
+<TypeList types={property.domainIncludes} />
+
+### Expected Value (Range)
+
+This property expects values of these types:
+
+<TypeList types={property.rangeIncludes} />
+
+{property.subPropertyOf && (
+  <>
+    ## Parent Property
+
+    <PropertyLink property={property.subPropertyOf} />
+  </>
+)}
+
+{property.inverseOf && (
+  <>
+    ## Inverse Property
+
+    <PropertyLink property={property.inverseOf} />
+  </>
+)}
+
+{property.supersededBy && (
+  <Callout type="warning">
+    This property is superseded by <PropertyLink property={property.supersededBy} />
+  </Callout>
+)}
+
+## Example Usage
+
+```yaml
+$type: {property.domainIncludes?.[0] || 'Thing'}
+$id: https://example.com/thing/123
+{property.name}: # {property.rangeIncludes?.[0] || 'Text'}
+```
+
+## JSON-LD Example
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "{property.domainIncludes?.[0] || 'Thing'}",
+  "{property.name}": "value"
+}
+```
+
+## Sub-Properties
+
+<SubProperties parent={params.property} />
+
+## Related Properties
+
+<RelatedProperties property={params.property} />
+
+---
+
+<a href={`https://schema.org/${params.property}`} target="_blank" rel="noopener">
+  View on Schema.org →
+</a>

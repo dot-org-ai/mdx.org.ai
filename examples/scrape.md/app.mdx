@@ -1,0 +1,72 @@
+---
+$type: App
+name: scrape.md
+title: Web Scraping for AI
+description: Turn any webpage into clean Markdown for AI
+---
+
+# scrape.md
+
+<App
+  name="scrape.md"
+  title="Web Scraping for AI"
+  description="Clean Markdown from any URL"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/try">Try It</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/scrape.md">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+      <Link href="/api">API Reference</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Configuration
+
+```ts
+export default {
+  name: 'scrape.md',
+
+  // Output format
+  format: 'markdown',  // or 'text', 'html'
+
+  // Content extraction
+  extraction: {
+    removeNav: true,
+    removeFooter: true,
+    removeAds: true,
+    extractMain: true
+  },
+
+  // JavaScript rendering
+  javascript: {
+    enabled: true,
+    waitFor: 'networkidle',
+    timeout: 10000
+  },
+
+  // Caching
+  cache: {
+    enabled: true,
+    ttl: '1h'
+  },
+
+  // Rate limiting
+  rateLimit: {
+    requests: 100,
+    window: '1m'
+  }
+}
+```

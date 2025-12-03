@@ -1,0 +1,214 @@
+---
+$type: APIReference
+title: API Reference
+description: Complete API documentation for db.ht
+---
+
+# API Reference
+
+Simple List, Search, and CRUD operations with URL-based identity.
+
+## Base URL
+
+```
+https://db.ht
+```
+
+## Collections
+
+### List Collections
+
+```bash
+GET https://db.ht/
+```
+
+```json
+{
+  "$id": "https://db.ht/",
+  "collections": [
+    { "$ref": "https://db.ht/users", "name": "users", "count": 150 },
+    { "$ref": "https://db.ht/products", "name": "products", "count": 45 }
+  ]
+}
+```
+
+## CRUD Operations
+
+### List (GET /collection)
+
+```bash
+GET https://db.ht/users
+GET https://db.ht/users?limit=10
+GET https://db.ht/users?cursor=abc123
+```
+
+```json
+{
+  "$id": "https://db.ht/users",
+  "$type": "Collection",
+  "items": [
+    { "$ref": "https://db.ht/users/u_abc", "name": "Alice" },
+    { "$ref": "https://db.ht/users/u_def", "name": "Bob" }
+  ],
+  "count": 150,
+  "limit": 20,
+  "next": { "$ref": "https://db.ht/users?cursor=xyz" }
+}
+```
+
+### Search (GET /collection?q=)
+
+```bash
+GET https://db.ht/users?q=alice
+GET https://db.ht/users?role=admin
+GET https://db.ht/users?q=alice&role=admin
+```
+
+```json
+{
+  "$id": "https://db.ht/users?q=alice",
+  "$type": "SearchResults",
+  "query": "alice",
+  "items": [
+    { "$ref": "https://db.ht/users/u_abc", "name": "Alice", "_score": 0.95 }
+  ],
+  "count": 1
+}
+```
+
+### Create (POST /collection)
+
+```bash
+POST https://db.ht/users
+Content-Type: application/json
+
+{
+  "name": "Charlie",
+  "email": "charlie@example.com"
+}
+```
+
+```json
+{
+  "$id": "https://db.ht/users/u_ghi",
+  "$ref": "https://db.ht/users/u_ghi",
+  "$type": "User",
+  "name": "Charlie",
+  "email": "charlie@example.com",
+  "createdAt": "2024-01-15T10:30:00Z"
+}
+```
+
+### Read (GET /collection/id)
+
+```bash
+GET https://db.ht/users/u_abc
+```
+
+```json
+{
+  "$id": "https://db.ht/users/u_abc",
+  "$type": "User",
+  "name": "Alice",
+  "email": "alice@example.com",
+  "role": "admin",
+  "createdAt": "2024-01-10T08:00:00Z",
+  "updatedAt": "2024-01-14T15:30:00Z"
+}
+```
+
+### Update (PUT /collection/id)
+
+```bash
+PUT https://db.ht/users/u_abc
+Content-Type: application/json
+
+{
+  "name": "Alice Smith"
+}
+```
+
+```json
+{
+  "$id": "https://db.ht/users/u_abc",
+  "$type": "User",
+  "name": "Alice Smith",
+  "email": "alice@example.com",
+  "updatedAt": "2024-01-15T11:00:00Z"
+}
+```
+
+### Delete (DELETE /collection/id)
+
+```bash
+DELETE https://db.ht/users/u_abc
+```
+
+```json
+{
+  "$id": "https://db.ht/users/u_abc",
+  "deleted": true
+}
+```
+
+## Filtering
+
+```bash
+# Exact match
+GET /users?role=admin
+
+# Multiple values
+GET /users?role=admin,member
+
+# Comparison
+GET /products?price[gte]=100&price[lte]=500
+
+# Date range
+GET /orders?createdAt[gte]=2024-01-01
+
+# Nested fields
+GET /users?profile.country=US
+```
+
+## Sorting
+
+```bash
+# Ascending
+GET /products?sort=price
+
+# Descending
+GET /products?sort=-price
+
+# Multiple fields
+GET /products?sort=-createdAt,name
+```
+
+## Pagination
+
+```bash
+# Cursor-based (recommended)
+GET /users?cursor=abc123&limit=20
+
+# Offset-based
+GET /users?offset=40&limit=20
+```
+
+## SDK
+
+```ts
+import { db } from 'db.ht'
+
+// List
+const users = await db.users.list()
+const page2 = await db.users.list({ cursor: users.next })
+
+// Search
+const results = await db.users.search('alice')
+const filtered = await db.users.list({ role: 'admin' })
+
+// CRUD
+const user = await db.users.create({ name: 'Alice' })
+const alice = await db.users.get('u_abc')
+await db.users.update('u_abc', { name: 'Alice Smith' })
+await db.users.delete('u_abc')
+```

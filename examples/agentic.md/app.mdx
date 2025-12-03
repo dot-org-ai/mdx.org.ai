@@ -1,0 +1,92 @@
+---
+$type: App
+name: agentic.md
+title: AI Agents in Markdown
+description: Build and Deploy AI Agents with Markdown
+---
+
+# agentic.md
+
+<App
+  name="agentic.md"
+  title="AI Agents in Markdown"
+  description="Build powerful AI agents using only Markdown"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+    <NavLink href="/gallery">Gallery</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/agentic.md">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+      <Link href="/gallery">Agent Gallery</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Agent Structure
+
+```mdx
+---
+$type: Agent
+name: My Agent
+model: claude-sonnet-4-20250514
+---
+
+# Agent Name
+
+System prompt describing the agent's personality and purpose.
+
+## Tools
+
+### Tool Name
+
+Description of what the tool does.
+
+```ts
+async function toolName(params) {
+  // Tool implementation
+}
+```
+```
+
+## Configuration
+
+```ts
+export default {
+  name: 'agentic.md',
+
+  // Default model
+  model: {
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514'
+  },
+
+  // Tool execution
+  tools: {
+    timeout: 30000,
+    retries: 3
+  },
+
+  // Memory
+  memory: {
+    provider: 'sqlite',
+    persist: true
+  },
+
+  // Deployment
+  deploy: {
+    platform: 'cloudflare',
+    region: 'auto'
+  }
+}
+```

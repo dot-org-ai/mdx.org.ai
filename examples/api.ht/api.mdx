@@ -1,0 +1,173 @@
+---
+$type: APIReference
+title: API Reference
+description: Complete API documentation for api.ht
+---
+
+# API Reference
+
+The api.ht API follows HyperText principles - start at the root and follow links.
+
+## Base URL
+
+```
+https://api.ht
+```
+
+## Authentication
+
+```bash
+# API Key in header
+curl https://api.ht/resources \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# Or as query parameter
+curl "https://api.ht/resources?api_key=YOUR_API_KEY"
+```
+
+## Root Endpoint
+
+```bash
+GET https://api.ht/
+```
+
+```json
+{
+  "$id": "https://api.ht/",
+  "$type": "Root",
+  "resources": { "$ref": "https://api.ht/resources" },
+  "docs": { "$ref": "https://api.ht/docs" },
+  "schema": { "$ref": "https://api.ht/schema" }
+}
+```
+
+## Resources
+
+### List Resources
+
+```bash
+GET https://api.ht/resources
+```
+
+```json
+{
+  "$id": "https://api.ht/resources",
+  "$type": "Collection",
+  "items": [
+    { "$ref": "https://api.ht/resources/users", "name": "Users" },
+    { "$ref": "https://api.ht/resources/products", "name": "Products" }
+  ]
+}
+```
+
+### Get Resource Schema
+
+```bash
+GET https://api.ht/resources/users
+```
+
+```json
+{
+  "$id": "https://api.ht/resources/users",
+  "$type": "Resource",
+  "name": "Users",
+  "schema": {
+    "id": "string",
+    "email": "string",
+    "name": "string"
+  },
+  "operations": {
+    "list": { "$ref": "https://api.ht/users" },
+    "create": { "$ref": "https://api.ht/users", "method": "POST" }
+  }
+}
+```
+
+### List Items
+
+```bash
+GET https://api.ht/users
+```
+
+```json
+{
+  "$id": "https://api.ht/users",
+  "$type": "Collection",
+  "items": [
+    { "$ref": "https://api.ht/users/u_abc", "name": "Alice" },
+    { "$ref": "https://api.ht/users/u_def", "name": "Bob" }
+  ],
+  "count": 2,
+  "next": { "$ref": "https://api.ht/users?cursor=xyz" }
+}
+```
+
+### Get Item
+
+```bash
+GET https://api.ht/users/u_abc
+```
+
+```json
+{
+  "$id": "https://api.ht/users/u_abc",
+  "$type": "User",
+  "name": "Alice",
+  "email": "alice@example.com",
+  "orders": { "$ref": "https://api.ht/users/u_abc/orders" },
+  "profile": { "$ref": "https://api.ht/users/u_abc/profile" }
+}
+```
+
+### Create Item
+
+```bash
+POST https://api.ht/users
+Content-Type: application/json
+
+{ "name": "Charlie", "email": "charlie@example.com" }
+```
+
+```json
+{
+  "$ref": "https://api.ht/users/u_ghi",
+  "$type": "User",
+  "name": "Charlie",
+  "email": "charlie@example.com"
+}
+```
+
+### Update Item
+
+```bash
+PUT https://api.ht/users/u_abc
+Content-Type: application/json
+
+{ "name": "Alice Smith" }
+```
+
+### Delete Item
+
+```bash
+DELETE https://api.ht/users/u_abc
+```
+
+## Error Responses
+
+```json
+{
+  "$type": "Error",
+  "status": 404,
+  "message": "Resource not found",
+  "details": { "resource": "users", "id": "u_xyz" }
+}
+```
+
+| Status | Description |
+|--------|-------------|
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 429 | Rate Limited |
+| 500 | Server Error |

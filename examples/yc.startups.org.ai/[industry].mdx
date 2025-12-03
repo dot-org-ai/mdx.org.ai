@@ -1,0 +1,83 @@
+---
+$type: Industry
+$id: https://yc.startups.org.ai/industry/${params.industry}
+source:
+  endpoint: search
+  body:
+    query: ''
+    facetFilters:
+      - - industries:${params.industry}
+    hitsPerPage: 100
+    facets: ['batch', 'status', 'regions']
+  transform: |
+    (data) => ({
+      $type: 'Industry',
+      $id: `https://yc.startups.org.ai/industry/${params.industry}`,
+      industry: params.industry,
+      companies: data.hits,
+      total: data.nbHits,
+      batches: data.facets?.batch || {},
+      statuses: data.facets?.status || {},
+      regions: data.facets?.regions || {},
+    })
+layout: industry
+---
+
+export async function getStaticProps({ params }) {
+  const yc = sources.get('https://yc.startups.org.ai')
+  const results = await yc.endpoint('search', {}, {
+    facetFilters: [[`industries:${params.industry}`]],
+    hitsPerPage: 200,
+    facets: ['batch', 'status', 'regions']
+  })
+  return {
+    props: {
+      industry: params.industry,
+      companies: results.hits,
+      total: results.nbHits,
+      facets: results.facets
+    }
+  }
+}
+
+export async function getStaticPaths() {
+  const industries = [
+    'B2B', 'Consumer', 'Fintech', 'Healthcare',
+    'Developer Tools', 'Education', 'Real Estate',
+    'Government', 'Industrials', 'Entertainment',
+    'AI/ML', 'Crypto/Web3', 'Climate',
+    'Consumer Health', 'Biotech', 'Transportation'
+  ]
+  return {
+    paths: industries.map(industry => ({ params: { industry } })),
+    fallback: 'blocking'
+  }
+}
+
+# {industry}
+
+<IndustryHeader
+  industry={industry}
+  total={total}
+  description={industryDescriptions[industry]}
+/>
+
+## Overview
+
+<IndustryStats total={total} facets={facets} />
+
+## Companies by Batch
+
+<BatchBreakdown batches={facets.batch} industry={industry} />
+
+## Active Companies ({total})
+
+<CompanyGrid companies={companies} />
+
+## Regional Distribution
+
+<RegionMap regions={facets.regions} />
+
+## Trending in {industry}
+
+<TrendingCompanies industry={industry} limit={6} />

@@ -1,0 +1,181 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Give your AI agents web browsing capabilities
+---
+
+# MCP Server
+
+Enable your AI agents to read and understand web pages.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "scrape": {
+      "command": "npx",
+      "args": ["@scrape.md/mcp"]
+    }
+  }
+}
+```
+
+## Tools
+
+### `scrape`
+
+Fetch and convert a URL to Markdown.
+
+```ts
+{
+  name: "scrape",
+  description: "Fetch a webpage and convert it to Markdown",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "URL to scrape" },
+      selector: { type: "string", description: "CSS selector to extract" },
+      format: { enum: ["markdown", "text", "html"], default: "markdown" }
+    },
+    required: ["url"]
+  }
+}
+```
+
+**Example:**
+
+```
+User: Summarize the article at https://blog.example.com/ai-trends-2024
+
+Agent: I'll read that article for you.
+
+[Uses scrape: url="https://blog.example.com/ai-trends-2024"]
+
+Based on the article, here are the key AI trends for 2024:
+1. Multimodal AI models...
+2. AI agents and automation...
+3. Edge AI deployment...
+```
+
+### `search_and_scrape`
+
+Search the web and scrape top results.
+
+```ts
+{
+  name: "search_and_scrape",
+  description: "Search the web and scrape the top results",
+  inputSchema: {
+    type: "object",
+    properties: {
+      query: { type: "string", description: "Search query" },
+      limit: { type: "number", default: 3, description: "Number of results to scrape" }
+    },
+    required: ["query"]
+  }
+}
+```
+
+### `extract_links`
+
+Extract all links from a page.
+
+```ts
+{
+  name: "extract_links",
+  description: "Extract all links from a webpage",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string" },
+      filter: { type: "string", description: "Filter links by pattern" }
+    },
+    required: ["url"]
+  }
+}
+```
+
+### `extract_data`
+
+Extract structured data from a page.
+
+```ts
+{
+  name: "extract_data",
+  description: "Extract structured data (JSON-LD, OpenGraph, etc.) from a page",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string" }
+    },
+    required: ["url"]
+  }
+}
+```
+
+## Usage Patterns
+
+### Research
+
+```
+User: Research the latest developments in quantum computing
+
+Agent:
+[search_and_scrape: query="quantum computing breakthroughs 2024", limit=5]
+
+Based on my research across 5 sources:
+
+1. IBM announced a 1000+ qubit processor...
+2. Google achieved new quantum supremacy milestone...
+3. Startups are focusing on practical applications...
+
+Sources:
+- https://techcrunch.com/quantum-computing-2024
+- https://nature.com/articles/quantum-breakthrough
+...
+```
+
+### Comparison
+
+```
+User: Compare the pricing of Vercel, Netlify, and Cloudflare Pages
+
+Agent:
+[scrape: url="https://vercel.com/pricing"]
+[scrape: url="https://netlify.com/pricing"]
+[scrape: url="https://pages.cloudflare.com/pricing"]
+
+Here's a comparison:
+
+| Feature | Vercel | Netlify | Cloudflare |
+|---------|--------|---------|------------|
+| Free tier | 100GB | 100GB | Unlimited |
+| ...
+```
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "scrape": {
+      "command": "npx",
+      "args": ["@scrape.md/mcp"],
+      "env": {
+        "CACHE_TTL": "3600",
+        "RATE_LIMIT": "100",
+        "JS_RENDERING": "true",
+        "PROXY_URL": "http://proxy.example.com"
+      }
+    }
+  }
+}
+```
+
+## Best Practices
+
+1. **Cache results** - Set appropriate TTL to avoid re-scraping
+2. **Respect robots.txt** - The MCP server respects site policies
+3. **Rate limiting** - Built-in rate limiting prevents overloading sites
+4. **Error handling** - Gracefully handles 404s, timeouts, etc.

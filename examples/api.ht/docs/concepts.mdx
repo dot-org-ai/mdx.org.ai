@@ -1,0 +1,125 @@
+---
+$type: Doc
+title: Core Concepts
+description: Understand the principles behind HyperText APIs
+---
+
+# Core Concepts
+
+HyperText APIs are built on simple principles that make them discoverable, self-documenting, and easy to use.
+
+## Everything is a URL
+
+Every resource has a URL that uniquely identifies it:
+
+```json
+{
+  "$id": "https://api.example.com/users/alice"
+}
+```
+
+URLs are:
+- **Permanent** - They don't change
+- **Shareable** - Copy and paste to share
+- **Bookmarkable** - Save for later
+- **Self-contained** - No context needed
+
+## Links Connect Resources
+
+Resources link to related resources using `$ref`:
+
+```json
+{
+  "$id": "https://api.example.com/users/alice",
+  "name": "Alice",
+  "orders": { "$ref": "https://api.example.com/users/alice/orders" },
+  "organization": { "$ref": "https://api.example.com/orgs/acme" }
+}
+```
+
+Follow links to navigate:
+- No need to construct URLs
+- No documentation lookup
+- Just click (or fetch) and go
+
+## Start at the Root
+
+Every API has a root that links to everything:
+
+```json
+{
+  "$id": "https://api.example.com/",
+  "users": { "$ref": "https://api.example.com/users" },
+  "products": { "$ref": "https://api.example.com/products" },
+  "orders": { "$ref": "https://api.example.com/orders" }
+}
+```
+
+From the root, you can discover:
+- All available resources
+- How to navigate
+- What operations are available
+
+## Self-Describing Resources
+
+Resources include their type and schema:
+
+```json
+{
+  "$id": "https://api.example.com/users/alice",
+  "$type": "User",
+  "$schema": { "$ref": "https://api.example.com/schemas/User" },
+  "name": "Alice"
+}
+```
+
+Clients can:
+- Understand the data structure
+- Validate responses
+- Generate forms automatically
+
+## Collections are Resources Too
+
+Collections follow the same pattern:
+
+```json
+{
+  "$id": "https://api.example.com/users",
+  "$type": "Collection",
+  "items": [
+    { "$ref": "https://api.example.com/users/alice" },
+    { "$ref": "https://api.example.com/users/bob" }
+  ],
+  "count": 100,
+  "next": { "$ref": "https://api.example.com/users?page=2" }
+}
+```
+
+Pagination is just more links:
+- `next` - Next page
+- `prev` - Previous page
+- `first` - First page
+- `last` - Last page
+
+## Actions are Links
+
+Operations are described as links with methods:
+
+```json
+{
+  "$id": "https://api.example.com/users",
+  "create": {
+    "$ref": "https://api.example.com/users",
+    "method": "POST",
+    "schema": { "$ref": "https://api.example.com/schemas/CreateUser" }
+  }
+}
+```
+
+## Why HyperText?
+
+1. **No Documentation Needed** - Follow links to discover
+2. **No SDK Required** - Use any HTTP client
+3. **No Breaking Changes** - Add links, don't change them
+4. **No Coupling** - Clients don't hardcode URLs
+5. **Works in Browser** - Click to navigate

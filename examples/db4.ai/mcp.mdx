@@ -1,0 +1,217 @@
+---
+$type: MCPServer
+title: MCP Server
+description: AI-native database access for agents
+---
+
+# MCP Server
+
+Give your AI agents access to semantic search, content generation, and intelligent data retrieval.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "db4": {
+      "command": "npx",
+      "args": ["@db4.ai/mcp"],
+      "env": {
+        "DATABASE_URL": "your-database-url",
+        "OPENAI_API_KEY": "your-openai-key"
+      }
+    }
+  }
+}
+```
+
+## Tools
+
+### `search`
+
+Semantic search across collections.
+
+```ts
+{
+  name: "search",
+  description: "Search for items using natural language",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string" },
+      query: { type: "string", description: "Natural language search query" },
+      mode: { enum: ["hybrid", "vector", "fulltext"], default: "hybrid" },
+      limit: { type: "number", default: 10 },
+      filter: { type: "object" }
+    },
+    required: ["collection", "query"]
+  }
+}
+```
+
+**Example:**
+
+```
+User: Find articles about deploying AI applications
+
+Agent: I'll search for relevant articles.
+
+[Uses search: collection="articles", query="deploying AI applications", mode="hybrid"]
+
+Found 5 relevant articles:
+1. "Deploying AI Models to Production" (score: 0.94)
+2. "AI Infrastructure Best Practices" (score: 0.89)
+3. "Scaling AI Applications" (score: 0.85)
+...
+```
+
+### `getOrGenerate`
+
+Get existing content or generate it on demand.
+
+```ts
+{
+  name: "getOrGenerate",
+  description: "Get an item, or generate it if it doesn't exist",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string" },
+      id: { type: "string", description: "Item ID or slug" },
+      generateOptions: {
+        type: "object",
+        properties: {
+          style: { type: "string" },
+          length: { enum: ["short", "medium", "long"] }
+        }
+      }
+    },
+    required: ["collection", "id"]
+  }
+}
+```
+
+**Example:**
+
+```
+User: Get me an article about GraphQL best practices
+
+Agent: I'll look for that article.
+
+[Uses getOrGenerate: collection="articles", id="graphql-best-practices"]
+
+The article didn't exist, so I generated it:
+
+# GraphQL Best Practices
+
+1. Design your schema first...
+2. Use DataLoader for batching...
+...
+```
+
+### `similar`
+
+Find similar items.
+
+```ts
+{
+  name: "similar",
+  description: "Find items similar to a given item",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string" },
+      id: { type: "string" },
+      limit: { type: "number", default: 5 }
+    },
+    required: ["collection", "id"]
+  }
+}
+```
+
+### `enrich`
+
+Generate or enhance a field for items.
+
+```ts
+{
+  name: "enrich",
+  description: "Generate or enhance a field for items in a collection",
+  inputSchema: {
+    type: "object",
+    properties: {
+      collection: { type: "string" },
+      field: { type: "string", description: "Field to generate/enrich" },
+      prompt: { type: "string", description: "Generation prompt" },
+      filter: { type: "object", description: "Filter which items to enrich" }
+    },
+    required: ["collection", "field", "prompt"]
+  }
+}
+```
+
+**Example:**
+
+```
+User: Add summaries to all articles that don't have them
+
+Agent: I'll generate summaries for articles missing them.
+
+[Uses enrich: collection="articles", field="summary", prompt="Summarize in 2 sentences", filter={ summary: null }]
+
+Generated summaries for 47 articles.
+```
+
+## Usage Patterns
+
+### Research Assistant
+
+```
+User: Find everything we have about authentication and summarize the key points
+
+Agent:
+1. [search: "authentication security patterns"]
+2. [search: "OAuth implementation"]
+3. [search: "JWT best practices"]
+
+Based on 12 relevant articles, here are the key points:
+- Use OAuth 2.0 with PKCE for web apps
+- Store tokens securely, never in localStorage
+- Implement refresh token rotation
+...
+```
+
+### Content Generation
+
+```
+User: We need a landing page for our new feature
+
+Agent:
+[getOrGenerate: collection="pages", id="feature-launch-landing"]
+
+I've generated a landing page. Here's a preview:
+
+# Introducing Smart Analytics
+
+Understand your users like never before...
+```
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "db4": {
+      "command": "npx",
+      "args": ["@db4.ai/mcp"],
+      "env": {
+        "DATABASE_URL": "libsql://your-db.turso.io",
+        "OPENAI_API_KEY": "sk-...",
+        "ANTHROPIC_API_KEY": "sk-ant-...",
+        "DEFAULT_MODEL": "claude-sonnet-4-20250514",
+        "COLLECTIONS": "articles,products,pages"
+      }
+    }
+  }
+}
+```

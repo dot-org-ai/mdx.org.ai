@@ -1,0 +1,126 @@
+---
+$type: SchemaType
+$id: https://schema.org.ai/${params.Type}
+$context: https://schema.org
+source:
+  endpoint: type
+  params: { type: params.Type }
+  transform: |
+    (data) => {
+      const graph = data['@graph'] || [data]
+      const type = graph.find(n => n['@id']?.endsWith(`/${params.Type}`))
+      if (!type) return null
+      return {
+        $type: 'SchemaType',
+        $id: `https://schema.org.ai/${params.Type}`,
+        $context: 'https://schema.org',
+        label: type['rdfs:label'],
+        comment: type['rdfs:comment'],
+        subClassOf: Array.isArray(type['rdfs:subClassOf'])
+          ? type['rdfs:subClassOf'].map(s => s['@id']?.split('/').pop())
+          : type['rdfs:subClassOf']?.['@id']?.split('/').pop(),
+        properties: graph
+          .filter(n => n['schema:domainIncludes']?.['@id']?.endsWith(`/${params.Type}`))
+          .map(p => ({
+            name: p['rdfs:label'],
+            description: p['rdfs:comment'],
+            expectedType: p['schema:rangeIncludes']?.['@id']?.split('/').pop()
+          }))
+      }
+    }
+layout: type
+---
+
+export async function getStaticProps({ params }) {
+  const schema = sources.get('https://schema.org.ai')
+  const data = await schema.endpoint('type', { type: params.Type })
+  return { props: { type: data } }
+}
+
+export async function getStaticPaths() {
+  const commonTypes = [
+    'Thing', 'Action', 'CreativeWork', 'Event', 'Intangible',
+    'Organization', 'Person', 'Place', 'Product',
+    'Article', 'BlogPosting', 'WebPage', 'WebSite',
+    'LocalBusiness', 'Restaurant', 'Hotel',
+    'ImageObject', 'VideoObject', 'AudioObject',
+    'Offer', 'AggregateOffer', 'Review', 'Rating',
+    'PostalAddress', 'ContactPoint', 'GeoCoordinates'
+  ]
+  return {
+    paths: commonTypes.map(Type => ({ params: { Type } })),
+    fallback: 'blocking'
+  }
+}
+
+# {type.label}
+
+<TypeBadge
+  type={type.label}
+  parent={type.subClassOf}
+  schemaUrl={`https://schema.org/${params.Type}`}
+/>
+
+## Description
+
+{type.comment}
+
+## Hierarchy
+
+<TypeBreadcrumb type={params.Type} />
+
+### Parent Type
+
+{type.subClassOf ? (
+  <TypeLink type={type.subClassOf} />
+) : (
+  <span className="text-muted">None (root type)</span>
+)}
+
+### Child Types
+
+<ChildTypes parent={params.Type} />
+
+## Properties
+
+<PropertyTable properties={type.properties} />
+
+## Expected Properties
+
+Properties inherited from parent types:
+
+<InheritedProperties type={params.Type} />
+
+## Example
+
+```yaml
+$type: {type.label}
+$id: https://example.com/{type.label.toLowerCase()}/123
+{type.properties?.slice(0, 5).map(p =>
+  `${p.name}: # ${p.expectedType || 'Text'}`
+).join('\n')}
+```
+
+## JSON-LD Example
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "{type.label}",
+  "@id": "https://example.com/{type.label.toLowerCase()}/123"
+}
+```
+
+## Usage Notes
+
+<UsageNotes type={params.Type} />
+
+## See Also
+
+<RelatedTypes type={params.Type} />
+
+---
+
+<a href={`https://schema.org/${params.Type}`} target="_blank" rel="noopener">
+  View on Schema.org →
+</a>

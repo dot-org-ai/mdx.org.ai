@@ -1,0 +1,77 @@
+---
+$type: App
+name: api.ht
+title: HyperText API
+description: Simple, Clickable APIs
+---
+
+# api.ht
+
+<App
+  name="api.ht"
+  title="HyperText API"
+  description="Build APIs the way the web was meant to work"
+>
+  <Nav>
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/docs">Docs</NavLink>
+    <NavLink href="/api">API</NavLink>
+    <NavLink href="/mcp">MCP</NavLink>
+  </Nav>
+
+  <Main>
+    <Slot />
+  </Main>
+
+  <Footer>
+    <Links>
+      <Link href="https://github.com/mdx-org/api.ht">GitHub</Link>
+      <Link href="/docs">Documentation</Link>
+      <Link href="/api">API Reference</Link>
+    </Links>
+  </Footer>
+</App>
+
+## Configuration
+
+```ts
+export default {
+  name: 'api.ht',
+
+  // Response format
+  format: {
+    id: '$id',
+    ref: '$ref',
+    type: '$type'
+  },
+
+  // Link generation
+  links: {
+    self: (resource) => resource.$id,
+    collection: (type) => `/${type}`,
+    related: (resource, rel) => `${resource.$id}/${rel}`
+  },
+
+  // Content negotiation
+  accept: ['application/json', 'text/html', 'text/markdown'],
+
+  // CORS
+  cors: {
+    origins: ['*'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+  }
+}
+```
+
+## Routes
+
+```ts
+// Auto-generated from [Type].mdx files
+export const routes = {
+  '/': 'index.mdx',
+  '/resources': 'resources/index.mdx',
+  '/resources/[type]': 'resources/[Resource].mdx',
+  '/docs': 'docs/index.mdx',
+  '/docs/[slug]': 'docs/[Doc].mdx'
+}
+```

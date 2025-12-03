@@ -1,0 +1,86 @@
+---
+$type: RestSource
+$id: https://yc.startups.org.ai
+name: YC Startup Directory
+description: Y Combinator startup directory via Algolia
+baseUrl: https://45bwzj1sgc-dsn.algolia.net/1/indexes
+headers:
+  Content-Type: application/json
+  X-Algolia-Application-Id: 45BWZJ1SGC
+  X-Algolia-API-Key: ${env.ALGOLIA_YC_API_KEY}
+cache:
+  ttl: 3600
+  staleWhileRevalidate: 600
+  tags:
+    - yc
+    - startups
+endpoints:
+  search:
+    method: POST
+    path: /YCCompany_production/query
+    cache: { ttl: 300 }
+  browse:
+    method: POST
+    path: /YCCompany_production/query
+    body: { query: '', hitsPerPage: 100 }
+    cache: { ttl: 1800 }
+routes:
+  /: { page: index, data: browse }
+  /company/:slug: { page: '[company]', data: search }
+  /batch/:batch: { page: '[batch]', data: search }
+  /industry/:industry: { page: '[industry]', data: search }
+---
+
+# YC Startup Directory
+
+Browse and search [Y Combinator](https://www.ycombinator.com/companies) startups.
+
+## Featured Companies
+
+<FeaturedStartups limit={6} />
+
+## Browse by Batch
+
+<BatchGrid batches={['S24', 'W24', 'S23', 'W23', 'S22', 'W22']} />
+
+## Browse by Industry
+
+<IndustryList industries={[
+  'B2B',
+  'Consumer',
+  'Fintech',
+  'Healthcare',
+  'Developer Tools',
+  'AI/ML',
+  'Education',
+  'Real Estate'
+]} />
+
+## Statistics
+
+<YCStats />
+
+## Search
+
+<SearchBox placeholder="Search startups..." />
+
+<SearchResults />
+
+## API
+
+```ts
+import { sources } from '@mdxdb/sources'
+
+const yc = sources.get('https://yc.startups.org.ai')
+
+// Search companies
+const results = await yc.endpoint('search', {}, {
+  query: 'artificial intelligence',
+  hitsPerPage: 20
+})
+
+// Browse by batch
+const batch = await yc.endpoint('search', {}, {
+  filters: 'batch:S23'
+})
+```

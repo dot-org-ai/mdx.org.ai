@@ -1,0 +1,133 @@
+---
+$type: Doc
+title: Quickstart
+description: Get started with db4.ai in 5 minutes
+---
+
+# Quickstart
+
+Set up an AI-native database in 5 minutes.
+
+## Install
+
+```bash
+npm install @db4.ai/core
+```
+
+## Configure
+
+```ts
+// db4.config.ts
+export default {
+  database: {
+    provider: 'sqlite',
+    filename: 'data.db'
+  },
+  embeddings: {
+    provider: 'openai',
+    model: 'text-embedding-3-small'
+  },
+  generation: {
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514'
+  }
+}
+```
+
+## Define a Collection
+
+Create `collections/[Article].mdx`:
+
+```mdx
+---
+$type: Collection
+name: articles
+embedding: [title, content]
+search:
+  fullText: true
+  vector: true
+generate: true
+---
+
+# Articles
+
+| Field | Type | Embed |
+|-------|------|-------|
+| title | string | yes |
+| content | text | yes |
+| summary | string | generated |
+| tags | string[] | no |
+```
+
+## Create the Database
+
+```ts
+import { createDB } from '@db4.ai/core'
+
+const db = createDB({
+  collections: './collections',
+  config: './db4.config.ts'
+})
+
+db.listen(3000)
+```
+
+## Try It
+
+### Insert (Auto-Embeds)
+
+```ts
+await db.articles.create({
+  title: 'Getting Started with AI',
+  content: 'Artificial intelligence is transforming...'
+})
+// Embedding generated automatically
+```
+
+### Hybrid Search
+
+```ts
+const results = await db.articles.search({
+  query: 'how to get started with machine learning',
+  mode: 'hybrid',
+  limit: 5
+})
+```
+
+### Get or Generate
+
+```ts
+// Returns existing article or generates one
+const article = await db.articles.getOrGenerate('intro-to-transformers', {
+  generator: (slug) => ai.write({
+    topic: slug.replace(/-/g, ' '),
+    type: 'technical-article'
+  })
+})
+```
+
+### Enrich All
+
+```ts
+// Generate summaries for all articles
+await db.articles.forEach(async (article) => {
+  if (!article.summary) {
+    const summary = await ai.summarize(article.content)
+    return { ...article, summary }
+  }
+  return article
+})
+```
+
+### Find Similar
+
+```ts
+const similar = await db.articles.similar('a_abc123', { limit: 5 })
+```
+
+## Next Steps
+
+- [Core Concepts](/docs/concepts)
+- [Hybrid Search](/docs/search)
+- [Get or Generate](/docs/get-or-generate)
+- [API Reference](/api)

@@ -1,0 +1,83 @@
+---
+$type: Resource
+$id: /resources/{name}
+name: string
+description: string?
+schema: Schema
+operations: Operation[]
+links: Link[]
+---
+
+# {name}
+
+{description}
+
+## Schema
+
+<SchemaTable schema={schema} />
+
+## Operations
+
+```ts
+const operations = {
+  list: {
+    method: 'GET',
+    url: `/${name}`,
+    description: `List all ${name}`
+  },
+  get: {
+    method: 'GET',
+    url: `/${name}/{id}`,
+    description: `Get a single ${name}`
+  },
+  create: {
+    method: 'POST',
+    url: `/${name}`,
+    description: `Create a new ${name}`
+  },
+  update: {
+    method: 'PUT',
+    url: `/${name}/{id}`,
+    description: `Update a ${name}`
+  },
+  delete: {
+    method: 'DELETE',
+    url: `/${name}/{id}`,
+    description: `Delete a ${name}`
+  }
+}
+```
+
+<OperationList operations={operations} />
+
+## Links
+
+```ts
+if (links?.length) {
+  return <LinkTable links={links} />
+}
+```
+
+## Example
+
+```bash
+GET /{name}
+```
+
+```json
+{
+  "$id": "https://api.ht/{name}",
+  "$type": "Collection",
+  "items": [
+    { "$ref": "https://api.ht/{name}/example-1" }
+  ]
+}
+```
+
+## Try It
+
+<APIPlayground
+  baseUrl="https://api.ht"
+  resource={name}
+  operations={operations}
+/>

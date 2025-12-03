@@ -1,0 +1,191 @@
+---
+$type: APIReference
+title: API Reference
+description: Complete API for scrape.md
+---
+
+# API Reference
+
+Convert any URL to clean Markdown.
+
+## Base URL
+
+```
+https://scrape.md
+```
+
+## Scrape URL
+
+```bash
+GET https://scrape.md/api?url=https://example.com
+```
+
+```json
+{
+  "url": "https://example.com",
+  "title": "Example Domain",
+  "description": "This domain is for use in examples",
+  "markdown": "# Example Domain\n\nThis domain is for use in illustrative examples...",
+  "links": [
+    { "text": "More information", "href": "https://www.iana.org/domains/example" }
+  ],
+  "images": [],
+  "metadata": {
+    "author": null,
+    "publishedAt": null,
+    "modifiedAt": null
+  },
+  "cached": false,
+  "scrapedAt": "2024-01-15T10:00:00Z"
+}
+```
+
+## Options
+
+### Format
+
+```bash
+# Markdown (default)
+GET /api?url=https://example.com&format=markdown
+
+# Plain text
+GET /api?url=https://example.com&format=text
+
+# HTML (cleaned)
+GET /api?url=https://example.com&format=html
+```
+
+### Selector
+
+Extract specific element:
+
+```bash
+GET /api?url=https://blog.example.com/post&selector=article
+GET /api?url=https://example.com&selector=.main-content
+```
+
+### Wait for JavaScript
+
+```bash
+# Wait for element
+GET /api?url=https://spa.example.com&waitFor=.content
+
+# Wait for network idle
+GET /api?url=https://spa.example.com&waitFor=networkidle
+
+# Custom timeout
+GET /api?url=https://slow.example.com&timeout=30000
+```
+
+### Include/Exclude
+
+```bash
+# Include only certain elements
+GET /api?url=https://example.com&include=article,main
+
+# Exclude elements
+GET /api?url=https://example.com&exclude=nav,footer,aside
+```
+
+## Batch Scrape
+
+```bash
+POST https://scrape.md/api/batch
+Content-Type: application/json
+
+{
+  "urls": [
+    "https://example.com/page1",
+    "https://example.com/page2",
+    "https://example.com/page3"
+  ],
+  "options": {
+    "format": "markdown",
+    "selector": "article"
+  }
+}
+```
+
+```json
+{
+  "results": [
+    { "url": "https://example.com/page1", "markdown": "...", "status": "success" },
+    { "url": "https://example.com/page2", "markdown": "...", "status": "success" },
+    { "url": "https://example.com/page3", "error": "404 Not Found", "status": "error" }
+  ],
+  "successful": 2,
+  "failed": 1
+}
+```
+
+## Crawl Site
+
+```bash
+POST https://scrape.md/api/crawl
+Content-Type: application/json
+
+{
+  "url": "https://docs.example.com",
+  "depth": 2,
+  "limit": 100,
+  "pattern": "/docs/*"
+}
+```
+
+```json
+{
+  "id": "crawl_abc123",
+  "status": "processing",
+  "progress": { "scraped": 0, "total": null }
+}
+```
+
+Check progress:
+
+```bash
+GET https://scrape.md/api/crawl/crawl_abc123
+```
+
+## SDK
+
+```ts
+import { scrape } from 'scrape.md'
+
+// Single URL
+const page = await scrape('https://example.com')
+console.log(page.markdown)
+
+// With options
+const article = await scrape('https://blog.example.com/post', {
+  selector: 'article',
+  format: 'markdown'
+})
+
+// Batch
+const pages = await scrape.batch([
+  'https://example.com/page1',
+  'https://example.com/page2'
+])
+
+// Crawl
+const site = await scrape.crawl('https://docs.example.com', {
+  depth: 2,
+  limit: 100
+})
+```
+
+## CLI
+
+```bash
+# Single URL
+npx scrape.md https://example.com
+
+# Save to file
+npx scrape.md https://example.com -o page.md
+
+# Batch from file
+npx scrape.md -i urls.txt -o output/
+
+# With selector
+npx scrape.md https://blog.example.com --selector article
+```

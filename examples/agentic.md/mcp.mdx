@@ -1,0 +1,167 @@
+---
+$type: MCPServer
+title: MCP Server
+description: Run agentic.md agents as MCP servers
+---
+
+# MCP Server
+
+Expose your Markdown agents as MCP servers for use with Claude Desktop and other MCP clients.
+
+## Installation
+
+```json
+{
+  "mcpServers": {
+    "my-agent": {
+      "command": "npx",
+      "args": ["agentic.md", "mcp", "./my-agent.md"]
+    }
+  }
+}
+```
+
+## How It Works
+
+Your agent's tools become MCP tools:
+
+```mdx
+---
+$type: Agent
+name: Research Assistant
+---
+
+# Research Assistant
+
+## Tools
+
+### search
+
+Search the web for information.
+
+```ts
+async function search(query: string) {
+  return await web.search(query)
+}
+```
+
+### read_url
+
+Read content from a URL.
+
+```ts
+async function read_url(url: string) {
+  return await fetch(url).then(r => r.text())
+}
+```
+```
+
+Becomes:
+
+```json
+{
+  "tools": [
+    {
+      "name": "search",
+      "description": "Search the web for information",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "read_url",
+      "description": "Read content from a URL",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string" }
+        },
+        "required": ["url"]
+      }
+    }
+  ]
+}
+```
+
+## Multiple Agents
+
+Run multiple agents as a single MCP server:
+
+```json
+{
+  "mcpServers": {
+    "agents": {
+      "command": "npx",
+      "args": ["agentic.md", "mcp", "./agents/"]
+    }
+  }
+}
+```
+
+Each agent becomes a namespaced set of tools:
+
+- `research_search`
+- `research_read_url`
+- `coder_run_code`
+- `coder_explain`
+
+## Agent as Tool
+
+Use the agent itself as a tool:
+
+```json
+{
+  "mcpServers": {
+    "research": {
+      "command": "npx",
+      "args": ["agentic.md", "mcp", "./research.md", "--as-tool"]
+    }
+  }
+}
+```
+
+```
+Claude: I'll use the research assistant to look that up.
+
+[Uses tool: research_assistant]
+Input: "Find the latest news about AI regulation"
+
+[Research agent runs, uses its tools, returns summary]
+
+Claude: Based on my research assistant's findings...
+```
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "my-agent": {
+      "command": "npx",
+      "args": ["agentic.md", "mcp", "./agent.md"],
+      "env": {
+        "ANTHROPIC_API_KEY": "your-key",
+        "OPENAI_API_KEY": "your-key",
+        "TOOL_TIMEOUT": "30000"
+      }
+    }
+  }
+}
+```
+
+## CLI
+
+```bash
+# Run as MCP server
+npx agentic.md mcp ./my-agent.md
+
+# With options
+npx agentic.md mcp ./my-agent.md --port 3000 --as-tool
+
+# Multiple agents
+npx agentic.md mcp ./agents/
+```

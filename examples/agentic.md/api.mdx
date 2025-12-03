@@ -1,0 +1,166 @@
+---
+$type: APIReference
+title: API Reference
+description: Deploy and interact with agentic.md agents
+---
+
+# API Reference
+
+Deploy agents and interact with them via HTTP.
+
+## Deploy an Agent
+
+```bash
+POST https://agentic.md/deploy
+Content-Type: multipart/form-data
+
+file: @my-agent.md
+```
+
+```json
+{
+  "id": "agent_abc123",
+  "name": "My Agent",
+  "url": "https://my-agent.agentic.md",
+  "status": "deployed"
+}
+```
+
+## Chat with Agent
+
+```bash
+POST https://my-agent.agentic.md/chat
+Content-Type: application/json
+
+{
+  "message": "Hello, can you help me with something?",
+  "conversation_id": "conv_xyz"
+}
+```
+
+```json
+{
+  "response": "Of course! I'd be happy to help. What do you need?",
+  "conversation_id": "conv_xyz",
+  "tools_used": []
+}
+```
+
+## Streaming Response
+
+```bash
+POST https://my-agent.agentic.md/chat/stream
+Content-Type: application/json
+
+{
+  "message": "Explain quantum computing",
+  "stream": true
+}
+```
+
+```
+data: {"type": "text", "content": "Quantum computing is "}
+data: {"type": "text", "content": "a type of computation "}
+data: {"type": "tool_use", "tool": "search", "input": {"query": "quantum computing basics"}}
+data: {"type": "tool_result", "result": "..."}
+data: {"type": "text", "content": "that harnesses quantum mechanics..."}
+data: {"type": "done"}
+```
+
+## List Agents
+
+```bash
+GET https://agentic.md/agents
+Authorization: Bearer YOUR_API_KEY
+```
+
+```json
+{
+  "agents": [
+    {
+      "id": "agent_abc",
+      "name": "Research Assistant",
+      "url": "https://research.agentic.md",
+      "status": "active"
+    },
+    {
+      "id": "agent_def",
+      "name": "Code Helper",
+      "url": "https://coder.agentic.md",
+      "status": "active"
+    }
+  ]
+}
+```
+
+## Get Agent Details
+
+```bash
+GET https://agentic.md/agents/agent_abc
+```
+
+```json
+{
+  "id": "agent_abc",
+  "name": "Research Assistant",
+  "url": "https://research.agentic.md",
+  "model": "claude-sonnet-4-20250514",
+  "tools": ["search", "read_url", "save_note"],
+  "conversations": 1250,
+  "messages": 8400,
+  "created_at": "2024-01-10T08:00:00Z"
+}
+```
+
+## Update Agent
+
+```bash
+PUT https://agentic.md/agents/agent_abc
+Content-Type: multipart/form-data
+
+file: @updated-agent.md
+```
+
+## Delete Agent
+
+```bash
+DELETE https://agentic.md/agents/agent_abc
+```
+
+## Conversation History
+
+```bash
+GET https://my-agent.agentic.md/conversations/conv_xyz
+```
+
+```json
+{
+  "id": "conv_xyz",
+  "messages": [
+    { "role": "user", "content": "Hello" },
+    { "role": "assistant", "content": "Hi! How can I help?" }
+  ],
+  "created_at": "2024-01-15T10:00:00Z"
+}
+```
+
+## SDK
+
+```ts
+import { Agent } from 'agentic.md'
+
+// Load agent from file
+const agent = await Agent.load('./my-agent.md')
+
+// Chat
+const response = await agent.chat('Hello!')
+
+// Stream
+for await (const chunk of agent.stream('Explain AI')) {
+  process.stdout.write(chunk.content)
+}
+
+// Deploy
+const deployed = await agent.deploy()
+console.log(deployed.url)
+```

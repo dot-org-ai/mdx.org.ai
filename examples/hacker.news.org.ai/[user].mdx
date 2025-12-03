@@ -1,0 +1,58 @@
+---
+$type: User
+$id: https://hacker.news.org.ai/user/${params.id}
+source:
+  endpoint: user
+  params: { id: params.id }
+  transform: |
+    (data) => ({
+      $type: 'User',
+      $id: `https://hacker.news.org.ai/user/${data.id}`,
+      ...data,
+      profileUrl: `https://news.ycombinator.com/user?id=${data.id}`,
+      karma: data.karma || 0,
+      createdAt: new Date(data.created * 1000).toISOString(),
+    })
+layout: user
+---
+
+export async function getStaticProps({ params }) {
+  const hn = sources.get('https://hacker.news.org.ai')
+  const user = await hn.endpoint('user', { id: params.id })
+  return { props: { user } }
+}
+
+# {user.id}
+
+<UserProfile
+  username={user.id}
+  karma={user.karma}
+  created={user.createdAt}
+  about={user.about}
+/>
+
+## About
+
+{user.about ? (
+  <div className="user-about" dangerouslySetInnerHTML={{ __html: user.about }} />
+) : (
+  <p className="text-muted">No bio provided.</p>
+)}
+
+## Stats
+
+| Stat | Value |
+|------|-------|
+| Karma | {user.karma.toLocaleString()} |
+| Member Since | {new Date(user.created * 1000).toLocaleDateString()} |
+| Submissions | {user.submitted?.length || 0} |
+
+## Recent Submissions
+
+<SubmissionList ids={user.submitted?.slice(0, 30)} />
+
+---
+
+<a href={user.profileUrl} target="_blank" rel="noopener">
+  View on Hacker News →
+</a>

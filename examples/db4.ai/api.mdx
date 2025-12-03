@@ -1,0 +1,231 @@
+---
+$type: APIReference
+title: API Reference
+description: Complete API documentation for db4.ai
+---
+
+# API Reference
+
+AI-native database operations: hybrid search, auto embeddings, and get-or-generate.
+
+## Base URL
+
+```
+https://db4.ai
+```
+
+## Search
+
+### Hybrid Search
+
+Combine full-text and vector search:
+
+```bash
+POST https://db4.ai/search
+Content-Type: application/json
+
+{
+  "collection": "articles",
+  "query": "how to deploy serverless functions",
+  "mode": "hybrid",
+  "limit": 10
+}
+```
+
+```json
+{
+  "results": [
+    {
+      "$id": "https://db4.ai/articles/a_abc",
+      "title": "Serverless Deployment Guide",
+      "score": 0.92,
+      "scores": { "vector": 0.95, "fulltext": 0.87 }
+    }
+  ],
+  "count": 10,
+  "query": "how to deploy serverless functions",
+  "mode": "hybrid"
+}
+```
+
+### Vector Search
+
+Semantic similarity search:
+
+```bash
+POST https://db4.ai/search
+Content-Type: application/json
+
+{
+  "collection": "articles",
+  "query": "best practices for cloud deployment",
+  "mode": "vector",
+  "limit": 5
+}
+```
+
+### Full-Text Search
+
+Traditional keyword search:
+
+```bash
+POST https://db4.ai/search
+Content-Type: application/json
+
+{
+  "collection": "articles",
+  "query": "serverless",
+  "mode": "fulltext"
+}
+```
+
+### Search with Filters
+
+```bash
+POST https://db4.ai/search
+Content-Type: application/json
+
+{
+  "collection": "articles",
+  "query": "deployment",
+  "filter": {
+    "category": "devops",
+    "publishedAt": { "$gte": "2024-01-01" }
+  }
+}
+```
+
+## Insert with Auto Embeddings
+
+```bash
+POST https://db4.ai/articles
+Content-Type: application/json
+
+{
+  "title": "Getting Started with MDX",
+  "content": "MDX lets you write JSX in markdown...",
+  "category": "tutorial"
+}
+```
+
+```json
+{
+  "$id": "https://db4.ai/articles/a_xyz",
+  "title": "Getting Started with MDX",
+  "content": "MDX lets you write JSX in markdown...",
+  "category": "tutorial",
+  "_embedding": true,
+  "createdAt": "2024-01-15T10:00:00Z"
+}
+```
+
+## forEach Generate/Enrich
+
+### Enrich All Items
+
+```bash
+POST https://db4.ai/articles/enrich
+Content-Type: application/json
+
+{
+  "field": "summary",
+  "prompt": "Summarize this article in 2 sentences",
+  "filter": { "summary": null }
+}
+```
+
+```json
+{
+  "processed": 150,
+  "updated": 150,
+  "duration": "45s"
+}
+```
+
+### Generate Field
+
+```bash
+POST https://db4.ai/products/generate
+Content-Type: application/json
+
+{
+  "field": "description",
+  "prompt": "Write a compelling product description for: {name}",
+  "filter": { "description": null }
+}
+```
+
+## Get or Generate
+
+Request content that may not exist:
+
+```bash
+GET https://db4.ai/articles/introduction-to-mdx?generate=true
+```
+
+If the article exists, returns it. If not:
+
+```json
+{
+  "$id": "https://db4.ai/articles/introduction-to-mdx",
+  "title": "Introduction to MDX",
+  "content": "# Introduction to MDX\n\nMDX is a powerful format...",
+  "_generated": true,
+  "_generatedAt": "2024-01-15T10:30:00Z"
+}
+```
+
+### Configure Generator
+
+```bash
+GET https://db4.ai/articles/advanced-patterns?generate=true&style=technical&length=long
+```
+
+## Similar Items
+
+Find similar items:
+
+```bash
+GET https://db4.ai/articles/a_abc/similar?limit=5
+```
+
+```json
+{
+  "results": [
+    { "$ref": "https://db4.ai/articles/a_def", "score": 0.89 },
+    { "$ref": "https://db4.ai/articles/a_ghi", "score": 0.85 }
+  ]
+}
+```
+
+## SDK
+
+```ts
+import { db4 } from 'db4.ai'
+
+// Hybrid search
+const results = await db4.search('articles', {
+  query: 'serverless deployment',
+  mode: 'hybrid'
+})
+
+// Insert (auto-embeds)
+const article = await db4.articles.create({
+  title: 'My Article',
+  content: '...'
+})
+
+// Enrich all
+await db4.articles.forEach(async (article) => {
+  const summary = await ai.summarize(article.content)
+  return { ...article, summary }
+})
+
+// Get or generate
+const post = await db4.articles.getOrGenerate('intro-to-mdx', {
+  generator: (slug) => ai.write({ topic: slug, type: 'article' })
+})
+
+// Find similar
+const similar = await db4.articles.similar('a_abc', { limit: 5 })
+```
