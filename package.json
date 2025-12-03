@@ -17,6 +17,8 @@
     "format:check": "prettier --check .",
     "clean": "turbo run clean && rm -rf node_modules",
     "mdxai": "node packages/mdxai/dist/cli.js",
+    "mdxe": "node packages/mdxe/dist/cli.js",
+    "mdxe:dev": "node packages/mdxe/dist/cli.js dev --dir examples",
     "mdxe:test": "node packages/mdxe/dist/cli.js test"
   },
   "devDependencies": {

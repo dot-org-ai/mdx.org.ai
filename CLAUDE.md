@@ -48,44 +48,102 @@ pnpm --filter mdxe exec -- mdxe deploy
 
 ## Package Architecture
 
-### Core Packages (packages/)
+### Core Design Principles
 
-- **mdxld** - Core parser/stringifier for MDXLD documents. Handles YAML frontmatter with JSON-LD properties (`$id`, `$type`, `$context`). Foundation for all other packages.
-- **mdxdb** - Database abstraction layer with `Database` and `DBClient` interfaces. URL-centric document storage.
-- **mdxe** - CLI for testing and deploying MDX applications. Runs MDX tests via `ai-sandbox`, deploys to Cloudflare Workers.
-- **mdxai** - Unified AI SDK combining `ai-functions`, `ai-workflows`, `ai-database`. Provides MCP server for Claude integration.
-- **mdxui** - UI component abstractions for MDX rendering.
+The monorepo follows a clear separation of concerns:
 
-### Adapter Packages
+| Scope | Purpose | Key Question |
+|-------|---------|--------------|
+| **@mdxui** | Rendering & Output Formats | "How does this render to X?" |
+| **@mdxe** | Execution & Protocols | "Where/how does this execute?" |
+| **@mdxdb** | Storage & Persistence | "Where is this stored?" |
+| **@mdxld** | Parsing & Transformation | "How is MDXLD processed?" |
+| **@mdxai** | AI Integrations | "How does AI interact?" |
 
-- **@mdxdb/fs** - Filesystem database adapter (stores MDX files on disk)
-- **@mdxdb/sqlite** - SQLite database adapter
-- **@mdxdb/postgres** - PostgreSQL database adapter
-- **@mdxdb/api** - Remote API client for mdxdb servers
-- **@mdxdb/mongo** - MongoDB adapter
-- **@mdxdb/clickhouse** - ClickHouse adapter
+### @mdxui - Rendering & Output Formats
 
-- **@mdxe/hono** - Hono runtime for mdxe
-- **@mdxe/workers** - Cloudflare Workers runtime
-- **@mdxe/next** - Next.js integration
-- **@mdxe/vitest** - Vitest integration for MDX tests
-- **@mdxe/node** - Node.js runtime
+Defines rendering conventions for core components (`Site`, `Docs`, `App`, `Page`, etc.) to various output formats:
 
-- **@mdxui/shadcn** - Shadcn UI component library
-- **@mdxui/html** - Plain HTML renderer
-- **@mdxui/json** - JSON output renderer
-- **@mdxui/markdown** - Markdown output renderer
+```
+@mdxui/
+├── html       → React → HTML strings (SSR)
+├── markdown   → React → Markdown strings
+├── json       → React → JSON / JSON-LD / Tool Schemas
+├── email      → React → Email HTML (React Email)
+├── slack      → React → Slack blocks (Slack-JSX)
+├── shadcn     → React web components (shadcn/ui)
+├── fumadocs   → Documentation utilities (Fumadocs)
+└── widgets    → Interactive widgets (Chat, Editor, Search)
+```
 
-- **@mdxai/claude** - Claude AI integration
-- **@mdxai/mastra** - Mastra AI integration
-- **@mdxai/vapi** - Voice API integration
+> **Note:** Terminal rendering uses `@mdxe/ink` (not @mdxui) because Ink output is inherently coupled to the Ink runtime execution context.
+
+### @mdxe - Execution Environments & Protocols
+
+Defines runtimes, servers, and communication protocols:
+
+```
+@mdxe/
+├── node       → Node.js runtime evaluation
+├── bun        → Bun runtime evaluation
+├── workers    → Cloudflare Workers runtime
+├── hono       → HTTP middleware (Hono)
+├── next       → Next.js App Router integration
+├── ink        → Terminal UI (React Ink) - runtime + rendering
+├── rpc        → capnweb RPC protocol (Node, Bun, Workers)
+├── mcp        → Model Context Protocol
+│   ├── stdio  → stdio transport (Node, Bun)
+│   └── http   → HTTP transport (Node, Bun, Workers)
+├── vitest     → Test runner integration
+└── isolate    → V8 isolate compilation
+```
+
+**Key distinction:**
+- `@mdxe/rpc` uses capnweb's `RPC` and `RPCPromise` from ai-functions
+- `@mdxe/mcp` is separate - different transports (stdio, http) and different runtimes
+
+### @mdxdb - Database Adapters
+
+```
+@mdxdb/
+├── fs         → Filesystem (git-friendly .mdx files)
+├── sqlite     → SQLite/Turso (vector search, local-first)
+├── postgres   → PostgreSQL (pgvector)
+├── mongo      → MongoDB (Atlas Vector Search)
+├── clickhouse → ClickHouse (analytics)
+├── api        → HTTP API client
+├── fumadocs   → Fumadocs content source
+└── sources    → Unified source interface
+```
+
+### @mdxld - Parsing & Transformation
+
+```
+@mdxld/
+├── ast        → AST manipulation and traversal
+├── compile    → MDX → JavaScript compilation
+├── evaluate   → Runtime evaluation
+├── validate   → Schema validation (JSON Schema, Zod)
+├── jsonld     → JSON-LD ↔ MDXLD conversion
+└── config     → Shared TypeScript/ESLint configs
+```
+
+### @mdxai - AI Integrations
+
+```
+@mdxai/
+├── claude     → Claude AI with MCP tools
+├── mastra     → Mastra agent framework
+├── agentkit   → Agent composition toolkit
+└── vapi       → Vapi voice AI
+```
 
 ### Primitives (primitives/)
 
 AI primitives packages (submodule) providing core functionality:
 - **ai-functions** - AI function definitions, RPC, generation
 - **ai-workflows** - Event-driven workflows with `$` context
-- **ai-database** - Simplified database interface
+- **ai-database** - Schema-first DB with bi-directional relationships
 - **ai-sandbox** - Test execution environment
 
 ## Key Concepts
@@ -107,18 +165,70 @@ import { parse, stringify } from 'mdxld'
 const doc = parse(content) // Returns { id, type, context, data, content }
 ```
 
+### Rendering to Multiple Formats
+
+```typescript
+import { parse } from 'mdxld'
+import { toHTML } from '@mdxui/html'
+import { toJSON } from '@mdxui/json'
+import { toSlack } from '@mdxui/slack'
+import { toEmail } from '@mdxui/email'
+
+const doc = parse(mdxContent)
+
+// Same document, different output formats
+const html = await toHTML(doc)      // HTML string for web
+const json = await toJSON(doc)      // JSON-LD for APIs
+const slack = await toSlack(doc)    // Slack blocks for messaging
+const email = await toEmail(doc)    // Email HTML for notifications
+```
+
+### Execution via Protocols
+
+```typescript
+// capnweb RPC (from ai-functions)
+import { createRPCServer } from '@mdxe/rpc'
+const rpc = createRPCServer({ functions, port: 3000 })
+
+// MCP for Claude/AI tools
+import { createMCPServer } from '@mdxe/mcp'
+const mcp = createMCPServer({
+  tools: toolDocs,
+  transport: 'stdio' // or 'http'
+})
+```
+
 ### Database Interface
 
-Both `Database` (mdxdb) and `DBClient` (ai-database) interfaces are supported:
+Schema-first with automatic bi-directional relationships:
 ```ts
-import { createFsDatabase } from '@mdxdb/fs'
-import { createSqliteDatabase } from '@mdxdb/sqlite'
+import { DB } from 'ai-database'
 
-const db = createFsDatabase({ root: './content' })
-await db.get('posts/hello')
-await db.set('posts/hello', { $type: 'Post', title: 'Hello' })
-await db.list({ type: 'Post' })
-await db.search({ query: 'hello' })
+const db = DB({
+  Post: {
+    title: 'string',
+    content: 'markdown',
+    author: 'Author.posts',  // Creates Post.author -> Author AND Author.posts -> Post[]
+  },
+  Author: {
+    name: 'string',
+    email: 'string',
+    // posts: Post[] auto-created from backref
+  },
+})
+
+// Typed, provider-agnostic access
+const post = await db.Post.get('hello-world')
+const author = await post.author           // Resolved Author
+const posts = await db.Author.get('john').posts  // Post[]
+```
+
+Provider resolved from `DATABASE_URL`:
+```bash
+DATABASE_URL=./content              # Filesystem
+DATABASE_URL=sqlite://./content     # SQLite
+DATABASE_URL=libsql://your-db.turso.io  # Turso
+DATABASE_URL=chdb://./content       # ClickHouse (local)
 ```
 
 ### MDX Test Files
@@ -135,9 +245,9 @@ Run with `mdxe test` which uses `ai-sandbox` for execution.
 ## File Conventions
 
 - **examples/[Type].mdx** - Template files for entity types (bracket notation = dynamic routes)
-- **examples/{domain}/** - Domain-specific MDX applications (api.ht, db.ht, schema.org.ai, etc.)
 - **packages/*/src/index.ts** - Package entry points (re-exports)
 - **packages/*/src/types.ts** - TypeScript type definitions
+- **packages/@scope/name/README.md** - Package documentation
 
 ## Testing
 
@@ -152,12 +262,48 @@ pnpm test:mdx                       # MDX-specific tests
 
 ```
 mdxld (core parsing)
-  └── mdxdb (database abstraction)
-        └── @mdxdb/* (database adapters)
-        └── mdxai (AI SDK, uses ai-* primitives)
-              └── @mdxai/* (AI integrations)
-  └── mdxe (execution/deployment)
-        └── @mdxe/* (runtime adapters)
-  └── mdxui (rendering)
-        └── @mdxui/* (UI adapters)
+├── @mdxld/* (AST, compile, validate, jsonld)
+│
+├── mdxdb (database abstraction)
+│   └── @mdxdb/* (fs, sqlite, postgres, mongo, clickhouse, api)
+│
+├── mdxe (execution)
+│   └── @mdxe/* (node, bun, workers, hono, next, ink, rpc, mcp, vitest)
+│
+├── mdxui (rendering)
+│   └── @mdxui/* (html, json, markdown, email, slack, shadcn)
+│
+└── mdxai (AI integrations)
+    └── @mdxai/* (claude, mastra, agentkit, vapi)
+
+primitives/ (submodule)
+├── ai-functions → used by @mdxe/rpc
+├── ai-workflows → used by mdxai
+├── ai-database → used by mdxdb
+└── ai-sandbox → used by @mdxe/vitest
 ```
+
+## Creating New Packages
+
+When creating a new scoped package, ask:
+
+1. **Is it about OUTPUT FORMAT?** → `@mdxui/`
+   - Rendering MDX to HTML, JSON, Markdown, Slack, Email, Terminal
+
+2. **Is it about EXECUTION?** → `@mdxe/`
+   - Runtimes (node, bun, workers)
+   - Protocols (rpc, mcp, http)
+   - Testing (vitest)
+
+3. **Is it about STORAGE?** → `@mdxdb/`
+   - Database adapters
+   - Content sources
+
+4. **Is it about PARSING/TRANSFORMATION?** → `@mdxld/`
+   - AST manipulation
+   - Compilation
+   - Validation
+
+5. **Is it about AI?** → `@mdxai/`
+   - AI provider integrations
+   - Agent frameworks

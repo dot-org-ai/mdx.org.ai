@@ -58,14 +58,13 @@ function createShouldChain(actual: unknown, negated = false): ShouldAssertion {
 
   const assertion: ShouldAssertion = {
     get be() {
-      return {
-        ...chain(),
+      const beObj = {
         a: (type: string) => {
           const actualType = actual === null ? 'null' : Array.isArray(actual) ? 'array' : typeof actual
           check(actualType === type.toLowerCase(), `Expected ${JSON.stringify(actual)} to be a ${type}`)
           return chain()
         },
-        an: (type: string) => assertion.be.a(type),
+        an: (type: string) => beObj.a(type),
         above: (n: number) => {
           check((actual as number) > n, `Expected ${actual} to be above ${n}`)
           return chain()
@@ -108,10 +107,10 @@ function createShouldChain(actual: unknown, negated = false): ShouldAssertion {
           return chain()
         },
       }
+      return beObj
     },
     get have() {
-      return {
-        ...chain(),
+      const haveObj = {
         property: (name: string, value?: unknown) => {
           const hasIt = actual != null && Object.prototype.hasOwnProperty.call(actual, name)
           if (value !== undefined) {
@@ -134,6 +133,7 @@ function createShouldChain(actual: unknown, negated = false): ShouldAssertion {
           return chain()
         },
       }
+      return haveObj
     },
     equal: (expected: unknown) => {
       check(actual === expected, `Expected ${JSON.stringify(actual)} to equal ${JSON.stringify(expected)}`)
@@ -142,6 +142,18 @@ function createShouldChain(actual: unknown, negated = false): ShouldAssertion {
     deep: {
       equal: (expected: unknown) => {
         check(JSON.stringify(actual) === JSON.stringify(expected), `Expected deep equal to ${JSON.stringify(expected)}`)
+        return chain()
+      },
+      include: (expected: unknown) => {
+        // Check that all properties in expected exist with same values in actual
+        if (typeof expected === 'object' && expected !== null && typeof actual === 'object' && actual !== null) {
+          const expectedObj = expected as Record<string, unknown>
+          const actualObj = actual as Record<string, unknown>
+          for (const key of Object.keys(expectedObj)) {
+            const matches = JSON.stringify(actualObj[key]) === JSON.stringify(expectedObj[key])
+            check(matches, `Expected ${JSON.stringify(actual)} to deeply include ${JSON.stringify(expected)}`)
+          }
+        }
         return chain()
       },
     },
@@ -535,6 +547,91 @@ function resolveUrl(parts: { ns?: string; type?: string; id?: string } | string)
 }
 
 // =============================================================================
+// Render Functions (Markdown/TOC)
+// =============================================================================
+
+interface TocEntry {
+  level: number
+  text: string
+  slug: string
+}
+
+function createRender() {
+  return {
+    /**
+     * Render MDX content to markdown
+     */
+    markdown(content: string, options: { includeFrontmatter?: boolean } = {}): string {
+      const { includeFrontmatter = false } = options
+
+      // Extract frontmatter and body
+      const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/)
+
+      if (frontmatterMatch) {
+        const frontmatter = frontmatterMatch[1]!
+        const body = frontmatterMatch[2]!
+
+        if (includeFrontmatter) {
+          return `---\n${frontmatter}\n---\n${body}`
+        }
+        return body.trim()
+      }
+
+      return content.trim()
+    },
+
+    /**
+     * Extract table of contents from markdown content
+     */
+    toc(content: string): TocEntry[] {
+      const toc: TocEntry[] = []
+      const lines = content.split('\n')
+
+      for (const line of lines) {
+        const match = line.match(/^(#{1,6})\s+(.+)$/)
+        if (match) {
+          const level = match[1]!.length
+          const text = match[2]!.trim()
+          const slug = text
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+          toc.push({ level, text, slug })
+        }
+      }
+
+      return toc
+    },
+
+    /**
+     * Render MDX content to HTML
+     */
+    html(content: string): string {
+      // Simple markdown to HTML conversion for testing
+      let html = content
+        // Headers
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        // Bold
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        // Code
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        // Links
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+        // Paragraphs (simple)
+        .split('\n\n')
+        .map((p) => (p.startsWith('<') ? p : `<p>${p}</p>`))
+        .join('\n')
+
+      return html
+    },
+  }
+}
+
+// =============================================================================
 // Event Handling (on/send)
 // =============================================================================
 
@@ -593,6 +690,7 @@ beforeEach(() => {
   g.extractRelationships = extractRelationships
   g.withRelationships = withRelationships
   g.resolveUrl = resolveUrl
+  g.render = createRender()
 })
 
 afterEach(() => {

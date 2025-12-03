@@ -28,6 +28,11 @@ export default defineConfig({
           '@mdxui/markdown',
           '@mdxdb/fs',
           '@mdxai/claude',
+          '@mdxld/ast',
+          '@mdxld/compile',
+          '@mdxld/evaluate',
+          '@mdxld/validate',
+          'ai-sandbox',
         ],
       },
     },
@@ -56,6 +61,15 @@ export default defineConfig({
 
       // @mdxai packages
       '@mdxai/claude': path.resolve(__dirname, 'packages/@mdxai/claude/src/index.ts'),
+
+      // @mdxld packages
+      '@mdxld/ast': path.resolve(__dirname, 'packages/@mdxld/ast/src/index.ts'),
+      '@mdxld/compile': path.resolve(__dirname, 'packages/@mdxld/compile/src/index.ts'),
+      '@mdxld/evaluate': path.resolve(__dirname, 'packages/@mdxld/evaluate/src/index.ts'),
+      '@mdxld/validate': path.resolve(__dirname, 'packages/@mdxld/validate/src/index.ts'),
+
+      // Primitives packages
+      'ai-sandbox': path.resolve(__dirname, 'primitives/packages/ai-sandbox/src/index.ts'),
     },
   },
 })
