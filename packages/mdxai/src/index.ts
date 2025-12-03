@@ -76,12 +76,225 @@ export {
 
 export {
   DB,
-  db,
-  configureDB,
-  type DBOptions,
-  MemoryDB,
-  createMemoryDB,
+  setProvider,
+  parseSchema,
+  MemoryProvider,
+  createMemoryProvider,
+  type DatabaseSchema,
+  type EntitySchema,
+  type FieldDefinition,
+  type PrimitiveType,
+  type ParsedSchema,
+  type ParsedEntity,
+  type ParsedField,
+  type TypedDB,
+  type EntityOperations,
+  type DBProvider,
+  type ListOptions as DBListOptions,
+  type SearchOptions as DBSearchOptions,
+  type InferEntity,
 } from 'ai-database'
+
+// =============================================================================
+// Re-export everything from ai-providers
+// =============================================================================
+
+// Note: Import types directly from 'ai-providers' if needed
+export {
+  createRegistry,
+  getRegistry,
+  configureRegistry,
+  model,
+  embeddingModel,
+  DIRECT_PROVIDERS,
+} from 'ai-providers'
+
+// =============================================================================
+// Re-export everything from ai-experiments
+// =============================================================================
+
+// Note: Most types from ai-experiments conflict with existing types in this file
+// Import types directly from 'ai-experiments' if needed
+export {
+  // Experiment functionality
+  Experiment,
+  createVariantsFromGrid,
+  // Cartesian product utilities
+  cartesian,
+  cartesianFilter,
+  cartesianSample,
+  cartesianCount,
+  cartesianWithLabels,
+  // Decision making utilities (aliased to avoid conflicts)
+  decide as decideExperiment,
+  decideWeighted,
+  decideEpsilonGreedy,
+  decideThompsonSampling,
+  decideUCB,
+  // Tracking utilities (aliased to avoid conflicts)
+  track as trackExperiment,
+  flush,
+  configureTracking,
+  getTrackingConfig,
+  createConsoleBackend,
+  createMemoryBackend,
+  createBatchBackend,
+  createFileBackend,
+} from 'ai-experiments'
+
+// =============================================================================
+// Re-export everything from autonomous-agents
+// =============================================================================
+
+// Note: Import types directly from 'autonomous-agents' if needed
+export {
+  // Agent creation and management
+  Agent,
+  // Role definitions
+  Role as AgentRole,
+  Roles,
+  hasPermission,
+  hasSkill,
+  getPermissions,
+  getSkills,
+  mergeRoles,
+  // Team collaboration
+  Team as AgentTeam,
+  createTeamMember,
+  teamMemberFromAgent,
+  calculateTeamCapacity,
+  getTeamSkills,
+  teamHasSkill,
+  findBestMemberForTask,
+  // Goals and objectives
+  Goals as AgentGoals,
+  createGoal,
+  createGoalWithSubgoals,
+  isGoalOverdue,
+  getOverdueGoals,
+  getGoalsDueSoon,
+  getGoalsByStatus,
+  getTimeRemaining,
+  // Action primitives (aliased to avoid conflicts)
+  do as agentDo,
+  doAction,
+  ask as agentAsk,
+  decide as agentDecide,
+  approve as agentApprove,
+  generate as agentGenerate,
+  is as agentIs,
+  notify as agentNotify,
+  // Metrics and performance tracking
+  kpi as agentKpi,
+  kpis as agentKpis,
+  okr as agentOkr,
+  okrs as agentOkrs,
+  createKeyResult,
+  updateKeyResultStatus,
+} from 'autonomous-agents'
+
+// =============================================================================
+// Re-export everything from digital-workers
+// =============================================================================
+
+// Note: Import types directly from 'digital-workers' if needed
+export {
+  // Core functions
+  Role as DigitalWorkerRole,
+  Team as DigitalWorkerTeam,
+  Goals as DigitalWorkerGoals,
+  approve as workerApprove,
+  ask as workerAsk,
+  do as workerDo,
+  decide as workerDecide,
+  generate as workerGenerate,
+  is as workerIs,
+  notify as workerNotify,
+  kpis as workerKpis,
+  okrs as workerOkrs,
+} from 'digital-workers'
+
+// =============================================================================
+// Re-export everything from human-in-the-loop
+// =============================================================================
+
+// Note: Import types directly from 'human-in-the-loop' if needed
+export {
+  // Main Human constructor and manager
+  Human,
+  HumanManager,
+  // Helper functions (convenience API)
+  Role as HumanRole,
+  Team as HumanTeam,
+  Goals as HumanGoals,
+  approve as humanApprove,
+  ask as humanAsk,
+  do as humanDo,
+  decide as humanDecide,
+  generate as humanGenerate,
+  is as humanIs,
+  notify as humanNotify,
+  kpis as humanKpis,
+  okrs as humanOkrs,
+  registerHuman,
+  getDefaultHuman,
+  // Store implementations
+  InMemoryHumanStore,
+} from 'human-in-the-loop'
+
+// =============================================================================
+// Re-export everything from services-as-software
+// =============================================================================
+
+// Note: Import types directly from 'services-as-software' if needed
+export {
+  // Core service primitives
+  Service,
+  Endpoint,
+  GET,
+  POST,
+  PUT,
+  DELETE,
+  PATCH,
+  Client as ServiceClient,
+  Provider as ServiceProvider,
+  providers,
+  // Helper functions for common operations
+  ask as serviceAsk,
+  deliver,
+  do as serviceDo,
+  generate as serviceGenerate,
+  is as serviceIs,
+  notify as serviceNotify,
+  on as serviceOn,
+  order,
+  queue,
+  quote,
+  subscribe,
+  every as serviceEvery,
+  entitlements,
+  kpis as serviceKpis,
+  okrs as serviceOkrs,
+  Plan,
+  KPI as ServiceKPI,
+  OKR as ServiceOKR,
+  Entitlement,
+} from 'services-as-software'
+
+// =============================================================================
+// Re-export everything from language-models
+// =============================================================================
+
+// Note: Import types directly from 'language-models' if needed
+export {
+  resolve as resolveModel,
+  resolveWithProvider,
+  list as listModels,
+  get as getModel,
+  search as searchModels,
+  DIRECT_PROVIDERS as MODEL_DIRECT_PROVIDERS,
+  ALIASES as MODEL_ALIASES,
+} from 'language-models'
 
 // =============================================================================
 // Persistence Provider using mdxdb
@@ -112,7 +325,7 @@ export { createSqliteDatabase } from '@mdxdb/sqlite'
 export type { Database, ListOptions, SearchOptions, GetOptions, SetOptions, DeleteOptions, DBClient, Thing } from 'mdxdb'
 export type { FsDatabaseConfig } from '@mdxdb/fs'
 export type { SqliteDatabaseConfig } from '@mdxdb/sqlite'
-export type { MDXLDDocument, MDXLDData, Relationship } from 'mdxld'
+export type { MDXLDDocument, MDXLDData } from 'mdxld'
 
 // =============================================================================
 // AI Database Tools for Agents
@@ -300,7 +513,7 @@ export function createDatabaseTools(db: AnyDatabase): DatabaseTool[] {
 // =============================================================================
 
 import { Workflow, createIsolatedContext } from 'ai-workflows'
-import { DB, type DBOptions, MemoryDB } from 'ai-database'
+import { DB, type DatabaseSchema, MemoryProvider, createMemoryProvider } from 'ai-database'
 import { AI, ai, generateObject, generateText, type AIProxy } from 'ai-functions'
 
 /**
@@ -308,7 +521,7 @@ import { AI, ai, generateObject, generateText, type AIProxy } from 'ai-functions
  */
 export interface ContextOptions {
   /** Database configuration or instance */
-  db?: AnyDatabase | DBOptions | string
+  db?: AnyDatabase | DatabaseSchema | string
   /** AI configuration */
   ai?: AIProxy | Record<string, unknown>
   /** Namespace for the context */
@@ -375,14 +588,15 @@ export interface UnifiedContext {
  * ```
  */
 export function createContext(options: ContextOptions = {}): UnifiedContext {
-  // Initialize database - MemoryDB and DBClient both implement AnyDatabase interface
+  // Initialize database - use simple in-memory object as placeholder
   let database: AnyDatabase
   if (!options.db) {
-    database = new MemoryDB() as AnyDatabase
+    // Simple in-memory database placeholder
+    database = createMemoryProvider() as unknown as AnyDatabase
   } else if (typeof options.db === 'string') {
-    database = DB(options.db) as unknown as AnyDatabase
-  } else if ('ns' in options.db || 'namespace' in options.db) {
-    database = DB(options.db as DBOptions) as unknown as AnyDatabase
+    database = DB(options.db as any) as unknown as AnyDatabase
+  } else if (typeof options.db === 'object' && !('list' in options.db)) {
+    database = DB(options.db as DatabaseSchema) as unknown as AnyDatabase
   } else {
     database = options.db as AnyDatabase
   }
@@ -705,6 +919,409 @@ export function createPersistentWorkflow(
       },
     },
   })
+}
+
+// =============================================================================
+// Helper Factories for Combining Primitives
+// =============================================================================
+
+import {
+  Agent,
+  do as agentDo,
+  ask as agentAsk,
+  decide as agentDecide,
+  approve as agentApprove,
+  notify as agentNotify,
+  is as agentIs,
+  type AgentConfig,
+} from 'autonomous-agents'
+
+import {
+  Service,
+  do as serviceDo,
+  ask as serviceAsk,
+  notify as serviceNotify,
+  is as serviceIs,
+  quote,
+  order,
+  subscribe,
+  queue,
+  deliver,
+  type ServiceDefinition,
+} from 'services-as-software'
+
+import {
+  Experiment,
+  decide as decideExperiment,
+  decideWeighted,
+  decideEpsilonGreedy,
+  decideThompsonSampling,
+  decideUCB,
+  track as trackExperiment,
+  flush,
+  cartesian,
+  cartesianFilter,
+  cartesianSample,
+  cartesianCount,
+  cartesianWithLabels,
+  configureTracking,
+} from 'ai-experiments'
+
+import {
+  model,
+  embeddingModel,
+  configureRegistry,
+  DIRECT_PROVIDERS,
+} from 'ai-providers'
+
+import {
+  resolve as resolveModel,
+  resolveWithProvider,
+  list as listModels,
+  get as getModel,
+  search as searchModels,
+  ALIASES as MODEL_ALIASES,
+} from 'language-models'
+
+/**
+ * Agent context with combined ai-functions and autonomous-agents capabilities
+ */
+export interface AgentContext {
+  /** Agent instance */
+  agent: ReturnType<typeof Agent>
+  /** Database instance */
+  db: AnyDatabase
+  /** AI instance */
+  ai: AIProxy
+  /** Generate structured objects */
+  generate: typeof generateObject
+  /** Generate text */
+  generateText: typeof generateText
+  /** Execute tasks */
+  do: typeof agentDo
+  /** Ask questions */
+  ask: typeof agentAsk
+  /** Make decisions */
+  decide: typeof agentDecide
+  /** Request approval */
+  approve: typeof agentApprove
+  /** Send notifications */
+  notify: typeof agentNotify
+  /** Check conditions */
+  is: typeof agentIs
+}
+
+/**
+ * Create an agent context that combines AI functions with autonomous agent capabilities
+ *
+ * @example
+ * ```ts
+ * import { createAgentContext } from 'mdxai'
+ *
+ * const ctx = createAgentContext({
+ *   name: 'ProductAgent',
+ *   role: {
+ *     name: 'Product Manager',
+ *     skills: ['product strategy', 'roadmap planning'],
+ *   },
+ *   mode: 'autonomous',
+ *   goals: [
+ *     { id: 'g1', description: 'Define Q1 roadmap', target: '100%' }
+ *   ],
+ * })
+ *
+ * // Use agent capabilities
+ * const result = await ctx.do('Create product brief')
+ * const decision = await ctx.decide(['A', 'B', 'C'], 'Which feature?')
+ *
+ * // Use AI capabilities
+ * const summary = await ctx.generate({
+ *   schema: z.object({ summary: z.string() }),
+ *   prompt: 'Summarize the roadmap'
+ * })
+ * ```
+ */
+export function createAgentContext(
+  config: AgentConfig,
+  options: { db?: AnyDatabase; ai?: AIProxy } = {}
+): AgentContext {
+  const database = options.db || $.db
+  const aiInstance = options.ai || ai
+
+  const agent = Agent(config)
+
+  return {
+    agent,
+    db: database,
+    ai: aiInstance,
+    generate: generateObject,
+    generateText,
+    do: agentDo,
+    ask: agentAsk,
+    decide: agentDecide,
+    approve: agentApprove,
+    notify: agentNotify,
+    is: agentIs,
+  }
+}
+
+/**
+ * Service context with combined services-as-software and ai-functions capabilities
+ */
+export interface ServiceContext {
+  /** Service instance */
+  service: ReturnType<typeof Service>
+  /** Database instance */
+  db: AnyDatabase
+  /** AI instance */
+  ai: AIProxy
+  /** Generate structured objects */
+  generate: typeof generateObject
+  /** Generate text */
+  generateText: typeof generateText
+  /** Execute service tasks */
+  do: typeof serviceDo
+  /** Ask questions */
+  ask: typeof serviceAsk
+  /** Send notifications */
+  notify: typeof serviceNotify
+  /** Check conditions */
+  is: typeof serviceIs
+  /** Create quotes */
+  quote: typeof quote
+  /** Create orders */
+  order: typeof order
+  /** Create subscriptions */
+  subscribe: typeof subscribe
+  /** Queue tasks */
+  queue: typeof queue
+  /** Deliver results */
+  deliver: typeof deliver
+}
+
+/**
+ * Create a service context that combines service capabilities with AI functions
+ *
+ * @example
+ * ```ts
+ * import { createServiceContext } from 'mdxai'
+ *
+ * const ctx = createServiceContext({
+ *   name: 'SummaryService',
+ *   description: 'Generates summaries of documents',
+ *   version: '1.0.0',
+ *   endpoints: {
+ *     '/summarize': {
+ *       POST: async ({ text }) => {
+ *         return await ctx.generate({
+ *           schema: z.object({ summary: z.string() }),
+ *           prompt: `Summarize: ${text}`
+ *         })
+ *       }
+ *     }
+ *   },
+ *   pricing: {
+ *     model: 'usage',
+ *     unit: 'request',
+ *     price: 0.01,
+ *   },
+ * })
+ *
+ * // Use service capabilities
+ * const quote = await ctx.quote({ items: [{ sku: 'summary', quantity: 100 }] })
+ * const subscription = await ctx.subscribe({ plan: 'pro' })
+ *
+ * // Use AI capabilities
+ * const result = await ctx.generate({
+ *   schema: z.object({ category: z.string() }),
+ *   prompt: 'Categorize this request'
+ * })
+ * ```
+ */
+export function createServiceContext(
+  definition: ServiceDefinition,
+  options: { db?: AnyDatabase; ai?: AIProxy } = {}
+): ServiceContext {
+  const database = options.db || $.db
+  const aiInstance = options.ai || ai
+
+  const service = Service(definition)
+
+  return {
+    service,
+    db: database,
+    ai: aiInstance,
+    generate: generateObject,
+    generateText,
+    do: serviceDo,
+    ask: serviceAsk,
+    notify: serviceNotify,
+    is: serviceIs,
+    quote,
+    order,
+    subscribe,
+    queue,
+    deliver,
+  }
+}
+
+/**
+ * Helper to create an experiment context with tracking
+ *
+ * @example
+ * ```ts
+ * import { createExperimentContext } from 'mdxai'
+ *
+ * const ctx = createExperimentContext({
+ *   name: 'button-color-test',
+ *   backend: createFileBackend('./experiments.jsonl'),
+ * })
+ *
+ * // Run experiments
+ * const variant = await ctx.decide(['blue', 'green', 'red'])
+ * await ctx.track('button_click', { variant, converted: true })
+ *
+ * // Run complex experiments
+ * const experiment = ctx.Experiment({
+ *   name: 'model-comparison',
+ *   variants: [
+ *     { name: 'gpt-4', value: 'gpt-4' },
+ *     { name: 'claude', value: 'claude-3-opus' },
+ *   ],
+ * })
+ *
+ * const result = await experiment.run(async (variant) => {
+ *   return await generateText({ model: variant.value, prompt: 'Hello!' })
+ * })
+ * ```
+ */
+export interface ExperimentContext {
+  /** Experiment factory */
+  Experiment: typeof Experiment
+  /** Simple decision making */
+  decide: typeof decideExperiment
+  /** Weighted decision making */
+  decideWeighted: typeof decideWeighted
+  /** Epsilon-greedy decision making */
+  decideEpsilonGreedy: typeof decideEpsilonGreedy
+  /** Thompson sampling decision making */
+  decideThompsonSampling: typeof decideThompsonSampling
+  /** UCB decision making */
+  decideUCB: typeof decideUCB
+  /** Track events */
+  track: typeof trackExperiment
+  /** Flush tracking backend */
+  flush: typeof flush
+  /** Cartesian product utilities */
+  cartesian: typeof cartesian
+  cartesianFilter: typeof cartesianFilter
+  cartesianSample: typeof cartesianSample
+  cartesianCount: typeof cartesianCount
+  cartesianWithLabels: typeof cartesianWithLabels
+}
+
+/**
+ * Create an experiment context with tracking configured
+ */
+export function createExperimentContext(options: {
+  name?: string
+  backend?: import('ai-experiments').TrackingBackend
+} = {}): ExperimentContext {
+  // Configure tracking if backend provided
+  if (options.backend) {
+    configureTracking({
+      backend: options.backend,
+      enabled: true,
+    })
+  }
+
+  return {
+    Experiment,
+    decide: decideExperiment,
+    decideWeighted,
+    decideEpsilonGreedy,
+    decideThompsonSampling,
+    decideUCB,
+    track: trackExperiment,
+    flush,
+    cartesian,
+    cartesianFilter,
+    cartesianSample,
+    cartesianCount,
+    cartesianWithLabels,
+  }
+}
+
+/**
+ * Helper to create a model registry context
+ *
+ * @example
+ * ```ts
+ * import { createModelContext } from 'mdxai'
+ *
+ * const ctx = createModelContext({
+ *   gateway: 'my-gateway',
+ *   accountId: 'account-123',
+ * })
+ *
+ * // Use models by name
+ * const response = await generateText({
+ *   model: ctx.model('gpt-4'),
+ *   prompt: 'Hello world'
+ * })
+ *
+ * // Search and list models
+ * const claudeModels = ctx.search('claude')
+ * const allModels = ctx.list()
+ * ```
+ */
+export interface ModelContext {
+  /** Create model from string identifier */
+  model: typeof model
+  /** Create embedding model */
+  embeddingModel: typeof embeddingModel
+  /** List all models */
+  list: typeof listModels
+  /** Get specific model */
+  get: typeof getModel
+  /** Search models */
+  search: typeof searchModels
+  /** Resolve model alias */
+  resolve: typeof resolveModel
+  /** Resolve with provider */
+  resolveWithProvider: typeof resolveWithProvider
+  /** Available providers */
+  providers: typeof DIRECT_PROVIDERS
+  /** Model aliases */
+  aliases: typeof MODEL_ALIASES
+}
+
+/**
+ * Create a model context with registry configured
+ */
+export function createModelContext(options: {
+  gatewayUrl?: string
+  accountId?: string
+} = {}): ModelContext {
+  // Configure registry if options provided
+  if (options.gatewayUrl || options.accountId) {
+    configureRegistry({
+      gatewayUrl: options.gatewayUrl,
+      cloudflareAccountId: options.accountId,
+    })
+  }
+
+  return {
+    model,
+    embeddingModel,
+    list: listModels,
+    get: getModel,
+    search: searchModels,
+    resolve: resolveModel,
+    resolveWithProvider,
+    providers: DIRECT_PROVIDERS,
+    aliases: MODEL_ALIASES,
+  }
 }
 
 // =============================================================================

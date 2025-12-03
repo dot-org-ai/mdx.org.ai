@@ -49,8 +49,15 @@
     "@mdxdb/sqlite": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.23.0",
     "ai-database": "workspace:*",
+    "ai-experiments": "workspace:*",
     "ai-functions": "workspace:*",
+    "ai-providers": "workspace:*",
     "ai-workflows": "workspace:*",
+    "autonomous-agents": "workspace:*",
+    "digital-workers": "workspace:*",
+    "human-in-the-loop": "workspace:*",
+    "language-models": "workspace:*",
+    "services-as-software": "workspace:*",
     "zod": "^3.24.0"
   },
   "devDependencies": {

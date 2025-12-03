@@ -14,13 +14,30 @@ yarn add mdxai
 
 ## Features
 
-- **AI Functions** - RPC primitives, generation, embeddings, auto-define
-- **Workflows** - Event-driven workflows with `$` context
-- **Database** - Simplified AI-powered database interface
+mdxai combines multiple AI primitives into a unified SDK:
+
+### Core Primitives
+
+- **ai-functions** - RPC primitives, generation, embeddings, auto-define
+- **ai-workflows** - Event-driven workflows with `$` context
+- **ai-database** - Simplified AI-powered database interface
+- **ai-providers** - Unified AI provider registry with Cloudflare AI Gateway support
+- **ai-experiments** - A/B testing, parameter exploration, and experiment tracking
+- **language-models** - Model listing, resolution, and alias management
+
+### Agent & Worker Primitives
+
+- **autonomous-agents** - Build autonomous AI agents with goals, teams, and KPIs
+- **digital-workers** - Common interface for AI agents and humans within company boundaries
+- **human-in-the-loop** - Human oversight, approvals, and intervention workflows
+- **services-as-software** - AI-powered services with pricing, subscriptions, and business logic
+
+### Additional Features
+
 - **Persistence** - mdxdb-backed storage for functions and workflows
-- **Experiments** - A/B testing and feature flags
 - **Event Tracking** - Analytics and conversion tracking
 - **MCP Server** - Claude integration via Model Context Protocol
+- **Helper Factories** - Pre-configured contexts for common use cases
 
 ## Quick Start
 
@@ -44,6 +61,343 @@ const ctx = createContext({
   db: 'myapp.example.com',
   ns: 'production',
 })
+```
+
+## Primitives Documentation
+
+### AI Providers
+
+Unified access to multiple AI providers with optional Cloudflare AI Gateway integration.
+
+```typescript
+import { createRegistry, model, embeddingModel, createModelContext } from 'mdxai'
+
+// Configure with Cloudflare AI Gateway
+const registry = createRegistry({
+  cloudflareGateway: 'my-gateway',
+  cloudflareAccountId: 'account-123',
+})
+
+// Use models by string identifier
+const gpt4 = model('gpt-4')
+const claude = model('claude-3-opus')
+
+// Or use the model context helper
+const ctx = createModelContext({
+  gateway: 'my-gateway',
+  accountId: 'account-123',
+})
+
+const response = await generateText({
+  model: ctx.model('gpt-4'),
+  prompt: 'Hello world',
+})
+```
+
+### AI Experiments
+
+Run experiments, track variants, and make data-driven decisions.
+
+```typescript
+import { Experiment, cartesian, createExperimentContext, createFileBackend } from 'mdxai'
+
+// Simple experiment
+const experiment = Experiment({
+  name: 'model-comparison',
+  variants: [
+    { name: 'gpt-4', value: 'gpt-4', weight: 0.5 },
+    { name: 'claude', value: 'claude-3-opus', weight: 0.5 },
+  ],
+})
+
+const results = await experiment.run(async (variant) => {
+  return await generateText({
+    model: variant.value,
+    prompt: 'Summarize this article',
+  })
+})
+
+// Cartesian product for parameter grids
+const grid = cartesian({
+  model: ['gpt-4', 'claude-3-opus'],
+  temperature: [0, 0.5, 1.0],
+  maxTokens: [100, 500],
+})
+// Generates 12 combinations (2 * 3 * 2)
+
+// Use experiment context with tracking
+const ctx = createExperimentContext({
+  backend: createFileBackend('./experiments.jsonl'),
+})
+
+const variant = await ctx.decide(['blue', 'green', 'red'])
+await ctx.track('button_click', { variant, converted: true })
+```
+
+### Autonomous Agents
+
+Build AI agents with roles, goals, teams, and metrics.
+
+```typescript
+import { Agent, AgentRole, AgentTeam, AgentGoals, createAgentContext } from 'mdxai'
+
+// Define a role
+const productManager = AgentRole({
+  name: 'Product Manager',
+  description: 'Manages product strategy and roadmap',
+  skills: ['product strategy', 'user research', 'roadmap planning'],
+  permissions: ['create_roadmap', 'approve_features'],
+})
+
+// Create an agent
+const agent = Agent({
+  name: 'ProductAgent',
+  role: productManager,
+  mode: 'autonomous', // or 'supervised'
+  goals: [
+    {
+      id: 'g1',
+      description: 'Define Q1 roadmap',
+      target: '100%',
+      deadline: '2024-03-31',
+    },
+  ],
+})
+
+// Execute tasks
+const result = await agent.do('Create product brief for feature X')
+
+// Make decisions
+const choice = await agent.decide(['Feature A', 'Feature B', 'Feature C'], 'Which feature to prioritize?')
+
+// Request approval
+const approval = await agent.approve({
+  title: 'Budget Request',
+  description: 'Request $50k for research',
+  data: { amount: 50000 },
+  priority: 'high',
+})
+
+// Or use the agent context helper
+const ctx = createAgentContext({
+  name: 'ProductAgent',
+  role: productManager,
+  mode: 'autonomous',
+})
+
+await ctx.do('Analyze market trends')
+```
+
+### Digital Workers
+
+Common interface for AI agents and humans within company boundaries.
+
+```typescript
+import { DigitalWorkerRole, DigitalWorkerTeam, workerDo, workerApprove } from 'mdxai'
+
+// Define worker roles
+const engineer = DigitalWorkerRole({
+  name: 'Software Engineer',
+  skills: ['coding', 'debugging', 'testing'],
+})
+
+const manager = DigitalWorkerRole({
+  name: 'Engineering Manager',
+  skills: ['code review', 'team management', 'planning'],
+})
+
+// Create a team
+const team = DigitalWorkerTeam({
+  name: 'Platform Team',
+  members: [
+    { role: engineer, capacity: 1.0 },
+    { role: manager, capacity: 0.5 },
+  ],
+})
+
+// Execute tasks
+await workerDo('Implement authentication feature', { assignee: engineer })
+
+// Request approval
+const approved = await workerApprove({
+  title: 'Deploy to Production',
+  description: 'Deploy v2.0.0',
+  approver: manager,
+})
+```
+
+### Human in the Loop
+
+Integrate human oversight and decision-making into AI workflows.
+
+```typescript
+import { Human, humanApprove, humanAsk, humanNotify, registerHuman } from 'mdxai'
+
+// Create human manager
+const human = Human({
+  defaultTimeout: 3600000, // 1 hour
+  autoEscalate: true,
+  escalationChain: ['tech-lead@example.com', 'director@example.com'],
+})
+
+// Request approval from human
+const result = await humanApprove({
+  title: 'Deploy to production',
+  description: 'Approve deployment of v2.0.0',
+  subject: 'Production Deployment',
+  assignee: 'tech-lead@example.com',
+  priority: 'high',
+  timeout: 1800000, // 30 minutes
+})
+
+if (result.approved) {
+  await deploy()
+  await humanNotify({
+    type: 'success',
+    title: 'Deployment complete',
+    message: 'v2.0.0 deployed successfully',
+    recipient: 'team@example.com',
+  })
+} else {
+  await humanNotify({
+    type: 'warning',
+    title: 'Deployment cancelled',
+    message: `Reason: ${result.reason}`,
+    recipient: 'team@example.com',
+  })
+}
+
+// Ask human a question
+const answer = await humanAsk({
+  question: 'Should we prioritize Feature A or Feature B?',
+  options: ['Feature A', 'Feature B'],
+  assignee: 'product-manager@example.com',
+})
+```
+
+### Services as Software
+
+Build AI-powered services with pricing, subscriptions, and business logic.
+
+```typescript
+import { Service, Endpoint, POST, createServiceContext, Plan } from 'mdxai'
+
+// Define a service
+const summaryService = Service({
+  name: 'SummaryService',
+  description: 'Generates summaries of documents',
+  version: '1.0.0',
+  endpoints: {
+    '/summarize': {
+      POST: async ({ text }) => {
+        const { object } = await generateObject({
+          schema: z.object({ summary: z.string() }),
+          prompt: `Summarize: ${text}`,
+        })
+        return object
+      },
+    },
+  },
+  pricing: {
+    model: 'usage',
+    unit: 'request',
+    price: 0.01,
+    currency: 'USD',
+  },
+})
+
+// Create subscription plans
+const freePlan = Plan({
+  id: 'free',
+  name: 'Free',
+  price: 0,
+  interval: 'month',
+  limits: {
+    requests: 100,
+  },
+})
+
+const proPlan = Plan({
+  id: 'pro',
+  name: 'Pro',
+  price: 29,
+  interval: 'month',
+  limits: {
+    requests: 10000,
+  },
+})
+
+// Use service context
+const ctx = createServiceContext({
+  name: 'SummaryService',
+  description: 'AI-powered document summarization',
+  version: '1.0.0',
+  endpoints: {
+    '/summarize': {
+      POST: async ({ text }) => {
+        return await ctx.generate({
+          schema: z.object({ summary: z.string() }),
+          prompt: `Summarize: ${text}`,
+        })
+      },
+    },
+  },
+  pricing: {
+    model: 'subscription',
+    plans: [freePlan, proPlan],
+  },
+})
+
+// Create quotes
+const quote = await ctx.quote({
+  items: [{ sku: 'summary', quantity: 100 }],
+})
+
+// Create orders
+const order = await ctx.order({
+  items: [{ sku: 'summary', quantity: 100 }],
+  customer: 'customer-123',
+})
+
+// Subscribe to plan
+const subscription = await ctx.subscribe({
+  plan: 'pro',
+  customer: 'customer-123',
+})
+```
+
+### Language Models
+
+List, search, and resolve language model identifiers.
+
+```typescript
+import { listModels, searchModels, resolveModel, MODEL_ALIASES } from 'mdxai'
+
+// List all available models
+const allModels = listModels()
+console.log(`Found ${allModels.length} models`)
+
+// Search for specific models
+const claudeModels = searchModels('claude')
+const gptModels = searchModels('gpt')
+
+// Resolve aliases
+const resolved = resolveModel('sonnet') // Resolves to claude-3-5-sonnet-20241022
+const model = resolveModel('gpt-4o') // Returns full model info
+
+// Get specific model
+const gpt4 = getModel('gpt-4-turbo')
+console.log(`Model: ${gpt4.id}, Provider: ${gpt4.provider}`)
+
+// Available aliases
+console.log(MODEL_ALIASES)
+// {
+//   'sonnet': 'claude-3-5-sonnet-20241022',
+//   'opus': 'claude-3-opus-20240229',
+//   'haiku': 'claude-3-5-haiku-20241022',
+//   'gpt-4o': 'gpt-4o-2024-11-20',
+//   ...
+// }
 ```
 
 ## API Reference
@@ -403,16 +757,44 @@ const response = await searchTool.handler({
 
 ## Re-exports
 
-mdxai re-exports functionality from several packages for convenience:
+mdxai re-exports functionality from all primitive packages for convenience:
 
-| Package | Exports |
-|---------|---------|
-| `ai-functions` | `AI`, `ai`, `generateObject`, `generateText`, RPC primitives |
-| `ai-workflows` | `Workflow`, `on`, `every`, `send`, context utilities |
-| `ai-database` | `DB`, `db`, `configureDB`, `MemoryDB` |
+### Core Primitives
+
+| Package | Key Exports |
+|---------|------------|
+| `ai-functions` | `AI`, `ai`, `generateObject`, `generateText`, `RPC`, `RPCPromise`, `autoDefine` |
+| `ai-workflows` | `Workflow`, `on`, `every`, `send`, `createWorkflowContext`, `createIsolatedContext` |
+| `ai-database` | `DB`, `db`, `configureDB`, `MemoryDB`, `createMemoryDB` |
+| `ai-providers` | `createRegistry`, `model`, `embeddingModel`, `configureRegistry`, `DIRECT_PROVIDERS` |
+| `ai-experiments` | `Experiment`, `cartesian`, `decide*`, `track`, `flush`, `configureTracking` |
+| `language-models` | `resolveModel`, `listModels`, `searchModels`, `getModel`, `MODEL_ALIASES` |
+
+### Agent & Worker Primitives
+
+| Package | Key Exports |
+|---------|------------|
+| `autonomous-agents` | `Agent`, `AgentRole`, `AgentTeam`, `AgentGoals`, action primitives (prefixed with `agent*`) |
+| `digital-workers` | `DigitalWorkerRole`, `DigitalWorkerTeam`, worker primitives (prefixed with `worker*`) |
+| `human-in-the-loop` | `Human`, `HumanManager`, `InMemoryHumanStore`, human primitives (prefixed with `human*`) |
+| `services-as-software` | `Service`, `Endpoint`, `ServiceClient`, `Plan`, service primitives (prefixed with `service*`) |
+
+### Database & Storage
+
+| Package | Key Exports |
+|---------|------------|
 | `@mdxdb/fs` | `createFsDatabase` |
 | `@mdxdb/sqlite` | `createSqliteDatabase` |
 | `mdxld` | `MDXLDDocument`, `MDXLDData`, `Relationship` types |
+
+### Helper Factories
+
+mdxai provides specialized context factories that combine multiple primitives:
+
+- `createAgentContext()` - Combines `ai-functions` + `autonomous-agents`
+- `createServiceContext()` - Combines `services-as-software` + `ai-functions`
+- `createExperimentContext()` - Pre-configured `ai-experiments` with tracking
+- `createModelContext()` - Pre-configured `ai-providers` + `language-models`
 
 ## Types
 
