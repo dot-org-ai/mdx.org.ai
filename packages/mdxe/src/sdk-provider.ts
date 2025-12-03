@@ -72,48 +72,65 @@ export async function createSDKProvider(config: SDKProviderConfig): Promise<SDKP
  * Create a local SDK provider using mdxdb, mdxai, and ai-workflows
  */
 async function createLocalSDKProvider(config: SDKProviderConfig): Promise<SDKProvider> {
-  // Import local implementations dynamically
-  const { MemoryDBClient } = await import('mdxdb')
-
   // Create database client based on backend
   let db: DBClient
 
-  switch (config.db) {
-    case 'fs': {
-      const { createFsDatabase } = await import('@mdxdb/fs')
-      const { createDBClient } = await import('mdxdb')
-      const fsDb = createFsDatabase({ root: config.dbPath || './content' })
-      db = createDBClient(fsDb, { ns: config.ns })
-      break
+  // Try to import mdxdb, fall back to stub if not available
+  try {
+    const mdxdbModule = await import('mdxdb')
+    const { MemoryDBClient } = mdxdbModule
+
+    switch (config.db) {
+      case 'fs': {
+        try {
+          const { createFsDatabase } = await import('@mdxdb/fs')
+          const { createDBClient } = mdxdbModule
+          const fsDb = createFsDatabase({ root: config.dbPath || './content' })
+          db = createDBClient(fsDb, { ns: config.ns })
+        } catch {
+          console.warn('@mdxdb/fs not available, falling back to memory')
+          db = new MemoryDBClient({ ns: config.ns })
+        }
+        break
+      }
+      case 'sqlite': {
+        try {
+          const { createSqliteDatabase } = await import('@mdxdb/sqlite')
+          const { createDBClient } = mdxdbModule
+          const sqliteDb = createSqliteDatabase({ path: config.dbPath || ':memory:' })
+          db = createDBClient(sqliteDb, { ns: config.ns })
+        } catch {
+          console.warn('@mdxdb/sqlite not available, falling back to memory')
+          db = new MemoryDBClient({ ns: config.ns })
+        }
+        break
+      }
+      case 'postgres': {
+        // TODO: Implement postgres backend
+        console.warn('Postgres backend not yet implemented, falling back to memory')
+        db = new MemoryDBClient({ ns: config.ns })
+        break
+      }
+      case 'clickhouse': {
+        // TODO: Implement clickhouse backend
+        console.warn('ClickHouse backend not yet implemented, falling back to memory')
+        db = new MemoryDBClient({ ns: config.ns })
+        break
+      }
+      case 'mongo': {
+        // TODO: Implement mongo backend
+        console.warn('MongoDB backend not yet implemented, falling back to memory')
+        db = new MemoryDBClient({ ns: config.ns })
+        break
+      }
+      case 'memory':
+      default:
+        db = new MemoryDBClient({ ns: config.ns })
     }
-    case 'sqlite': {
-      const { createSqliteDatabase } = await import('@mdxdb/sqlite')
-      const { createDBClient } = await import('mdxdb')
-      const sqliteDb = createSqliteDatabase({ path: config.dbPath || ':memory:' })
-      db = createDBClient(sqliteDb, { ns: config.ns })
-      break
-    }
-    case 'postgres': {
-      // TODO: Implement postgres backend
-      console.warn('Postgres backend not yet implemented, falling back to memory')
-      db = new MemoryDBClient({ ns: config.ns })
-      break
-    }
-    case 'clickhouse': {
-      // TODO: Implement clickhouse backend
-      console.warn('ClickHouse backend not yet implemented, falling back to memory')
-      db = new MemoryDBClient({ ns: config.ns })
-      break
-    }
-    case 'mongo': {
-      // TODO: Implement mongo backend
-      console.warn('MongoDB backend not yet implemented, falling back to memory')
-      db = new MemoryDBClient({ ns: config.ns })
-      break
-    }
-    case 'memory':
-    default:
-      db = new MemoryDBClient({ ns: config.ns })
+  } catch {
+    // mdxdb not available, use stub implementation
+    console.warn('mdxdb not available, using stub implementation')
+    db = createStubDBClient(config.ns || 'default')
   }
 
   // Create AI provider
@@ -392,6 +409,28 @@ const send = $.send;
 const every = $.every;
 $.ns = __SDK_CONFIG__.ns;
 `
+}
+
+/**
+ * Create a stub DB client when mdxdb is not available
+ */
+function createStubDBClient(ns: string): DBClient {
+  const stub: any = {
+    ns,
+    close: async () => {},
+  }
+
+  // Create a proxy that returns stub methods
+  return new Proxy(stub, {
+    get: (target, prop) => {
+      if (prop in target) return target[prop]
+      // Return async stub functions for unknown methods
+      return async () => {
+        console.warn(`DBClient.${String(prop)}() called but mdxdb is not available`)
+        return null
+      }
+    },
+  }) as DBClient
 }
 
 /**

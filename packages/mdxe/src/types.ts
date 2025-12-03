@@ -262,3 +262,15 @@ export interface ExecutorConfig {
 export type CreateExecutor<TConfig extends ExecutorConfig = ExecutorConfig, TData extends MDXLDData = MDXLDData> = (
   config?: TConfig
 ) => Executor<TData>
+
+/**
+ * SDK Provider Types - Re-exported from sdk-provider.ts
+ */
+
+export type {
+  SDKProviderConfig,
+  SDKProvider,
+  AIProvider,
+  WorkflowProvider,
+  ContextProvider,
+} from './sdk-provider.js'

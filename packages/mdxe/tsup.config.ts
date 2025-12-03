@@ -6,6 +6,8 @@ export default defineConfig([
     entry: {
       index: 'src/index.ts',
       types: 'src/types.ts',
+      sdk: 'src/sdk.ts',
+      'sdk-provider': 'src/sdk-provider.ts',
       'commands/deploy': 'src/commands/deploy.ts',
       'cloudflare/api': 'src/cloudflare/api.ts',
     },
@@ -13,7 +15,18 @@ export default defineConfig([
     dts: true,
     clean: true,
     sourcemap: true,
-    external: ['mdxld'],
+    external: [
+      'mdxld',
+      'mdxdb',
+      '@mdxdb/fs',
+      '@mdxdb/sqlite',
+      '@mdxdb/postgres',
+      '@mdxdb/mongo',
+      '@mdxdb/clickhouse',
+      'ai-sandbox',
+      'ai-functions',
+      'ai-workflows',
+    ],
   },
   // CLI build
   {
@@ -23,7 +36,18 @@ export default defineConfig([
     format: ['esm'],
     dts: false,
     sourcemap: true,
-    external: ['mdxld'],
+    external: [
+      'mdxld',
+      'mdxdb',
+      '@mdxdb/fs',
+      '@mdxdb/sqlite',
+      '@mdxdb/postgres',
+      '@mdxdb/mongo',
+      '@mdxdb/clickhouse',
+      'ai-sandbox',
+      'ai-functions',
+      'ai-workflows',
+    ],
     banner: {
       js: '#!/usr/bin/env node',
     },

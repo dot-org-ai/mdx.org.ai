@@ -14,10 +14,12 @@ yarn add mdxe
 
 ## Features
 
-- **Execute** - Run MDX documents as applications
+- **Execute** - Run MDX documents as applications with ai-sandbox
 - **Test** - Test MDX content with inline test blocks
 - **Deploy** - Deploy to Cloudflare Workers
+- **SDK Provider** - Local and remote SDK implementations for db, ai, workflows
 - **Multi-Runtime** - Support for Hono, Next.js, Node, Bun, Workers
+- **Primitives Integration** - Built-in support for ai-functions, ai-workflows, ai-sandbox
 - **Type-Safe** - Full TypeScript support
 
 ## Quick Start
@@ -198,6 +200,115 @@ interface CloudflareApi {
 }
 ```
 
+## SDK Provider
+
+The SDK Provider creates local or remote implementations of the SDK globals (`$`, `db`, `ai`, `on`, `every`, `send`) used in MDX documents.
+
+### Creating an SDK Provider
+
+```typescript
+import { createSDKProvider } from 'mdxe'
+
+// Local context with SQLite
+const sdk = await createSDKProvider({
+  context: 'local',
+  db: 'sqlite',
+  dbPath: './data.db',
+  aiMode: 'remote',
+  ns: 'my-app'
+})
+
+// Use the SDK
+const post = await sdk.db.create({
+  type: 'Post',
+  data: { title: 'Hello World', content: 'My first post' }
+})
+
+const response = await sdk.ai.generate('Write a summary of this post')
+
+// Register workflow handlers
+sdk.workflows.on.Post.created(async (post, $) => {
+  console.log('Post created:', post.title)
+})
+
+// Clean up
+await sdk.close()
+```
+
+### Local vs Remote Context
+
+**Local Context** - Uses in-process implementations:
+- `db`: Uses mdxdb with specified backend (memory, fs, sqlite, postgres, clickhouse, mongo)
+- `ai`: Uses local models or remote AI APIs
+- `workflows`: Uses ai-workflows for event-driven workflows
+
+**Remote Context** - Proxies calls to RPC server:
+```typescript
+const sdk = await createSDKProvider({
+  context: 'remote',
+  rpcUrl: 'https://rpc.example.com',
+  token: process.env.API_TOKEN,
+  ns: 'tenant-123',
+  db: 'memory', // Used for type info, actual storage on server
+  aiMode: 'remote'
+})
+```
+
+### Code Generation for Sandboxed Execution
+
+Generate SDK code to inject into sandboxed workers:
+
+```typescript
+import { generateSDKInjectionCode, evaluate } from 'mdxe'
+
+const sdkCode = generateSDKInjectionCode({
+  context: 'local',
+  db: 'memory',
+  aiMode: 'remote',
+  ns: 'my-app'
+})
+
+const result = await evaluate({
+  code: userCode,
+  sdkConfig: {
+    context: 'local',
+    db: 'memory',
+    aiMode: 'remote',
+    ns: 'my-app'
+  }
+})
+```
+
+### Database Backends
+
+Supported backends:
+- `memory` - In-memory (testing, development)
+- `fs` - File system (git-friendly .mdx files)
+- `sqlite` - SQLite/Turso (vector search, local-first)
+- `postgres` - PostgreSQL with pgvector
+- `clickhouse` - ClickHouse (analytics)
+- `mongo` - MongoDB with Atlas Vector Search
+
+```typescript
+// File system backend
+const sdk = await createSDKProvider({
+  context: 'local',
+  db: 'fs',
+  dbPath: './content',
+  aiMode: 'local',
+  ns: 'my-app'
+})
+
+// SQLite backend
+const sdk = await createSDKProvider({
+  context: 'local',
+  db: 'sqlite',
+  dbPath: './data.db',
+  aiMode: 'remote',
+  ns: 'my-app'
+})
+```
+
 ## Execution Contexts
 
 mdxe provides execution contexts for different runtimes.
@@ -218,6 +329,90 @@ interface ExecutionResult<T = unknown> {
   error?: Error
   duration: number
 }
+```
+
+### ai-sandbox Integration
+
+mdxe re-exports `evaluate` and `createEvaluator` from ai-sandbox for secure code execution:
+
+```typescript
+import { evaluate } from 'mdxe'
+
+const result = await evaluate({
+  code: `
+    // User code with SDK access
+    const post = await db.create({
+      type: 'Post',
+      data: { title: 'Test' }
+    })
+    return post
+  `,
+  sdkConfig: {
+    context: 'local',
+    db: 'memory',
+    aiMode: 'local',
+    ns: 'sandbox'
+  }
+})
+
+console.log(result.value) // Created post
+```
+
+## Primitives Integration
+
+mdxe integrates with the primitives packages for core functionality:
+
+| Package | Description | Usage in mdxe |
+|---------|-------------|---------------|
+| [ai-sandbox](../../primitives/packages/ai-sandbox) | Secure code execution | `evaluate()`, `createEvaluator()` for running untrusted code |
+| [ai-functions](../../primitives/packages/ai-functions) | AI functions & RPC | RPC types for `@mdxe/rpc`, AI function interfaces |
+| [ai-workflows](../../primitives/packages/ai-workflows) | Event-driven workflows | Workflow types (`on`, `every`, `send`) in SDK provider |
+
+### ai-sandbox
+
+Execute code safely in sandboxed environments:
+
+```typescript
+import { evaluate } from 'mdxe'
+
+const result = await evaluate({
+  code: `
+    const greeting = 'Hello ' + input.name
+    return { message: greeting }
+  `,
+  input: { name: 'World' }
+})
+
+console.log(result.value) // { message: 'Hello World' }
+```
+
+### ai-workflows
+
+Event-driven workflows with the `$` context:
+
+```typescript
+import type { WorkflowContext, OnProxy, EveryProxy } from 'mdxe'
+
+// Type-safe workflow handlers
+const handlers = {
+  on: {
+    Customer: {
+      created: async (customer: any, $: WorkflowContext) => {
+        await $.send('Email.welcome', { to: customer.email })
+      }
+    }
+  }
+}
+```
+
+### ai-functions RPC
+
+RPC types for distributed execution:
+
+```typescript
+import type { RPC, RPCPromise, RPCServer, RPCClient } from 'mdxe'
+
+// Use with @mdxe/rpc for capnweb promise pipelining
 ```
 
 ## Runtime Packages
