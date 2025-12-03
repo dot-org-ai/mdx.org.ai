@@ -1,0 +1,292 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://todo.mdx.org.ai
+name: todo.mdx
+version: 0.1.0
+description: MDX-powered task management with multi-platform sync
+license: MIT
+repository: https://github.com/mdx-org/todo.mdx
+keywords:
+  - mdx
+  - todo
+  - task
+  - github-issues
+  - linear
+  - sync
+bin:
+  todo: ./cli.js
+exports:
+  '.': ./index.ts
+  './sync': ./sync.ts
+  './webhooks': ./webhooks.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const config = {
+  interval: 0, // 0 = manual sync only
+  platforms: {
+    github: {
+      enabled: true,
+      labels: ['todo', 'task', 'bug', 'feature'],
+      projects: true,
+    },
+    linear: {
+      enabled: !!process.env.LINEAR_API_KEY,
+      team: process.env.LINEAR_TEAM,
+    },
+    local: {
+      enabled: true,
+      path: '.todo/',
+      format: 'mdx',
+    },
+  },
+  mappings: {
+    status: {
+      local: ['open', 'in-progress', 'done', 'cancelled'],
+      github: ['open', 'open', 'closed', 'closed'],
+      linear: ['Todo', 'In Progress', 'Done', 'Cancelled'],
+    },
+    priority: {
+      local: ['low', 'medium', 'high', 'urgent'],
+      github: ['priority:low', 'priority:medium', 'priority:high', 'priority:urgent'],
+      linear: [4, 3, 2, 1],
+    },
+  },
+  conflicts: {
+    strategy: 'newest',
+    fields: {
+      status: 'remote',
+      description: 'newest',
+      checklist: 'merge',
+    },
+  },
+}
+
+export function transform(data) {
+  return {
+    $type: 'Task',
+    $id: `https://todo.mdx.org.ai/task/${data.id}`,
+    ...data,
+    sources: {
+      github: data.githubUrl,
+      linear: data.linearUrl,
+      local: data.localPath,
+    },
+  }
+}
+
+export async function syncToGitHub(task) {
+  const { Octokit } = await import('@octokit/rest')
+  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
+  const [owner, repo] = process.env.GITHUB_REPO.split('/')
+
+  if (task.githubNumber) {
+    await octokit.issues.update({
+      owner, repo,
+      issue_number: task.githubNumber,
+      title: task.title,
+      body: task.description,
+      state: task.status === 'done' ? 'closed' : 'open',
+      labels: task.labels,
+    })
+  } else {
+    const { data } = await octokit.issues.create({
+      owner, repo,
+      title: task.title,
+      body: task.description,
+      labels: task.labels,
+    })
+    return { githubNumber: data.number, githubUrl: data.html_url }
+  }
+}
+
+export async function syncFromGitHub() {
+  const { Octokit } = await import('@octokit/rest')
+  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
+  const [owner, repo] = process.env.GITHUB_REPO.split('/')
+
+  const { data: issues } = await octokit.issues.listForRepo({
+    owner, repo,
+    state: 'all',
+    labels: config.platforms.github.labels.join(','),
+  })
+
+  return issues.map(issue => transform({
+    id: `github:${issue.number}`,
+    title: issue.title,
+    description: issue.body,
+    status: issue.state === 'closed' ? 'done' : 'open',
+    labels: issue.labels.map(l => l.name),
+    assignee: issue.assignee?.login,
+    githubNumber: issue.number,
+    githubUrl: issue.html_url,
+    createdAt: issue.created_at,
+    updatedAt: issue.updated_at,
+  }))
+}
+
+export async function syncToLinear(task) {
+  const { LinearClient } = await import('@linear/sdk')
+  const linear = new LinearClient({ apiKey: process.env.LINEAR_API_KEY })
+  const priorityIndex = config.mappings.priority.local.indexOf(task.priority)
+
+  if (task.linearId) {
+    await linear.updateIssue(task.linearId, {
+      title: task.title,
+      description: task.description,
+      priority: config.mappings.priority.linear[priorityIndex],
+    })
+  } else {
+    const team = await linear.team(process.env.LINEAR_TEAM)
+    const issue = await linear.createIssue({
+      teamId: team.id,
+      title: task.title,
+      description: task.description,
+    })
+    return { linearId: issue.id, linearUrl: issue.url }
+  }
+}
+
+export function resolveConflict(local, remote, field) {
+  const strategy = config.conflicts.fields[field] || config.conflicts.strategy
+
+  switch (strategy) {
+    case 'local': return local[field]
+    case 'remote': return remote[field]
+    case 'newest':
+      return new Date(local.updatedAt) > new Date(remote.updatedAt)
+        ? local[field] : remote[field]
+    case 'merge':
+      if (field === 'checklist') return mergeChecklists(local.checklist, remote.checklist)
+      return remote[field]
+    default: return remote[field]
+  }
+}
+
+export function mergeChecklists(local = [], remote = []) {
+  const merged = new Map()
+  local.forEach(item => merged.set(item.id, item))
+  remote.forEach(item => {
+    const existing = merged.get(item.id)
+    if (!existing || (item.done && !existing.done)) {
+      merged.set(item.id, item)
+    }
+  })
+  return Array.from(merged.values())
+}
+
+export function handleGitHubWebhook({ secret, onIssueOpened, onIssueEdited, onIssueClosed }) {
+  return async (req) => {
+    // Verify signature
+    const sig = req.headers['x-hub-signature-256']
+    // ... verification logic
+
+    const event = req.headers['x-github-event']
+    const { action, issue } = req.body
+
+    if (event === 'issues') {
+      if (action === 'opened') await onIssueOpened?.(issue)
+      if (action === 'edited') await onIssueEdited?.(issue)
+      if (action === 'closed') await onIssueClosed?.(issue)
+    }
+  }
+}
+
+# TODO.mdx
+
+Unified task management across code, issues, and project boards.
+
+## Installation
+
+```bash
+npm install todo.mdx
+```
+
+## Quick Start
+
+```bash
+# Initialize
+npx todo init
+
+# Scan for TODOs in code
+npx todo scan
+
+# Sync with platforms
+npx todo sync
+```
+
+## In-Code TODOs
+
+```ts
+// TODO: Implement caching @priority:high @assignee:@username
+function fetchData() {}
+
+// FIXME(@username): This breaks on edge cases #bug
+function parseInput() {}
+```
+
+## MDX Task Files
+
+```mdx
+---
+$type: Task
+$id: implement-caching
+title: Implement caching layer
+priority: high
+assignee: '@username'
+labels: [feature, performance]
+due: 2024-02-01
+---
+
+## Description
+
+Add Redis caching to reduce API calls.
+
+## Acceptance Criteria
+
+- [ ] Cache GET requests
+- [ ] Invalidate on mutations
+- [ ] Add cache headers
+```
+
+## Sync Commands
+
+```bash
+npx todo sync              # Full bidirectional sync
+npx todo sync --from github  # Pull from GitHub
+npx todo sync --push         # Push local changes
+npx todo sync --dry-run      # Preview changes
+```
+
+## Platform Mapping
+
+| Local Status | GitHub | Linear |
+|--------------|--------|--------|
+| open | open | Todo |
+| in-progress | open | In Progress |
+| done | closed | Done |
+| cancelled | closed | Cancelled |
+
+## Webhooks
+
+```ts
+import { handleGitHubWebhook } from 'todo.mdx'
+
+export default handleGitHubWebhook({
+  secret: process.env.GITHUB_WEBHOOK_SECRET,
+  onIssueOpened: (issue) => syncFromGitHub(issue),
+  onIssueClosed: (issue) => syncFromGitHub(issue),
+})
+```
+
+## Conflict Resolution
+
+```yaml
+conflicts:
+  strategy: newest    # newest | local | remote | manual
+  fields:
+    status: remote    # Always trust remote for status
+    description: newest
+    checklist: merge  # Merge checklist items
+```

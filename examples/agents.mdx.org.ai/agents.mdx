@@ -1,0 +1,299 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://agents.mdx.org.ai
+name: agents.mdx
+version: 0.1.0
+description: Multi-agent configuration from a single MDX source
+license: MIT
+repository: https://github.com/mdx-org/agents.mdx
+keywords:
+  - mdx
+  - ai
+  - agents
+  - claude
+  - cursor
+  - copilot
+bin:
+  agents: ./cli.js
+exports:
+  '.': ./index.ts
+  './rules': ./rules.ts
+  './context': ./context.ts
+  './outputs': ./outputs.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const outputs = {
+  claude: {
+    target: '.claude/CLAUDE.md',
+    format: 'markdown',
+    features: ['memory', 'tools', 'permissions'],
+  },
+  cursor: {
+    target: '.cursorrules',
+    format: 'plain',
+    maxLength: 10000,
+  },
+  copilot: {
+    target: '.github/copilot-instructions.md',
+    format: 'markdown',
+  },
+  windsurf: {
+    target: '.windsurf/rules.md',
+    format: 'markdown',
+  },
+  aider: {
+    target: '.aider.conf.yml',
+    format: 'yaml',
+  },
+}
+
+export const rules = {
+  codeStyle: [
+    'Use TypeScript for all new code',
+    'Prefer functional components over class components',
+    'Use named exports instead of default exports',
+    'Add JSDoc comments for public APIs',
+  ],
+  testing: [
+    'Write tests for all new features',
+    'Maintain 80% code coverage minimum',
+    'Use descriptive test names',
+    'Mock external dependencies',
+  ],
+  gitWorkflow: [
+    'Use conventional commits (feat:, fix:, docs:, etc.)',
+    'Keep commits small and focused',
+    'Never force push to main',
+  ],
+  security: [
+    'Never commit secrets or credentials',
+    'Validate all user input',
+    'Use parameterized queries for database access',
+  ],
+}
+
+export async function detectContext() {
+  const fs = await import('fs/promises')
+  const context = { type: 'unknown', language: 'unknown', framework: null, packageManager: 'npm' }
+
+  // Detect package manager
+  const lockFiles = { 'pnpm-lock.yaml': 'pnpm', 'yarn.lock': 'yarn', 'package-lock.json': 'npm', 'bun.lockb': 'bun' }
+  for (const [file, pm] of Object.entries(lockFiles)) {
+    try { await fs.access(file); context.packageManager = pm; break } catch {}
+  }
+
+  // Detect monorepo
+  try { await fs.access('pnpm-workspace.yaml'); context.type = 'monorepo' } catch {
+    try {
+      const pkg = JSON.parse(await fs.readFile('package.json', 'utf-8'))
+      if (pkg.workspaces) context.type = 'monorepo'
+    } catch {}
+  }
+
+  // Detect framework
+  try {
+    const pkg = JSON.parse(await fs.readFile('package.json', 'utf-8'))
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies }
+    if (deps['next']) context.framework = 'next.js'
+    else if (deps['nuxt']) context.framework = 'nuxt'
+    else if (deps['astro']) context.framework = 'astro'
+    else if (deps['svelte']) context.framework = 'sveltekit'
+  } catch {}
+
+  // Detect language
+  try { await fs.access('tsconfig.json'); context.language = 'typescript' } catch { context.language = 'javascript' }
+
+  return context
+}
+
+export function render(agent, format) {
+  const config = outputs[format]
+  if (!config) throw new Error(`Unknown format: ${format}`)
+
+  const renderers = { claude: renderClaude, cursor: renderCursor, copilot: renderCopilot, windsurf: renderWindsurf, aider: renderAider }
+  let output = renderers[format](agent)
+
+  if (config.maxLength && output.length > config.maxLength) {
+    output = output.slice(0, config.maxLength - 50) + '\n\n... (truncated)'
+  }
+  return output
+}
+
+export function renderClaude(agent) {
+  return `# ${agent.name}
+
+${agent.description}
+
+## Memory
+
+${agent.context ? Object.entries(agent.context).map(([k, v]) => `- **${k}**: ${v}`).join('\n') : 'No context.'}
+
+## Rules
+
+${agent.rules.map(r => `- ${r}`).join('\n')}
+
+${agent.tools?.length ? `## Tools\n\nAvailable: ${agent.tools.join(', ')}` : ''}
+`
+}
+
+export function renderCursor(agent) {
+  const lines = [agent.description, '', 'Rules:']
+  agent.rules.forEach(r => lines.push(`- ${r}`))
+  if (agent.context) {
+    lines.push('', 'Context:')
+    Object.entries(agent.context).forEach(([k, v]) => lines.push(`- ${k}: ${v}`))
+  }
+  return lines.join('\n')
+}
+
+export function renderCopilot(agent) {
+  return `# ${agent.name}
+
+${agent.description}
+
+## Guidelines
+
+${agent.rules.map(r => `- ${r}`).join('\n')}
+
+## Project Context
+
+${agent.context ? Object.entries(agent.context).map(([k, v]) => `- ${k}: ${v}`).join('\n') : 'No specific context.'}
+`
+}
+
+export function renderWindsurf(agent) {
+  return `# ${agent.name}\n\n${agent.description}\n\n## Rules\n\n${agent.rules.map(r => `- ${r}`).join('\n')}`
+}
+
+export function renderAider(agent) {
+  return `auto-commits: false
+lint-cmd: "${agent.lintCmd || 'npm run lint'}"
+conventions:
+${agent.rules.slice(0, 5).map(r => `  - "${r}"`).join('\n')}`
+}
+
+export function combineRules(...categories) {
+  return [...new Set(categories.flatMap(cat => rules[cat] || cat))]
+}
+
+export function defineAgent(config) {
+  return {
+    ...config,
+    render: (format) => render(config, format),
+    renderAll: () => Object.keys(outputs).reduce((acc, fmt) => ({ ...acc, [fmt]: render(config, fmt) }), {}),
+  }
+}
+
+# Agents.mdx
+
+Define AI agent configurations once, deploy to multiple platforms.
+
+## Installation
+
+```bash
+npm install agents.mdx
+```
+
+## Quick Start
+
+Create `agents.mdx`:
+
+```mdx
+---
+$type: https://mdx.org.ai/Package
+name: my-project-agent
+---
+
+export const agent = defineAgent({
+  name: 'Project Assistant',
+  description: 'Helps with this TypeScript monorepo',
+  rules: combineRules('codeStyle', 'testing', 'gitWorkflow'),
+  context: await detectContext(),
+  tools: ['read', 'write', 'bash'],
+})
+```
+
+Generate outputs:
+
+```bash
+npx agents render                # All outputs
+npx agents render --format claude  # Just CLAUDE.md
+npx agents render --format cursor  # Just .cursorrules
+```
+
+## Output Targets
+
+| Format | File | Description |
+|--------|------|-------------|
+| claude | `.claude/CLAUDE.md` | Claude Code memory |
+| cursor | `.cursorrules` | Cursor editor rules |
+| copilot | `.github/copilot-instructions.md` | GitHub Copilot |
+| windsurf | `.windsurf/rules.md` | Windsurf AI |
+| aider | `.aider.conf.yml` | Aider config |
+
+## Built-in Rules
+
+```ts
+import { rules, combineRules } from 'agents.mdx'
+
+// Use built-in categories
+const myRules = combineRules('codeStyle', 'testing', 'security')
+
+// Mix with custom rules
+const allRules = combineRules('codeStyle', [
+  'Use Tailwind CSS for styling',
+  'Follow the existing component patterns',
+])
+```
+
+## Auto-Detection
+
+```ts
+import { detectContext } from 'agents.mdx'
+
+const context = await detectContext()
+// {
+//   type: 'monorepo',
+//   language: 'typescript',
+//   framework: 'next.js',
+//   packageManager: 'pnpm'
+// }
+```
+
+## Example Output
+
+### Claude (.claude/CLAUDE.md)
+
+```markdown
+# Project Assistant
+
+Helps with this TypeScript monorepo
+
+## Memory
+
+- **type**: monorepo
+- **language**: typescript
+- **framework**: next.js
+
+## Rules
+
+- Use TypeScript for all new code
+- Write tests for all new features
+- Use conventional commits
+```
+
+### Cursor (.cursorrules)
+
+```
+Helps with this TypeScript monorepo
+
+Rules:
+- Use TypeScript for all new code
+- Write tests for all new features
+
+Context:
+- type: monorepo
+- language: typescript
+```

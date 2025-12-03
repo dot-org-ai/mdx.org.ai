@@ -1,0 +1,218 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://readme.mdx.org.ai
+name: readme.mdx
+version: 0.1.0
+description: Single-source README generation for multiple targets
+license: MIT
+repository: https://github.com/mdx-org/readme.mdx
+keywords:
+  - mdx
+  - readme
+  - documentation
+  - generator
+bin:
+  readme: ./cli.js
+exports:
+  '.': ./index.ts
+  './hooks': ./hooks.ts
+  './templates': ./templates.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const templates = {
+  github: {
+    format: 'markdown',
+    features: ['badges', 'toc', 'collapsible', 'alerts'],
+    maxLength: null,
+  },
+  npm: {
+    format: 'markdown',
+    features: ['badges', 'installation', 'quickstart'],
+    maxLength: 25000,
+  },
+  docs: {
+    format: 'mdx',
+    features: ['frontmatter', 'components', 'navigation'],
+    maxLength: null,
+  },
+  website: {
+    format: 'mdx',
+    features: ['hero', 'cta', 'features', 'testimonials'],
+    maxLength: null,
+  },
+}
+
+export const hooks = {
+  'pre-commit': async ({ staged, render, git }) => {
+    const patterns = ['readme.mdx', 'package.json', 'src/**/*.ts', 'CHANGELOG.md']
+    const shouldRegen = staged.some(f => patterns.some(p =>
+      p.includes('**') ? f.startsWith(p.split('**')[0]) : f === p
+    ))
+    if (shouldRegen) {
+      await render({ target: 'README.md' })
+      await git.add('README.md')
+    }
+  },
+  'pre-publish': async ({ version, render, generateApiDocs }) => {
+    await render({ target: 'README.md', data: { version } })
+    await render({ target: 'docs/', data: { version } })
+    await generateApiDocs()
+  },
+  'post-release': async ({ tag, release, render, deploy }) => {
+    await render({ target: 'website/', data: { release } })
+    await deploy({ target: 'website' })
+  },
+}
+
+export function render(content, { template = 'github', data = {} } = {}) {
+  const config = templates[template]
+  if (!config) throw new Error(`Unknown template: ${template}`)
+
+  let output = interpolate(content, data)
+
+  if (config.features.includes('badges')) {
+    output = addBadges(output, data)
+  }
+  if (config.features.includes('toc')) {
+    output = addTOC(output)
+  }
+  if (config.maxLength && output.length > config.maxLength) {
+    output = truncate(output, config.maxLength)
+  }
+
+  return output
+}
+
+export function interpolate(content, data) {
+  return content.replace(/\{([^}]+)\}/g, (_, path) => {
+    return path.split('.').reduce((obj, key) => obj?.[key], data) ?? ''
+  })
+}
+
+export function addBadges(content, { name, repo }) {
+  const badges = [
+    `[![npm](https://img.shields.io/npm/v/${name})](https://npmjs.com/package/${name})`,
+    `[![CI](https://github.com/${repo}/actions/workflows/ci.yml/badge.svg)](https://github.com/${repo}/actions)`,
+  ]
+  return badges.join(' ') + '\n\n' + content
+}
+
+export function addTOC(content) {
+  const headings = []
+  const regex = /^(#{2,3}) (.+)$/gm
+  let match
+  while ((match = regex.exec(content)) !== null) {
+    const level = match[1].length
+    const title = match[2]
+    const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+    headings.push({ level, title, slug })
+  }
+  const toc = headings.map(h => {
+    const indent = '  '.repeat(h.level - 2)
+    return `${indent}- [${h.title}](#${h.slug})`
+  }).join('\n')
+  return content.replace(/^(# .+\n)/, `$1\n## Table of Contents\n\n${toc}\n\n`)
+}
+
+export function truncate(content, maxLength) {
+  if (content.length <= maxLength) return content
+  return content.slice(0, maxLength - 50) + '\n\n... (truncated)'
+}
+
+export function defineHook(name, fn) {
+  return { name, fn }
+}
+
+export function defineTemplate(config) {
+  return { ...config, render: (content, data) => render(content, { template: config.name, data }) }
+}
+
+# README.mdx
+
+Single-source README generation for GitHub, npm, docs sites, and landing pages.
+
+## Installation
+
+```bash
+npm install readme.mdx
+```
+
+## Quick Start
+
+Create `readme.mdx` in your project:
+
+```mdx
+---
+$type: https://mdx.org.ai/Package
+name: my-package
+---
+
+# {pkg.name}
+
+{pkg.description}
+
+## Installation
+
+npm install {pkg.name}
+```
+
+Generate outputs:
+
+```bash
+npx readme render                    # Generate README.md
+npx readme render --template docs    # Generate docs/
+npx readme render --template npm     # Generate npm-optimized README
+```
+
+## Templates
+
+| Template | Target | Features |
+|----------|--------|----------|
+| `github` | README.md | Badges, TOC, collapsible sections, alerts |
+| `npm` | README.md | Badges, install, quickstart (25KB limit) |
+| `docs` | docs/ | MDX components, frontmatter, navigation |
+| `website` | website/ | Hero, CTA, features, testimonials |
+
+## Hooks
+
+Integrate with git hooks and CI/CD:
+
+```ts
+import { hooks } from 'readme.mdx'
+
+// Pre-commit: regenerate README when sources change
+hooks['pre-commit']({ staged, render, git })
+
+// Pre-publish: update version in all docs
+hooks['pre-publish']({ version, render })
+
+// Post-release: deploy website
+hooks['post-release']({ tag, render, deploy })
+```
+
+## Conditional Content
+
+Include content for specific targets:
+
+```mdx
+<IfTarget target="github">
+  ![CI](https://github.com/user/repo/actions/workflows/ci.yml/badge.svg)
+</IfTarget>
+
+<IfTarget not="npm">
+  ## Extended Examples
+  ... lots of content ...
+</IfTarget>
+```
+
+## Variables
+
+Available in all templates:
+
+- `{pkg.name}` - Package name
+- `{pkg.version}` - Current version
+- `{pkg.description}` - Description
+- `{git.branch}` - Current branch
+- `{git.tag}` - Latest tag
