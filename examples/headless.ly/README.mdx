@@ -1,0 +1,652 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://headless.ly
+$context: https://headless.ly
+name: headless.ly
+version: 0.1.0
+description: Headless CMS powered by MDX and AI
+license: MIT
+repository: https://github.com/mdx-org/headless.ly
+keywords:
+  - cms
+  - headless
+  - mdx
+  - content
+  - ai
+bin:
+  headless: ./cli.js
+exports:
+  '.': ./index.ts
+  './content': ./content.ts
+  './api': ./api.ts
+  './ai': ./ai.ts
+  './admin': ./admin.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const config = {
+  content: {
+    path: './content',
+    format: 'mdx',
+    git: true,
+  },
+  api: {
+    port: 3000,
+    prefix: '/api',
+    cors: true,
+  },
+  admin: {
+    path: '/admin',
+    auth: {
+      provider: 'github',
+      allowedUsers: [],
+    },
+  },
+  ai: {
+    enabled: true,
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514',
+  },
+  media: {
+    provider: 'local',
+    path: './public/uploads',
+    maxSize: 10 * 1024 * 1024, // 10MB
+  },
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en'],
+  },
+}
+
+export const contentTypes = {
+  BlogPost: {
+    name: 'Blog Post',
+    icon: 'file-text',
+    fields: {
+      title: { type: 'string', required: true },
+      slug: { type: 'slug', from: 'title' },
+      excerpt: { type: 'text', maxLength: 300 },
+      content: { type: 'markdown', required: true },
+      author: { type: 'reference', to: 'Author' },
+      tags: { type: 'array', of: 'reference', to: 'Tag' },
+      image: { type: 'image' },
+      publishedAt: { type: 'datetime' },
+      status: { type: 'enum', values: ['draft', 'published', 'archived'], default: 'draft' },
+    },
+    preview: (doc) => ({ title: doc.title, subtitle: doc.excerpt }),
+  },
+
+  Author: {
+    name: 'Author',
+    icon: 'user',
+    fields: {
+      name: { type: 'string', required: true },
+      slug: { type: 'slug', from: 'name' },
+      email: { type: 'email' },
+      bio: { type: 'text' },
+      avatar: { type: 'image' },
+      social: {
+        type: 'object',
+        fields: {
+          twitter: { type: 'url' },
+          github: { type: 'url' },
+          linkedin: { type: 'url' },
+        },
+      },
+    },
+  },
+
+  Tag: {
+    name: 'Tag',
+    icon: 'tag',
+    fields: {
+      name: { type: 'string', required: true },
+      slug: { type: 'slug', from: 'name' },
+      description: { type: 'text' },
+      color: { type: 'color' },
+    },
+  },
+
+  Page: {
+    name: 'Page',
+    icon: 'file',
+    fields: {
+      title: { type: 'string', required: true },
+      slug: { type: 'slug', from: 'title' },
+      content: { type: 'markdown', required: true },
+      layout: { type: 'enum', values: ['default', 'landing', 'docs'], default: 'default' },
+      seo: {
+        type: 'object',
+        fields: {
+          title: { type: 'string' },
+          description: { type: 'text', maxLength: 160 },
+          image: { type: 'image' },
+        },
+      },
+    },
+  },
+}
+
+export const fieldTypes = {
+  string: { validate: (v) => typeof v === 'string' },
+  text: { validate: (v) => typeof v === 'string' },
+  markdown: { validate: (v) => typeof v === 'string' },
+  number: { validate: (v) => typeof v === 'number' },
+  boolean: { validate: (v) => typeof v === 'boolean' },
+  datetime: { validate: (v) => !isNaN(Date.parse(v)) },
+  email: { validate: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+  url: { validate: (v) => /^https?:\/\/.+/.test(v) },
+  slug: { validate: (v) => /^[a-z0-9-]+$/.test(v) },
+  image: { validate: (v) => typeof v === 'string' || typeof v === 'object' },
+  color: { validate: (v) => /^#[0-9a-fA-F]{6}$/.test(v) },
+  enum: { validate: (v, field) => field.values.includes(v) },
+  array: { validate: (v) => Array.isArray(v) },
+  object: { validate: (v) => typeof v === 'object' && v !== null },
+  reference: { validate: (v) => typeof v === 'string' },
+}
+
+export async function createContentStore(options = {}) {
+  const fs = await import('fs/promises')
+  const path = await import('path')
+  const contentPath = options.path || config.content.path
+
+  async function getAll(type) {
+    const typePath = path.join(contentPath, type.toLowerCase())
+    try {
+      const files = await fs.readdir(typePath)
+      const items = await Promise.all(
+        files.filter(f => f.endsWith('.mdx')).map(async f => {
+          const content = await fs.readFile(path.join(typePath, f), 'utf-8')
+          return parseContent(content, type)
+        })
+      )
+      return items.filter(Boolean)
+    } catch {
+      return []
+    }
+  }
+
+  async function get(type, slug) {
+    const filePath = path.join(contentPath, type.toLowerCase(), `${slug}.mdx`)
+    try {
+      const content = await fs.readFile(filePath, 'utf-8')
+      return parseContent(content, type)
+    } catch {
+      return null
+    }
+  }
+
+  async function create(type, data) {
+    const slug = data.slug || slugify(data.title || data.name)
+    const filePath = path.join(contentPath, type.toLowerCase(), `${slug}.mdx`)
+
+    await fs.mkdir(path.dirname(filePath), { recursive: true })
+
+    const mdx = stringifyContent(data, type)
+    await fs.writeFile(filePath, mdx)
+
+    if (config.content.git) {
+      await gitCommit(filePath, `Create ${type}: ${slug}`)
+    }
+
+    return { ...data, slug }
+  }
+
+  async function update(type, slug, data) {
+    const filePath = path.join(contentPath, type.toLowerCase(), `${slug}.mdx`)
+    const mdx = stringifyContent({ ...data, slug }, type)
+    await fs.writeFile(filePath, mdx)
+
+    if (config.content.git) {
+      await gitCommit(filePath, `Update ${type}: ${slug}`)
+    }
+
+    return { ...data, slug }
+  }
+
+  async function remove(type, slug) {
+    const filePath = path.join(contentPath, type.toLowerCase(), `${slug}.mdx`)
+    await fs.unlink(filePath)
+
+    if (config.content.git) {
+      await gitCommit(filePath, `Delete ${type}: ${slug}`)
+    }
+  }
+
+  return { getAll, get, create, update, remove }
+}
+
+function parseContent(content, type) {
+  const { parse } = require('mdxld')
+  const doc = parse(content)
+
+  return {
+    $type: type,
+    $id: doc.data.$id || doc.data.slug,
+    ...doc.data,
+    content: doc.content,
+  }
+}
+
+function stringifyContent(data, type) {
+  const { content, ...frontmatter } = data
+  const yaml = Object.entries({ $type: type, ...frontmatter })
+    .map(([k, v]) => {
+      if (Array.isArray(v)) return `${k}:\n${v.map(i => `  - ${i}`).join('\n')}`
+      if (typeof v === 'object') return `${k}:\n${Object.entries(v).map(([k2, v2]) => `  ${k2}: ${v2}`).join('\n')}`
+      return `${k}: ${v}`
+    })
+    .join('\n')
+
+  return `---\n${yaml}\n---\n\n${content || ''}`
+}
+
+function slugify(text) {
+  return text.toLowerCase().replace(/[^\w]+/g, '-').replace(/^-|-$/g, '')
+}
+
+async function gitCommit(filePath, message) {
+  const { exec } = await import('child_process')
+  const { promisify } = await import('util')
+  const execAsync = promisify(exec)
+
+  try {
+    await execAsync(`git add "${filePath}"`)
+    await execAsync(`git commit -m "${message}"`)
+  } catch (error) {
+    console.warn('Git commit failed:', error.message)
+  }
+}
+
+export async function createAPI(store) {
+  const { Hono } = await import('hono')
+  const { cors } = await import('hono/cors')
+
+  const app = new Hono()
+
+  if (config.api.cors) {
+    app.use('*', cors())
+  }
+
+  // List content types
+  app.get('/types', (c) => {
+    return c.json(Object.entries(contentTypes).map(([id, type]) => ({
+      id,
+      name: type.name,
+      icon: type.icon,
+      fields: Object.keys(type.fields),
+    })))
+  })
+
+  // CRUD for each content type
+  for (const [typeName] of Object.entries(contentTypes)) {
+    const basePath = `/${typeName.toLowerCase()}`
+
+    // List
+    app.get(basePath, async (c) => {
+      const items = await store.getAll(typeName)
+      const limit = parseInt(c.req.query('limit') || '50')
+      const offset = parseInt(c.req.query('offset') || '0')
+      return c.json({
+        items: items.slice(offset, offset + limit),
+        total: items.length,
+        limit,
+        offset,
+      })
+    })
+
+    // Get
+    app.get(`${basePath}/:slug`, async (c) => {
+      const item = await store.get(typeName, c.req.param('slug'))
+      if (!item) return c.json({ error: 'Not found' }, 404)
+      return c.json(item)
+    })
+
+    // Create
+    app.post(basePath, async (c) => {
+      const data = await c.req.json()
+      const item = await store.create(typeName, data)
+      return c.json(item, 201)
+    })
+
+    // Update
+    app.put(`${basePath}/:slug`, async (c) => {
+      const data = await c.req.json()
+      const item = await store.update(typeName, c.req.param('slug'), data)
+      return c.json(item)
+    })
+
+    // Delete
+    app.delete(`${basePath}/:slug`, async (c) => {
+      await store.remove(typeName, c.req.param('slug'))
+      return c.json({ success: true })
+    })
+  }
+
+  return app
+}
+
+export async function createAIHelpers(store) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  return {
+    async draft(type, options) {
+      const typeConfig = contentTypes[type]
+      if (!typeConfig) throw new Error(`Unknown type: ${type}`)
+
+      const response = await client.messages.create({
+        model: config.ai.model,
+        max_tokens: 4096,
+        system: `You are a content writer for a CMS. Generate content for a ${typeConfig.name}.
+Fields: ${Object.entries(typeConfig.fields).map(([k, v]) => `${k} (${v.type})`).join(', ')}
+Output valid YAML frontmatter followed by markdown content.`,
+        messages: [{
+          role: 'user',
+          content: `Create a ${typeConfig.name} about: ${options.topic}
+Tone: ${options.tone || 'professional'}
+${options.keywords ? `Keywords: ${options.keywords.join(', ')}` : ''}`,
+        }],
+      })
+
+      return parseContent(response.content[0].text, type)
+    },
+
+    async improve(slug, type) {
+      const content = await store.get(type, slug)
+      if (!content) throw new Error('Content not found')
+
+      const response = await client.messages.create({
+        model: config.ai.model,
+        max_tokens: 4096,
+        system: 'You are an editor. Improve the provided content for clarity, engagement, and SEO.',
+        messages: [{
+          role: 'user',
+          content: `Improve this ${type}:\n\n${stringifyContent(content, type)}`,
+        }],
+      })
+
+      return parseContent(response.content[0].text, type)
+    },
+
+    async suggest(type, field, context) {
+      const typeConfig = contentTypes[type]
+      const fieldConfig = typeConfig?.fields[field]
+
+      const response = await client.messages.create({
+        model: config.ai.model,
+        max_tokens: 500,
+        system: `Suggest values for a ${field} field (${fieldConfig?.type}) in a ${type}.`,
+        messages: [{
+          role: 'user',
+          content: `Context: ${JSON.stringify(context)}. Suggest 5 options.`,
+        }],
+      })
+
+      return response.content[0].text.split('\n').filter(Boolean)
+    },
+
+    async generateSEO(content) {
+      const response = await client.messages.create({
+        model: config.ai.model,
+        max_tokens: 500,
+        system: 'Generate SEO metadata for the provided content.',
+        messages: [{
+          role: 'user',
+          content: `Generate SEO title (60 chars max) and description (160 chars max) for:\n\n${content.title}\n\n${content.content?.slice(0, 500)}`,
+        }],
+      })
+
+      const text = response.content[0].text
+      const titleMatch = text.match(/title[:\s]+["']?([^"'\n]+)["']?/i)
+      const descMatch = text.match(/description[:\s]+["']?([^"'\n]+)["']?/i)
+
+      return {
+        title: titleMatch?.[1]?.slice(0, 60) || content.title,
+        description: descMatch?.[1]?.slice(0, 160) || content.excerpt,
+      }
+    },
+  }
+}
+
+export async function startServer(options = {}) {
+  const store = await createContentStore()
+  const api = await createAPI(store)
+  const ai = await createAIHelpers(store)
+
+  // Add AI endpoints
+  api.post('/ai/draft', async (c) => {
+    const { type, ...options } = await c.req.json()
+    const draft = await ai.draft(type, options)
+    return c.json(draft)
+  })
+
+  api.post('/ai/improve/:type/:slug', async (c) => {
+    const improved = await ai.improve(c.req.param('slug'), c.req.param('type'))
+    return c.json(improved)
+  })
+
+  api.post('/ai/seo', async (c) => {
+    const content = await c.req.json()
+    const seo = await ai.generateSEO(content)
+    return c.json(seo)
+  })
+
+  const { serve } = await import('@hono/node-server')
+  serve({ fetch: api.fetch, port: options.port || config.api.port })
+
+  console.log(`Headless CMS running on port ${options.port || config.api.port}`)
+
+  return { store, api, ai }
+}
+
+export function defineContentType(name, schema) {
+  contentTypes[name] = schema
+  return schema
+}
+
+# headless.ly
+
+Headless CMS powered by MDX and AI.
+
+## Installation
+
+```bash
+npm install headless.ly
+```
+
+## Quick Start
+
+```bash
+# Initialize a new CMS
+npx headless init my-blog
+
+# Start the server
+npx headless dev
+
+# Open admin UI
+open http://localhost:3000/admin
+```
+
+## CLI Commands
+
+```bash
+npx headless init <name>           # Initialize new project
+npx headless dev                   # Start dev server
+npx headless build                 # Build for production
+npx headless deploy                # Deploy to cloud
+npx headless content list <type>   # List content
+npx headless content get <type> <slug>   # Get content
+npx headless ai draft <type> <topic>     # AI draft
+```
+
+## Content Types
+
+### Built-in Types
+
+- **BlogPost** - Blog posts with author, tags, images
+- **Author** - Content authors
+- **Tag** - Content categorization
+- **Page** - Static pages
+
+### Custom Types
+
+```ts
+import { defineContentType } from 'headless.ly'
+
+defineContentType('Product', {
+  name: 'Product',
+  icon: 'package',
+  fields: {
+    name: { type: 'string', required: true },
+    slug: { type: 'slug', from: 'name' },
+    description: { type: 'markdown' },
+    price: { type: 'number' },
+    images: { type: 'array', of: 'image' },
+    category: { type: 'reference', to: 'Category' },
+    inStock: { type: 'boolean', default: true },
+  },
+})
+```
+
+## Content Files
+
+Content is stored as MDX files:
+
+```mdx
+---
+$type: BlogPost
+title: Getting Started with MDX
+slug: getting-started-mdx
+author: john-doe
+tags: [tutorial, mdx]
+publishedAt: 2024-01-15
+status: published
+---
+
+# Getting Started with MDX
+
+MDX combines the simplicity of Markdown with the power of React components...
+```
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/types` | List content types |
+| GET | `/api/{type}` | List content |
+| GET | `/api/{type}/{slug}` | Get content |
+| POST | `/api/{type}` | Create content |
+| PUT | `/api/{type}/{slug}` | Update content |
+| DELETE | `/api/{type}/{slug}` | Delete content |
+| POST | `/api/ai/draft` | AI-generated draft |
+| POST | `/api/ai/improve/:type/:slug` | AI content improvement |
+| POST | `/api/ai/seo` | AI SEO generation |
+
+## SDK Usage
+
+```ts
+import { createContentStore, createAIHelpers } from 'headless.ly'
+
+const store = await createContentStore()
+const ai = await createAIHelpers(store)
+
+// List all blog posts
+const posts = await store.getAll('BlogPost')
+
+// Get a specific post
+const post = await store.get('BlogPost', 'getting-started')
+
+// Create a new post
+await store.create('BlogPost', {
+  title: 'New Post',
+  content: '# Hello World',
+  status: 'draft',
+})
+
+// AI-assisted drafting
+const draft = await ai.draft('BlogPost', {
+  topic: 'Introduction to GraphQL',
+  tone: 'technical',
+})
+
+// Generate SEO metadata
+const seo = await ai.generateSEO(post)
+```
+
+## Field Types
+
+| Type | Description |
+|------|-------------|
+| `string` | Single line text |
+| `text` | Multi-line text |
+| `markdown` | Rich text with markdown |
+| `number` | Numeric value |
+| `boolean` | True/false |
+| `datetime` | Date and time |
+| `email` | Email address |
+| `url` | URL |
+| `slug` | URL-safe identifier |
+| `image` | Image upload |
+| `color` | Color picker |
+| `enum` | Select from options |
+| `array` | List of items |
+| `object` | Nested fields |
+| `reference` | Link to other content |
+
+## Configuration
+
+```ts
+import { config } from 'headless.ly'
+
+// Content storage
+config.content.path = './content'
+config.content.git = true  // Git-based versioning
+
+// API settings
+config.api.port = 3000
+config.api.cors = true
+
+// AI features
+config.ai.enabled = true
+config.ai.model = 'claude-opus-4-20250514'
+
+// Media uploads
+config.media.provider = 's3'
+config.media.bucket = 'my-bucket'
+```
+
+## Git-based Workflow
+
+All content changes are automatically committed:
+
+```bash
+git log --oneline content/
+# a1b2c3d Create BlogPost: getting-started
+# d4e5f6g Update BlogPost: getting-started
+# h7i8j9k Create Author: john-doe
+```
+
+## Webhooks
+
+Trigger external services on content changes:
+
+```ts
+import { onContentChange } from 'headless.ly'
+
+onContentChange('BlogPost', async (event, content) => {
+  if (event === 'publish') {
+    await fetch('https://api.netlify.com/build_hooks/xxx', {
+      method: 'POST',
+    })
+  }
+})
+```
+
+## Integrations
+
+- **Vercel / Netlify** - Automatic deploys
+- **Algolia** - Full-text search
+- **Cloudinary** - Image optimization
+- **GitHub** - Content versioning

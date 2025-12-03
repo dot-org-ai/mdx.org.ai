@@ -1,0 +1,639 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://assistant.md
+$context: https://assistant.md
+name: assistant.md
+version: 0.1.0
+description: Design and deploy personal AI assistants with Markdown
+license: MIT
+repository: https://github.com/mdx-org/assistant.md
+keywords:
+  - markdown
+  - ai
+  - assistant
+  - voice
+  - personal
+bin:
+  assistant: ./cli.js
+exports:
+  '.': ./index.ts
+  './voice': ./voice.ts
+  './memory': ./memory.ts
+  './tools': ./tools.ts
+  './schedule': ./schedule.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const config = {
+  model: {
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514',
+    maxTokens: 4096,
+  },
+  voice: {
+    provider: 'openai',
+    model: 'tts-1',
+    voice: 'alloy',
+    speed: 1.0,
+  },
+  memory: {
+    enabled: true,
+    provider: 'sqlite',
+    path: '.assistant/memory.db',
+    retention: '90d',
+  },
+  schedule: {
+    timezone: 'America/Los_Angeles',
+    dailyBriefing: '08:00',
+    checkIn: '17:00',
+  },
+}
+
+export const toolProviders = {
+  calendar: {
+    google: ['calendar.readonly', 'calendar.events'],
+    outlook: ['Calendars.Read', 'Calendars.ReadWrite'],
+  },
+  email: {
+    gmail: ['gmail.readonly', 'gmail.send'],
+    outlook: ['Mail.Read', 'Mail.Send'],
+  },
+  tasks: {
+    linear: ['read', 'write'],
+    todoist: ['read', 'write'],
+    notion: ['read_content', 'insert_content'],
+  },
+  communication: {
+    slack: ['chat:write', 'channels:read'],
+    discord: ['SEND_MESSAGES'],
+  },
+}
+
+export async function parseAssistant(content) {
+  const { parse } = await import('mdxld')
+  const doc = parse(content)
+
+  const sections = extractSections(doc.content)
+  const tools = extractTools(sections)
+  const personality = extractPersonality(sections)
+  const routines = extractRoutines(sections)
+
+  return {
+    $type: 'Assistant',
+    $id: doc.data.$id || `assistant:${doc.data.name}`,
+    name: doc.data.name,
+    model: doc.data.model || config.model.model,
+    voice: doc.data.voice || config.voice.voice,
+    systemPrompt: buildSystemPrompt(doc.content, personality),
+    tools,
+    routines,
+    ...doc.data,
+  }
+}
+
+export function extractSections(content) {
+  const sections = {}
+  const regex = /^##\s+(.+)$/gm
+  const parts = content.split(regex)
+
+  for (let i = 1; i < parts.length; i += 2) {
+    const title = parts[i].trim().toLowerCase().replace(/\s+/g, '_')
+    sections[title] = parts[i + 1]?.trim() || ''
+  }
+  return sections
+}
+
+export function extractTools(sections) {
+  const tools = {}
+  const toolSection = sections.tools || ''
+  const toolBlocks = toolSection.split(/^###\s+/gm).filter(Boolean)
+
+  for (const block of toolBlocks) {
+    const lines = block.split('\n')
+    const name = lines[0].trim().toLowerCase()
+    const codeMatch = block.match(/```ts\n([\s\S]*?)```/)
+    if (codeMatch) {
+      tools[name] = {
+        name,
+        description: lines.slice(1).find(l => l.trim() && !l.startsWith('```')) || '',
+        implementation: codeMatch[1].trim(),
+      }
+    }
+  }
+  return tools
+}
+
+export function extractPersonality(sections) {
+  const personality = sections.personality || ''
+  return personality
+    .split('\n')
+    .filter(line => line.trim().startsWith('-'))
+    .map(line => line.replace(/^-\s*/, '').trim())
+}
+
+export function extractRoutines(sections) {
+  const routines = []
+  const routineKeys = ['daily_briefing', 'daily_routine', 'morning', 'evening']
+
+  for (const key of routineKeys) {
+    if (sections[key]) {
+      const timeMatch = sections[key].match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i)
+      routines.push({
+        name: key.replace(/_/g, ' '),
+        time: timeMatch?.[1] || '08:00',
+        content: sections[key],
+      })
+    }
+  }
+  return routines
+}
+
+export function buildSystemPrompt(content, personality) {
+  const lines = [
+    content.split('## Tools')[0].trim(),
+    '',
+    'Personality traits:',
+    ...personality.map(p => `- ${p}`),
+  ]
+  return lines.join('\n')
+}
+
+export async function createVoiceSession(assistant, options = {}) {
+  const { voice: voiceConfig } = config
+
+  return {
+    speak: async (text) => {
+      const { OpenAI } = await import('openai')
+      const openai = new OpenAI()
+
+      const response = await openai.audio.speech.create({
+        model: voiceConfig.model,
+        voice: assistant.voice || voiceConfig.voice,
+        input: text,
+        speed: options.speed || voiceConfig.speed,
+      })
+
+      return response.body
+    },
+
+    listen: async (audioStream) => {
+      const { OpenAI } = await import('openai')
+      const openai = new OpenAI()
+
+      const transcription = await openai.audio.transcriptions.create({
+        model: 'whisper-1',
+        file: audioStream,
+      })
+
+      return transcription.text
+    },
+  }
+}
+
+export async function createMemoryStore(assistant) {
+  const { Database } = await import('better-sqlite3')
+  const db = new Database(config.memory.path)
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS conversations (
+      id TEXT PRIMARY KEY,
+      assistant_id TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS messages (
+      id TEXT PRIMARY KEY,
+      conversation_id TEXT,
+      role TEXT,
+      content TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (conversation_id) REFERENCES conversations(id)
+    );
+    CREATE TABLE IF NOT EXISTS facts (
+      id TEXT PRIMARY KEY,
+      assistant_id TEXT,
+      key TEXT,
+      value TEXT,
+      source TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      expires_at DATETIME
+    );
+    CREATE INDEX IF NOT EXISTS idx_facts_key ON facts(assistant_id, key);
+  `)
+
+  return {
+    async saveMessage(conversationId, role, content) {
+      const id = `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`
+      db.prepare('INSERT INTO messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)')
+        .run(id, conversationId, role, content)
+      return id
+    },
+
+    async getHistory(conversationId, limit = 50) {
+      return db.prepare(
+        'SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY created_at DESC LIMIT ?'
+      ).all(conversationId, limit).reverse()
+    },
+
+    async saveFact(key, value, source = 'conversation') {
+      const id = `fact_${Date.now()}`
+      const expiresAt = new Date(Date.now() + parseDuration(config.memory.retention))
+      db.prepare('INSERT OR REPLACE INTO facts (id, assistant_id, key, value, source, expires_at) VALUES (?, ?, ?, ?, ?, ?)')
+        .run(id, assistant.$id, key, JSON.stringify(value), source, expiresAt.toISOString())
+    },
+
+    async getFact(key) {
+      const row = db.prepare(
+        'SELECT value FROM facts WHERE assistant_id = ? AND key = ? AND expires_at > datetime("now")'
+      ).get(assistant.$id, key)
+      return row ? JSON.parse(row.value) : null
+    },
+
+    async getAllFacts() {
+      return db.prepare(
+        'SELECT key, value FROM facts WHERE assistant_id = ? AND expires_at > datetime("now")'
+      ).all(assistant.$id).reduce((acc, row) => {
+        acc[row.key] = JSON.parse(row.value)
+        return acc
+      }, {})
+    },
+  }
+}
+
+export function parseDuration(str) {
+  const units = { d: 86400000, h: 3600000, m: 60000, s: 1000 }
+  const match = str.match(/^(\d+)([dhms])$/)
+  if (!match) return 86400000 * 90 // default 90 days
+  return parseInt(match[1]) * units[match[2]]
+}
+
+export async function createToolExecutor(assistant) {
+  const tools = assistant.tools || {}
+
+  return {
+    list: () => Object.entries(tools).map(([name, tool]) => ({
+      name,
+      description: tool.description,
+    })),
+
+    execute: async (name, params) => {
+      const tool = tools[name]
+      if (!tool) throw new Error(`Unknown tool: ${name}`)
+
+      // Create execution context with available APIs
+      const context = {
+        google: await createGoogleClient(),
+        slack: await createSlackClient(),
+        linear: await createLinearClient(),
+        db: await createMemoryStore(assistant),
+      }
+
+      // Execute tool implementation
+      const fn = new Function('params', ...Object.keys(context), `
+        return (async () => { ${tool.implementation} })()
+      `)
+
+      return fn(params, ...Object.values(context))
+    },
+  }
+}
+
+async function createGoogleClient() {
+  const { google } = await import('googleapis')
+  const auth = new google.auth.GoogleAuth({
+    scopes: toolProviders.calendar.google.concat(toolProviders.email.gmail),
+  })
+  return {
+    calendar: google.calendar({ version: 'v3', auth }),
+    gmail: google.gmail({ version: 'v1', auth }),
+  }
+}
+
+async function createSlackClient() {
+  const { WebClient } = await import('@slack/web-api')
+  return new WebClient(process.env.SLACK_TOKEN)
+}
+
+async function createLinearClient() {
+  const { LinearClient } = await import('@linear/sdk')
+  return new LinearClient({ apiKey: process.env.LINEAR_API_KEY })
+}
+
+export async function runAssistant(assistant, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const memory = await createMemoryStore(assistant)
+  const tools = await createToolExecutor(assistant)
+  const conversationId = options.conversationId || `conv_${Date.now()}`
+
+  const history = await memory.getHistory(conversationId)
+  const facts = await memory.getAllFacts()
+
+  const systemPrompt = [
+    assistant.systemPrompt,
+    '',
+    'Known facts about the user:',
+    ...Object.entries(facts).map(([k, v]) => `- ${k}: ${v}`),
+  ].join('\n')
+
+  return {
+    conversationId,
+
+    async chat(message) {
+      await memory.saveMessage(conversationId, 'user', message)
+
+      const messages = [
+        ...history,
+        { role: 'user', content: message },
+      ]
+
+      const response = await client.messages.create({
+        model: assistant.model,
+        max_tokens: config.model.maxTokens,
+        system: systemPrompt,
+        messages,
+        tools: tools.list().map(t => ({
+          name: t.name,
+          description: t.description,
+          input_schema: { type: 'object', properties: {}, required: [] },
+        })),
+      })
+
+      let result = response.content[0].text
+
+      // Handle tool use
+      for (const block of response.content) {
+        if (block.type === 'tool_use') {
+          const toolResult = await tools.execute(block.name, block.input)
+          // Continue conversation with tool result...
+        }
+      }
+
+      await memory.saveMessage(conversationId, 'assistant', result)
+      return result
+    },
+
+    async remember(key, value) {
+      await memory.saveFact(key, value, 'explicit')
+    },
+
+    async recall(key) {
+      return memory.getFact(key)
+    },
+  }
+}
+
+export async function scheduleRoutines(assistant) {
+  const { CronJob } = await import('cron')
+  const jobs = []
+
+  for (const routine of assistant.routines || []) {
+    const [hour, minute] = routine.time.split(':').map(Number)
+    const job = new CronJob(
+      `${minute || 0} ${hour} * * *`,
+      async () => {
+        const session = await runAssistant(assistant)
+        const response = await session.chat(`It's time for my ${routine.name}. Please proceed.`)
+        console.log(`[${routine.name}]`, response)
+      },
+      null,
+      true,
+      config.schedule.timezone
+    )
+    jobs.push(job)
+  }
+
+  return {
+    jobs,
+    stop: () => jobs.forEach(j => j.stop()),
+  }
+}
+
+export function defineAssistant(config) {
+  return {
+    ...config,
+    run: (options) => runAssistant(config, options),
+    schedule: () => scheduleRoutines(config),
+    createVoice: (options) => createVoiceSession(config, options),
+  }
+}
+
+# assistant.md
+
+Design and deploy personal AI assistants with Markdown.
+
+## Installation
+
+```bash
+npm install assistant.md
+```
+
+## Quick Start
+
+Create `alex.mdx`:
+
+```mdx
+---
+$type: Assistant
+name: Alex
+model: claude-sonnet-4-20250514
+voice: alloy
+---
+
+# Alex
+
+You are Alex, my personal assistant. You help me stay organized and on top of my tasks.
+
+## About Me
+
+- I'm a software engineer
+- I prefer concise communication
+- My calendar is in Google Calendar
+- My tasks are in Linear
+
+## Personality
+
+- Friendly but professional
+- Proactive in suggesting improvements
+- Remembers context from previous conversations
+
+## Daily Briefing
+
+Every morning at 8am, give me:
+1. Weather forecast
+2. Today's calendar events
+3. Urgent tasks
+
+## Tools
+
+### calendar
+
+Access my Google Calendar to check and create events.
+
+```ts
+const events = await google.calendar.events.list({
+  calendarId: 'primary',
+  timeMin: new Date().toISOString(),
+  maxResults: 10,
+})
+return events.data.items
+```
+
+### tasks
+
+Manage my Linear tasks.
+
+```ts
+const issues = await linear.issues({
+  filter: { assignee: { isMe: true }, state: { type: { in: ['started', 'unstarted'] } } }
+})
+return issues.nodes
+```
+
+### send_slack
+
+Send messages to Slack.
+
+```ts
+await slack.chat.postMessage({
+  channel: params.channel,
+  text: params.message
+})
+```
+```
+
+Run your assistant:
+
+```bash
+# Interactive chat
+npx assistant chat alex.mdx
+
+# With voice
+npx assistant chat alex.mdx --voice
+
+# Run as daemon with scheduled routines
+npx assistant daemon alex.mdx
+
+# Deploy to cloud
+npx assistant deploy alex.mdx
+```
+
+## CLI Commands
+
+```bash
+npx assistant init <name>          # Create new assistant
+npx assistant chat <file>          # Interactive chat
+npx assistant chat <file> --voice  # Voice mode
+npx assistant daemon <file>        # Run with schedules
+npx assistant deploy <file>        # Deploy to cloud
+npx assistant test <file>          # Test assistant
+```
+
+## Configuration
+
+```ts
+import { config } from 'assistant.md'
+
+// Override defaults
+config.model.model = 'claude-opus-4-20250514'
+config.voice.voice = 'nova'
+config.memory.retention = '365d'
+```
+
+## Integrations
+
+| Service | Scopes | Env Var |
+|---------|--------|---------|
+| Google Calendar | `calendar.readonly`, `calendar.events` | `GOOGLE_CREDENTIALS` |
+| Gmail | `gmail.readonly`, `gmail.send` | `GOOGLE_CREDENTIALS` |
+| Slack | `chat:write`, `channels:read` | `SLACK_TOKEN` |
+| Linear | `read`, `write` | `LINEAR_API_KEY` |
+| Notion | `read_content`, `insert_content` | `NOTION_TOKEN` |
+
+## Memory
+
+Assistants automatically remember:
+
+- Facts you explicitly tell them
+- Preferences learned from conversations
+- Important dates and events
+
+```ts
+const session = await runAssistant(assistant)
+
+// Explicitly store a fact
+await session.remember('preferred_coffee', 'oat milk latte')
+
+// Recall later
+const coffee = await session.recall('preferred_coffee')
+```
+
+## Voice Mode
+
+```ts
+import { createVoiceSession } from 'assistant.md'
+
+const voice = await createVoiceSession(assistant)
+
+// Text to speech
+const audio = await voice.speak('Good morning!')
+
+// Speech to text
+const text = await voice.listen(audioStream)
+```
+
+## Scheduled Routines
+
+Define routines in your assistant:
+
+```mdx
+## Daily Briefing
+
+Every morning at 8am, give me:
+1. Weather
+2. Calendar
+3. Tasks
+```
+
+Run as daemon:
+
+```bash
+npx assistant daemon alex.mdx
+```
+
+## SDK
+
+```ts
+import { parseAssistant, runAssistant, defineAssistant } from 'assistant.md'
+
+// Parse from MDX file
+const assistant = await parseAssistant(fs.readFileSync('alex.mdx', 'utf-8'))
+
+// Or define programmatically
+const assistant = defineAssistant({
+  name: 'Alex',
+  model: 'claude-sonnet-4-20250514',
+  systemPrompt: 'You are a helpful assistant.',
+  tools: {
+    calendar: {
+      description: 'Access calendar',
+      implementation: '...',
+    },
+  },
+})
+
+// Run
+const session = await assistant.run()
+const response = await session.chat('What\'s on my calendar today?')
+```
+
+## MCP Server
+
+Expose your assistant as an MCP server:
+
+```bash
+npx assistant mcp alex.mdx
+```
+
+This allows Claude Desktop and other MCP clients to use your assistant.

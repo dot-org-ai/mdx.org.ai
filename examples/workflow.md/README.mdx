@@ -1,0 +1,809 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://workflow.md
+$context: https://workflow.md
+name: workflow.md
+version: 0.1.0
+description: Design and run automation workflows with Markdown
+license: MIT
+repository: https://github.com/mdx-org/workflow.md
+keywords:
+  - markdown
+  - workflow
+  - automation
+  - triggers
+  - orchestration
+bin:
+  workflow: ./cli.js
+exports:
+  '.': ./index.ts
+  './triggers': ./triggers.ts
+  './steps': ./steps.ts
+  './runtime': ./runtime.ts
+  './storage': ./storage.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const config = {
+  execution: {
+    timeout: 300000, // 5 minutes
+    retries: 3,
+    backoff: 'exponential',
+    backoffBase: 1000,
+    backoffMax: 60000,
+  },
+  storage: {
+    provider: 'sqlite',
+    path: '.workflow/runs.db',
+  },
+  triggers: {
+    webhook: {
+      port: 3001,
+      path: '/webhook',
+      secret: process.env.WEBHOOK_SECRET,
+    },
+    schedule: {
+      timezone: 'UTC',
+    },
+  },
+  integrations: {
+    slack: process.env.SLACK_TOKEN,
+    github: process.env.GITHUB_TOKEN,
+    email: {
+      provider: 'resend',
+      apiKey: process.env.RESEND_API_KEY,
+      from: process.env.EMAIL_FROM,
+    },
+  },
+}
+
+export const triggers = {
+  webhook: (options = {}) => ({
+    type: 'webhook',
+    path: options.path || '/trigger',
+    method: options.method || 'POST',
+    validate: options.validate,
+  }),
+
+  cron: (expression, options = {}) => ({
+    type: 'cron',
+    expression,
+    timezone: options.timezone || config.triggers.schedule.timezone,
+  }),
+
+  event: (eventType, options = {}) => ({
+    type: 'event',
+    eventType,
+    source: options.source,
+    filter: options.filter,
+  }),
+
+  manual: () => ({
+    type: 'manual',
+  }),
+}
+
+export const steps = {
+  wait: (duration) => ({
+    type: 'wait',
+    duration: parseDuration(duration),
+  }),
+
+  waitFor: (event, options = {}) => ({
+    type: 'wait_for',
+    event,
+    timeout: options.timeout ? parseDuration(options.timeout) : null,
+  }),
+
+  waitUntil: (date) => ({
+    type: 'wait_until',
+    date: new Date(date).toISOString(),
+  }),
+
+  condition: (check, options = {}) => ({
+    type: 'condition',
+    check,
+    onTrue: options.onTrue,
+    onFalse: options.onFalse,
+  }),
+
+  parallel: (tasks) => ({
+    type: 'parallel',
+    tasks,
+  }),
+
+  approve: (options) => ({
+    type: 'approval',
+    assignee: options.assignee,
+    message: options.message,
+    timeout: options.timeout ? parseDuration(options.timeout) : null,
+    channels: options.channels || ['email'],
+  }),
+
+  retry: (step, options = {}) => ({
+    type: 'retry',
+    step,
+    maxAttempts: options.maxAttempts || 3,
+    backoff: options.backoff || 'exponential',
+  }),
+}
+
+export function parseDuration(str) {
+  if (typeof str === 'number') return str
+  const units = { d: 86400000, h: 3600000, m: 60000, s: 1000, ms: 1 }
+  const match = str.match(/^(\d+)(d|h|m|s|ms)$/)
+  if (!match) throw new Error(`Invalid duration: ${str}`)
+  return parseInt(match[1]) * units[match[2]]
+}
+
+export async function parseWorkflow(content) {
+  const { parse } = await import('mdxld')
+  const doc = parse(content)
+
+  const steps = extractSteps(doc.content)
+  const trigger = parseTrigger(doc.data.trigger)
+
+  return {
+    $type: 'Workflow',
+    $id: doc.data.$id || `workflow:${doc.data.name}`,
+    name: doc.data.name,
+    description: extractDescription(doc.content),
+    trigger,
+    steps,
+    ...doc.data,
+  }
+}
+
+function parseTrigger(trigger) {
+  if (!trigger) return triggers.manual()
+  if (trigger === 'manual') return triggers.manual()
+  if (trigger === 'webhook') return triggers.webhook()
+  if (trigger.startsWith('cron(')) {
+    const expr = trigger.match(/cron\(['"](.+)['"]\)/)?.[1]
+    return triggers.cron(expr)
+  }
+  return triggers.event(trigger)
+}
+
+export function extractDescription(content) {
+  const lines = content.split('\n')
+  const descLines = []
+  let inDesc = false
+
+  for (const line of lines) {
+    if (line.startsWith('# ')) {
+      inDesc = true
+      continue
+    }
+    if (line.startsWith('## ')) break
+    if (inDesc && line.trim()) {
+      descLines.push(line.trim())
+    }
+  }
+  return descLines.join(' ')
+}
+
+export function extractSteps(content) {
+  const steps = []
+  const stepRegex = /^##\s+(.+)$/gm
+  const parts = content.split(stepRegex)
+
+  for (let i = 1; i < parts.length; i += 2) {
+    const name = parts[i].trim()
+    const body = parts[i + 1] || ''
+
+    // Extract code block
+    const codeMatch = body.match(/```(?:ts|typescript|js|javascript)\n([\s\S]*?)```/)
+    const description = body.split('```')[0].trim()
+
+    steps.push({
+      id: name.toLowerCase().replace(/\s+/g, '-'),
+      name,
+      description,
+      code: codeMatch?.[1]?.trim() || '',
+    })
+  }
+  return steps
+}
+
+export async function createRuntime(workflow) {
+  const db = await createStorage()
+  const context = await createContext(workflow)
+
+  return {
+    workflow,
+    context,
+
+    async execute(input = {}) {
+      const runId = `run_${Date.now()}_${Math.random().toString(36).slice(2)}`
+
+      await db.createRun({
+        id: runId,
+        workflowId: workflow.$id,
+        status: 'running',
+        input,
+        startedAt: new Date().toISOString(),
+      })
+
+      try {
+        let stepIndex = 0
+        let result = { ...input }
+
+        for (const step of workflow.steps) {
+          await db.updateStep(runId, step.id, { status: 'running', startedAt: new Date().toISOString() })
+
+          try {
+            result = await executeStep(step, result, context)
+            await db.updateStep(runId, step.id, { status: 'completed', result, completedAt: new Date().toISOString() })
+          } catch (error) {
+            await db.updateStep(runId, step.id, { status: 'failed', error: error.message })
+            throw error
+          }
+
+          stepIndex++
+        }
+
+        await db.updateRun(runId, { status: 'completed', result, completedAt: new Date().toISOString() })
+        return { runId, status: 'completed', result }
+
+      } catch (error) {
+        await db.updateRun(runId, { status: 'failed', error: error.message, completedAt: new Date().toISOString() })
+        throw error
+      }
+    },
+
+    async getRun(runId) {
+      return db.getRun(runId)
+    },
+
+    async listRuns(options = {}) {
+      return db.listRuns(workflow.$id, options)
+    },
+  }
+}
+
+async function createContext(workflow) {
+  return {
+    // Control flow
+    goto: (stepId) => ({ __goto: stepId }),
+    wait: (duration) => new Promise(resolve => setTimeout(resolve, parseDuration(duration))),
+    waitFor: async (event, options) => {
+      // Implementation would use event bus
+      return new Promise((resolve, reject) => {
+        const timeout = options?.timeout ? parseDuration(options.timeout) : null
+        if (timeout) {
+          setTimeout(() => reject(new Error('Wait timeout')), timeout)
+        }
+        // Event subscription logic here
+      })
+    },
+
+    // Parallel execution
+    parallel: async (tasks) => Promise.all(tasks.map(t => typeof t === 'function' ? t() : t)),
+
+    // Approval flow
+    approve: async (options) => {
+      const approvalId = `approval_${Date.now()}`
+      // Send approval request
+      await sendApprovalRequest(approvalId, options)
+      // Wait for response
+      return waitForApproval(approvalId, options.timeout)
+    },
+
+    // Integrations
+    email: createEmailClient(),
+    slack: createSlackClient(),
+    github: createGitHubClient(),
+    calendar: createCalendarClient(),
+
+    // Utilities
+    log: (message, data) => console.log(`[${workflow.name}]`, message, data || ''),
+    env: process.env,
+  }
+}
+
+async function executeStep(step, input, context) {
+  if (!step.code) return input
+
+  // Create step function
+  const fn = new Function(
+    'input', 'ctx', 'email', 'slack', 'github', 'calendar',
+    'wait', 'waitFor', 'parallel', 'approve', 'goto', 'log', 'env',
+    `return (async () => { ${step.code} })()`,
+  )
+
+  const result = await fn(
+    input,
+    context,
+    context.email,
+    context.slack,
+    context.github,
+    context.calendar,
+    context.wait,
+    context.waitFor,
+    context.parallel,
+    context.approve,
+    context.goto,
+    context.log,
+    context.env,
+  )
+
+  // Handle goto
+  if (result?.__goto) {
+    return { ...input, __goto: result.__goto }
+  }
+
+  return result ?? input
+}
+
+async function createStorage() {
+  const { Database } = await import('better-sqlite3')
+  const db = new Database(config.storage.path)
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS runs (
+      id TEXT PRIMARY KEY,
+      workflow_id TEXT,
+      status TEXT,
+      input TEXT,
+      result TEXT,
+      error TEXT,
+      started_at TEXT,
+      completed_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS steps (
+      id TEXT,
+      run_id TEXT,
+      status TEXT,
+      result TEXT,
+      error TEXT,
+      started_at TEXT,
+      completed_at TEXT,
+      PRIMARY KEY (run_id, id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_runs_workflow ON runs(workflow_id);
+  `)
+
+  return {
+    createRun: (run) => {
+      db.prepare('INSERT INTO runs (id, workflow_id, status, input, started_at) VALUES (?, ?, ?, ?, ?)')
+        .run(run.id, run.workflowId, run.status, JSON.stringify(run.input), run.startedAt)
+    },
+    updateRun: (id, updates) => {
+      const fields = Object.keys(updates).map(k => `${k.replace(/([A-Z])/g, '_$1').toLowerCase()} = ?`).join(', ')
+      const values = Object.values(updates).map(v => typeof v === 'object' ? JSON.stringify(v) : v)
+      db.prepare(`UPDATE runs SET ${fields} WHERE id = ?`).run(...values, id)
+    },
+    getRun: (id) => {
+      const row = db.prepare('SELECT * FROM runs WHERE id = ?').get(id)
+      if (!row) return null
+      return {
+        ...row,
+        input: JSON.parse(row.input || '{}'),
+        result: row.result ? JSON.parse(row.result) : null,
+      }
+    },
+    listRuns: (workflowId, options = {}) => {
+      return db.prepare('SELECT * FROM runs WHERE workflow_id = ? ORDER BY started_at DESC LIMIT ?')
+        .all(workflowId, options.limit || 50)
+        .map(row => ({
+          ...row,
+          input: JSON.parse(row.input || '{}'),
+          result: row.result ? JSON.parse(row.result) : null,
+        }))
+    },
+    updateStep: (runId, stepId, updates) => {
+      const existing = db.prepare('SELECT * FROM steps WHERE run_id = ? AND id = ?').get(runId, stepId)
+      if (existing) {
+        const fields = Object.keys(updates).map(k => `${k.replace(/([A-Z])/g, '_$1').toLowerCase()} = ?`).join(', ')
+        const values = Object.values(updates).map(v => typeof v === 'object' ? JSON.stringify(v) : v)
+        db.prepare(`UPDATE steps SET ${fields} WHERE run_id = ? AND id = ?`).run(...values, runId, stepId)
+      } else {
+        db.prepare('INSERT INTO steps (run_id, id, status, started_at) VALUES (?, ?, ?, ?)')
+          .run(runId, stepId, updates.status, updates.startedAt)
+      }
+    },
+  }
+}
+
+function createEmailClient() {
+  return {
+    send: async (options) => {
+      const { Resend } = await import('resend')
+      const resend = new Resend(config.integrations.email.apiKey)
+      return resend.emails.send({
+        from: config.integrations.email.from,
+        to: options.to,
+        subject: options.subject,
+        html: options.html || options.body,
+      })
+    },
+  }
+}
+
+function createSlackClient() {
+  return {
+    send: async (channel, message) => {
+      const { WebClient } = await import('@slack/web-api')
+      const client = new WebClient(config.integrations.slack)
+      return client.chat.postMessage({ channel, text: message })
+    },
+    channels: {
+      create: async (name, options = {}) => {
+        const { WebClient } = await import('@slack/web-api')
+        const client = new WebClient(config.integrations.slack)
+        return client.conversations.create({ name, ...options })
+      },
+      invite: async (channel, users) => {
+        const { WebClient } = await import('@slack/web-api')
+        const client = new WebClient(config.integrations.slack)
+        return client.conversations.invite({ channel, users: users.join(',') })
+      },
+    },
+  }
+}
+
+function createGitHubClient() {
+  return {
+    createIssue: async (repo, options) => {
+      const { Octokit } = await import('@octokit/rest')
+      const octokit = new Octokit({ auth: config.integrations.github })
+      const [owner, repoName] = repo.split('/')
+      return octokit.issues.create({ owner, repo: repoName, ...options })
+    },
+    createPR: async (repo, options) => {
+      const { Octokit } = await import('@octokit/rest')
+      const octokit = new Octokit({ auth: config.integrations.github })
+      const [owner, repoName] = repo.split('/')
+      return octokit.pulls.create({ owner, repo: repoName, ...options })
+    },
+  }
+}
+
+function createCalendarClient() {
+  return {
+    findSlot: async (options) => {
+      // Integration with Google Calendar / Outlook
+      return new Date(Date.now() + 86400000).toISOString()
+    },
+    create: async (options) => {
+      // Create calendar event
+      return { id: `event_${Date.now()}`, ...options }
+    },
+  }
+}
+
+async function sendApprovalRequest(approvalId, options) {
+  if (options.channels?.includes('email')) {
+    await createEmailClient().send({
+      to: options.assignee,
+      subject: `Approval Required: ${options.message}`,
+      html: `<p>${options.message}</p><a href="${process.env.BASE_URL}/approve/${approvalId}">Approve</a>`,
+    })
+  }
+  if (options.channels?.includes('slack')) {
+    await createSlackClient().send(options.slackChannel || '#approvals', options.message)
+  }
+}
+
+async function waitForApproval(approvalId, timeout) {
+  // Poll for approval status
+  return new Promise((resolve, reject) => {
+    const timeoutMs = timeout ? parseDuration(timeout) : 86400000
+    setTimeout(() => reject(new Error('Approval timeout')), timeoutMs)
+    // Approval polling logic here
+  })
+}
+
+export async function startWebhookServer(workflows) {
+  const { Hono } = await import('hono')
+  const { serve } = await import('@hono/node-server')
+
+  const app = new Hono()
+
+  for (const workflow of workflows) {
+    if (workflow.trigger.type === 'webhook') {
+      app.post(workflow.trigger.path || `/trigger/${workflow.$id}`, async (c) => {
+        const body = await c.req.json()
+        const runtime = await createRuntime(workflow)
+        const result = await runtime.execute(body)
+        return c.json(result)
+      })
+    }
+  }
+
+  serve({ fetch: app.fetch, port: config.triggers.webhook.port })
+  console.log(`Webhook server running on port ${config.triggers.webhook.port}`)
+}
+
+export async function startScheduler(workflows) {
+  const { CronJob } = await import('cron')
+  const jobs = []
+
+  for (const workflow of workflows) {
+    if (workflow.trigger.type === 'cron') {
+      const job = new CronJob(
+        workflow.trigger.expression,
+        async () => {
+          const runtime = await createRuntime(workflow)
+          await runtime.execute({ triggeredAt: new Date().toISOString() })
+        },
+        null,
+        true,
+        workflow.trigger.timezone,
+      )
+      jobs.push({ workflow: workflow.$id, job })
+    }
+  }
+
+  return { jobs, stop: () => jobs.forEach(j => j.job.stop()) }
+}
+
+export function defineWorkflow(config) {
+  return {
+    ...config,
+    run: (input) => createRuntime(config).then(r => r.execute(input)),
+    start: () => Promise.all([startWebhookServer([config]), startScheduler([config])]),
+  }
+}
+
+# workflow.md
+
+Design and run automation workflows with Markdown.
+
+## Installation
+
+```bash
+npm install workflow.md
+```
+
+## Quick Start
+
+Create `onboarding.md`:
+
+```mdx
+---
+$type: Workflow
+name: Customer Onboarding
+trigger: customer.created
+---
+
+# Customer Onboarding
+
+When a new customer signs up, guide them through onboarding.
+
+## Send Welcome Email
+
+```ts
+await email.send({
+  to: input.customer.email,
+  subject: `Welcome to ${env.COMPANY_NAME}!`,
+  template: 'welcome',
+  data: { name: input.customer.name }
+})
+```
+
+## Create Slack Channel
+
+```ts
+const channel = await slack.channels.create(`customer-${input.customer.id}`)
+await slack.channels.invite(channel.id, ['support-team'])
+await slack.send(channel.id, `New customer: ${input.customer.name}`)
+```
+
+## Schedule Onboarding Call
+
+```ts
+const slot = await calendar.findSlot({
+  duration: 30,
+  attendees: [input.customer.email, 'success@company.com'],
+  within: '3d'
+})
+
+await calendar.create({
+  title: `Onboarding: ${input.customer.name}`,
+  time: slot,
+  attendees: [input.customer.email, 'success@company.com']
+})
+```
+
+## Check In After 3 Days
+
+```ts
+await wait('3d')
+
+const activity = await analytics.get({
+  user: input.customer.id,
+  metric: 'sessions'
+})
+
+if (activity.count < 3) {
+  await email.send({
+    to: input.customer.email,
+    template: 'need-help'
+  })
+}
+```
+```
+
+Run your workflow:
+
+```bash
+# Deploy and start listening
+npx workflow deploy onboarding.md
+
+# Trigger manually
+npx workflow trigger onboarding.md --data '{"customer": {"id": "123", "email": "test@example.com"}}'
+
+# View run history
+npx workflow logs onboarding.md
+```
+
+## CLI Commands
+
+```bash
+npx workflow init <name>            # Create new workflow
+npx workflow deploy <file>          # Deploy workflow
+npx workflow trigger <file> [data]  # Trigger manually
+npx workflow logs <file>            # View run history
+npx workflow status <file>          # Check workflow status
+npx workflow pause <file>           # Pause workflow
+npx workflow resume <file>          # Resume workflow
+```
+
+## Triggers
+
+### Webhook
+
+```mdx
+---
+trigger: webhook
+---
+```
+
+Triggers on HTTP POST to `/webhook/<workflow-id>`.
+
+### Schedule (Cron)
+
+```mdx
+---
+trigger: cron('0 9 * * *')
+---
+```
+
+Runs daily at 9am UTC.
+
+### Event
+
+```mdx
+---
+trigger: customer.created
+---
+```
+
+Triggers when the specified event is emitted.
+
+### Manual
+
+```mdx
+---
+trigger: manual
+---
+```
+
+Only runs when explicitly triggered.
+
+## Control Flow
+
+### Wait
+
+```ts
+await wait('1h')           // Wait 1 hour
+await wait('3d')           // Wait 3 days
+await waitFor('approval')  // Wait for event
+await waitUntil('2024-12-01')  // Wait until date
+```
+
+### Conditions
+
+```ts
+if (order.total > 1000) {
+  goto('high-value-flow')
+} else {
+  goto('standard-flow')
+}
+```
+
+### Parallel Execution
+
+```ts
+await parallel([
+  email.send({ to: customer.email, template: 'welcome' }),
+  slack.send('#sales', `New customer: ${customer.name}`),
+  crm.createContact(customer)
+])
+```
+
+### Human Approval
+
+```ts
+const approved = await approve({
+  assignee: 'manager@company.com',
+  message: `Approve refund of $${amount}?`,
+  timeout: '24h',
+  channels: ['email', 'slack']
+})
+
+if (!approved) {
+  goto('refund-denied')
+}
+```
+
+## Integrations
+
+| Service | Functions | Env Var |
+|---------|-----------|---------|
+| Email | `email.send()` | `RESEND_API_KEY` |
+| Slack | `slack.send()`, `slack.channels.*` | `SLACK_TOKEN` |
+| GitHub | `github.createIssue()`, `github.createPR()` | `GITHUB_TOKEN` |
+| Calendar | `calendar.findSlot()`, `calendar.create()` | `GOOGLE_CREDENTIALS` |
+
+## Error Handling
+
+```ts
+try {
+  await riskyOperation()
+} catch (error) {
+  log('Operation failed', { error: error.message })
+  await slack.send('#alerts', `Workflow failed: ${error.message}`)
+  throw error  // Re-throw to fail the workflow
+}
+```
+
+## SDK
+
+```ts
+import { parseWorkflow, createRuntime, defineWorkflow } from 'workflow.md'
+
+// Parse from file
+const workflow = await parseWorkflow(fs.readFileSync('onboarding.md', 'utf-8'))
+
+// Create runtime and execute
+const runtime = await createRuntime(workflow)
+const result = await runtime.execute({ customer: { id: '123' } })
+
+// Or define programmatically
+const workflow = defineWorkflow({
+  name: 'My Workflow',
+  trigger: triggers.webhook(),
+  steps: [
+    { id: 'step-1', name: 'First Step', code: '...' },
+  ],
+})
+
+// Run
+await workflow.run({ input: 'data' })
+```
+
+## Templates
+
+### Customer Onboarding
+```bash
+npx workflow init onboarding --template customer-onboarding
+```
+
+### Lead Nurturing
+```bash
+npx workflow init nurture --template lead-nurturing
+```
+
+### Approval Flow
+```bash
+npx workflow init approval --template approval-flow
+```
+
+### Incident Response
+```bash
+npx workflow init incident --template incident-response
+```

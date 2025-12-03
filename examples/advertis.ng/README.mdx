@@ -1,0 +1,704 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://advertis.ng
+$context: https://advertis.ng
+name: advertis.ng
+version: 0.1.0
+description: AI-powered ad generation and optimization
+license: MIT
+repository: https://github.com/mdx-org/advertis.ng
+keywords:
+  - advertising
+  - ai
+  - ads
+  - creative
+  - optimization
+bin:
+  ads: ./cli.js
+exports:
+  '.': ./index.ts
+  './creative': ./creative.ts
+  './optimize': ./optimize.ts
+  './platforms': ./platforms.ts
+  './analytics': ./analytics.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const config = {
+  ai: {
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514',
+    maxTokens: 4096,
+  },
+  platforms: {
+    google: {
+      clientId: process.env.GOOGLE_ADS_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_ADS_CLIENT_SECRET,
+      developerToken: process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
+    },
+    facebook: {
+      accessToken: process.env.META_ACCESS_TOKEN,
+      adAccountId: process.env.META_AD_ACCOUNT_ID,
+    },
+    linkedin: {
+      accessToken: process.env.LINKEDIN_ACCESS_TOKEN,
+      adAccountId: process.env.LINKEDIN_AD_ACCOUNT_ID,
+    },
+  },
+  storage: {
+    provider: 'sqlite',
+    path: '.ads/data.db',
+  },
+}
+
+export const platforms = {
+  google: {
+    name: 'Google Ads',
+    formats: {
+      search: {
+        headlines: { count: 15, maxLength: 30 },
+        descriptions: { count: 4, maxLength: 90 },
+        paths: { count: 2, maxLength: 15 },
+      },
+      display: {
+        headlines: { count: 5, maxLength: 30 },
+        descriptions: { count: 5, maxLength: 90 },
+        images: { sizes: ['1200x628', '1200x1200', '300x250'] },
+      },
+      video: {
+        duration: [6, 15, 30],
+        formats: ['bumper', 'skippable', 'non-skippable'],
+      },
+    },
+  },
+  facebook: {
+    name: 'Meta Ads',
+    formats: {
+      image: {
+        primaryText: { maxLength: 125 },
+        headline: { maxLength: 40 },
+        description: { maxLength: 30 },
+        images: { ratio: '1.91:1', minWidth: 1080 },
+      },
+      video: {
+        primaryText: { maxLength: 125 },
+        headline: { maxLength: 40 },
+        duration: { min: 1, max: 240 },
+      },
+      carousel: {
+        cards: { min: 2, max: 10 },
+        headline: { maxLength: 40 },
+      },
+    },
+    placements: ['feed', 'stories', 'reels', 'messenger', 'audience_network'],
+  },
+  linkedin: {
+    name: 'LinkedIn Ads',
+    formats: {
+      singleImage: {
+        headline: { maxLength: 70 },
+        introText: { maxLength: 150 },
+        images: { ratio: '1.91:1', minWidth: 1200 },
+      },
+      video: {
+        headline: { maxLength: 70 },
+        introText: { maxLength: 150 },
+        duration: { min: 3, max: 30 },
+      },
+      carousel: {
+        cards: { min: 2, max: 10 },
+        headline: { maxLength: 45 },
+      },
+    },
+  },
+  tiktok: {
+    name: 'TikTok Ads',
+    formats: {
+      inFeed: {
+        text: { maxLength: 100 },
+        video: { duration: { min: 5, max: 60 }, ratio: '9:16' },
+      },
+      spark: {
+        organic: true,
+        boost: true,
+      },
+    },
+  },
+}
+
+export const objectives = {
+  awareness: {
+    name: 'Brand Awareness',
+    metrics: ['impressions', 'reach', 'frequency', 'brand_lift'],
+    bidding: ['cpm', 'target_frequency'],
+  },
+  traffic: {
+    name: 'Website Traffic',
+    metrics: ['clicks', 'ctr', 'cpc', 'landing_page_views'],
+    bidding: ['cpc', 'maximize_clicks'],
+  },
+  engagement: {
+    name: 'Engagement',
+    metrics: ['likes', 'comments', 'shares', 'saves', 'engagement_rate'],
+    bidding: ['cpe', 'maximize_engagement'],
+  },
+  leads: {
+    name: 'Lead Generation',
+    metrics: ['leads', 'cpl', 'lead_quality_score', 'form_completions'],
+    bidding: ['cpa', 'maximize_conversions'],
+  },
+  conversions: {
+    name: 'Conversions',
+    metrics: ['conversions', 'cpa', 'roas', 'conversion_rate'],
+    bidding: ['cpa', 'target_roas', 'maximize_conversions'],
+  },
+  sales: {
+    name: 'Sales',
+    metrics: ['purchases', 'revenue', 'roas', 'aov'],
+    bidding: ['target_roas', 'maximize_conversion_value'],
+  },
+}
+
+export async function generateAd(options) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const platform = platforms[options.platform]
+  const format = platform?.formats[options.format]
+  const objective = objectives[options.objective]
+
+  if (!platform || !format) {
+    throw new Error(`Invalid platform/format: ${options.platform}/${options.format}`)
+  }
+
+  const systemPrompt = `You are an expert advertising copywriter specializing in ${platform.name}.
+Create ad copy that is compelling, compliant, and optimized for ${objective?.name || 'conversions'}.
+
+Platform constraints:
+${JSON.stringify(format, null, 2)}
+
+Guidelines:
+- Be specific and benefit-focused
+- Use active voice and action verbs
+- Include clear calls-to-action
+- Avoid prohibited content and claims
+- Write multiple variations for testing`
+
+  const response = await client.messages.create({
+    model: config.ai.model,
+    max_tokens: config.ai.maxTokens,
+    system: systemPrompt,
+    messages: [{
+      role: 'user',
+      content: buildAdPrompt(options),
+    }],
+  })
+
+  return parseAdResponse(response.content[0].text, options)
+}
+
+function buildAdPrompt(options) {
+  return `Create ${options.platform} ${options.format} ads for:
+
+Product/Service: ${options.product}
+Target Audience: ${options.audience || 'General'}
+Objective: ${options.objective || 'conversions'}
+${options.offer ? `Offer: ${options.offer}` : ''}
+${options.usp ? `Unique Selling Points: ${options.usp.join(', ')}` : ''}
+${options.tone ? `Tone: ${options.tone}` : ''}
+${options.keywords ? `Keywords: ${options.keywords.join(', ')}` : ''}
+${options.competitors ? `Competitor positioning: ${options.competitors}` : ''}
+
+Generate 5 complete ad variations with all required fields.`
+}
+
+function parseAdResponse(text, options) {
+  const variations = []
+  const platform = platforms[options.platform]
+  const format = platform?.formats[options.format]
+
+  // Parse variations from response
+  const variantRegex = /(?:variation|ad|option)\s*(\d+)/gi
+  const parts = text.split(variantRegex)
+
+  for (let i = 1; i < parts.length; i += 2) {
+    const content = parts[i + 1]?.trim()
+    if (content) {
+      const variation = { id: `var_${i}` }
+
+      // Extract fields based on format
+      if (format.headlines) {
+        const headlineMatches = content.match(/headline[s]?[:\s]*["']?([^"'\n]+)["']?/gi) || []
+        variation.headlines = headlineMatches.map(m => m.replace(/headline[s]?[:\s]*["']?/i, '').replace(/["']$/, '').trim())
+      }
+      if (format.descriptions) {
+        const descMatches = content.match(/description[s]?[:\s]*["']?([^"'\n]+)["']?/gi) || []
+        variation.descriptions = descMatches.map(m => m.replace(/description[s]?[:\s]*["']?/i, '').replace(/["']$/, '').trim())
+      }
+      if (format.primaryText) {
+        const textMatch = content.match(/(?:primary\s*)?text[:\s]*["']?([^"'\n]+)["']?/i)
+        variation.primaryText = textMatch?.[1]?.trim()
+      }
+
+      variation.raw = content
+      variations.push(variation)
+    }
+  }
+
+  return {
+    platform: options.platform,
+    format: options.format,
+    variations,
+    raw: text,
+  }
+}
+
+export async function generateCreative(options) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.ai.model,
+    max_tokens: config.ai.maxTokens,
+    system: `You are a creative director for digital advertising.
+Design ad creative concepts including visual direction, copy, and layout.`,
+    messages: [{
+      role: 'user',
+      content: `Create ad creative concept for:
+
+Product: ${options.product}
+Platform: ${options.platform}
+Format: ${options.format}
+Style: ${options.style || 'modern, clean'}
+Color palette: ${options.colors || 'brand colors'}
+${options.mood ? `Mood: ${options.mood}` : ''}
+
+Provide:
+1. Visual concept description
+2. Layout recommendations
+3. Copy placement
+4. Image/video direction
+5. Call-to-action design`,
+    }],
+  })
+
+  return {
+    concept: response.content[0].text,
+    platform: options.platform,
+    format: options.format,
+  }
+}
+
+export async function optimizeAd(adId, options = {}) {
+  const db = await getDatabase()
+  const ad = await db.get('SELECT * FROM ads WHERE id = ?', adId)
+  if (!ad) throw new Error('Ad not found')
+
+  const performance = await db.all(
+    'SELECT * FROM ad_performance WHERE ad_id = ? ORDER BY date DESC LIMIT 30',
+    adId
+  )
+
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.ai.model,
+    max_tokens: config.ai.maxTokens,
+    system: 'You are a performance marketing expert. Analyze ad performance and suggest optimizations.',
+    messages: [{
+      role: 'user',
+      content: `Analyze and optimize this ad:
+
+Current Copy:
+${JSON.stringify(JSON.parse(ad.content), null, 2)}
+
+Performance (last 30 days):
+${JSON.stringify(performance, null, 2)}
+
+Target metrics: ${options.targetMetrics?.join(', ') || 'CTR, conversions'}
+
+Provide:
+1. Performance analysis
+2. Specific copy improvements
+3. Targeting suggestions
+4. Bidding recommendations
+5. New variations to test`,
+    }],
+  })
+
+  return {
+    adId,
+    analysis: response.content[0].text,
+    currentPerformance: performance,
+  }
+}
+
+export async function createCampaign(options) {
+  const db = await getDatabase()
+  const campaignId = `camp_${Date.now()}_${Math.random().toString(36).slice(2)}`
+
+  // Generate ads
+  const ads = await generateAd({
+    platform: options.platform,
+    format: options.format,
+    product: options.product,
+    audience: options.audience,
+    objective: options.objective,
+  })
+
+  // Store campaign
+  await db.run(`
+    INSERT INTO campaigns (id, name, platform, objective, budget, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `, campaignId, options.name, options.platform, options.objective, options.budget, 'draft', new Date().toISOString())
+
+  // Store ads
+  for (const variation of ads.variations) {
+    await db.run(`
+      INSERT INTO ads (id, campaign_id, content, status, created_at)
+      VALUES (?, ?, ?, ?, ?)
+    `, `ad_${Date.now()}_${Math.random().toString(36).slice(2)}`, campaignId, JSON.stringify(variation), 'draft', new Date().toISOString())
+  }
+
+  return {
+    id: campaignId,
+    name: options.name,
+    platform: options.platform,
+    ads: ads.variations,
+    status: 'draft',
+  }
+}
+
+export async function analyzeCampaign(campaignId) {
+  const db = await getDatabase()
+
+  const campaign = await db.get('SELECT * FROM campaigns WHERE id = ?', campaignId)
+  if (!campaign) throw new Error('Campaign not found')
+
+  const ads = await db.all('SELECT * FROM ads WHERE campaign_id = ?', campaignId)
+  const performance = await db.all(`
+    SELECT ap.* FROM ad_performance ap
+    JOIN ads a ON ap.ad_id = a.id
+    WHERE a.campaign_id = ?
+    ORDER BY ap.date DESC
+  `, campaignId)
+
+  const totals = {
+    impressions: performance.reduce((sum, p) => sum + (p.impressions || 0), 0),
+    clicks: performance.reduce((sum, p) => sum + (p.clicks || 0), 0),
+    conversions: performance.reduce((sum, p) => sum + (p.conversions || 0), 0),
+    spend: performance.reduce((sum, p) => sum + (p.spend || 0), 0),
+  }
+
+  totals.ctr = totals.impressions > 0 ? (totals.clicks / totals.impressions * 100).toFixed(2) : 0
+  totals.cpc = totals.clicks > 0 ? (totals.spend / totals.clicks).toFixed(2) : 0
+  totals.cpa = totals.conversions > 0 ? (totals.spend / totals.conversions).toFixed(2) : 0
+
+  // Find best performing ad
+  const adPerformance = {}
+  for (const p of performance) {
+    if (!adPerformance[p.ad_id]) {
+      adPerformance[p.ad_id] = { clicks: 0, conversions: 0, spend: 0 }
+    }
+    adPerformance[p.ad_id].clicks += p.clicks || 0
+    adPerformance[p.ad_id].conversions += p.conversions || 0
+    adPerformance[p.ad_id].spend += p.spend || 0
+  }
+
+  const bestAd = Object.entries(adPerformance)
+    .map(([id, data]) => ({ id, ...data, cpa: data.conversions > 0 ? data.spend / data.conversions : Infinity }))
+    .sort((a, b) => a.cpa - b.cpa)[0]
+
+  return {
+    campaignId,
+    name: campaign.name,
+    platform: campaign.platform,
+    status: campaign.status,
+    totals,
+    bestAd,
+    adsCount: ads.length,
+    daysCounted: new Set(performance.map(p => p.date)).size,
+  }
+}
+
+async function getDatabase() {
+  const { Database } = await import('better-sqlite3')
+  const db = new Database(config.storage.path)
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS campaigns (
+      id TEXT PRIMARY KEY,
+      name TEXT,
+      platform TEXT,
+      objective TEXT,
+      budget REAL,
+      status TEXT,
+      created_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS ads (
+      id TEXT PRIMARY KEY,
+      campaign_id TEXT,
+      content TEXT,
+      status TEXT,
+      created_at TEXT,
+      FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+    );
+    CREATE TABLE IF NOT EXISTS ad_performance (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ad_id TEXT,
+      date TEXT,
+      impressions INTEGER,
+      clicks INTEGER,
+      conversions INTEGER,
+      spend REAL,
+      FOREIGN KEY (ad_id) REFERENCES ads(id)
+    );
+  `)
+
+  return {
+    run: (sql, ...params) => db.prepare(sql).run(...params),
+    get: (sql, ...params) => db.prepare(sql).get(...params),
+    all: (sql, ...params) => db.prepare(sql).all(...params),
+  }
+}
+
+export async function publishToGoogle(campaignId) {
+  // Google Ads API integration
+  const { GoogleAdsApi } = await import('google-ads-api')
+  const client = new GoogleAdsApi({
+    client_id: config.platforms.google.clientId,
+    client_secret: config.platforms.google.clientSecret,
+    developer_token: config.platforms.google.developerToken,
+  })
+
+  // Implementation would create campaign in Google Ads
+  return { status: 'published', platform: 'google', campaignId }
+}
+
+export async function publishToMeta(campaignId) {
+  // Meta Ads API integration
+  // Implementation would create campaign in Meta Ads Manager
+  return { status: 'published', platform: 'facebook', campaignId }
+}
+
+export function defineAd(config) {
+  return {
+    ...config,
+    generate: () => generateAd(config),
+    optimize: () => optimizeAd(config.id),
+    publish: (platform) => platform === 'google' ? publishToGoogle(config.id) : publishToMeta(config.id),
+  }
+}
+
+# advertis.ng
+
+AI-powered ad generation and optimization.
+
+## Installation
+
+```bash
+npm install advertis.ng
+```
+
+## Quick Start
+
+```bash
+# Generate Google Search ads
+npx ads generate google search "Analytics Platform" --audience b2b
+
+# Generate Meta ads
+npx ads generate facebook image "Fitness App" --objective conversions
+
+# Create full campaign
+npx ads campaign create --name "Q1 Launch" --platform google --budget 5000
+
+# Analyze performance
+npx ads analyze camp_abc123
+```
+
+## CLI Commands
+
+```bash
+npx ads generate <platform> <format> <product>   # Generate ads
+npx ads creative <platform> <format> <product>   # Generate creative concept
+npx ads campaign create                          # Create campaign
+npx ads campaign publish <id>                    # Publish to platform
+npx ads analyze <campaign_id>                    # Analyze performance
+npx ads optimize <ad_id>                         # Get optimization suggestions
+```
+
+## Platforms
+
+### Google Ads
+
+```ts
+import { generateAd } from 'advertis.ng'
+
+const ads = await generateAd({
+  platform: 'google',
+  format: 'search',  // search, display, video
+  product: 'Project Management Tool',
+  audience: 'B2B SaaS buyers',
+  objective: 'conversions',
+  keywords: ['project management', 'team collaboration'],
+})
+```
+
+**Search Ad Format:**
+- 15 headlines (30 chars each)
+- 4 descriptions (90 chars each)
+- 2 display paths (15 chars each)
+
+### Meta Ads (Facebook/Instagram)
+
+```ts
+const ads = await generateAd({
+  platform: 'facebook',
+  format: 'image',  // image, video, carousel
+  product: 'Meditation App',
+  audience: 'Health-conscious millennials',
+  objective: 'leads',
+  offer: '7-day free trial',
+})
+```
+
+**Image Ad Format:**
+- Primary text (125 chars)
+- Headline (40 chars)
+- Description (30 chars)
+
+### LinkedIn Ads
+
+```ts
+const ads = await generateAd({
+  platform: 'linkedin',
+  format: 'singleImage',
+  product: 'Enterprise Security',
+  audience: 'CISOs and IT Directors',
+  objective: 'leads',
+})
+```
+
+### TikTok Ads
+
+```ts
+const ads = await generateAd({
+  platform: 'tiktok',
+  format: 'inFeed',
+  product: 'Fashion Brand',
+  audience: 'Gen Z fashion enthusiasts',
+  tone: 'authentic, trendy',
+})
+```
+
+## Campaign Objectives
+
+| Objective | Optimized For | Metrics |
+|-----------|--------------|---------|
+| `awareness` | Brand lift | Impressions, reach |
+| `traffic` | Clicks | CTR, CPC |
+| `engagement` | Interactions | Likes, shares |
+| `leads` | Form fills | CPL, lead quality |
+| `conversions` | Actions | CPA, ROAS |
+| `sales` | Revenue | ROAS, AOV |
+
+## Creative Generation
+
+Generate creative concepts:
+
+```ts
+import { generateCreative } from 'advertis.ng'
+
+const creative = await generateCreative({
+  product: 'Coffee Subscription',
+  platform: 'facebook',
+  format: 'video',
+  style: 'lifestyle, warm tones',
+  mood: 'cozy morning ritual',
+})
+```
+
+## Campaign Management
+
+```ts
+import { createCampaign, analyzeCampaign } from 'advertis.ng'
+
+// Create campaign with generated ads
+const campaign = await createCampaign({
+  name: 'Spring Launch',
+  platform: 'google',
+  format: 'search',
+  product: 'Analytics Platform',
+  audience: 'Marketing managers',
+  objective: 'leads',
+  budget: 10000,
+})
+
+// Analyze performance
+const analysis = await analyzeCampaign(campaign.id)
+```
+
+## Ad Optimization
+
+```ts
+import { optimizeAd } from 'advertis.ng'
+
+const suggestions = await optimizeAd('ad_abc123', {
+  targetMetrics: ['CTR', 'conversions'],
+})
+
+// Returns:
+// - Performance analysis
+// - Copy improvements
+// - Targeting suggestions
+// - New variations to test
+```
+
+## Configuration
+
+```ts
+import { config } from 'advertis.ng'
+
+// AI settings
+config.ai.model = 'claude-opus-4-20250514'
+
+// Platform credentials
+config.platforms.google.developerToken = 'xxx'
+config.platforms.facebook.accessToken = 'xxx'
+config.platforms.linkedin.accessToken = 'xxx'
+```
+
+## Environment Variables
+
+| Variable | Platform | Description |
+|----------|----------|-------------|
+| `GOOGLE_ADS_CLIENT_ID` | Google | OAuth client ID |
+| `GOOGLE_ADS_CLIENT_SECRET` | Google | OAuth client secret |
+| `GOOGLE_ADS_DEVELOPER_TOKEN` | Google | Developer token |
+| `META_ACCESS_TOKEN` | Meta | Access token |
+| `META_AD_ACCOUNT_ID` | Meta | Ad account ID |
+| `LINKEDIN_ACCESS_TOKEN` | LinkedIn | Access token |
+
+## SDK
+
+```ts
+import { defineAd } from 'advertis.ng'
+
+const ad = defineAd({
+  platform: 'google',
+  format: 'search',
+  product: 'CRM Software',
+  objective: 'leads',
+})
+
+// Generate variations
+const variations = await ad.generate()
+
+// Optimize based on performance
+const suggestions = await ad.optimize()
+
+// Publish to platform
+await ad.publish('google')
+```

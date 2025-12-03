@@ -1,0 +1,628 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://writer.md
+$context: https://writer.md
+name: writer.md
+version: 0.1.0
+description: AI-powered content writing and editing for Markdown
+license: MIT
+repository: https://github.com/mdx-org/writer.md
+keywords:
+  - markdown
+  - ai
+  - writing
+  - content
+  - editing
+bin:
+  writer: ./cli.js
+exports:
+  '.': ./index.ts
+  './generate': ./generate.ts
+  './edit': ./edit.ts
+  './transform': ./transform.ts
+  './style': ./style.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const config = {
+  model: {
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514',
+    maxTokens: 4096,
+  },
+  defaults: {
+    tone: 'professional',
+    audience: 'general',
+    length: 'medium',
+  },
+  output: {
+    format: 'markdown',
+    frontmatter: true,
+  },
+}
+
+export const tones = {
+  professional: 'Clear, authoritative, and business-appropriate',
+  casual: 'Friendly, conversational, and approachable',
+  technical: 'Precise, detailed, with technical terminology',
+  creative: 'Engaging, imaginative, and expressive',
+  academic: 'Formal, well-researched, with citations',
+  marketing: 'Persuasive, benefit-focused, and action-oriented',
+}
+
+export const contentTypes = {
+  blogPost: {
+    structure: ['title', 'introduction', 'body', 'conclusion', 'cta'],
+    frontmatter: ['title', 'description', 'author', 'date', 'tags'],
+    minWords: 800,
+    maxWords: 2500,
+  },
+  documentation: {
+    structure: ['title', 'overview', 'prerequisites', 'steps', 'examples', 'troubleshooting'],
+    frontmatter: ['title', 'description', 'category', 'order'],
+    minWords: 500,
+    maxWords: 3000,
+  },
+  tutorial: {
+    structure: ['title', 'introduction', 'whatYouWillLearn', 'prerequisites', 'steps', 'conclusion'],
+    frontmatter: ['title', 'description', 'difficulty', 'duration', 'tags'],
+    minWords: 1000,
+    maxWords: 4000,
+  },
+  landingPage: {
+    structure: ['headline', 'subheadline', 'benefits', 'features', 'socialProof', 'cta'],
+    frontmatter: ['title', 'description', 'layout'],
+    minWords: 300,
+    maxWords: 1000,
+  },
+  email: {
+    structure: ['subject', 'preview', 'greeting', 'body', 'cta', 'signature'],
+    frontmatter: ['subject', 'preheader', 'template'],
+    minWords: 100,
+    maxWords: 500,
+  },
+  socialPost: {
+    structure: ['hook', 'body', 'cta', 'hashtags'],
+    frontmatter: ['platform', 'scheduledFor'],
+    minWords: 50,
+    maxWords: 280,
+  },
+}
+
+export const operations = {
+  generate: 'Create new content from scratch based on a topic or outline',
+  expand: 'Elaborate on existing content, adding depth and detail',
+  condense: 'Shorten content while preserving key information',
+  rewrite: 'Rewrite content with a different tone or style',
+  improve: 'Enhance clarity, flow, and impact of existing content',
+  proofread: 'Check and fix grammar, spelling, and punctuation',
+  translate: 'Translate content to another language',
+  outline: 'Create an outline for a topic or existing content',
+  summarize: 'Create a concise summary of longer content',
+  seo: 'Optimize content for search engines',
+}
+
+export async function generate(options) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const contentType = contentTypes[options.type] || contentTypes.blogPost
+  const tone = tones[options.tone] || tones[config.defaults.tone]
+
+  const systemPrompt = `You are an expert content writer. Write in a ${options.tone || config.defaults.tone} tone.
+Target audience: ${options.audience || config.defaults.audience}
+Content type: ${options.type || 'blog post'}
+Tone description: ${tone}
+
+Structure your output with proper Markdown formatting including:
+- Clear headings (H1 for title, H2 for sections)
+- Bullet points and numbered lists where appropriate
+- Code blocks if relevant
+- Links and emphasis where helpful
+
+${contentType.minWords ? `Target length: ${contentType.minWords}-${contentType.maxWords} words` : ''}`
+
+  const prompt = buildGeneratePrompt(options, contentType)
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: prompt }],
+  })
+
+  const content = response.content[0].text
+  return config.output.frontmatter ? addFrontmatter(content, options, contentType) : content
+}
+
+function buildGeneratePrompt(options, contentType) {
+  const parts = [`Write a ${options.type || 'blog post'} about: ${options.topic}`]
+
+  if (options.outline) {
+    parts.push(`\nFollow this outline:\n${options.outline}`)
+  }
+  if (options.keywords) {
+    parts.push(`\nInclude these keywords naturally: ${options.keywords.join(', ')}`)
+  }
+  if (options.context) {
+    parts.push(`\nAdditional context: ${options.context}`)
+  }
+  if (options.examples) {
+    parts.push(`\nReference examples: ${options.examples}`)
+  }
+
+  return parts.join('\n')
+}
+
+function addFrontmatter(content, options, contentType) {
+  const frontmatter = {
+    $type: options.type || 'BlogPost',
+    title: extractTitle(content) || options.topic,
+    description: options.description || extractDescription(content),
+    date: new Date().toISOString().split('T')[0],
+    ...(options.author && { author: options.author }),
+    ...(options.tags && { tags: options.tags }),
+    ...(options.category && { category: options.category }),
+  }
+
+  const yaml = Object.entries(frontmatter)
+    .map(([k, v]) => `${k}: ${Array.isArray(v) ? `[${v.join(', ')}]` : v}`)
+    .join('\n')
+
+  return `---\n${yaml}\n---\n\n${content}`
+}
+
+function extractTitle(content) {
+  const match = content.match(/^#\s+(.+)$/m)
+  return match ? match[1].trim() : null
+}
+
+function extractDescription(content) {
+  const lines = content.split('\n').filter(l => l.trim() && !l.startsWith('#'))
+  return lines[0]?.slice(0, 160) || ''
+}
+
+export async function expand(content, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: `You are an expert editor. Expand and elaborate on the provided content.
+Add depth, examples, and detail while maintaining the original voice and structure.
+${options.focus ? `Focus particularly on: ${options.focus}` : ''}
+${options.targetLength ? `Target length: approximately ${options.targetLength} words` : 'Roughly double the length'}`,
+    messages: [{ role: 'user', content: `Expand this content:\n\n${content}` }],
+  })
+
+  return response.content[0].text
+}
+
+export async function condense(content, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: `You are an expert editor. Condense the provided content while preserving key information.
+Remove redundancy and fluff while keeping the core message intact.
+${options.targetLength ? `Target length: approximately ${options.targetLength} words` : 'Roughly half the length'}
+${options.preserve ? `Preserve these elements: ${options.preserve.join(', ')}` : ''}`,
+    messages: [{ role: 'user', content: `Condense this content:\n\n${content}` }],
+  })
+
+  return response.content[0].text
+}
+
+export async function rewrite(content, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const targetTone = tones[options.tone] || options.tone || 'professional'
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: `You are an expert editor. Rewrite the provided content with a different tone or style.
+Target tone: ${targetTone}
+${options.audience ? `Target audience: ${options.audience}` : ''}
+Preserve the core information and structure while transforming the voice.`,
+    messages: [{ role: 'user', content: `Rewrite this content:\n\n${content}` }],
+  })
+
+  return response.content[0].text
+}
+
+export async function improve(content, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: `You are an expert editor. Improve the provided content for clarity, flow, and impact.
+Fix any issues with:
+- Sentence structure and flow
+- Word choice and clarity
+- Paragraph organization
+- Engagement and readability
+${options.focus ? `Focus particularly on: ${options.focus}` : ''}
+Preserve the original voice and intent.`,
+    messages: [{ role: 'user', content: `Improve this content:\n\n${content}` }],
+  })
+
+  return response.content[0].text
+}
+
+export async function proofread(content, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: `You are an expert proofreader. Check and fix the provided content for:
+- Grammar and syntax errors
+- Spelling mistakes
+- Punctuation issues
+- Consistency in style
+${options.styleGuide ? `Follow this style guide: ${options.styleGuide}` : ''}
+Return the corrected content. Only make necessary corrections, don't change the style or voice.`,
+    messages: [{ role: 'user', content: `Proofread this content:\n\n${content}` }],
+  })
+
+  return response.content[0].text
+}
+
+export async function outline(topic, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const contentType = contentTypes[options.type] || contentTypes.blogPost
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: `You are an expert content strategist. Create a detailed outline for the given topic.
+Content type: ${options.type || 'blog post'}
+Suggested structure: ${contentType.structure.join(' → ')}
+Include:
+- Main sections with H2 headers
+- Key points under each section
+- Suggested examples or supporting points
+- Estimated word count for each section`,
+    messages: [{ role: 'user', content: `Create an outline for: ${topic}` }],
+  })
+
+  return response.content[0].text
+}
+
+export async function summarize(content, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: `You are an expert summarizer. Create a concise summary of the provided content.
+${options.length === 'brief' ? 'Keep it to 2-3 sentences.' : ''}
+${options.length === 'detailed' ? 'Include key points and supporting details.' : ''}
+${options.format === 'bullets' ? 'Use bullet points.' : ''}
+Capture the main ideas and key takeaways.`,
+    messages: [{ role: 'user', content: `Summarize this content:\n\n${content}` }],
+  })
+
+  return response.content[0].text
+}
+
+export async function seoOptimize(content, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: `You are an SEO expert. Optimize the provided content for search engines.
+${options.keyword ? `Primary keyword: ${options.keyword}` : ''}
+${options.secondaryKeywords ? `Secondary keywords: ${options.secondaryKeywords.join(', ')}` : ''}
+
+Improvements to make:
+- Add keyword-rich headings (H2, H3)
+- Improve meta description potential (first paragraph)
+- Add internal linking opportunities (suggest where)
+- Improve readability for featured snippets
+- Add FAQ section if appropriate
+- Optimize for semantic search
+
+Preserve the original content quality and voice.`,
+    messages: [{ role: 'user', content: `SEO optimize this content:\n\n${content}` }],
+  })
+
+  return response.content[0].text
+}
+
+export async function translate(content, options) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.model.model,
+    max_tokens: config.model.maxTokens,
+    system: `You are an expert translator. Translate the provided content to ${options.language}.
+Preserve:
+- Markdown formatting
+- Technical terms (transliterate if needed)
+- Tone and style
+- Cultural nuances (adapt appropriately)
+${options.preserveCode ? 'Keep code blocks in original language.' : ''}`,
+    messages: [{ role: 'user', content: `Translate to ${options.language}:\n\n${content}` }],
+  })
+
+  return response.content[0].text
+}
+
+export async function batch(files, operation, options = {}) {
+  const fs = await import('fs/promises')
+  const results = []
+
+  for (const file of files) {
+    const content = await fs.readFile(file, 'utf-8')
+    const fn = { generate, expand, condense, rewrite, improve, proofread, summarize, seoOptimize, translate }[operation]
+
+    if (!fn) throw new Error(`Unknown operation: ${operation}`)
+
+    const result = await fn(content, options)
+
+    if (options.inPlace) {
+      await fs.writeFile(file, result)
+      results.push({ file, status: 'updated' })
+    } else {
+      const outFile = file.replace(/\.md$/, `.${operation}.md`)
+      await fs.writeFile(outFile, result)
+      results.push({ file, output: outFile, status: 'created' })
+    }
+  }
+
+  return results
+}
+
+export function defineStyle(config) {
+  return {
+    ...config,
+    generate: (options) => generate({ ...options, ...config }),
+    rewrite: (content, options) => rewrite(content, { ...options, ...config }),
+  }
+}
+
+# writer.md
+
+AI-powered content writing and editing for Markdown.
+
+## Installation
+
+```bash
+npm install writer.md
+```
+
+## Quick Start
+
+```bash
+# Generate a blog post
+npx writer generate "Introduction to GraphQL" --type blogPost
+
+# Improve existing content
+npx writer improve README.md
+
+# Rewrite with different tone
+npx writer rewrite article.md --tone casual
+
+# SEO optimize
+npx writer seo content.md --keyword "GraphQL tutorial"
+```
+
+## CLI Commands
+
+```bash
+npx writer generate <topic>       # Generate new content
+npx writer expand <file>          # Expand content
+npx writer condense <file>        # Shorten content
+npx writer rewrite <file>         # Change tone/style
+npx writer improve <file>         # Improve clarity
+npx writer proofread <file>       # Fix grammar/spelling
+npx writer outline <topic>        # Create outline
+npx writer summarize <file>       # Create summary
+npx writer seo <file>             # SEO optimize
+npx writer translate <file>       # Translate content
+```
+
+## Content Types
+
+| Type | Description | Length |
+|------|-------------|--------|
+| `blogPost` | Blog posts and articles | 800-2500 words |
+| `documentation` | Technical docs | 500-3000 words |
+| `tutorial` | Step-by-step guides | 1000-4000 words |
+| `landingPage` | Marketing pages | 300-1000 words |
+| `email` | Email content | 100-500 words |
+| `socialPost` | Social media posts | 50-280 chars |
+
+## Tones
+
+```bash
+npx writer generate "AI in Healthcare" --tone technical
+```
+
+- `professional` - Clear and business-appropriate
+- `casual` - Friendly and conversational
+- `technical` - Precise with terminology
+- `creative` - Engaging and expressive
+- `academic` - Formal with citations
+- `marketing` - Persuasive and action-oriented
+
+## Operations
+
+### Generate
+
+Create new content from scratch:
+
+```ts
+import { generate } from 'writer.md'
+
+const post = await generate({
+  topic: 'Getting Started with TypeScript',
+  type: 'tutorial',
+  tone: 'technical',
+  audience: 'JavaScript developers',
+  keywords: ['typescript', 'types', 'javascript'],
+})
+```
+
+### Expand
+
+Add depth to existing content:
+
+```ts
+import { expand } from 'writer.md'
+
+const expanded = await expand(content, {
+  focus: 'code examples',
+  targetLength: 2000,
+})
+```
+
+### Condense
+
+Shorten while preserving key points:
+
+```ts
+import { condense } from 'writer.md'
+
+const shorter = await condense(content, {
+  targetLength: 500,
+  preserve: ['key features', 'pricing'],
+})
+```
+
+### Rewrite
+
+Transform tone or style:
+
+```ts
+import { rewrite } from 'writer.md'
+
+const casual = await rewrite(content, {
+  tone: 'casual',
+  audience: 'beginners',
+})
+```
+
+### Improve
+
+Enhance clarity and flow:
+
+```ts
+import { improve } from 'writer.md'
+
+const better = await improve(content, {
+  focus: 'readability',
+})
+```
+
+### Proofread
+
+Fix grammar and spelling:
+
+```ts
+import { proofread } from 'writer.md'
+
+const corrected = await proofread(content, {
+  styleGuide: 'AP',
+})
+```
+
+### SEO Optimize
+
+Optimize for search engines:
+
+```ts
+import { seoOptimize } from 'writer.md'
+
+const optimized = await seoOptimize(content, {
+  keyword: 'GraphQL tutorial',
+  secondaryKeywords: ['API', 'query language'],
+})
+```
+
+### Translate
+
+Translate to other languages:
+
+```ts
+import { translate } from 'writer.md'
+
+const spanish = await translate(content, {
+  language: 'Spanish',
+  preserveCode: true,
+})
+```
+
+## Batch Processing
+
+Process multiple files:
+
+```bash
+npx writer improve docs/*.md --in-place
+npx writer translate content/*.md --language Spanish
+```
+
+```ts
+import { batch } from 'writer.md'
+
+const results = await batch(
+  ['post1.md', 'post2.md', 'post3.md'],
+  'improve',
+  { inPlace: true }
+)
+```
+
+## Custom Styles
+
+Define reusable style presets:
+
+```ts
+import { defineStyle } from 'writer.md'
+
+const techBlogStyle = defineStyle({
+  tone: 'technical',
+  audience: 'developers',
+  type: 'blogPost',
+  frontmatter: true,
+})
+
+const post = await techBlogStyle.generate({
+  topic: 'Building REST APIs',
+})
+```
+
+## Configuration
+
+```ts
+import { config } from 'writer.md'
+
+config.model.model = 'claude-opus-4-20250514'
+config.defaults.tone = 'professional'
+config.output.frontmatter = true
+```
+
+## MCP Server
+
+Expose as an MCP server for use in editors:
+
+```bash
+npx writer mcp
+```
+
+This enables AI-powered writing assistance in Claude Desktop and other MCP clients.

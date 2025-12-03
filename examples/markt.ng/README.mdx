@@ -1,0 +1,650 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://markt.ng
+$context: https://markt.ng
+name: markt.ng
+version: 0.1.0
+description: AI-powered marketing automation and content generation
+license: MIT
+repository: https://github.com/mdx-org/markt.ng
+keywords:
+  - marketing
+  - ai
+  - automation
+  - campaigns
+  - content
+bin:
+  markt: ./cli.js
+exports:
+  '.': ./index.ts
+  './campaigns': ./campaigns.ts
+  './content': ./content.ts
+  './analytics': ./analytics.ts
+  './ab-test': ./ab-test.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const config = {
+  ai: {
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514',
+    maxTokens: 4096,
+  },
+  email: {
+    provider: 'resend',
+    apiKey: process.env.RESEND_API_KEY,
+    from: process.env.EMAIL_FROM,
+  },
+  analytics: {
+    provider: 'posthog',
+    apiKey: process.env.POSTHOG_API_KEY,
+  },
+  storage: {
+    provider: 'sqlite',
+    path: '.markt/data.db',
+  },
+}
+
+export const contentTypes = {
+  emailCampaign: {
+    name: 'Email Campaign',
+    fields: ['subject', 'preheader', 'body', 'cta'],
+    variants: 5,
+  },
+  socialPost: {
+    name: 'Social Post',
+    fields: ['hook', 'body', 'cta', 'hashtags'],
+    platforms: ['twitter', 'linkedin', 'facebook', 'instagram'],
+  },
+  landingPage: {
+    name: 'Landing Page',
+    fields: ['headline', 'subheadline', 'benefits', 'features', 'cta', 'socialProof'],
+  },
+  blogPost: {
+    name: 'Blog Post',
+    fields: ['title', 'intro', 'sections', 'conclusion', 'cta'],
+    seo: true,
+  },
+  adCopy: {
+    name: 'Ad Copy',
+    fields: ['headline', 'description', 'cta'],
+    platforms: ['google', 'facebook', 'linkedin'],
+  },
+}
+
+export const tones = {
+  professional: 'Clear, authoritative, business-appropriate',
+  conversational: 'Friendly, approachable, like talking to a friend',
+  urgent: 'Time-sensitive, action-oriented, FOMO-inducing',
+  educational: 'Informative, helpful, establishes expertise',
+  playful: 'Fun, witty, memorable',
+  inspirational: 'Motivating, aspirational, emotionally resonant',
+}
+
+export const audiences = {
+  b2b: 'Business decision-makers, focus on ROI and efficiency',
+  b2c: 'Individual consumers, focus on benefits and emotions',
+  developers: 'Technical audience, focus on features and implementation',
+  executives: 'C-level, focus on strategic value and competitive advantage',
+  smb: 'Small business owners, focus on practicality and cost',
+  enterprise: 'Large organizations, focus on scale and security',
+}
+
+export async function generateCampaign(options) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const typeConfig = contentTypes[options.type] || contentTypes.emailCampaign
+  const tone = tones[options.tone] || tones.professional
+  const audience = audiences[options.audience] || audiences.b2b
+
+  const systemPrompt = `You are an expert marketing copywriter. Generate ${typeConfig.name} content.
+Tone: ${tone}
+Target audience: ${audience}
+${options.brand ? `Brand voice: ${options.brand}` : ''}
+
+Output structured content with clear sections. Be specific, actionable, and compelling.`
+
+  const response = await client.messages.create({
+    model: config.ai.model,
+    max_tokens: config.ai.maxTokens,
+    system: systemPrompt,
+    messages: [{
+      role: 'user',
+      content: buildCampaignPrompt(options, typeConfig),
+    }],
+  })
+
+  return parseCampaignResponse(response.content[0].text, typeConfig)
+}
+
+function buildCampaignPrompt(options, typeConfig) {
+  const parts = [
+    `Create a ${typeConfig.name} for: ${options.product || options.topic}`,
+    `\nGoals: ${options.goals?.join(', ') || 'engagement, conversion'}`,
+    options.keyMessages ? `\nKey messages: ${options.keyMessages.join(', ')}` : '',
+    options.keywords ? `\nKeywords to include: ${options.keywords.join(', ')}` : '',
+    options.constraints ? `\nConstraints: ${options.constraints}` : '',
+    typeConfig.variants ? `\nGenerate ${typeConfig.variants} variants for A/B testing.` : '',
+  ]
+  return parts.filter(Boolean).join('\n')
+}
+
+function parseCampaignResponse(text, typeConfig) {
+  const result = { raw: text, variants: [] }
+
+  // Parse variants if present
+  const variantRegex = /(?:variant|option|version)\s*(\d+)/gi
+  const parts = text.split(variantRegex)
+
+  if (parts.length > 1) {
+    for (let i = 1; i < parts.length; i += 2) {
+      const variantNum = parts[i]
+      const content = parts[i + 1]?.trim()
+      if (content) {
+        result.variants.push(parseVariant(content, typeConfig.fields))
+      }
+    }
+  } else {
+    result.variants.push(parseVariant(text, typeConfig.fields))
+  }
+
+  return result
+}
+
+function parseVariant(text, fields) {
+  const variant = {}
+  for (const field of fields) {
+    const regex = new RegExp(`${field}[:\\s]*["']?([^"'\n]+)["']?`, 'i')
+    const match = text.match(regex)
+    if (match) {
+      variant[field] = match[1].trim()
+    }
+  }
+  variant.raw = text
+  return variant
+}
+
+export async function generateEmailSequence(options) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.ai.model,
+    max_tokens: config.ai.maxTokens,
+    system: `You are an expert email marketer. Create a ${options.length || 5}-email sequence.
+Each email should build on the previous, moving the reader toward ${options.goal || 'conversion'}.
+Include timing recommendations between emails.`,
+    messages: [{
+      role: 'user',
+      content: `Create an email sequence for: ${options.product}
+Target audience: ${options.audience || 'potential customers'}
+Trigger: ${options.trigger || 'signup'}
+Goal: ${options.goal || 'purchase'}
+${options.painPoints ? `Address pain points: ${options.painPoints.join(', ')}` : ''}`,
+    }],
+  })
+
+  return parseEmailSequence(response.content[0].text)
+}
+
+function parseEmailSequence(text) {
+  const emails = []
+  const emailRegex = /email\s*(\d+)/gi
+  const parts = text.split(emailRegex)
+
+  for (let i = 1; i < parts.length; i += 2) {
+    const num = parseInt(parts[i])
+    const content = parts[i + 1]?.trim()
+    if (content) {
+      const subjectMatch = content.match(/subject[:\s]*["']?([^"'\n]+)["']?/i)
+      const delayMatch = content.match(/(?:delay|send after|timing)[:\s]*(\d+\s*(?:hours?|days?|weeks?))/i)
+
+      emails.push({
+        number: num,
+        subject: subjectMatch?.[1]?.trim() || `Email ${num}`,
+        delay: delayMatch?.[1] || (num === 1 ? 'immediately' : '2 days'),
+        content: content,
+      })
+    }
+  }
+
+  return { emails }
+}
+
+export async function analyzeAudience(options) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.ai.model,
+    max_tokens: config.ai.maxTokens,
+    system: 'You are a marketing analyst. Analyze the target audience and provide actionable insights.',
+    messages: [{
+      role: 'user',
+      content: `Analyze this audience for ${options.product}:
+Demographics: ${options.demographics || 'Not specified'}
+Behaviors: ${options.behaviors || 'Not specified'}
+Current data: ${JSON.stringify(options.data || {})}
+
+Provide:
+1. Persona summary
+2. Pain points
+3. Motivations
+4. Preferred channels
+5. Messaging recommendations
+6. Content format preferences`,
+    }],
+  })
+
+  return { analysis: response.content[0].text }
+}
+
+export async function optimizeCopy(content, options = {}) {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default
+  const client = new Anthropic()
+
+  const response = await client.messages.create({
+    model: config.ai.model,
+    max_tokens: config.ai.maxTokens,
+    system: `You are a conversion copywriting expert. Optimize the provided copy for ${options.metric || 'conversions'}.`,
+    messages: [{
+      role: 'user',
+      content: `Optimize this copy:
+${content}
+
+Focus: ${options.focus || 'clarity and persuasion'}
+${options.constraints ? `Constraints: ${options.constraints}` : ''}
+${options.testResults ? `Previous A/B test results: ${JSON.stringify(options.testResults)}` : ''}
+
+Provide the optimized version and explain the changes.`,
+    }],
+  })
+
+  return { optimized: response.content[0].text }
+}
+
+export async function createABTest(options) {
+  const db = await getDatabase()
+
+  const testId = `test_${Date.now()}_${Math.random().toString(36).slice(2)}`
+
+  await db.run(`
+    INSERT INTO ab_tests (id, name, variants, metric, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `, testId, options.name, JSON.stringify(options.variants), options.metric, 'active', new Date().toISOString())
+
+  return {
+    id: testId,
+    name: options.name,
+    variants: options.variants,
+    metric: options.metric,
+    status: 'active',
+    trackingCode: generateTrackingCode(testId, options.variants),
+  }
+}
+
+function generateTrackingCode(testId, variants) {
+  return `
+<script>
+  (function() {
+    var testId = '${testId}';
+    var variants = ${JSON.stringify(variants.map((v, i) => i))};
+    var variant = variants[Math.floor(Math.random() * variants.length)];
+
+    localStorage.setItem('markt_' + testId, variant);
+
+    window.markt = window.markt || {};
+    window.markt.track = function(event, data) {
+      fetch('${process.env.MARKT_API_URL || ''}/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ testId: testId, variant: variant, event: event, data: data })
+      });
+    };
+  })();
+</script>
+  `.trim()
+}
+
+export async function getTestResults(testId) {
+  const db = await getDatabase()
+
+  const test = await db.get('SELECT * FROM ab_tests WHERE id = ?', testId)
+  if (!test) return null
+
+  const events = await db.all('SELECT * FROM ab_events WHERE test_id = ?', testId)
+
+  const results = {}
+  const variants = JSON.parse(test.variants)
+
+  for (let i = 0; i < variants.length; i++) {
+    const variantEvents = events.filter(e => e.variant === i)
+    const impressions = variantEvents.filter(e => e.event === 'impression').length
+    const conversions = variantEvents.filter(e => e.event === 'conversion').length
+
+    results[`variant_${i}`] = {
+      name: variants[i].name || `Variant ${i + 1}`,
+      impressions,
+      conversions,
+      conversionRate: impressions > 0 ? (conversions / impressions * 100).toFixed(2) : 0,
+    }
+  }
+
+  // Calculate statistical significance
+  const winner = calculateWinner(results)
+
+  return {
+    testId,
+    name: test.name,
+    status: test.status,
+    results,
+    winner,
+    confidence: calculateConfidence(results),
+  }
+}
+
+function calculateWinner(results) {
+  let best = null
+  let bestRate = 0
+
+  for (const [key, data] of Object.entries(results)) {
+    if (parseFloat(data.conversionRate) > bestRate) {
+      bestRate = parseFloat(data.conversionRate)
+      best = key
+    }
+  }
+
+  return best
+}
+
+function calculateConfidence(results) {
+  // Simplified confidence calculation
+  const rates = Object.values(results).map(r => parseFloat(r.conversionRate))
+  if (rates.length < 2) return 0
+
+  const sorted = rates.sort((a, b) => b - a)
+  const diff = sorted[0] - sorted[1]
+  const totalSamples = Object.values(results).reduce((sum, r) => sum + r.impressions, 0)
+
+  // Very simplified - real implementation would use proper statistics
+  if (totalSamples < 100) return 0
+  if (diff < 1) return Math.min(50, totalSamples / 10)
+  if (diff < 5) return Math.min(80, 50 + totalSamples / 20)
+  return Math.min(99, 80 + totalSamples / 50)
+}
+
+async function getDatabase() {
+  const { Database } = await import('better-sqlite3')
+  const db = new Database(config.storage.path)
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS ab_tests (
+      id TEXT PRIMARY KEY,
+      name TEXT,
+      variants TEXT,
+      metric TEXT,
+      status TEXT,
+      created_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS ab_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      test_id TEXT,
+      variant INTEGER,
+      event TEXT,
+      data TEXT,
+      created_at TEXT,
+      FOREIGN KEY (test_id) REFERENCES ab_tests(id)
+    );
+    CREATE TABLE IF NOT EXISTS campaigns (
+      id TEXT PRIMARY KEY,
+      name TEXT,
+      type TEXT,
+      content TEXT,
+      status TEXT,
+      created_at TEXT
+    );
+  `)
+
+  return {
+    run: (sql, ...params) => db.prepare(sql).run(...params),
+    get: (sql, ...params) => db.prepare(sql).get(...params),
+    all: (sql, ...params) => db.prepare(sql).all(...params),
+  }
+}
+
+export async function sendCampaign(campaignId, options = {}) {
+  const db = await getDatabase()
+  const campaign = await db.get('SELECT * FROM campaigns WHERE id = ?', campaignId)
+  if (!campaign) throw new Error('Campaign not found')
+
+  const content = JSON.parse(campaign.content)
+  const { Resend } = await import('resend')
+  const resend = new Resend(config.email.apiKey)
+
+  const results = []
+
+  for (const recipient of options.recipients || []) {
+    try {
+      const result = await resend.emails.send({
+        from: config.email.from,
+        to: recipient.email,
+        subject: content.subject,
+        html: content.body,
+      })
+      results.push({ email: recipient.email, status: 'sent', id: result.id })
+    } catch (error) {
+      results.push({ email: recipient.email, status: 'failed', error: error.message })
+    }
+  }
+
+  return { campaignId, sent: results.filter(r => r.status === 'sent').length, results }
+}
+
+export function defineCampaign(options) {
+  return {
+    ...options,
+    generate: () => generateCampaign(options),
+    test: (variants) => createABTest({ ...options, variants }),
+    send: (recipients) => sendCampaign(options.id, { recipients }),
+  }
+}
+
+# markt.ng
+
+AI-powered marketing automation and content generation.
+
+## Installation
+
+```bash
+npm install markt.ng
+```
+
+## Quick Start
+
+```bash
+# Generate email campaign
+npx markt generate email "Product Launch" --product "Analytics Tool"
+
+# Generate social posts
+npx markt generate social "New Feature" --platforms twitter,linkedin
+
+# Create A/B test
+npx markt test create --name "Subject Line Test" --variants 3
+
+# View test results
+npx markt test results test_abc123
+```
+
+## CLI Commands
+
+```bash
+npx markt generate <type> <topic>  # Generate content
+npx markt sequence <trigger>       # Create email sequence
+npx markt analyze <audience>       # Analyze audience
+npx markt optimize <file>          # Optimize copy
+npx markt test create              # Create A/B test
+npx markt test results <id>        # View test results
+npx markt send <campaign>          # Send campaign
+```
+
+## Content Types
+
+### Email Campaign
+
+```ts
+import { generateCampaign } from 'markt.ng'
+
+const campaign = await generateCampaign({
+  type: 'emailCampaign',
+  product: 'AI Analytics Platform',
+  audience: 'b2b',
+  tone: 'professional',
+  goals: ['awareness', 'demo-signup'],
+})
+
+// Returns 5 subject line variants with full email copy
+```
+
+### Social Posts
+
+```ts
+const posts = await generateCampaign({
+  type: 'socialPost',
+  topic: 'Product Update: New Dashboard',
+  platforms: ['twitter', 'linkedin'],
+  tone: 'conversational',
+})
+```
+
+### Landing Page
+
+```ts
+const page = await generateCampaign({
+  type: 'landingPage',
+  product: 'Project Management Tool',
+  audience: 'smb',
+  tone: 'professional',
+  keywords: ['productivity', 'team collaboration'],
+})
+```
+
+### Ad Copy
+
+```ts
+const ads = await generateCampaign({
+  type: 'adCopy',
+  product: 'SaaS Analytics',
+  platforms: ['google', 'facebook'],
+  constraints: 'Google: 30 char headline, 90 char description',
+})
+```
+
+## Email Sequences
+
+Create automated email sequences:
+
+```ts
+import { generateEmailSequence } from 'markt.ng'
+
+const sequence = await generateEmailSequence({
+  product: 'Online Course Platform',
+  trigger: 'free-trial-signup',
+  length: 7,
+  goal: 'paid-conversion',
+  painPoints: ['time management', 'course completion', 'engagement'],
+})
+
+// Returns sequence of 7 emails with timing
+```
+
+## A/B Testing
+
+```ts
+import { createABTest, getTestResults } from 'markt.ng'
+
+// Create test
+const test = await createABTest({
+  name: 'Homepage Headline',
+  variants: [
+    { name: 'Control', content: 'Build Better Products' },
+    { name: 'Benefit-focused', content: 'Ship 10x Faster' },
+    { name: 'Social Proof', content: 'Join 10,000+ Teams' },
+  ],
+  metric: 'signup_click',
+})
+
+// Add tracking code to page
+console.log(test.trackingCode)
+
+// Check results later
+const results = await getTestResults(test.id)
+// { winner: 'variant_1', confidence: 95, results: {...} }
+```
+
+## Audience Analysis
+
+```ts
+import { analyzeAudience } from 'markt.ng'
+
+const insights = await analyzeAudience({
+  product: 'Developer Tool',
+  demographics: 'Software engineers, 25-45, tech companies',
+  behaviors: 'Active on GitHub, read tech blogs',
+  data: {
+    topReferrers: ['hackernews', 'reddit', 'twitter'],
+    avgSessionDuration: 180,
+  },
+})
+```
+
+## Copy Optimization
+
+```ts
+import { optimizeCopy } from 'markt.ng'
+
+const optimized = await optimizeCopy(
+  'Sign up for our newsletter to get updates.',
+  {
+    metric: 'click-through',
+    focus: 'urgency and value proposition',
+  }
+)
+```
+
+## Integrations
+
+| Service | Purpose | Env Var |
+|---------|---------|---------|
+| Resend | Email sending | `RESEND_API_KEY` |
+| PostHog | Analytics | `POSTHOG_API_KEY` |
+| Mailchimp | Lists | `MAILCHIMP_API_KEY` |
+| HubSpot | CRM | `HUBSPOT_API_KEY` |
+
+## Configuration
+
+```ts
+import { config } from 'markt.ng'
+
+config.ai.model = 'claude-opus-4-20250514'
+config.email.from = 'hello@mycompany.com'
+```
+
+## Tones
+
+- `professional` - Business-appropriate
+- `conversational` - Friendly and approachable
+- `urgent` - Time-sensitive, action-oriented
+- `educational` - Informative, establishes expertise
+- `playful` - Fun and memorable
+- `inspirational` - Motivating and aspirational
+
+## Audiences
+
+- `b2b` - Business decision-makers
+- `b2c` - Individual consumers
+- `developers` - Technical audience
+- `executives` - C-level leadership
+- `smb` - Small business owners
+- `enterprise` - Large organizations

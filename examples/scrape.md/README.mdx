@@ -1,0 +1,762 @@
+---
+$type: https://mdx.org.ai/Package
+$id: https://scrape.md
+$context: https://scrape.md
+name: scrape.md
+version: 0.1.0
+description: Define web scrapers in Markdown
+license: MIT
+repository: https://github.com/mdx-org/scrape.md
+keywords:
+  - markdown
+  - scraping
+  - web
+  - data
+  - extraction
+bin:
+  scrape: ./cli.js
+exports:
+  '.': ./index.ts
+  './browser': ./browser.ts
+  './extract': ./extract.ts
+  './transform': ./transform.ts
+  './schedule': ./schedule.ts
+peerDependencies:
+  mdx: ^3.0.0
+---
+
+export const config = {
+  browser: {
+    headless: true,
+    timeout: 30000,
+    userAgent: 'Mozilla/5.0 (compatible; scrape.md/1.0)',
+  },
+  http: {
+    timeout: 10000,
+    retries: 3,
+    retryDelay: 1000,
+  },
+  rateLimit: {
+    requests: 10,
+    period: 1000, // 10 requests per second
+  },
+  output: {
+    format: 'json',
+    pretty: true,
+  },
+  cache: {
+    enabled: true,
+    ttl: 3600000, // 1 hour
+    path: '.scrape/cache',
+  },
+}
+
+export const selectors = {
+  // Common patterns
+  title: ['h1', 'title', '[class*="title"]', '[data-testid="title"]'],
+  description: ['meta[name="description"]', '[class*="description"]', 'p:first-of-type'],
+  price: ['[class*="price"]', '[data-price]', '.price', '#price'],
+  image: ['meta[property="og:image"]', 'img[class*="main"]', 'img:first-of-type'],
+  date: ['time', '[class*="date"]', '[datetime]'],
+  author: ['[class*="author"]', '[rel="author"]', '.byline'],
+  content: ['article', '[class*="content"]', 'main', '.post-body'],
+  links: ['a[href]'],
+  navigation: ['nav a', '.nav a', '[class*="menu"] a'],
+}
+
+export async function parseScraper(content) {
+  const { parse } = await import('mdxld')
+  const doc = parse(content)
+
+  const fields = extractFields(doc.content)
+  const pagination = extractPagination(doc.content)
+  const actions = extractActions(doc.content)
+
+  return {
+    $type: 'Scraper',
+    $id: doc.data.$id || `scraper:${doc.data.name}`,
+    name: doc.data.name,
+    url: doc.data.url,
+    schedule: doc.data.schedule,
+    fields,
+    pagination,
+    actions,
+    ...doc.data,
+  }
+}
+
+function extractFields(content) {
+  const fields = {}
+  const fieldRegex = /^###\s+(\w+)\s*$/gm
+  const parts = content.split(fieldRegex)
+
+  for (let i = 1; i < parts.length; i += 2) {
+    const name = parts[i].trim()
+    const body = parts[i + 1] || ''
+
+    const selectorMatch = body.match(/selector:\s*[`'"]([^`'"]+)[`'"]/i)
+    const attrMatch = body.match(/attribute:\s*[`'"]([^`'"]+)[`'"]/i)
+    const transformMatch = body.match(/```(?:ts|js)\n([\s\S]*?)```/)
+
+    fields[name] = {
+      selector: selectorMatch?.[1] || selectors[name]?.[0] || name,
+      attribute: attrMatch?.[1] || 'textContent',
+      transform: transformMatch?.[1]?.trim() || null,
+    }
+  }
+  return fields
+}
+
+function extractPagination(content) {
+  const paginationMatch = content.match(/## Pagination[\s\S]*?(?=##|$)/)
+  if (!paginationMatch) return null
+
+  const body = paginationMatch[0]
+  const nextMatch = body.match(/next:\s*[`'"]([^`'"]+)[`'"]/i)
+  const limitMatch = body.match(/limit:\s*(\d+)/i)
+
+  return {
+    nextSelector: nextMatch?.[1] || 'a[rel="next"]',
+    maxPages: limitMatch ? parseInt(limitMatch[1]) : 10,
+  }
+}
+
+function extractActions(content) {
+  const actions = []
+  const actionRegex = /## Actions[\s\S]*?(?=##|$)/
+  const match = content.match(actionRegex)
+  if (!match) return actions
+
+  const body = match[0]
+  const stepRegex = /(\d+)\.\s+(.+)/g
+  let step
+
+  while ((step = stepRegex.exec(body)) !== null) {
+    const instruction = step[2].trim()
+
+    if (instruction.startsWith('Click')) {
+      const selector = instruction.match(/`([^`]+)`/)?.[1]
+      actions.push({ type: 'click', selector })
+    } else if (instruction.startsWith('Type') || instruction.startsWith('Enter')) {
+      const match = instruction.match(/`([^`]+)`.*["']([^"']+)["']/)
+      actions.push({ type: 'type', selector: match?.[1], text: match?.[2] })
+    } else if (instruction.startsWith('Wait')) {
+      const ms = instruction.match(/(\d+)/)?.[1]
+      const selector = instruction.match(/`([^`]+)`/)?.[1]
+      actions.push({ type: 'wait', ms: ms ? parseInt(ms) : null, selector })
+    } else if (instruction.startsWith('Scroll')) {
+      actions.push({ type: 'scroll', direction: instruction.includes('down') ? 'down' : 'up' })
+    }
+  }
+  return actions
+}
+
+export async function createBrowser() {
+  const { chromium } = await import('playwright')
+
+  const browser = await chromium.launch({
+    headless: config.browser.headless,
+  })
+
+  const context = await browser.newContext({
+    userAgent: config.browser.userAgent,
+  })
+
+  const page = await context.newPage()
+  page.setDefaultTimeout(config.browser.timeout)
+
+  return {
+    page,
+    browser,
+
+    async goto(url) {
+      await page.goto(url, { waitUntil: 'networkidle' })
+    },
+
+    async click(selector) {
+      await page.click(selector)
+    },
+
+    async type(selector, text) {
+      await page.fill(selector, text)
+    },
+
+    async wait(options) {
+      if (options.ms) {
+        await page.waitForTimeout(options.ms)
+      } else if (options.selector) {
+        await page.waitForSelector(options.selector)
+      }
+    },
+
+    async scroll(direction = 'down') {
+      await page.evaluate((dir) => {
+        window.scrollBy(0, dir === 'down' ? window.innerHeight : -window.innerHeight)
+      }, direction)
+    },
+
+    async extract(fields) {
+      return page.evaluate((fieldsConfig) => {
+        const result = {}
+        for (const [name, field] of Object.entries(fieldsConfig)) {
+          const el = document.querySelector(field.selector)
+          if (el) {
+            result[name] = field.attribute === 'textContent'
+              ? el.textContent?.trim()
+              : el.getAttribute(field.attribute)
+          }
+        }
+        return result
+      }, fields)
+    },
+
+    async extractAll(selector, fields) {
+      return page.evaluate(({ selector, fields }) => {
+        const elements = document.querySelectorAll(selector)
+        return Array.from(elements).map(el => {
+          const result = {}
+          for (const [name, field] of Object.entries(fields)) {
+            const child = el.querySelector(field.selector) || el
+            result[name] = field.attribute === 'textContent'
+              ? child.textContent?.trim()
+              : child.getAttribute(field.attribute)
+          }
+          return result
+        })
+      }, { selector, fields })
+    },
+
+    async close() {
+      await browser.close()
+    },
+  }
+}
+
+export async function httpFetch(url, options = {}) {
+  const cache = await getCache()
+  const cacheKey = `${url}:${JSON.stringify(options)}`
+
+  if (config.cache.enabled) {
+    const cached = await cache.get(cacheKey)
+    if (cached) return cached
+  }
+
+  let lastError
+  for (let attempt = 0; attempt < config.http.retries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': config.browser.userAgent,
+          ...options.headers,
+        },
+        signal: AbortSignal.timeout(config.http.timeout),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const html = await response.text()
+
+      if (config.cache.enabled) {
+        await cache.set(cacheKey, html)
+      }
+
+      return html
+    } catch (error) {
+      lastError = error
+      await new Promise(r => setTimeout(r, config.http.retryDelay * (attempt + 1)))
+    }
+  }
+
+  throw lastError
+}
+
+async function getCache() {
+  const fs = await import('fs/promises')
+  const path = await import('path')
+
+  await fs.mkdir(config.cache.path, { recursive: true })
+
+  return {
+    async get(key) {
+      try {
+        const file = path.join(config.cache.path, encodeURIComponent(key))
+        const stat = await fs.stat(file)
+        if (Date.now() - stat.mtimeMs > config.cache.ttl) return null
+        return fs.readFile(file, 'utf-8')
+      } catch {
+        return null
+      }
+    },
+    async set(key, value) {
+      const file = (await import('path')).join(config.cache.path, encodeURIComponent(key))
+      await fs.writeFile(file, value)
+    },
+  }
+}
+
+export async function parseHtml(html) {
+  const { JSDOM } = await import('jsdom')
+  const dom = new JSDOM(html)
+  return dom.window.document
+}
+
+export async function run(scraper, options = {}) {
+  const results = []
+  let currentUrl = scraper.url
+  let pageCount = 0
+  const maxPages = scraper.pagination?.maxPages || 1
+
+  const useBrowser = scraper.actions?.length > 0
+
+  if (useBrowser) {
+    const browser = await createBrowser()
+
+    try {
+      while (currentUrl && pageCount < maxPages) {
+        await browser.goto(currentUrl)
+
+        // Execute actions
+        for (const action of scraper.actions || []) {
+          switch (action.type) {
+            case 'click':
+              await browser.click(action.selector)
+              break
+            case 'type':
+              await browser.type(action.selector, action.text)
+              break
+            case 'wait':
+              await browser.wait(action)
+              break
+            case 'scroll':
+              await browser.scroll(action.direction)
+              break
+          }
+        }
+
+        // Extract data
+        if (scraper.listSelector) {
+          const items = await browser.extractAll(scraper.listSelector, scraper.fields)
+          results.push(...items)
+        } else {
+          const item = await browser.extract(scraper.fields)
+          results.push(item)
+        }
+
+        // Pagination
+        if (scraper.pagination) {
+          const nextUrl = await browser.page.evaluate((sel) => {
+            const next = document.querySelector(sel)
+            return next?.href
+          }, scraper.pagination.nextSelector)
+
+          currentUrl = nextUrl
+        } else {
+          currentUrl = null
+        }
+
+        pageCount++
+      }
+    } finally {
+      await browser.close()
+    }
+  } else {
+    // HTTP-only scraping
+    while (currentUrl && pageCount < maxPages) {
+      const html = await httpFetch(currentUrl)
+      const doc = await parseHtml(html)
+
+      if (scraper.listSelector) {
+        const elements = doc.querySelectorAll(scraper.listSelector)
+        for (const el of elements) {
+          const item = {}
+          for (const [name, field] of Object.entries(scraper.fields)) {
+            const target = el.querySelector(field.selector) || el
+            item[name] = field.attribute === 'textContent'
+              ? target.textContent?.trim()
+              : target.getAttribute(field.attribute)
+
+            if (field.transform) {
+              const fn = new Function('value', `return ${field.transform}`)
+              item[name] = fn(item[name])
+            }
+          }
+          results.push(item)
+        }
+      } else {
+        const item = {}
+        for (const [name, field] of Object.entries(scraper.fields)) {
+          const el = doc.querySelector(field.selector)
+          item[name] = el
+            ? (field.attribute === 'textContent' ? el.textContent?.trim() : el.getAttribute(field.attribute))
+            : null
+        }
+        results.push(item)
+      }
+
+      // Pagination
+      if (scraper.pagination) {
+        const nextLink = doc.querySelector(scraper.pagination.nextSelector)
+        currentUrl = nextLink?.href ? new URL(nextLink.href, currentUrl).toString() : null
+      } else {
+        currentUrl = null
+      }
+
+      pageCount++
+    }
+  }
+
+  // Apply transforms
+  return options.transform ? results.map(options.transform) : results
+}
+
+export async function schedule(scraper, callback) {
+  if (!scraper.schedule) return null
+
+  const { CronJob } = await import('cron')
+
+  const job = new CronJob(
+    scraper.schedule,
+    async () => {
+      const results = await run(scraper)
+      await callback(results)
+    },
+    null,
+    true,
+  )
+
+  return {
+    job,
+    stop: () => job.stop(),
+  }
+}
+
+export function defineScraper(config) {
+  return {
+    ...config,
+    run: (options) => run(config, options),
+    schedule: (callback) => schedule(config, callback),
+  }
+}
+
+# scrape.md
+
+Define web scrapers in Markdown.
+
+## Installation
+
+```bash
+npm install scrape.md
+```
+
+## Quick Start
+
+Create `products.md`:
+
+```mdx
+---
+$type: Scraper
+name: Product Scraper
+url: https://example.com/products
+listSelector: .product-card
+schedule: 0 * * * *
+---
+
+# Product Scraper
+
+Scrapes product listings from Example Store.
+
+## Fields
+
+### title
+
+selector: `.product-title`
+
+### price
+
+selector: `.product-price`
+attribute: `textContent`
+
+```ts
+value.replace('$', '').trim()
+```
+
+### image
+
+selector: `img.product-image`
+attribute: `src`
+
+### link
+
+selector: `a.product-link`
+attribute: `href`
+
+## Pagination
+
+next: `a.next-page`
+limit: 5
+```
+
+Run the scraper:
+
+```bash
+# Run once
+npx scrape run products.md
+
+# Run on schedule
+npx scrape schedule products.md
+
+# Output to file
+npx scrape run products.md -o products.json
+```
+
+## CLI Commands
+
+```bash
+npx scrape run <file>              # Run scraper
+npx scrape schedule <file>         # Run on schedule
+npx scrape test <file>             # Test selectors
+npx scrape init <name>             # Create new scraper
+```
+
+## Scraper Structure
+
+### Basic Fields
+
+```mdx
+## Fields
+
+### fieldName
+
+selector: `CSS selector`
+attribute: `textContent` | `href` | `src` | any HTML attribute
+
+Optional transform:
+```ts
+value.trim().toLowerCase()
+```
+```
+
+### List Scraping
+
+For pages with multiple items:
+
+```yaml
+listSelector: .item-card
+```
+
+### Pagination
+
+```mdx
+## Pagination
+
+next: `a.next-page`
+limit: 10
+```
+
+### Browser Actions
+
+For dynamic pages requiring interaction:
+
+```mdx
+## Actions
+
+1. Click `button.load-more`
+2. Wait 2000
+3. Scroll down
+4. Type `input.search` "query"
+```
+
+## Examples
+
+### E-commerce Product Scraper
+
+```mdx
+---
+$type: Scraper
+name: Amazon Products
+url: https://amazon.com/s?k=laptop
+listSelector: [data-component-type="s-search-result"]
+---
+
+## Fields
+
+### title
+selector: `h2 a span`
+
+### price
+selector: `.a-price .a-offscreen`
+
+### rating
+selector: `.a-icon-star-small span`
+
+### reviews
+selector: `[data-csa-c-content-id] span:last-child`
+```
+
+### News Article Scraper
+
+```mdx
+---
+$type: Scraper
+name: Tech News
+url: https://news.ycombinator.com
+listSelector: .athing
+---
+
+## Fields
+
+### title
+selector: `.titleline a`
+
+### link
+selector: `.titleline a`
+attribute: `href`
+
+### points
+selector: `+ tr .score`
+
+## Pagination
+
+next: `a.morelink`
+limit: 3
+```
+
+### Single Page Scraper
+
+```mdx
+---
+$type: Scraper
+name: Company Info
+url: https://example.com/about
+---
+
+## Fields
+
+### companyName
+selector: `h1`
+
+### description
+selector: `meta[name="description"]`
+attribute: `content`
+
+### founded
+selector: `.founded-year`
+
+### employees
+selector: `.employee-count`
+```
+
+### Dynamic Page (Browser Required)
+
+```mdx
+---
+$type: Scraper
+name: Infinite Scroll
+url: https://example.com/feed
+listSelector: .feed-item
+---
+
+## Actions
+
+1. Wait `.feed-item`
+2. Scroll down
+3. Wait 1000
+4. Scroll down
+5. Wait 1000
+
+## Fields
+
+### content
+selector: `.item-content`
+
+### author
+selector: `.item-author`
+
+### timestamp
+selector: `time`
+attribute: `datetime`
+```
+
+## SDK
+
+```ts
+import { parseScraper, run, defineScraper } from 'scrape.md'
+import fs from 'fs'
+
+// Parse from file
+const scraper = await parseScraper(fs.readFileSync('products.md', 'utf-8'))
+const results = await run(scraper)
+
+// Or define programmatically
+const scraper = defineScraper({
+  name: 'My Scraper',
+  url: 'https://example.com',
+  fields: {
+    title: { selector: 'h1' },
+    description: { selector: 'p.intro' },
+  },
+})
+
+const data = await scraper.run()
+```
+
+## Scheduling
+
+```ts
+import { schedule } from 'scrape.md'
+
+const job = await schedule(scraper, async (results) => {
+  // Save to database
+  await db.products.insertMany(results)
+
+  // Send notification
+  await slack.send('#scraping', `Scraped ${results.length} products`)
+})
+
+// Stop later
+job.stop()
+```
+
+## Configuration
+
+```ts
+import { config } from 'scrape.md'
+
+// Browser settings
+config.browser.headless = false  // Show browser
+config.browser.timeout = 60000   // Increase timeout
+
+// HTTP settings
+config.http.retries = 5
+config.http.retryDelay = 2000
+
+// Rate limiting
+config.rateLimit.requests = 5
+config.rateLimit.period = 1000
+
+// Caching
+config.cache.enabled = true
+config.cache.ttl = 3600000  // 1 hour
+```
+
+## Output Formats
+
+```bash
+npx scrape run products.md -o products.json   # JSON
+npx scrape run products.md -o products.csv    # CSV
+npx scrape run products.md -o products.md     # Markdown table
+```
+
+## Transform Results
+
+```ts
+const results = await run(scraper, {
+  transform: (item) => ({
+    ...item,
+    price: parseFloat(item.price.replace('$', '')),
+    scrapedAt: new Date().toISOString(),
+  }),
+})
+```
