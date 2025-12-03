@@ -1,0 +1,397 @@
+---
+$type: TestSuite
+title: E-commerce Examples Tests
+description: Tests for Product, Order, Customer, and Invoice examples
+---
+
+import Product from '../../examples/[Product].mdx'
+import Order from '../../examples/[Order].mdx'
+import Customer from '../../examples/[Customer].mdx'
+import Invoice from '../../examples/[Invoice].mdx'
+
+# E-commerce Examples Tests
+
+Tests validating the e-commerce examples.
+
+## Product
+
+### Create Product
+
+```ts test
+const product = await db.Products.create('widget-pro', {
+  $type: 'Product',
+  sku: 'WIDGET-PRO-001',
+  name: 'Widget Pro',
+  description: 'The ultimate widget for professionals',
+  price: 99.99,
+  compareAtPrice: 129.99,
+  currency: 'USD',
+  images: ['https://example.com/widget.jpg'],
+  category: 'https://shop.example.com/categories/widgets',
+  inventory: 100,
+  status: 'active'
+})
+
+product.data.sku.should.equal('WIDGET-PRO-001')
+product.data.price.should.equal(99.99)
+product.data.status.should.equal('active')
+```
+
+### Product Inventory
+
+```ts test
+const product = await db.Products.get('widget-pro')
+
+// Decrement inventory
+await db.Products.update(product.id, {
+  inventory: product.data.inventory - 1
+})
+
+const updated = await db.Products.get('widget-pro')
+updated.data.inventory.should.equal(99)
+```
+
+### Out of Stock Detection
+
+```ts test
+await db.Products.update('widget-pro', { inventory: 0 })
+
+const product = await db.Products.get('widget-pro')
+const outOfStock = product.data.inventory === 0
+
+outOfStock.should.be.true
+```
+
+### Product Recommendations
+
+```ts test
+await db.Products.create('gadget-basic', {
+  $type: 'Product',
+  sku: 'GADGET-001',
+  name: 'Gadget Basic',
+  price: 49.99,
+  inventory: 50,
+  status: 'active'
+})
+
+const recommendations = await ai.recommend('products', {
+  similar: 'https://shop.example.com/products/widget-pro',
+  limit: 4
+})
+
+recommendations.should.be.an('array')
+```
+
+## Customer
+
+### Create Customer
+
+```ts test
+const customer = await db.Customers.create({
+  $type: 'Customer',
+  id: 'cust-001',
+  email: 'jane@example.com',
+  name: 'Jane Doe',
+  phone: '+1-555-0100',
+  addresses: [{
+    street: '123 Main St',
+    city: 'San Francisco',
+    state: 'CA',
+    zip: '94102',
+    country: 'US'
+  }]
+})
+
+customer.data.email.should.equal('jane@example.com')
+customer.data.totalOrders.should.equal(0)
+customer.data.totalSpent.should.equal(0)
+```
+
+### Customer Stripe Integration
+
+```ts test
+const customer = await db.Customers.get('cust-001')
+
+// Create Stripe customer
+const stripeCustomer = await api.stripe.customers.create({
+  email: customer.data.email,
+  name: customer.data.name,
+  metadata: { internalId: customer.id }
+})
+
+await db.Customers.update(customer.id, {
+  stripeCustomerId: stripeCustomer.id
+})
+
+const updated = await db.Customers.get('cust-001')
+updated.data.stripeCustomerId.should.match(/^cus_/)
+```
+
+### Customer Segmentation
+
+```ts test
+// Create high-value customer
+await db.Customers.update('cust-001', {
+  totalOrders: 10,
+  totalSpent: 1500
+})
+
+const customer = await db.Customers.get('cust-001')
+
+let segment
+if (customer.data.totalSpent >= 1000) {
+  segment = 'vip'
+} else if (customer.data.totalOrders >= 5) {
+  segment = 'loyal'
+} else {
+  segment = 'standard'
+}
+
+segment.should.equal('vip')
+```
+
+## Order
+
+### Create Order
+
+```ts test
+const order = await db.Orders.create({
+  $type: 'Order',
+  number: 'ORD-001',
+  customer: 'https://shop.example.com/customers/cust-001',
+  items: [
+    { product: 'https://shop.example.com/products/widget-pro', quantity: 2, price: 99.99 }
+  ],
+  subtotal: 199.98,
+  tax: 16.50,
+  shipping: 9.99,
+  total: 226.47,
+  status: 'pending',
+  shippingAddress: {
+    street: '123 Main St',
+    city: 'San Francisco',
+    state: 'CA',
+    zip: '94102'
+  },
+  billingAddress: {
+    street: '123 Main St',
+    city: 'San Francisco',
+    state: 'CA',
+    zip: '94102'
+  }
+})
+
+order.data.number.should.equal('ORD-001')
+order.data.status.should.equal('pending')
+order.data.total.should.equal(226.47)
+```
+
+### Order Payment
+
+```ts test
+const order = await db.Orders.findOne({ where: { number: 'ORD-001' } })
+
+// Create payment intent
+const paymentIntent = await api.stripe.paymentIntents.create({
+  amount: Math.round(order.data.total * 100),
+  currency: order.data.currency || 'usd',
+  metadata: { orderId: order.id }
+})
+
+await db.Orders.update(order.id, {
+  stripePaymentIntent: paymentIntent.id,
+  status: 'paid'
+})
+
+const paid = await db.Orders.get(order.id)
+paid.data.status.should.equal('paid')
+```
+
+### Order Fulfillment Workflow
+
+```ts test
+const order = await db.Orders.findOne({ where: { number: 'ORD-001' } })
+
+// Fulfill
+await db.Orders.update(order.id, { status: 'fulfilled' })
+
+// Ship
+await db.Orders.update(order.id, {
+  status: 'shipped',
+  trackingNumber: 'TRACK123456'
+})
+
+// Deliver
+await db.Orders.update(order.id, { status: 'delivered' })
+
+const delivered = await db.Orders.get(order.id)
+delivered.data.status.should.equal('delivered')
+delivered.data.trackingNumber.should.equal('TRACK123456')
+```
+
+### Update Customer Stats on Order
+
+```ts test
+const order = await db.Orders.findOne({ where: { number: 'ORD-001' } })
+const customerId = order.data.customer.split('/').pop()
+
+const customer = await db.Customers.get(customerId)
+
+await db.Customers.update(customerId, {
+  totalOrders: customer.data.totalOrders + 1,
+  totalSpent: customer.data.totalSpent + order.data.total
+})
+
+const updated = await db.Customers.get(customerId)
+updated.data.totalOrders.should.be.above(0)
+```
+
+## Invoice
+
+### Create Invoice
+
+```ts test
+const invoice = await db.Invoices.create({
+  $type: 'Invoice',
+  number: 'INV-001',
+  customer: 'https://shop.example.com/customers/cust-001',
+  items: [
+    { description: 'Widget Pro x 2', quantity: 2, unitPrice: 99.99 },
+    { description: 'Shipping', quantity: 1, unitPrice: 9.99 }
+  ],
+  subtotal: 209.97,
+  tax: 16.80,
+  total: 226.77,
+  status: 'draft',
+  dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+})
+
+invoice.data.number.should.equal('INV-001')
+invoice.data.status.should.equal('draft')
+```
+
+### Send Invoice via Stripe
+
+```ts test
+const invoice = await db.Invoices.findOne({ where: { number: 'INV-001' } })
+const customer = await db.Customers.get('cust-001')
+
+// Create Stripe invoice
+const stripeInvoice = await api.stripe.invoices.create({
+  customer: customer.data.stripeCustomerId,
+  auto_advance: false
+})
+
+for (const item of invoice.data.items) {
+  await api.stripe.invoiceItems.create({
+    customer: customer.data.stripeCustomerId,
+    invoice: stripeInvoice.id,
+    description: item.description,
+    quantity: item.quantity,
+    unit_amount: Math.round(item.unitPrice * 100)
+  })
+}
+
+const finalized = await api.stripe.invoices.finalizeInvoice(stripeInvoice.id)
+
+await db.Invoices.update(invoice.id, {
+  stripeInvoiceId: finalized.id,
+  paymentLink: finalized.hosted_invoice_url,
+  status: 'sent'
+})
+
+const sent = await db.Invoices.get(invoice.id)
+sent.data.status.should.equal('sent')
+sent.data.paymentLink.should.be.a('string')
+```
+
+### Overdue Invoice Detection
+
+```ts test
+const overdueDate = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+
+await db.Invoices.create({
+  $type: 'Invoice',
+  number: 'INV-OVERDUE',
+  customer: 'https://shop.example.com/customers/cust-001',
+  items: [{ description: 'Service', quantity: 1, unitPrice: 100 }],
+  subtotal: 100,
+  tax: 0,
+  total: 100,
+  status: 'sent',
+  dueDate: overdueDate
+})
+
+const overdueInvoices = await db.Invoices.find({
+  where: {
+    status: 'sent',
+    dueDate: { $lt: new Date() }
+  }
+})
+
+overdueInvoices.should.have.lengthOf.at.least(1)
+
+for (const inv of overdueInvoices) {
+  await db.Invoices.update(inv.id, { status: 'overdue' })
+}
+```
+
+## Full E-commerce Flow
+
+### Complete Purchase Flow
+
+```ts test
+// 1. Create product
+const product = await db.Products.create('test-item', {
+  $type: 'Product',
+  sku: 'TEST-001',
+  name: 'Test Item',
+  price: 25.00,
+  inventory: 10,
+  status: 'active'
+})
+
+// 2. Create customer
+const customer = await db.Customers.create('test-cust', {
+  $type: 'Customer',
+  id: 'test-cust',
+  email: 'test@example.com',
+  name: 'Test Customer'
+})
+
+// 3. Create order
+const order = await db.Orders.create({
+  $type: 'Order',
+  number: 'TEST-ORD-001',
+  customer: customer.$id,
+  items: [{ product: product.$id, quantity: 2, price: 25.00 }],
+  subtotal: 50.00,
+  tax: 4.00,
+  shipping: 5.00,
+  total: 59.00,
+  status: 'pending',
+  shippingAddress: { street: '123 Test St', city: 'Test City', state: 'TS', zip: '12345' },
+  billingAddress: { street: '123 Test St', city: 'Test City', state: 'TS', zip: '12345' }
+})
+
+// 4. Process payment (simulate)
+await db.Orders.update(order.id, { status: 'paid' })
+
+// 5. Update inventory
+await db.Products.update(product.id, {
+  inventory: product.data.inventory - 2
+})
+
+// 6. Update customer stats
+await db.Customers.update(customer.id, {
+  totalOrders: 1,
+  totalSpent: 59.00
+})
+
+// Verify final state
+const finalProduct = await db.Products.get('test-item')
+finalProduct.data.inventory.should.equal(8)
+
+const finalCustomer = await db.Customers.get('test-cust')
+finalCustomer.data.totalSpent.should.equal(59.00)
+```

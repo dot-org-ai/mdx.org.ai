@@ -1,0 +1,250 @@
+---
+$type: TestSuite
+title: Hacker News Examples Tests
+description: Tests for Hacker News API source integration
+---
+
+import HackerNewsREADME from '../../examples/hacker.news.org.ai/README.mdx'
+import HackerNewsItem from '../../examples/hacker.news.org.ai/[item].mdx'
+import HackerNewsUser from '../../examples/hacker.news.org.ai/[user].mdx'
+
+# Hacker News Examples Tests
+
+Tests validating the Hacker News API integration examples.
+
+## Source Configuration
+
+### REST Source Setup
+
+```ts test
+const hn = sources.create({
+  $type: 'RestSource',
+  $id: 'https://hacker.news.org.ai',
+  baseUrl: 'https://hacker-news.firebaseio.com/v0',
+  endpoints: {
+    topStories: { path: '/topstories.json' },
+    newStories: { path: '/newstories.json' },
+    bestStories: { path: '/beststories.json' },
+    item: { path: '/item/{id}.json' },
+    user: { path: '/user/{id}.json' }
+  }
+})
+
+hn.config.baseUrl.should.equal('https://hacker-news.firebaseio.com/v0')
+hn.config.endpoints.should.have.property('topStories')
+hn.config.endpoints.should.have.property('item')
+```
+
+### Fetch Top Stories
+
+```ts test
+const hn = sources.get('https://hacker.news.org.ai')
+const topIds = await hn.endpoint('topStories')
+
+topIds.should.be.an('array')
+topIds.length.should.be.above(0)
+topIds[0].should.be.a('number')
+```
+
+## Item Transform
+
+### Fetch and Transform Story
+
+```ts test
+const hn = sources.get('https://hacker.news.org.ai')
+const topIds = await hn.endpoint('topStories')
+const item = await hn.endpoint('item', { id: topIds[0] })
+
+item.should.have.property('id')
+item.should.have.property('type')
+item.should.have.property('title')
+```
+
+### Transform Story to MDXLD
+
+```ts test
+import { transform } from '../../examples/hacker.news.org.ai/[item].mdx'
+
+const rawItem = {
+  id: 12345,
+  type: 'story',
+  title: 'Test Story',
+  url: 'https://example.com/story',
+  by: 'testuser',
+  score: 100,
+  time: 1699900000,
+  descendants: 50,
+  kids: [111, 222, 333]
+}
+
+const transformed = transform(rawItem)
+
+transformed.$type.should.equal('Story')
+transformed.$id.should.equal('https://hacker.news.org.ai/item/12345')
+transformed.title.should.equal('Test Story')
+transformed.hnUrl.should.equal('https://news.ycombinator.com/item?id=12345')
+```
+
+### Transform Comment to MDXLD
+
+```ts test
+import { transform } from '../../examples/hacker.news.org.ai/[item].mdx'
+
+const rawComment = {
+  id: 67890,
+  type: 'comment',
+  text: 'This is a comment',
+  by: 'commenter',
+  time: 1699900000,
+  parent: 12345
+}
+
+const transformed = transform(rawComment)
+
+transformed.$type.should.equal('Comment')
+transformed.$id.should.equal('https://hacker.news.org.ai/item/67890')
+```
+
+### Transform Job to MDXLD
+
+```ts test
+import { transform } from '../../examples/hacker.news.org.ai/[item].mdx'
+
+const rawJob = {
+  id: 99999,
+  type: 'job',
+  title: 'YC Startup Hiring Engineers',
+  url: 'https://startup.com/jobs',
+  time: 1699900000
+}
+
+const transformed = transform(rawJob)
+
+transformed.$type.should.equal('Job')
+transformed.$id.should.equal('https://hacker.news.org.ai/item/99999')
+```
+
+## User Transform
+
+### Fetch and Transform User
+
+```ts test
+const hn = sources.get('https://hacker.news.org.ai')
+const user = await hn.endpoint('user', { id: 'pg' })
+
+user.should.have.property('id', 'pg')
+user.should.have.property('karma')
+user.should.have.property('created')
+```
+
+### Transform User to MDXLD
+
+```ts test
+import { transform } from '../../examples/hacker.news.org.ai/[user].mdx'
+
+const rawUser = {
+  id: 'testuser',
+  karma: 5000,
+  created: 1200000000,
+  about: 'Test bio here',
+  submitted: [1, 2, 3, 4, 5]
+}
+
+const transformed = transform(rawUser)
+
+transformed.$type.should.equal('User')
+transformed.$id.should.equal('https://hacker.news.org.ai/user/testuser')
+transformed.karma.should.equal(5000)
+transformed.profileUrl.should.equal('https://news.ycombinator.com/user?id=testuser')
+transformed.createdAt.should.be.a('string')
+```
+
+## Static Paths
+
+### Generate Item Paths
+
+```ts test
+import { getStaticPaths } from '../../examples/hacker.news.org.ai/[item].mdx'
+
+const { paths, fallback } = await getStaticPaths()
+
+paths.should.be.an('array')
+paths.length.should.be.at.most(100)
+paths[0].params.should.have.property('id')
+fallback.should.equal('blocking')
+```
+
+## Caching
+
+### Cache Story Responses
+
+```ts test
+const hn = sources.get('https://hacker.news.org.ai')
+
+// First request
+const start1 = Date.now()
+const item1 = await hn.endpoint('item', { id: 1 }, { cache: { ttl: 300 } })
+const time1 = Date.now() - start1
+
+// Second request (should be cached)
+const start2 = Date.now()
+const item2 = await hn.endpoint('item', { id: 1 }, { cache: { ttl: 300 } })
+const time2 = Date.now() - start2
+
+item1.id.should.equal(item2.id)
+// Cached response should be faster
+time2.should.be.below(time1)
+```
+
+## Batch Fetching
+
+### Fetch Multiple Items
+
+```ts test
+const hn = sources.get('https://hacker.news.org.ai')
+const topIds = await hn.endpoint('topStories')
+const first10 = topIds.slice(0, 10)
+
+const items = await Promise.all(
+  first10.map(id => hn.endpoint('item', { id }))
+)
+
+items.should.have.lengthOf(10)
+items.forEach(item => {
+  item.should.have.property('id')
+  item.should.have.property('type')
+})
+```
+
+## Error Handling
+
+### Handle Missing Item
+
+```ts test
+const hn = sources.get('https://hacker.news.org.ai')
+
+try {
+  const item = await hn.endpoint('item', { id: 999999999999 })
+  // Item might be null for non-existent IDs
+  if (item === null) {
+    true.should.be.true
+  }
+} catch (error) {
+  error.should.exist
+}
+```
+
+### Handle Missing User
+
+```ts test
+const hn = sources.get('https://hacker.news.org.ai')
+
+try {
+  const user = await hn.endpoint('user', { id: 'nonexistent_user_12345' })
+  if (user === null) {
+    true.should.be.true
+  }
+} catch (error) {
+  error.should.exist
+}
+```

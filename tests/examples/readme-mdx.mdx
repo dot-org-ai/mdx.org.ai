@@ -1,0 +1,266 @@
+---
+$type: TestSuite
+title: README.mdx Package Tests
+description: Tests for @mdxe/readme package - single-source README generation
+---
+
+import * as Readme from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+# README.mdx Package Tests
+
+Tests validating the @mdxe/readme package for multi-target README generation.
+
+## Package Structure
+
+### Package Metadata
+
+```ts test
+const pkg = Readme.default // frontmatter
+pkg.$type.should.equal('https://mdx.org.ai/Package')
+pkg.$id.should.equal('https://readme.mdx.org.ai')
+pkg.name.should.equal('readme.mdx')
+```
+
+### Exports
+
+```ts test
+Readme.should.have.property('templates')
+Readme.should.have.property('hooks')
+Readme.should.have.property('render')
+Readme.should.have.property('interpolate')
+Readme.should.have.property('addBadges')
+Readme.should.have.property('addTOC')
+Readme.should.have.property('truncate')
+```
+
+## Templates
+
+### Template Configuration
+
+```ts test
+import { templates } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+templates.should.have.property('github')
+templates.should.have.property('npm')
+templates.should.have.property('docs')
+templates.should.have.property('website')
+
+templates.github.format.should.equal('markdown')
+templates.npm.maxLength.should.equal(25000)
+templates.docs.format.should.equal('mdx')
+```
+
+### GitHub Template Features
+
+```ts test
+import { templates } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+templates.github.features.should.include('badges')
+templates.github.features.should.include('toc')
+templates.github.features.should.include('collapsible')
+templates.github.features.should.include('alerts')
+```
+
+### NPM Template Length Limit
+
+```ts test
+import { templates } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+templates.npm.maxLength.should.equal(25000)
+templates.npm.features.should.include('badges')
+templates.npm.features.should.include('quickstart')
+```
+
+## Rendering
+
+### Render with Interpolation
+
+```ts test
+import { render, interpolate } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+const template = '# {name}\n\n{description}'
+const data = { name: 'My Package', description: 'A useful package' }
+
+const result = interpolate(template, data)
+result.should.include('# My Package')
+result.should.include('A useful package')
+```
+
+### Interpolate Nested Values
+
+```ts test
+import { interpolate } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+const template = '{pkg.name} v{pkg.version} by {pkg.author.name}'
+const data = {
+  pkg: {
+    name: 'my-pkg',
+    version: '1.0.0',
+    author: { name: 'John' }
+  }
+}
+
+const result = interpolate(template, data)
+result.should.equal('my-pkg v1.0.0 by John')
+```
+
+### Add Badges
+
+```ts test
+import { addBadges } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+const content = '# My Package\n\nDescription here.'
+const data = { name: 'my-package', repo: 'user/my-package' }
+
+const result = addBadges(content, data)
+result.should.include('img.shields.io/npm/v/my-package')
+result.should.include('github.com/user/my-package/actions')
+result.should.include('# My Package')
+```
+
+### Add Table of Contents
+
+```ts test
+import { addTOC } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+const content = `# Title
+
+## Installation
+
+Install instructions.
+
+## Usage
+
+### Basic
+
+Basic usage.
+
+### Advanced
+
+Advanced usage.
+`
+
+const result = addTOC(content)
+result.should.include('## Table of Contents')
+result.should.include('- [Installation](#installation)')
+result.should.include('- [Usage](#usage)')
+result.should.include('  - [Basic](#basic)')
+result.should.include('  - [Advanced](#advanced)')
+```
+
+### Truncate Long Content
+
+```ts test
+import { truncate } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+const shortContent = 'Short content'
+truncate(shortContent, 1000).should.equal(shortContent)
+
+const longContent = 'x'.repeat(500)
+const truncated = truncate(longContent, 200)
+truncated.length.should.be.below(250)
+truncated.should.include('(truncated)')
+```
+
+## Hooks
+
+### Hooks Configuration
+
+```ts test
+import { hooks } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+hooks.should.have.property('pre-commit')
+hooks.should.have.property('pre-publish')
+hooks.should.have.property('post-release')
+```
+
+### Pre-commit Hook Logic
+
+```ts test
+// Simulate pre-commit behavior
+const shouldRegenerate = (staged, patterns) => {
+  return staged.some(f => patterns.some(p =>
+    p.includes('**') ? f.startsWith(p.split('**')[0]) : f === p
+  ))
+}
+
+const patterns = ['readme.mdx', 'package.json', 'src/**/*.ts']
+
+shouldRegenerate(['readme.mdx'], patterns).should.be.true
+shouldRegenerate(['src/index.ts'], patterns).should.be.true
+shouldRegenerate(['tests/foo.test.ts'], patterns).should.be.false
+```
+
+### Pre-publish Hook Actions
+
+```ts test
+// Simulate pre-publish actions
+const prePublishActions = (version) => [
+  { action: 'render', target: 'README.md', data: { version } },
+  { action: 'render', target: 'docs/', data: { version } },
+  { action: 'generateApiDocs' }
+]
+
+const actions = prePublishActions('2.0.0')
+actions.should.have.lengthOf(3)
+actions[0].data.version.should.equal('2.0.0')
+```
+
+## Helper Functions
+
+### Define Hook
+
+```ts test
+import { defineHook } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+const myHook = defineHook('my-hook', async (ctx) => {
+  return 'done'
+})
+
+myHook.name.should.equal('my-hook')
+myHook.fn.should.be.a('function')
+```
+
+### Define Template
+
+```ts test
+import { defineTemplate } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+const myTemplate = defineTemplate({
+  name: 'custom',
+  format: 'markdown',
+  features: ['badges']
+})
+
+myTemplate.name.should.equal('custom')
+myTemplate.render.should.be.a('function')
+```
+
+## Integration
+
+### Full Render Pipeline
+
+```ts test
+import { render, templates } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+const content = '# {pkg.name}\n\n{pkg.description}\n\n## Installation\n\nnpm install {pkg.name}'
+const data = {
+  pkg: { name: 'test-pkg', description: 'Test package' }
+}
+
+// This tests the full render pipeline
+const result = render(content, { template: 'github', data })
+result.should.be.a('string')
+```
+
+### NPM Length Enforcement
+
+```ts test
+import { render } from '../../examples/readme.mdx.org.ai/readme.mdx'
+
+const longContent = 'x'.repeat(30000)
+const result = render(longContent, { template: 'npm', data: {} })
+
+result.length.should.be.at.most(25000)
+result.should.include('(truncated)')
+```

@@ -1,0 +1,384 @@
+---
+$type: TestSuite
+title: AI Agent Examples Tests
+description: Tests for Assistant and Conversation examples
+---
+
+import Assistant from '../../examples/[Assistant].mdx'
+import Conversation from '../../examples/[Conversation].mdx'
+
+# AI Agent Examples Tests
+
+Tests validating the AI assistant and conversation examples.
+
+## Assistant
+
+### Create Assistant
+
+```ts test
+const assistant = await db.Assistants.create('support-bot', {
+  $type: 'Assistant',
+  slug: 'support-bot',
+  name: 'Support Bot',
+  description: 'Customer support assistant',
+  model: 'claude-3-sonnet',
+  systemPrompt: 'You are a helpful customer support agent. Be concise and friendly.',
+  temperature: 0.7,
+  createdBy: 'https://ai.example.com/users/admin'
+})
+
+assistant.data.name.should.equal('Support Bot')
+assistant.data.model.should.equal('claude-3-sonnet')
+assistant.data.temperature.should.equal(0.7)
+```
+
+### Assistant with Tools
+
+```ts test
+const assistant = await db.Assistants.get('support-bot')
+
+const tools = [
+  {
+    name: 'lookupOrder',
+    description: 'Look up an order by number',
+    input: { orderNumber: 'string' }
+  },
+  {
+    name: 'createTicket',
+    description: 'Create a support ticket',
+    input: { title: 'string', description: 'string', priority: 'string' }
+  }
+]
+
+await db.Assistants.update(assistant.id, { tools })
+
+const updated = await db.Assistants.get(assistant.id)
+updated.data.tools.should.have.lengthOf(2)
+updated.data.tools[0].name.should.equal('lookupOrder')
+```
+
+### AI Chat
+
+```ts test
+const assistant = await db.Assistants.get('support-bot')
+
+const response = await ai.chat({
+  model: assistant.data.model,
+  system: assistant.data.systemPrompt,
+  messages: [
+    { role: 'user', content: 'What is your return policy?' }
+  ],
+  temperature: assistant.data.temperature
+})
+
+response.should.have.property('content')
+response.content.should.be.a('string')
+response.content.length.should.be.above(0)
+```
+
+### AI with Tool Use
+
+```ts test
+const assistant = await db.Assistants.get('support-bot')
+
+// Create a test order
+await db.Orders.create('test-order-123', {
+  $type: 'Order',
+  number: 'ORD-12345',
+  status: 'shipped',
+  total: 99.99
+})
+
+const lookupOrder = async ({ orderNumber }) => {
+  const order = await db.Orders.findOne({ where: { number: orderNumber } })
+  if (!order) return { error: 'Order not found' }
+  return {
+    number: order.data.number,
+    status: order.data.status,
+    total: order.data.total
+  }
+}
+
+const response = await ai.chat({
+  model: assistant.data.model,
+  system: assistant.data.systemPrompt,
+  messages: [
+    { role: 'user', content: 'Can you check the status of order ORD-12345?' }
+  ],
+  tools: [
+    {
+      name: 'lookupOrder',
+      description: 'Look up an order by number',
+      input: { orderNumber: 'string' },
+      fn: lookupOrder
+    }
+  ]
+})
+
+response.should.have.property('content')
+// The AI should have used the tool and know the status
+```
+
+### AI Streaming
+
+```ts test
+const assistant = await db.Assistants.get('support-bot')
+
+let fullResponse = ''
+
+for await (const chunk of ai.stream({
+  model: assistant.data.model,
+  system: assistant.data.systemPrompt,
+  messages: [
+    { role: 'user', content: 'Tell me a short joke' }
+  ]
+})) {
+  fullResponse += chunk.content
+}
+
+fullResponse.length.should.be.above(10)
+```
+
+## Conversation
+
+### Create Conversation
+
+```ts test
+const conversation = await db.Conversations.create({
+  $type: 'Conversation',
+  id: 'conv-001',
+  assistant: 'https://ai.example.com/assistants/support-bot',
+  user: 'https://ai.example.com/users/customer-1',
+  messages: [],
+  status: 'active',
+  startedAt: new Date(),
+  lastMessageAt: new Date()
+})
+
+conversation.data.status.should.equal('active')
+conversation.data.messages.should.be.an('array')
+```
+
+### Add Messages to Conversation
+
+```ts test
+const conversation = await db.Conversations.get('conv-001')
+
+const userMessage = {
+  role: 'user',
+  content: 'Hi, I need help with my order',
+  timestamp: new Date()
+}
+
+const assistantMessage = {
+  role: 'assistant',
+  content: 'Hello! I\'d be happy to help you with your order. Could you please provide your order number?',
+  timestamp: new Date()
+}
+
+await db.Conversations.update(conversation.id, {
+  messages: [...conversation.data.messages, userMessage, assistantMessage],
+  lastMessageAt: new Date()
+})
+
+const updated = await db.Conversations.get(conversation.id)
+updated.data.messages.should.have.lengthOf(2)
+```
+
+### Conversation with Context
+
+```ts test
+const conversation = await db.Conversations.get('conv-001')
+
+// Add more messages
+const messages = [
+  ...conversation.data.messages,
+  { role: 'user', content: 'My order number is ORD-12345', timestamp: new Date() },
+  { role: 'assistant', content: 'I found your order. It was shipped yesterday and should arrive by Friday.', timestamp: new Date() }
+]
+
+await db.Conversations.update(conversation.id, { messages })
+
+// Get context from last N messages
+const lastMessages = messages.slice(-4)
+lastMessages.should.have.lengthOf(4)
+
+// Context for AI
+const context = lastMessages.map(m => ({ role: m.role, content: m.content }))
+context.should.be.an('array')
+```
+
+### Archive Conversation
+
+```ts test
+const conversation = await db.Conversations.get('conv-001')
+
+await db.Conversations.update(conversation.id, {
+  status: 'archived'
+})
+
+const archived = await db.Conversations.get(conversation.id)
+archived.data.status.should.equal('archived')
+```
+
+### Conversation Analytics
+
+```ts test
+const conversation = await db.Conversations.get('conv-001')
+
+const stats = {
+  messageCount: conversation.data.messages.length,
+  userMessages: conversation.data.messages.filter(m => m.role === 'user').length,
+  assistantMessages: conversation.data.messages.filter(m => m.role === 'assistant').length,
+  duration: new Date() - new Date(conversation.data.startedAt)
+}
+
+stats.messageCount.should.be.above(0)
+stats.userMessages.should.be.above(0)
+stats.assistantMessages.should.be.above(0)
+```
+
+## AI Features
+
+### Embeddings and Similarity Search
+
+```ts test
+// Create knowledge base entries
+await db.Knowledge.create('kb-1', {
+  content: 'Our return policy allows returns within 30 days of purchase.',
+  embedding: await ai.embed('Our return policy allows returns within 30 days of purchase.')
+})
+
+await db.Knowledge.create('kb-2', {
+  content: 'Shipping typically takes 3-5 business days for standard delivery.',
+  embedding: await ai.embed('Shipping typically takes 3-5 business days for standard delivery.')
+})
+
+await db.Knowledge.create('kb-3', {
+  content: 'We accept Visa, Mastercard, and PayPal as payment methods.',
+  embedding: await ai.embed('We accept Visa, Mastercard, and PayPal as payment methods.')
+})
+
+// Search for relevant content
+const results = await ai.search(db.Knowledge, 'How long does delivery take?', { limit: 2 })
+
+results.should.have.lengthOf(2)
+// First result should be about shipping
+results[0].data.content.should.contain('Shipping')
+```
+
+### Text Generation
+
+```ts test
+const generated = await ai.generate({
+  prompt: 'Write a product description for a wireless mouse',
+  maxTokens: 100
+})
+
+generated.should.have.property('text')
+generated.text.length.should.be.above(50)
+```
+
+### Content Summarization
+
+```ts test
+const longText = `
+The quarterly sales report shows significant growth across all regions.
+North America saw a 25% increase in revenue compared to last quarter.
+Europe showed steady growth at 15%, while Asia-Pacific exceeded expectations with 35% growth.
+The new product line contributed to 40% of total sales.
+Customer satisfaction scores remained high at 4.5 out of 5.
+We expect continued growth in the next quarter based on current trends.
+`
+
+const summary = await ai.summarize(longText, { maxLength: 50 })
+
+summary.should.be.a('string')
+summary.length.should.be.below(longText.length)
+```
+
+### Sentiment Analysis
+
+```ts test
+const feedback = [
+  'I love this product! Best purchase ever.',
+  'The delivery was late and the package was damaged.',
+  'Good quality, but a bit pricey.'
+]
+
+const sentiments = await Promise.all(
+  feedback.map(text => ai.analyze(text, { type: 'sentiment' }))
+)
+
+sentiments[0].sentiment.should.equal('positive')
+sentiments[1].sentiment.should.equal('negative')
+sentiments[2].sentiment.should.be.oneOf(['neutral', 'mixed'])
+```
+
+### AI Recommendations
+
+```ts test
+// Create some products
+await db.Products.create('prod-1', { name: 'Laptop', category: 'electronics', price: 999 })
+await db.Products.create('prod-2', { name: 'Mouse', category: 'electronics', price: 29 })
+await db.Products.create('prod-3', { name: 'Keyboard', category: 'electronics', price: 79 })
+
+const recommendations = await ai.recommend('products', {
+  similar: 'https://shop.example.com/products/prod-1',
+  limit: 2
+})
+
+recommendations.should.be.an('array')
+recommendations.should.have.lengthOf(2)
+```
+
+## Multi-turn Conversation
+
+### Full Chat Session
+
+```ts test
+const assistant = await db.Assistants.get('support-bot')
+const messages = []
+
+// Turn 1
+messages.push({ role: 'user', content: 'I want to return an item' })
+
+let response = await ai.chat({
+  model: assistant.data.model,
+  system: assistant.data.systemPrompt,
+  messages
+})
+messages.push({ role: 'assistant', content: response.content })
+
+// Turn 2
+messages.push({ role: 'user', content: 'Order number is ORD-99999' })
+
+response = await ai.chat({
+  model: assistant.data.model,
+  system: assistant.data.systemPrompt,
+  messages
+})
+messages.push({ role: 'assistant', content: response.content })
+
+// Turn 3
+messages.push({ role: 'user', content: 'Yes, please process the return' })
+
+response = await ai.chat({
+  model: assistant.data.model,
+  system: assistant.data.systemPrompt,
+  messages
+})
+messages.push({ role: 'assistant', content: response.content })
+
+messages.should.have.lengthOf(6)
+
+// Save the conversation
+await db.Conversations.create({
+  $type: 'Conversation',
+  assistant: assistant.$id,
+  messages,
+  status: 'active',
+  startedAt: new Date(),
+  lastMessageAt: new Date()
+})
+```

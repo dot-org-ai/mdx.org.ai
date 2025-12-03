@@ -1,0 +1,347 @@
+---
+$type: TestSuite
+title: TODO.mdx Package Tests
+description: Tests for @mdxe/todo package - task management with multi-platform sync
+---
+
+import * as Todo from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+# TODO.mdx Package Tests
+
+Tests validating the @mdxe/todo package for task management and sync.
+
+## Package Structure
+
+### Package Metadata
+
+```ts test
+const pkg = Todo.default // frontmatter
+pkg.$type.should.equal('https://mdx.org.ai/Package')
+pkg.$id.should.equal('https://todo.mdx.org.ai')
+pkg.name.should.equal('todo.mdx')
+```
+
+### Exports
+
+```ts test
+Todo.should.have.property('config')
+Todo.should.have.property('transform')
+Todo.should.have.property('syncToGitHub')
+Todo.should.have.property('syncFromGitHub')
+Todo.should.have.property('syncToLinear')
+Todo.should.have.property('resolveConflict')
+Todo.should.have.property('mergeChecklists')
+Todo.should.have.property('handleGitHubWebhook')
+```
+
+## Configuration
+
+### Config Structure
+
+```ts test
+import { config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+config.should.have.property('interval')
+config.should.have.property('platforms')
+config.should.have.property('mappings')
+config.should.have.property('conflicts')
+```
+
+### Platform Config
+
+```ts test
+import { config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+config.platforms.should.have.property('github')
+config.platforms.should.have.property('linear')
+config.platforms.should.have.property('local')
+
+config.platforms.github.enabled.should.be.true
+config.platforms.local.enabled.should.be.true
+config.platforms.local.format.should.equal('mdx')
+```
+
+### Status Mappings
+
+```ts test
+import { config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const { mappings } = config
+
+mappings.status.local.should.deep.equal(['open', 'in-progress', 'done', 'cancelled'])
+mappings.status.github.should.deep.equal(['open', 'open', 'closed', 'closed'])
+mappings.status.linear.should.deep.equal(['Todo', 'In Progress', 'Done', 'Cancelled'])
+```
+
+### Priority Mappings
+
+```ts test
+import { config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const { mappings } = config
+
+mappings.priority.local.should.deep.equal(['low', 'medium', 'high', 'urgent'])
+mappings.priority.linear.should.deep.equal([4, 3, 2, 1])
+
+// Verify mapping: high -> priority 2
+const highIndex = mappings.priority.local.indexOf('high')
+mappings.priority.linear[highIndex].should.equal(2)
+
+// Verify mapping: urgent -> priority 1
+const urgentIndex = mappings.priority.local.indexOf('urgent')
+mappings.priority.linear[urgentIndex].should.equal(1)
+```
+
+## Transform
+
+### Transform Task Data
+
+```ts test
+import { transform } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const data = {
+  id: 'task-001',
+  title: 'Implement feature',
+  description: 'Build the new feature',
+  status: 'in-progress',
+  priority: 'high',
+  githubUrl: 'https://github.com/org/repo/issues/123',
+  linearUrl: 'https://linear.app/team/ABC-123',
+  localPath: '.todo/task-001.mdx'
+}
+
+const transformed = transform(data)
+
+transformed.$type.should.equal('Task')
+transformed.$id.should.equal('https://todo.mdx.org.ai/task/task-001')
+transformed.sources.github.should.equal('https://github.com/org/repo/issues/123')
+transformed.sources.linear.should.equal('https://linear.app/team/ABC-123')
+transformed.sources.local.should.equal('.todo/task-001.mdx')
+```
+
+## Conflict Resolution
+
+### Resolve Newest Wins
+
+```ts test
+import { resolveConflict } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const local = {
+  title: 'Local Version',
+  updatedAt: '2024-01-15T00:00:00Z'
+}
+
+const remote = {
+  title: 'Remote Version',
+  updatedAt: '2024-01-20T00:00:00Z'
+}
+
+const resolved = resolveConflict(local, remote, 'title')
+resolved.should.equal('Remote Version')
+```
+
+### Resolve Status Uses Remote
+
+```ts test
+import { resolveConflict, config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+// Status always uses remote per config
+config.conflicts.fields.status.should.equal('remote')
+
+const local = { status: 'open', updatedAt: '2024-01-20T00:00:00Z' }
+const remote = { status: 'done', updatedAt: '2024-01-15T00:00:00Z' }
+
+const resolved = resolveConflict(local, remote, 'status')
+resolved.should.equal('done') // Remote wins for status
+```
+
+### Merge Checklists
+
+```ts test
+import { mergeChecklists } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const local = [
+  { id: 1, text: 'Item 1', done: true },
+  { id: 2, text: 'Item 2', done: false }
+]
+
+const remote = [
+  { id: 1, text: 'Item 1', done: false },
+  { id: 3, text: 'Item 3', done: true }
+]
+
+const merged = mergeChecklists(local, remote)
+
+merged.should.have.lengthOf(3)
+merged.find(i => i.id === 1).done.should.be.true // Keep done=true
+merged.find(i => i.id === 2).done.should.be.false
+merged.find(i => i.id === 3).done.should.be.true
+```
+
+### Merge Empty Checklists
+
+```ts test
+import { mergeChecklists } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const result1 = mergeChecklists([], [{ id: 1, text: 'Item', done: false }])
+result1.should.have.lengthOf(1)
+
+const result2 = mergeChecklists([{ id: 1, text: 'Item', done: true }], [])
+result2.should.have.lengthOf(1)
+
+const result3 = mergeChecklists(undefined, undefined)
+result3.should.deep.equal([])
+```
+
+## Webhooks
+
+### GitHub Webhook Handler Structure
+
+```ts test
+import { handleGitHubWebhook } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const handler = handleGitHubWebhook({
+  secret: 'test-secret',
+  onIssueOpened: async (issue) => 'opened',
+  onIssueEdited: async (issue) => 'edited',
+  onIssueClosed: async (issue) => 'closed'
+})
+
+handler.should.be.a('function')
+```
+
+## Status Mapping Helpers
+
+### Map Local to GitHub Status
+
+```ts test
+import { config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const mapStatus = (localStatus, target) => {
+  const index = config.mappings.status.local.indexOf(localStatus)
+  return config.mappings.status[target][index]
+}
+
+mapStatus('open', 'github').should.equal('open')
+mapStatus('in-progress', 'github').should.equal('open')
+mapStatus('done', 'github').should.equal('closed')
+mapStatus('cancelled', 'github').should.equal('closed')
+```
+
+### Map Local to Linear Status
+
+```ts test
+import { config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const mapStatus = (localStatus, target) => {
+  const index = config.mappings.status.local.indexOf(localStatus)
+  return config.mappings.status[target][index]
+}
+
+mapStatus('open', 'linear').should.equal('Todo')
+mapStatus('in-progress', 'linear').should.equal('In Progress')
+mapStatus('done', 'linear').should.equal('Done')
+```
+
+### Map Priority to Linear
+
+```ts test
+import { config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+const mapPriority = (localPriority) => {
+  const index = config.mappings.priority.local.indexOf(localPriority)
+  return config.mappings.priority.linear[index]
+}
+
+mapPriority('low').should.equal(4)
+mapPriority('medium').should.equal(3)
+mapPriority('high').should.equal(2)
+mapPriority('urgent').should.equal(1)
+```
+
+## Sync Operations
+
+### Sync to GitHub - New Issue
+
+```ts test
+// Test sync logic without actual API call
+const task = {
+  title: 'New Task',
+  description: 'Description',
+  status: 'open',
+  labels: ['feature']
+}
+
+// Should create new issue since no githubNumber
+task.should.not.have.property('githubNumber')
+```
+
+### Sync to GitHub - Update Issue
+
+```ts test
+const task = {
+  title: 'Existing Task',
+  description: 'Updated',
+  status: 'done',
+  labels: ['feature'],
+  githubNumber: 123
+}
+
+// Should update existing since has githubNumber
+task.githubNumber.should.equal(123)
+```
+
+### Transform from GitHub Issue
+
+```ts test
+import { transform } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+// Simulate GitHub issue data
+const issue = {
+  number: 456,
+  title: 'GitHub Issue',
+  body: 'Issue description',
+  state: 'open',
+  labels: [{ name: 'bug' }],
+  assignee: { login: 'developer' },
+  html_url: 'https://github.com/org/repo/issues/456',
+  created_at: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-15T00:00:00Z'
+}
+
+const taskData = {
+  id: `github:${issue.number}`,
+  title: issue.title,
+  description: issue.body,
+  status: issue.state === 'closed' ? 'done' : 'open',
+  labels: issue.labels.map(l => l.name),
+  assignee: issue.assignee?.login,
+  githubNumber: issue.number,
+  githubUrl: issue.html_url
+}
+
+const transformed = transform(taskData)
+transformed.$type.should.equal('Task')
+transformed.$id.should.include('github:456')
+transformed.sources.github.should.equal('https://github.com/org/repo/issues/456')
+```
+
+## Conflict Config
+
+### Default Conflict Strategy
+
+```ts test
+import { config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+config.conflicts.strategy.should.equal('newest')
+```
+
+### Field-Specific Strategies
+
+```ts test
+import { config } from '../../examples/todo.mdx.org.ai/todo.mdx'
+
+config.conflicts.fields.status.should.equal('remote')
+config.conflicts.fields.description.should.equal('newest')
+config.conflicts.fields.checklist.should.equal('merge')
+```

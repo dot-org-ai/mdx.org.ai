@@ -1,0 +1,359 @@
+---
+$type: TestSuite
+title: Schema.org Examples Tests
+description: Tests for Schema.org JSON-LD source integration
+---
+
+import SchemaREADME from '../../examples/schema.org.ai/README.mdx'
+import SchemaType from '../../examples/schema.org.ai/[Type].mdx'
+import SchemaProperty from '../../examples/schema.org.ai/[property].mdx'
+
+# Schema.org Examples Tests
+
+Tests validating the Schema.org JSON-LD integration.
+
+## Source Configuration
+
+### JSON-LD Source Setup
+
+```ts test
+const schema = sources.create({
+  $type: 'JSONLDSource',
+  $id: 'https://schema.org.ai',
+  baseUrl: 'https://schema.org',
+  endpoints: {
+    vocabulary: { path: '/version/latest/schemaorg-current-https.jsonld' },
+    type: { path: '/{type}.jsonld' }
+  }
+})
+
+schema.config.baseUrl.should.equal('https://schema.org')
+schema.config.endpoints.should.have.property('vocabulary')
+schema.config.endpoints.should.have.property('type')
+```
+
+### Fetch Schema Vocabulary
+
+```ts test
+const schema = sources.get('https://schema.org.ai')
+const vocab = await schema.endpoint('vocabulary')
+
+vocab.should.have.property('@graph')
+vocab['@graph'].should.be.an('array')
+vocab['@graph'].length.should.be.above(1000)
+```
+
+## Type Transform
+
+### Transform Person Type
+
+```ts test
+import { transform } from '../../examples/schema.org.ai/[Type].mdx'
+
+const rawData = {
+  '@graph': [
+    {
+      '@id': 'https://schema.org/Person',
+      '@type': 'rdfs:Class',
+      'rdfs:label': 'Person',
+      'rdfs:comment': 'A person (alive, dead, undead, or fictional).',
+      'rdfs:subClassOf': { '@id': 'https://schema.org/Thing' }
+    },
+    {
+      '@id': 'https://schema.org/name',
+      '@type': 'rdf:Property',
+      'rdfs:label': 'name',
+      'schema:domainIncludes': { '@id': 'https://schema.org/Person' },
+      'schema:rangeIncludes': { '@id': 'https://schema.org/Text' }
+    }
+  ]
+}
+
+const params = { Type: 'Person' }
+const transformed = transform(rawData, { params })
+
+transformed.$type.should.equal('SchemaType')
+transformed.$id.should.equal('https://schema.org.ai/Person')
+transformed.$context.should.equal('https://schema.org')
+transformed.label.should.equal('Person')
+transformed.subClassOf.should.equal('Thing')
+transformed.properties.should.be.an('array')
+```
+
+### Transform Type with Multiple Parents
+
+```ts test
+import { transform } from '../../examples/schema.org.ai/[Type].mdx'
+
+const rawData = {
+  '@graph': [
+    {
+      '@id': 'https://schema.org/LocalBusiness',
+      '@type': 'rdfs:Class',
+      'rdfs:label': 'LocalBusiness',
+      'rdfs:subClassOf': [
+        { '@id': 'https://schema.org/Organization' },
+        { '@id': 'https://schema.org/Place' }
+      ]
+    }
+  ]
+}
+
+const params = { Type: 'LocalBusiness' }
+const transformed = transform(rawData, { params })
+
+transformed.subClassOf.should.be.an('array')
+transformed.subClassOf.should.include('Organization')
+transformed.subClassOf.should.include('Place')
+```
+
+### Handle Missing Type
+
+```ts test
+import { transform } from '../../examples/schema.org.ai/[Type].mdx'
+
+const rawData = { '@graph': [] }
+const params = { Type: 'NonExistentType' }
+const result = transform(rawData, { params })
+
+should.equal(result, null)
+```
+
+## Property Transform
+
+### Transform name Property
+
+```ts test
+import { transform } from '../../examples/schema.org.ai/[property].mdx'
+
+const rawData = {
+  '@graph': [
+    {
+      '@id': 'https://schema.org/name',
+      '@type': 'rdf:Property',
+      'rdfs:label': 'name',
+      'rdfs:comment': 'The name of the item.',
+      'schema:domainIncludes': [
+        { '@id': 'https://schema.org/Thing' }
+      ],
+      'schema:rangeIncludes': [
+        { '@id': 'https://schema.org/Text' }
+      ]
+    }
+  ]
+}
+
+const params = { property: 'name' }
+const transformed = transform(rawData, { params })
+
+transformed.$type.should.equal('SchemaProperty')
+transformed.$id.should.equal('https://schema.org.ai/property/name')
+transformed.name.should.equal('name')
+transformed.domainIncludes.should.include('Thing')
+transformed.rangeIncludes.should.include('Text')
+```
+
+### Transform Property with Multiple Domains
+
+```ts test
+import { transform } from '../../examples/schema.org.ai/[property].mdx'
+
+const rawData = {
+  '@graph': [
+    {
+      '@id': 'https://schema.org/email',
+      '@type': 'rdf:Property',
+      'rdfs:label': 'email',
+      'schema:domainIncludes': [
+        { '@id': 'https://schema.org/Person' },
+        { '@id': 'https://schema.org/Organization' },
+        { '@id': 'https://schema.org/ContactPoint' }
+      ],
+      'schema:rangeIncludes': { '@id': 'https://schema.org/Text' }
+    }
+  ]
+}
+
+const params = { property: 'email' }
+const transformed = transform(rawData, { params })
+
+transformed.domainIncludes.should.have.lengthOf(3)
+transformed.domainIncludes.should.include('Person')
+transformed.domainIncludes.should.include('Organization')
+```
+
+### Transform Property with Inverse
+
+```ts test
+import { transform } from '../../examples/schema.org.ai/[property].mdx'
+
+const rawData = {
+  '@graph': [
+    {
+      '@id': 'https://schema.org/parent',
+      '@type': 'rdf:Property',
+      'rdfs:label': 'parent',
+      'schema:inverseOf': { '@id': 'https://schema.org/children' },
+      'schema:domainIncludes': { '@id': 'https://schema.org/Person' },
+      'schema:rangeIncludes': { '@id': 'https://schema.org/Person' }
+    }
+  ]
+}
+
+const params = { property: 'parent' }
+const transformed = transform(rawData, { params })
+
+transformed.inverseOf.should.equal('children')
+```
+
+### Handle Superseded Property
+
+```ts test
+import { transform } from '../../examples/schema.org.ai/[property].mdx'
+
+const rawData = {
+  '@graph': [
+    {
+      '@id': 'https://schema.org/productID',
+      '@type': 'rdf:Property',
+      'rdfs:label': 'productID',
+      'schema:supersededBy': { '@id': 'https://schema.org/identifier' },
+      'schema:domainIncludes': { '@id': 'https://schema.org/Product' }
+    }
+  ]
+}
+
+const params = { property: 'productID' }
+const transformed = transform(rawData, { params })
+
+transformed.supersededBy.should.equal('identifier')
+```
+
+## Static Paths
+
+### Generate Type Paths
+
+```ts test
+import { getStaticPaths } from '../../examples/schema.org.ai/[Type].mdx'
+
+const { paths, fallback } = await getStaticPaths()
+
+paths.should.be.an('array')
+paths.some(p => p.params.Type === 'Person').should.be.true
+paths.some(p => p.params.Type === 'Organization').should.be.true
+paths.some(p => p.params.Type === 'Product').should.be.true
+fallback.should.equal('blocking')
+```
+
+### Generate Property Paths
+
+```ts test
+import { getStaticPaths } from '../../examples/schema.org.ai/[property].mdx'
+
+const { paths, fallback } = await getStaticPaths()
+
+paths.should.be.an('array')
+paths.some(p => p.params.property === 'name').should.be.true
+paths.some(p => p.params.property === 'email').should.be.true
+paths.some(p => p.params.property === 'url').should.be.true
+fallback.should.equal('blocking')
+```
+
+## JSON-LD Conversion
+
+### Convert MDXLD to JSON-LD
+
+```ts test
+const mdxld = {
+  $type: 'Person',
+  $id: 'https://example.com/person/john',
+  $context: 'https://schema.org',
+  name: 'John Doe',
+  email: 'john@example.com'
+}
+
+const jsonld = {
+  '@context': mdxld.$context,
+  '@type': mdxld.$type,
+  '@id': mdxld.$id,
+  name: mdxld.name,
+  email: mdxld.email
+}
+
+jsonld['@type'].should.equal('Person')
+jsonld['@id'].should.equal('https://example.com/person/john')
+```
+
+### Parse JSON-LD to MDXLD
+
+```ts test
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': 'https://example.com/org/acme',
+  name: 'Acme Corp',
+  url: 'https://acme.com'
+}
+
+const mdxld = {
+  $context: jsonld['@context'],
+  $type: jsonld['@type'],
+  $id: jsonld['@id'],
+  name: jsonld.name,
+  url: jsonld.url
+}
+
+mdxld.$type.should.equal('Organization')
+mdxld.$id.should.equal('https://example.com/org/acme')
+```
+
+## Caching
+
+### Cache Vocabulary
+
+```ts test
+const schema = sources.get('https://schema.org.ai')
+
+const start1 = Date.now()
+await schema.endpoint('vocabulary', {}, { cache: { ttl: 3600 } })
+const time1 = Date.now() - start1
+
+const start2 = Date.now()
+await schema.endpoint('vocabulary', {}, { cache: { ttl: 3600 } })
+const time2 = Date.now() - start2
+
+// Cached should be faster
+time2.should.be.below(time1)
+```
+
+## Validation
+
+### Validate Type Structure
+
+```ts test
+const schema = sources.get('https://schema.org.ai')
+const vocab = await schema.endpoint('vocabulary')
+
+const types = vocab['@graph'].filter(n => n['@type'] === 'rdfs:Class')
+
+types.length.should.be.above(500)
+types.forEach(type => {
+  type.should.have.property('@id')
+  type.should.have.property('rdfs:label')
+})
+```
+
+### Validate Property Structure
+
+```ts test
+const schema = sources.get('https://schema.org.ai')
+const vocab = await schema.endpoint('vocabulary')
+
+const properties = vocab['@graph'].filter(n => n['@type'] === 'rdf:Property')
+
+properties.length.should.be.above(1000)
+properties.forEach(prop => {
+  prop.should.have.property('@id')
+  prop.should.have.property('rdfs:label')
+})
+```

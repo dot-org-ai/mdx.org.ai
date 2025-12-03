@@ -1,0 +1,365 @@
+---
+$type: TestSuite
+title: SaaS Examples Tests
+description: Tests for User, Organization, and Subscription examples
+---
+
+import User from '../../examples/[User].mdx'
+import Organization from '../../examples/[Organization].mdx'
+import Subscription from '../../examples/[Subscription].mdx'
+
+# SaaS Examples Tests
+
+Tests validating the SaaS multi-tenant examples.
+
+## User
+
+### Create User
+
+```ts test
+const user = await db.Users.create('user-001', {
+  $type: 'User',
+  id: 'user-001',
+  email: 'alice@company.com',
+  name: 'Alice Johnson',
+  role: 'member',
+  organization: 'https://app.example.com/orgs/acme'
+})
+
+user.data.email.should.equal('alice@company.com')
+user.data.role.should.equal('member')
+```
+
+### User Roles
+
+```ts test
+// Admin user
+const admin = await db.Users.create('admin-001', {
+  $type: 'User',
+  id: 'admin-001',
+  email: 'admin@company.com',
+  name: 'Admin User',
+  role: 'admin',
+  organization: 'https://app.example.com/orgs/acme'
+})
+
+admin.data.role.should.equal('admin')
+
+// Check permissions
+const canManageUsers = admin.data.role === 'admin'
+canManageUsers.should.be.true
+```
+
+### Track User Activity
+
+```ts test
+const user = await db.Users.get('user-001')
+
+await track('user.login', {
+  userId: user.id,
+  timestamp: new Date(),
+  ip: '192.168.1.1'
+})
+
+await db.Users.update(user.id, {
+  lastLoginAt: new Date()
+})
+
+const updated = await db.Users.get('user-001')
+updated.data.lastLoginAt.should.be.a('date')
+```
+
+### User Preferences
+
+```ts test
+await db.Users.update('user-001', {
+  preferences: {
+    theme: 'dark',
+    notifications: { email: true, push: false },
+    timezone: 'America/Los_Angeles'
+  }
+})
+
+const user = await db.Users.get('user-001')
+user.data.preferences.theme.should.equal('dark')
+user.data.preferences.notifications.email.should.be.true
+```
+
+## Organization
+
+### Create Organization
+
+```ts test
+const org = await db.Organizations.create('acme', {
+  $type: 'Organization',
+  slug: 'acme',
+  name: 'Acme Corp',
+  plan: 'pro',
+  members: ['https://app.example.com/users/user-001']
+})
+
+org.data.slug.should.equal('acme')
+org.data.plan.should.equal('pro')
+```
+
+### Upgrade Plan
+
+```ts test
+const org = await db.Organizations.get('acme')
+
+await db.Organizations.update(org.id, {
+  plan: 'enterprise'
+})
+
+const upgraded = await db.Organizations.get('acme')
+upgraded.data.plan.should.equal('enterprise')
+```
+
+### Add Member
+
+```ts test
+const org = await db.Organizations.get('acme')
+const newUser = await db.Users.create('user-002', {
+  $type: 'User',
+  id: 'user-002',
+  email: 'bob@company.com',
+  name: 'Bob Smith',
+  role: 'member',
+  organization: org.$id
+})
+
+await db.Organizations.update(org.id, {
+  members: [...org.data.members, newUser.$id]
+})
+
+const updated = await db.Organizations.get('acme')
+updated.data.members.should.have.lengthOf(2)
+```
+
+### Organization SSO Setup
+
+```ts test
+await db.Organizations.update('acme', {
+  plan: 'enterprise',
+  ssoEnabled: true,
+  domain: 'acme.com'
+})
+
+const org = await db.Organizations.get('acme')
+org.data.ssoEnabled.should.be.true
+
+// SSO only available on enterprise
+const canUseSSO = org.data.plan === 'enterprise' && org.data.ssoEnabled
+canUseSSO.should.be.true
+```
+
+### Stripe Customer Setup
+
+```ts test
+const org = await db.Organizations.get('acme')
+
+const stripeCustomer = await api.stripe.customers.create({
+  name: org.data.name,
+  metadata: { organizationId: org.id }
+})
+
+await db.Organizations.update(org.id, {
+  stripeCustomerId: stripeCustomer.id
+})
+
+const updated = await db.Organizations.get('acme')
+updated.data.stripeCustomerId.should.match(/^cus_/)
+```
+
+## Subscription
+
+### Create Subscription
+
+```ts test
+const org = await db.Organizations.get('acme')
+
+// Create Stripe subscription
+const stripeSubscription = await api.stripe.subscriptions.create({
+  customer: org.data.stripeCustomerId,
+  items: [{ price: 'price_pro_monthly' }]
+})
+
+const subscription = await db.Subscriptions.create({
+  $type: 'Subscription',
+  id: 'sub-001',
+  organization: org.$id,
+  plan: 'https://app.example.com/plans/pro',
+  status: stripeSubscription.status,
+  stripeSubscriptionId: stripeSubscription.id,
+  currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
+  currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000)
+})
+
+await db.Organizations.update(org.id, {
+  stripeSubscriptionId: stripeSubscription.id
+})
+
+subscription.data.status.should.be.oneOf(['active', 'trialing'])
+```
+
+### Subscription with Trial
+
+```ts test
+const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+
+const subscription = await db.Subscriptions.create({
+  $type: 'Subscription',
+  id: 'sub-trial',
+  organization: 'https://app.example.com/orgs/acme',
+  plan: 'https://app.example.com/plans/pro',
+  status: 'trialing',
+  stripeSubscriptionId: 'sub_trial123',
+  currentPeriodStart: new Date(),
+  currentPeriodEnd: trialEnd,
+  trialEnd: trialEnd
+})
+
+subscription.data.status.should.equal('trialing')
+subscription.data.trialEnd.should.be.a('date')
+
+const isTrialing = subscription.data.status === 'trialing'
+isTrialing.should.be.true
+```
+
+### Cancel Subscription
+
+```ts test
+const subscription = await db.Subscriptions.get('sub-001')
+
+await api.stripe.subscriptions.update(subscription.data.stripeSubscriptionId, {
+  cancel_at_period_end: true
+})
+
+await db.Subscriptions.update(subscription.id, {
+  cancelAtPeriodEnd: true
+})
+
+const updated = await db.Subscriptions.get('sub-001')
+updated.data.cancelAtPeriodEnd.should.be.true
+```
+
+### Handle Subscription Webhook
+
+```ts test
+// Simulate webhook event
+const webhookEvent = {
+  type: 'customer.subscription.updated',
+  data: {
+    object: {
+      id: 'sub_test123',
+      status: 'past_due',
+      current_period_end: Math.floor(Date.now() / 1000) + 86400
+    }
+  }
+}
+
+const subscription = await db.Subscriptions.findOne({
+  where: { stripeSubscriptionId: webhookEvent.data.object.id }
+})
+
+if (subscription) {
+  await db.Subscriptions.update(subscription.id, {
+    status: webhookEvent.data.object.status,
+    currentPeriodEnd: new Date(webhookEvent.data.object.current_period_end * 1000)
+  })
+}
+```
+
+### Usage Tracking
+
+```ts test
+const subscription = await db.Subscriptions.get('sub-001')
+
+await db.Usage.create({
+  $type: 'Usage',
+  organization: subscription.data.organization,
+  date: new Date(),
+  apiCalls: 1000,
+  storage: 500,
+  seats: 5
+})
+
+const usage = await db.Usage.find({
+  where: {
+    organization: subscription.data.organization,
+    date: { $gte: subscription.data.currentPeriodStart }
+  }
+})
+
+usage.should.have.lengthOf.at.least(1)
+```
+
+## Full SaaS Flow
+
+### Complete Onboarding Flow
+
+```ts test
+// 1. Create organization
+const org = await db.Organizations.create('newco', {
+  $type: 'Organization',
+  slug: 'newco',
+  name: 'NewCo Inc',
+  plan: 'free',
+  members: []
+})
+
+// 2. Create admin user
+const admin = await db.Users.create('newco-admin', {
+  $type: 'User',
+  id: 'newco-admin',
+  email: 'admin@newco.com',
+  name: 'NewCo Admin',
+  role: 'admin',
+  organization: org.$id
+})
+
+// 3. Add user to org
+await db.Organizations.update(org.id, {
+  members: [admin.$id]
+})
+
+// 4. Create Stripe customer
+const stripeCustomer = await api.stripe.customers.create({
+  email: admin.data.email,
+  name: org.data.name
+})
+
+await db.Organizations.update(org.id, {
+  stripeCustomerId: stripeCustomer.id
+})
+
+// 5. Upgrade to pro
+const subscription = await api.stripe.subscriptions.create({
+  customer: stripeCustomer.id,
+  items: [{ price: 'price_pro_monthly' }],
+  trial_period_days: 14
+})
+
+await db.Subscriptions.create({
+  $type: 'Subscription',
+  id: 'newco-sub',
+  organization: org.$id,
+  plan: 'https://app.example.com/plans/pro',
+  status: subscription.status,
+  stripeSubscriptionId: subscription.id,
+  currentPeriodStart: new Date(subscription.current_period_start * 1000),
+  currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+  trialEnd: new Date(subscription.trial_end * 1000)
+})
+
+await db.Organizations.update(org.id, {
+  plan: 'pro',
+  stripeSubscriptionId: subscription.id
+})
+
+// Verify
+const finalOrg = await db.Organizations.get('newco')
+finalOrg.data.plan.should.equal('pro')
+finalOrg.data.stripeCustomerId.should.exist
+finalOrg.data.stripeSubscriptionId.should.exist
+```

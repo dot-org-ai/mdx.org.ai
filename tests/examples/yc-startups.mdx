@@ -1,0 +1,269 @@
+---
+$type: TestSuite
+title: YC Startups Examples Tests
+description: Tests for YC Directory Algolia API integration
+---
+
+import YCStartupsREADME from '../../examples/yc.startups.org.ai/README.mdx'
+import YCCompany from '../../examples/yc.startups.org.ai/[company].mdx'
+import YCBatch from '../../examples/yc.startups.org.ai/[batch].mdx'
+import YCIndustry from '../../examples/yc.startups.org.ai/[industry].mdx'
+
+# YC Startups Examples Tests
+
+Tests validating the YC Directory Algolia API integration.
+
+## Source Configuration
+
+### REST Source Setup
+
+```ts test
+const yc = sources.create({
+  $type: 'RestSource',
+  $id: 'https://yc.startups.org.ai',
+  baseUrl: 'https://45bwzj1sgc-dsn.algolia.net/1/indexes/YCCompany_production',
+  headers: {
+    'x-algolia-application-id': '45BWZJ1SGC',
+    'x-algolia-api-key': 'public'
+  },
+  endpoints: {
+    search: { path: '/query', method: 'POST' },
+    browse: { path: '/browse', method: 'POST' }
+  }
+})
+
+yc.config.baseUrl.should.contain('algolia.net')
+yc.config.headers.should.have.property('x-algolia-application-id')
+```
+
+### Search Companies
+
+```ts test
+const yc = sources.get('https://yc.startups.org.ai')
+const results = await yc.endpoint('search', {}, {
+  query: 'AI',
+  hitsPerPage: 10
+})
+
+results.should.have.property('hits')
+results.hits.should.be.an('array')
+results.should.have.property('nbHits')
+```
+
+## Company Transform
+
+### Transform Company to MDXLD
+
+```ts test
+import { transform } from '../../examples/yc.startups.org.ai/[company].mdx'
+
+const rawData = {
+  hits: [{
+    slug: 'test-company',
+    name: 'Test Company',
+    one_liner: 'Making tests easier',
+    long_description: 'A longer description',
+    batch: 'S24',
+    status: 'Active',
+    website: 'https://test.com',
+    industries: ['B2B', 'Developer Tools'],
+    team_size: 10
+  }]
+}
+
+const transformed = transform(rawData)
+
+transformed.$type.should.equal('Startup')
+transformed.$id.should.equal('https://yc.startups.org.ai/company/test-company')
+transformed.name.should.equal('Test Company')
+transformed.ycUrl.should.equal('https://www.ycombinator.com/companies/test-company')
+```
+
+### Handle Missing Company
+
+```ts test
+import { transform } from '../../examples/yc.startups.org.ai/[company].mdx'
+
+const emptyData = { hits: [] }
+const result = transform(emptyData)
+
+should.equal(result, null)
+```
+
+## Batch Transform
+
+### Transform Batch Results
+
+```ts test
+import { transform } from '../../examples/yc.startups.org.ai/[batch].mdx'
+
+const rawData = {
+  hits: [
+    { slug: 'company-1', name: 'Company 1', batch: 'S24' },
+    { slug: 'company-2', name: 'Company 2', batch: 'S24' }
+  ],
+  nbHits: 150,
+  facets: {
+    industries: { 'B2B': 50, 'Consumer': 30 },
+    status: { 'Active': 100, 'Acquired': 20 }
+  }
+}
+
+const params = { batch: 'S24' }
+const transformed = transform(rawData, { params })
+
+transformed.$type.should.equal('Batch')
+transformed.$id.should.equal('https://yc.startups.org.ai/batch/S24')
+transformed.batch.should.equal('S24')
+transformed.companies.should.have.lengthOf(2)
+transformed.total.should.equal(150)
+transformed.industries.should.have.property('B2B', 50)
+```
+
+## Industry Transform
+
+### Transform Industry Results
+
+```ts test
+import { transform } from '../../examples/yc.startups.org.ai/[industry].mdx'
+
+const rawData = {
+  hits: [
+    { slug: 'ai-company', name: 'AI Company', industries: ['AI/ML'] }
+  ],
+  nbHits: 200,
+  facets: {
+    batch: { 'S24': 30, 'W24': 25 },
+    status: { 'Active': 180 },
+    regions: { 'US': 150, 'EU': 30 }
+  }
+}
+
+const params = { industry: 'AI/ML' }
+const transformed = transform(rawData, { params })
+
+transformed.$type.should.equal('Industry')
+transformed.$id.should.equal('https://yc.startups.org.ai/industry/AI/ML')
+transformed.industry.should.equal('AI/ML')
+transformed.total.should.equal(200)
+transformed.batches.should.have.property('S24', 30)
+transformed.regions.should.have.property('US', 150)
+```
+
+## Static Paths
+
+### Generate Batch Paths
+
+```ts test
+import { getStaticPaths } from '../../examples/yc.startups.org.ai/[batch].mdx'
+
+const { paths, fallback } = await getStaticPaths()
+
+paths.should.be.an('array')
+paths.length.should.be.above(30) // Should have many batches
+paths[0].params.should.have.property('batch')
+paths.some(p => p.params.batch === 'S24').should.be.true
+paths.some(p => p.params.batch === 'W24').should.be.true
+fallback.should.equal('blocking')
+```
+
+### Generate Industry Paths
+
+```ts test
+import { getStaticPaths } from '../../examples/yc.startups.org.ai/[industry].mdx'
+
+const { paths, fallback } = await getStaticPaths()
+
+paths.should.be.an('array')
+paths.some(p => p.params.industry === 'B2B').should.be.true
+paths.some(p => p.params.industry === 'Fintech').should.be.true
+fallback.should.equal('blocking')
+```
+
+## Faceted Search
+
+### Search with Filters
+
+```ts test
+const yc = sources.get('https://yc.startups.org.ai')
+
+const results = await yc.endpoint('search', {}, {
+  filters: 'batch:S24',
+  facets: ['industries', 'status'],
+  hitsPerPage: 50
+})
+
+results.hits.forEach(company => {
+  company.batch.should.equal('S24')
+})
+results.facets.should.have.property('industries')
+results.facets.should.have.property('status')
+```
+
+### Search by Industry Facet
+
+```ts test
+const yc = sources.get('https://yc.startups.org.ai')
+
+const results = await yc.endpoint('search', {}, {
+  facetFilters: [['industries:B2B']],
+  hitsPerPage: 20
+})
+
+results.hits.forEach(company => {
+  company.industries.should.include('B2B')
+})
+```
+
+## Pagination
+
+### Browse All Companies
+
+```ts test
+const yc = sources.get('https://yc.startups.org.ai')
+
+const page1 = await yc.endpoint('browse', {}, { hitsPerPage: 100, page: 0 })
+const page2 = await yc.endpoint('browse', {}, { hitsPerPage: 100, page: 1 })
+
+page1.hits.should.have.lengthOf(100)
+page2.hits.should.have.lengthOf(100)
+
+// Should be different companies
+const slugs1 = page1.hits.map(h => h.slug)
+const slugs2 = page2.hits.map(h => h.slug)
+slugs1.should.not.deep.equal(slugs2)
+```
+
+## Data Validation
+
+### Validate Company Schema
+
+```ts test
+const yc = sources.get('https://yc.startups.org.ai')
+const results = await yc.endpoint('search', {}, { hitsPerPage: 10 })
+
+results.hits.forEach(company => {
+  company.should.have.property('slug')
+  company.should.have.property('name')
+  company.should.have.property('batch')
+  company.should.have.property('industries')
+  company.industries.should.be.an('array')
+})
+```
+
+## Error Handling
+
+### Handle Search Errors
+
+```ts test
+const yc = sources.get('https://yc.startups.org.ai')
+
+try {
+  // Invalid facet filter syntax
+  await yc.endpoint('search', {}, {
+    facetFilters: 'invalid'
+  })
+} catch (error) {
+  error.should.exist
+}
+```

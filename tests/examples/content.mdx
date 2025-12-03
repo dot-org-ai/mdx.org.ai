@@ -1,0 +1,525 @@
+---
+$type: TestSuite
+title: Content & API Examples Tests
+description: Tests for LandingPage, Email, and APIEndpoint examples
+---
+
+import LandingPage from '../../examples/[LandingPage].mdx'
+import Email from '../../examples/[Email].mdx'
+import APIEndpoint from '../../examples/[APIEndpoint].mdx'
+
+# Content & API Examples Tests
+
+Tests validating the content and API endpoint examples.
+
+## Landing Page
+
+### Create Landing Page
+
+```ts test
+const page = await db.LandingPages.create('homepage', {
+  $type: 'LandingPage',
+  slug: 'homepage',
+  title: 'Build Faster with MDX',
+  description: 'The modern way to build web applications',
+  hero: {
+    headline: 'Build Faster with MDX',
+    subheadline: 'Write content, not code. Ship products, not configs.',
+    primaryCta: { label: 'Get Started', url: '/signup' },
+    secondaryCta: { label: 'Learn More', url: '/docs' },
+    image: 'https://example.com/hero.png'
+  },
+  features: [
+    { icon: 'zap', title: 'Fast', description: 'Lightning fast builds' },
+    { icon: 'shield', title: 'Secure', description: 'Enterprise security' },
+    { icon: 'globe', title: 'Global', description: 'Edge-first deployment' }
+  ],
+  cta: {
+    headline: 'Ready to Get Started?',
+    subheadline: 'Join thousands of developers',
+    buttonLabel: 'Sign Up Free'
+  },
+  published: false
+})
+
+page.data.title.should.equal('Build Faster with MDX')
+page.data.hero.headline.should.exist
+page.data.features.should.have.lengthOf(3)
+```
+
+### Publish Landing Page
+
+```ts test
+const page = await db.LandingPages.get('homepage')
+
+await db.LandingPages.update(page.id, {
+  published: true,
+  publishedAt: new Date()
+})
+
+const published = await db.LandingPages.get(page.id)
+published.data.published.should.be.true
+published.data.publishedAt.should.be.a('date')
+```
+
+### Landing Page with Pricing
+
+```ts test
+const page = await db.LandingPages.get('homepage')
+
+await db.LandingPages.update(page.id, {
+  pricing: {
+    plans: [
+      {
+        name: 'Free',
+        price: 0,
+        interval: 'month',
+        features: ['1 Project', '100 MB Storage', 'Community Support'],
+        cta: { label: 'Get Started', url: '/signup?plan=free' }
+      },
+      {
+        name: 'Pro',
+        price: 29,
+        interval: 'month',
+        features: ['Unlimited Projects', '10 GB Storage', 'Priority Support'],
+        cta: { label: 'Start Trial', url: '/signup?plan=pro' },
+        highlighted: true
+      },
+      {
+        name: 'Enterprise',
+        price: 99,
+        interval: 'month',
+        features: ['Everything in Pro', 'SSO', 'Dedicated Support'],
+        cta: { label: 'Contact Sales', url: '/contact' }
+      }
+    ]
+  }
+})
+
+const updated = await db.LandingPages.get(page.id)
+updated.data.pricing.plans.should.have.lengthOf(3)
+updated.data.pricing.plans[1].highlighted.should.be.true
+```
+
+### Landing Page Analytics
+
+```ts test
+const page = await db.LandingPages.get('homepage')
+
+// Track page view
+await track('landing.view', { page: page.data.slug })
+
+// Track CTA click
+await track('landing.cta.click', {
+  page: page.data.slug,
+  cta: 'primary',
+  label: page.data.hero.primaryCta.label
+})
+
+// Track signup conversion
+await track('landing.signup', {
+  page: page.data.slug,
+  email: 'user@example.com'
+})
+```
+
+### Landing Page Lead Capture
+
+```ts test
+const lead = await db.Leads.create({
+  $type: 'Lead',
+  email: 'prospect@company.com',
+  source: 'homepage',
+  createdAt: new Date()
+})
+
+lead.data.email.should.equal('prospect@company.com')
+lead.data.source.should.equal('homepage')
+
+// Send event for lead nurturing
+await send('lead.created', { email: lead.data.email, source: lead.data.source })
+```
+
+## Email Templates
+
+### Create Email Template
+
+```ts test
+const template = await db.EmailTemplates.create('welcome', {
+  $type: 'EmailTemplate',
+  slug: 'welcome',
+  name: 'Welcome Email',
+  subject: 'Welcome to {{appName}}, {{user.name}}!',
+  preview: 'Get started with your new account',
+  category: 'transactional',
+  variables: [
+    { name: 'user.name', type: 'string', required: true },
+    { name: 'user.email', type: 'string', required: true },
+    { name: 'appName', type: 'string', required: true }
+  ]
+})
+
+template.data.name.should.equal('Welcome Email')
+template.data.category.should.equal('transactional')
+template.data.variables.should.have.lengthOf(3)
+```
+
+### Render Email Template
+
+```ts test
+const template = await db.EmailTemplates.get('welcome')
+
+const data = {
+  user: { name: 'Alice', email: 'alice@example.com' },
+  appName: 'MDX Platform'
+}
+
+// Interpolate subject
+const subject = template.data.subject
+  .replace('{{user.name}}', data.user.name)
+  .replace('{{appName}}', data.appName)
+
+subject.should.equal('Welcome to MDX Platform, Alice!')
+```
+
+### Send Email
+
+```ts test
+const template = await db.EmailTemplates.get('welcome')
+
+const sent = await api.email.send({
+  from: 'hello@example.com',
+  to: 'alice@example.com',
+  subject: 'Welcome to MDX Platform, Alice!',
+  template: template.data.slug,
+  data: {
+    user: { name: 'Alice', email: 'alice@example.com' },
+    appName: 'MDX Platform'
+  }
+})
+
+sent.should.have.property('messageId')
+
+// Track the send
+await track('email.sent', {
+  template: template.data.slug,
+  to: 'alice@example.com',
+  category: template.data.category
+})
+```
+
+### Marketing Email Campaign
+
+```ts test
+const template = await db.EmailTemplates.create('newsletter', {
+  $type: 'EmailTemplate',
+  slug: 'newsletter-2024-01',
+  name: 'January Newsletter',
+  subject: 'What\'s New in January',
+  category: 'marketing'
+})
+
+// Queue emails for batch sending
+const recipients = [
+  { email: 'user1@example.com', name: 'User 1' },
+  { email: 'user2@example.com', name: 'User 2' },
+  { email: 'user3@example.com', name: 'User 3' }
+]
+
+for (const recipient of recipients) {
+  await $.queue('emails').add({
+    template: template.data.slug,
+    to: recipient.email,
+    data: { user: recipient }
+  }, { priority: 1 }) // Low priority for marketing
+}
+
+const stats = await $.queue('emails').stats()
+stats.pending.should.be.at.least(3)
+```
+
+### Email A/B Test
+
+```ts test
+const variants = [
+  { id: 'a', subject: 'Welcome to MDX!' },
+  { id: 'b', subject: 'Get started with MDX today' },
+  { id: 'c', subject: '{{user.name}}, your MDX account is ready' }
+]
+
+// Assign variant randomly
+const assignVariant = () => {
+  const index = Math.floor(Math.random() * variants.length)
+  return variants[index]
+}
+
+const variant = assignVariant()
+variant.should.have.property('id')
+variant.should.have.property('subject')
+
+// Track which variant was sent
+await track('email.experiment', {
+  experimentId: 'welcome-subject',
+  variantId: variant.id
+})
+```
+
+## API Endpoint
+
+### Create API Endpoint Definition
+
+```ts test
+const endpoint = await db.APIEndpoints.create('users-list', {
+  $type: 'APIEndpoint',
+  path: 'users',
+  method: 'GET',
+  name: 'List Users',
+  description: 'Returns a paginated list of users',
+  auth: 'bearer',
+  rateLimit: { limit: 100, window: 60, tier: 'standard' },
+  input: {
+    page: { type: 'number', default: 1 },
+    limit: { type: 'number', default: 20, max: 100 },
+    sort: { type: 'string', enum: ['created', 'name', 'email'] }
+  },
+  output: {
+    data: { type: 'array', items: 'User' },
+    meta: { total: 'number', page: 'number', limit: 'number' }
+  },
+  version: 'v1'
+})
+
+endpoint.data.method.should.equal('GET')
+endpoint.data.auth.should.equal('bearer')
+endpoint.data.rateLimit.limit.should.equal(100)
+```
+
+### Register API Route
+
+```ts test
+const endpoint = await db.APIEndpoints.get('users-list')
+
+app.get(`/${endpoint.data.version}/${endpoint.data.path}`, async (c) => {
+  const page = parseInt(c.req.query('page') || '1')
+  const limit = parseInt(c.req.query('limit') || '20')
+
+  const users = await db.Users.find({
+    offset: (page - 1) * limit,
+    limit
+  })
+
+  const total = await db.Users.count()
+
+  return c.json({
+    data: users.map(u => u.data),
+    meta: { total, page, limit }
+  })
+})
+
+const res = await app.request('/v1/users?page=1&limit=10')
+res.status.should.equal(200)
+
+const json = await res.json()
+json.should.have.property('data')
+json.should.have.property('meta')
+```
+
+### API Rate Limiting
+
+```ts test
+const endpoint = await db.APIEndpoints.get('users-list')
+const clientId = 'client-123'
+const key = `ratelimit:${endpoint.data.path}:${clientId}`
+
+// Simulate requests
+let allowed = true
+let requestCount = 0
+
+for (let i = 0; i < 110; i++) {
+  requestCount++
+  if (requestCount > endpoint.data.rateLimit.limit) {
+    allowed = false
+    break
+  }
+}
+
+allowed.should.be.false
+requestCount.should.equal(101)
+```
+
+### API Input Validation
+
+```ts test
+const endpoint = await db.APIEndpoints.get('users-list')
+
+const validateInput = (query) => {
+  const errors = []
+
+  if (query.page && (isNaN(query.page) || query.page < 1)) {
+    errors.push({ field: 'page', message: 'Must be a positive number' })
+  }
+
+  if (query.limit) {
+    if (isNaN(query.limit) || query.limit < 1) {
+      errors.push({ field: 'limit', message: 'Must be a positive number' })
+    }
+    if (query.limit > 100) {
+      errors.push({ field: 'limit', message: 'Maximum is 100' })
+    }
+  }
+
+  if (query.sort && !['created', 'name', 'email'].includes(query.sort)) {
+    errors.push({ field: 'sort', message: 'Invalid sort field' })
+  }
+
+  return { valid: errors.length === 0, errors }
+}
+
+validateInput({ page: 1, limit: 20 }).valid.should.be.true
+validateInput({ page: -1 }).valid.should.be.false
+validateInput({ limit: 200 }).valid.should.be.false
+validateInput({ sort: 'invalid' }).valid.should.be.false
+```
+
+### API Authentication
+
+```ts test
+const authenticate = async (c, authType) => {
+  if (authType === 'none') return true
+
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader) return false
+
+  if (authType === 'bearer') {
+    if (!authHeader.startsWith('Bearer ')) return false
+    const token = authHeader.replace('Bearer ', '')
+    // Validate token (simplified)
+    return token.length > 0
+  }
+
+  if (authType === 'api_key') {
+    if (!authHeader.startsWith('ApiKey ')) return false
+    const apiKey = authHeader.replace('ApiKey ', '')
+    const key = await db.ApiKeys.findOne({ where: { key: apiKey, active: true } })
+    return !!key
+  }
+
+  return false
+}
+
+// Test scenarios
+const mockContext = (header) => ({
+  req: { header: (name) => name === 'Authorization' ? header : null }
+})
+
+const result1 = await authenticate(mockContext('Bearer valid-token'), 'bearer')
+result1.should.be.true
+
+const result2 = await authenticate(mockContext(null), 'bearer')
+result2.should.be.false
+
+const result3 = await authenticate(mockContext('Invalid'), 'bearer')
+result3.should.be.false
+```
+
+### API Versioning
+
+```ts test
+const endpoints = [
+  { path: 'users', version: 'v1', deprecated: false },
+  { path: 'users', version: 'v2', deprecated: false },
+  { path: 'legacy-users', version: 'v1', deprecated: true }
+]
+
+const activeEndpoints = endpoints.filter(e => !e.deprecated)
+activeEndpoints.should.have.lengthOf(2)
+
+const v2Endpoints = endpoints.filter(e => e.version === 'v2')
+v2Endpoints.should.have.lengthOf(1)
+
+// Deprecation warning
+const deprecated = endpoints.filter(e => e.deprecated)
+deprecated[0].path.should.equal('legacy-users')
+```
+
+### API Documentation Generation
+
+```ts test
+const endpoint = await db.APIEndpoints.get('users-list')
+
+const generateDocs = (ep) => ({
+  method: ep.method,
+  path: `/${ep.version}/${ep.path}`,
+  description: ep.description,
+  authentication: ep.auth,
+  parameters: Object.entries(ep.input || {}).map(([name, schema]) => ({
+    name,
+    ...schema
+  })),
+  response: ep.output,
+  rateLimit: ep.rateLimit
+})
+
+const docs = generateDocs(endpoint.data)
+
+docs.method.should.equal('GET')
+docs.path.should.equal('/v1/users')
+docs.authentication.should.equal('bearer')
+docs.parameters.should.be.an('array')
+```
+
+## Full Integration
+
+### Complete Content Flow
+
+```ts test
+// 1. Create landing page
+const page = await db.LandingPages.create('product-launch', {
+  $type: 'LandingPage',
+  slug: 'product-launch',
+  title: 'Introducing Widget Pro',
+  hero: {
+    headline: 'The Future of Widgets',
+    primaryCta: { label: 'Pre-order Now', url: '/preorder' }
+  },
+  cta: {
+    headline: 'Be First',
+    buttonLabel: 'Join Waitlist'
+  }
+})
+
+// 2. Create email template for leads
+const email = await db.EmailTemplates.create('waitlist', {
+  $type: 'EmailTemplate',
+  slug: 'waitlist-confirm',
+  name: 'Waitlist Confirmation',
+  subject: 'You\'re on the list!',
+  category: 'transactional'
+})
+
+// 3. Create API endpoint for signups
+const api = await db.APIEndpoints.create('waitlist-signup', {
+  $type: 'APIEndpoint',
+  path: 'waitlist',
+  method: 'POST',
+  name: 'Join Waitlist',
+  auth: 'none',
+  input: { email: { type: 'string', format: 'email', required: true } }
+})
+
+// 4. Simulate user flow
+const lead = await db.Leads.create({
+  email: 'eager@customer.com',
+  source: page.data.slug
+})
+
+await api.email.send({
+  to: lead.data.email,
+  template: email.data.slug
+})
+
+await track('landing.signup', { page: page.data.slug, email: lead.data.email })
+
+// Verify
+lead.data.source.should.equal('product-launch')
+```

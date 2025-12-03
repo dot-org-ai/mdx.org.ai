@@ -1,0 +1,511 @@
+---
+$type: TestSuite
+title: Workflow Examples Tests
+description: Tests for Approval, Notification, Webhook, and workflow patterns
+---
+
+import Approval from '../../examples/[Approval].mdx'
+import Notification from '../../examples/[Notification].mdx'
+import Webhook from '../../examples/[Webhook].mdx'
+
+# Workflow Examples Tests
+
+Tests validating the workflow and automation examples.
+
+## Approval Workflow
+
+### Create Approval Request
+
+```ts test
+const approval = await db.Approvals.create({
+  $type: 'Approval',
+  id: 'apr-001',
+  type: 'expense',
+  title: 'Conference Travel',
+  description: 'Attend tech conference in San Francisco',
+  requester: 'https://app.example.com/users/alice',
+  approvers: [
+    'https://app.example.com/users/manager',
+    'https://app.example.com/users/finance'
+  ],
+  currentApprover: 'https://app.example.com/users/manager',
+  status: 'pending',
+  amount: 2500,
+  currency: 'USD'
+})
+
+approval.data.status.should.equal('pending')
+approval.data.type.should.equal('expense')
+approval.data.amount.should.equal(2500)
+```
+
+### Approve Request
+
+```ts test
+const approval = await db.Approvals.get('apr-001')
+
+await db.Approvals.update(approval.id, {
+  status: 'approved',
+  decision: {
+    by: approval.data.currentApprover,
+    at: new Date(),
+    approved: true,
+    comment: 'Approved for learning opportunity'
+  },
+  completedAt: new Date()
+})
+
+const approved = await db.Approvals.get(approval.id)
+approved.data.status.should.equal('approved')
+approved.data.decision.approved.should.be.true
+```
+
+### Reject Request
+
+```ts test
+const approval = await db.Approvals.create({
+  $type: 'Approval',
+  id: 'apr-002',
+  type: 'expense',
+  title: 'Office Furniture',
+  requester: 'https://app.example.com/users/bob',
+  approvers: ['https://app.example.com/users/manager'],
+  currentApprover: 'https://app.example.com/users/manager',
+  status: 'pending',
+  amount: 5000
+})
+
+await db.Approvals.update(approval.id, {
+  status: 'rejected',
+  decision: {
+    by: approval.data.currentApprover,
+    at: new Date(),
+    approved: false,
+    comment: 'Budget not available this quarter'
+  },
+  completedAt: new Date()
+})
+
+const rejected = await db.Approvals.get(approval.id)
+rejected.data.status.should.equal('rejected')
+rejected.data.decision.approved.should.be.false
+```
+
+### Multi-Level Approval Chain
+
+```ts test
+const approval = await db.Approvals.create({
+  $type: 'Approval',
+  id: 'apr-003',
+  type: 'purchase',
+  title: 'New Server Hardware',
+  amount: 15000,
+  requester: 'https://app.example.com/users/alice',
+  approvers: [
+    'https://app.example.com/users/manager',
+    'https://app.example.com/users/director',
+    'https://app.example.com/users/cfo'
+  ],
+  currentApprover: 'https://app.example.com/users/manager',
+  status: 'pending'
+})
+
+// Level 1 - Manager approves
+let current = await db.Approvals.get(approval.id)
+await db.Approvals.update(approval.id, {
+  currentApprover: current.data.approvers[1]
+})
+
+// Level 2 - Director approves
+current = await db.Approvals.get(approval.id)
+await db.Approvals.update(approval.id, {
+  currentApprover: current.data.approvers[2]
+})
+
+// Level 3 - CFO approves
+await db.Approvals.update(approval.id, {
+  status: 'approved',
+  currentApprover: null,
+  completedAt: new Date()
+})
+
+const final = await db.Approvals.get(approval.id)
+final.data.status.should.equal('approved')
+```
+
+### Approval Routing by Amount
+
+```ts test
+const routeApproval = (amount) => {
+  if (amount > 10000) {
+    return ['manager', 'director', 'cfo']
+  } else if (amount > 1000) {
+    return ['manager', 'finance']
+  } else {
+    return ['manager']
+  }
+}
+
+routeApproval(500).should.have.lengthOf(1)
+routeApproval(2000).should.have.lengthOf(2)
+routeApproval(15000).should.have.lengthOf(3)
+```
+
+## Notification System
+
+### Create Notification
+
+```ts test
+const notification = await db.Notifications.create({
+  $type: 'Notification',
+  id: 'notif-001',
+  user: 'https://app.example.com/users/alice',
+  type: 'info',
+  title: 'Welcome!',
+  message: 'Welcome to the platform. Get started by creating your first project.',
+  read: false
+})
+
+notification.data.type.should.equal('info')
+notification.data.read.should.be.false
+```
+
+### Action Notification
+
+```ts test
+const notification = await db.Notifications.create({
+  $type: 'Notification',
+  id: 'notif-002',
+  user: 'https://app.example.com/users/bob',
+  type: 'action',
+  title: 'Approval Required',
+  message: 'You have a pending expense approval request.',
+  actionLabel: 'Review Now',
+  actionUrl: 'https://app.example.com/approvals/apr-001'
+})
+
+notification.data.type.should.equal('action')
+notification.data.actionLabel.should.equal('Review Now')
+notification.data.actionUrl.should.exist
+```
+
+### Mark as Read
+
+```ts test
+const notification = await db.Notifications.get('notif-001')
+
+await db.Notifications.update(notification.id, {
+  read: true,
+  readAt: new Date()
+})
+
+const updated = await db.Notifications.get(notification.id)
+updated.data.read.should.be.true
+updated.data.readAt.should.be.a('date')
+```
+
+### Notification Expiry
+
+```ts test
+const expiryDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
+
+const notification = await db.Notifications.create({
+  $type: 'Notification',
+  id: 'notif-expiring',
+  user: 'https://app.example.com/users/alice',
+  type: 'warning',
+  title: 'Limited Time Offer',
+  message: 'This offer expires in 24 hours!',
+  expiresAt: expiryDate
+})
+
+notification.data.expiresAt.should.exist
+
+// Check if expired
+const isExpired = new Date() > notification.data.expiresAt
+isExpired.should.be.false
+```
+
+### Batch Notifications
+
+```ts test
+const users = ['user-1', 'user-2', 'user-3']
+const notifications = []
+
+for (const userId of users) {
+  const notif = await db.Notifications.create({
+    $type: 'Notification',
+    user: `https://app.example.com/users/${userId}`,
+    type: 'info',
+    title: 'System Maintenance',
+    message: 'The system will undergo maintenance on Sunday.'
+  })
+  notifications.push(notif)
+}
+
+notifications.should.have.lengthOf(3)
+```
+
+## Webhook System
+
+### Create Webhook
+
+```ts test
+const webhook = await db.Webhooks.create({
+  $type: 'Webhook',
+  id: 'wh-001',
+  name: 'Order Notifications',
+  url: 'https://partner.example.com/webhooks',
+  events: ['order.created', 'order.paid', 'order.shipped'],
+  secret: 'whsec_test123456',
+  active: true
+})
+
+webhook.data.name.should.equal('Order Notifications')
+webhook.data.active.should.be.true
+webhook.data.events.should.have.lengthOf(3)
+```
+
+### Webhook Event Matching
+
+```ts test
+const webhook = await db.Webhooks.get('wh-001')
+
+const shouldDeliver = (event) => {
+  return webhook.data.active && (
+    webhook.data.events.includes(event) ||
+    webhook.data.events.includes('*')
+  )
+}
+
+shouldDeliver('order.created').should.be.true
+shouldDeliver('order.paid').should.be.true
+shouldDeliver('customer.updated').should.be.false
+```
+
+### Webhook Signature
+
+```ts test
+const webhook = await db.Webhooks.get('wh-001')
+const payload = JSON.stringify({ event: 'order.created', data: { id: 'order-1' } })
+
+// Create signature (simplified)
+const signature = `sha256=${crypto.createHmac('sha256', webhook.data.secret).update(payload).digest('hex')}`
+
+signature.should.startWith('sha256=')
+signature.length.should.be.above(70)
+
+// Verify signature
+const verify = (payload, sig, secret) => {
+  const expected = `sha256=${crypto.createHmac('sha256', secret).update(payload).digest('hex')}`
+  return sig === expected
+}
+
+verify(payload, signature, webhook.data.secret).should.be.true
+verify(payload, 'invalid', webhook.data.secret).should.be.false
+```
+
+### Record Webhook Delivery
+
+```ts test
+const delivery = await db.WebhookDeliveries.create({
+  $type: 'WebhookDelivery',
+  webhook: 'https://api.example.com/webhooks/wh-001',
+  event: 'order.created',
+  payload: { orderId: 'order-123' },
+  status: 'success',
+  statusCode: 200,
+  response: '{"received": true}',
+  deliveredAt: new Date()
+})
+
+delivery.data.status.should.equal('success')
+delivery.data.statusCode.should.equal(200)
+```
+
+### Webhook Retry Logic
+
+```ts test
+const webhook = await db.Webhooks.get('wh-001')
+
+// Simulate failed delivery
+await db.Webhooks.update(webhook.id, {
+  failureCount: webhook.data.failureCount + 1
+})
+
+let updated = await db.Webhooks.get(webhook.id)
+updated.data.failureCount.should.equal(1)
+
+// Check if should retry
+const maxRetries = 5
+const shouldRetry = updated.data.failureCount < maxRetries
+shouldRetry.should.be.true
+
+// Simulate too many failures
+await db.Webhooks.update(webhook.id, { failureCount: 10 })
+
+updated = await db.Webhooks.get(webhook.id)
+const shouldDisable = updated.data.failureCount >= 10
+shouldDisable.should.be.true
+
+// Disable webhook
+if (shouldDisable) {
+  await db.Webhooks.update(webhook.id, { active: false })
+}
+
+updated = await db.Webhooks.get(webhook.id)
+updated.data.active.should.be.false
+```
+
+## Event System
+
+### Record Event
+
+```ts test
+const event = await $.events.record({
+  type: 'user.signup',
+  source: 'auth-service',
+  data: { userId: 'user-123', email: 'new@example.com' }
+})
+
+event.should.have.property('id')
+event.should.have.property('timestamp')
+event.type.should.equal('user.signup')
+```
+
+### Query Events
+
+```ts test
+await $.events.record({ type: 'order.created', source: 'shop', data: { orderId: '1' } })
+await $.events.record({ type: 'order.created', source: 'shop', data: { orderId: '2' } })
+await $.events.record({ type: 'order.paid', source: 'shop', data: { orderId: '1' } })
+
+const orderEvents = await $.events.query({ type: { $startsWith: 'order.' } })
+orderEvents.should.have.lengthOf.at.least(3)
+
+const createdEvents = await $.events.query({ type: 'order.created' })
+createdEvents.should.have.lengthOf.at.least(2)
+```
+
+### Event Correlation
+
+```ts test
+const startEvent = await $.events.record({
+  type: 'workflow.started',
+  source: 'orchestrator',
+  data: { workflowId: 'wf-123' }
+})
+
+await $.events.record({
+  type: 'workflow.step.completed',
+  source: 'orchestrator',
+  data: { step: 1 },
+  correlationId: startEvent.id
+})
+
+await $.events.record({
+  type: 'workflow.step.completed',
+  source: 'orchestrator',
+  data: { step: 2 },
+  correlationId: startEvent.id
+})
+
+const relatedEvents = await $.events.query({
+  correlationId: startEvent.id
+})
+
+relatedEvents.should.have.lengthOf.at.least(2)
+```
+
+## Scheduled Tasks
+
+### Cron-like Scheduling
+
+```ts test
+const scheduledTasks = [
+  { name: 'daily-report', schedule: '0 9 * * *', lastRun: null },
+  { name: 'weekly-cleanup', schedule: '0 0 * * 0', lastRun: null },
+  { name: 'hourly-sync', schedule: '0 * * * *', lastRun: null }
+]
+
+for (const task of scheduledTasks) {
+  await db.ScheduledTasks.create(task.name, {
+    $type: 'ScheduledTask',
+    ...task
+  })
+}
+
+const tasks = await db.ScheduledTasks.find({})
+tasks.should.have.lengthOf(3)
+```
+
+### Run Scheduled Task
+
+```ts test
+const task = await db.ScheduledTasks.get('daily-report')
+
+// Simulate task execution
+await db.ScheduledTasks.update(task.id, {
+  lastRun: new Date(),
+  lastStatus: 'success'
+})
+
+const updated = await db.ScheduledTasks.get(task.id)
+updated.data.lastRun.should.be.a('date')
+updated.data.lastStatus.should.equal('success')
+```
+
+## Queue Processing
+
+### Add to Queue
+
+```ts test
+await $.queue('emails').add({
+  to: 'user@example.com',
+  subject: 'Welcome!',
+  template: 'welcome'
+})
+
+await $.queue('emails').add({
+  to: 'other@example.com',
+  subject: 'Reminder',
+  template: 'reminder'
+})
+
+const stats = await $.queue('emails').stats()
+stats.pending.should.be.at.least(2)
+```
+
+### Process Queue
+
+```ts test
+const processed = []
+
+await $.queue('test-queue').add({ id: 1 })
+await $.queue('test-queue').add({ id: 2 })
+await $.queue('test-queue').add({ id: 3 })
+
+await $.queue('test-queue').process(async (item) => {
+  processed.push(item.id)
+})
+
+processed.should.deep.equal([1, 2, 3])
+```
+
+### Priority Queue
+
+```ts test
+const results = []
+
+await $.queue('priority').add({ name: 'low' }, { priority: 1 })
+await $.queue('priority').add({ name: 'high' }, { priority: 10 })
+await $.queue('priority').add({ name: 'medium' }, { priority: 5 })
+
+await $.queue('priority').process(async (item) => {
+  results.push(item.name)
+})
+
+results[0].should.equal('high')
+results[1].should.equal('medium')
+results[2].should.equal('low')
+```

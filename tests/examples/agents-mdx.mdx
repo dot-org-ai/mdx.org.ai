@@ -1,0 +1,383 @@
+---
+$type: TestSuite
+title: Agents.mdx Package Tests
+description: Tests for @mdxe/agents package - multi-agent configuration
+---
+
+import * as Agents from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+# Agents.mdx Package Tests
+
+Tests validating the @mdxe/agents package for multi-platform agent config.
+
+## Package Structure
+
+### Package Metadata
+
+```ts test
+const pkg = Agents.default // frontmatter
+pkg.$type.should.equal('https://mdx.org.ai/Package')
+pkg.$id.should.equal('https://agents.mdx.org.ai')
+pkg.name.should.equal('agents.mdx')
+```
+
+### Exports
+
+```ts test
+Agents.should.have.property('outputs')
+Agents.should.have.property('rules')
+Agents.should.have.property('detectContext')
+Agents.should.have.property('render')
+Agents.should.have.property('renderClaude')
+Agents.should.have.property('renderCursor')
+Agents.should.have.property('renderCopilot')
+Agents.should.have.property('renderWindsurf')
+Agents.should.have.property('renderAider')
+Agents.should.have.property('combineRules')
+Agents.should.have.property('defineAgent')
+```
+
+## Output Configuration
+
+### Output Targets
+
+```ts test
+import { outputs } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+outputs.should.have.property('claude')
+outputs.should.have.property('cursor')
+outputs.should.have.property('copilot')
+outputs.should.have.property('windsurf')
+outputs.should.have.property('aider')
+```
+
+### Claude Output Config
+
+```ts test
+import { outputs } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+outputs.claude.target.should.equal('.claude/CLAUDE.md')
+outputs.claude.format.should.equal('markdown')
+outputs.claude.features.should.include('memory')
+outputs.claude.features.should.include('tools')
+```
+
+### Cursor Output Config
+
+```ts test
+import { outputs } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+outputs.cursor.target.should.equal('.cursorrules')
+outputs.cursor.format.should.equal('plain')
+outputs.cursor.maxLength.should.equal(10000)
+```
+
+### Copilot Output Config
+
+```ts test
+import { outputs } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+outputs.copilot.target.should.equal('.github/copilot-instructions.md')
+outputs.copilot.format.should.equal('markdown')
+```
+
+## Built-in Rules
+
+### Code Style Rules
+
+```ts test
+import { rules } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+rules.codeStyle.should.be.an('array')
+rules.codeStyle.length.should.be.above(0)
+rules.codeStyle.some(r => r.includes('TypeScript')).should.be.true
+```
+
+### Testing Rules
+
+```ts test
+import { rules } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+rules.testing.should.be.an('array')
+rules.testing.some(r => r.includes('test')).should.be.true
+rules.testing.some(r => r.includes('coverage')).should.be.true
+```
+
+### Git Workflow Rules
+
+```ts test
+import { rules } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+rules.gitWorkflow.should.be.an('array')
+rules.gitWorkflow.some(r => r.includes('conventional commits')).should.be.true
+```
+
+### Security Rules
+
+```ts test
+import { rules } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+rules.security.should.be.an('array')
+rules.security.some(r => r.includes('secret')).should.be.true
+rules.security.some(r => r.includes('input')).should.be.true
+```
+
+### Combine Rules
+
+```ts test
+import { combineRules, rules } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const combined = combineRules('codeStyle', 'testing')
+combined.should.be.an('array')
+combined.length.should.equal(rules.codeStyle.length + rules.testing.length)
+```
+
+### Combine Rules with Custom
+
+```ts test
+import { combineRules } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const combined = combineRules('codeStyle', ['Custom rule 1', 'Custom rule 2'])
+combined.should.include('Custom rule 1')
+combined.should.include('Custom rule 2')
+```
+
+## Rendering
+
+### Render to Claude Format
+
+```ts test
+import { renderClaude } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const agent = {
+  name: 'Test Agent',
+  description: 'A test agent',
+  rules: ['Rule 1', 'Rule 2'],
+  context: { type: 'monorepo', language: 'typescript' },
+  tools: ['read', 'write', 'bash']
+}
+
+const output = renderClaude(agent)
+
+output.should.include('# Test Agent')
+output.should.include('A test agent')
+output.should.include('## Memory')
+output.should.include('- **type**: monorepo')
+output.should.include('## Rules')
+output.should.include('- Rule 1')
+output.should.include('## Tools')
+output.should.include('read, write, bash')
+```
+
+### Render to Cursor Format
+
+```ts test
+import { renderCursor } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const agent = {
+  name: 'Test Agent',
+  description: 'A test agent',
+  rules: ['Use TypeScript', 'Write tests'],
+  context: { type: 'library' }
+}
+
+const output = renderCursor(agent)
+
+output.should.include('A test agent')
+output.should.include('Rules:')
+output.should.include('- Use TypeScript')
+output.should.include('Context:')
+output.should.include('- type: library')
+output.should.not.include('# ') // No markdown headers in cursor
+```
+
+### Render to Copilot Format
+
+```ts test
+import { renderCopilot } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const agent = {
+  name: 'Project Helper',
+  description: 'Helps with project',
+  rules: ['Follow patterns', 'Add tests'],
+  context: { framework: 'next.js' }
+}
+
+const output = renderCopilot(agent)
+
+output.should.include('# Project Helper')
+output.should.include('## Guidelines')
+output.should.include('- Follow patterns')
+output.should.include('## Project Context')
+```
+
+### Render to Aider Format
+
+```ts test
+import { renderAider } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const agent = {
+  name: 'Code Agent',
+  rules: ['Rule 1', 'Rule 2', 'Rule 3'],
+  lintCmd: 'pnpm lint'
+}
+
+const output = renderAider(agent)
+
+output.should.include('auto-commits: false')
+output.should.include('lint-cmd: "pnpm lint"')
+output.should.include('conventions:')
+output.should.include('- "Rule 1"')
+```
+
+### Render with Format Selection
+
+```ts test
+import { render } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const agent = {
+  name: 'Universal Agent',
+  description: 'Works everywhere',
+  rules: ['Be consistent'],
+  context: {}
+}
+
+const claudeOutput = render(agent, 'claude')
+claudeOutput.should.include('# Universal Agent')
+
+const cursorOutput = render(agent, 'cursor')
+cursorOutput.should.not.include('# ')
+```
+
+### Truncate Long Output
+
+```ts test
+import { render, outputs } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const agent = {
+  name: 'Agent',
+  description: 'x'.repeat(15000),
+  rules: [],
+  context: {}
+}
+
+const cursorOutput = render(agent, 'cursor')
+cursorOutput.length.should.be.at.most(outputs.cursor.maxLength)
+cursorOutput.should.include('(truncated)')
+```
+
+## Context Detection
+
+### Detect Context Function
+
+```ts test
+import { detectContext } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+detectContext.should.be.a('function')
+
+// Would return context object when run
+// { type, language, framework, packageManager }
+```
+
+## Define Agent Helper
+
+### Define Agent
+
+```ts test
+import { defineAgent } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const agent = defineAgent({
+  name: 'My Agent',
+  description: 'Does things',
+  rules: ['Rule 1'],
+  context: { type: 'app' }
+})
+
+agent.name.should.equal('My Agent')
+agent.render.should.be.a('function')
+agent.renderAll.should.be.a('function')
+```
+
+### Agent Render Method
+
+```ts test
+import { defineAgent } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const agent = defineAgent({
+  name: 'Test',
+  description: 'Test agent',
+  rules: ['Rule'],
+  context: {}
+})
+
+const claudeOutput = agent.render('claude')
+claudeOutput.should.include('# Test')
+```
+
+### Agent Render All Method
+
+```ts test
+import { defineAgent, outputs } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const agent = defineAgent({
+  name: 'Test',
+  description: 'Test agent',
+  rules: ['Rule'],
+  context: {}
+})
+
+const allOutputs = agent.renderAll()
+
+Object.keys(allOutputs).should.have.lengthOf(Object.keys(outputs).length)
+allOutputs.should.have.property('claude')
+allOutputs.should.have.property('cursor')
+allOutputs.should.have.property('copilot')
+```
+
+## Error Handling
+
+### Unknown Format Error
+
+```ts test
+import { render } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+try {
+  render({ name: 'Test', rules: [] }, 'unknown-format')
+  false.should.be.true // Should not reach here
+} catch (error) {
+  error.message.should.include('Unknown format')
+}
+```
+
+## Integration
+
+### Full Agent Definition and Render
+
+```ts test
+import { defineAgent, combineRules, rules } from '../../examples/agents.mdx.org.ai/agents.mdx'
+
+const projectAgent = defineAgent({
+  name: 'Project Assistant',
+  description: 'Helps with TypeScript monorepo development',
+  rules: combineRules('codeStyle', 'testing', ['Use pnpm for package management']),
+  context: {
+    type: 'monorepo',
+    language: 'typescript',
+    framework: 'next.js',
+    packageManager: 'pnpm'
+  },
+  tools: ['read', 'write', 'bash', 'grep'],
+  lintCmd: 'pnpm lint'
+})
+
+const claudeOutput = projectAgent.render('claude')
+claudeOutput.should.include('Project Assistant')
+claudeOutput.should.include('TypeScript')
+claudeOutput.should.include('monorepo')
+
+const cursorOutput = projectAgent.render('cursor')
+cursorOutput.should.include('pnpm')
+
+const aiderOutput = projectAgent.render('aider')
+aiderOutput.should.include('pnpm lint')
+```

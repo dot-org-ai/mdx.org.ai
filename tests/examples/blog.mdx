@@ -1,0 +1,261 @@
+---
+$type: TestSuite
+title: Blog Examples Tests
+description: Tests for Author, BlogPost, and Tag examples
+---
+
+import Author from '../../examples/[Author].mdx'
+import BlogPost from '../../examples/[BlogPost].mdx'
+import Tag from '../../examples/[Tag].mdx'
+
+# Blog Examples Tests
+
+Tests validating the blog content management examples.
+
+## Author
+
+### Create Author
+
+```ts test
+const author = await db.Authors.create('alice', {
+  $type: 'Author',
+  slug: 'alice',
+  name: 'Alice Smith',
+  email: 'alice@example.com',
+  bio: 'Tech writer and developer',
+  twitter: 'alicesmith',
+  github: 'alicesmith',
+  createdAt: new Date()
+})
+
+author.should.have.property('id', 'alice')
+author.data.name.should.equal('Alice Smith')
+author.data.$type.should.equal('Author')
+```
+
+### Author URL Resolution
+
+```ts test
+const author = await db.Authors.get('alice')
+author.$id.should.equal('https://blog.example.com/authors/alice')
+```
+
+### List Author Posts
+
+```ts test
+await db.BlogPosts.create('post-1', {
+  $type: 'BlogPost',
+  slug: 'post-1',
+  title: 'First Post',
+  author: 'https://blog.example.com/authors/alice',
+  status: 'published',
+  publishedAt: new Date()
+})
+
+await db.BlogPosts.create('post-2', {
+  $type: 'BlogPost',
+  slug: 'post-2',
+  title: 'Second Post',
+  author: 'https://blog.example.com/authors/alice',
+  status: 'published',
+  publishedAt: new Date()
+})
+
+const posts = await db.BlogPosts.find({
+  where: { author: 'https://blog.example.com/authors/alice' }
+})
+
+posts.should.have.lengthOf(2)
+```
+
+## BlogPost
+
+### Create Blog Post
+
+```ts test
+const post = await db.BlogPosts.create({
+  $type: 'BlogPost',
+  slug: 'hello-world',
+  title: 'Hello World',
+  excerpt: 'Welcome to my blog',
+  content: '# Hello\n\nThis is my first post.',
+  author: 'https://blog.example.com/authors/alice',
+  tags: ['https://blog.example.com/tags/intro'],
+  status: 'draft'
+})
+
+post.should.have.property('id')
+post.data.status.should.equal('draft')
+```
+
+### Publish Blog Post
+
+```ts test
+const post = await db.BlogPosts.get('hello-world')
+
+const published = await db.BlogPosts.update(post.id, {
+  status: 'published',
+  publishedAt: new Date()
+})
+
+published.data.status.should.equal('published')
+published.data.publishedAt.should.be.a('date')
+```
+
+### Find Related Posts with AI
+
+```ts test
+const post = await db.BlogPosts.get('hello-world')
+const related = await ai.similar(db.BlogPosts, post.id, { limit: 3 })
+
+related.should.be.an('array')
+related.should.have.lengthOf.at.most(3)
+```
+
+### Post with Comments
+
+```ts test
+const postId = 'hello-world'
+
+await db.Comments.create({
+  $type: 'Comment',
+  post: `https://blog.example.com/posts/${postId}`,
+  author: 'reader@example.com',
+  content: 'Great post!',
+  status: 'approved',
+  createdAt: new Date()
+})
+
+const comments = await db.Comments.find({
+  where: { post: `https://blog.example.com/posts/${postId}` }
+})
+
+comments.should.have.lengthOf(1)
+comments[0].data.content.should.equal('Great post!')
+```
+
+## Tag
+
+### Create Tag
+
+```ts test
+const tag = await db.Tags.create('typescript', {
+  $type: 'Tag',
+  slug: 'typescript',
+  name: 'TypeScript',
+  description: 'Posts about TypeScript',
+  color: '#3178c6'
+})
+
+tag.should.have.property('id', 'typescript')
+tag.data.name.should.equal('TypeScript')
+```
+
+### List Posts by Tag
+
+```ts test
+await db.BlogPosts.create('ts-post', {
+  $type: 'BlogPost',
+  slug: 'ts-post',
+  title: 'TypeScript Tips',
+  tags: ['https://blog.example.com/tags/typescript'],
+  status: 'published'
+})
+
+const posts = await db.BlogPosts.find({
+  where: { tags: { $contains: 'https://blog.example.com/tags/typescript' } }
+})
+
+posts.should.have.lengthOf.at.least(1)
+```
+
+### Tag Cloud
+
+```ts test
+const tags = await db.Tags.find({ limit: 10 })
+
+tags.should.be.an('array')
+tags.forEach(tag => {
+  tag.data.should.have.property('name')
+  tag.data.should.have.property('slug')
+})
+```
+
+## Full Blog Workflow
+
+### Create and Publish Post
+
+```ts test
+// 1. Create author
+const author = await db.Authors.create('bob', {
+  $type: 'Author',
+  slug: 'bob',
+  name: 'Bob Jones',
+  email: 'bob@example.com'
+})
+
+// 2. Create tags
+const tag1 = await db.Tags.create('tutorial', {
+  $type: 'Tag',
+  slug: 'tutorial',
+  name: 'Tutorial'
+})
+
+const tag2 = await db.Tags.create('react', {
+  $type: 'Tag',
+  slug: 'react',
+  name: 'React'
+})
+
+// 3. Create post
+const post = await db.BlogPosts.create({
+  $type: 'BlogPost',
+  slug: 'react-tutorial',
+  title: 'React Tutorial',
+  excerpt: 'Learn React basics',
+  content: '# Getting Started with React',
+  author: author.$id,
+  tags: [tag1.$id, tag2.$id],
+  status: 'draft'
+})
+
+// 4. Publish
+await db.BlogPosts.update(post.id, {
+  status: 'published',
+  publishedAt: new Date()
+})
+
+// 5. Verify relationships
+const published = await db.BlogPosts.get(post.id)
+published.data.author.should.equal(author.$id)
+published.data.tags.should.include(tag1.$id)
+published.data.status.should.equal('published')
+```
+
+### Archive Old Posts
+
+```ts test
+const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+
+await db.BlogPosts.create('old-post', {
+  $type: 'BlogPost',
+  slug: 'old-post',
+  title: 'Old Post',
+  status: 'published',
+  publishedAt: thirtyDaysAgo
+})
+
+const oldPosts = await db.BlogPosts.find({
+  where: {
+    status: 'published',
+    publishedAt: { $lt: thirtyDaysAgo }
+  }
+})
+
+for (const post of oldPosts) {
+  await db.BlogPosts.update(post.id, { status: 'archived' })
+}
+
+const archived = await db.BlogPosts.get('old-post')
+archived.data.status.should.equal('archived')
+```

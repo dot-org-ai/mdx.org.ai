@@ -1,0 +1,317 @@
+---
+$type: TestSuite
+title: Project Management Examples Tests
+description: Tests for Project and Task examples
+---
+
+import Project from '../../examples/[Project].mdx'
+import Task from '../../examples/[Task].mdx'
+
+# Project Management Examples Tests
+
+Tests validating the project management examples.
+
+## Project
+
+### Create Project
+
+```ts test
+const project = await db.Projects.create('website-redesign', {
+  $type: 'Project',
+  slug: 'website-redesign',
+  name: 'Website Redesign',
+  description: 'Complete redesign of company website',
+  owner: 'https://pm.example.com/users/alice',
+  team: ['https://pm.example.com/users/bob', 'https://pm.example.com/users/carol'],
+  status: 'planning',
+  priority: 'high',
+  startDate: new Date(),
+  dueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+})
+
+project.data.name.should.equal('Website Redesign')
+project.data.status.should.equal('planning')
+project.data.priority.should.equal('high')
+```
+
+### Project Status Transitions
+
+```ts test
+const project = await db.Projects.get('website-redesign')
+
+// Planning -> Active
+await db.Projects.update(project.id, { status: 'active' })
+let updated = await db.Projects.get(project.id)
+updated.data.status.should.equal('active')
+
+// Active -> On Hold
+await db.Projects.update(project.id, { status: 'on_hold' })
+updated = await db.Projects.get(project.id)
+updated.data.status.should.equal('on_hold')
+
+// On Hold -> Active
+await db.Projects.update(project.id, { status: 'active' })
+
+// Active -> Completed
+await db.Projects.update(project.id, {
+  status: 'completed',
+  completedAt: new Date()
+})
+updated = await db.Projects.get(project.id)
+updated.data.status.should.equal('completed')
+updated.data.completedAt.should.be.a('date')
+```
+
+### Project Progress Calculation
+
+```ts test
+const project = await db.Projects.get('website-redesign')
+
+// Create tasks
+await db.Tasks.create('task-1', { project: project.$id, status: 'done', title: 'Task 1' })
+await db.Tasks.create('task-2', { project: project.$id, status: 'done', title: 'Task 2' })
+await db.Tasks.create('task-3', { project: project.$id, status: 'in_progress', title: 'Task 3' })
+await db.Tasks.create('task-4', { project: project.$id, status: 'todo', title: 'Task 4' })
+
+const tasks = await db.Tasks.find({ where: { project: project.$id } })
+const completed = tasks.filter(t => t.data.status === 'done').length
+const total = tasks.length
+const progress = (completed / total) * 100
+
+progress.should.equal(50)
+```
+
+### Project Team Management
+
+```ts test
+const project = await db.Projects.get('website-redesign')
+
+// Add team member
+const newMember = 'https://pm.example.com/users/dave'
+await db.Projects.update(project.id, {
+  team: [...project.data.team, newMember]
+})
+
+const updated = await db.Projects.get(project.id)
+updated.data.team.should.include(newMember)
+
+// Remove team member
+const filtered = updated.data.team.filter(m => m !== newMember)
+await db.Projects.update(project.id, { team: filtered })
+
+const afterRemove = await db.Projects.get(project.id)
+afterRemove.data.team.should.not.include(newMember)
+```
+
+## Task
+
+### Create Task
+
+```ts test
+const task = await db.Tasks.create({
+  $type: 'Task',
+  id: 'task-new',
+  title: 'Implement login page',
+  description: 'Create responsive login page with OAuth support',
+  project: 'https://pm.example.com/projects/website-redesign',
+  status: 'todo',
+  priority: 'high',
+  createdBy: 'https://pm.example.com/users/alice'
+})
+
+task.data.title.should.equal('Implement login page')
+task.data.status.should.equal('todo')
+```
+
+### Assign Task
+
+```ts test
+const task = await db.Tasks.get('task-new')
+
+await db.Tasks.update(task.id, {
+  assignee: 'https://pm.example.com/users/bob',
+  status: 'in_progress'
+})
+
+const assigned = await db.Tasks.get(task.id)
+assigned.data.assignee.should.exist
+assigned.data.status.should.equal('in_progress')
+```
+
+### Task with Subtasks
+
+```ts test
+const task = await db.Tasks.get('task-new')
+
+await db.Tasks.update(task.id, {
+  subtasks: [
+    { title: 'Design mockup', done: true },
+    { title: 'HTML structure', done: true },
+    { title: 'CSS styling', done: false },
+    { title: 'JavaScript logic', done: false },
+    { title: 'Testing', done: false }
+  ]
+})
+
+const updated = await db.Tasks.get(task.id)
+updated.data.subtasks.should.have.lengthOf(5)
+
+const completedSubtasks = updated.data.subtasks.filter(s => s.done).length
+completedSubtasks.should.equal(2)
+```
+
+### Task Time Tracking
+
+```ts test
+const task = await db.Tasks.get('task-new')
+
+// Start with no time
+task.data.timeSpent = task.data.timeSpent || 0
+
+// Log 2 hours
+await db.Tasks.update(task.id, {
+  timeSpent: task.data.timeSpent + 2
+})
+
+// Log 1.5 more hours
+let updated = await db.Tasks.get(task.id)
+await db.Tasks.update(task.id, {
+  timeSpent: updated.data.timeSpent + 1.5
+})
+
+updated = await db.Tasks.get(task.id)
+updated.data.timeSpent.should.equal(3.5)
+
+// Compare to estimate
+await db.Tasks.update(task.id, { estimate: 4 })
+updated = await db.Tasks.get(task.id)
+
+const onTrack = updated.data.timeSpent <= updated.data.estimate
+onTrack.should.be.true
+```
+
+### Complete Task
+
+```ts test
+const task = await db.Tasks.get('task-new')
+
+await db.Tasks.update(task.id, {
+  status: 'done',
+  completedAt: new Date()
+})
+
+const completed = await db.Tasks.get(task.id)
+completed.data.status.should.equal('done')
+completed.data.completedAt.should.be.a('date')
+```
+
+### Task Comments
+
+```ts test
+const task = await db.Tasks.get('task-new')
+const comments = task.data.comments || []
+
+const newComment = {
+  author: 'https://pm.example.com/users/alice',
+  content: 'Looking good! Just need to fix the mobile layout.',
+  createdAt: new Date()
+}
+
+await db.Tasks.update(task.id, {
+  comments: [...comments, newComment]
+})
+
+const updated = await db.Tasks.get(task.id)
+updated.data.comments.should.have.lengthOf(1)
+updated.data.comments[0].content.should.contain('mobile layout')
+```
+
+## Task Workflow
+
+### Kanban Board Flow
+
+```ts test
+const project = 'https://pm.example.com/projects/website-redesign'
+
+// Create tasks in different states
+await db.Tasks.create('kb-1', { project, title: 'Todo 1', status: 'todo' })
+await db.Tasks.create('kb-2', { project, title: 'Todo 2', status: 'todo' })
+await db.Tasks.create('kb-3', { project, title: 'In Progress 1', status: 'in_progress' })
+await db.Tasks.create('kb-4', { project, title: 'Review 1', status: 'review' })
+await db.Tasks.create('kb-5', { project, title: 'Done 1', status: 'done' })
+
+// Get tasks by column
+const columns = {
+  todo: await db.Tasks.find({ where: { project, status: 'todo' } }),
+  inProgress: await db.Tasks.find({ where: { project, status: 'in_progress' } }),
+  review: await db.Tasks.find({ where: { project, status: 'review' } }),
+  done: await db.Tasks.find({ where: { project, status: 'done' } })
+}
+
+columns.todo.length.should.be.at.least(2)
+columns.inProgress.length.should.be.at.least(1)
+columns.review.length.should.be.at.least(1)
+columns.done.length.should.be.at.least(1)
+
+// Move task (drag & drop simulation)
+await db.Tasks.update('kb-1', { status: 'in_progress' })
+
+const movedTask = await db.Tasks.get('kb-1')
+movedTask.data.status.should.equal('in_progress')
+```
+
+### Overdue Task Detection
+
+```ts test
+const project = 'https://pm.example.com/projects/website-redesign'
+const pastDue = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+
+await db.Tasks.create('overdue-1', {
+  $type: 'Task',
+  project,
+  title: 'Overdue Task',
+  status: 'todo',
+  dueDate: pastDue
+})
+
+const overdueTasks = await db.Tasks.find({
+  where: {
+    status: { $ne: 'done' },
+    dueDate: { $lt: new Date() }
+  }
+})
+
+overdueTasks.should.have.lengthOf.at.least(1)
+overdueTasks.forEach(task => {
+  task.data.status.should.not.equal('done')
+  task.data.dueDate.should.be.below(new Date())
+})
+```
+
+### Sprint Planning
+
+```ts test
+const project = 'https://pm.example.com/projects/website-redesign'
+const sprintStart = new Date()
+const sprintEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+
+// Create sprint tasks with estimates
+await db.Tasks.create('sprint-1', { project, title: 'Sprint Task 1', estimate: 4, status: 'todo' })
+await db.Tasks.create('sprint-2', { project, title: 'Sprint Task 2', estimate: 8, status: 'todo' })
+await db.Tasks.create('sprint-3', { project, title: 'Sprint Task 3', estimate: 2, status: 'todo' })
+
+const sprintTasks = await db.Tasks.find({
+  where: {
+    project,
+    status: { $in: ['todo', 'in_progress'] }
+  }
+})
+
+const totalEstimate = sprintTasks.reduce((sum, t) => sum + (t.data.estimate || 0), 0)
+totalEstimate.should.equal(14)
+
+// Calculate velocity (assuming 40 hours/sprint capacity)
+const capacity = 40
+const utilizationPercent = (totalEstimate / capacity) * 100
+utilizationPercent.should.be.below(100)
+```
