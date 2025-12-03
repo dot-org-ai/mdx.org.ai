@@ -2,7 +2,11 @@
   "extends": "@mdxld/config/typescript/library.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "paths": {
+      "ai-database": ["../../primitives/packages/ai-database/src/index.ts"]
+    }
   },
   "include": ["src"]
 }

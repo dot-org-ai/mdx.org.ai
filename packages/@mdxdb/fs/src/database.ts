@@ -20,7 +20,16 @@ import type {
   DeleteOptions,
   DeleteResult,
 } from 'mdxdb'
-import type { FsDatabaseConfig } from './types.js'
+import {
+  extract,
+  diff,
+  applyExtract,
+  type ExtractResult,
+  type ExtractDiff,
+  type ExtractOptions,
+  type ComponentExtractor,
+} from '@mdxld/extract'
+import type { FsDatabaseConfig, ExtractUpdateOptions, ExtractUpdateResult } from './types.js'
 
 /**
  * Filesystem-based MDX document database
@@ -343,6 +352,160 @@ export class FsDatabase<TData extends MDXLDData = MDXLDData> implements Database
         id,
         deleted: false,
       }
+    }
+  }
+
+  /**
+   * Extract structured data from rendered markdown using a document's template
+   *
+   * This is the core of bi-directional MDX ↔ Markdown translation.
+   * The document's content serves as the template, and the rendered markdown
+   * is matched against it to extract updated data.
+   *
+   * @example
+   * ```ts
+   * // Document content: "# {data.title}\n\n{data.content}"
+   * const result = await db.extractFromRendered(
+   *   'posts/hello',
+   *   '# Updated Title\n\nNew content here'
+   * )
+   * // result.data = { data: { title: 'Updated Title', content: 'New content here' } }
+   * ```
+   */
+  async extractFromRendered(
+    id: string,
+    renderedMarkdown: string,
+    options: Partial<ExtractOptions> = {}
+  ): Promise<ExtractResult & { original: MDXLDDocument<TData> }> {
+    const doc = await this.get(id)
+    if (!doc) {
+      throw new Error(`Document not found: ${id}`)
+    }
+
+    // Use the document's content as the template
+    const template = doc.content
+
+    // Extract data from the rendered markdown
+    const result = extract({
+      template,
+      rendered: renderedMarkdown,
+      ...options,
+    })
+
+    return {
+      ...result,
+      original: doc,
+    }
+  }
+
+  /**
+   * Update a document from edited markdown
+   *
+   * This performs a full round-trip:
+   * 1. Extract structured data from the edited markdown
+   * 2. Calculate diff between original and extracted data
+   * 3. Apply changes to the document
+   * 4. Save the updated document
+   *
+   * @example
+   * ```ts
+   * const { doc, changes } = await db.updateFromRendered(
+   *   'posts/hello',
+   *   '# Updated Title\n\nNew content here'
+   * )
+   *
+   * if (changes.hasChanges) {
+   *   console.log('Modified fields:', Object.keys(changes.modified))
+   * }
+   * ```
+   */
+  async updateFromRendered(
+    id: string,
+    renderedMarkdown: string,
+    options: ExtractUpdateOptions = {}
+  ): Promise<ExtractUpdateResult<TData>> {
+    const { components, strict, paths, arrayMerge = 'replace' } = options
+
+    // Extract data from rendered markdown
+    const { data: extractedData, original, confidence, unmatched, aiAssisted } = await this.extractFromRendered(
+      id,
+      renderedMarkdown,
+      { components, strict }
+    )
+
+    // Calculate diff
+    const changes = diff(original.data, extractedData)
+
+    // If no changes, return early
+    if (!changes.hasChanges) {
+      return {
+        doc: original,
+        changes,
+        extracted: { data: extractedData, confidence, unmatched, aiAssisted },
+      }
+    }
+
+    // Apply changes to original data
+    const updatedData = applyExtract(original.data, extractedData, { paths, arrayMerge }) as TData
+
+    // Create updated document
+    const updatedDoc: MDXLDDocument<TData> = {
+      ...original,
+      data: updatedData,
+    }
+
+    // Save the updated document
+    await this.set(id, updatedDoc)
+
+    return {
+      doc: updatedDoc,
+      changes,
+      extracted: { data: extractedData, confidence, unmatched, aiAssisted },
+    }
+  }
+
+  /**
+   * Preview changes from edited markdown without saving
+   *
+   * Use this to show the user what would change before applying.
+   *
+   * @example
+   * ```ts
+   * const { changes, extracted } = await db.previewFromRendered(
+   *   'posts/hello',
+   *   editedMarkdown
+   * )
+   *
+   * if (changes.hasChanges) {
+   *   console.log('Would modify:', Object.keys(changes.modified))
+   *   const confirmed = await askUserConfirmation()
+   *   if (confirmed) {
+   *     await db.updateFromRendered('posts/hello', editedMarkdown)
+   *   }
+   * }
+   * ```
+   */
+  async previewFromRendered(
+    id: string,
+    renderedMarkdown: string,
+    options: Partial<ExtractOptions> = {}
+  ): Promise<{
+    original: MDXLDDocument<TData>
+    changes: ExtractDiff
+    extracted: ExtractResult
+  }> {
+    const { data: extractedData, original, confidence, unmatched, aiAssisted } = await this.extractFromRendered(
+      id,
+      renderedMarkdown,
+      options
+    )
+
+    const changes = diff(original.data, extractedData)
+
+    return {
+      original,
+      changes,
+      extracted: { data: extractedData, confidence, unmatched, aiAssisted },
     }
   }
 

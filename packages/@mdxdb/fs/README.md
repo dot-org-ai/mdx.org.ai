@@ -19,6 +19,7 @@ yarn add @mdxdb/fs
 - **Directory Structure** - Hierarchical organization via nested folders
 - **Auto-Discovery** - Recursively finds all MDX files
 - **Soft Delete** - Optional soft delete with `.deleted` extension
+- **Bi-directional Sync** - Update documents from edited markdown (via @mdxld/extract)
 - **Type-Safe** - Full TypeScript support
 
 ## Quick Start
@@ -274,6 +275,138 @@ await db.delete('posts/archived', { soft: true })
 // File renamed to posts/archived.mdx.deleted
 ```
 
+### Bi-directional Extraction (FsDatabase only)
+
+The `FsDatabase` class supports bi-directional MDX ↔ Markdown translation, allowing you to update documents from edited rendered markdown.
+
+#### `extractFromRendered(id, renderedMarkdown, options?)`
+
+Extract structured data from rendered markdown using the document's content as a template.
+
+```typescript
+// Document contains: "# {data.title}\n\n{data.content}"
+const result = await db.extractFromRendered(
+  'posts/hello',
+  '# Updated Title\n\nNew content here'
+)
+
+console.log(result.data)
+// { data: { title: 'Updated Title', content: 'New content here' } }
+
+console.log(result.confidence) // 1.0 (full match)
+console.log(result.original)   // Original document
+```
+
+#### `updateFromRendered(id, renderedMarkdown, options?)`
+
+Update a document by extracting changes from edited markdown and saving.
+
+```typescript
+interface ExtractUpdateOptions {
+  components?: Record<string, ComponentExtractor>  // Custom extractors
+  strict?: boolean                                  // Throw on unmatched slots
+  paths?: string[]                                  // Only update these paths
+  arrayMerge?: 'replace' | 'append' | 'prepend'   // Array merge strategy
+}
+
+interface ExtractUpdateResult<TData> {
+  doc: MDXLDDocument<TData>   // Updated document
+  changes: ExtractDiff         // What changed
+  extracted: ExtractResult     // Raw extraction result
+}
+```
+
+**Example:**
+
+```typescript
+// Original document has: { post: { title: 'Hello', content: 'World' } }
+// Template: "# {post.title}\n\n{post.content}"
+
+const { doc, changes } = await db.updateFromRendered(
+  'posts/hello',
+  '# Hello Updated!\n\nNew content here'
+)
+
+console.log(doc.data.post.title)  // 'Hello Updated!'
+console.log(changes.hasChanges)    // true
+console.log(changes.modified)      // { 'post.title': { from: 'Hello', to: 'Hello Updated!' }, ... }
+
+// Only update specific fields
+const result = await db.updateFromRendered(
+  'posts/hello',
+  '# New Title\n\nNew content',
+  { paths: ['post.title'] }  // Only update title, ignore content changes
+)
+```
+
+#### `previewFromRendered(id, renderedMarkdown, options?)`
+
+Preview changes without saving - useful for confirmation dialogs.
+
+```typescript
+const { original, changes, extracted } = await db.previewFromRendered(
+  'posts/hello',
+  '# Preview Title\n\nPreview content'
+)
+
+if (changes.hasChanges) {
+  console.log('Changes detected:')
+  for (const [path, change] of Object.entries(changes.modified)) {
+    console.log(`  ${path}: "${change.from}" → "${change.to}"`)
+  }
+
+  // Ask user for confirmation
+  if (await confirm('Apply these changes?')) {
+    await db.updateFromRendered('posts/hello', editedMarkdown)
+  }
+}
+```
+
+### Use Cases
+
+#### Headless CMS with WYSIWYG Editing
+
+```typescript
+// 1. Get document and render to HTML for editing
+const doc = await db.get('posts/hello')
+const html = await renderMDXToHTML(doc.content, doc.data)
+
+// 2. User edits in WYSIWYG editor...
+const editedMarkdown = convertHTMLToMarkdown(editedHTML)
+
+// 3. Extract changes and save
+const { doc: updated, changes } = await db.updateFromRendered(
+  'posts/hello',
+  editedMarkdown
+)
+
+console.log(`Updated fields: ${Object.keys(changes.modified).join(', ')}`)
+```
+
+#### AI Content Editing
+
+```typescript
+// 1. Get document and render
+const doc = await db.get('posts/draft')
+const rendered = renderTemplate(doc.content, doc.data)
+
+// 2. AI improves the content
+const improved = await ai.improve(rendered, 'Make it more engaging')
+
+// 3. Preview changes before applying
+const { changes } = await db.previewFromRendered('posts/draft', improved)
+
+console.log('AI made these improvements:')
+for (const [path, change] of Object.entries(changes.modified)) {
+  console.log(`  ${path}:`)
+  console.log(`    Before: ${change.from}`)
+  console.log(`    After: ${change.to}`)
+}
+
+// 4. Apply if approved
+await db.updateFromRendered('posts/draft', improved)
+```
+
 ## File Structure
 
 Documents are stored as MDX files with YAML frontmatter:
@@ -475,6 +608,7 @@ interface FsDatabaseConfig {
 | [@mdxdb/sqlite](https://www.npmjs.com/package/@mdxdb/sqlite) | SQLite backend with vector search |
 | [@mdxdb/api](https://www.npmjs.com/package/@mdxdb/api) | REST API server |
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
+| [@mdxld/extract](https://www.npmjs.com/package/@mdxld/extract) | Bi-directional MDX ↔ Markdown translation |
 
 ## License
 

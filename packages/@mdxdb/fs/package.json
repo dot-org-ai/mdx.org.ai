@@ -36,11 +36,13 @@
   ],
   "license": "MIT",
   "peerDependencies": {
+    "@mdxld/extract": "workspace:*",
     "mdxdb": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
+    "@mdxld/extract": "workspace:*",
     "mdxdb": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",

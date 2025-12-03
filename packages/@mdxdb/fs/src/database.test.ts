@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 import * as os from 'node:os'
-import { createFsDatabase } from './database.js'
+import { createFsDatabase, FsDatabase } from './database.js'
 import type { Database } from 'mdxdb'
 import type { MDXLDDocument } from 'mdxld'
 
@@ -296,6 +296,271 @@ describe('FsDatabase', () => {
 
       const doc = await db.get('with-id')
       expect(doc?.id).toBe('custom-id')
+    })
+  })
+})
+
+describe('FsDatabase Extraction', () => {
+  let testDir: string
+  let db: FsDatabase
+
+  beforeEach(async () => {
+    testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mdxdb-fs-extract-test-'))
+    db = new FsDatabase({ root: testDir })
+  })
+
+  afterEach(async () => {
+    await fs.rm(testDir, { recursive: true, force: true })
+  })
+
+  describe('extractFromRendered', () => {
+    it('should extract data from rendered markdown', async () => {
+      // Create a document with template slots
+      await db.set('blog-post', {
+        type: 'BlogPost',
+        data: { data: { title: 'Hello World', content: 'Original content' } },
+        content: '# {data.title}\n\n{data.content}',
+      })
+
+      // Extract from edited markdown
+      const result = await db.extractFromRendered(
+        'blog-post',
+        '# Updated Title\n\nNew content here'
+      )
+
+      expect(result.data).toEqual({
+        data: {
+          title: 'Updated Title',
+          content: 'New content here'
+        }
+      })
+      expect(result.confidence).toBe(1)
+      expect(result.original.type).toBe('BlogPost')
+    })
+
+    it('should throw for non-existent document', async () => {
+      await expect(
+        db.extractFromRendered('non-existent', '# Test')
+      ).rejects.toThrow('Document not found')
+    })
+
+    it('should handle nested data paths', async () => {
+      await db.set('nested', {
+        data: { user: { profile: { name: 'John', bio: 'Developer' } } },
+        content: '# {user.profile.name}\n\n{user.profile.bio}',
+      })
+
+      const result = await db.extractFromRendered(
+        'nested',
+        '# Jane\n\nDesigner'
+      )
+
+      expect(result.data).toEqual({
+        user: {
+          profile: {
+            name: 'Jane',
+            bio: 'Designer'
+          }
+        }
+      })
+    })
+  })
+
+  describe('updateFromRendered', () => {
+    it('should update document from edited markdown', async () => {
+      await db.set('updateable', {
+        data: { data: { title: 'Original', content: 'Original content' } },
+        content: '# {data.title}\n\n{data.content}',
+      })
+
+      const { doc, changes, extracted } = await db.updateFromRendered(
+        'updateable',
+        '# New Title\n\nNew content'
+      )
+
+      // Document should be updated
+      expect(doc.data.data.title).toBe('New Title')
+      expect(doc.data.data.content).toBe('New content')
+
+      // Changes should be tracked
+      expect(changes.hasChanges).toBe(true)
+      expect(changes.modified).toHaveProperty('data.title')
+      expect(changes.modified).toHaveProperty('data.content')
+
+      // Extracted data should be available
+      expect(extracted.confidence).toBe(1)
+    })
+
+    it('should persist changes to file', async () => {
+      await db.set('persist-test', {
+        data: { info: { name: 'Before' } },
+        content: '# {info.name}',
+      })
+
+      await db.updateFromRendered(
+        'persist-test',
+        '# After'
+      )
+
+      // Re-read from file
+      const doc = await db.get('persist-test')
+      expect(doc?.data.info.name).toBe('After')
+    })
+
+    it('should return original document if no changes', async () => {
+      await db.set('no-change', {
+        data: { title: 'Same' },
+        content: '# {title}',
+      })
+
+      const { doc, changes } = await db.updateFromRendered(
+        'no-change',
+        '# Same'
+      )
+
+      expect(changes.hasChanges).toBe(false)
+      expect(doc.data.title).toBe('Same')
+    })
+
+    it('should only update specified paths', async () => {
+      await db.set('partial-update', {
+        data: { a: 'original-a', b: 'original-b' },
+        content: '# {a}\n\n{b}',
+      })
+
+      const { doc } = await db.updateFromRendered(
+        'partial-update',
+        '# new-a\n\nnew-b',
+        { paths: ['a'] }
+      )
+
+      expect(doc.data.a).toBe('new-a')
+      expect(doc.data.b).toBe('original-b') // unchanged because not in paths
+    })
+
+    it('should pass arrayMerge option to applyExtract', async () => {
+      // Note: Array merge only works when both values are arrays.
+      // When extracting from rendered markdown, arrays are typically
+      // represented as comma-separated strings. This test verifies
+      // that the option is passed through correctly.
+      await db.set('array-test', {
+        data: { tags: 'a, b' },
+        content: '**Tags:** {tags}',
+      })
+
+      const { doc } = await db.updateFromRendered(
+        'array-test',
+        '**Tags:** c, d',
+        { arrayMerge: 'replace' }
+      )
+
+      expect(doc.data.tags).toBe('c, d')
+    })
+  })
+
+  describe('previewFromRendered', () => {
+    it('should preview changes without saving', async () => {
+      await db.set('preview-test', {
+        data: { title: 'Original' },
+        content: '# {title}',
+      })
+
+      const { original, changes, extracted } = await db.previewFromRendered(
+        'preview-test',
+        '# Preview'
+      )
+
+      // Changes should be detected
+      expect(changes.hasChanges).toBe(true)
+      expect(changes.modified.title.from).toBe('Original')
+      expect(changes.modified.title.to).toBe('Preview')
+
+      // Original should be unchanged
+      expect(original.data.title).toBe('Original')
+
+      // Extracted data should be available
+      expect(extracted.data.title).toBe('Preview')
+
+      // File should still have original content
+      const doc = await db.get('preview-test')
+      expect(doc?.data.title).toBe('Original')
+    })
+  })
+
+  describe('real-world use cases', () => {
+    it('should handle blog post round-trip', async () => {
+      // Template-based MDX file
+      await db.set('posts/hello', {
+        type: 'BlogPost',
+        data: {
+          post: {
+            title: 'Hello World',
+            author: 'Jane Doe',
+            date: '2024-01-15',
+            content: 'Welcome to my blog!'
+          }
+        },
+        content: `# {post.title}
+
+*By {post.author} on {post.date}*
+
+{post.content}`,
+      })
+
+      // User edits the rendered markdown
+      const editedMarkdown = `# Hello World - Updated!
+
+*By Jane Doe on 2024-01-15*
+
+Welcome to my blog! I've added more content.`
+
+      const { doc, changes } = await db.updateFromRendered(
+        'posts/hello',
+        editedMarkdown
+      )
+
+      expect(doc.data.post.title).toBe('Hello World - Updated!')
+      expect(doc.data.post.content).toBe("Welcome to my blog! I've added more content.")
+      expect(doc.data.post.author).toBe('Jane Doe') // Unchanged
+      expect(changes.modified).toHaveProperty('post.title')
+      expect(changes.modified).toHaveProperty('post.content')
+    })
+
+    it('should handle schema.org type editing', async () => {
+      await db.set('types/Person', {
+        type: 'SchemaType',
+        data: {
+          type: {
+            label: 'Person',
+            comment: 'A person (alive, dead, undead, or fictional).',
+            subClassOf: 'Thing'
+          }
+        },
+        content: `# {type.label}
+
+## Description
+{type.comment}
+
+## Parent Type
+{type.subClassOf}`,
+      })
+
+      const editedMarkdown = `# Person
+
+## Description
+A human being or individual.
+
+## Parent Type
+Thing`
+
+      const { doc } = await db.updateFromRendered(
+        'types/Person',
+        editedMarkdown
+      )
+
+      expect(doc.data.type.label).toBe('Person')
+      expect(doc.data.type.comment).toBe('A human being or individual.')
+      expect(doc.data.type.subClassOf).toBe('Thing')
     })
   })
 })

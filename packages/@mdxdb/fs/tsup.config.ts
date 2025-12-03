@@ -7,8 +7,10 @@ export default defineConfig({
     types: 'src/types.ts',
   },
   format: ['esm', 'cjs'],
-  dts: true,
+  // DTS temporarily disabled due to ai-database dependency in provider.ts
+  // Enable when ai-database types are available in workspace
+  dts: false,
   clean: true,
   sourcemap: true,
-  external: ['mdxdb', 'mdxld'],
+  external: ['mdxdb', 'mdxld', '@mdxld/extract', 'ai-database'],
 })

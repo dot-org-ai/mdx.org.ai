@@ -16,7 +16,7 @@ export { FsDatabase, createFsDatabase } from './database.js'
 export { FsProvider, createFsProvider } from './provider.js'
 
 // Types
-export type { FsDatabaseConfig } from './types.js'
+export type { FsDatabaseConfig, ExtractUpdateOptions, ExtractUpdateResult } from './types.js'
 
 // Re-export mdxdb types for convenience
 export type {
@@ -33,3 +33,14 @@ export type {
 } from 'mdxdb'
 
 export type { MDXLDDocument, MDXLDData } from 'mdxld'
+
+// Re-export extraction types for convenience
+export type {
+  ExtractResult,
+  ExtractDiff,
+  ExtractOptions,
+  ComponentExtractor,
+} from '@mdxld/extract'
+
+// Re-export extraction functions
+export { extract, diff, applyExtract, validateTemplate, roundTripComponent } from '@mdxld/extract'
