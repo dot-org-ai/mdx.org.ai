@@ -16,6 +16,26 @@
       "types": "./dist/server.d.ts",
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "./jsx": {
+      "types": "./dist/jsx.d.ts",
+      "import": "./dist/jsx.js",
+      "require": "./dist/jsx.cjs"
+    },
+    "./fumadocs": {
+      "types": "./dist/fumadocs.css.d.ts",
+      "import": "./dist/fumadocs.css.js",
+      "require": "./dist/fumadocs.css.cjs"
+    },
+    "./templates": {
+      "types": "./dist/templates.d.ts",
+      "import": "./dist/templates.js",
+      "require": "./dist/templates.cjs"
+    },
+    "./styles": {
+      "types": "./dist/styles.d.ts",
+      "import": "./dist/styles.js",
+      "require": "./dist/styles.cjs"
     }
   },
   "files": [
@@ -42,6 +62,7 @@
   "license": "MIT",
   "dependencies": {
     "@hono/node-server": "^1.13.0",
+    "@mdxui/fumadocs": "workspace:*",
     "mdxld": "workspace:*"
   },
   "peerDependencies": {
