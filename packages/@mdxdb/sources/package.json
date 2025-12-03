@@ -1,0 +1,93 @@
+{
+  "name": "@mdxdb/sources",
+  "version": "0.0.0",
+  "description": "External data source adapters for mdxdb - REST, GraphQL, web scraping, JSON-LD, and CSV with caching",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./rest": {
+      "types": "./dist/rest.d.ts",
+      "import": "./dist/rest.js",
+      "require": "./dist/rest.cjs"
+    },
+    "./graphql": {
+      "types": "./dist/graphql.d.ts",
+      "import": "./dist/graphql.js",
+      "require": "./dist/graphql.cjs"
+    },
+    "./scraper": {
+      "types": "./dist/scraper.d.ts",
+      "import": "./dist/scraper.js",
+      "require": "./dist/scraper.cjs"
+    },
+    "./jsonld": {
+      "types": "./dist/jsonld.d.ts",
+      "import": "./dist/jsonld.js",
+      "require": "./dist/jsonld.cjs"
+    },
+    "./csv": {
+      "types": "./dist/csv.d.ts",
+      "import": "./dist/csv.js",
+      "require": "./dist/csv.cjs"
+    },
+    "./cache": {
+      "types": "./dist/cache.d.ts",
+      "import": "./dist/cache.js",
+      "require": "./dist/cache.cjs"
+    },
+    "./proxy": {
+      "types": "./dist/proxy.d.ts",
+      "import": "./dist/proxy.js",
+      "require": "./dist/proxy.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxdb",
+    "sources",
+    "rest",
+    "graphql",
+    "scraper",
+    "jsonld",
+    "json-ld",
+    "csv",
+    "mdxld",
+    "proxy",
+    "cache",
+    "swr",
+    "api"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "linkedom": "^0.18.0"
+  },
+  "peerDependencies": {
+    "mdxdb": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "mdxdb": "workspace:*",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
