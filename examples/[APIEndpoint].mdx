@@ -1,0 +1,232 @@
+---
+$type: APIEndpoint
+$id: https://api.example.com/endpoints/{path}
+path: string
+method: GET | POST | PUT | PATCH | DELETE
+name: string
+description: string?
+auth: none | api_key | bearer | oauth
+rateLimit: RateLimit?
+input: Schema?
+output: Schema?
+tags: string[]?
+deprecated: boolean?
+version: string = 'v1'
+createdAt: datetime
+updatedAt: datetime
+---
+
+# {method} /{path}
+
+{description}
+
+**Authentication:** {auth}
+
+```ts
+if (deprecated) {
+  return <DeprecationWarning />
+}
+```
+
+## Request
+
+```ts
+if (input) {
+  return <SchemaTable schema={input} />
+}
+```
+
+### Example
+
+```ts
+const exampleRequest = {
+  method: '{method}',
+  url: `https://api.example.com/${version}/${path}`,
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_API_KEY'
+  },
+  body: generateExample(input)
+}
+```
+
+<CodeBlock language="bash">
+{`curl -X ${method} \\
+  https://api.example.com/${version}/${path} \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '${JSON.stringify(generateExample(input), null, 2)}'`}
+</CodeBlock>
+
+## Response
+
+```ts
+if (output) {
+  return <SchemaTable schema={output} />
+}
+```
+
+### Success (200)
+
+<CodeBlock language="json">
+{JSON.stringify(generateExample(output), null, 2)}
+</CodeBlock>
+
+### Errors
+
+| Status | Description |
+|--------|-------------|
+| 400 | Bad Request - Invalid input |
+| 401 | Unauthorized - Missing or invalid API key |
+| 403 | Forbidden - Insufficient permissions |
+| 404 | Not Found - Resource doesn't exist |
+| 429 | Too Many Requests - Rate limit exceeded |
+| 500 | Internal Server Error |
+
+## Implementation
+
+```ts
+app.{method.toLowerCase()}('/{version}/{path}', async (c) => {
+  // Auth check
+  if (auth !== 'none') {
+    const authorized = await authenticate(c, auth)
+    if (!authorized) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+  }
+
+  // Rate limiting
+  if (rateLimit) {
+    const key = `ratelimit:${path}:${c.get('userId') || c.req.header('X-Forwarded-For')}`
+    const current = await api.redis.incr(key)
+
+    if (current === 1) {
+      await api.redis.expire(key, rateLimit.window)
+    }
+
+    if (current > rateLimit.limit) {
+      c.header('X-RateLimit-Limit', rateLimit.limit.toString())
+      c.header('X-RateLimit-Remaining', '0')
+      c.header('Retry-After', rateLimit.window.toString())
+      return c.json({ error: 'Rate limit exceeded' }, 429)
+    }
+
+    c.header('X-RateLimit-Limit', rateLimit.limit.toString())
+    c.header('X-RateLimit-Remaining', (rateLimit.limit - current).toString())
+  }
+
+  // Input validation
+  if (input) {
+    const body = await c.req.json()
+    const validation = validate(body, input)
+    if (!validation.valid) {
+      return c.json({ error: 'Validation failed', details: validation.errors }, 400)
+    }
+  }
+
+  // Handler implementation
+  try {
+    const result = await handler(c)
+    track('api.request', {
+      path,
+      method,
+      status: 200,
+      userId: c.get('userId')
+    })
+    return c.json(result)
+  } catch (error) {
+    track('api.error', {
+      path,
+      method,
+      error: error.message
+    })
+    return c.json({ error: error.message }, 500)
+  }
+})
+```
+
+## Rate Limits
+
+```ts
+if (rateLimit) {
+  return (
+    <RateLimitInfo
+      limit={rateLimit.limit}
+      window={rateLimit.window}
+      tier={rateLimit.tier}
+    />
+  )
+}
+```
+
+## SDK Examples
+
+### JavaScript
+
+```ts
+const response = await client.{path.replace(/\//g, '.')}({
+  // params
+})
+```
+
+### Python
+
+```python
+response = client.{path.replace(/\//g, '_')}(
+    # params
+)
+```
+
+### cURL
+
+```bash
+curl -X {method} https://api.example.com/{version}/{path}
+```
+
+## Try It
+
+```tsx
+const APIPlayground = () => {
+  'use client'
+  const [params, setParams] = useState({})
+  const [response, setResponse] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const execute = async () => {
+    setLoading(true)
+    const res = await fetch(`/api/${version}/${path}`, {
+      method: '{method}',
+      headers: { 'Content-Type': 'application/json' },
+      body: method !== 'GET' ? JSON.stringify(params) : undefined
+    })
+    setResponse({
+      status: res.status,
+      body: await res.json()
+    })
+    setLoading(false)
+  }
+
+  return (
+    <div>
+      <ParamEditor schema={input} value={params} onChange={setParams} />
+      <button onClick={execute} disabled={loading}>
+        {loading ? 'Executing...' : 'Execute'}
+      </button>
+      {response && <ResponseViewer response={response} />}
+    </div>
+  )
+}
+```
+
+<APIPlayground />
+
+## Changelog
+
+```ts
+const changes = await db.APIChanges.find({
+  where: { endpoint: $id },
+  orderBy: { date: 'desc' }
+})
+```
+
+<ChangelogList changes={changes} />

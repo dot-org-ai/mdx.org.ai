@@ -1,0 +1,139 @@
+---
+$type: RestSource
+$id: https://api.example.com/v1
+baseUrl: https://api.example.com/v1
+auth:
+  type: bearer
+  token: ${env.API_TOKEN}
+headers:
+  Accept: application/json
+  X-API-Version: '2024-01'
+cache:
+  ttl: 300
+  staleWhileRevalidate: 60
+  tags:
+    - api
+    - example
+rateLimit:
+  limit: 100
+  window: 60
+  strategy: wait
+retry:
+  maxRetries: 3
+  baseDelay: 1000
+  maxDelay: 10000
+  retryOn:
+    - 429
+    - 500
+    - 502
+    - 503
+endpoints:
+  listUsers:
+    method: GET
+    path: /users
+    query:
+      page:
+        type: number
+        default: 1
+      limit:
+        type: number
+        default: 20
+    cache:
+      ttl: 60
+  getUser:
+    method: GET
+    path: /users/:id
+    cache:
+      ttl: 300
+  createUser:
+    method: POST
+    path: /users
+    body:
+      name: string
+      email: string
+  updateUser:
+    method: PATCH
+    path: /users/:id
+  deleteUser:
+    method: DELETE
+    path: /users/:id
+transform:
+  id: (data) => data.id
+  type: () => 'User'
+---
+
+# REST API Source
+
+This source connects to a REST API with authentication, caching, and rate limiting.
+
+## Usage
+
+```ts
+import { sources } from '@mdxdb/sources'
+
+const api = sources.get('https://api.example.com/v1')
+
+// List users with pagination
+const users = await api.get('/users', { page: '1', limit: '10' })
+
+// Get specific user
+const user = await api.get('/users/123')
+
+// Create user
+const newUser = await api.post('/users', {
+  name: 'John Doe',
+  email: 'john@example.com'
+})
+
+// Use named endpoint
+const { data } = await api.endpoint('listUsers', {}, { page: '2' })
+```
+
+## Caching
+
+Responses are cached for 5 minutes (300s) with a 1-minute stale-while-revalidate window.
+
+```ts
+// First call - fetches from API
+const data1 = await api.get('/users/123')
+// data1.cached = false
+
+// Second call within 5 min - returns cached
+const data2 = await api.get('/users/123')
+// data2.cached = true, data2.stale = false
+
+// Call after 5 min but within 6 min - returns stale, revalidates in background
+const data3 = await api.get('/users/123')
+// data3.cached = true, data3.stale = true
+
+// Invalidate cache
+await api.invalidateCache(undefined, ['api', 'example'])
+```
+
+## Rate Limiting
+
+The source enforces a rate limit of 100 requests per 60 seconds.
+When the limit is reached, requests wait until tokens are available.
+
+## Error Handling
+
+```ts
+try {
+  const data = await api.get('/protected')
+} catch (error) {
+  if (error.message.includes('401')) {
+    // Handle authentication error
+  } else if (error.message.includes('429')) {
+    // Rate limited - retries exhausted
+  }
+}
+```
+
+## Transform
+
+All responses are transformed to include `id` and `type` fields:
+
+```ts
+const user = await api.get('/users/123')
+// user = { id: '123', $type: 'User', name: 'John', ... }
+```

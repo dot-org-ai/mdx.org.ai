@@ -1,0 +1,205 @@
+---
+$type: Webhook
+$id: https://api.example.com/webhooks/{id}
+id: string
+name: string
+url: url
+events: string[]
+secret: string
+active: boolean = true
+organization: Organization?
+headers: object?
+retryPolicy: RetryPolicy?
+lastTriggeredAt: datetime?
+failureCount: number = 0
+createdAt: datetime
+updatedAt: datetime
+---
+
+# {name}
+
+<WebhookStatusBadge active={active} failureCount={failureCount} />
+
+## Configuration
+
+**Endpoint:** `{url}`
+**Events:** {events.join(', ')}
+
+### Secret
+
+```ts
+// Use this secret to verify webhook signatures
+const verifySignature = (payload, signature) => {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex')
+  return `sha256=${expected}` === signature
+}
+```
+
+### Headers
+
+```ts
+if (headers) {
+  return <HeadersTable headers={headers} />
+}
+```
+
+## Delivery
+
+```ts
+const deliver = async (event, payload) => {
+  if (!active) return { skipped: true }
+  if (!events.includes(event) && !events.includes('*')) return { skipped: true }
+
+  const body = JSON.stringify({
+    id: crypto.randomUUID(),
+    type: event,
+    timestamp: new Date().toISOString(),
+    data: payload
+  })
+
+  const signature = crypto
+    .createHmac('sha256', secret)
+    .update(body)
+    .digest('hex')
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Webhook-Signature': `sha256=${signature}`,
+      'X-Webhook-Event': event,
+      ...headers
+    },
+    body
+  })
+
+  const delivery = await db.WebhookDeliveries.create({
+    $type: 'WebhookDelivery',
+    webhook: $id,
+    event,
+    payload,
+    status: response.ok ? 'success' : 'failed',
+    statusCode: response.status,
+    response: await response.text(),
+    deliveredAt: new Date()
+  })
+
+  if (response.ok) {
+    await db.Webhooks.update($id, {
+      lastTriggeredAt: new Date(),
+      failureCount: 0
+    })
+  } else {
+    await db.Webhooks.update($id, {
+      failureCount: failureCount + 1
+    })
+
+    // Retry with backoff
+    if (retryPolicy && failureCount < retryPolicy.maxRetries) {
+      const delay = retryPolicy.baseDelay * Math.pow(2, failureCount)
+      await $.queue('webhook-retry').add(
+        { deliveryId: delivery.id },
+        { delay }
+      )
+    }
+
+    // Disable after too many failures
+    if (failureCount >= 10) {
+      await db.Webhooks.update($id, { active: false })
+      await send('webhook.disabled', { webhook: $id, reason: 'too_many_failures' })
+    }
+  }
+
+  return delivery
+}
+```
+
+## Event Handlers
+
+```ts
+// Register webhook for events
+on('*', async (event, payload) => {
+  const webhooks = await db.Webhooks.find({
+    where: {
+      active: true,
+      $or: [
+        { events: { $contains: event } },
+        { events: { $contains: '*' } }
+      ]
+    }
+  })
+
+  for (const webhook of webhooks) {
+    await $.queue('webhooks').add({
+      webhookId: webhook.id,
+      event,
+      payload
+    })
+  }
+})
+
+// Process webhook queue
+$.queue('webhooks').process(async ({ webhookId, event, payload }) => {
+  const webhook = await db.Webhooks.get(webhookId)
+  if (webhook) {
+    await webhook.deliver(event, payload)
+  }
+})
+```
+
+## Recent Deliveries
+
+```ts
+const deliveries = await db.WebhookDeliveries.find({
+  where: { webhook: $id },
+  orderBy: { deliveredAt: 'desc' },
+  limit: 20
+})
+```
+
+<DeliveryList deliveries={deliveries} />
+
+## Test
+
+```tsx
+const WebhookTester = () => {
+  'use client'
+  const [event, setEvent] = useState('test.event')
+  const [payload, setPayload] = useState('{"test": true}')
+  const [result, setResult] = useState(null)
+
+  const test = async () => {
+    const delivery = await deliver(event, JSON.parse(payload))
+    setResult(delivery)
+  }
+
+  return (
+    <div>
+      <input value={event} onChange={e => setEvent(e.target.value)} />
+      <textarea value={payload} onChange={e => setPayload(e.target.value)} />
+      <button onClick={test}>Send Test</button>
+      {result && <DeliveryResult delivery={result} />}
+    </div>
+  )
+}
+```
+
+<WebhookTester />
+
+## Actions
+
+```tsx
+const toggleActive = async () => {
+  await db.Webhooks.update($id, { active: !active })
+  track('webhook.toggled', { webhook: id, active: !active })
+}
+
+const regenerateSecret = async () => {
+  const newSecret = crypto.randomBytes(32).toString('hex')
+  await db.Webhooks.update($id, { secret: newSecret })
+  track('webhook.secret.regenerated', { webhook: id })
+}
+```

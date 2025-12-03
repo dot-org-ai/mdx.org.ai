@@ -1,0 +1,239 @@
+---
+$type: GraphQLSource
+$id: https://api.github.com/graphql
+baseUrl: https://api.github.com
+endpoint: /graphql
+auth:
+  type: bearer
+  token: ${env.GITHUB_TOKEN}
+headers:
+  Accept: application/vnd.github.v4+json
+cache:
+  ttl: 120
+  staleWhileRevalidate: 30
+queries:
+  getRepository:
+    query: |
+      query GetRepository($owner: String!, $name: String!) {
+        repository(owner: $owner, name: $name) {
+          id
+          name
+          description
+          stargazerCount
+          forkCount
+          issues(states: OPEN) {
+            totalCount
+          }
+          pullRequests(states: OPEN) {
+            totalCount
+          }
+        }
+      }
+    variables:
+      owner:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+    cache:
+      ttl: 300
+  searchRepositories:
+    query: |
+      query SearchRepositories($query: String!, $first: Int) {
+        search(query: $query, type: REPOSITORY, first: $first) {
+          repositoryCount
+          nodes {
+            ... on Repository {
+              id
+              nameWithOwner
+              description
+              stargazerCount
+            }
+          }
+        }
+      }
+    variables:
+      query:
+        type: string
+        required: true
+      first:
+        type: number
+        default: 10
+  getViewer:
+    query: |
+      query GetViewer {
+        viewer {
+          login
+          name
+          email
+          avatarUrl
+          repositories(first: 10, orderBy: {field: STARGAZERS, direction: DESC}) {
+            nodes {
+              name
+              stargazerCount
+            }
+          }
+        }
+      }
+    cache:
+      ttl: 600
+mutations:
+  createIssue:
+    query: |
+      mutation CreateIssue($repositoryId: ID!, $title: String!, $body: String) {
+        createIssue(input: {repositoryId: $repositoryId, title: $title, body: $body}) {
+          issue {
+            id
+            number
+            title
+            url
+          }
+        }
+      }
+    variables:
+      repositoryId:
+        type: string
+        required: true
+      title:
+        type: string
+        required: true
+      body:
+        type: string
+subscriptionUrl: wss://api.github.com/graphql
+---
+
+# GraphQL API Source
+
+This source connects to GitHub's GraphQL API with predefined queries and mutations.
+
+## Usage
+
+```ts
+import { sources } from '@mdxdb/sources'
+import { gql } from '@mdxdb/sources/graphql'
+
+const github = sources.get('https://api.github.com/graphql')
+
+// Use named query
+const repo = await github.namedQuery('getRepository', {
+  owner: 'anthropics',
+  name: 'claude-code'
+})
+
+// Search repositories
+const results = await github.namedQuery('searchRepositories', {
+  query: 'mdx stars:>100',
+  first: 20
+})
+
+// Get current user
+const viewer = await github.namedQuery('getViewer')
+
+// Execute raw query
+const data = await github.query(gql`
+  query {
+    viewer {
+      login
+    }
+  }
+`)
+```
+
+## Mutations
+
+```ts
+// Create an issue
+const issue = await github.namedMutation('createIssue', {
+  repositoryId: 'R_xxx',
+  title: 'Bug report',
+  body: 'Description of the bug'
+})
+```
+
+## Subscriptions
+
+```ts
+// Subscribe to events (requires websocket support)
+const unsubscribe = github.subscribe(
+  gql`
+    subscription OnIssueComment($repoId: ID!) {
+      issueCommentEvent(repositoryId: $repoId) {
+        action
+        comment {
+          body
+          author {
+            login
+          }
+        }
+      }
+    }
+  `,
+  { repoId: 'R_xxx' },
+  (data) => console.log('New comment:', data),
+  (error) => console.error('Subscription error:', error)
+)
+
+// Later: unsubscribe()
+```
+
+## Caching
+
+GraphQL queries are cached based on operation name and variables:
+
+```ts
+// Cached for 5 minutes
+const repo1 = await github.namedQuery('getRepository', {
+  owner: 'anthropics',
+  name: 'claude-code'
+})
+
+// Returns cached result
+const repo2 = await github.namedQuery('getRepository', {
+  owner: 'anthropics',
+  name: 'claude-code'
+})
+
+// Different variables = different cache key
+const repo3 = await github.namedQuery('getRepository', {
+  owner: 'facebook',
+  name: 'react'
+})
+```
+
+## Error Handling
+
+```ts
+import { GraphQLExecutionError } from '@mdxdb/sources'
+
+try {
+  const data = await github.query(invalidQuery)
+} catch (error) {
+  if (error instanceof GraphQLExecutionError) {
+    console.log('GraphQL errors:', error.errors)
+    // [{ message: 'Field "foo" not found', ... }]
+  }
+}
+```
+
+## Transform
+
+Apply transforms to query results:
+
+```ts
+const source = createGraphQLSource({
+  // ...
+  queries: {
+    getRepo: {
+      query: '...',
+      transform: {
+        response: (data) => ({
+          ...data.repository,
+          $type: 'Repository',
+          $id: `https://github.com/${data.repository.nameWithOwner}`
+        })
+      }
+    }
+  }
+})
+```

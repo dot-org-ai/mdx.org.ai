@@ -1,0 +1,266 @@
+---
+$type: ScraperSource
+$id: https://news.ycombinator.com
+baseUrl: https://news.ycombinator.com
+engine: fetch
+userAgent: Mozilla/5.0 (compatible; MDXBot/1.0)
+cache:
+  ttl: 300
+  staleWhileRevalidate: 60
+selectors:
+  title:
+    selector: .titleline > a
+    multiple: true
+  link:
+    selector: .titleline > a
+    attribute: href
+    multiple: true
+  score:
+    selector: .score
+    multiple: true
+    transform: parseInt
+  author:
+    selector: .hnuser
+    multiple: true
+  age:
+    selector: .age
+    attribute: title
+    multiple: true
+  comments:
+    selector: .subline > a:last-child
+    multiple: true
+    transform: parseInt
+  story:
+    selector: .athing
+    multiple: true
+    children:
+      id:
+        selector: ''
+        attribute: id
+      title:
+        selector: .titleline > a
+      link:
+        selector: .titleline > a
+        attribute: href
+      domain:
+        selector: .sitestr
+pages:
+  frontpage:
+    path: /
+    selectors:
+      - story
+    cache:
+      ttl: 60
+  newest:
+    path: /newest
+    selectors:
+      - story
+  item:
+    path: /item
+    selectors:
+      - title
+      - author
+      - score
+      - comments
+---
+
+# Web Scraper Source
+
+This source scrapes Hacker News using CSS selectors.
+
+## Usage
+
+```ts
+import { sources } from '@mdxdb/sources'
+
+const hn = sources.get('https://news.ycombinator.com')
+
+// Scrape front page
+const frontpage = await hn.page('frontpage')
+// frontpage.story = [{ id, title, link, domain }, ...]
+
+// Scrape newest
+const newest = await hn.page('newest')
+
+// Scrape specific item
+const item = await hn.request({
+  method: 'GET',
+  path: '/item',
+  query: { id: '12345' }
+})
+```
+
+## Selectors
+
+### Simple Text Selector
+
+```yaml
+title:
+  selector: .titleline > a
+```
+
+Extracts text content from matching element.
+
+### Attribute Selector
+
+```yaml
+link:
+  selector: .titleline > a
+  attribute: href
+```
+
+Extracts specific attribute value.
+
+### Multiple Elements
+
+```yaml
+titles:
+  selector: .titleline > a
+  multiple: true
+```
+
+Returns array of all matching elements.
+
+### Nested Selectors
+
+```yaml
+story:
+  selector: .athing
+  multiple: true
+  children:
+    id:
+      selector: ''
+      attribute: id
+    title:
+      selector: .titleline > a
+```
+
+Extracts structured data from parent element.
+
+### With Transform
+
+```yaml
+score:
+  selector: .score
+  transform: parseInt
+```
+
+Apply transform to extracted value.
+
+## Engines
+
+### fetch (default)
+
+Uses native fetch + linkedom for parsing. Works everywhere.
+
+```ts
+const source = createScraperSource({
+  engine: 'fetch',
+  // ...
+})
+```
+
+### htmlrewriter (Cloudflare Workers)
+
+Uses Cloudflare's HTMLRewriter for streaming parsing.
+
+```ts
+const source = createScraperSource({
+  engine: 'htmlrewriter',
+  // ...
+})
+```
+
+### playwright (JS-rendered pages)
+
+Uses Playwright for pages that require JavaScript.
+
+```ts
+const source = createScraperSource({
+  engine: 'playwright',
+  javascript: {
+    enabled: true,
+    waitUntil: 'networkidle',
+    timeout: 30000
+  },
+  // ...
+})
+
+// Don't forget to close the browser
+await source.close()
+```
+
+## Selector Helpers
+
+```ts
+import { select, transforms } from '@mdxdb/sources'
+
+const source = createScraperSource({
+  selectors: {
+    // Text content
+    title: select.text('.title'),
+
+    // Attribute
+    link: select.href('.title a'),
+    image: select.src('.thumbnail img'),
+
+    // Multiple
+    tags: select.all('.tag'),
+
+    // Nested
+    article: select.nested('.article', {
+      title: select.text('h1'),
+      body: select.text('.content'),
+      author: select.text('.byline'),
+    }),
+
+    // With transform
+    price: select.transform('.price', transforms.number),
+    date: select.transform('.date', transforms.date),
+    isNew: select.transform('.badge', transforms.boolean),
+  }
+})
+```
+
+## Transform Utilities
+
+```ts
+import { transforms } from '@mdxdb/sources'
+
+// Parse numbers
+transforms.number('$1,234.56') // 1234.56
+transforms.int('42 items') // 42
+
+// Parse dates
+transforms.date('2024-01-15') // Date object
+
+// Parse booleans
+transforms.boolean('true') // true
+transforms.boolean('yes') // true
+
+// Make URLs absolute
+const absolute = transforms.absoluteUrl('https://example.com')
+absolute('/path/to/page') // 'https://example.com/path/to/page'
+
+// Parse JSON from script tags
+transforms.json('{"foo": "bar"}') // { foo: 'bar' }
+```
+
+## Proxy Support
+
+```ts
+const source = createScraperSource({
+  proxy: {
+    url: 'http://proxy.example.com:8080',
+    auth: { username: 'user', password: 'pass' }
+  },
+  // or for Cloudflare Workers
+  proxy: {
+    cloudflare: {
+      hostname: 'proxy.example.com',
+      port: 8080,
+      tls: true
+    }
+  }
+})
+```
