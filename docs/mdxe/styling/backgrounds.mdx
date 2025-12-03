@@ -1,0 +1,44 @@
+---
+$type: Docs
+title: "Backgrounds"
+description: Background effects for BuilderCSS
+---
+
+# Background Effects
+
+Add visual background effects via the `bg` query parameter.
+
+## Available Effects
+
+| Effect | Description |
+|--------|-------------|
+| `gradient` | Radial gradient overlay |
+| `grid` | CSS grid pattern |
+| `dots` | Polka dot pattern |
+| `waves` | Soft wave gradients |
+| `stars` | Star field effect |
+
+## Usage
+
+```html
+<link rel="stylesheet" href="/styles/landing.css?bg=gradient&color=purple">
+```
+
+Or in frontmatter:
+
+```yaml
+---
+$type: LandingPage
+$style:
+  background: gradient
+  color: purple
+---
+```
+
+## Full Documentation
+
+See the [BuilderCSS backgrounds documentation](/packages/buildercss/docs/backgrounds.md) for:
+- CSS implementation details
+- Color integration
+- Best use cases for each effect
+- Creating custom backgrounds

@@ -1,0 +1,61 @@
+---
+$type: Docs
+title: "Content Formats"
+description: Extension-based content negotiation
+---
+
+# Content Formats
+
+The @mdxe/hono runtime supports multiple output formats via file extensions.
+
+## Supported Formats
+
+| Extension | Content-Type | Description |
+|-----------|--------------|-------------|
+| `.html` | `text/html` | Rendered HTML |
+| `.json` | `application/json` | MDXLD document |
+| `.md` | `text/markdown` | Original MDX source |
+| `.txt` | `text/plain` | Plain text content |
+| `.xml` | `application/xml` | XML representation |
+
+## Usage
+
+Append extension to any URL:
+
+```bash
+curl https://example.com/docs/getting-started.json
+curl https://example.com/docs/getting-started.md
+```
+
+## Accept Header
+
+Alternatively use Accept headers:
+
+```bash
+curl -H "Accept: application/json" https://example.com/docs/getting-started
+```
+
+## JSON Response
+
+```json
+{
+  "id": "https://example.com/docs/getting-started",
+  "type": "Docs",
+  "data": {
+    "title": "Getting Started",
+    "description": "Learn how to use the library"
+  },
+  "content": "# Getting Started..."
+}
+```
+
+## Programmatic Usage
+
+```typescript
+import { formatResponse } from '@mdxe/hono/format'
+
+app.get('/docs/:slug', (c) => {
+  const doc = loadDocument(c.req.param('slug'))
+  return formatResponse(c, doc)
+})
+```

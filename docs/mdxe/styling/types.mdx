@@ -1,0 +1,41 @@
+---
+$type: Docs
+title: "Document Types"
+description: Available document types for BuilderCSS templates
+---
+
+# Document Types
+
+BuilderCSS provides semantic HTML templates for MDXLD document types.
+
+## Available Types
+
+| Type | URL | Description |
+|------|-----|-------------|
+| `Website` | `/styles/website.css` | General content pages |
+| `LandingPage` | `/styles/landing.css` | Marketing pages |
+| `Blog` | `/styles/blog.css` | Blog listing |
+| `BlogPost` | `/styles/blogpost.css` | Individual posts |
+| `Docs` | `/styles/docs.css` | Documentation |
+| `Collection` | `/styles/collection.css` | Card grids |
+| `Directory` | `/styles/directory.css` | File listings |
+| `Slides` | `/styles/slides.css` | Presentations |
+
+## Usage
+
+Set `$type` in MDX frontmatter:
+
+```yaml
+---
+$type: LandingPage
+title: My Product
+---
+```
+
+## Full Documentation
+
+See the [BuilderCSS types documentation](/packages/buildercss/docs/types.md) for:
+- Complete HTML structures for each type
+- All frontmatter properties
+- CSS class references
+- Layout features

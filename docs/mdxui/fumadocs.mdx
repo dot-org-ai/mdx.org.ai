@@ -1,22 +1,22 @@
 ---
-title: "@mdxe/fumadocs"
+title: "@mdxui/fumadocs"
 description: Fumadocs React components for mdxe
 ---
 
-# @mdxe/fumadocs
+# @mdxui/fumadocs
 
 React components and utilities for building Fumadocs-powered documentation with mdxe.
 
 ## Installation
 
 ```bash
-npm install @mdxe/fumadocs
+npm install @mdxui/fumadocs
 ```
 
 ## Usage
 
 ```typescript
-import { DocsLayout, DocsPage } from '@mdxe/fumadocs'
+import { DocsLayout, DocsPage } from '@mdxui/fumadocs'
 import { source } from '@/lib/source'
 
 export default function Layout({ children }) {
@@ -35,7 +35,7 @@ export default function Layout({ children }) {
 Main layout component for documentation sites.
 
 ```typescript
-import { DocsLayout } from '@mdxe/fumadocs'
+import { DocsLayout } from '@mdxui/fumadocs'
 
 <DocsLayout
   tree={pageTree}
@@ -58,7 +58,7 @@ import { DocsLayout } from '@mdxe/fumadocs'
 Page wrapper with TOC and navigation.
 
 ```typescript
-import { DocsPage, DocsBody, DocsTitle } from '@mdxe/fumadocs'
+import { DocsPage, DocsBody, DocsTitle } from '@mdxui/fumadocs'
 
 export default function Page({ page }) {
   return (
@@ -93,7 +93,7 @@ import {
   Accordion,
   TypeTable,
   ImageZoom,
-} from '@mdxe/fumadocs'
+} from '@mdxui/fumadocs'
 
 const components = {
   Callout,
@@ -171,7 +171,7 @@ const components = {
     ### Install dependencies
 
     ```bash
-    npm install @mdxe/fumadocs
+    npm install @mdxui/fumadocs
     ```
   </Step>
   <Step>
@@ -214,7 +214,7 @@ export const source = createSource(db, { baseUrl: '/docs' })
 
 ```typescript
 // app/docs/layout.tsx
-import { DocsLayout } from '@mdxe/fumadocs'
+import { DocsLayout } from '@mdxui/fumadocs'
 import { source } from '@/lib/source'
 
 export default function Layout({ children }) {
@@ -228,7 +228,7 @@ export default function Layout({ children }) {
 
 ```typescript
 // app/docs/[[...slug]]/page.tsx
-import { DocsPage, DocsBody } from '@mdxe/fumadocs'
+import { DocsPage, DocsBody } from '@mdxui/fumadocs'
 import { source } from '@/lib/source'
 import { notFound } from 'next/navigation'
 
@@ -253,7 +253,7 @@ export default function Page({ params }) {
 ### Theme
 
 ```typescript
-import { DocsLayout } from '@mdxe/fumadocs'
+import { DocsLayout } from '@mdxui/fumadocs'
 
 <DocsLayout
   theme={{
@@ -272,7 +272,7 @@ import { DocsLayout } from '@mdxe/fumadocs'
 ### Custom Components
 
 ```typescript
-import { DocsPage } from '@mdxe/fumadocs'
+import { DocsPage } from '@mdxui/fumadocs'
 
 const customComponents = {
   // Override default heading

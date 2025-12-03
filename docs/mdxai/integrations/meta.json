@@ -1,5 +1,0 @@
-{
-  "title": "Integrations",
-  "defaultOpen": true,
-  "pages": ["index", "claude", "agentkit", "mastra", "vapi"]
-}

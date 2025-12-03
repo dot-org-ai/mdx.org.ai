@@ -1,0 +1,60 @@
+---
+$type: Docs
+title: "Styling"
+description: Dynamic CSS generation with BuilderCSS
+---
+
+# Styling
+
+The @mdxe/hono runtime includes BuilderCSS, a dynamic CSS generation system for MDXLD documents.
+
+## Overview
+
+BuilderCSS generates type-aware stylesheets customizable via URL query parameters:
+
+```
+/styles/{type}.css?color={color}&bg={background}&mode={mode}&font={font}&radius={radius}
+```
+
+## Quick Example
+
+```html
+<!-- Default theme -->
+<link rel="stylesheet" href="/styles/landing.css">
+
+<!-- Customized -->
+<link rel="stylesheet" href="/styles/landing.css?color=purple&bg=gradient&mode=dark">
+```
+
+## Query Parameters
+
+| Parameter | Values | Default |
+|-----------|--------|---------|
+| `color` | Tailwind color names | `indigo` |
+| `bg` | `gradient`, `grid`, `dots`, `waves`, `stars` | none |
+| `mode` | `auto`, `light`, `dark` | `auto` |
+| `font` | `system`, `sans`, `serif`, `mono` | `system` |
+| `radius` | `none`, `sm`, `md`, `lg`, `xl`, `full` | `md` |
+
+## MDX Frontmatter
+
+```yaml
+---
+$type: LandingPage
+title: My Product
+$style:
+  color: purple
+  background: gradient
+  mode: auto
+---
+```
+
+## Full Documentation
+
+For comprehensive documentation, see the [BuilderCSS docs](https://github.com/your-org/buildercss):
+
+- [URL Conventions](/packages/buildercss/docs/url-conventions.md) - URL patterns and parameters
+- [Document Types](/packages/buildercss/docs/types.md) - Available types and HTML structures
+- [Backgrounds](/packages/buildercss/docs/backgrounds.md) - Background effects
+- [Colors](/packages/buildercss/docs/colors.md) - Color system
+- [CSS Variables](/packages/buildercss/docs/variables.md) - shadcn/ui compatible variables
