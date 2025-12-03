@@ -2,7 +2,7 @@
 $type: Site
 $id: https://docs.buildercss.dev
 name: BuilderCSS Documentation
-description: Semantic HTML/CSS Design System for AI-Native Applications
+description: Pure Semantic HTML/CSS Design System
 layout: DocsLayout
 navigation:
   - title: Getting Started
@@ -13,13 +13,13 @@ navigation:
   - title: Layouts
     items:
       - { href: /layouts, title: Overview }
-      - { href: /layouts/stacked, title: StackedLayout }
-      - { href: /layouts/sidebar, title: SidebarLayout }
-      - { href: /layouts/docs, title: DocsLayout }
-      - { href: /layouts/auth, title: AuthLayout }
-      - { href: /layouts/dashboard, title: DashboardLayout }
-      - { href: /layouts/fullscreen, title: FullscreenLayout }
-      - { href: /layouts/split, title: SplitLayout }
+      - { href: /layouts/stacked, title: Stacked }
+      - { href: /layouts/sidebar, title: Sidebar }
+      - { href: /layouts/docs, title: Docs }
+      - { href: /layouts/auth, title: Auth }
+      - { href: /layouts/dashboard, title: Dashboard }
+      - { href: /layouts/fullscreen, title: Fullscreen }
+      - { href: /layouts/split, title: Split }
   - title: Pages
     items:
       - { href: /pages, title: Overview }
@@ -59,92 +59,151 @@ navigation:
 
 # BuilderCSS
 
-A semantic HTML/CSS design system for building AI-native applications across web and mobile platforms.
+A pure semantic HTML/CSS design system. No utility classes. No data attributes. Just meaningful HTML structure and CSS pattern-matching.
 
 ## Philosophy
 
-BuilderCSS embraces pure semantic HTML with CSS selectors—no utility classes, no JavaScript frameworks required. Components are defined using data attributes and semantic elements that work natively in browsers and translate cleanly to React Native for mobile.
+BuilderCSS styles HTML based on **semantic structure**, not arbitrary class names or data attributes. The HTML itself declares intent—CSS uses `:has()` selectors to pattern-match that intent.
 
-## Architecture
+```html
+<!-- The structure IS the styling API -->
+<article>
+  <aside>
+    <nav>...</nav>
+  </aside>
+  <main>...</main>
+</article>
+```
 
-<CardGrid>
-  <Card href="/layouts" title="Layouts" icon="layout">
-    Page-level structural patterns like StackedLayout, SidebarLayout, and DocsLayout.
-  </Card>
-  <Card href="/pages" title="Pages" icon="file">
-    Site content templates like Home, Pricing, Blog, and Contact pages.
-  </Card>
-  <Card href="/views" title="Views" icon="grid">
-    App interaction patterns like Dashboard, List, Grid, Form, and Chat views.
-  </Card>
-  <Card href="/sections" title="Sections" icon="layers">
-    Reusable content blocks like Hero, Features, Testimonials, and FAQ.
-  </Card>
-  <Card href="/containers" title="Containers" icon="box">
-    Presentation modes like Modal, Slideover, Popup, and Drawer.
-  </Card>
-</CardGrid>
+```css
+/* CSS pattern-matches semantic structure */
+article:has(> aside:first-child > nav) {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+}
+```
+
+## How It Works
+
+Components are identified by their semantic HTML structure:
+
+| Pattern | CSS Selector | Meaning |
+|---------|-------------|---------|
+| `article > aside + main` | `article:has(> aside:first-child)` | Sidebar layout |
+| `section > h1:first-child` | `section:has(> h1:first-child)` | Hero section |
+| `section > dl` | `section:has(> dl)` | FAQ section |
+| `section > blockquote` | `section:has(> blockquote)` | Testimonials |
+| `dialog` | `dialog` | Modal |
+| `article > table` | `article:has(> table)` | Table view |
 
 ## Quick Example
 
 ```html
-<!-- Semantic structure -->
-<body data-layout="stacked">
+<article>
   <header>
     <nav>
       <a href="/">BuilderCSS</a>
-      <ul>
+      <menu>
         <li><a href="/docs">Docs</a></li>
         <li><a href="/pricing">Pricing</a></li>
-      </ul>
+      </menu>
     </nav>
   </header>
   <main>
-    <section data-section="hero">
+    <section>
       <h1>Build semantic interfaces</h1>
       <p>Pure HTML/CSS that works everywhere.</p>
-      <a href="/quickstart" data-button="primary">Get Started</a>
+      <menu>
+        <li><a href="/quickstart">Get Started</a></li>
+        <li><a href="/demo">View Demo</a></li>
+      </menu>
     </section>
   </main>
   <footer>
     <p>&copy; 2024 BuilderCSS</p>
   </footer>
-</body>
+</article>
 ```
 
 ```css
-/* Pure CSS styling */
-[data-layout="stacked"] {
+/* Stacked layout = article with header + main + footer */
+article:has(> header + main + footer) {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-[data-section="hero"] {
+/* Hero = first section with h1 */
+section:has(> h1:first-child) {
   text-align: center;
   padding: var(--spacing-16) var(--spacing-4);
 }
 
-[data-button="primary"] {
-  display: inline-flex;
-  padding: var(--spacing-3) var(--spacing-6);
+/* Primary action = first item in menu */
+section:has(> h1) menu > :first-child a {
   background: var(--primary);
   color: var(--primary-foreground);
-  border-radius: var(--radius-md);
+  padding: var(--spacing-3) var(--spacing-6);
+  border-radius: var(--radius);
 }
 ```
 
-## Platforms
+## Architecture
 
-BuilderCSS provides implementations for:
+<CardGrid>
+  <Card href="/layouts" title="Layouts" icon="layout">
+    Structural patterns identified by child element relationships.
+  </Card>
+  <Card href="/pages" title="Pages" icon="file">
+    Content templates composed of semantic sections.
+  </Card>
+  <Card href="/views" title="Views" icon="grid">
+    App patterns identified by content elements (table, form, dl).
+  </Card>
+  <Card href="/sections" title="Sections" icon="layers">
+    Content blocks identified by first-child and content patterns.
+  </Card>
+  <Card href="/containers" title="Containers" icon="box">
+    Native elements: dialog, aside, details.
+  </Card>
+</CardGrid>
 
-- **Web** - Pure HTML/CSS with semantic selectors
-- **React** - Component wrappers with TypeScript
-- **React Native** - Expo-compatible mobile components
+## States via ARIA
+
+Interactive states use accessibility attributes—not data attributes:
+
+```html
+<nav>
+  <a href="/" aria-current="page">Home</a>
+  <a href="/about">About</a>
+</nav>
+
+<button aria-pressed="true">Toggle</button>
+
+<details open>
+  <summary>Expand</summary>
+  <p>Content</p>
+</details>
+```
+
+```css
+[aria-current="page"] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[aria-pressed="true"] {
+  background: var(--muted);
+}
+
+details[open] > summary {
+  font-weight: 600;
+}
+```
 
 ## Design Tokens
 
-All components use CSS custom properties for theming:
+All visual properties use CSS custom properties:
 
 ```css
 :root {
@@ -161,27 +220,8 @@ All components use CSS custom properties for theming:
   --spacing-8: 2rem;
 
   /* Radii */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
+  --radius: 0.375rem;
 }
 ```
 
-## Getting Started
-
-<Steps>
-  <Step title="Install">
-    Add BuilderCSS to your project via CDN or npm.
-  </Step>
-  <Step title="Choose a Layout">
-    Start with a layout pattern that fits your use case.
-  </Step>
-  <Step title="Add Sections">
-    Compose your pages using semantic sections.
-  </Step>
-  <Step title="Customize">
-    Override CSS variables to match your brand.
-  </Step>
-</Steps>
-
-[Get Started →](/quickstart)
+[Get Started](/quickstart)

@@ -13,9 +13,9 @@ vi.mock('../src/commands/deploy.js', () => ({
 
 describe('CLI parseArgs', () => {
   describe('Commands', () => {
-    it('should default to help command with no args', () => {
+    it('should default to dev command with no args', () => {
       const result = parseArgs([])
-      expect(result.command).toBe('help')
+      expect(result.command).toBe('dev')
     })
 
     it('should parse deploy command', () => {
@@ -28,10 +28,10 @@ describe('CLI parseArgs', () => {
       expect(result.command).toBe('version')
     })
 
-    it('should parse -v alone as help (verbose flag without command)', () => {
+    it('should parse -v alone as dev with verbose (verbose flag without command)', () => {
       const result = parseArgs(['-v'])
-      // -v alone is parsed as a flag, command defaults to help
-      expect(result.command).toBe('help')
+      // -v alone is parsed as a flag, command defaults to dev
+      expect(result.command).toBe('dev')
       expect(result.verbose).toBe(true)
     })
 
@@ -56,9 +56,9 @@ describe('CLI parseArgs', () => {
       expect(result.help).toBe(true)
     })
 
-    it('should handle unknown commands as help', () => {
+    it('should handle unknown commands as dev', () => {
       const result = parseArgs(['unknown'])
-      expect(result.command).toBe('help')
+      expect(result.command).toBe('dev')
     })
   })
 
@@ -271,14 +271,14 @@ describe('CLI parseArgs', () => {
       // Options before command should still work
       const result = parseArgs(['--dry-run', 'deploy'])
       // The first non-flag arg becomes the command
-      expect(result.command).toBe('help') // deploy is consumed as an arg value
+      expect(result.command).toBe('dev') // deploy is consumed as an arg value
     })
   })
 
   describe('Edge Cases', () => {
     it('should handle empty array', () => {
       const result = parseArgs([])
-      expect(result.command).toBe('help')
+      expect(result.command).toBe('dev')
     })
 
     it('should handle whitespace in values', () => {
@@ -623,12 +623,14 @@ describe('main', () => {
     expect(logs.some(l => l.includes('mdxe - Execute, Test, & Deploy'))).toBe(true)
   })
 
-  it('should show help when no command is provided', async () => {
+  it('should run dev command when no command is provided', async () => {
     process.argv = ['node', 'cli.js']
 
     await main()
 
-    expect(logs.some(l => l.includes('mdxe - Execute, Test, & Deploy'))).toBe(true)
+    // Default command is now 'dev', which starts the dev server
+    // The main function will try to start the dev server
+    expect(logs.some(l => l.includes('mdxe dev') || l.includes('Starting'))).toBe(true)
   })
 
   it('should run deploy command', async () => {

@@ -43,3 +43,6 @@ export { isType, isOneOfTypes, createTypedDocument } from './types.js'
 // Core functions
 export { parse } from './parse.js'
 export { stringify } from './stringify.js'
+
+// AST utilities
+export { toAst } from './ast.js'

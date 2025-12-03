@@ -193,8 +193,8 @@ describe('CLI Startup', () => {
 describe('MCP Server', () => {
   let db: Database
 
-  beforeEach(() => {
-    db = createSqliteDatabase({ filename: ':memory:' })
+  beforeEach(async () => {
+    db = await createSqliteDatabase({ filename: ':memory:' })
   })
 
   afterEach(async () => {
@@ -219,8 +219,8 @@ describe('MCP Server', () => {
 describe('Database Operations (used by MCP tools)', () => {
   let db: Database
 
-  beforeEach(() => {
-    db = createSqliteDatabase({ filename: ':memory:' })
+  beforeEach(async () => {
+    db = await createSqliteDatabase({ filename: ':memory:' })
   })
 
   afterEach(async () => {
