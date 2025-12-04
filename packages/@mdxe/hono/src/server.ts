@@ -10,7 +10,55 @@ import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
+import { createServer as createNetServer, type AddressInfo } from 'node:net'
 import { join, relative, extname, basename } from 'node:path'
+
+/**
+ * Check if a port is available on a specific host
+ */
+function checkPort(port: number, host: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = createNetServer()
+    server.once('error', () => {
+      resolve(false)
+    })
+    server.once('listening', () => {
+      server.close(() => resolve(true))
+    })
+    server.listen(port, host)
+  })
+}
+
+/**
+ * Check if a port is available on all relevant interfaces
+ * Checks both IPv4 (127.0.0.1) and IPv6 (::1) to ensure full availability
+ */
+export async function isPortAvailable(port: number, host: string = 'localhost'): Promise<boolean> {
+  // If host is 'localhost', check both IPv4 and IPv6
+  if (host === 'localhost') {
+    const [ipv4Available, ipv6Available] = await Promise.all([
+      checkPort(port, '127.0.0.1'),
+      checkPort(port, '::1'),
+    ])
+    return ipv4Available && ipv6Available
+  }
+  // Otherwise just check the specific host
+  return checkPort(port, host)
+}
+
+/**
+ * Find an available port starting from the given port
+ * Auto-increments if the port is in use
+ */
+export async function findAvailablePort(startPort: number, host: string = 'localhost', maxAttempts: number = 10): Promise<number> {
+  for (let i = 0; i < maxAttempts; i++) {
+    const port = startPort + i
+    if (await isPortAvailable(port, host)) {
+      return port
+    }
+  }
+  throw new Error(`Could not find an available port after ${maxAttempts} attempts starting from ${startPort}`)
+}
 import { parse, type MDXLDDocument } from 'mdxld'
 import { getRenderer, type TemplateContext } from './templates.js'
 import { generateCSS, parseStyleOptions } from './styles.js'
@@ -1005,19 +1053,83 @@ Frontmatter may include $type, $id, and $context for linked data.
 }
 
 /**
+ * Normalize host to avoid dual IPv4/IPv6 binding issues
+ * When 'localhost' is used, Node.js tries to bind both IPv4 and IPv6,
+ * which can cause race conditions and EADDRINUSE errors
+ */
+function normalizeHost(host: string): string {
+  // Convert 'localhost' to explicit IPv4 to avoid dual-stack binding issues
+  return host === 'localhost' ? '127.0.0.1' : host
+}
+
+/**
+ * Start server with automatic port retry on EADDRINUSE
+ */
+async function startServerWithRetry(
+  app: Hono,
+  startPort: number,
+  host: string,
+  maxAttempts: number,
+  onListening: (info: { port: number }) => void
+): Promise<void> {
+  // Normalize host to avoid dual-stack binding issues
+  const normalizedHost = normalizeHost(host)
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const port = startPort + attempt
+
+    // Check if port is available first to avoid race conditions
+    const available = await checkPort(port, normalizedHost)
+    if (!available) {
+      continue
+    }
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const server = serve({
+          fetch: app.fetch,
+          port,
+          hostname: normalizedHost,
+        }, (info) => {
+          onListening(info)
+          resolve()
+        })
+        // Handle server errors
+        const nodeServer = (server as { server?: { once?: (event: string, handler: (err: Error) => void) => void } }).server
+        if (nodeServer?.once) {
+          nodeServer.once('error', (err: Error & { code?: string }) => {
+            reject(err)
+          })
+        }
+      })
+      return // Success, server is running
+    } catch (err) {
+      const error = err as Error & { code?: string }
+      if (error.code === 'EADDRINUSE' && attempt < maxAttempts - 1) {
+        // Port in use, try next port
+        continue
+      }
+      throw err
+    }
+  }
+  throw new Error(`Could not start server after ${maxAttempts} attempts starting from port ${startPort}`)
+}
+
+/**
  * Start development server with hot reload
  */
 export async function createDevServer(options: ServerOptions): Promise<void> {
-  const { port = 3000, host = 'localhost', verbose } = options
+  const { port: requestedPort = 3000, host = 'localhost', verbose } = options
   const app = createApp(options)
 
   console.log('Starting development server...\n')
 
-  serve({
-    fetch: app.fetch,
-    port,
-    hostname: host,
-  }, (info) => {
+  let actualPort = requestedPort
+  await startServerWithRetry(app, requestedPort, host, 10, (info) => {
+    actualPort = info.port
+    if (actualPort !== requestedPort) {
+      console.log(`Port ${requestedPort} was in use, using port ${actualPort} instead\n`)
+    }
     console.log(`Server running at http://${host}:${info.port}`)
     console.log('')
     console.log('Available routes:')
@@ -1035,14 +1147,13 @@ export async function createDevServer(options: ServerOptions): Promise<void> {
  * Start production server
  */
 export async function createServer(options: ServerOptions): Promise<void> {
-  const { port = 3000, host = 'localhost' } = options
+  const { port: requestedPort = 3000, host = 'localhost' } = options
   const app = createApp(options)
 
-  serve({
-    fetch: app.fetch,
-    port,
-    hostname: host,
-  }, (info) => {
+  await startServerWithRetry(app, requestedPort, host, 10, (info) => {
+    if (info.port !== requestedPort) {
+      console.log(`Port ${requestedPort} was in use, using port ${info.port} instead`)
+    }
     console.log(`Production server running at http://${host}:${info.port}`)
   })
 }
