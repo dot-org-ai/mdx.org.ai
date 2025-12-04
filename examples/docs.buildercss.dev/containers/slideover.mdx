@@ -10,7 +10,7 @@ screenshot: /screenshots/containers/slideover.png
 A side panel that slides in from the left or right edge of the screen.
 
 <Preview>
-  <div data-container="slideover">
+  <aside aria-modal="true">
     <article>
       <header>
         <h2>Settings</h2>
@@ -31,29 +31,25 @@ A side panel that slides in from the left or right edge of the screen.
         </div>
       </section>
       <footer>
-        <button>Cancel</button>
-        <button>Save</button>
+        <menu>
+          <li><button>Cancel</button></li>
+          <li><button>Save</button></li>
+        </menu>
       </footer>
     </article>
-  </div>
+  </aside>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Settings panels
-- Detail views
-- Filters and facets
-- Secondary navigation
-- Cart sidebars
-
-## Structure
+A slideover uses `<aside aria-modal="true">` containing an article with settings/panel content. The pattern identifies a side panel:
 
 ```html
 <!-- Trigger -->
 <button>Settings</button>
 
 <!-- Slideover -->
-<aside data-container="slideover" aria-hidden="true">
+<aside aria-modal="true" aria-hidden="true">
   <article>
     <header>
       <h2>Settings</h2>
@@ -63,8 +59,10 @@ A side panel that slides in from the left or right edge of the screen.
       <!-- Settings content -->
     </section>
     <footer>
-      <button>Cancel</button>
-      <button>Save Changes</button>
+      <menu>
+        <li><button>Cancel</button></li>
+        <li><button>Save Changes</button></li>
+      </menu>
     </footer>
   </article>
 </aside>
@@ -73,7 +71,8 @@ A side panel that slides in from the left or right edge of the screen.
 ## CSS
 
 ```css
-[data-container="slideover"] {
+/* Slideover: aside with aria-modal containing article */
+aside[aria-modal="true"]:has(> article > header + section) {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -81,14 +80,14 @@ A side panel that slides in from the left or right edge of the screen.
   justify-content: flex-end;
 }
 
-[data-container="slideover"]::before {
+aside[aria-modal="true"]:has(> article > header + section)::before {
   content: '';
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.3);
 }
 
-[data-container="slideover"] > article {
+aside[aria-modal="true"]:has(> article > header + section) > article {
   position: relative;
   background: var(--background);
   width: 100%;
@@ -99,7 +98,7 @@ A side panel that slides in from the left or right edge of the screen.
   animation: slideInRight 0.3s ease;
 }
 
-[data-container="slideover"] > article > header {
+aside[aria-modal="true"]:has(> article > header + section) > article > header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -107,72 +106,82 @@ A side panel that slides in from the left or right edge of the screen.
   border-bottom: 1px solid var(--border);
 }
 
-[data-container="slideover"] > article > header h2 {
+aside[aria-modal="true"]:has(> article > header + section) > article > header h2 {
   font-size: var(--text-lg);
   font-weight: 600;
 }
 
-[data-container="slideover"] > article > header button {
+aside[aria-modal="true"]:has(> article > header + section) > article > header button {
   background: none;
   border: none;
   font-size: var(--text-xl);
   cursor: pointer;
 }
 
-[data-container="slideover"] > article > section {
+aside[aria-modal="true"]:has(> article > header + section) > article > section {
   flex: 1;
   padding: var(--spacing-4);
   overflow-y: auto;
 }
 
-[data-container="slideover"] > article > section > div {
+aside[aria-modal="true"]:has(> article > header + section) > article > section > div {
   margin-bottom: var(--spacing-4);
 }
 
-[data-container="slideover"] > article > section label {
+aside[aria-modal="true"]:has(> article > header + section) > article > section label {
   display: block;
   margin-bottom: var(--spacing-1);
   font-size: var(--text-sm);
 }
 
-[data-container="slideover"] > article > section p {
+aside[aria-modal="true"]:has(> article > header + section) > article > section p {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-container="slideover"] > article > section select {
+aside[aria-modal="true"]:has(> article > header + section) > article > section select {
   width: 100%;
   padding: var(--spacing-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-container="slideover"] > article > footer {
+aside[aria-modal="true"]:has(> article > header + section) > article > footer {
   padding: var(--spacing-4);
   border-top: 1px solid var(--border);
-  display: flex;
-  gap: var(--spacing-2);
 }
 
-[data-container="slideover"] > article > footer button {
+aside[aria-modal="true"]:has(> article > header + section) > article > footer menu {
+  display: flex;
+  gap: var(--spacing-2);
+  list-style: none;
+}
+
+aside[aria-modal="true"]:has(> article > header + section) > article > footer menu li {
   flex: 1;
+}
+
+aside[aria-modal="true"]:has(> article > header + section) > article > footer button {
+  width: 100%;
   padding: var(--spacing-2);
   border-radius: var(--radius);
   cursor: pointer;
 }
 
-[data-container="slideover"] > article > footer button:first-child {
+/* Secondary: first button */
+aside[aria-modal="true"]:has(> article > header + section) > article > footer menu > :first-child button {
   background: transparent;
   border: 1px solid var(--border);
 }
 
-[data-container="slideover"] > article > footer button:last-child {
+/* Primary: last button */
+aside[aria-modal="true"]:has(> article > header + section) > article > footer menu > :last-child button {
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
 }
 
-[data-container="slideover"][aria-hidden="true"] {
+aside[aria-modal="true"][aria-hidden="true"] {
   display: none;
 }
 
@@ -186,45 +195,26 @@ A side panel that slides in from the left or right edge of the screen.
 
 ```js
 // Open slideover
-document.querySelectorAll('[data-slideover-trigger]').forEach(trigger => {
+document.querySelectorAll('[aria-controls]').forEach(trigger => {
   trigger.addEventListener('click', () => {
-    const slideover = document.querySelector('[data-container="slideover"]')
+    const slideover = document.getElementById(trigger.getAttribute('aria-controls'))
     slideover.setAttribute('aria-hidden', 'false')
   })
 })
 
 // Close on button click
-document.querySelectorAll('[data-container="slideover"] header button').forEach(btn => {
+document.querySelectorAll('aside[aria-modal] header button').forEach(btn => {
   btn.addEventListener('click', () => {
-    const slideover = btn.closest('[data-container="slideover"]')
+    const slideover = btn.closest('aside[aria-modal]')
     slideover.setAttribute('aria-hidden', 'true')
   })
 })
 ```
 
-## Variations
+## When to Use
 
-### Wide Slideover
-
-```css
-[data-container="slideover"] > article {
-  max-width: 600px;
-}
-```
-
-### With Tabs
-
-```html
-<aside data-container="slideover">
-  <article>
-    <header>
-      <nav>
-        <button aria-selected="true">Details</button>
-        <button>Activity</button>
-      </nav>
-      <button aria-label="Close">&times;</button>
-    </header>
-    <section>...</section>
-  </article>
-</aside>
-```
+- Settings panels
+- Detail views
+- Filters and facets
+- Secondary navigation
+- Cart sidebars

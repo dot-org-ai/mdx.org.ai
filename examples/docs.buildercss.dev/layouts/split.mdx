@@ -1,140 +1,90 @@
 ---
 $type: DocsPage
 title: Split Layout
-description: Two-panel layout for visual and content areas
+description: Two equal-width panels side by side
 screenshot: /screenshots/layouts/split.png
 ---
 
 # Split Layout
 
-A two-panel layout perfect for onboarding flows, auth screens, and focused content presentation.
+Two equal-width content panels, useful for comparisons, editors, or side-by-side views.
 
 <Preview>
-  <div data-layout="split">
-    <aside>
-      <figure>Visual Content</figure>
-    </aside>
+  <article>
     <main>
-      <h1>Welcome aboard</h1>
-      <p>Get started with our platform in just a few steps.</p>
-      <button>Get Started</button>
+      <header><h2>Editor</h2></header>
+      <pre><code>const hello = "world"</code></pre>
     </main>
-  </div>
+    <main>
+      <header><h2>Preview</h2></header>
+      <p>Hello, world!</p>
+    </main>
+  </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Onboarding flows
-- Authentication screens
-- Feature introductions
-- Landing page sections
-
-## Structure
+A split layout is an `<article>` with two `<main>` elements as siblings:
 
 ```html
-<div data-layout="split">
-  <aside>
-    <img src="/hero.jpg" alt="" />
-  </aside>
+<article>
   <main>
-    <h1>Welcome aboard</h1>
-    <p>Get started with our platform in just a few steps.</p>
-    <button>Get Started</button>
+    <header><h2>Left Panel</h2></header>
+    <!-- Left content -->
   </main>
-</div>
+  <main>
+    <header><h2>Right Panel</h2></header>
+    <!-- Right content -->
+  </main>
+</article>
 ```
 
 ## CSS
 
 ```css
-[data-layout="split"] {
+/* Match article with two main elements */
+article:has(> main + main) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 100vh;
 }
 
-[data-layout="split"] > aside {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: var(--spacing-8);
+article:has(> main + main) > main {
+  overflow-y: auto;
 }
 
-[data-layout="split"] > aside img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+article:has(> main + main) > main:first-child {
+  border-right: 1px solid var(--border);
 }
 
-[data-layout="split"] > main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-8);
-  max-width: 400px;
-  margin: auto;
+article:has(> main + main) > main > header {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--muted);
 }
 
-[data-layout="split"] h1 {
-  font-size: var(--text-3xl);
-  font-weight: 700;
-  margin-bottom: var(--spacing-4);
-}
-
-[data-layout="split"] p {
-  color: var(--muted-foreground);
-  margin-bottom: var(--spacing-6);
-}
-
-[data-layout="split"] button {
-  padding: var(--spacing-2) var(--spacing-4);
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
+article:has(> main + main) > main > header h2 {
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {
-  [data-layout="split"] {
+  article:has(> main + main) {
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
   }
 
-  [data-layout="split"] > aside {
-    min-height: 200px;
+  article:has(> main + main) > main:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
   }
 }
 ```
 
-## Variations
+## When to Use
 
-### Reversed
-
-```html
-<div data-layout="split" dir="rtl">
-  <main dir="ltr">...</main>
-  <aside>...</aside>
-</div>
-```
-
-### With Form
-
-```html
-<div data-layout="split">
-  <aside>
-    <img src="/brand.svg" alt="" />
-  </aside>
-  <main>
-    <h1>Create account</h1>
-    <form>
-      <label>Email</label>
-      <input type="email" />
-      <label>Password</label>
-      <input type="password" />
-      <button type="submit">Sign Up</button>
-    </form>
-  </main>
-</div>
-```
+- Code editors with preview
+- Diff viewers
+- Translation interfaces
+- Before/after comparisons
+- Chat with sidebar

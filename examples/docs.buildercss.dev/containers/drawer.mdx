@@ -10,7 +10,7 @@ screenshot: /screenshots/containers/drawer.png
 A bottom sheet that slides up from the bottom of the screen, commonly used on mobile.
 
 <Preview>
-  <div data-container="drawer">
+  <aside aria-modal="true" role="dialog">
     <article>
       <header>
         <span></span>
@@ -31,36 +31,34 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
         </div>
       </section>
       <footer>
-        <button>Reset</button>
-        <button>Apply Filters</button>
+        <menu>
+          <li><button>Reset</button></li>
+          <li><button>Apply Filters</button></li>
+        </menu>
       </footer>
     </article>
-  </div>
+  </aside>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Mobile filters
-- Action sheets
-- Share menus
-- Quick options
-- Mobile navigation
-
-## Structure
+A drawer uses `<aside aria-modal role="dialog">` to indicate a modal dialog from the bottom. The header contains a drag handle (`<span>`) for touch gestures:
 
 ```html
-<aside data-container="drawer" aria-modal="true" aria-hidden="true">
+<aside aria-modal="true" role="dialog" aria-hidden="true">
   <article>
     <header>
-      <span></span>
+      <span></span><!-- Drag handle -->
       <h2>Filter Results</h2>
     </header>
     <section>
       <!-- Filter options -->
     </section>
     <footer>
-      <button>Reset</button>
-      <button>Apply Filters</button>
+      <menu>
+        <li><button>Reset</button></li>
+        <li><button>Apply Filters</button></li>
+      </menu>
     </footer>
   </article>
 </aside>
@@ -69,7 +67,8 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
 ## CSS
 
 ```css
-[data-container="drawer"] {
+/* Drawer: aside dialog with bottom-sheet header (span handle) */
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -78,14 +77,14 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
   justify-content: flex-end;
 }
 
-[data-container="drawer"]::before {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child)::before {
   content: '';
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.3);
 }
 
-[data-container="drawer"] > article {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article {
   position: relative;
   background: var(--background);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
@@ -95,12 +94,13 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
   animation: slideUp 0.3s ease;
 }
 
-[data-container="drawer"] > article > header {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > header {
   padding: var(--spacing-2) var(--spacing-4);
   text-align: center;
 }
 
-[data-container="drawer"] > article > header > span {
+/* Drag handle */
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > header > span:first-child {
   display: block;
   width: 40px;
   height: 4px;
@@ -109,34 +109,34 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
   margin: 0 auto var(--spacing-3);
 }
 
-[data-container="drawer"] > article > header h2 {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > header h2 {
   font-size: var(--text-lg);
   font-weight: 600;
 }
 
-[data-container="drawer"] > article > section {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > section {
   flex: 1;
   padding: var(--spacing-4);
   overflow-y: auto;
 }
 
-[data-container="drawer"] > article > section > div {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > section > div {
   margin-bottom: var(--spacing-4);
 }
 
-[data-container="drawer"] > article > section label {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > section label {
   display: block;
   margin-bottom: var(--spacing-2);
   font-weight: 500;
 }
 
-[data-container="drawer"] > article > section nav {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > section nav {
   display: flex;
   gap: var(--spacing-2);
   flex-wrap: wrap;
 }
 
-[data-container="drawer"] > article > section nav button {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > section nav button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--muted);
   border: none;
@@ -144,41 +144,51 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
   cursor: pointer;
 }
 
-[data-container="drawer"] > article > section nav button[aria-current] {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > section nav button[aria-current] {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-[data-container="drawer"] > article > section input[type="range"] {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > section input[type="range"] {
   width: 100%;
 }
 
-[data-container="drawer"] > article > footer {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > footer {
   padding: var(--spacing-4);
   border-top: 1px solid var(--border);
-  display: flex;
-  gap: var(--spacing-2);
 }
 
-[data-container="drawer"] > article > footer button {
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > footer menu {
+  display: flex;
+  gap: var(--spacing-2);
+  list-style: none;
+}
+
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > footer menu li {
   flex: 1;
+}
+
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > footer button {
+  width: 100%;
   padding: var(--spacing-3);
   border-radius: var(--radius);
   cursor: pointer;
 }
 
-[data-container="drawer"] > article > footer button:first-child {
+/* Secondary: first button */
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > footer menu > :first-child button {
   background: transparent;
   border: 1px solid var(--border);
 }
 
-[data-container="drawer"] > article > footer button:last-child {
+/* Primary: last button */
+aside[aria-modal][role="dialog"]:has(> article > header > span:first-child) > article > footer menu > :last-child button {
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
 }
 
-[data-container="drawer"][aria-hidden="true"] {
+aside[aria-modal][role="dialog"][aria-hidden="true"] {
   display: none;
 }
 
@@ -191,9 +201,9 @@ A bottom sheet that slides up from the bottom of the screen, commonly used on mo
 ## JavaScript (with Gesture Support)
 
 ```js
-const drawer = document.querySelector('[data-container="drawer"]')
+const drawer = document.querySelector('aside[aria-modal][role="dialog"]')
 const article = drawer.querySelector('article')
-const handle = drawer.querySelector('header > span')
+const handle = drawer.querySelector('header > span:first-child')
 
 let startY = 0
 let currentY = 0
@@ -232,35 +242,10 @@ drawer.addEventListener('click', (e) => {
 })
 ```
 
-## Variations
+## When to Use
 
-### Action Sheet
-
-```html
-<aside data-container="drawer">
-  <article>
-    <header>
-      <span></span>
-    </header>
-    <nav>
-      <button>Share</button>
-      <button>Copy Link</button>
-      <button>Edit</button>
-      <button>Delete</button>
-    </nav>
-    <footer>
-      <button>Cancel</button>
-    </footer>
-  </article>
-</aside>
-```
-
-### Map/Full Height
-
-```html
-<aside data-container="drawer">
-  <article>
-    <!-- Can be dragged to different snap points -->
-  </article>
-</aside>
-```
+- Mobile filters
+- Action sheets
+- Share menus
+- Quick options
+- Mobile navigation

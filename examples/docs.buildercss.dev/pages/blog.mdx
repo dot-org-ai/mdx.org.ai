@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/blog.png
 A blog listing page displaying articles in a grid layout.
 
 <Preview>
-  <article data-page="blog">
+  <main>
     <header>
       <h1>Blog</h1>
       <p>Insights, tutorials, and updates from our team</p>
@@ -49,41 +49,24 @@ A blog listing page displaying articles in a grid layout.
         <h3>Our Journey to 50K Users</h3>
         <footer><time datetime="2024-11-20">Nov 20, 2024</time> · 6 min read</footer>
       </article>
-      <article>
-        <figure></figure>
-        <mark>Engineering</mark>
-        <h3>CSS Custom Properties Deep Dive</h3>
-        <footer><time datetime="2024-11-15">Nov 15, 2024</time> · 10 min read</footer>
-      </article>
-      <article>
-        <figure></figure>
-        <mark>Design</mark>
-        <h3>Designing for Accessibility</h3>
-        <footer><time datetime="2024-11-10">Nov 10, 2024</time> · 7 min read</footer>
-      </article>
     </section>
 
     <nav aria-label="Pagination">
-      <button aria-label="Previous page">←</button>
+      <button disabled aria-label="Previous page">←</button>
       <button aria-current="page">1</button>
       <button>2</button>
       <button>3</button>
       <button aria-label="Next page">→</button>
     </nav>
-  </article>
+  </main>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Company blog index
-- News archive pages
-- Article listings
-- Content hubs
-
-## Structure
+A blog listing uses `<main>` with a header, category nav, section of articles, and pagination. The pattern `main:has(> section > article > figure + mark)` identifies blog listings:
 
 ```html
-<article data-page="blog">
+<main>
   <header>
     <h1>Blog</h1>
     <p>Insights, tutorials, and updates from our team</p>
@@ -106,43 +89,45 @@ A blog listing page displaying articles in a grid layout.
   </section>
 
   <nav aria-label="Pagination">
-    <button aria-label="Previous page">←</button>
+    <button disabled aria-label="Previous page">←</button>
     <button aria-current="page">1</button>
     <button>2</button>
     <button>3</button>
     <button aria-label="Next page">→</button>
   </nav>
-</article>
+</main>
 ```
 
 ## CSS
 
 ```css
-[data-page="blog"] {
+/* Blog listing: main with section containing article cards */
+main:has(> section > article > figure + mark) {
   padding: var(--spacing-6);
 }
 
-[data-page="blog"] > header {
+main:has(> section > article > figure + mark) > header {
   margin-bottom: var(--spacing-8);
 }
 
-[data-page="blog"] > header h1 {
+main:has(> section > article > figure + mark) > header h1 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="blog"] > header p {
+main:has(> section > article > figure + mark) > header p {
   color: var(--muted-foreground);
 }
 
-[data-page="blog"] > nav[aria-label="Categories"] {
+/* Category filter nav */
+main:has(> section > article) > nav[aria-label="Categories"] {
   display: flex;
   gap: var(--spacing-2);
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="blog"] > nav[aria-label="Categories"] button {
+main:has(> section > article) > nav[aria-label="Categories"] button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--muted);
   border: none;
@@ -151,67 +136,81 @@ A blog listing page displaying articles in a grid layout.
   cursor: pointer;
 }
 
-[data-page="blog"] > nav[aria-label="Categories"] button[aria-pressed="true"] {
+main:has(> section > article) > nav[aria-label="Categories"] button[aria-pressed="true"] {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-[data-page="blog"] > section {
+/* Article grid */
+main:has(> section > article > figure + mark) > section {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-6);
 }
 
-[data-page="blog"] > section > article {
+main:has(> section > article > figure + mark) > section > article {
   cursor: pointer;
 }
 
-[data-page="blog"] > section > article figure {
+main:has(> section > article > figure + mark) > section > article figure {
   background: var(--muted);
   border-radius: var(--radius-lg);
   aspect-ratio: 16/9;
   margin: 0 0 var(--spacing-3);
 }
 
-[data-page="blog"] > section > article mark {
+main:has(> section > article > figure + mark) > section > article mark {
   font-size: var(--text-xs);
   color: var(--primary);
   font-weight: 500;
   background: transparent;
 }
 
-[data-page="blog"] > section > article h3 {
+main:has(> section > article > figure + mark) > section > article h3 {
   font-weight: 600;
   margin: var(--spacing-1) 0 var(--spacing-2);
 }
 
-[data-page="blog"] > section > article footer {
+main:has(> section > article > figure + mark) > section > article footer {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-page="blog"] > nav[aria-label="Pagination"] {
+/* Pagination */
+nav[aria-label="Pagination"] {
   display: flex;
   justify-content: center;
   gap: var(--spacing-2);
   margin-top: var(--spacing-8);
 }
 
-[data-page="blog"] > nav[aria-label="Pagination"] button {
+nav[aria-label="Pagination"] button {
   padding: var(--spacing-2) var(--spacing-3);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-page="blog"] > nav[aria-label="Pagination"] button[aria-current="page"] {
+nav[aria-label="Pagination"] button[aria-current="page"] {
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
 }
 
-[data-page="blog"] > nav[aria-label="Pagination"] button[aria-label] {
+nav[aria-label="Pagination"] button[aria-label] {
   background: var(--muted);
   border: none;
 }
+
+nav[aria-label="Pagination"] button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 ```
+
+## When to Use
+
+- Company blog index
+- News archive pages
+- Article listings
+- Content hubs

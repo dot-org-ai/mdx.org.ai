@@ -13,47 +13,40 @@ Content embedded directly within the page flow, always visible without overlays.
   <div>
     <p>Regular page content flows here...</p>
 
-    <article data-container="inline">
+    <aside>
       <header>
-        <span>NEW</span>
+        <mark>NEW</mark>
         <h3>Introducing Dark Mode</h3>
       </header>
       <p>Experience our app in a whole new way with our brand new dark mode feature.</p>
-      <nav>
-        <button>Try it now</button>
-        <a href="#">Learn more</a>
-      </nav>
-    </article>
+      <menu>
+        <li><button>Try it now</button></li>
+        <li><a href="#">Learn more</a></li>
+      </menu>
+    </aside>
 
     <p>More content continues below...</p>
   </div>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Feature announcements
-- Inline CTAs
-- Embedded widgets
-- Contextual cards
-- Tip/note boxes
-- Inline forms
-
-## Structure
+An inline container is an `<aside>` with announcement/card content in the page flow. The pattern `aside:has(> header > mark)` identifies feature announcements:
 
 ```html
 <article>
   <p>Regular content...</p>
 
-  <aside data-container="inline">
+  <aside>
     <header>
-      <span>NEW</span>
+      <mark>NEW</mark>
       <h3>Feature Announcement</h3>
     </header>
     <p>Description of the feature...</p>
-    <nav>
-      <a href="/try">Try it now</a>
-      <a href="/learn">Learn more</a>
-    </nav>
+    <menu>
+      <li><a href="/try">Try it now</a></li>
+      <li><a href="/learn">Learn more</a></li>
+    </menu>
   </aside>
 
   <p>More content...</p>
@@ -63,7 +56,8 @@ Content embedded directly within the page flow, always visible without overlays.
 ## CSS
 
 ```css
-[data-container="inline"] {
+/* Inline card: aside with header containing mark */
+aside:has(> header > mark) {
   background: var(--muted);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -71,11 +65,11 @@ Content embedded directly within the page flow, always visible without overlays.
   margin: var(--spacing-6) 0;
 }
 
-[data-container="inline"] > header {
+aside:has(> header > mark) > header {
   margin-bottom: var(--spacing-4);
 }
 
-[data-container="inline"] > header > span {
+aside:has(> header > mark) > header > mark {
   display: inline-block;
   padding: var(--spacing-1) var(--spacing-2);
   background: var(--primary);
@@ -85,22 +79,26 @@ Content embedded directly within the page flow, always visible without overlays.
   margin-bottom: var(--spacing-2);
 }
 
-[data-container="inline"] > header h3 {
+aside:has(> header > mark) > header h3 {
   font-size: var(--text-lg);
   font-weight: 600;
 }
 
-[data-container="inline"] > p {
+aside:has(> header > mark) > p {
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-4);
 }
 
-[data-container="inline"] > nav {
+aside:has(> header > mark) > menu {
   display: flex;
   gap: var(--spacing-2);
+  list-style: none;
 }
 
-[data-container="inline"] > nav > :first-child {
+/* Primary: first action */
+aside:has(> header > mark) > menu > :first-child button,
+aside:has(> header > mark) > menu > :first-child a {
+  display: inline-block;
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -110,7 +108,9 @@ Content embedded directly within the page flow, always visible without overlays.
   text-decoration: none;
 }
 
-[data-container="inline"] > nav > :not(:first-child) {
+/* Secondary: other actions */
+aside:has(> header > mark) > menu > :not(:first-child) a {
+  display: inline-block;
   padding: var(--spacing-2) var(--spacing-4);
   background: transparent;
   border: 1px solid var(--border);
@@ -124,8 +124,10 @@ Content embedded directly within the page flow, always visible without overlays.
 
 ### Tip Box
 
+Use `<aside>` with a figure for icons:
+
 ```html
-<aside data-container="inline">
+<aside>
   <figure>💡</figure>
   <div>
     <strong>Pro tip:</strong>
@@ -135,19 +137,26 @@ Content embedded directly within the page flow, always visible without overlays.
 ```
 
 ```css
-[data-container="inline"]:has(> figure) {
+aside:has(> figure + div) {
   display: flex;
   gap: var(--spacing-3);
   padding: var(--spacing-4);
   background: var(--accent);
   border-left: 4px solid var(--accent-foreground);
+  border-radius: var(--radius);
+  margin: var(--spacing-4) 0;
+}
+
+aside:has(> figure + div) > figure {
+  margin: 0;
+  font-size: var(--text-xl);
 }
 ```
 
 ### Warning Box
 
 ```html
-<aside data-container="inline">
+<aside aria-label="Warning">
   <figure>⚠️</figure>
   <div>
     <strong>Warning:</strong>
@@ -159,7 +168,7 @@ Content embedded directly within the page flow, always visible without overlays.
 ### Embedded Form
 
 ```html
-<aside data-container="inline">
+<aside>
   <header>
     <h3>Subscribe to updates</h3>
   </header>
@@ -173,16 +182,37 @@ Content embedded directly within the page flow, always visible without overlays.
 ### Dismissible Banner
 
 ```html
-<aside data-container="inline">
+<aside>
   <p>🎉 New feature available! Check out our latest update.</p>
   <button aria-label="Dismiss">&times;</button>
 </aside>
 ```
 
+```css
+aside:has(> p + button[aria-label="Dismiss"]) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  margin: var(--spacing-4) 0;
+}
+
+aside:has(> p + button[aria-label="Dismiss"]) button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: var(--text-lg);
+}
+```
+
 ```js
-document.querySelectorAll('[data-container="inline"] button[aria-label="Dismiss"]').forEach(btn => {
+document.querySelectorAll('aside button[aria-label="Dismiss"]').forEach(btn => {
   btn.addEventListener('click', () => {
-    const container = btn.closest('[data-container="inline"]')
+    const container = btn.closest('aside')
     container.remove()
     // Optionally persist dismissal
     localStorage.setItem(`dismissed-${container.id}`, 'true')
@@ -192,8 +222,10 @@ document.querySelectorAll('[data-container="inline"] button[aria-label="Dismiss"
 
 ### Collapsible Details
 
+Use native `<details>` for collapsible content:
+
 ```html
-<details data-container="inline">
+<details>
   <summary>
     <h3>More information</h3>
   </summary>
@@ -202,3 +234,12 @@ document.querySelectorAll('[data-container="inline"] button[aria-label="Dismiss"
   </div>
 </details>
 ```
+
+## When to Use
+
+- Feature announcements
+- Inline CTAs
+- Embedded widgets
+- Contextual cards
+- Tip/note boxes
+- Inline forms

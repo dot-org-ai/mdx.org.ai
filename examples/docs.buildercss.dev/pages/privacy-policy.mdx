@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/privacy-policy.png
 A legal page for privacy policy documentation.
 
 <Preview>
-  <article data-page="privacy-policy">
+  <article>
     <header>
       <h1>Privacy Policy</h1>
       <p><time datetime="2024-12-01">Last updated: December 1, 2024</time></p>
@@ -56,17 +56,12 @@ A legal page for privacy policy documentation.
   </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Privacy policy pages
-- GDPR compliance documents
-- Data handling policies
-- Legal disclosures
-
-## Structure
+A legal document uses `<article>` with header, table of contents nav, and content sections. The pattern `article:has(> header > h1 + p > time):has(> nav[aria-label="Table of contents"])` identifies legal pages:
 
 ```html
-<article data-page="privacy-policy">
+<article>
   <header>
     <h1>Privacy Policy</h1>
     <p><time datetime="2024-12-01">Last updated: December 1, 2024</time></p>
@@ -102,79 +97,87 @@ A legal page for privacy policy documentation.
 ## CSS
 
 ```css
-[data-page="privacy-policy"] {
+/* Legal document: article with header containing time and TOC nav */
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) {
   padding: var(--spacing-6);
   max-width: 800px;
   margin: 0 auto;
 }
 
-[data-page="privacy-policy"] > header {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > header {
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="privacy-policy"] > header h1 {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > header h1 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="privacy-policy"] > header time {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > header time {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
 }
 
-[data-page="privacy-policy"] > nav {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > nav {
   background: var(--muted);
   padding: var(--spacing-4);
   border-radius: var(--radius-lg);
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="privacy-policy"] > nav h3 {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > nav h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-2);
   font-size: var(--text-sm);
 }
 
-[data-page="privacy-policy"] > nav ul {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > nav ul {
   font-size: var(--text-sm);
   padding-left: var(--spacing-4);
 }
 
-[data-page="privacy-policy"] > nav li {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > nav li {
   padding: var(--spacing-1) 0;
 }
 
-[data-page="privacy-policy"] > nav a {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > nav a {
   color: var(--primary);
 }
 
-[data-page="privacy-policy"] > div {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > div {
   line-height: 1.8;
   color: var(--muted-foreground);
 }
 
-[data-page="privacy-policy"] > div section {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > div section {
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="privacy-policy"] > div h2 {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > div h2 {
   font-size: var(--text-lg);
   font-weight: 600;
   color: var(--foreground);
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="privacy-policy"] > div p {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > div p {
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="privacy-policy"] > div ul {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > div ul {
   padding-left: var(--spacing-6);
   margin-top: var(--spacing-2);
 }
 
-[data-page="privacy-policy"] > div a {
+article:has(> header > h1):has(> nav[aria-label="Table of contents"]) > div a {
   color: var(--primary);
 }
 ```
+
+## When to Use
+
+- Privacy policy pages
+- GDPR compliance documents
+- Data handling policies
+- Legal disclosures

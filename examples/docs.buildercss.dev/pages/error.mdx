@@ -10,14 +10,14 @@ screenshot: /screenshots/pages/error.png
 A generic error page for server errors and unexpected issues.
 
 <Preview>
-  <article data-page="error">
+  <main>
     <figure aria-hidden="true">!</figure>
     <h1>Something went wrong</h1>
     <p>We're sorry, but something unexpected happened. Please try again later or contact support if the problem persists.</p>
 
     <menu>
-      <button>Try Again</button>
-      <a href="#">Go Home</a>
+      <li><button>Try Again</button></li>
+      <li><a href="#">Go Home</a></li>
     </menu>
 
     <details>
@@ -28,27 +28,22 @@ Request ID: abc-123-def-456
 Timestamp: 2024-12-01T10:30:00Z
       </pre>
     </details>
-  </article>
+  </main>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- 500 server error pages
-- Application crash states
-- Unexpected error handling
-- Service unavailable pages
-
-## Structure
+An error page uses `<main>` with an error icon figure, heading, message, actions, and collapsible technical details. The pattern `main:has(> figure[aria-hidden] + h1 + p + menu)` identifies error pages:
 
 ```html
-<article data-page="error">
+<main>
   <figure aria-hidden="true">!</figure>
   <h1>Something went wrong</h1>
   <p>We're sorry, but something unexpected happened.</p>
 
   <menu>
-    <button onclick="location.reload()">Try Again</button>
-    <a href="/">Go Home</a>
+    <li><button onclick="location.reload()">Try Again</button></li>
+    <li><a href="/">Go Home</a></li>
   </menu>
 
   <details>
@@ -59,13 +54,14 @@ Request ID: abc-123-def-456
 Timestamp: 2024-12-01T10:30:00Z
     </pre>
   </details>
-</article>
+</main>
 ```
 
 ## CSS
 
 ```css
-[data-page="error"] {
+/* Error page: main with error icon and actions */
+main:has(> figure[aria-hidden] + h1 + p + menu) {
   padding: var(--spacing-6);
   text-align: center;
   min-height: 100vh;
@@ -75,7 +71,7 @@ Timestamp: 2024-12-01T10:30:00Z
   justify-content: center;
 }
 
-[data-page="error"] > figure {
+main:has(> figure[aria-hidden] + h1 + p + menu) > figure {
   width: 64px;
   height: 64px;
   background: var(--destructive);
@@ -88,55 +84,61 @@ Timestamp: 2024-12-01T10:30:00Z
   color: var(--destructive-foreground);
 }
 
-[data-page="error"] h1 {
+main:has(> figure[aria-hidden] + h1 + p + menu) h1 {
   font-size: var(--text-2xl);
   font-weight: 700;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="error"] > p {
+main:has(> figure[aria-hidden] + h1 + p + menu) > p {
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-6);
   max-width: 400px;
 }
 
-[data-page="error"] menu {
+main:has(> figure[aria-hidden] + h1 + p + menu) menu {
   display: flex;
   gap: var(--spacing-3);
   margin-bottom: var(--spacing-6);
+  list-style: none;
 }
 
-[data-page="error"] menu button {
+/* Primary: first action (Try Again) */
+main:has(> figure[aria-hidden] + h1 + p + menu) menu > :first-child button {
   padding: var(--spacing-3) var(--spacing-6);
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
   border-radius: var(--radius);
   font-weight: 500;
+  cursor: pointer;
 }
 
-[data-page="error"] menu a {
+/* Secondary: other actions */
+main:has(> figure[aria-hidden] + h1 + p + menu) menu > :not(:first-child) a {
+  display: inline-block;
   padding: var(--spacing-3) var(--spacing-6);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   font-weight: 500;
+  text-decoration: none;
 }
 
-[data-page="error"] details {
+main:has(> figure[aria-hidden] + h1 + p + menu) details {
   text-align: left;
   max-width: 500px;
   width: 100%;
 }
 
-[data-page="error"] details summary {
+main:has(> figure[aria-hidden] + h1 + p + menu) details summary {
   cursor: pointer;
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="error"] details pre {
+main:has(> figure[aria-hidden] + h1 + p + menu) details pre {
   background: var(--muted);
   padding: var(--spacing-3);
   border-radius: var(--radius);
@@ -151,21 +153,28 @@ Timestamp: 2024-12-01T10:30:00Z
 ### Maintenance Mode
 
 ```html
-<article data-page="error" data-variant="maintenance">
+<main>
   <figure aria-hidden="true">🔧</figure>
   <h1>Under Maintenance</h1>
   <p>We're performing scheduled maintenance. We'll be back shortly.</p>
   <p><time>Estimated time: 30 minutes</time></p>
-</article>
+</main>
 ```
 
 ### Service Unavailable
 
 ```html
-<article data-page="error" data-variant="unavailable">
+<main>
   <figure aria-hidden="true">⚡</figure>
   <h1>Service Temporarily Unavailable</h1>
   <p>We're experiencing high traffic. Please try again in a few minutes.</p>
   <button onclick="location.reload()">Refresh Page</button>
-</article>
+</main>
 ```
+
+## When to Use
+
+- 500 server error pages
+- Application crash states
+- Unexpected error handling
+- Service unavailable pages

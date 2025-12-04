@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/docs.png
 A documentation page with sidebar navigation and table of contents.
 
 <Preview>
-  <article data-page="docs">
+  <div>
     <aside aria-label="Navigation">
       <nav>
         <h4>Getting Started</h4>
@@ -60,20 +60,15 @@ A documentation page with sidebar navigation and table of contents.
         <li><a href="#">Using CDN</a></li>
       </ul>
     </aside>
-  </article>
+  </div>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Technical documentation
-- API references
-- User guides
-- Knowledge bases
-
-## Structure
+A docs page uses a container with sidebar navigation, main content, and table of contents aside. The pattern `div:has(> aside[aria-label="Navigation"] + main)` identifies documentation layouts:
 
 ```html
-<article data-page="docs">
+<div>
   <aside aria-label="Navigation">
     <nav>
       <h4>Getting Started</h4>
@@ -122,19 +117,20 @@ A documentation page with sidebar navigation and table of contents.
       <li><a href="#cdn">Using CDN</a></li>
     </ul>
   </aside>
-</article>
+</div>
 ```
 
 ## CSS
 
 ```css
-[data-page="docs"] {
+/* Docs page: container with sidebar + main + TOC */
+div:has(> aside[aria-label="Navigation"] + main) {
   display: grid;
   grid-template-columns: 240px 1fr 200px;
   min-height: 100vh;
 }
 
-[data-page="docs"] > aside[aria-label="Navigation"] {
+div:has(> aside[aria-label="Navigation"] + main) > aside[aria-label="Navigation"] {
   padding: var(--spacing-4);
   border-right: 1px solid var(--border);
   position: sticky;
@@ -143,67 +139,68 @@ A documentation page with sidebar navigation and table of contents.
   overflow-y: auto;
 }
 
-[data-page="docs"] > aside[aria-label="Navigation"] nav {
+aside[aria-label="Navigation"] nav {
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="docs"] > aside[aria-label="Navigation"] h4 {
+aside[aria-label="Navigation"] h4 {
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="docs"] > aside[aria-label="Navigation"] ul {
+aside[aria-label="Navigation"] ul {
   list-style: none;
   padding: 0;
   font-size: var(--text-sm);
 }
 
-[data-page="docs"] > aside[aria-label="Navigation"] a {
+aside[aria-label="Navigation"] a {
   display: block;
   padding: var(--spacing-1) 0;
   color: var(--muted-foreground);
 }
 
-[data-page="docs"] > aside[aria-label="Navigation"] a[aria-current="page"] {
+aside[aria-label="Navigation"] a[aria-current="page"] {
   color: var(--primary);
   font-weight: 500;
 }
 
-[data-page="docs"] > main {
+/* Main content */
+div:has(> aside[aria-label="Navigation"] + main) > main {
   padding: var(--spacing-6);
   max-width: 800px;
 }
 
-[data-page="docs"] > main > nav[aria-label="Breadcrumb"] {
+main > nav[aria-label="Breadcrumb"] {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="docs"] > main h1 {
+div:has(> aside[aria-label="Navigation"] + main) > main h1 {
   font-size: var(--text-2xl);
   font-weight: 700;
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="docs"] > main > p {
+div:has(> aside[aria-label="Navigation"] + main) > main > p {
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="docs"] > main section {
+div:has(> aside[aria-label="Navigation"] + main) > main section {
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="docs"] > main section h2 {
+div:has(> aside[aria-label="Navigation"] + main) > main section h2 {
   font-size: var(--text-lg);
   font-weight: 600;
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="docs"] > main pre {
+div:has(> aside[aria-label="Navigation"] + main) > main pre {
   background: var(--muted);
   padding: var(--spacing-3);
   border-radius: var(--radius);
@@ -212,7 +209,8 @@ A documentation page with sidebar navigation and table of contents.
   overflow-x: auto;
 }
 
-[data-page="docs"] > main > nav[aria-label="Page navigation"] {
+/* Page navigation */
+main > nav[aria-label="Page navigation"] {
   display: flex;
   justify-content: space-between;
   margin-top: var(--spacing-8);
@@ -221,15 +219,16 @@ A documentation page with sidebar navigation and table of contents.
   font-size: var(--text-sm);
 }
 
-[data-page="docs"] > main > nav[aria-label="Page navigation"] a:first-child {
+main > nav[aria-label="Page navigation"] a:first-child {
   color: var(--muted-foreground);
 }
 
-[data-page="docs"] > main > nav[aria-label="Page navigation"] a:last-child {
+main > nav[aria-label="Page navigation"] a:last-child {
   color: var(--primary);
 }
 
-[data-page="docs"] > aside[aria-label="Table of contents"] {
+/* Table of contents */
+aside[aria-label="Table of contents"] {
   padding: var(--spacing-4);
   border-left: 1px solid var(--border);
   position: sticky;
@@ -237,25 +236,32 @@ A documentation page with sidebar navigation and table of contents.
   height: fit-content;
 }
 
-[data-page="docs"] > aside[aria-label="Table of contents"] h4 {
+aside[aria-label="Table of contents"] h4 {
   font-size: var(--text-sm);
   font-weight: 600;
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="docs"] > aside[aria-label="Table of contents"] ul {
+aside[aria-label="Table of contents"] ul {
   list-style: none;
   padding: 0;
   font-size: var(--text-sm);
 }
 
-[data-page="docs"] > aside[aria-label="Table of contents"] a {
+aside[aria-label="Table of contents"] a {
   display: block;
   padding: var(--spacing-1) 0;
   color: var(--muted-foreground);
 }
 
-[data-page="docs"] > aside[aria-label="Table of contents"] a[aria-current="true"] {
+aside[aria-label="Table of contents"] a[aria-current="true"] {
   color: var(--primary);
 }
 ```
+
+## When to Use
+
+- Technical documentation
+- API references
+- User guides
+- Knowledge bases

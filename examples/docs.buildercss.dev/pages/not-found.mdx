@@ -10,13 +10,13 @@ screenshot: /screenshots/pages/not-found.png
 A friendly 404 error page when content is not found.
 
 <Preview>
-  <article data-page="not-found">
+  <main>
     <data value="404">404</data>
     <h1>Page not found</h1>
     <p>Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.</p>
     <menu>
-      <a href="#">Go Home</a>
-      <a href="#">Contact Support</a>
+      <li><a href="#">Go Home</a></li>
+      <li><a href="#">Contact Support</a></li>
     </menu>
     <nav aria-label="Suggestions">
       <p>Popular pages:</p>
@@ -26,27 +26,22 @@ A friendly 404 error page when content is not found.
         <li><a href="#">Blog</a></li>
       </ul>
     </nav>
-  </article>
+  </main>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- 404 error pages
-- Content not found states
-- Broken link handling
-- Missing resource pages
-
-## Structure
+A 404 page uses `<main>` with a `<data>` element for the error code, heading, message, and navigation options. The pattern `main:has(> data[value="404"])` identifies 404 pages:
 
 ```html
-<article data-page="not-found">
+<main>
   <data value="404">404</data>
   <h1>Page not found</h1>
   <p>Sorry, we couldn't find the page you're looking for.</p>
 
   <menu>
-    <a href="/">Go Home</a>
-    <a href="/contact">Contact Support</a>
+    <li><a href="/">Go Home</a></li>
+    <li><a href="/contact">Contact Support</a></li>
   </menu>
 
   <nav aria-label="Suggestions">
@@ -57,13 +52,14 @@ A friendly 404 error page when content is not found.
       <li><a href="/blog">Blog</a></li>
     </ul>
   </nav>
-</article>
+</main>
 ```
 
 ## CSS
 
 ```css
-[data-page="not-found"] {
+/* 404 page: main with data element showing error code */
+main:has(> data[value="404"]) {
   padding: var(--spacing-6);
   text-align: center;
   min-height: 100vh;
@@ -73,7 +69,7 @@ A friendly 404 error page when content is not found.
   justify-content: center;
 }
 
-[data-page="not-found"] > data {
+main:has(> data[value="404"]) > data {
   font-size: 120px;
   font-weight: 800;
   color: var(--muted);
@@ -81,57 +77,64 @@ A friendly 404 error page when content is not found.
   display: block;
 }
 
-[data-page="not-found"] h1 {
+main:has(> data[value="404"]) h1 {
   font-size: var(--text-2xl);
   font-weight: 700;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="not-found"] > p {
+main:has(> data[value="404"]) > p {
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-6);
   max-width: 400px;
 }
 
-[data-page="not-found"] menu {
+main:has(> data[value="404"]) menu {
   display: flex;
   gap: var(--spacing-3);
+  list-style: none;
 }
 
-[data-page="not-found"] menu a:first-child {
+/* Primary: first action */
+main:has(> data[value="404"]) menu > :first-child a {
+  display: inline-block;
   padding: var(--spacing-3) var(--spacing-6);
   background: var(--primary);
   color: var(--primary-foreground);
   border-radius: var(--radius);
   font-weight: 500;
+  text-decoration: none;
 }
 
-[data-page="not-found"] menu a:last-child {
+/* Secondary: other actions */
+main:has(> data[value="404"]) menu > :not(:first-child) a {
+  display: inline-block;
   padding: var(--spacing-3) var(--spacing-6);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   font-weight: 500;
+  text-decoration: none;
 }
 
-[data-page="not-found"] nav[aria-label="Suggestions"] {
+main:has(> data[value="404"]) nav[aria-label="Suggestions"] {
   margin-top: var(--spacing-8);
 }
 
-[data-page="not-found"] nav[aria-label="Suggestions"] p {
+main:has(> data[value="404"]) nav[aria-label="Suggestions"] p {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="not-found"] nav[aria-label="Suggestions"] ul {
+main:has(> data[value="404"]) nav[aria-label="Suggestions"] ul {
   display: flex;
   gap: var(--spacing-4);
   list-style: none;
   padding: 0;
 }
 
-[data-page="not-found"] nav[aria-label="Suggestions"] a {
+main:has(> data[value="404"]) nav[aria-label="Suggestions"] a {
   font-size: var(--text-sm);
   color: var(--primary);
 }
@@ -142,20 +145,28 @@ A friendly 404 error page when content is not found.
 ### Minimal 404
 
 ```html
-<article data-page="not-found" data-variant="minimal">
-  <h1>404</h1>
-  <p>Page not found</p>
+<main>
+  <data value="404">404</data>
+  <h1>Page not found</h1>
   <a href="/">Return home</a>
-</article>
+</main>
 ```
 
 ### Illustrated 404
 
 ```html
-<article data-page="not-found" data-variant="illustrated">
+<main>
   <figure><img src="/404-illustration.svg" alt="" /></figure>
+  <data value="404">404</data>
   <h1>Oops! Lost in space</h1>
   <p>The page you're looking for has drifted away.</p>
   <a href="/">Back to Earth</a>
-</article>
+</main>
 ```
+
+## When to Use
+
+- 404 error pages
+- Content not found states
+- Broken link handling
+- Missing resource pages

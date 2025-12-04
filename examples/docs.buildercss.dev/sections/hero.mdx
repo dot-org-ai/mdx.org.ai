@@ -10,80 +10,77 @@ screenshot: /screenshots/sections/hero.png
 The primary landing section that captures attention with a headline, description, and call-to-action.
 
 <Preview>
-  <section data-section="hero">
+  <section>
     <h1>Build better products with semantic HTML</h1>
-    <p>A design system that uses data attributes instead of utility classes. Clean markup, powerful styling.</p>
-    <nav>
-      <button>Get Started</button>
-      <a href="#">View Documentation</a>
-    </nav>
+    <p>A design system that uses pure HTML structure for styling. Clean markup, powerful CSS.</p>
+    <menu>
+      <li><a href="/docs">Get Started</a></li>
+      <li><a href="/demo">View Demo</a></li>
+    </menu>
   </section>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Homepage primary section
-- Product landing pages
-- Campaign pages
-- App marketing sites
-
-## Structure
+A hero section is a `<section>` with `<h1>` as first child:
 
 ```html
-<section data-section="hero">
+<section>
   <h1>Build better products with semantic HTML</h1>
-  <p>A design system that uses data attributes instead of utility classes.</p>
-  <nav>
-    <button>Get Started</button>
-    <a href="/docs">View Documentation</a>
-  </nav>
+  <p>A design system that uses pure HTML structure for styling.</p>
+  <menu>
+    <li><a href="/docs">Get Started</a></li>
+    <li><a href="/demo">View Demo</a></li>
+  </menu>
 </section>
 ```
 
 ## CSS
 
 ```css
-[data-section="hero"] {
+/* Hero: section with h1 as first child */
+section:has(> h1:first-child) {
   padding: var(--spacing-16) var(--spacing-6);
   text-align: center;
 }
 
-[data-section="hero"] h1 {
+section:has(> h1:first-child) > h1 {
   font-size: var(--text-4xl);
   font-weight: 800;
   margin-bottom: var(--spacing-4);
   line-height: 1.1;
 }
 
-[data-section="hero"] p {
+section:has(> h1:first-child) > p {
   font-size: var(--text-lg);
   color: var(--muted-foreground);
   max-width: 600px;
   margin: 0 auto var(--spacing-6);
 }
 
-[data-section="hero"] nav {
+section:has(> h1:first-child) > menu {
   display: flex;
   gap: var(--spacing-3);
   justify-content: center;
+  list-style: none;
+  padding: 0;
 }
 
-[data-section="hero"] button,
-[data-section="hero"] a {
+section:has(> h1:first-child) > menu a {
   padding: var(--spacing-3) var(--spacing-6);
   border-radius: var(--radius);
   font-weight: 500;
   text-decoration: none;
-  cursor: pointer;
 }
 
-[data-section="hero"] nav > :first-child {
+/* Primary action: first menu item */
+section:has(> h1:first-child) > menu > :first-child a {
   background: var(--primary);
   color: var(--primary-foreground);
-  border: none;
 }
 
-[data-section="hero"] nav > :not(:first-child) {
+/* Secondary action: not first */
+section:has(> h1:first-child) > menu > :not(:first-child) a {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--foreground);
@@ -94,17 +91,19 @@ The primary landing section that captures attention with a headline, description
 
 ### With Badge
 
+Add a `<mark>` element before the heading:
+
 ```html
-<section data-section="hero">
-  <span>New: Version 2.0 Released</span>
+<section>
+  <mark>New: Version 2.0 Released</mark>
   <h1>Build better products</h1>
   <p>...</p>
-  <nav>...</nav>
+  <menu>...</menu>
 </section>
 ```
 
 ```css
-[data-section="hero"] > span:first-child {
+section:has(> h1) > mark:first-child {
   display: inline-block;
   padding: var(--spacing-1) var(--spacing-3);
   background: var(--primary);
@@ -117,16 +116,27 @@ The primary landing section that captures attention with a headline, description
 
 ### With Social Proof
 
+Add a `<footer>` with avatars:
+
 ```html
-<section data-section="hero">
+<section>
   <h1>...</h1>
   <p>...</p>
-  <nav>...</nav>
+  <menu>...</menu>
   <footer>
-    <img src="/avatar1.jpg" alt="" />
-    <img src="/avatar2.jpg" alt="" />
-    <img src="/avatar3.jpg" alt="" />
+    <figure>
+      <img src="/avatar1.jpg" alt="">
+      <img src="/avatar2.jpg" alt="">
+      <img src="/avatar3.jpg" alt="">
+    </figure>
     <span>Join 10,000+ developers</span>
   </footer>
 </section>
 ```
+
+## When to Use
+
+- Homepage primary section
+- Product landing pages
+- Campaign pages
+- App marketing sites

@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/terms.png
 A legal page for terms of service documentation.
 
 <Preview>
-  <article data-page="terms">
+  <article>
     <header>
       <h1>Terms of Service</h1>
       <p><time datetime="2024-12-01">Effective date: December 1, 2024</time></p>
@@ -55,17 +55,12 @@ A legal page for terms of service documentation.
   </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Terms of service pages
-- User agreements
-- Legal terms and conditions
-- Service agreements
-
-## Structure
+Terms of service uses `<article>` with header, important notice aside, and content sections. The pattern `article:has(> header > h1 + p > time):has(> aside + div > section)` identifies terms pages:
 
 ```html
-<article data-page="terms">
+<article>
   <header>
     <h1>Terms of Service</h1>
     <p><time datetime="2024-12-01">Effective date: December 1, 2024</time></p>
@@ -101,28 +96,30 @@ A legal page for terms of service documentation.
 ## CSS
 
 ```css
-[data-page="terms"] {
+/* Terms page: article with header, notice aside, and sections */
+article:has(> header > h1 + p > time):has(> aside + div > section) {
   padding: var(--spacing-6);
   max-width: 800px;
   margin: 0 auto;
 }
 
-[data-page="terms"] > header {
+article:has(> header > h1 + p > time):has(> aside + div > section) > header {
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="terms"] > header h1 {
+article:has(> header > h1 + p > time):has(> aside + div > section) > header h1 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="terms"] > header time {
+article:has(> header > h1 + p > time):has(> aside + div > section) > header time {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
 }
 
-[data-page="terms"] > aside {
+/* Important notice aside */
+article:has(> header > h1 + p > time):has(> aside + div > section) > aside {
   background: var(--muted);
   padding: var(--spacing-4);
   border-radius: var(--radius-lg);
@@ -131,32 +128,40 @@ A legal page for terms of service documentation.
   font-size: var(--text-sm);
 }
 
-[data-page="terms"] > div {
+/* Content sections */
+article:has(> header > h1 + p > time):has(> aside + div > section) > div {
   line-height: 1.8;
   color: var(--muted-foreground);
 }
 
-[data-page="terms"] > div section {
+article:has(> header > h1 + p > time):has(> aside + div > section) > div section {
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="terms"] > div h2 {
+article:has(> header > h1 + p > time):has(> aside + div > section) > div h2 {
   font-size: var(--text-lg);
   font-weight: 600;
   color: var(--foreground);
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="terms"] > div p {
+article:has(> header > h1 + p > time):has(> aside + div > section) > div p {
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="terms"] > div ul {
+article:has(> header > h1 + p > time):has(> aside + div > section) > div ul {
   padding-left: var(--spacing-6);
   margin-top: var(--spacing-2);
 }
 
-[data-page="terms"] > div a {
+article:has(> header > h1 + p > time):has(> aside + div > section) > div a {
   color: var(--primary);
 }
 ```
+
+## When to Use
+
+- Terms of service pages
+- User agreements
+- Legal terms and conditions
+- Service agreements

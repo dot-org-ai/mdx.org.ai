@@ -10,8 +10,8 @@ screenshot: /screenshots/containers/popup.png
 A small floating widget in the corner, commonly used for chat interfaces.
 
 <Preview>
-  <div data-container="popup">
-    <button aria-label="Open chat">💬</button>
+  <aside aria-label="Chat widget">
+    <button aria-label="Open chat" aria-expanded="false">💬</button>
     <article>
       <header>
         <h2>Chat with us</h2>
@@ -27,27 +27,20 @@ A small floating widget in the corner, commonly used for chat interfaces.
         <button type="submit">Send</button>
       </footer>
     </article>
-  </div>
+  </aside>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Live chat widgets
-- Help/support bubbles
-- Quick feedback forms
-- Notification centers
-
-## Structure
+A popup widget uses `<aside aria-label>` with a trigger button. The pattern `aside:has(> button[aria-expanded] + article)` identifies it:
 
 ```html
-<!-- Trigger button -->
-<button aria-label="Open chat">
-  <svg><!-- Chat icon --></svg>
-</button>
-
-<!-- Popup -->
-<aside data-container="popup" aria-hidden="true">
-  <article>
+<!-- Popup Widget -->
+<aside aria-label="Chat widget">
+  <button aria-label="Open chat" aria-expanded="false">
+    <svg><!-- Chat icon --></svg>
+  </button>
+  <article aria-hidden="true">
     <header>
       <h2>Chat with us</h2>
       <button aria-label="Close">&times;</button>
@@ -66,10 +59,15 @@ A small floating widget in the corner, commonly used for chat interfaces.
 ## CSS
 
 ```css
-[data-container="popup"] > button:first-child {
+/* Popup widget: aside with button trigger + article */
+aside:has(> button[aria-expanded] + article) {
   position: fixed;
   bottom: var(--spacing-4);
   right: var(--spacing-4);
+  z-index: 90;
+}
+
+aside:has(> button[aria-expanded] + article) > button[aria-expanded] {
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -77,20 +75,19 @@ A small floating widget in the corner, commonly used for chat interfaces.
   color: var(--primary-foreground);
   border: none;
   cursor: pointer;
-  z-index: 90;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   font-size: var(--text-xl);
   transition: transform 0.2s;
 }
 
-[data-container="popup"] > button:first-child:hover {
+aside:has(> button[aria-expanded] + article) > button[aria-expanded]:hover {
   transform: scale(1.05);
 }
 
-[data-container="popup"] > article {
-  position: fixed;
-  bottom: calc(var(--spacing-4) + 70px);
-  right: var(--spacing-4);
+aside:has(> button[aria-expanded] + article) > article {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
   width: 380px;
   background: var(--background);
   border-radius: var(--radius-lg);
@@ -100,27 +97,26 @@ A small floating widget in the corner, commonly used for chat interfaces.
   display: flex;
   flex-direction: column;
   max-height: 500px;
-  z-index: 95;
   animation: popupIn 0.3s ease;
 }
 
-[data-container="popup"] > article > header {
+aside:has(> button[aria-expanded] + article) > article > header {
   padding: var(--spacing-4);
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-[data-container="popup"] > article > header h2 {
+aside:has(> button[aria-expanded] + article) > article > header h2 {
   font-size: var(--text-lg);
   font-weight: 600;
 }
 
-[data-container="popup"] > article > header p {
+aside:has(> button[aria-expanded] + article) > article > header p {
   font-size: var(--text-sm);
   opacity: 0.9;
 }
 
-[data-container="popup"] > article > section {
+aside:has(> button[aria-expanded] + article) > article > section {
   flex: 1;
   padding: var(--spacing-4);
   overflow-y: auto;
@@ -128,7 +124,7 @@ A small floating widget in the corner, commonly used for chat interfaces.
   min-height: 200px;
 }
 
-[data-container="popup"] > article > section > div {
+aside:has(> button[aria-expanded] + article) > article > section > div {
   background: var(--background);
   padding: var(--spacing-3);
   border-radius: var(--radius);
@@ -136,25 +132,25 @@ A small floating widget in the corner, commonly used for chat interfaces.
   max-width: 80%;
 }
 
-[data-container="popup"] > article > section > div p {
+aside:has(> button[aria-expanded] + article) > article > section > div p {
   font-size: var(--text-sm);
 }
 
-[data-container="popup"] > article > footer {
+aside:has(> button[aria-expanded] + article) > article > footer {
   padding: var(--spacing-3);
   border-top: 1px solid var(--border);
   display: flex;
   gap: var(--spacing-2);
 }
 
-[data-container="popup"] > article > footer input {
+aside:has(> button[aria-expanded] + article) > article > footer input {
   flex: 1;
   padding: var(--spacing-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-container="popup"] > article > footer button {
+aside:has(> button[aria-expanded] + article) > article > footer button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -163,7 +159,8 @@ A small floating widget in the corner, commonly used for chat interfaces.
   cursor: pointer;
 }
 
-[data-container="popup"][aria-hidden="true"] > article {
+/* Hide article when button is not expanded */
+aside:has(> button[aria-expanded="false"] + article) > article {
   display: none;
 }
 
@@ -179,7 +176,7 @@ A small floating widget in the corner, commonly used for chat interfaces.
 }
 
 @media (max-width: 480px) {
-  [data-container="popup"] > article {
+  aside:has(> button[aria-expanded] + article) > article {
     left: var(--spacing-4);
     right: var(--spacing-4);
     width: auto;
@@ -190,55 +187,18 @@ A small floating widget in the corner, commonly used for chat interfaces.
 ## JavaScript
 
 ```js
-const trigger = document.querySelector('[data-container="popup"] > button:first-child')
-const popup = document.querySelector('[data-container="popup"]')
+const widget = document.querySelector('aside[aria-label="Chat widget"]')
+const trigger = widget.querySelector('button[aria-expanded]')
 
 trigger.addEventListener('click', () => {
-  const isHidden = popup.getAttribute('aria-hidden') === 'true'
-  popup.setAttribute('aria-hidden', !isHidden)
+  const isExpanded = trigger.getAttribute('aria-expanded') === 'true'
+  trigger.setAttribute('aria-expanded', !isExpanded)
 })
 ```
 
-## Variations
+## When to Use
 
-### Notification Popup
-
-```html
-<aside data-container="popup">
-  <article>
-    <header>
-      <h2>Notifications</h2>
-      <button>Mark all read</button>
-    </header>
-    <ul>
-      <li>
-        <img src="/avatar.jpg" alt="" />
-        <div>
-          <p><strong>John</strong> commented on your post</p>
-          <time>2 minutes ago</time>
-        </div>
-      </li>
-    </ul>
-  </article>
-</aside>
-```
-
-### Help Widget
-
-```html
-<aside data-container="popup">
-  <article>
-    <header>
-      <h2>Help Center</h2>
-    </header>
-    <section>
-      <input type="search" placeholder="Search help articles..." />
-      <nav>
-        <a href="/help/getting-started">Getting Started</a>
-        <a href="/help/faq">FAQ</a>
-        <a href="/help/contact">Contact Support</a>
-      </nav>
-    </section>
-  </article>
-</aside>
-```
+- Live chat widgets
+- Help/support bubbles
+- Quick feedback forms
+- Notification centers

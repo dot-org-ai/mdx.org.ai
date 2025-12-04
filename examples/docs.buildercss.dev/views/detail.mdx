@@ -10,7 +10,7 @@ screenshot: /screenshots/views/detail.png
 A detailed view of a single item with all its information.
 
 <Preview>
-  <article data-view="detail">
+  <article>
     <header>
       <div>
         <mark>Active</mark>
@@ -19,8 +19,8 @@ A detailed view of a single item with all its information.
       <h1>Project Alpha</h1>
       <p>Web application redesign project</p>
       <menu>
-        <button>Edit</button>
-        <button>Delete</button>
+        <li><button>Edit</button></li>
+        <li><button>Delete</button></li>
       </menu>
     </header>
     <div>
@@ -70,18 +70,12 @@ A detailed view of a single item with all its information.
   </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Project details
-- Item views
-- User profiles
-- Record details
-- Document previews
-
-## Structure
+A detail view is an `<article>` with header and a `<div>` containing `<section>` + `<aside>`:
 
 ```html
-<article data-view="detail">
+<article>
   <header>
     <div>
       <mark>Active</mark>
@@ -90,8 +84,8 @@ A detailed view of a single item with all its information.
     <h1>Project Alpha</h1>
     <p>Web application redesign project</p>
     <menu>
-      <button>Edit</button>
-      <button>Delete</button>
+      <li><button>Edit</button></li>
+      <li><button>Delete</button></li>
     </menu>
   </header>
 
@@ -132,11 +126,12 @@ A detailed view of a single item with all its information.
 ## CSS
 
 ```css
-[data-view="detail"] {
+/* Detail view: article with header + div containing section + aside */
+article:has(> header + div > section + aside) {
   padding: var(--spacing-6);
 }
 
-[data-view="detail"] > header {
+article:has(> header + div > section + aside) > header {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -144,7 +139,7 @@ A detailed view of a single item with all its information.
   margin-bottom: var(--spacing-6);
 }
 
-[data-view="detail"] > header > div:first-child {
+article:has(> header + div > section + aside) > header > div:first-child {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
@@ -152,7 +147,7 @@ A detailed view of a single item with all its information.
   width: 100%;
 }
 
-[data-view="detail"] > header mark {
+article:has(> header + div > section + aside) > header mark {
   padding: 2px 8px;
   background: green;
   color: white;
@@ -160,36 +155,39 @@ A detailed view of a single item with all its information.
   font-size: var(--text-xs);
 }
 
-[data-view="detail"] > header time {
+article:has(> header + div > section + aside) > header time {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-view="detail"] > header h1 {
+article:has(> header + div > section + aside) > header h1 {
   font-size: var(--text-2xl);
   font-weight: 700;
   margin-bottom: var(--spacing-1);
   flex: 1;
 }
 
-[data-view="detail"] > header > p {
+article:has(> header + div > section + aside) > header > p {
   color: var(--muted-foreground);
   width: 100%;
 }
 
-[data-view="detail"] > header menu {
+article:has(> header + div > section + aside) > header menu {
   display: flex;
   gap: var(--spacing-2);
+  list-style: none;
 }
 
-[data-view="detail"] > header menu button:first-child {
+/* Secondary button: first */
+article:has(> header + div > section + aside) > header menu > :first-child button {
   padding: var(--spacing-2) var(--spacing-4);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-view="detail"] > header menu button:last-child {
+/* Destructive button: last (delete) */
+article:has(> header + div > section + aside) > header menu > :last-child button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--destructive);
   color: var(--destructive-foreground);
@@ -197,29 +195,29 @@ A detailed view of a single item with all its information.
   border-radius: var(--radius);
 }
 
-[data-view="detail"] > div {
+article:has(> header + div > section + aside) > div {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--spacing-6);
 }
 
-[data-view="detail"] section h2 {
+article:has(> header + div > section + aside) section h2 {
   font-size: var(--text-lg);
   font-weight: 600;
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="detail"] section > p {
+article:has(> header + div > section + aside) section > p {
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="detail"] section ul {
+article:has(> header + div > section + aside) section ul {
   list-style: none;
   padding: 0;
 }
 
-[data-view="detail"] section ul li {
+article:has(> header + div > section + aside) section ul li {
   display: flex;
   gap: var(--spacing-3);
   padding-bottom: var(--spacing-3);
@@ -227,12 +225,12 @@ A detailed view of a single item with all its information.
   margin-bottom: var(--spacing-3);
 }
 
-[data-view="detail"] section ul li:last-child {
+article:has(> header + div > section + aside) section ul li:last-child {
   border-bottom: none;
   margin-bottom: 0;
 }
 
-[data-view="detail"] section figure {
+article:has(> header + div > section + aside) section figure {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -241,36 +239,44 @@ A detailed view of a single item with all its information.
   margin: 0;
 }
 
-[data-view="detail"] section ul time {
+article:has(> header + div > section + aside) section ul time {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-view="detail"] aside {
+article:has(> header + div > section + aside) aside {
   background: var(--muted);
   padding: var(--spacing-4);
   border-radius: var(--radius-lg);
 }
 
-[data-view="detail"] aside h3 {
+article:has(> header + div > section + aside) aside h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="detail"] aside dl {
+article:has(> header + div > section + aside) aside dl {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-3);
 }
 
-[data-view="detail"] aside dt {
+article:has(> header + div > section + aside) aside dt {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
 @media (max-width: 768px) {
-  [data-view="detail"] > div {
+  article:has(> header + div > section + aside) > div {
     grid-template-columns: 1fr;
   }
 }
 ```
+
+## When to Use
+
+- Project details
+- Item views
+- User profiles
+- Record details
+- Document previews

@@ -1,141 +1,257 @@
 ---
 $type: DocsPage
 title: Quickstart
-description: Get started with BuilderCSS in 5 minutes
+description: Build your first page with pure semantic HTML
 ---
 
 # Quickstart
 
-Get up and running with BuilderCSS in just a few minutes.
-
-## Installation
-
-### CDN (Recommended for prototyping)
-
-Add BuilderCSS directly to your HTML:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Site</title>
-  <link rel="stylesheet" href="https://cdn.buildercss.dev/base.css">
-</head>
-<body data-layout="stacked">
-  <!-- Your content here -->
-</body>
-</html>
-```
-
-### npm
-
-```bash
-npm install buildercss
-```
-
-```js
-import 'buildercss/base.css'
-```
+Build a complete landing page using pure semantic HTML in 5 minutes.
 
 ## Your First Page
 
-Here's a complete landing page using BuilderCSS:
-
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome</title>
+  <title>My App</title>
   <link rel="stylesheet" href="https://cdn.buildercss.dev/base.css">
 </head>
-<body data-layout="stacked">
-  <header>
-    <nav>
-      <a href="/" data-logo>MyApp</a>
-      <ul>
-        <li><a href="/features">Features</a></li>
-        <li><a href="/pricing">Pricing</a></li>
-        <li><a href="/docs">Docs</a></li>
-      </ul>
-      <a href="/login" data-button="outline">Log in</a>
-    </nav>
-  </header>
+<body>
+  <article>
+    <header>
+      <nav>
+        <a href="/">MyApp</a>
+        <menu>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/docs">Docs</a></li>
+        </menu>
+        <menu>
+          <li><a href="/login">Log in</a></li>
+          <li><a href="/signup">Sign up</a></li>
+        </menu>
+      </nav>
+    </header>
 
-  <main>
-    <section data-section="hero">
-      <h1>Build faster with semantic CSS</h1>
-      <p>A design system that works with plain HTML.</p>
-      <div data-actions>
-        <a href="/docs" data-button="primary">Get Started</a>
-        <a href="/demo" data-button="outline">View Demo</a>
-      </div>
-    </section>
+    <main>
+      <!-- Hero section -->
+      <section>
+        <h1>Build faster with semantic HTML</h1>
+        <p>A design system that works with pure HTML. No classes. No data attributes.</p>
+        <menu>
+          <li><a href="/docs">Get Started</a></li>
+          <li><a href="/demo">View Demo</a></li>
+        </menu>
+      </section>
 
-    <section data-section="features">
-      <h2>Features</h2>
-      <div data-grid="3">
-        <article>
-          <h3>Pure HTML/CSS</h3>
-          <p>No JavaScript required. Works in any browser.</p>
-        </article>
-        <article>
-          <h3>Semantic</h3>
-          <p>Uses native HTML elements with data attributes.</p>
-        </article>
-        <article>
-          <h3>Cross-platform</h3>
-          <p>Web + React Native implementations.</p>
-        </article>
-      </div>
-    </section>
-  </main>
+      <!-- Features section -->
+      <section>
+        <h2>Features</h2>
+        <ul>
+          <li>
+            <article>
+              <h3>Pure HTML/CSS</h3>
+              <p>No JavaScript required. Works in any browser.</p>
+            </article>
+          </li>
+          <li>
+            <article>
+              <h3>Semantic</h3>
+              <p>Uses native HTML elements with meaningful structure.</p>
+            </article>
+          </li>
+          <li>
+            <article>
+              <h3>AI-Friendly</h3>
+              <p>LLMs understand semantic HTML, not arbitrary classes.</p>
+            </article>
+          </li>
+        </ul>
+      </section>
+    </main>
 
-  <footer>
-    <p>&copy; 2024 MyApp. All rights reserved.</p>
-  </footer>
+    <footer>
+      <p>&copy; 2024 MyApp. All rights reserved.</p>
+    </footer>
+  </article>
 </body>
 </html>
 ```
 
-## Key Concepts
+## How It Works
 
-### Data Attributes
-
-BuilderCSS uses `data-*` attributes for styling:
-
-| Attribute | Purpose | Example |
-|-----------|---------|---------|
-| `data-layout` | Page structure | `data-layout="stacked"` |
-| `data-section` | Content sections | `data-section="hero"` |
-| `data-button` | Button variants | `data-button="primary"` |
-| `data-grid` | Grid layouts | `data-grid="3"` |
-
-### CSS Variables
-
-Customize the theme using CSS custom properties:
+The CSS matches your semantic structure:
 
 ```css
-:root {
-  --primary: 222.2 47.4% 11.2%;
-  --primary-foreground: 210 40% 98%;
-  --radius-md: 0.5rem;
+/* Stacked layout: article with header + main + footer */
+article:has(> header + main + footer) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+
+/* Hero: first section with h1 */
+main > section:first-child:has(> h1) {
+  text-align: center;
+  padding: var(--spacing-16) var(--spacing-4);
+}
+
+/* Features: section with list of articles */
+section:has(> ul > li > article) ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-6);
+  list-style: none;
+  padding: 0;
+}
+
+/* Primary action: first menu item */
+section:has(> h1) menu > :first-child a {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+```
+
+## Key Patterns
+
+### Navigation
+
+```html
+<nav>
+  <a href="/">Brand</a>
+  <menu>
+    <li><a href="/features">Features</a></li>
+    <li><a href="/pricing" aria-current="page">Pricing</a></li>
+  </menu>
+</nav>
+```
+
+### Hero Section
+
+A section with `h1` as first child:
+
+```html
+<section>
+  <h1>Headline</h1>
+  <p>Subheadline</p>
+  <menu>
+    <li><a href="#">Primary</a></li>
+    <li><a href="#">Secondary</a></li>
+  </menu>
+</section>
+```
+
+### Feature Grid
+
+A section with a list of articles:
+
+```html
+<section>
+  <h2>Features</h2>
+  <ul>
+    <li><article><h3>Title</h3><p>Description</p></article></li>
+    <li><article><h3>Title</h3><p>Description</p></article></li>
+    <li><article><h3>Title</h3><p>Description</p></article></li>
+  </ul>
+</section>
+```
+
+### FAQ
+
+A section with a definition list:
+
+```html
+<section>
+  <h2>FAQ</h2>
+  <dl>
+    <dt>Question one?</dt>
+    <dd>Answer one.</dd>
+    <dt>Question two?</dt>
+    <dd>Answer two.</dd>
+  </dl>
+</section>
+```
+
+### Testimonials
+
+A section with blockquotes:
+
+```html
+<section>
+  <h2>What people say</h2>
+  <blockquote>
+    <p>This is amazing!</p>
+    <cite>Jane Doe, CEO</cite>
+  </blockquote>
+</section>
+```
+
+### Modal
+
+Native `<dialog>` element:
+
+```html
+<dialog id="signup">
+  <article>
+    <header>
+      <h2>Sign Up</h2>
+      <button onclick="this.closest('dialog').close()">×</button>
+    </header>
+    <form method="dialog">
+      <fieldset>
+        <label>Email <input type="email" required></label>
+        <label>Password <input type="password" required></label>
+      </fieldset>
+      <menu>
+        <li><button type="submit">Create Account</button></li>
+      </menu>
+    </form>
+  </article>
+</dialog>
+
+<button onclick="document.getElementById('signup').showModal()">
+  Sign Up
+</button>
+```
+
+## States with ARIA
+
+Use accessibility attributes for interactive states:
+
+```html
+<!-- Current page -->
+<a href="/" aria-current="page">Home</a>
+
+<!-- Toggle state -->
+<button aria-pressed="true">Dark Mode</button>
+
+<!-- Expanded -->
+<button aria-expanded="true">Menu</button>
+
+<!-- Loading -->
+<button aria-busy="true">Saving...</button>
+```
+
+```css
+[aria-current="page"] { background: var(--primary); }
+[aria-pressed="true"] { background: var(--muted); }
+[aria-expanded="true"] + menu { display: block; }
+[aria-busy="true"] { opacity: 0.7; }
 ```
 
 ## Next Steps
 
 <CardGrid>
   <Card href="/concepts" title="Core Concepts">
-    Learn the philosophy behind BuilderCSS.
+    Understand the semantic pattern-matching philosophy.
   </Card>
   <Card href="/layouts" title="Layouts">
-    Explore page-level layout patterns.
+    Explore structural patterns.
   </Card>
   <Card href="/sections" title="Sections">
-    Build with reusable content blocks.
+    Build with semantic content blocks.
   </Card>
 </CardGrid>

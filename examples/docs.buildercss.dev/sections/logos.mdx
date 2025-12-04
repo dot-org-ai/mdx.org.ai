@@ -10,7 +10,7 @@ screenshot: /screenshots/sections/logos.png
 A logo cloud showing trusted companies and partners.
 
 <Preview>
-  <section data-section="logos">
+  <section>
     <p>Trusted by teams at</p>
     <div>
       <figure>Company 1</figure>
@@ -22,17 +22,12 @@ A logo cloud showing trusted companies and partners.
   </section>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Social proof after hero
-- Partner showcases
-- Client lists
-- Integration displays
-
-## Structure
+A logos section is a `<section>` containing a row of company logos. The pattern `section:has(> p + div > figure)` identifies it:
 
 ```html
-<section data-section="logos">
+<section>
   <p>Trusted by teams at</p>
   <div>
     <img src="/logos/company1.svg" alt="Company 1" />
@@ -47,18 +42,22 @@ A logo cloud showing trusted companies and partners.
 ## CSS
 
 ```css
-[data-section="logos"] {
+/* Logos: section with p + div containing images/figures */
+section:has(> p + div > figure),
+section:has(> p + div > img) {
   padding: var(--spacing-12) var(--spacing-4);
   text-align: center;
 }
 
-[data-section="logos"] > p {
+section:has(> p + div > figure) > p,
+section:has(> p + div > img) > p {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
   margin-bottom: var(--spacing-8);
 }
 
-[data-section="logos"] > div {
+section:has(> p + div > figure) > div,
+section:has(> p + div > img) > div {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,7 +65,7 @@ A logo cloud showing trusted companies and partners.
   flex-wrap: wrap;
 }
 
-[data-section="logos"] > div img {
+section:has(> p + div > img) > div img {
   height: 32px;
   width: auto;
   opacity: 0.6;
@@ -74,12 +73,12 @@ A logo cloud showing trusted companies and partners.
   transition: opacity 0.2s, filter 0.2s;
 }
 
-[data-section="logos"] > div img:hover {
+section:has(> p + div > img) > div img:hover {
   opacity: 1;
   filter: grayscale(0%);
 }
 
-[data-section="logos"] > div figure {
+section:has(> p + div > figure) > div figure {
   width: 120px;
   height: 40px;
   background: var(--muted);
@@ -88,14 +87,16 @@ A logo cloud showing trusted companies and partners.
   align-items: center;
   justify-content: center;
   opacity: 0.6;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
-  [data-section="logos"] > div {
+  section:has(> p + div > figure) > div,
+  section:has(> p + div > img) > div {
     gap: var(--spacing-6);
   }
 
-  [data-section="logos"] > div img {
+  section:has(> p + div > img) > div img {
     height: 24px;
   }
 }
@@ -106,7 +107,7 @@ A logo cloud showing trusted companies and partners.
 ### Scrolling Marquee
 
 ```html
-<section data-section="logos">
+<section>
   <p>Trusted by teams at</p>
   <div>
     <div>
@@ -119,7 +120,7 @@ A logo cloud showing trusted companies and partners.
 ```
 
 ```css
-[data-section="logos"] > div {
+section:has(> p + div > div > img) > div {
   overflow: hidden;
   mask-image: linear-gradient(
     to right,
@@ -130,7 +131,7 @@ A logo cloud showing trusted companies and partners.
   );
 }
 
-[data-section="logos"] > div > div {
+section:has(> p + div > div > img) > div > div {
   display: flex;
   gap: var(--spacing-12);
   animation: marquee 30s linear infinite;
@@ -142,10 +143,10 @@ A logo cloud showing trusted companies and partners.
 }
 ```
 
-### With Borders
+### With Links
 
 ```html
-<section data-section="logos">
+<section>
   <div>
     <a href="https://company1.com">
       <img src="/logos/company1.svg" alt="Company 1" />
@@ -154,3 +155,10 @@ A logo cloud showing trusted companies and partners.
   </div>
 </section>
 ```
+
+## When to Use
+
+- Social proof after hero
+- Partner showcases
+- Client lists
+- Integration displays

@@ -10,32 +10,32 @@ screenshot: /screenshots/views/dashboard.png
 An overview dashboard displaying key metrics, charts, and quick actions.
 
 <Preview>
-  <article data-view="dashboard">
+  <article>
     <header>
       <h1>Dashboard</h1>
       <menu>
-        <button>Export</button>
-        <button>Settings</button>
+        <li><button>Export</button></li>
+        <li><button>Settings</button></li>
       </menu>
     </header>
-    <section aria-label="Metrics">
+    <section>
       <article>
-        <header><span>Total Users</span></header>
+        <header>Total Users</header>
         <data value="12345">12,345</data>
         <footer>+12% from last month</footer>
       </article>
       <article>
-        <header><span>Revenue</span></header>
+        <header>Revenue</header>
         <data value="45200">$45.2K</data>
         <footer>+8% from last month</footer>
       </article>
       <article>
-        <header><span>Active Now</span></header>
+        <header>Active Now</header>
         <data value="573">573</data>
         <footer>users online</footer>
       </article>
       <article>
-        <header><span>Conversion</span></header>
+        <header>Conversion</header>
         <data value="3.2">3.2%</data>
         <footer>-2% from last month</footer>
       </article>
@@ -57,40 +57,39 @@ An overview dashboard displaying key metrics, charts, and quick actions.
   </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Admin dashboards
-- Analytics overview
-- KPI monitoring
-- Quick status checks
-
-## Structure
+A dashboard view is an `<article>` with:
+- `<header>` containing title and action menu
+- `<section>` containing metric cards with `<data>` elements
+- `<div>` with charts/widgets and `<aside>` for activity
 
 ```html
-<article data-view="dashboard">
+<article>
   <header>
     <h1>Dashboard</h1>
     <menu>
-      <button>Export</button>
-      <button>Settings</button>
+      <li><button>Export</button></li>
+      <li><button>Settings</button></li>
     </menu>
   </header>
 
-  <section aria-label="Metrics">
+  <!-- Metrics section -->
+  <section>
     <article>
-      <header><span>Total Users</span></header>
+      <header>Total Users</header>
       <data value="12345">12,345</data>
       <footer>+12% from last month</footer>
     </article>
     <!-- More metrics -->
   </section>
 
+  <!-- Charts and activity -->
   <div>
     <article>
       <header><h3>Revenue</h3></header>
-      <figure><!-- Chart component --></figure>
+      <figure><!-- Chart --></figure>
     </article>
-
     <aside>
       <header><h3>Recent Activity</h3></header>
       <ul><!-- Activity items --></ul>
@@ -102,35 +101,39 @@ An overview dashboard displaying key metrics, charts, and quick actions.
 ## CSS
 
 ```css
-[data-view="dashboard"] {
+/* Dashboard: article with header + section + div */
+article:has(> header + section + div) {
   padding: var(--spacing-6);
 }
 
-[data-view="dashboard"] > header {
+article:has(> header + section + div) > header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-6);
 }
 
-[data-view="dashboard"] > header h1 {
+article:has(> header + section + div) > header h1 {
   font-size: var(--text-2xl);
   font-weight: 700;
 }
 
-[data-view="dashboard"] > header menu {
+article:has(> header + section + div) > header menu {
   display: flex;
   gap: var(--spacing-2);
+  list-style: none;
 }
 
-[data-view="dashboard"] > header menu button:first-child {
+/* Secondary button */
+article:has(> header + section + div) > header menu > :first-child button {
   padding: var(--spacing-2) var(--spacing-4);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-view="dashboard"] > header menu button:last-child {
+/* Primary button */
+article:has(> header + section + div) > header menu > :last-child button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -138,57 +141,61 @@ An overview dashboard displaying key metrics, charts, and quick actions.
   border-radius: var(--radius);
 }
 
-[data-view="dashboard"] [aria-label="Metrics"] {
+/* Metrics section - contains articles with data elements */
+article:has(> header + section + div) > section:has(> article > data) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-4);
   margin-bottom: var(--spacing-6);
 }
 
-[data-view="dashboard"] [aria-label="Metrics"] > article {
+/* Metric card */
+article:has(> header + section + div) > section > article {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-4);
 }
 
-[data-view="dashboard"] [aria-label="Metrics"] header span {
+article:has(> header + section + div) > section > article > header {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
+  margin-bottom: var(--spacing-2);
 }
 
-[data-view="dashboard"] [aria-label="Metrics"] data {
+article:has(> header + section + div) > section > article > data {
   display: block;
   font-size: var(--text-3xl);
   font-weight: 700;
 }
 
-[data-view="dashboard"] [aria-label="Metrics"] footer {
+article:has(> header + section + div) > section > article > footer {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-view="dashboard"] > div {
+/* Charts and sidebar */
+article:has(> header + section + div) > div {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--spacing-4);
 }
 
-[data-view="dashboard"] > div > article,
-[data-view="dashboard"] > div > aside {
+article:has(> header + section + div) > div > article,
+article:has(> header + section + div) > div > aside {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-4);
 }
 
-[data-view="dashboard"] > div h3 {
+article:has(> header + section + div) > div h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="dashboard"] > div figure {
-  height: 150px;
+article:has(> header + section + div) > div figure {
+  height: 200px;
   background: var(--muted);
   border-radius: var(--radius);
   display: flex;
@@ -197,18 +204,25 @@ An overview dashboard displaying key metrics, charts, and quick actions.
   color: var(--muted-foreground);
 }
 
-[data-view="dashboard"] > div ul {
+article:has(> header + section + div) > div ul {
   list-style: none;
   padding: 0;
 }
 
-[data-view="dashboard"] > div ul li {
+article:has(> header + section + div) > div li {
   padding: var(--spacing-2) 0;
   border-bottom: 1px solid var(--border);
   font-size: var(--text-sm);
 }
 
-[data-view="dashboard"] > div ul li:last-child {
+article:has(> header + section + div) > div li:last-child {
   border-bottom: none;
 }
 ```
+
+## When to Use
+
+- Admin dashboards
+- Analytics overview
+- KPI monitoring
+- Quick status checks

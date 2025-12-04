@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/article.png
 A single article or blog post with rich content formatting.
 
 <Preview>
-  <article data-page="article">
+  <article>
     <header>
       <nav>
         <a href="#">← Back to Blog</a>
@@ -32,7 +32,7 @@ A single article or blog post with rich content formatting.
       <p>Design systems have become an essential part of modern web development. In this guide, we'll explore how to build one from scratch using semantic HTML and CSS custom properties.</p>
 
       <h2>Why Semantic HTML?</h2>
-      <p>Semantic HTML provides meaning to your content, making it more accessible and maintainable. Instead of relying on class names, we use data attributes to style components.</p>
+      <p>Semantic HTML provides meaning to your content, making it more accessible and maintainable. Instead of relying on class names, we use structural patterns to style components.</p>
 
       <blockquote>
         "The best code is code that explains itself."
@@ -49,24 +49,19 @@ A single article or blog post with rich content formatting.
         <li>HTML</li>
       </ul>
       <menu>
-        <button>Share on Twitter</button>
-        <button>Copy Link</button>
+        <li><button>Share on Twitter</button></li>
+        <li><button>Copy Link</button></li>
       </menu>
     </footer>
   </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Individual blog posts
-- News articles
-- Tutorial pages
-- Long-form content
-
-## Structure
+A blog article uses `<article>` with a header containing back navigation and author info, a hero figure, content div, and footer with tags. The pattern `article:has(> header > h1 + div > figure)` identifies single articles:
 
 ```html
-<article data-page="article">
+<article>
   <header>
     <nav>
       <a href="/blog">← Back to Blog</a>
@@ -103,8 +98,8 @@ A single article or blog post with rich content formatting.
       <li>CSS</li>
     </ul>
     <menu>
-      <button>Share on Twitter</button>
-      <button>Copy Link</button>
+      <li><button>Share on Twitter</button></li>
+      <li><button>Copy Link</button></li>
     </menu>
   </footer>
 </article>
@@ -113,46 +108,47 @@ A single article or blog post with rich content formatting.
 ## CSS
 
 ```css
-[data-page="article"] {
+/* Blog article: article with header containing h1 and author info */
+article:has(> header > h1):has(> header > div > figure) {
   padding: var(--spacing-6);
   max-width: 720px;
   margin: 0 auto;
 }
 
-[data-page="article"] > header {
+article:has(> header > h1):has(> header > div > figure) > header {
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="article"] > header nav {
+article:has(> header > h1):has(> header > div > figure) > header nav {
   font-size: var(--text-sm);
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="article"] > header nav a {
+article:has(> header > h1):has(> header > div > figure) > header nav a {
   color: var(--primary);
 }
 
-[data-page="article"] > header mark {
+article:has(> header > h1):has(> header > div > figure) > header mark {
   font-size: var(--text-sm);
   color: var(--primary);
   font-weight: 500;
   background: transparent;
 }
 
-[data-page="article"] > header h1 {
+article:has(> header > h1):has(> header > div > figure) > header h1 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin: var(--spacing-2) 0 var(--spacing-4);
   line-height: 1.2;
 }
 
-[data-page="article"] > header > div {
+article:has(> header > h1):has(> header > div > figure) > header > div {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
 }
 
-[data-page="article"] > header figure {
+article:has(> header > h1):has(> header > div > figure) > header > div > figure {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -164,39 +160,41 @@ A single article or blog post with rich content formatting.
   margin: 0;
 }
 
-[data-page="article"] > header > div > div p:first-child {
+article:has(> header > h1):has(> header > div > figure) > header > div > div p:first-child {
   font-weight: 500;
 }
 
-[data-page="article"] > header > div > div p:last-child {
+article:has(> header > h1):has(> header > div > figure) > header > div > div p:last-child {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-page="article"] > figure[aria-label="Hero image"] {
+/* Hero image */
+article:has(> header > h1) > figure[aria-label="Hero image"] {
   background: var(--muted);
   border-radius: var(--radius-lg);
   aspect-ratio: 16/9;
   margin: 0 0 var(--spacing-6);
 }
 
-[data-page="article"] > div {
+/* Article content */
+article:has(> header > h1) > div {
   font-size: var(--text-lg);
   line-height: 1.8;
 }
 
-[data-page="article"] > div p {
+article:has(> header > h1) > div p {
   margin-bottom: var(--spacing-4);
   color: var(--muted-foreground);
 }
 
-[data-page="article"] > div h2 {
+article:has(> header > h1) > div h2 {
   font-size: var(--text-xl);
   font-weight: 600;
   margin: var(--spacing-8) 0 var(--spacing-4);
 }
 
-[data-page="article"] > div blockquote {
+article:has(> header > h1) > div blockquote {
   border-left: 3px solid var(--primary);
   padding-left: var(--spacing-4);
   margin: var(--spacing-6) 0;
@@ -204,13 +202,14 @@ A single article or blog post with rich content formatting.
   color: var(--muted-foreground);
 }
 
-[data-page="article"] > footer {
+/* Article footer */
+article:has(> header > h1) > footer {
   margin-top: var(--spacing-8);
   padding-top: var(--spacing-6);
   border-top: 1px solid var(--border);
 }
 
-[data-page="article"] > footer ul[aria-label="Tags"] {
+article:has(> header > h1) > footer ul[aria-label="Tags"] {
   display: flex;
   gap: var(--spacing-2);
   list-style: none;
@@ -218,19 +217,20 @@ A single article or blog post with rich content formatting.
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="article"] > footer ul[aria-label="Tags"] li {
+article:has(> header > h1) > footer ul[aria-label="Tags"] li {
   padding: 4px 12px;
   background: var(--muted);
   border-radius: var(--radius-full);
   font-size: var(--text-sm);
 }
 
-[data-page="article"] > footer menu {
+article:has(> header > h1) > footer menu {
   display: flex;
   gap: var(--spacing-3);
+  list-style: none;
 }
 
-[data-page="article"] > footer menu button {
+article:has(> header > h1) > footer menu button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--muted);
   border: none;
@@ -238,3 +238,10 @@ A single article or blog post with rich content formatting.
   font-size: var(--text-sm);
 }
 ```
+
+## When to Use
+
+- Individual blog posts
+- News articles
+- Tutorial pages
+- Long-form content

@@ -10,78 +10,72 @@ screenshot: /screenshots/layouts/sidebar.png
 A two-column layout with a persistent sidebar for navigation. Best for applications and dashboards.
 
 <Preview>
-  <div data-layout="sidebar">
+  <article>
     <aside>
       <nav>
-        <h3>Navigation</h3>
-        <ul>
-          <li><a href="#" aria-current="page">Dashboard</a></li>
-          <li><a href="#">Projects</a></li>
-          <li><a href="#">Settings</a></li>
-        </ul>
+        <a href="/">Brand</a>
+        <menu>
+          <li><a href="/dashboard" aria-current="page">Dashboard</a></li>
+          <li><a href="/projects">Projects</a></li>
+          <li><a href="/settings">Settings</a></li>
+        </menu>
       </nav>
     </aside>
     <main>
-      <h1>Dashboard</h1>
+      <header>
+        <h1>Dashboard</h1>
+      </header>
       <p>Main content area with full width.</p>
     </main>
-  </div>
+  </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Application dashboards
-- Admin panels
-- Settings pages
-- Any page with persistent navigation
-
-## Structure
+A sidebar layout is an `<article>` with an `<aside>` containing `<nav>` as first child:
 
 ```html
-<body data-layout="sidebar">
+<article>
   <aside>
     <nav>
       <a href="/">Brand</a>
-      <ul>
+      <menu>
         <li><a href="/dashboard" aria-current="page">Dashboard</a></li>
         <li><a href="/projects">Projects</a></li>
         <li><a href="/settings">Settings</a></li>
-      </ul>
+      </menu>
     </nav>
   </aside>
-
   <main>
     <!-- Page content -->
   </main>
-</body>
+</article>
 ```
 
 ## CSS
 
 ```css
-[data-layout="sidebar"] {
+/* Match article with aside > nav as first child */
+article:has(> aside:first-child > nav) {
   display: grid;
   grid-template-columns: 280px 1fr;
   min-height: 100vh;
 }
 
-[data-layout="sidebar"] > aside {
+article:has(> aside:first-child > nav) > aside {
   background: var(--muted);
   border-right: 1px solid var(--border);
-  padding: var(--spacing-4);
   position: sticky;
   top: 0;
   height: 100vh;
   overflow-y: auto;
 }
 
-[data-layout="sidebar"] > aside h3 {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  margin-bottom: var(--spacing-2);
+article:has(> aside:first-child > nav) > aside > nav {
+  padding: var(--spacing-4);
 }
 
-[data-layout="sidebar"] > aside ul {
+article:has(> aside:first-child > nav) > aside menu {
   list-style: none;
   padding: 0;
   display: flex;
@@ -89,48 +83,38 @@ A two-column layout with a persistent sidebar for navigation. Best for applicati
   gap: var(--spacing-1);
 }
 
-[data-layout="sidebar"] > aside a {
+article:has(> aside:first-child > nav) > aside a {
   display: block;
-  padding: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
 }
 
-[data-layout="sidebar"] > aside a[aria-current] {
+article:has(> aside:first-child > nav) > aside a[aria-current] {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-[data-layout="sidebar"] > main {
+article:has(> aside:first-child > nav) > main {
   padding: var(--spacing-6);
   overflow-y: auto;
 }
 
 @media (max-width: 768px) {
-  [data-layout="sidebar"] {
+  article:has(> aside:first-child > nav) {
     grid-template-columns: 1fr;
   }
 
-  [data-layout="sidebar"] > aside {
+  article:has(> aside:first-child > nav) > aside {
     display: none;
   }
 }
 ```
 
-## React Native
+## When to Use
 
-```tsx
-import { View, ScrollView } from 'react-native'
-
-export function SidebarLayout({ children, sidebar }) {
-  return (
-    <View style={{ flex: 1, flexDirection: 'row' }}>
-      <View style={styles.sidebar}>
-        {sidebar}
-      </View>
-      <ScrollView style={{ flex: 1 }}>
-        {children}
-      </ScrollView>
-    </View>
-  )
-}
-```
+- Application dashboards
+- Admin panels
+- Settings pages
+- Any page with persistent navigation

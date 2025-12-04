@@ -10,7 +10,7 @@ screenshot: /screenshots/containers/fullscreen.png
 An edge-to-edge container that takes over the entire viewport for immersive experiences.
 
 <Preview>
-  <div data-container="fullscreen">
+  <aside aria-modal="true" role="presentation">
     <aside>
       <button>⚙️ Settings</button>
       <button>✕ Exit</button>
@@ -28,22 +28,15 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
         <button>⏭</button>
       </nav>
     </footer>
-  </div>
+  </aside>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Video players
-- Photo galleries
-- Media presentations
-- Immersive reading
-- Games
-- Interactive demos
-
-## Structure
+A fullscreen container uses `<aside aria-modal role="presentation">` for an immersive overlay. The structure includes top controls, main content, and footer controls:
 
 ```html
-<aside data-container="fullscreen" aria-hidden="true">
+<aside aria-modal="true" role="presentation" aria-hidden="true">
   <aside>
     <button>Settings</button>
     <button>Exit Fullscreen</button>
@@ -53,18 +46,21 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
     <video src="/media/video.mp4" autoplay controls></video>
   </main>
 
-  <nav aria-label="Media controls">
-    <button>Previous</button>
-    <button>Play/Pause</button>
-    <button>Next</button>
-  </nav>
+  <footer>
+    <nav aria-label="Media controls">
+      <button>Previous</button>
+      <button>Play/Pause</button>
+      <button>Next</button>
+    </nav>
+  </footer>
 </aside>
 ```
 
 ## CSS
 
 ```css
-[data-container="fullscreen"] {
+/* Fullscreen: aside presentation with main content */
+aside[aria-modal][role="presentation"]:has(> main) {
   position: fixed;
   inset: 0;
   z-index: 200;
@@ -75,7 +71,7 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
   color: white;
 }
 
-[data-container="fullscreen"] > aside {
+aside[aria-modal][role="presentation"]:has(> main) > aside {
   position: absolute;
   top: var(--spacing-4);
   right: var(--spacing-4);
@@ -85,11 +81,11 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
   transition: opacity 0.3s;
 }
 
-[data-container="fullscreen"]:hover > aside {
+aside[aria-modal][role="presentation"]:has(> main):hover > aside {
   opacity: 1;
 }
 
-[data-container="fullscreen"] > aside button {
+aside[aria-modal][role="presentation"]:has(> main) > aside button {
   padding: var(--spacing-2) var(--spacing-3);
   background: rgba(255, 255, 255, 0.1);
   border: none;
@@ -99,11 +95,11 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
   font-size: var(--text-sm);
 }
 
-[data-container="fullscreen"] > main {
+aside[aria-modal][role="presentation"]:has(> main) > main {
   text-align: center;
 }
 
-[data-container="fullscreen"] > main figure {
+aside[aria-modal][role="presentation"]:has(> main) > main figure {
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -115,24 +111,24 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
   font-size: var(--text-4xl);
 }
 
-[data-container="fullscreen"] > main h2 {
+aside[aria-modal][role="presentation"]:has(> main) > main h2 {
   font-size: var(--text-2xl);
   font-weight: 600;
   margin-bottom: var(--spacing-2);
 }
 
-[data-container="fullscreen"] > main p {
+aside[aria-modal][role="presentation"]:has(> main) > main p {
   opacity: 0.7;
 }
 
-[data-container="fullscreen"] > main video,
-[data-container="fullscreen"] > main img {
+aside[aria-modal][role="presentation"]:has(> main) > main video,
+aside[aria-modal][role="presentation"]:has(> main) > main img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
 }
 
-[data-container="fullscreen"] > footer {
+aside[aria-modal][role="presentation"]:has(> main) > footer {
   position: absolute;
   bottom: var(--spacing-6);
   left: var(--spacing-6);
@@ -141,11 +137,11 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
   transition: opacity 0.3s;
 }
 
-[data-container="fullscreen"]:hover > footer {
+aside[aria-modal][role="presentation"]:has(> main):hover > footer {
   opacity: 1;
 }
 
-[data-container="fullscreen"] > footer progress {
+aside[aria-modal][role="presentation"]:has(> main) > footer progress {
   width: 100%;
   height: 4px;
   margin-bottom: var(--spacing-4);
@@ -153,23 +149,23 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
   border-radius: 2px;
 }
 
-[data-container="fullscreen"] > footer progress::-webkit-progress-bar {
+aside[aria-modal][role="presentation"]:has(> main) > footer progress::-webkit-progress-bar {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 2px;
 }
 
-[data-container="fullscreen"] > footer progress::-webkit-progress-value {
+aside[aria-modal][role="presentation"]:has(> main) > footer progress::-webkit-progress-value {
   background: white;
   border-radius: 2px;
 }
 
-[data-container="fullscreen"] > footer nav {
+aside[aria-modal][role="presentation"]:has(> main) > footer nav {
   display: flex;
   justify-content: center;
   gap: var(--spacing-4);
 }
 
-[data-container="fullscreen"] > footer nav button {
+aside[aria-modal][role="presentation"]:has(> main) > footer nav button {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -179,14 +175,14 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
   cursor: pointer;
 }
 
-[data-container="fullscreen"] > footer nav button[aria-current] {
+aside[aria-modal][role="presentation"]:has(> main) > footer nav button[aria-current] {
   width: 56px;
   height: 56px;
   background: white;
   color: black;
 }
 
-[data-container="fullscreen"][aria-hidden="true"] {
+aside[aria-modal][role="presentation"][aria-hidden="true"] {
   display: none;
 }
 ```
@@ -194,7 +190,7 @@ An edge-to-edge container that takes over the entire viewport for immersive expe
 ## JavaScript
 
 ```js
-const fullscreen = document.querySelector('[data-container="fullscreen"]')
+const fullscreen = document.querySelector('aside[aria-modal][role="presentation"]')
 
 // Enter fullscreen
 function enterFullscreen(element) {
@@ -232,34 +228,11 @@ fullscreen.addEventListener('mousemove', () => {
 })
 ```
 
-## Variations
+## When to Use
 
-### Photo Gallery
-
-```html
-<aside data-container="fullscreen">
-  <main>
-    <img src="/photo.jpg" alt="Photo" />
-  </main>
-  <nav>
-    <button><img src="/thumb1.jpg" alt="" /></button>
-    <button><img src="/thumb2.jpg" alt="" /></button>
-  </nav>
-</aside>
-```
-
-### Presentation Mode
-
-```html
-<aside data-container="fullscreen">
-  <main>
-    <article>
-      <h1>Slide Title</h1>
-      <p>Slide content...</p>
-    </article>
-  </main>
-  <nav>
-    <span>Slide 1 of 10</span>
-  </nav>
-</aside>
-```
+- Video players
+- Photo galleries
+- Media presentations
+- Immersive reading
+- Games
+- Interactive demos

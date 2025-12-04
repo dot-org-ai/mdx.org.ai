@@ -10,7 +10,7 @@ screenshot: /screenshots/views/form.png
 A form for creating or editing data with validation.
 
 <Preview>
-  <article data-view="form">
+  <article>
     <header>
       <h1>Create Project</h1>
     </header>
@@ -50,23 +50,20 @@ A form for creating or editing data with validation.
       </div>
     </form>
     <footer>
-      <button type="button">Cancel</button>
-      <button type="submit">Create Project</button>
+      <menu>
+        <li><button type="button">Cancel</button></li>
+        <li><button type="submit">Create Project</button></li>
+      </menu>
     </footer>
   </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Create/edit forms
-- Settings forms
-- Multi-step wizards
-- Data entry screens
-
-## Structure
+A form view is an `<article>` containing a `<form>` element:
 
 ```html
-<article data-view="form">
+<article>
   <header>
     <h1>Create Project</h1>
   </header>
@@ -112,8 +109,10 @@ A form for creating or editing data with validation.
   </form>
 
   <footer>
-    <button type="button">Cancel</button>
-    <button type="submit">Create Project</button>
+    <menu>
+      <li><button type="button">Cancel</button></li>
+      <li><button type="submit">Create Project</button></li>
+    </menu>
   </footer>
 </article>
 ```
@@ -121,60 +120,61 @@ A form for creating or editing data with validation.
 ## CSS
 
 ```css
-[data-view="form"] {
+/* Form view: article containing form */
+article:has(> form) {
   padding: var(--spacing-6);
   max-width: 600px;
 }
 
-[data-view="form"] > header {
+article:has(> form) > header {
   margin-bottom: var(--spacing-6);
 }
 
-[data-view="form"] > header h1 {
+article:has(> form) > header h1 {
   font-size: var(--text-xl);
   font-weight: 700;
 }
 
-[data-view="form"] form {
+article:has(> form) form {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
 }
 
-[data-view="form"] form > div {
+article:has(> form) form > div {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-1);
 }
 
-[data-view="form"] form label {
+article:has(> form) form label {
   font-weight: 500;
   font-size: var(--text-sm);
 }
 
-[data-view="form"] form input[type="text"],
-[data-view="form"] form input[type="email"],
-[data-view="form"] form input[type="password"],
-[data-view="form"] form textarea,
-[data-view="form"] form select {
+article:has(> form) form input[type="text"],
+article:has(> form) form input[type="email"],
+article:has(> form) form input[type="password"],
+article:has(> form) form textarea,
+article:has(> form) form select {
   width: 100%;
   padding: var(--spacing-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-view="form"] form textarea {
+article:has(> form) form textarea {
   resize: vertical;
 }
 
-[data-view="form"] form input:focus,
-[data-view="form"] form textarea:focus,
-[data-view="form"] form select:focus {
+article:has(> form) form input:focus,
+article:has(> form) form textarea:focus,
+article:has(> form) form select:focus {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 
-[data-view="form"] form fieldset {
+article:has(> form) form fieldset {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-4);
@@ -183,38 +183,43 @@ A form for creating or editing data with validation.
   margin: 0;
 }
 
-[data-view="form"] form [role="alert"] {
+article:has(> form) form [role="alert"] {
   color: var(--destructive);
   font-size: var(--text-sm);
   display: none;
 }
 
-[data-view="form"] form div:has(:invalid:not(:placeholder-shown)) [role="alert"] {
+article:has(> form) form div:has(:invalid:not(:placeholder-shown)) [role="alert"] {
   display: block;
 }
 
-[data-view="form"] form small {
+article:has(> form) form small {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
 }
 
-[data-view="form"] form label:has(input[type="checkbox"]) {
+article:has(> form) form label:has(input[type="checkbox"]) {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
   cursor: pointer;
 }
 
-[data-view="form"] > footer {
-  display: flex;
-  gap: var(--spacing-2);
-  justify-content: flex-end;
+article:has(> form) > footer {
   margin-top: var(--spacing-4);
   padding-top: var(--spacing-4);
   border-top: 1px solid var(--border);
 }
 
-[data-view="form"] > footer button:first-child {
+article:has(> form) > footer menu {
+  display: flex;
+  gap: var(--spacing-2);
+  justify-content: flex-end;
+  list-style: none;
+}
+
+/* Secondary button: first in menu */
+article:has(> form) > footer menu > :first-child button {
   padding: var(--spacing-2) var(--spacing-4);
   background: transparent;
   border: 1px solid var(--border);
@@ -222,7 +227,8 @@ A form for creating or editing data with validation.
   cursor: pointer;
 }
 
-[data-view="form"] > footer button:last-child {
+/* Primary button: last in menu */
+article:has(> form) > footer menu > :last-child button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -231,3 +237,10 @@ A form for creating or editing data with validation.
   cursor: pointer;
 }
 ```
+
+## When to Use
+
+- Create/edit forms
+- Settings forms
+- Multi-step wizards
+- Data entry screens

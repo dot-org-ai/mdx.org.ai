@@ -10,7 +10,7 @@ screenshot: /screenshots/views/table.png
 A data table with sorting, filtering, and row actions.
 
 <Preview>
-  <article data-view="table">
+  <article>
     <header>
       <h1>Users</h1>
       <nav>
@@ -56,7 +56,7 @@ A data table with sorting, filtering, and row actions.
           </td>
           <td>bob@example.com</td>
           <td>Viewer</td>
-          <td><mark data-status="inactive">Inactive</mark></td>
+          <td><mark aria-disabled="true">Inactive</mark></td>
           <td><button aria-label="Actions">⋮</button></td>
         </tr>
       </tbody>
@@ -71,18 +71,12 @@ A data table with sorting, filtering, and row actions.
   </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- User management
-- Data administration
-- Inventory management
-- Report tables
-- Log viewers
-
-## Structure
+A table view is an `<article>` containing a `<table>` element:
 
 ```html
-<article data-view="table">
+<article>
   <header>
     <h1>Users</h1>
     <nav>
@@ -125,35 +119,36 @@ A data table with sorting, filtering, and row actions.
 ## CSS
 
 ```css
-[data-view="table"] {
+/* Table view: article containing table */
+article:has(> table) {
   padding: var(--spacing-6);
 }
 
-[data-view="table"] > header {
+article:has(> table) > header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="table"] > header h1 {
+article:has(> table) > header h1 {
   font-size: var(--text-xl);
   font-weight: 700;
 }
 
-[data-view="table"] > header nav {
+article:has(> table) > header nav {
   display: flex;
   gap: var(--spacing-2);
 }
 
-[data-view="table"] > header input {
+article:has(> table) > header input {
   padding: var(--spacing-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   width: 200px;
 }
 
-[data-view="table"] > header button {
+article:has(> table) > header button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -161,7 +156,7 @@ A data table with sorting, filtering, and row actions.
   border-radius: var(--radius);
 }
 
-[data-view="table"] > table {
+article:has(> table) > table {
   width: 100%;
   border-collapse: collapse;
   border: 1px solid var(--border);
@@ -169,33 +164,33 @@ A data table with sorting, filtering, and row actions.
   overflow: hidden;
 }
 
-[data-view="table"] thead {
+article:has(> table) thead {
   background: var(--muted);
 }
 
-[data-view="table"] th {
+article:has(> table) th {
   padding: var(--spacing-3);
   text-align: left;
   font-weight: 500;
   font-size: var(--text-sm);
 }
 
-[data-view="table"] th:last-child {
+article:has(> table) th:last-child {
   text-align: right;
 }
 
-[data-view="table"] td {
+article:has(> table) td {
   padding: var(--spacing-3);
   border-top: 1px solid var(--border);
 }
 
-[data-view="table"] td:first-child {
+article:has(> table) td:first-child {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
 }
 
-[data-view="table"] td figure {
+article:has(> table) td figure {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -203,17 +198,17 @@ A data table with sorting, filtering, and row actions.
   margin: 0;
 }
 
-[data-view="table"] td:last-child {
+article:has(> table) td:last-child {
   text-align: right;
 }
 
-[data-view="table"] td:last-child button {
+article:has(> table) td:last-child button {
   background: none;
   border: none;
   cursor: pointer;
 }
 
-[data-view="table"] mark {
+article:has(> table) mark {
   padding: 2px 8px;
   background: green;
   color: white;
@@ -221,44 +216,53 @@ A data table with sorting, filtering, and row actions.
   font-size: var(--text-xs);
 }
 
-[data-view="table"] mark[data-status="inactive"] {
+/* Inactive status uses aria-disabled */
+article:has(> table) mark[aria-disabled="true"] {
   background: var(--muted);
   color: inherit;
 }
 
-[data-view="table"] tbody tr:hover {
+article:has(> table) tbody tr:hover {
   background: var(--accent);
 }
 
-[data-view="table"] > footer {
+article:has(> table) > footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: var(--spacing-4);
 }
 
-[data-view="table"] > footer > span {
+article:has(> table) > footer > span {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-view="table"] > footer nav {
+article:has(> table) > footer nav {
   display: flex;
   gap: var(--spacing-1);
 }
 
-[data-view="table"] > footer nav button {
+article:has(> table) > footer nav button {
   padding: var(--spacing-2);
   border-radius: var(--radius);
   border: none;
 }
 
-[data-view="table"] > footer nav button:first-child {
+article:has(> table) > footer nav button:first-child {
   background: var(--muted);
 }
 
-[data-view="table"] > footer nav button:last-child {
+article:has(> table) > footer nav button:last-child {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 ```
+
+## When to Use
+
+- User management
+- Data administration
+- Inventory management
+- Report tables
+- Log viewers

@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/pricing.png
 A pricing page with comparison tiers and feature lists.
 
 <Preview>
-  <article data-page="pricing">
+  <main>
     <header>
       <h1>Simple, transparent pricing</h1>
       <p>Choose the plan that's right for you</p>
@@ -19,7 +19,7 @@ A pricing page with comparison tiers and feature lists.
       <article>
         <h3>Starter</h3>
         <p>For individuals</p>
-        <strong>$0</strong>
+        <data value="0">$0</data>
         <span>/month</span>
         <button>Get Started</button>
         <ul>
@@ -29,10 +29,10 @@ A pricing page with comparison tiers and feature lists.
         </ul>
       </article>
       <article aria-current="true">
-        <span>Popular</span>
+        <mark>Popular</mark>
         <h3>Pro</h3>
         <p>For growing teams</p>
-        <strong>$29</strong>
+        <data value="29">$29</data>
         <span>/month</span>
         <button>Start Free Trial</button>
         <ul>
@@ -45,7 +45,7 @@ A pricing page with comparison tiers and feature lists.
       <article>
         <h3>Enterprise</h3>
         <p>For large organizations</p>
-        <strong>Custom</strong>
+        <data value="custom">Custom</data>
         <button>Contact Sales</button>
         <ul>
           <li>Everything in Pro</li>
@@ -56,20 +56,15 @@ A pricing page with comparison tiers and feature lists.
         </ul>
       </article>
     </div>
-  </article>
+  </main>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- SaaS pricing pages
-- Subscription plan comparisons
-- Membership tiers
-- Service packages
-
-## Structure
+A pricing page uses `<main>` with a header and a grid of pricing `<article>` elements containing `<data>` for prices. The pattern `main:has(> div > article data)` identifies pricing comparison:
 
 ```html
-<article data-page="pricing">
+<main>
   <header>
     <h1>Simple, transparent pricing</h1>
     <p>Choose the plan that's right for you</p>
@@ -78,7 +73,7 @@ A pricing page with comparison tiers and feature lists.
     <article>
       <h3>Starter</h3>
       <p>For individuals</p>
-      <strong>$0</strong>
+      <data value="0">$0</data>
       <span>/month</span>
       <button>Get Started</button>
       <ul>
@@ -87,10 +82,10 @@ A pricing page with comparison tiers and feature lists.
       </ul>
     </article>
     <article aria-current="true">
-      <span>Popular</span>
+      <mark>Popular</mark>
       <h3>Pro</h3>
       <p>For growing teams</p>
-      <strong>$29</strong>
+      <data value="29">$29</data>
       <span>/month</span>
       <button>Start Free Trial</button>
       <ul>...</ul>
@@ -98,37 +93,38 @@ A pricing page with comparison tiers and feature lists.
     <article>
       <h3>Enterprise</h3>
       <p>For large organizations</p>
-      <strong>Custom</strong>
+      <data value="custom">Custom</data>
       <button>Contact Sales</button>
       <ul>...</ul>
     </article>
   </div>
-</article>
+</main>
 ```
 
 ## CSS
 
 ```css
-[data-page="pricing"] {
+/* Pricing page: main with header + div containing pricing articles */
+main:has(> header + div > article data) {
   padding: var(--spacing-6);
 }
 
-[data-page="pricing"] > header {
+main:has(> header + div > article data) > header {
   text-align: center;
   margin-bottom: var(--spacing-8);
 }
 
-[data-page="pricing"] > header h1 {
+main:has(> header + div > article data) > header h1 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="pricing"] > header p {
+main:has(> header + div > article data) > header p {
   color: var(--muted-foreground);
 }
 
-[data-page="pricing"] > div {
+main:has(> header + div > article data) > div {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-4);
@@ -136,18 +132,19 @@ A pricing page with comparison tiers and feature lists.
   margin: 0 auto;
 }
 
-[data-page="pricing"] > div > article {
+main:has(> header + div > article data) > div > article {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-6);
 }
 
-[data-page="pricing"] > div > article[aria-current] {
+/* Featured tier: aria-current */
+main:has(> header + div > article data) > div > article[aria-current] {
   border: 2px solid var(--primary);
   position: relative;
 }
 
-[data-page="pricing"] > div > article[aria-current] > span:first-child {
+main:has(> header + div > article data) > div > article[aria-current] > mark {
   position: absolute;
   top: -12px;
   left: 50%;
@@ -159,27 +156,27 @@ A pricing page with comparison tiers and feature lists.
   font-size: var(--text-xs);
 }
 
-[data-page="pricing"] article h3 {
+main:has(> header + div > article data) article h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-1);
 }
 
-[data-page="pricing"] article > p {
+main:has(> header + div > article data) article > p {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="pricing"] article strong {
+main:has(> header + div > article data) article data {
   font-size: var(--text-3xl);
   font-weight: 700;
 }
 
-[data-page="pricing"] article > span {
+main:has(> header + div > article data) article > span {
   color: var(--muted-foreground);
 }
 
-[data-page="pricing"] article button {
+main:has(> header + div > article data) article button {
   display: block;
   width: 100%;
   padding: var(--spacing-2);
@@ -188,29 +185,38 @@ A pricing page with comparison tiers and feature lists.
   cursor: pointer;
 }
 
-[data-page="pricing"] article:not([aria-current]) button {
+/* Standard tier buttons */
+main:has(> header + div > article data) article:not([aria-current]) button {
   background: transparent;
   border: 1px solid var(--border);
 }
 
-[data-page="pricing"] article[aria-current] button {
+/* Featured tier buttons */
+main:has(> header + div > article data) article[aria-current] button {
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
 }
 
-[data-page="pricing"] article ul {
+main:has(> header + div > article data) article ul {
   list-style: none;
   padding: 0;
   font-size: var(--text-sm);
 }
 
-[data-page="pricing"] article li {
+main:has(> header + div > article data) article li {
   padding: var(--spacing-1) 0;
 }
 
-[data-page="pricing"] article li::before {
+main:has(> header + div > article data) article li::before {
   content: "✓ ";
   color: var(--primary);
 }
 ```
+
+## When to Use
+
+- SaaS pricing pages
+- Subscription plan comparisons
+- Membership tiers
+- Service packages

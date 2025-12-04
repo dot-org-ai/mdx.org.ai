@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/product.png
 A product detail page with images, description, and purchase options.
 
 <Preview>
-  <article data-page="product">
+  <main>
     <nav aria-label="Breadcrumb">
       <ol>
         <li><a href="#">Home</a></li>
@@ -19,7 +19,7 @@ A product detail page with images, description, and purchase options.
       </ol>
     </nav>
 
-    <div>
+    <article>
       <section aria-label="Gallery">
         <figure></figure>
         <ul>
@@ -31,10 +31,10 @@ A product detail page with images, description, and purchase options.
       </section>
 
       <section aria-label="Details">
-        <mark data-status="success">In Stock</mark>
+        <mark aria-label="In Stock">In Stock</mark>
         <h1>Premium Wireless Headphones</h1>
         <div aria-label="Rating">
-          <data value="4.9">4.9</data>
+          <data value="4.9">★★★★★ 4.9</data>
           <span>(128 reviews)</span>
         </div>
         <div aria-label="Price">
@@ -46,9 +46,9 @@ A product detail page with images, description, and purchase options.
         <fieldset aria-label="Color">
           <legend>Color</legend>
           <menu>
-            <button aria-pressed="true" aria-label="Black"></button>
-            <button aria-label="White"></button>
-            <button aria-label="Blue"></button>
+            <li><button aria-pressed="true" aria-label="Black"></button></li>
+            <li><button aria-label="White"></button></li>
+            <li><button aria-label="Blue"></button></li>
           </menu>
         </fieldset>
 
@@ -62,25 +62,20 @@ A product detail page with images, description, and purchase options.
         </fieldset>
 
         <menu>
-          <button>Add to Cart</button>
-          <button aria-label="Add to wishlist"></button>
+          <li><button>Add to Cart</button></li>
+          <li><button aria-label="Add to wishlist">♡</button></li>
         </menu>
       </section>
-    </div>
-  </article>
+    </article>
+  </main>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- E-commerce product pages
-- Digital product listings
-- Service detail pages
-- Item showcases
-
-## Structure
+A product page uses `<main>` with breadcrumb navigation and an `<article>` containing gallery and details sections. The pattern `main:has(> article > section[aria-label="Gallery"])` identifies it:
 
 ```html
-<article data-page="product">
+<main>
   <nav aria-label="Breadcrumb">
     <ol>
       <li><a href="/">Home</a></li>
@@ -89,7 +84,7 @@ A product detail page with images, description, and purchase options.
     </ol>
   </nav>
 
-  <div>
+  <article>
     <section aria-label="Gallery">
       <figure><img src="/product.jpg" alt="Product" /></figure>
       <ul>
@@ -99,10 +94,10 @@ A product detail page with images, description, and purchase options.
     </section>
 
     <section aria-label="Details">
-      <mark data-status="success">In Stock</mark>
+      <mark aria-label="In Stock">In Stock</mark>
       <h1>Premium Wireless Headphones</h1>
       <div aria-label="Rating">
-        <data value="4.9">4.9</data>
+        <data value="4.9">★★★★★ 4.9</data>
         <span>(128 reviews)</span>
       </div>
       <div aria-label="Price">
@@ -114,8 +109,8 @@ A product detail page with images, description, and purchase options.
       <fieldset aria-label="Color">
         <legend>Color</legend>
         <menu>
-          <button aria-pressed="true" aria-label="Black"></button>
-          <button aria-label="White"></button>
+          <li><button aria-pressed="true" aria-label="Black"></button></li>
+          <li><button aria-label="White"></button></li>
         </menu>
       </fieldset>
 
@@ -129,53 +124,55 @@ A product detail page with images, description, and purchase options.
       </fieldset>
 
       <menu>
-        <button>Add to Cart</button>
-        <button aria-label="Add to wishlist"></button>
+        <li><button>Add to Cart</button></li>
+        <li><button aria-label="Add to wishlist">♡</button></li>
       </menu>
     </section>
-  </div>
-</article>
+  </article>
+</main>
 ```
 
 ## CSS
 
 ```css
-[data-page="product"] {
+/* Product page: main with breadcrumb + article with gallery */
+main:has(> article > section[aria-label="Gallery"]) {
   padding: var(--spacing-6);
 }
 
-[data-page="product"] > nav[aria-label="Breadcrumb"] {
+main:has(> article > section[aria-label="Gallery"]) > nav[aria-label="Breadcrumb"] {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="product"] > nav ol {
+main:has(> article > section[aria-label="Gallery"]) > nav ol {
   display: flex;
   gap: var(--spacing-2);
   list-style: none;
   padding: 0;
 }
 
-[data-page="product"] > nav li:not(:last-child)::after {
+main:has(> article > section[aria-label="Gallery"]) > nav li:not(:last-child)::after {
   content: "/";
   margin-left: var(--spacing-2);
 }
 
-[data-page="product"] > div {
+main:has(> article > section[aria-label="Gallery"]) > article {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-8);
 }
 
-[data-page="product"] section[aria-label="Gallery"] figure {
+/* Gallery section */
+section[aria-label="Gallery"] figure {
   background: var(--muted);
   border-radius: var(--radius-lg);
   aspect-ratio: 1;
   margin: 0 0 var(--spacing-4);
 }
 
-[data-page="product"] section[aria-label="Gallery"] ul {
+section[aria-label="Gallery"] ul {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-2);
@@ -183,102 +180,99 @@ A product detail page with images, description, and purchase options.
   padding: 0;
 }
 
-[data-page="product"] section[aria-label="Gallery"] li {
+section[aria-label="Gallery"] li {
   background: var(--muted);
   border-radius: var(--radius);
   aspect-ratio: 1;
   border: 1px solid var(--border);
 }
 
-[data-page="product"] section[aria-label="Gallery"] li[aria-selected="true"] {
+section[aria-label="Gallery"] li[aria-selected="true"] {
   border: 2px solid var(--primary);
 }
 
-[data-page="product"] section[aria-label="Details"] mark {
+/* Details section */
+section[aria-label="Details"] mark {
   display: inline-block;
   padding: 2px 8px;
   border-radius: var(--radius);
   font-size: var(--text-xs);
   margin-bottom: var(--spacing-2);
-}
-
-[data-page="product"] section[aria-label="Details"] mark[data-status="success"] {
   background: green;
   color: white;
 }
 
-[data-page="product"] section[aria-label="Details"] h1 {
+section[aria-label="Details"] h1 {
   font-size: var(--text-2xl);
   font-weight: 700;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="product"] div[aria-label="Rating"] {
+div[aria-label="Rating"] {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="product"] div[aria-label="Rating"] data::before {
-  content: "★★★★★";
+div[aria-label="Rating"] data {
   color: gold;
-  margin-right: var(--spacing-2);
 }
 
-[data-page="product"] div[aria-label="Rating"] span {
+div[aria-label="Rating"] span {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-page="product"] div[aria-label="Price"] {
+div[aria-label="Price"] {
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="product"] div[aria-label="Price"] data {
+div[aria-label="Price"] data {
   font-size: var(--text-3xl);
   font-weight: 700;
 }
 
-[data-page="product"] div[aria-label="Price"] s {
+div[aria-label="Price"] s {
   font-size: var(--text-lg);
   color: var(--muted-foreground);
   margin-left: var(--spacing-2);
 }
 
-[data-page="product"] section[aria-label="Details"] > p {
+section[aria-label="Details"] > p {
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="product"] fieldset {
+section[aria-label="Details"] fieldset {
   border: none;
   padding: 0;
   margin: 0 0 var(--spacing-4);
 }
 
-[data-page="product"] fieldset legend {
+section[aria-label="Details"] fieldset legend {
   font-weight: 500;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="product"] fieldset[aria-label="Color"] menu {
+fieldset[aria-label="Color"] menu {
   display: flex;
   gap: var(--spacing-2);
+  list-style: none;
 }
 
-[data-page="product"] fieldset[aria-label="Color"] button {
+fieldset[aria-label="Color"] button {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   border: 1px solid var(--border);
 }
 
-[data-page="product"] fieldset[aria-label="Color"] button[aria-pressed="true"] {
+fieldset[aria-label="Color"] button[aria-pressed="true"] {
   border: 2px solid var(--primary);
 }
 
-[data-page="product"] fieldset[aria-label="Quantity"] > div {
+fieldset[aria-label="Quantity"] > div {
   display: flex;
   align-items: center;
   border: 1px solid var(--border);
@@ -286,23 +280,25 @@ A product detail page with images, description, and purchase options.
   width: fit-content;
 }
 
-[data-page="product"] fieldset[aria-label="Quantity"] button {
+fieldset[aria-label="Quantity"] button {
   padding: var(--spacing-2) var(--spacing-3);
   background: none;
   border: none;
 }
 
-[data-page="product"] fieldset[aria-label="Quantity"] output {
+fieldset[aria-label="Quantity"] output {
   padding: 0 var(--spacing-3);
 }
 
-[data-page="product"] section[aria-label="Details"] > menu {
+section[aria-label="Details"] > menu {
   display: flex;
   gap: var(--spacing-3);
   margin-top: var(--spacing-6);
+  list-style: none;
 }
 
-[data-page="product"] section[aria-label="Details"] > menu button:first-child {
+/* Primary: first action (Add to Cart) */
+section[aria-label="Details"] > menu > :first-child button {
   flex: 1;
   padding: var(--spacing-3);
   background: var(--primary);
@@ -312,14 +308,18 @@ A product detail page with images, description, and purchase options.
   font-weight: 500;
 }
 
-[data-page="product"] section[aria-label="Details"] > menu button:last-child {
+/* Secondary: other actions (Wishlist) */
+section[aria-label="Details"] > menu > :not(:first-child) button {
   padding: var(--spacing-3);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
-
-[data-page="product"] section[aria-label="Details"] > menu button:last-child::before {
-  content: "♡";
-}
 ```
+
+## When to Use
+
+- E-commerce product pages
+- Digital product listings
+- Service detail pages
+- Item showcases

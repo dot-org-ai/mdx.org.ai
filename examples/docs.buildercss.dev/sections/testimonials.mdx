@@ -10,7 +10,7 @@ screenshot: /screenshots/sections/testimonials.png
 Customer quotes and social proof to build trust.
 
 <Preview>
-  <section data-section="testimonials">
+  <section>
     <header>
       <h2>Loved by developers</h2>
       <p>See what our customers have to say.</p>
@@ -40,17 +40,12 @@ Customer quotes and social proof to build trust.
   </section>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Social proof sections
-- Customer stories
-- Trust building
-- Case study highlights
-
-## Structure
+A testimonials section uses `<blockquote>` elements inside a container:
 
 ```html
-<section data-section="testimonials">
+<section>
   <header>
     <h2>Loved by developers</h2>
     <p>See what our customers have to say.</p>
@@ -58,7 +53,7 @@ Customer quotes and social proof to build trust.
 
   <div>
     <blockquote>
-      <p>"BuilderCSS transformed how we build UIs. The semantic approach just makes sense."</p>
+      <p>"BuilderCSS transformed how we build UIs."</p>
       <footer>
         <img src="/avatar.jpg" alt="" />
         <div>
@@ -69,7 +64,7 @@ Customer quotes and social proof to build trust.
     </blockquote>
 
     <blockquote>
-      <p>"Finally, a CSS framework that works with how we think about design."</p>
+      <p>"Finally, a CSS framework that works with how we think."</p>
       <footer>
         <img src="/avatar2.jpg" alt="" />
         <div>
@@ -85,27 +80,28 @@ Customer quotes and social proof to build trust.
 ## CSS
 
 ```css
-[data-section="testimonials"] {
+/* Testimonials: section with blockquotes */
+section:has(> div > blockquote) {
   padding: var(--spacing-16) var(--spacing-4);
   background: var(--muted);
 }
 
-[data-section="testimonials"] > header {
+section:has(> div > blockquote) > header {
   text-align: center;
   margin-bottom: var(--spacing-12);
 }
 
-[data-section="testimonials"] > header h2 {
+section:has(> div > blockquote) > header h2 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-4);
 }
 
-[data-section="testimonials"] > header p {
+section:has(> div > blockquote) > header p {
   color: var(--muted-foreground);
 }
 
-[data-section="testimonials"] > div {
+section:has(> div > blockquote) > div {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--spacing-6);
@@ -113,39 +109,40 @@ Customer quotes and social proof to build trust.
   margin: 0 auto;
 }
 
-[data-section="testimonials"] blockquote {
+section:has(> div > blockquote) blockquote {
   background: var(--background);
   padding: var(--spacing-6);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
-[data-section="testimonials"] blockquote > p {
+section:has(> div > blockquote) blockquote > p {
   margin-bottom: var(--spacing-4);
   font-style: italic;
 }
 
-[data-section="testimonials"] blockquote > footer {
+section:has(> div > blockquote) blockquote > footer {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
 }
 
-[data-section="testimonials"] blockquote img,
-[data-section="testimonials"] blockquote figure {
+section:has(> div > blockquote) blockquote img,
+section:has(> div > blockquote) blockquote figure {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   background: var(--muted);
+  margin: 0;
 }
 
-[data-section="testimonials"] blockquote cite {
+section:has(> div > blockquote) blockquote cite {
   font-weight: 600;
   font-style: normal;
   display: block;
 }
 
-[data-section="testimonials"] blockquote span {
+section:has(> div > blockquote) blockquote span {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
@@ -165,8 +162,10 @@ Customer quotes and social proof to build trust.
 
 ### Featured Testimonial
 
+Use `aria-current="true"` for featured quotes:
+
 ```html
-<section data-section="testimonials">
+<section>
   <blockquote aria-current="true">
     <p>"This completely changed how we work..."</p>
     <footer>
@@ -179,3 +178,10 @@ Customer quotes and social proof to build trust.
   </blockquote>
 </section>
 ```
+
+## When to Use
+
+- Social proof sections
+- Customer stories
+- Trust building
+- Case study highlights

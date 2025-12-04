@@ -1,16 +1,16 @@
 ---
 $type: DocsPage
 title: Modal Container
-description: Centered dialog overlay
+description: Centered dialog using native dialog element
 screenshot: /screenshots/containers/modal.png
 ---
 
 # Modal Container
 
-A centered dialog overlay for confirmations, forms, and focused content.
+A centered dialog overlay using the native `<dialog>` element for built-in accessibility and keyboard handling.
 
 <Preview>
-  <div data-container="modal">
+  <dialog open>
     <article>
       <header>
         <h2>Confirm Action</h2>
@@ -18,74 +18,76 @@ A centered dialog overlay for confirmations, forms, and focused content.
       </header>
       <p>Are you sure you want to continue? This action cannot be undone.</p>
       <footer>
-        <button>Cancel</button>
-        <button>Confirm</button>
+        <menu>
+          <li><button>Cancel</button></li>
+          <li><button>Confirm</button></li>
+        </menu>
       </footer>
     </article>
-  </div>
+  </dialog>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Confirmation dialogs
-- Form submissions
-- Alert messages
-- Focused tasks
-
-## Structure
+Use the native `<dialog>` element:
 
 ```html
-<div data-container="modal">
+<dialog id="confirm">
   <article>
     <header>
       <h2>Confirm Action</h2>
-      <button aria-label="Close">×</button>
+      <button onclick="this.closest('dialog').close()">×</button>
     </header>
     <p>Are you sure you want to continue?</p>
     <footer>
-      <button>Cancel</button>
-      <button>Confirm</button>
+      <menu>
+        <li><button onclick="this.closest('dialog').close()">Cancel</button></li>
+        <li><button onclick="handleConfirm()">Confirm</button></li>
+      </menu>
     </footer>
   </article>
-</div>
+</dialog>
+
+<!-- Open the dialog -->
+<button onclick="document.getElementById('confirm').showModal()">
+  Delete Item
+</button>
 ```
 
 ## CSS
 
 ```css
-[data-container="modal"] {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-}
-
-[data-container="modal"] > article {
-  background: var(--background);
+/* Native dialog element */
+dialog {
+  border: none;
   border-radius: var(--radius-lg);
-  padding: var(--spacing-6);
-  width: 100%;
+  padding: 0;
   max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
+  width: 90vw;
+  box-shadow: var(--shadow-lg);
 }
 
-[data-container="modal"] header {
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+dialog > article {
+  padding: var(--spacing-6);
+}
+
+dialog header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-4);
 }
 
-[data-container="modal"] header h2 {
+dialog header h2 {
   font-size: var(--text-lg);
   font-weight: 600;
 }
 
-[data-container="modal"] header button {
+dialog header > button {
   background: none;
   border: none;
   font-size: var(--text-xl);
@@ -93,119 +95,111 @@ A centered dialog overlay for confirmations, forms, and focused content.
   color: var(--muted-foreground);
 }
 
-[data-container="modal"] > article > p {
+dialog > article > p {
   color: var(--muted-foreground);
 }
 
-[data-container="modal"] footer {
+dialog footer {
   margin-top: var(--spacing-4);
+}
+
+dialog footer menu {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-2);
+  list-style: none;
+  padding: 0;
 }
 
-[data-container="modal"] footer button {
+dialog footer button {
   padding: var(--spacing-2) var(--spacing-4);
   border-radius: var(--radius);
   cursor: pointer;
 }
 
-[data-container="modal"] footer button:first-child {
+/* Secondary action: first button */
+dialog footer menu > :first-child button {
   background: transparent;
   border: 1px solid var(--border);
 }
 
-[data-container="modal"] footer button:last-child {
+/* Primary action: last button */
+dialog footer menu > :last-child button {
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
 }
-
-[data-container="modal"][hidden] {
-  display: none;
-}
 ```
+
+## Why Native `<dialog>`?
+
+The `<dialog>` element provides:
+- **Built-in accessibility** - Focus management and screen reader support
+- **Keyboard handling** - Escape key closes the dialog
+- **`::backdrop`** - Native backdrop styling
+- **`showModal()`** - Traps focus and adds backdrop
+- **`close()`** - Closes dialog and restores focus
+- **No JavaScript required** - Works with `open` attribute for non-modal
 
 ## JavaScript
 
 ```js
-const modal = document.querySelector('[data-container="modal"]')
+const dialog = document.getElementById('confirm')
+
+// Open as modal (with backdrop)
+dialog.showModal()
+
+// Open as non-modal (no backdrop)
+dialog.show()
+
+// Close
+dialog.close()
+
+// Close with return value
+dialog.close('confirmed')
+
+// Handle close event
+dialog.addEventListener('close', () => {
+  console.log(dialog.returnValue) // 'confirmed' or ''
+})
 
 // Close on backdrop click
-modal.addEventListener('click', (e) => {
-  if (e.target === modal) {
-    modal.hidden = true
+dialog.addEventListener('click', (e) => {
+  if (e.target === dialog) {
+    dialog.close()
   }
 })
-
-// Close on escape key
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !modal.hidden) {
-    modal.hidden = true
-  }
-})
-
-// Open modal
-function openModal() {
-  modal.hidden = false
-  modal.querySelector('article').focus()
-}
 ```
-
-## Accessibility
-
-- Use `role="dialog"` and `aria-modal="true"` for screen readers
-- Trap focus within the modal when open
-- Return focus to trigger element on close
-- Support Escape key to dismiss
 
 ## Variations
 
-### Destructive
-
-```html
-<div data-container="modal">
-  <article>
-    <header>
-      <h2>Delete Item</h2>
-      <button aria-label="Close">×</button>
-    </header>
-    <p>This action cannot be undone.</p>
-    <footer>
-      <button>Cancel</button>
-      <button>Delete</button>
-    </footer>
-  </article>
-</div>
-```
-
-```css
-[data-container="modal"] footer button:last-child:has(+ :empty) {
-  /* When it's destructive action */
-  background: var(--destructive);
-  color: var(--destructive-foreground);
-}
-```
-
 ### With Form
 
+Use `method="dialog"` to close on submit:
+
 ```html
-<div data-container="modal">
-  <article>
+<dialog id="edit">
+  <form method="dialog">
     <header>
       <h2>Edit Profile</h2>
-      <button aria-label="Close">×</button>
     </header>
-    <form>
-      <label>Name</label>
-      <input type="text" />
-      <label>Email</label>
-      <input type="email" />
-      <footer>
-        <button type="button">Cancel</button>
-        <button type="submit">Save</button>
-      </footer>
-    </form>
-  </article>
-</div>
+    <fieldset>
+      <label>Name <input type="text" name="name" required></label>
+      <label>Email <input type="email" name="email" required></label>
+    </fieldset>
+    <footer>
+      <menu>
+        <li><button type="button" onclick="this.closest('dialog').close()">Cancel</button></li>
+        <li><button type="submit">Save</button></li>
+      </menu>
+    </footer>
+  </form>
+</dialog>
 ```
+
+## When to Use
+
+- Confirmation dialogs
+- Form submissions
+- Alert messages
+- Focused tasks

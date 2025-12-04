@@ -10,7 +10,7 @@ screenshot: /screenshots/sections/newsletter.png
 An email signup form for newsletter subscriptions.
 
 <Preview>
-  <section data-section="newsletter">
+  <section>
     <h2>Stay up to date</h2>
     <p>Get the latest updates delivered to your inbox.</p>
     <form>
@@ -21,17 +21,12 @@ An email signup form for newsletter subscriptions.
   </section>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Newsletter signups
-- Product updates
-- Blog subscriptions
-- Marketing lists
-
-## Structure
+A newsletter section contains a heading and an email form. The pattern `section:has(> h2 + p + form)` identifies it:
 
 ```html
-<section data-section="newsletter">
+<section>
   <h2>Stay up to date</h2>
   <p>Get the latest updates delivered to your inbox.</p>
 
@@ -52,35 +47,36 @@ An email signup form for newsletter subscriptions.
 ## CSS
 
 ```css
-[data-section="newsletter"] {
+/* Newsletter: section with h2 + p + form */
+section:has(> h2 + p + form) {
   padding: var(--spacing-16) var(--spacing-4);
   background: var(--muted);
   text-align: center;
   border-radius: var(--radius-lg);
 }
 
-[data-section="newsletter"] > * {
+section:has(> h2 + p + form) > * {
   max-width: 500px;
   margin: 0 auto;
 }
 
-[data-section="newsletter"] h2 {
+section:has(> h2 + p + form) h2 {
   font-size: var(--text-2xl);
   font-weight: 700;
   margin-bottom: var(--spacing-2);
 }
 
-[data-section="newsletter"] > p {
+section:has(> h2 + p + form) > p {
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-6);
 }
 
-[data-section="newsletter"] form {
+section:has(> h2 + p + form) form {
   display: flex;
   gap: var(--spacing-2);
 }
 
-[data-section="newsletter"] input[type="email"] {
+section:has(> h2 + p + form) input[type="email"] {
   flex: 1;
   padding: var(--spacing-3);
   border: 1px solid var(--border);
@@ -88,12 +84,12 @@ An email signup form for newsletter subscriptions.
   background: var(--background);
 }
 
-[data-section="newsletter"] input[type="email"]:focus {
+section:has(> h2 + p + form) input[type="email"]:focus {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 
-[data-section="newsletter"] button {
+section:has(> h2 + p + form) button {
   padding: var(--spacing-3) var(--spacing-6);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -103,7 +99,7 @@ An email signup form for newsletter subscriptions.
   font-weight: 500;
 }
 
-[data-section="newsletter"] small {
+section:has(> h2 + p + form) small {
   display: block;
   font-size: var(--text-sm);
   color: var(--muted-foreground);
@@ -111,7 +107,7 @@ An email signup form for newsletter subscriptions.
 }
 
 @media (max-width: 480px) {
-  [data-section="newsletter"] form {
+  section:has(> h2 + p + form) form {
     flex-direction: column;
   }
 }
@@ -120,7 +116,7 @@ An email signup form for newsletter subscriptions.
 ## JavaScript
 
 ```js
-const form = document.querySelector('[data-section="newsletter"] form')
+const form = document.querySelector('section:has(> h2 + p + form) form')
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault()
@@ -150,10 +146,10 @@ form.addEventListener('submit', async (e) => {
 
 ## Variations
 
-### With Categories
+### With Topic Selection
 
 ```html
-<section data-section="newsletter">
+<section>
   <h2>Subscribe to updates</h2>
   <form>
     <fieldset>
@@ -180,7 +176,7 @@ form.addEventListener('submit', async (e) => {
 ### Inline Banner
 
 ```html
-<section data-section="newsletter">
+<section>
   <p>Stay updated with our newsletter</p>
   <form>
     <input type="email" placeholder="Email" />
@@ -188,3 +184,10 @@ form.addEventListener('submit', async (e) => {
   </form>
 </section>
 ```
+
+## When to Use
+
+- Newsletter signups
+- Product updates
+- Blog subscriptions
+- Marketing lists

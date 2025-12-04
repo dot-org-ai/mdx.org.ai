@@ -10,7 +10,7 @@ screenshot: /screenshots/views/chat.png
 A chat/messaging interface for real-time communication.
 
 <Preview>
-  <article data-view="chat">
+  <article>
     <header>
       <figure></figure>
       <div>
@@ -23,7 +23,7 @@ A chat/messaging interface for real-time communication.
         <p>Hi! How can I help you today?</p>
         <time>10:30 AM</time>
       </div>
-      <div data-self="true">
+      <div aria-current="true">
         <p>I have a question about my order #12345</p>
         <time>10:31 AM</time>
       </div>
@@ -40,18 +40,12 @@ A chat/messaging interface for real-time communication.
   </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Support chat
-- Direct messaging
-- Team chat
-- Customer service
-- AI assistants
-
-## Structure
+A chat view uses `aria-current="true"` to mark the current user's messages:
 
 ```html
-<article data-view="chat">
+<article>
   <header>
     <figure><img src="/avatar.jpg" alt="" /></figure>
     <div>
@@ -61,12 +55,14 @@ A chat/messaging interface for real-time communication.
   </header>
 
   <section>
+    <!-- Other person's message -->
     <div>
       <p>Hi! How can I help you today?</p>
       <time>10:30 AM</time>
     </div>
 
-    <div data-self="true">
+    <!-- Current user's message (aria-current) -->
+    <div aria-current="true">
       <p>I have a question about my order</p>
       <time>10:31 AM</time>
     </div>
@@ -83,7 +79,8 @@ A chat/messaging interface for real-time communication.
 ## CSS
 
 ```css
-[data-view="chat"] {
+/* Chat view: article with header + section (messages) + footer (input) */
+article:has(> header + section + footer > input) {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -92,7 +89,7 @@ A chat/messaging interface for real-time communication.
   overflow: hidden;
 }
 
-[data-view="chat"] > header {
+article:has(> header + section + footer > input) > header {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
@@ -100,7 +97,7 @@ A chat/messaging interface for real-time communication.
   border-bottom: 1px solid var(--border);
 }
 
-[data-view="chat"] > header figure {
+article:has(> header + section + footer > input) > header figure {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -108,20 +105,20 @@ A chat/messaging interface for real-time communication.
   margin: 0;
 }
 
-[data-view="chat"] > header h2 {
+article:has(> header + section + footer > input) > header h2 {
   font-weight: 600;
 }
 
-[data-view="chat"] > header span {
+article:has(> header + section + footer > input) > header span {
   font-size: var(--text-sm);
   color: green;
 }
 
-[data-view="chat"] > header span::before {
+article:has(> header + section + footer > input) > header span::before {
   content: '● ';
 }
 
-[data-view="chat"] > section {
+article:has(> header + section + footer > input) > section {
   flex: 1;
   padding: var(--spacing-4);
   overflow-y: auto;
@@ -131,62 +128,63 @@ A chat/messaging interface for real-time communication.
   gap: var(--spacing-3);
 }
 
-[data-view="chat"] > section > div {
+article:has(> header + section + footer > input) > section > div {
   max-width: 70%;
   align-self: flex-start;
 }
 
-[data-view="chat"] > section > div[data-self="true"] {
+/* Current user's messages use aria-current */
+article:has(> header + section + footer > input) > section > div[aria-current="true"] {
   align-self: flex-end;
 }
 
-[data-view="chat"] > section > div > p {
+article:has(> header + section + footer > input) > section > div > p {
   padding: var(--spacing-3);
   border-radius: var(--radius-lg);
   background: var(--background);
   border-bottom-left-radius: 0;
 }
 
-[data-view="chat"] > section > div[data-self="true"] > p {
+article:has(> header + section + footer > input) > section > div[aria-current="true"] > p {
   background: var(--primary);
   color: var(--primary-foreground);
   border-bottom-left-radius: var(--radius-lg);
   border-bottom-right-radius: 0;
 }
 
-[data-view="chat"] > section time {
+article:has(> header + section + footer > input) > section time {
   font-size: var(--text-xs);
   color: var(--muted-foreground);
   margin-top: 4px;
   display: block;
 }
 
-[data-view="chat"] > section > div[data-self="true"] time {
+article:has(> header + section + footer > input) > section > div[aria-current="true"] time {
   text-align: right;
 }
 
-[data-view="chat"] > footer {
+article:has(> header + section + footer > input) > footer {
   padding: var(--spacing-4);
   border-top: 1px solid var(--border);
   display: flex;
   gap: var(--spacing-2);
 }
 
-[data-view="chat"] > footer button:first-child {
+article:has(> header + section + footer > input) > footer button:first-child {
   padding: var(--spacing-2);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-view="chat"] > footer input {
+article:has(> header + section + footer > input) > footer input {
   flex: 1;
   padding: var(--spacing-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-view="chat"] > footer button:last-child {
+article:has(> header + section + footer > input) > footer button:last-child {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -198,14 +196,14 @@ A chat/messaging interface for real-time communication.
 ## JavaScript
 
 ```js
-const chat = document.querySelector('[data-view="chat"]')
+const chat = document.querySelector('article:has(> header + section + footer > input)')
 const section = chat.querySelector('section')
 const input = chat.querySelector('footer input')
 const sendBtn = chat.querySelector('footer button:last-child')
 
 function addMessage(text, isSelf = false) {
   const div = document.createElement('div')
-  if (isSelf) div.dataset.self = 'true'
+  if (isSelf) div.setAttribute('aria-current', 'true')
 
   const p = document.createElement('p')
   p.textContent = text
@@ -230,3 +228,11 @@ input.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') sendBtn.click()
 })
 ```
+
+## When to Use
+
+- Support chat
+- Direct messaging
+- Team chat
+- Customer service
+- AI assistants

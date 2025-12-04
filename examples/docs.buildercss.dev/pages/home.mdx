@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/home.png
 A marketing landing page template combining hero, features, testimonials, and CTA sections.
 
 <Preview>
-  <article data-page="home">
+  <body>
     <header>
       <a href="/">Acme</a>
       <nav>
@@ -21,39 +21,36 @@ A marketing landing page template combining hero, features, testimonials, and CT
       <button>Get Started</button>
     </header>
 
-    <section aria-label="Hero">
-      <mark>New: v2.0 Released</mark>
-      <h1>Build better products with semantic HTML</h1>
-      <p>A design system that uses data attributes instead of utility classes. Clean HTML, powerful styling.</p>
-      <menu>
-        <button>Start Building</button>
-        <button>View Docs</button>
-      </menu>
-    </section>
+    <main>
+      <section>
+        <mark>New: v2.0 Released</mark>
+        <h1>Build better products with semantic HTML</h1>
+        <p>A design system that uses HTML structure instead of utility classes. Clean HTML, powerful styling.</p>
+        <menu>
+          <li><button>Start Building</button></li>
+          <li><button>View Docs</button></li>
+        </menu>
+      </section>
 
-    <section aria-label="Social proof">
-      <p>Trusted by teams at</p>
-      <ul>
-        <li>Vercel</li>
-        <li>Stripe</li>
-        <li>Linear</li>
-        <li>Notion</li>
-      </ul>
-    </section>
-  </article>
+      <section aria-label="Social proof">
+        <p>Trusted by teams at</p>
+        <ul>
+          <li><figure>Vercel</figure></li>
+          <li><figure>Stripe</figure></li>
+          <li><figure>Linear</figure></li>
+          <li><figure>Notion</figure></li>
+        </ul>
+      </section>
+    </main>
+  </body>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Product marketing landing pages
-- SaaS homepage
-- Startup websites
-- Product launches
-
-## Structure
+A landing page uses `<body>` with a global `<header>` containing navigation, followed by `<main>` with multiple `<section>` elements. CSS identifies this as `body:has(> header + main > section:first-child h1)`:
 
 ```html
-<article data-page="home">
+<body>
   <header>
     <a href="/">Acme</a>
     <nav>
@@ -64,51 +61,54 @@ A marketing landing page template combining hero, features, testimonials, and CT
     <button>Get Started</button>
   </header>
 
-  <section aria-label="Hero">
-    <mark>New: v2.0 Released</mark>
-    <h1>Build better products with semantic HTML</h1>
-    <p>A design system that uses data attributes...</p>
-    <menu>
-      <button>Start Building</button>
-      <button>View Docs</button>
-    </menu>
-  </section>
+  <main>
+    <section>
+      <mark>New: v2.0 Released</mark>
+      <h1>Build better products with semantic HTML</h1>
+      <p>A design system that uses HTML structure...</p>
+      <menu>
+        <li><button>Start Building</button></li>
+        <li><button>View Docs</button></li>
+      </menu>
+    </section>
 
-  <section aria-label="Social proof">
-    <p>Trusted by teams at</p>
-    <ul>
-      <li><img src="/logos/vercel.svg" alt="Vercel" /></li>
-      <li><img src="/logos/stripe.svg" alt="Stripe" /></li>
-    </ul>
-  </section>
+    <section aria-label="Social proof">
+      <p>Trusted by teams at</p>
+      <ul>
+        <li><figure><img src="/logos/vercel.svg" alt="Vercel" /></figure></li>
+        <li><figure><img src="/logos/stripe.svg" alt="Stripe" /></figure></li>
+      </ul>
+    </section>
 
-  <section aria-label="Features">
-    <!-- Feature cards -->
-  </section>
+    <section aria-label="Features">
+      <!-- Feature cards -->
+    </section>
 
-  <section aria-label="Testimonials">
-    <!-- Testimonial cards -->
-  </section>
+    <section aria-label="Testimonials">
+      <!-- Testimonial cards -->
+    </section>
 
-  <section aria-label="Call to action">
-    <h2>Ready to get started?</h2>
-    <button>Start Free Trial</button>
-  </section>
+    <section aria-label="Call to action">
+      <h2>Ready to get started?</h2>
+      <button>Start Free Trial</button>
+    </section>
+  </main>
 
   <footer>
     <!-- Footer content -->
   </footer>
-</article>
+</body>
 ```
 
 ## CSS
 
 ```css
-[data-page="home"] {
+/* Landing page: body with header + main containing hero section */
+body:has(> header + main > section:first-child h1) {
   min-height: 100vh;
 }
 
-[data-page="home"] > header {
+body:has(> header + main) > header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -120,26 +120,26 @@ A marketing landing page template combining hero, features, testimonials, and CT
   z-index: 50;
 }
 
-[data-page="home"] > header > a:first-child {
+body:has(> header + main) > header > a:first-child {
   font-weight: 700;
   font-size: var(--text-xl);
 }
 
-[data-page="home"] > header nav {
+body:has(> header + main) > header nav {
   display: flex;
   gap: var(--spacing-6);
   font-size: var(--text-sm);
 }
 
-[data-page="home"] > header nav a {
+body:has(> header + main) > header nav a {
   color: var(--muted-foreground);
 }
 
-[data-page="home"] > header nav a[aria-current="page"] {
+body:has(> header + main) > header nav a[aria-current="page"] {
   color: var(--foreground);
 }
 
-[data-page="home"] > header > button {
+body:has(> header + main) > header > button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -147,14 +147,15 @@ A marketing landing page template combining hero, features, testimonials, and CT
   border-radius: var(--radius);
 }
 
-[data-page="home"] > section[aria-label="Hero"] {
+/* Hero section: first section with h1 */
+main > section:first-child:has(h1) {
   padding: var(--spacing-16) var(--spacing-6);
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
 }
 
-[data-page="home"] > section[aria-label="Hero"] mark {
+main > section:first-child:has(h1) mark {
   display: inline-block;
   padding: var(--spacing-1) var(--spacing-3);
   background: var(--muted);
@@ -163,26 +164,28 @@ A marketing landing page template combining hero, features, testimonials, and CT
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="home"] > section[aria-label="Hero"] h1 {
+main > section:first-child:has(h1) h1 {
   font-size: var(--text-4xl);
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="home"] > section[aria-label="Hero"] p {
+main > section:first-child:has(h1) p {
   font-size: var(--text-lg);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-6);
 }
 
-[data-page="home"] > section[aria-label="Hero"] menu {
+main > section:first-child:has(h1) menu {
   display: flex;
   gap: var(--spacing-3);
   justify-content: center;
+  list-style: none;
 }
 
-[data-page="home"] > section[aria-label="Hero"] menu button:first-child {
+/* Primary: first button */
+main > section:first-child:has(h1) menu > :first-child button {
   padding: var(--spacing-3) var(--spacing-6);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -191,7 +194,8 @@ A marketing landing page template combining hero, features, testimonials, and CT
   font-weight: 500;
 }
 
-[data-page="home"] > section[aria-label="Hero"] menu button:last-child {
+/* Secondary: other buttons */
+main > section:first-child:has(h1) menu > :not(:first-child) button {
   padding: var(--spacing-3) var(--spacing-6);
   background: transparent;
   border: 1px solid var(--border);
@@ -199,19 +203,20 @@ A marketing landing page template combining hero, features, testimonials, and CT
   font-weight: 500;
 }
 
-[data-page="home"] > section[aria-label="Social proof"] {
+/* Social proof section */
+section[aria-label="Social proof"] {
   padding: var(--spacing-8) var(--spacing-6);
   background: var(--muted);
 }
 
-[data-page="home"] > section[aria-label="Social proof"] p {
+section[aria-label="Social proof"] p {
   text-align: center;
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="home"] > section[aria-label="Social proof"] ul {
+section[aria-label="Social proof"] ul {
   display: flex;
   justify-content: center;
   gap: var(--spacing-8);
@@ -220,7 +225,15 @@ A marketing landing page template combining hero, features, testimonials, and CT
   opacity: 0.5;
 }
 
-[data-page="home"] > section[aria-label="Social proof"] li {
+section[aria-label="Social proof"] figure {
   font-weight: 600;
+  margin: 0;
 }
 ```
+
+## When to Use
+
+- Product marketing landing pages
+- SaaS homepage
+- Startup websites
+- Product launches

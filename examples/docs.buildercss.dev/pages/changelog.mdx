@@ -10,14 +10,14 @@ screenshot: /screenshots/pages/changelog.png
 A changelog page displaying product updates and release history.
 
 <Preview>
-  <article data-page="changelog">
+  <main>
     <header>
       <h1>Changelog</h1>
       <p>New updates and improvements to Builder CSS</p>
     </header>
 
     <section>
-      <article data-latest="true">
+      <article aria-current="true">
         <header>
           <mark>v2.0.0</mark>
           <time datetime="2024-12-01">December 1, 2024</time>
@@ -25,7 +25,7 @@ A changelog page displaying product updates and release history.
         <h2>Major Release: Builder CSS 2.0</h2>
         <ul>
           <li>Complete rewrite with improved performance</li>
-          <li>New data-attribute based API</li>
+          <li>New semantic HTML-based API</li>
           <li>Dark mode support out of the box</li>
           <li>50+ new components added</li>
         </ul>
@@ -58,27 +58,22 @@ A changelog page displaying product updates and release history.
         </ul>
       </article>
     </section>
-  </article>
+  </main>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Product changelog
-- Release notes pages
-- Update history
-- Version documentation
-
-## Structure
+A changelog uses `<main>` with header and section of release articles. The pattern `main:has(> section > article > header > mark + time)` identifies changelog pages:
 
 ```html
-<article data-page="changelog">
+<main>
   <header>
     <h1>Changelog</h1>
     <p>New updates and improvements to Builder CSS</p>
   </header>
 
   <section>
-    <article data-latest="true">
+    <article aria-current="true">
       <header>
         <mark>v2.0.0</mark>
         <time datetime="2024-12-01">December 1, 2024</time>
@@ -86,7 +81,7 @@ A changelog page displaying product updates and release history.
       <h2>Major Release: Builder CSS 2.0</h2>
       <ul>
         <li>Complete rewrite with improved performance</li>
-        <li>New data-attribute based API</li>
+        <li>New semantic HTML-based API</li>
         <li>Dark mode support out of the box</li>
       </ul>
     </article>
@@ -103,45 +98,47 @@ A changelog page displaying product updates and release history.
       </ul>
     </article>
   </section>
-</article>
+</main>
 ```
 
 ## CSS
 
 ```css
-[data-page="changelog"] {
+/* Changelog: main with section of release articles */
+main:has(> section > article > header > mark + time) {
   padding: var(--spacing-6);
   max-width: 700px;
   margin: 0 auto;
 }
 
-[data-page="changelog"] > header {
+main:has(> section > article > header > mark + time) > header {
   margin-bottom: var(--spacing-8);
 }
 
-[data-page="changelog"] > header h1 {
+main:has(> section > article > header > mark + time) > header h1 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="changelog"] > header p {
+main:has(> section > article > header > mark + time) > header p {
   color: var(--muted-foreground);
 }
 
-[data-page="changelog"] > section {
+main:has(> section > article > header > mark + time) > section {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-8);
 }
 
-[data-page="changelog"] > section > article {
+/* Timeline styling */
+main:has(> section > article > header > mark + time) > section > article {
   padding-left: var(--spacing-6);
   border-left: 2px solid var(--border);
   position: relative;
 }
 
-[data-page="changelog"] > section > article::before {
+main:has(> section > article > header > mark + time) > section > article::before {
   content: "";
   position: absolute;
   left: -6px;
@@ -152,41 +149,42 @@ A changelog page displaying product updates and release history.
   background: var(--muted);
 }
 
-[data-page="changelog"] > section > article[data-latest="true"]::before {
+/* Latest release: aria-current */
+main:has(> section > article > header > mark + time) > section > article[aria-current]::before {
   background: var(--primary);
 }
 
-[data-page="changelog"] > section > article > header {
+main:has(> section > article > header > mark + time) > section > article > header {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="changelog"] > section > article mark {
+main:has(> section > article > header > mark + time) > section > article mark {
   padding: 2px 8px;
   background: var(--muted);
   border-radius: var(--radius);
   font-size: var(--text-xs);
 }
 
-[data-page="changelog"] > section > article[data-latest="true"] mark {
+main:has(> section > article > header > mark + time) > section > article[aria-current] mark {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-[data-page="changelog"] > section > article time {
+main:has(> section > article > header > mark + time) > section > article time {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-page="changelog"] > section > article h2 {
+main:has(> section > article > header > mark + time) > section > article h2 {
   font-size: var(--text-lg);
   font-weight: 600;
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="changelog"] > section > article ul {
+main:has(> section > article > header > mark + time) > section > article ul {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
   padding-left: var(--spacing-4);
@@ -195,3 +193,10 @@ A changelog page displaying product updates and release history.
   gap: var(--spacing-2);
 }
 ```
+
+## When to Use
+
+- Product changelog
+- Release notes pages
+- Update history
+- Version documentation

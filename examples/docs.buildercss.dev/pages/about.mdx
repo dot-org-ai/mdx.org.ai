@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/about.png
 A page showcasing company story, mission, and team members.
 
 <Preview>
-  <article data-page="about">
+  <main>
     <header>
       <h1>About Us</h1>
       <p>We're on a mission to make web development simpler and more accessible for everyone.</p>
@@ -29,24 +29,32 @@ A page showcasing company story, mission, and team members.
       <h2>Our Team</h2>
       <ul>
         <li>
-          <figure>AC</figure>
-          <h3>Alex Chen</h3>
-          <p>CEO</p>
+          <article>
+            <figure>AC</figure>
+            <h3>Alex Chen</h3>
+            <p>CEO</p>
+          </article>
         </li>
         <li>
-          <figure>SK</figure>
-          <h3>Sarah Kim</h3>
-          <p>CTO</p>
+          <article>
+            <figure>SK</figure>
+            <h3>Sarah Kim</h3>
+            <p>CTO</p>
+          </article>
         </li>
         <li>
-          <figure>MR</figure>
-          <h3>Mike Ross</h3>
-          <p>Design Lead</p>
+          <article>
+            <figure>MR</figure>
+            <h3>Mike Ross</h3>
+            <p>Design Lead</p>
+          </article>
         </li>
         <li>
-          <figure>EL</figure>
-          <h3>Emma Liu</h3>
-          <p>Engineering</p>
+          <article>
+            <figure>EL</figure>
+            <h3>Emma Liu</h3>
+            <p>Engineering</p>
+          </article>
         </li>
       </ul>
     </section>
@@ -54,33 +62,28 @@ A page showcasing company story, mission, and team members.
     <section aria-label="Stats">
       <dl>
         <div>
-          <dd>50K+</dd>
+          <dd><data value="50000">50K+</data></dd>
           <dt>Active Users</dt>
         </div>
         <div>
-          <dd>120+</dd>
+          <dd><data value="120">120+</data></dd>
           <dt>Countries</dt>
         </div>
         <div>
-          <dd>99.9%</dd>
+          <dd><data value="99.9">99.9%</data></dd>
           <dt>Uptime</dt>
         </div>
       </dl>
     </section>
-  </article>
+  </main>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Company "About Us" page
-- Team introduction pages
-- Startup story pages
-- Organization profile
-
-## Structure
+An about page uses `<main>` with a centered `<header>` followed by story, team, and stats sections. The pattern `main:has(> header + section[aria-label="Story"])` identifies it:
 
 ```html
-<article data-page="about">
+<main>
   <header>
     <h1>About Us</h1>
     <p>We're on a mission to make web development simpler...</p>
@@ -98,9 +101,11 @@ A page showcasing company story, mission, and team members.
     <h2>Our Team</h2>
     <ul>
       <li>
-        <figure><img src="/avatar.jpg" alt="" /></figure>
-        <h3>Alex Chen</h3>
-        <p>CEO</p>
+        <article>
+          <figure><img src="/avatar.jpg" alt="" /></figure>
+          <h3>Alex Chen</h3>
+          <p>CEO</p>
+        </article>
       </li>
     </ul>
   </section>
@@ -108,81 +113,84 @@ A page showcasing company story, mission, and team members.
   <section aria-label="Stats">
     <dl>
       <div>
-        <dd>50K+</dd>
+        <dd><data value="50000">50K+</data></dd>
         <dt>Active Users</dt>
       </div>
     </dl>
   </section>
-</article>
+</main>
 ```
 
 ## CSS
 
 ```css
-[data-page="about"] {
+/* About page: main with header + story section */
+main:has(> header + section[aria-label="Story"]) {
   padding: var(--spacing-6);
 }
 
-[data-page="about"] > header {
+main:has(> header + section[aria-label="Story"]) > header {
   text-align: center;
   max-width: 700px;
   margin: 0 auto var(--spacing-12);
 }
 
-[data-page="about"] > header h1 {
+main:has(> header + section[aria-label="Story"]) > header h1 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="about"] > header p {
+main:has(> header + section[aria-label="Story"]) > header p {
   font-size: var(--text-lg);
   color: var(--muted-foreground);
 }
 
-[data-page="about"] > section[aria-label="Story"] {
+/* Story section: figure + content */
+section[aria-label="Story"] {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-8);
   margin-bottom: var(--spacing-12);
 }
 
-[data-page="about"] > section[aria-label="Story"] figure {
+section[aria-label="Story"] figure {
   background: var(--muted);
   border-radius: var(--radius-lg);
   aspect-ratio: 16/9;
   margin: 0;
 }
 
-[data-page="about"] > section[aria-label="Story"] > div {
+section[aria-label="Story"] > div {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-[data-page="about"] > section[aria-label="Story"] h2 {
+section[aria-label="Story"] h2 {
   font-size: var(--text-xl);
   font-weight: 600;
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="about"] > section[aria-label="Story"] p {
+section[aria-label="Story"] p {
   color: var(--muted-foreground);
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="about"] > section[aria-label="Team"] {
+/* Team section: h2 + grid of member cards */
+section[aria-label="Team"] {
   margin-bottom: var(--spacing-12);
 }
 
-[data-page="about"] > section[aria-label="Team"] h2 {
+section[aria-label="Team"] h2 {
   font-size: var(--text-xl);
   font-weight: 600;
   margin-bottom: var(--spacing-6);
   text-align: center;
 }
 
-[data-page="about"] > section[aria-label="Team"] ul {
+section[aria-label="Team"] ul {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-6);
@@ -190,11 +198,11 @@ A page showcasing company story, mission, and team members.
   padding: 0;
 }
 
-[data-page="about"] > section[aria-label="Team"] li {
+section[aria-label="Team"] article {
   text-align: center;
 }
 
-[data-page="about"] > section[aria-label="Team"] figure {
+section[aria-label="Team"] figure {
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -206,30 +214,41 @@ A page showcasing company story, mission, and team members.
   font-weight: 600;
 }
 
-[data-page="about"] > section[aria-label="Team"] h3 {
+section[aria-label="Team"] h3 {
   font-weight: 600;
 }
 
-[data-page="about"] > section[aria-label="Team"] p {
+section[aria-label="Team"] p {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-page="about"] > section[aria-label="Stats"] dl {
+/* Stats section with data elements */
+section[aria-label="Stats"] dl {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-6);
   text-align: center;
 }
 
-[data-page="about"] > section[aria-label="Stats"] dd {
-  font-size: var(--text-3xl);
-  font-weight: 700;
-  color: var(--primary);
+section[aria-label="Stats"] dd {
   margin: 0;
 }
 
-[data-page="about"] > section[aria-label="Stats"] dt {
+section[aria-label="Stats"] data {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--primary);
+}
+
+section[aria-label="Stats"] dt {
   color: var(--muted-foreground);
 }
 ```
+
+## When to Use
+
+- Company "About Us" page
+- Team introduction pages
+- Startup story pages
+- Organization profile

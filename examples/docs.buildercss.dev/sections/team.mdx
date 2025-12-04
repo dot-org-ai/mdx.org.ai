@@ -10,129 +10,127 @@ screenshot: /screenshots/sections/team.png
 Display team member profiles and roles.
 
 <Preview>
-  <section data-section="team">
+  <section>
     <header>
       <h2>Meet Our Team</h2>
       <p>The people behind the product.</p>
     </header>
-    <div>
-      <article>
-        <figure></figure>
-        <h3>Sarah Chen</h3>
-        <p>CEO & Co-founder</p>
-        <nav aria-label="Social links">
-          <a href="#">𝕏</a>
-          <a href="#">in</a>
-        </nav>
-      </article>
-      <article>
-        <figure></figure>
-        <h3>Alex Rivera</h3>
-        <p>CTO & Co-founder</p>
-        <nav aria-label="Social links">
-          <a href="#">𝕏</a>
-          <a href="#">gh</a>
-        </nav>
-      </article>
-      <article>
-        <figure></figure>
-        <h3>Jordan Lee</h3>
-        <p>Head of Design</p>
-        <nav aria-label="Social links">
-          <a href="#">𝕏</a>
-          <a href="#">dr</a>
-        </nav>
-      </article>
-    </div>
+    <ul>
+      <li>
+        <article>
+          <figure></figure>
+          <h3>Sarah Chen</h3>
+          <p>CEO & Co-founder</p>
+          <nav aria-label="Social links">
+            <a href="#">𝕏</a>
+            <a href="#">in</a>
+          </nav>
+        </article>
+      </li>
+      <li>
+        <article>
+          <figure></figure>
+          <h3>Alex Rivera</h3>
+          <p>CTO & Co-founder</p>
+          <nav aria-label="Social links">
+            <a href="#">𝕏</a>
+            <a href="#">gh</a>
+          </nav>
+        </article>
+      </li>
+      <li>
+        <article>
+          <figure></figure>
+          <h3>Jordan Lee</h3>
+          <p>Head of Design</p>
+          <nav aria-label="Social links">
+            <a href="#">𝕏</a>
+            <a href="#">dr</a>
+          </nav>
+        </article>
+      </li>
+    </ul>
   </section>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- About pages
-- Team introductions
-- Company culture
-- Leadership showcase
-
-## Structure
+A team section is a list of `<article>` elements with team member info:
 
 ```html
-<section data-section="team">
+<section>
   <header>
     <h2>Meet Our Team</h2>
     <p>The people behind the product.</p>
   </header>
 
-  <div>
-    <article>
-      <img src="/team/sarah.jpg" alt="Sarah Chen" />
-      <h3>Sarah Chen</h3>
-      <p>CEO & Co-founder</p>
-      <nav aria-label="Social links">
-        <a href="https://twitter.com/sarah">Twitter</a>
-        <a href="https://linkedin.com/in/sarah">LinkedIn</a>
-      </nav>
-    </article>
+  <ul>
+    <li>
+      <article>
+        <img src="/team/sarah.jpg" alt="Sarah Chen" />
+        <h3>Sarah Chen</h3>
+        <p>CEO & Co-founder</p>
+        <nav aria-label="Social links">
+          <a href="https://twitter.com/sarah">Twitter</a>
+          <a href="https://linkedin.com/in/sarah">LinkedIn</a>
+        </nav>
+      </article>
+    </li>
 
-    <article>
-      <img src="/team/alex.jpg" alt="Alex Rivera" />
-      <h3>Alex Rivera</h3>
-      <p>CTO & Co-founder</p>
-      <nav aria-label="Social links">
-        <a href="https://twitter.com/alex">Twitter</a>
-        <a href="https://github.com/alex">GitHub</a>
-      </nav>
-    </article>
-
-    <article>
-      <img src="/team/jordan.jpg" alt="Jordan Lee" />
-      <h3>Jordan Lee</h3>
-      <p>Head of Design</p>
-      <nav aria-label="Social links">
-        <a href="https://twitter.com/jordan">Twitter</a>
-        <a href="https://dribbble.com/jordan">Dribbble</a>
-      </nav>
-    </article>
-  </div>
+    <li>
+      <article>
+        <img src="/team/alex.jpg" alt="Alex Rivera" />
+        <h3>Alex Rivera</h3>
+        <p>CTO & Co-founder</p>
+        <nav aria-label="Social links">
+          <a href="https://twitter.com/alex">Twitter</a>
+          <a href="https://github.com/alex">GitHub</a>
+        </nav>
+      </article>
+    </li>
+  </ul>
 </section>
 ```
 
 ## CSS
 
 ```css
-[data-section="team"] {
+/* Team: section with ul > li > article containing figure + h3 */
+section:has(> ul > li > article > figure + h3) {
   padding: var(--spacing-16) var(--spacing-4);
 }
 
-[data-section="team"] > header {
+section:has(> ul > li > article > figure + h3) > header {
   text-align: center;
   margin-bottom: var(--spacing-12);
 }
 
-[data-section="team"] > header h2 {
+section:has(> ul > li > article > figure + h3) > header h2 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-4);
 }
 
-[data-section="team"] > header p {
+section:has(> ul > li > article > figure + h3) > header p {
   color: var(--muted-foreground);
 }
 
-[data-section="team"] > div {
+section:has(> ul > li > article > figure + h3) > ul {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-8);
   max-width: 900px;
   margin: 0 auto;
+  list-style: none;
+  padding: 0;
 }
 
-[data-section="team"] article {
+section:has(> ul > li > article > figure + h3) article {
   text-align: center;
 }
 
-[data-section="team"] article img,
-[data-section="team"] article figure {
+section:has(> ul > li > article > figure + h3) article img,
+section:has(> ul > li > article > figure + h3) article figure {
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -141,29 +139,29 @@ Display team member profiles and roles.
   background: var(--muted);
 }
 
-[data-section="team"] article h3 {
+section:has(> ul > li > article > figure + h3) article h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-1);
 }
 
-[data-section="team"] article > p {
+section:has(> ul > li > article > figure + h3) article > p {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
   margin-bottom: var(--spacing-2);
 }
 
-[data-section="team"] article nav {
+section:has(> ul > li > article > figure + h3) article nav {
   display: flex;
   justify-content: center;
   gap: var(--spacing-2);
 }
 
-[data-section="team"] article nav a {
+section:has(> ul > li > article > figure + h3) article nav a {
   color: var(--muted-foreground);
   transition: color 0.2s;
 }
 
-[data-section="team"] article nav a:hover {
+section:has(> ul > li > article > figure + h3) article nav a:hover {
   color: var(--foreground);
 }
 ```
@@ -173,7 +171,7 @@ Display team member profiles and roles.
 ### With Cards
 
 ```html
-<section data-section="team">
+<section>
   <article>
     <img src="/team/sarah.jpg" alt="" />
     <div>
@@ -185,12 +183,9 @@ Display team member profiles and roles.
 </section>
 ```
 
-### Grid Layout
+## When to Use
 
-```html
-<section data-section="team">
-  <div>
-    <!-- More compact grid with 4 columns -->
-  </div>
-</section>
-```
+- About pages
+- Team introductions
+- Company culture
+- Leadership showcase

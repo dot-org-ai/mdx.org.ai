@@ -1,108 +1,60 @@
 ---
 $type: DocsPage
 title: FAQ Section
-description: Frequently asked questions accordion
+description: Frequently asked questions with native details element
 screenshot: /screenshots/sections/faq.png
 ---
 
 # FAQ Section
 
-An accordion of frequently asked questions.
+Frequently asked questions using the native `<details>` element for accessible accordion behavior.
 
 <Preview>
-  <section data-section="faq">
+  <section>
     <header>
       <h2>Frequently Asked Questions</h2>
       <p>Everything you need to know.</p>
     </header>
     <dl>
-      <div>
-        <dt>
-          <button aria-expanded="true">
-            How is BuilderCSS different from Tailwind?
-          </button>
-        </dt>
-        <dd>
-          BuilderCSS uses semantic HTML and data attributes instead of utility classes, making code more readable and accessible.
-        </dd>
-      </div>
-      <div>
-        <dt>
-          <button aria-expanded="false">
-            Does it work with React Native?
-          </button>
-        </dt>
-        <dd hidden>
-          Yes! Every component has a React Native implementation using StyleSheet for consistent cross-platform design.
-        </dd>
-      </div>
-      <div>
-        <dt>
-          <button aria-expanded="false">
-            Is it production ready?
-          </button>
-        </dt>
-        <dd hidden>
-          Absolutely. BuilderCSS is used in production by thousands of websites and applications.
-        </dd>
-      </div>
+      <details open>
+        <summary>How is BuilderCSS different from Tailwind?</summary>
+        <p>BuilderCSS uses semantic HTML structure for styling instead of utility classes, making code more readable and accessible.</p>
+      </details>
+      <details>
+        <summary>Does it work with React Native?</summary>
+        <p>Yes! Every component has a React Native implementation using StyleSheet for consistent cross-platform design.</p>
+      </details>
+      <details>
+        <summary>Is it production ready?</summary>
+        <p>Absolutely. BuilderCSS is used in production by thousands of websites and applications.</p>
+      </details>
     </dl>
   </section>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- FAQ pages
-- Product questions
-- Support pages
-- Documentation
-
-## Structure
+A FAQ section uses `<details>` elements inside a `<dl>` (definition list):
 
 ```html
-<section data-section="faq">
+<section>
   <header>
     <h2>Frequently Asked Questions</h2>
     <p>Everything you need to know.</p>
   </header>
-
   <dl>
-    <div>
-      <dt>
-        <button aria-expanded="false">
-          How is BuilderCSS different from Tailwind?
-        </button>
-      </dt>
-      <dd>
-        BuilderCSS uses semantic HTML and data attributes
-        instead of utility classes, making code more readable
-        and accessible.
-      </dd>
-    </div>
-
-    <div>
-      <dt>
-        <button aria-expanded="false">
-          Does it work with React Native?
-        </button>
-      </dt>
-      <dd>
-        Yes! Every component has a React Native implementation
-        using StyleSheet for consistent cross-platform design.
-      </dd>
-    </div>
-
-    <div>
-      <dt>
-        <button aria-expanded="true">
-          Is it production ready?
-        </button>
-      </dt>
-      <dd>
-        Absolutely. BuilderCSS is used in production by
-        thousands of websites and applications.
-      </dd>
-    </div>
+    <details>
+      <summary>Question one?</summary>
+      <p>Answer one.</p>
+    </details>
+    <details>
+      <summary>Question two?</summary>
+      <p>Answer two.</p>
+    </details>
+    <details open>
+      <summary>Question three?</summary>
+      <p>Answer three (open by default).</p>
+    </details>
   </dl>
 </section>
 ```
@@ -110,80 +62,75 @@ An accordion of frequently asked questions.
 ## CSS
 
 ```css
-[data-section="faq"] {
+/* FAQ: section with dl containing details */
+section:has(> dl > details) {
   padding: var(--spacing-16) var(--spacing-4);
   max-width: 800px;
   margin: 0 auto;
 }
 
-[data-section="faq"] > header {
+section:has(> dl > details) > header {
   text-align: center;
   margin-bottom: var(--spacing-12);
 }
 
-[data-section="faq"] > header h2 {
+section:has(> dl > details) > header h2 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-4);
 }
 
-[data-section="faq"] > header p {
+section:has(> dl > details) > header p {
   color: var(--muted-foreground);
 }
 
-[data-section="faq"] dl {
+section:has(> dl > details) > dl {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
 }
 
-[data-section="faq"] dl > div {
+section:has(> dl > details) details {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
 }
 
-[data-section="faq"] dt button {
-  width: 100%;
+section:has(> dl > details) summary {
   padding: var(--spacing-4);
-  background: transparent;
-  border: none;
-  text-align: left;
   font-weight: 600;
   cursor: pointer;
+  list-style: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-[data-section="faq"] dt button::after {
+section:has(> dl > details) summary::after {
   content: '+';
   font-size: var(--text-xl);
 }
 
-[data-section="faq"] dt button[aria-expanded="true"]::after {
+section:has(> dl > details) details[open] > summary::after {
   content: '−';
 }
 
-[data-section="faq"] dd {
+section:has(> dl > details) details > p {
   padding: 0 var(--spacing-4) var(--spacing-4);
   color: var(--muted-foreground);
 }
-
-[data-section="faq"] dd[hidden] {
-  display: none;
-}
 ```
 
-## JavaScript
+## Why `<details>` Instead of Buttons?
 
-```js
-document.querySelectorAll('[data-section="faq"] dt button').forEach(button => {
-  button.addEventListener('click', () => {
-    const expanded = button.getAttribute('aria-expanded') === 'true'
-    button.setAttribute('aria-expanded', !expanded)
-    const dd = button.closest('div').querySelector('dd')
-    dd.hidden = expanded
-  })
-})
-```
+The `<details>` element provides:
+- **Native accessibility** - Keyboard navigation and screen reader support built-in
+- **No JavaScript required** - Open/close works without JS
+- **Semantic meaning** - Browsers understand this is disclosure content
+- **The `open` attribute** - Easy styling for open/closed states
+
+## When to Use
+
+- FAQ pages
+- Product questions
+- Support pages
+- Documentation

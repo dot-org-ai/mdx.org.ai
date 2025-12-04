@@ -1,24 +1,24 @@
 ---
 $type: DocsPage
 title: Stacked Layout
-description: Simple vertical flow with header, main, and footer
+description: Vertical header, main, footer structure
 screenshot: /screenshots/layouts/stacked.png
 ---
 
 # Stacked Layout
 
-A simple vertical layout for content-focused pages. Header and footer are optional.
+The most common layout pattern: a vertical stack of header, main content, and footer.
 
 <Preview>
-  <div data-layout="stacked">
+  <article>
     <header>
       <nav>
         <a href="/">Brand</a>
-        <ul>
-          <li><a href="#">Features</a></li>
-          <li><a href="#">Pricing</a></li>
-          <li><a href="#">Docs</a></li>
-        </ul>
+        <menu>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/docs">Docs</a></li>
+        </menu>
       </nav>
     </header>
     <main>
@@ -28,50 +28,44 @@ A simple vertical layout for content-focused pages. Header and footer are option
     <footer>
       <p>&copy; 2024 Brand. All rights reserved.</p>
     </footer>
-  </div>
+  </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Marketing sites and landing pages
-- Blog posts and articles
-- Simple content-focused pages
-- Any page that flows vertically
-
-## Structure
+A stacked layout is an `<article>` with `<header>`, `<main>`, and `<footer>` as direct children:
 
 ```html
-<body data-layout="stacked">
+<article>
   <header>
     <nav>
       <a href="/">Brand</a>
-      <ul>
+      <menu>
         <li><a href="/features">Features</a></li>
         <li><a href="/pricing">Pricing</a></li>
-      </ul>
+      </menu>
     </nav>
   </header>
-
   <main>
     <!-- Page content -->
   </main>
-
   <footer>
-    <!-- Footer content -->
+    <p>&copy; 2024 Brand</p>
   </footer>
-</body>
+</article>
 ```
 
 ## CSS
 
 ```css
-[data-layout="stacked"] {
+/* Match article with header + main + footer */
+article:has(> header + main + footer) {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-[data-layout="stacked"] > header {
+article:has(> header + main + footer) > header {
   position: sticky;
   top: 0;
   z-index: 50;
@@ -79,34 +73,30 @@ A simple vertical layout for content-focused pages. Header and footer are option
   border-bottom: 1px solid var(--border);
 }
 
-[data-layout="stacked"] > header nav {
+article:has(> header + main + footer) > header > nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-4);
-  max-width: var(--container-width, 1200px);
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-[data-layout="stacked"] > header nav > a {
-  font-weight: 700;
-}
-
-[data-layout="stacked"] > header ul {
+article:has(> header + main + footer) > header menu {
   display: flex;
   gap: var(--spacing-4);
   list-style: none;
 }
 
-[data-layout="stacked"] > main {
+article:has(> header + main + footer) > main {
   flex: 1;
-  width: 100%;
-  max-width: var(--container-width, 1200px);
+  max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-6) var(--spacing-4);
+  width: 100%;
 }
 
-[data-layout="stacked"] > footer {
+article:has(> header + main + footer) > footer {
   border-top: 1px solid var(--border);
   padding: var(--spacing-6) var(--spacing-4);
   text-align: center;
@@ -114,20 +104,9 @@ A simple vertical layout for content-focused pages. Header and footer are option
 }
 ```
 
-## React Native
+## When to Use
 
-```tsx
-import { SafeAreaView, ScrollView, View } from 'react-native'
-
-export function StackedLayout({ children }) {
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Header />
-      <ScrollView style={{ flex: 1 }}>
-        {children}
-      </ScrollView>
-      <Footer />
-    </SafeAreaView>
-  )
-}
-```
+- Marketing sites and landing pages
+- Blog posts and articles
+- Simple content-focused pages
+- Any page that flows vertically

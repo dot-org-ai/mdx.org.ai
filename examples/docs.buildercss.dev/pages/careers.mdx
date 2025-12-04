@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/careers.png
 A careers page showcasing open positions and company culture.
 
 <Preview>
-  <article data-page="careers">
+  <main>
     <header>
       <h1>Join Our Team</h1>
       <p>Help us build the future of web development</p>
@@ -91,20 +91,15 @@ A careers page showcasing open positions and company culture.
         </li>
       </ul>
     </section>
-  </article>
+  </main>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Company career pages
-- Job listing boards
-- Recruitment pages
-- Team hiring pages
-
-## Structure
+A careers page uses `<main>` with header, perks section, and jobs section. The pattern `main:has(> section[aria-label="Perks"] + section[aria-label="Jobs"])` identifies career pages:
 
 ```html
-<article data-page="careers">
+<main>
   <header>
     <h1>Join Our Team</h1>
     <p>Help us build the future of web development</p>
@@ -139,38 +134,40 @@ A careers page showcasing open positions and company culture.
       </li>
     </ul>
   </section>
-</article>
+</main>
 ```
 
 ## CSS
 
 ```css
-[data-page="careers"] {
+/* Careers page: main with perks + jobs sections */
+main:has(> section[aria-label="Perks"] + section[aria-label="Jobs"]) {
   padding: var(--spacing-6);
 }
 
-[data-page="careers"] > header {
+main:has(> section[aria-label="Perks"]) > header {
   text-align: center;
   max-width: 700px;
   margin: 0 auto var(--spacing-8);
 }
 
-[data-page="careers"] > header h1 {
+main:has(> section[aria-label="Perks"]) > header h1 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="careers"] > header p {
+main:has(> section[aria-label="Perks"]) > header p {
   font-size: var(--text-lg);
   color: var(--muted-foreground);
 }
 
-[data-page="careers"] > section[aria-label="Perks"] {
+/* Perks grid */
+section[aria-label="Perks"] {
   margin-bottom: var(--spacing-12);
 }
 
-[data-page="careers"] > section[aria-label="Perks"] ul {
+section[aria-label="Perks"] ul {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-4);
@@ -178,42 +175,43 @@ A careers page showcasing open positions and company culture.
   padding: 0;
 }
 
-[data-page="careers"] > section[aria-label="Perks"] li {
+section[aria-label="Perks"] li {
   padding: var(--spacing-4);
   background: var(--muted);
   border-radius: var(--radius-lg);
   text-align: center;
 }
 
-[data-page="careers"] > section[aria-label="Perks"] li > span {
+section[aria-label="Perks"] li > span {
   font-size: var(--text-2xl);
   display: block;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="careers"] > section[aria-label="Perks"] h3 {
+section[aria-label="Perks"] h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-1);
 }
 
-[data-page="careers"] > section[aria-label="Perks"] p {
+section[aria-label="Perks"] p {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] h2 {
+/* Job listings */
+section[aria-label="Jobs"] h2 {
   font-size: var(--text-xl);
   font-weight: 600;
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] nav {
+section[aria-label="Jobs"] nav[aria-label="Departments"] {
   display: flex;
   gap: var(--spacing-3);
   margin-bottom: var(--spacing-4);
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] nav button {
+section[aria-label="Jobs"] nav button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--muted);
   border: none;
@@ -221,19 +219,19 @@ A careers page showcasing open positions and company culture.
   font-size: var(--text-sm);
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] nav button[aria-pressed="true"] {
+section[aria-label="Jobs"] nav button[aria-pressed="true"] {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] > ul {
+section[aria-label="Jobs"] > ul {
   list-style: none;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] > ul > li {
+section[aria-label="Jobs"] > ul > li {
   padding: var(--spacing-4);
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -241,21 +239,21 @@ A careers page showcasing open positions and company culture.
   align-items: center;
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] > ul > li:last-child {
+section[aria-label="Jobs"] > ul > li:last-child {
   border-bottom: none;
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] > ul h3 {
+section[aria-label="Jobs"] > ul h3 {
   font-weight: 600;
   margin-bottom: var(--spacing-1);
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] > ul p {
+section[aria-label="Jobs"] > ul p {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-page="careers"] > section[aria-label="Jobs"] > ul a {
+section[aria-label="Jobs"] > ul a {
   padding: var(--spacing-2) var(--spacing-4);
   background: transparent;
   border: 1px solid var(--border);
@@ -263,3 +261,10 @@ A careers page showcasing open positions and company culture.
   font-size: var(--text-sm);
 }
 ```
+
+## When to Use
+
+- Company career pages
+- Job listing boards
+- Recruitment pages
+- Team hiring pages

@@ -10,7 +10,7 @@ screenshot: /screenshots/views/list.png
 A vertical list of items with search, filters, and actions.
 
 <Preview>
-  <article data-view="list">
+  <article>
     <header>
       <h1>Projects</h1>
       <nav>
@@ -29,8 +29,8 @@ A vertical list of items with search, filters, and actions.
           </footer>
         </div>
         <menu>
-          <button>Edit</button>
-          <button>Delete</button>
+          <li><button>Edit</button></li>
+          <li><button>Delete</button></li>
         </menu>
       </li>
       <li>
@@ -43,8 +43,8 @@ A vertical list of items with search, filters, and actions.
           </footer>
         </div>
         <menu>
-          <button>Edit</button>
-          <button>Delete</button>
+          <li><button>Edit</button></li>
+          <li><button>Delete</button></li>
         </menu>
       </li>
       <li>
@@ -57,8 +57,8 @@ A vertical list of items with search, filters, and actions.
           </footer>
         </div>
         <menu>
-          <button>Edit</button>
-          <button>Delete</button>
+          <li><button>Edit</button></li>
+          <li><button>Delete</button></li>
         </menu>
       </li>
     </ul>
@@ -72,18 +72,12 @@ A vertical list of items with search, filters, and actions.
   </article>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Project lists
-- Task lists
-- File browsers
-- Search results
-- Email inbox
-
-## Structure
+A list view is an `<article>` containing a `<ul>` with list items and a pagination footer:
 
 ```html
-<article data-view="list">
+<article>
   <header>
     <h1>Projects</h1>
     <nav>
@@ -108,8 +102,8 @@ A vertical list of items with search, filters, and actions.
         </footer>
       </div>
       <menu>
-        <button>Edit</button>
-        <button>Delete</button>
+        <li><button>Edit</button></li>
+        <li><button>Delete</button></li>
       </menu>
     </li>
   </ul>
@@ -127,35 +121,36 @@ A vertical list of items with search, filters, and actions.
 ## CSS
 
 ```css
-[data-view="list"] {
+/* List view: article with header + ul + footer */
+article:has(> header + ul + footer) {
   padding: var(--spacing-6);
 }
 
-[data-view="list"] > header {
+article:has(> header + ul + footer) > header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-4);
 }
 
-[data-view="list"] > header h1 {
+article:has(> header + ul + footer) > header h1 {
   font-size: var(--text-xl);
   font-weight: 700;
 }
 
-[data-view="list"] > header nav {
+article:has(> header + ul + footer) > header nav {
   display: flex;
   gap: var(--spacing-2);
 }
 
-[data-view="list"] > header input[type="search"] {
+article:has(> header + ul + footer) > header input[type="search"] {
   padding: var(--spacing-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   width: 200px;
 }
 
-[data-view="list"] > header nav button {
+article:has(> header + ul + footer) > header nav button {
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -163,14 +158,14 @@ A vertical list of items with search, filters, and actions.
   border-radius: var(--radius);
 }
 
-[data-view="list"] > ul {
+article:has(> header + ul + footer) > ul {
   list-style: none;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
 }
 
-[data-view="list"] > ul > li {
+article:has(> header + ul + footer) > ul > li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -178,79 +173,88 @@ A vertical list of items with search, filters, and actions.
   border-bottom: 1px solid var(--border);
 }
 
-[data-view="list"] > ul > li:last-child {
+article:has(> header + ul + footer) > ul > li:last-child {
   border-bottom: none;
 }
 
-[data-view="list"] > ul h3 {
+article:has(> header + ul + footer) > ul h3 {
   font-weight: 600;
 }
 
-[data-view="list"] > ul p {
+article:has(> header + ul + footer) > ul p {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-view="list"] > ul footer {
+article:has(> header + ul + footer) > ul > li > div > footer {
   display: flex;
   gap: var(--spacing-2);
   align-items: center;
   margin-top: var(--spacing-1);
 }
 
-[data-view="list"] > ul mark {
+article:has(> header + ul + footer) > ul mark {
   padding: 2px 8px;
   border-radius: var(--radius-full);
   font-size: var(--text-xs);
   background: var(--muted);
 }
 
-[data-view="list"] > ul time {
+article:has(> header + ul + footer) > ul time {
   font-size: var(--text-xs);
   color: var(--muted-foreground);
 }
 
-[data-view="list"] > ul menu {
+article:has(> header + ul + footer) > ul menu {
   display: flex;
   gap: var(--spacing-2);
+  list-style: none;
 }
 
-[data-view="list"] > ul menu button {
+article:has(> header + ul + footer) > ul menu button {
   padding: var(--spacing-2);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-view="list"] > footer {
+article:has(> header + ul + footer) > footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: var(--spacing-4);
 }
 
-[data-view="list"] > footer > span {
+article:has(> header + ul + footer) > footer > span {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-[data-view="list"] > footer nav {
+article:has(> header + ul + footer) > footer nav {
   display: flex;
   gap: var(--spacing-1);
 }
 
-[data-view="list"] > footer nav button {
+article:has(> header + ul + footer) > footer nav button {
   padding: var(--spacing-2);
   border-radius: var(--radius);
   border: none;
 }
 
-[data-view="list"] > footer nav button:disabled {
+article:has(> header + ul + footer) > footer nav button:disabled {
   background: var(--muted);
 }
 
-[data-view="list"] > footer nav button:not(:disabled) {
+article:has(> header + ul + footer) > footer nav button:not(:disabled) {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 ```
+
+## When to Use
+
+- Project lists
+- Task lists
+- File browsers
+- Search results
+- Email inbox

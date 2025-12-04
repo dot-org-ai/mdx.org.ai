@@ -10,7 +10,7 @@ screenshot: /screenshots/pages/contact.png
 A contact page with form and company information.
 
 <Preview>
-  <article data-page="contact">
+  <main>
     <header>
       <h1>Get in Touch</h1>
       <p>Have questions? We'd love to hear from you.</p>
@@ -68,20 +68,15 @@ A contact page with form and company information.
         </dl>
       </aside>
     </div>
-  </article>
+  </main>
 </Preview>
 
-## When to Use
+## Semantic Pattern
 
-- Contact us pages
-- Support inquiry forms
-- Business contact information
-- Customer service pages
-
-## Structure
+A contact page uses `<main>` with a header, form, and aside with contact details. The pattern `main:has(> div > form + aside > dl)` identifies contact pages:
 
 ```html
-<article data-page="contact">
+<main>
   <header>
     <h1>Get in Touch</h1>
     <p>Have questions? We'd love to hear from you.</p>
@@ -134,33 +129,34 @@ A contact page with form and company information.
       </dl>
     </aside>
   </div>
-</article>
+</main>
 ```
 
 ## CSS
 
 ```css
-[data-page="contact"] {
+/* Contact page: main with form + aside containing contact info */
+main:has(> div > form + aside > dl) {
   padding: var(--spacing-6);
 }
 
-[data-page="contact"] > header {
+main:has(> div > form + aside > dl) > header {
   text-align: center;
   max-width: 600px;
   margin: 0 auto var(--spacing-8);
 }
 
-[data-page="contact"] > header h1 {
+main:has(> div > form + aside > dl) > header h1 {
   font-size: var(--text-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-3);
 }
 
-[data-page="contact"] > header p {
+main:has(> div > form + aside > dl) > header p {
   color: var(--muted-foreground);
 }
 
-[data-page="contact"] > div {
+main:has(> div > form + aside > dl) > div {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-8);
@@ -168,13 +164,13 @@ A contact page with form and company information.
   margin: 0 auto;
 }
 
-[data-page="contact"] form {
+main:has(> div > form + aside > dl) form {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
 }
 
-[data-page="contact"] form fieldset {
+main:has(> div > form + aside > dl) form fieldset {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-4);
@@ -183,27 +179,27 @@ A contact page with form and company information.
   margin: 0;
 }
 
-[data-page="contact"] form label {
+main:has(> div > form + aside > dl) form label {
   display: block;
   font-weight: 500;
   margin-bottom: var(--spacing-1);
   font-size: var(--text-sm);
 }
 
-[data-page="contact"] form input,
-[data-page="contact"] form select,
-[data-page="contact"] form textarea {
+main:has(> div > form + aside > dl) form input,
+main:has(> div > form + aside > dl) form select,
+main:has(> div > form + aside > dl) form textarea {
   width: 100%;
   padding: var(--spacing-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-[data-page="contact"] form textarea {
+main:has(> div > form + aside > dl) form textarea {
   resize: vertical;
 }
 
-[data-page="contact"] form button {
+main:has(> div > form + aside > dl) form button {
   padding: var(--spacing-3);
   background: var(--primary);
   color: var(--primary-foreground);
@@ -212,19 +208,27 @@ A contact page with form and company information.
   font-weight: 500;
 }
 
-[data-page="contact"] aside dl {
+/* Contact info aside */
+main:has(> div > form + aside > dl) aside dl {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-6);
 }
 
-[data-page="contact"] aside dt {
+main:has(> div > form + aside > dl) aside dt {
   font-weight: 600;
   margin-bottom: var(--spacing-2);
 }
 
-[data-page="contact"] aside dd {
+main:has(> div > form + aside > dl) aside dd {
   color: var(--muted-foreground);
   margin: 0;
 }
 ```
+
+## When to Use
+
+- Contact us pages
+- Support inquiry forms
+- Business contact information
+- Customer service pages
