@@ -1,42 +1,7 @@
 # TODO
 
-- [ ] `mdxe` Execute, Test, & Deploy MDX-based Agents, Apps, APIs, and Sites
-  - [ ] `mdxe` SDK 
-    - [ ] `dev`
-    - [ ] `test`
-    - [ ] `build`
-    - [ ] `start`
-    - [ ] `deploy`
-  - [ ] `mdxe` CLI 
-  - [ ] `mdxe` MCP `do`, `test`, & `deploy`
-  - [ ] `@mdxe/node` 
-  - [ ] `@mdxe/workers` 
-  - [ ] `@mdxe/hono` 
-  - [ ] `@mdxe/isolate` 
-  - [ ] `@mdxe/next` 
-  - [ ] `@mdxe/vitest` 
-  - [ ] `@mdxe/ink` 
-- [ ] `mdxai` Manage, Deploy, & Run MDX-based AI Agents 
-  - [ ] `@mdxai/agentkit` 
-  - [ ] `@mdxai/claude` 
-  - [ ] `@mdxai/mastra` 
-  - [ ] `@mdxai/vapi` 
-- [ ] `mdxdb` Create, Manage, & Publish MDX & URL-centric File System & Database
-  - [ ] `mdxdb` SDK
-    - [ ] `list`
-    - [ ] `search`
-    - [ ] `get`
-    - [ ] `set`
-    - [ ] `delete`
-  - [ ] `mdxdb` CLI
-  - [ ] `@mdxdb/fs` 
-  - [ ] `@mdxdb/sqlite`
-  - [ ] `@mdxdb/postgres` 
-  - [ ] `@mdxdb/mongo` 
-  - [ ] `@mdxdb/clickhouse`  
-  - [ ] `@mdxdb/api` 
-- [ ] `mdxld` Parse, Stringify, Validate, and Compile MDXLD Documents
-- [ ] `mdxui` Compose, Design, & Publish MDX-based UI Components
-  - [ ] `@mdxui/json` 
-  - [ ] `@mdxui/html` 
-  - [ ] `@mdxui/markdown` 
+- [ ] `mdxe`
+- [ ] `mdxai`
+- [ ] `mdxdb`
+- [ ] `mdxld`
+- [ ] `mdxui`
