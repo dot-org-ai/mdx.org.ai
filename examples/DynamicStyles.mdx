@@ -1,0 +1,70 @@
+---
+$type: https://mdx.org.ai/Theme
+---
+
+
+```css
+/* Collection layout */
+body > main {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+body > main > header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+body > main > header h1 {
+  margin-bottom: 0.5rem;
+}
+
+body > main > header p {
+  font-size: 1.125rem;
+  color: var(--muted-foreground);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Card grid in section */
+body > main > section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+body > main > section article {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+body > main > section article:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body > main > section article h3 {
+  margin: 0 0 0.5rem 0;
+}
+
+body > main > section article h3 a {
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+body > main > section article h3 a:hover {
+  color: var(--primary);
+}
+
+body > main > section article p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}`
+```
