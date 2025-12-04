@@ -1,0 +1,119 @@
+---
+title: Modal
+description: Modal dialog for confirmations, forms, and focused interactions
+---
+
+Modal dialog for confirmations, forms, and focused user interactions.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ backdrop                                            │
+│                                                     │
+│     ┌───────────────────────────────────────┐       │
+│     │ dialog                                │       │
+│     │ ┌───────────────────────────────────┐ │       │
+│     │ │ header                            │ │       │
+│     │ │ ┌───────────────────────────┐ [×] │ │       │
+│     │ │ │ title                     │     │ │       │
+│     │ │ │ Modal Title               │     │ │       │
+│     │ │ └───────────────────────────┘     │ │       │
+│     │ │ description                       │ │       │
+│     │ └───────────────────────────────────┘ │       │
+│     │ ┌───────────────────────────────────┐ │       │
+│     │ │ body                              │ │       │
+│     │ │                                   │ │       │
+│     │ │ Modal content goes here...        │ │       │
+│     │ │                                   │ │       │
+│     │ │ Can include forms, information,   │ │       │
+│     │ │ or any other content.             │ │       │
+│     │ │                                   │ │       │
+│     │ └───────────────────────────────────┘ │       │
+│     │ ┌───────────────────────────────────┐ │       │
+│     │ │ footer                            │ │       │
+│     │ │         [Cancel] [Confirm]        │ │       │
+│     │ └───────────────────────────────────┘ │       │
+│     └───────────────────────────────────────┘       │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+### Basic Modal
+
+```mdx
+<Modal
+  open={isOpen}
+  onClose={() => setIsOpen(false)}
+  title="Confirm Action"
+  description="Are you sure you want to proceed?"
+  footer={
+    <>
+      <Button variant="ghost" onClick={handleCancel}>Cancel</Button>
+      <Button variant="primary" onClick={handleConfirm}>Confirm</Button>
+    </>
+  }
+>
+  <p>This action cannot be undone.</p>
+</Modal>
+```
+
+### Form Modal
+
+```mdx
+<Modal
+  open={showForm}
+  onClose={handleClose}
+  title="Create New Project"
+  size="lg"
+>
+  <form onSubmit={handleSubmit}>
+    <Input label="Project Name" name="name" required />
+    <Textarea label="Description" name="description" />
+    <Select label="Team" name="team" options={teams} />
+  </form>
+</Modal>
+```
+
+### Full-Screen Modal
+
+```mdx
+<Modal
+  size="full"
+  open={showPreview}
+  onClose={handleClose}
+  title="Document Preview"
+>
+  <DocumentViewer document={doc} />
+</Modal>
+```
+
+## Size Variants
+
+```mdx
+<Modal size="sm" />   // 400px - confirmations
+<Modal size="md" />   // 500px - standard dialogs
+<Modal size="lg" />   // 700px - forms
+<Modal size="xl" />   // 900px - complex content
+<Modal size="full" /> // Full viewport
+```
+
+## Confirmation Dialog Pattern
+
+```mdx
+<Modal
+  open={showDeleteConfirm}
+  onClose={() => setShowDeleteConfirm(false)}
+  title="Delete Item"
+  description="This will permanently delete the item."
+  size="sm"
+  footer={
+    <>
+      <Button variant="ghost">Cancel</Button>
+      <Button variant="destructive">Delete</Button>
+    </>
+  }
+/>
+```

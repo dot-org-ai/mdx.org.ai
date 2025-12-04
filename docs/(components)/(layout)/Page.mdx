@@ -1,0 +1,66 @@
+---
+title: Page
+description: Generic page wrapper with title, SEO, and layout options
+---
+
+Generic page wrapper that provides consistent structure, SEO metadata, and layout options.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ header                                          │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ breadcrumbs: Home / Products / Widget       │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ │ ┌───────────────────────────────┐ ┌───────────┐ │ │
+│ │ │ title                         │ │  actions  │ │ │
+│ │ │ description                   │ │  [Edit]   │ │ │
+│ │ └───────────────────────────────┘ └───────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ content                                         │ │
+│ │                                                 │ │
+│ │   {children}                                    │ │
+│ │                                                 │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ footer (optional)                               │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Page
+  title="Product Details"
+  description="View and manage your product"
+  breadcrumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Products', href: '/products' },
+    { label: 'Widget', href: '/products/widget' },
+  ]}
+  actions={[
+    { label: 'Edit', href: '/products/widget/edit' },
+    { label: 'Delete', action: 'delete', variant: 'outline' },
+  ]}
+  layout="default"
+>
+  <Section>
+    <ProductCard product={product} />
+  </Section>
+</Page>
+```
+
+## Layout Variants
+
+| Layout | Max Width | Use Case |
+|--------|-----------|----------|
+| `default` | 1200px | Standard content pages |
+| `narrow` | 768px | Blog posts, articles |
+| `wide` | 1440px | Dashboards, tables |
+| `full` | 100% | Full-bleed layouts |
+| `centered` | 768px | Forms, auth pages |

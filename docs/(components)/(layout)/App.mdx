@@ -1,0 +1,35 @@
+---
+title: App
+description: Root application wrapper with theme, locale, and global providers
+---
+
+Root application wrapper that provides global context, theme, and error boundaries.
+
+## Structure
+
+```
+┌─────────────────────────────────────────┐
+│ root                                    │
+│ ┌─────────────────────────────────────┐ │
+│ │ providers                           │ │
+│ │ ┌─────────────────────────────────┐ │ │
+│ │ │ error-boundary                  │ │ │
+│ │ │                                 │ │ │
+│ │ │   {children}                    │ │ │
+│ │ │                                 │ │ │
+│ │ └─────────────────────────────────┘ │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<App appName="My Application" theme="system" locale="en">
+  <Site>
+    <Page>
+      <Hero title="Welcome" />
+    </Page>
+  </Site>
+</App>
+```

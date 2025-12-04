@@ -1,0 +1,98 @@
+---
+title: Layout
+description: Abstract layout container that can be used for Sites or Apps
+---
+
+Abstract layout container that provides consistent structure for both marketing sites and applications.
+
+## Structure
+
+### Site Layout (Marketing)
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+│ ┌──────┐ ┌──────────────────────────┐ ┌──────────┐ │
+│ │ logo │ │ nav                      │ │ actions  │ │
+│ └──────┘ └──────────────────────────┘ └──────────┘ │
+├─────────────────────────────────────────────────────┤
+│ main                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ main-container                                  │ │
+│ │                                                 │ │
+│ │   {children} - Pages, Sections                  │ │
+│ │                                                 │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ footer                                              │
+└─────────────────────────────────────────────────────┘
+```
+
+### App Layout (Dashboard)
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+├──────────┬──────────────────────────────────────────┤
+│ sidebar  │ main                                     │
+│ ┌──────┐ │ ┌──────────────────────────────────────┐ │
+│ │header│ │ │ main-container                       │ │
+│ ├──────┤ │ │                                      │ │
+│ │ nav  │ │ │   {children} - Views                 │ │
+│ │      │ │ │                                      │ │
+│ │      │ │ │                                      │ │
+│ ├──────┤ │ │                                      │ │
+│ │footer│ │ │                                      │ │
+│ └──────┘ │ └──────────────────────────────────────┘ │
+└──────────┴──────────────────────────────────────────┘
+```
+
+### Docs Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+├──────────┬────────────────────────────┬─────────────┤
+│ sidebar  │ main                       │ toc         │
+│ ┌──────┐ │ ┌────────────────────────┐ │ ┌─────────┐ │
+│ │search│ │ │ {children}             │ │ │ On this │ │
+│ ├──────┤ │ │                        │ │ │ page    │ │
+│ │ nav  │ │ │                        │ │ │ • Intro │ │
+│ │ tree │ │ │                        │ │ │ • Usage │ │
+│ │      │ │ │                        │ │ │ • API   │ │
+│ └──────┘ │ └────────────────────────┘ │ └─────────┘ │
+└──────────┴────────────────────────────┴─────────────┘
+```
+
+## Usage
+
+```mdx
+<Layout variant="site" nav={siteNav}>
+  <Page>
+    <Hero title="Welcome" />
+    <Features items={features} />
+  </Page>
+</Layout>
+
+<Layout variant="app" sidebar={{ nav: appNav }}>
+  <View title="Dashboard">
+    <Stats items={stats} />
+  </View>
+</Layout>
+
+<Layout variant="docs" sidebar={{ nav: docsNav }}>
+  <DocsPage toc={toc}>
+    {content}
+  </DocsPage>
+</Layout>
+```
+
+## Variants
+
+| Variant | Header | Sidebar | Footer | Use Case |
+|---------|--------|---------|--------|----------|
+| `site` | ✓ | ✗ | ✓ | Marketing sites |
+| `app` | ✓ | ✓ | ✗ | Applications |
+| `dashboard` | ✓ | ✓ | ✗ | Admin dashboards |
+| `docs` | ✓ | ✓ | ✗ | Documentation |
+| `minimal` | ✗ | ✗ | ✗ | Auth pages, landing |
