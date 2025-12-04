@@ -1,0 +1,47 @@
+---
+title: Unstructured Content
+description: Markdown content, parsing, and bi-directional extraction
+root: true
+defaultOpen: true
+---
+
+The **Unstructured Content** layer handles the Markdown body of MDX documents - the human-readable prose that sits between the frontmatter and components.
+
+## Markdown Processing
+
+MDX extends standard Markdown with JSX support, allowing rich content that combines prose with interactive components.
+
+```mdx
+# Welcome
+
+This is **markdown** content with an embedded component:
+
+<Chart data={salesData} />
+
+And more prose continues here...
+```
+
+## Bi-directional Extraction
+
+The `@mdxld/extract` package enables round-trip editing between rendered content and structured data:
+
+```typescript
+import { extract } from '@mdxld/extract'
+
+// Template defines structure
+const template = `# {data.title}\n\n{data.content}`
+
+// User edits rendered markdown
+const edited = `# Updated Title\n\nNew content here`
+
+// Extract changes back to data
+const result = extract({ template, rendered: edited })
+// { data: { title: 'Updated Title', content: 'New content here' } }
+```
+
+## Use Cases
+
+- **Headless CMS** - Edit rendered content, sync back to frontmatter
+- **AI Editing** - Let AI improve content, extract the changes
+- **Round-trip Sync** - Keep source MDX and rendered output in sync
+- **Content Migration** - Transform between formats while preserving structure

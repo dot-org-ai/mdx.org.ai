@@ -1,0 +1,56 @@
+---
+title: Structured Data
+description: YAML-LD frontmatter, schemas, and database storage for MDX documents
+root: true
+defaultOpen: true
+---
+
+The **Structured Data** layer of MDX provides semantic frontmatter using YAML-LD (YAML + Linked Data), enabling type-safe schemas, validation, and database storage.
+
+## Core Concepts
+
+### [Document](/Document)
+
+The fundamental unit - combines YAML-LD frontmatter with content body.
+
+```yaml
+---
+$type: BlogPost
+$id: https://example.com/posts/hello
+title: Hello World
+author: https://example.com/authors/jane
+---
+```
+
+### [Database](/Database)
+
+Schema-first database modeling with automatic bi-directional relationships.
+
+```typescript
+const db = DB({
+  Post: {
+    title: 'string',
+    author: 'Author.posts',  // Creates both directions
+  },
+})
+```
+
+## Packages
+
+### [mdxld](/mdxld)
+
+Parse, stringify, validate, and compile MDXLD documents.
+
+```bash
+npm install mdxld
+```
+
+### [mdxdb](/mdxdb)
+
+Database adapters for storing MDX documents:
+
+- **@mdxdb/fs** - Filesystem (git-friendly)
+- **@mdxdb/sqlite** - SQLite with vector search
+- **@mdxdb/postgres** - PostgreSQL with pgvector
+- **@mdxdb/mongo** - MongoDB with Atlas Vector Search
+- **@mdxdb/clickhouse** - ClickHouse for analytics

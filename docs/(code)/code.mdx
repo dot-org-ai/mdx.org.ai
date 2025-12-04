@@ -1,0 +1,68 @@
+---
+title: Executable Code
+description: Functions, agents, workflows, and execution runtimes
+root: true
+defaultOpen: true
+---
+
+The **Executable Code** layer brings MDX documents to life with TypeScript functions, AI agents, event-driven workflows, and multiple execution runtimes.
+
+## Core Concepts
+
+### [Function](/Function)
+
+AI function definitions with four variants:
+
+- **CodeFunction** - Deterministic TypeScript
+- **GenerativeFunction** - LLM-generated responses
+- **AgenticFunction** - Multi-step AI reasoning
+- **HumanFunction** - Human-in-the-loop approval
+
+### [Agent](/Agent)
+
+Autonomous AI entities with roles, goals, and team coordination.
+
+```typescript
+const writer = await createAgent({
+  name: 'ContentWriter',
+  role: writerRole,
+  mode: 'supervised',
+  goals: [dailyPostsGoal],
+})
+```
+
+### [Workflow](/Workflow)
+
+Event-driven business logic using the `$` context:
+
+```typescript
+$.on.Order.placed(async (order) => {
+  await $.do('processPayment', { orderId: order.id })
+  $.send('Shipment.create', { order })
+})
+
+$.every.day.at('9:00')(async () => {
+  await $.do('sendDailyDigest')
+})
+```
+
+## Packages
+
+### [mdxe](/mdxe)
+
+Execute MDX in various runtimes:
+
+- **@mdxe/node** - Node.js runtime
+- **@mdxe/next** - Next.js App Router
+- **@mdxe/hono** - Hono web framework
+- **@mdxe/workers** - Cloudflare Workers
+- **@mdxe/ink** - Terminal UI
+
+### [mdxai](/mdxai)
+
+AI integrations:
+
+- **@mdxai/claude** - Claude AI with MCP tools
+- **@mdxai/mastra** - Mastra agent framework
+- **@mdxai/agentkit** - Agent composition
+- **@mdxai/vapi** - Voice AI

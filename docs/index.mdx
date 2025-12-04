@@ -2,58 +2,70 @@
 title: MDX.org.ai Documentation
 description: The complete MDX ecosystem for building AI-powered applications, databases, and user interfaces
 root: true
-pages: [index, types, components, packages]
+pages: [index, data, content, code, ui]
 ---
 
-# MDX.org.ai
+MDX.org.ai extends MDX with four integrated layers that mirror MDX's own structure:
 
-Welcome to the MDX.org.ai documentation. This ecosystem provides a comprehensive set of tools for working with MDX (Markdown + JSX) enhanced with Linked Data capabilities.
+## The Four Layers
 
-## What is MDX.org.ai?
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     MDX Document                            │
+├─────────────────────────────────────────────────────────────┤
+│  ---                        ← Structured Data (YAML-LD)     │
+│  $type: BlogPost                                            │
+│  title: Hello World                                         │
+│  ---                                                        │
+├─────────────────────────────────────────────────────────────┤
+│  # Hello World              ← Unstructured Content (MD)     │
+│                                                             │
+│  Welcome to my blog...                                      │
+├─────────────────────────────────────────────────────────────┤
+│  <Chart data={sales} />     ← Executable Code (TS/JSX)      │
+│                                                             │
+│  {posts.map(p => ...)}                                      │
+├─────────────────────────────────────────────────────────────┤
+│  <Hero />                   ← UI Components (React)         │
+│  <Features items={...} />                                   │
+└─────────────────────────────────────────────────────────────┘
+```
 
-MDX.org.ai is a suite of packages that extend MDX with:
+### [Structured Data](/data)
 
-- **Linked Data** - Semantic frontmatter with JSON-LD compatibility
-- **Database Storage** - Store and query MDX documents in various databases
-- **Execution Runtimes** - Run MDX in different environments
-- **AI Integration** - Build and deploy AI agents with MDX
-- **UI Components** - Render MDX with customizable components
+YAML-LD frontmatter with schemas, validation, and database storage.
 
-## Documentation
+| | |
+|---|---|
+| **Types** | [Document](/Document), [Database](/Database) |
+| **Packages** | [mdxld](/mdxld), [mdxdb](/mdxdb) |
 
-### [Types](/types)
+### [Unstructured Content](/content)
 
-Core types and concepts in the MDX.org.ai ecosystem:
+Markdown content body with parsing and bi-directional extraction.
 
-| Type | Description |
-|------|-------------|
-| [Document](/Document) | MDXLD document structure with frontmatter and content |
-| [Function](/Function) | AI function definitions (Code, Generative, Agentic, Human) |
-| [Agent](/Agent) | Autonomous AI agents with roles, goals, and teams |
-| [Workflow](/Workflow) | Event-driven workflows with the `$` context |
-| [Database](/Database) | Schema-first database modeling with bi-directional relations |
+| | |
+|---|---|
+| **Features** | Markdown processing, round-trip extraction |
+| **Package** | [@mdxld/extract](/mdxld) |
 
-### [Components](/components)
+### [Executable Code](/code)
 
-UI component specifications for building MDX applications:
+TypeScript functions, AI agents, and event-driven workflows.
 
-| Category | Components |
-|----------|------------|
-| Layout | [Site](/Site), [App](/App), [Page](/Page), [Section](/Section), [Layout](/Layout) |
-| Marketing | [Hero](/Hero), [LandingPage](/LandingPage), [Features](/Features), [Pricing](/Pricing), [CTA](/CTA) |
-| Content | [Blog](/Blog), [BlogPost](/BlogPost), [Article](/Article), [Docs](/Docs), [API](/API) |
-| Data | [Dashboard](/Dashboard), [Directory](/Directory), [Card](/Card), [Table](/Table), [ListView](/ListView) |
-| Navigation | [Header](/Header), [Footer](/Footer), [Nav](/Nav), [Sidebar](/Sidebar), [Modal](/Modal) |
+| | |
+|---|---|
+| **Types** | [Function](/Function), [Agent](/Agent), [Workflow](/Workflow) |
+| **Packages** | [mdxe](/mdxe), [mdxai](/mdxai) |
 
-### [Packages](/packages)
+### [UI Components](/ui)
 
-| Package | Description |
-|---------|-------------|
-| [mdxld](/mdxld) | Parse, stringify, validate, and compile MDXLD documents |
-| [mdxdb](/mdxdb) | MDX document database with multiple storage adapters |
-| [mdxe](/mdxe) | Execute MDX in various runtime environments |
-| [mdxai](/mdxai) | Build and deploy MDX-based AI agents |
-| [mdxui](/mdxui) | Render MDX with customizable UI components |
+Component specifications and multi-format rendering.
+
+| | |
+|---|---|
+| **Components** | 31 specs: Site, Hero, Blog, Dashboard, etc. |
+| **Package** | [mdxui](/mdxui) |
 
 ## Quick Start
 

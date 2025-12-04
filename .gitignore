@@ -78,6 +78,9 @@ web_modules/
 .next
 out
 
+# OpenNext build output
+.open-next
+
 # Nuxt.js build / generate output
 .nuxt
 dist

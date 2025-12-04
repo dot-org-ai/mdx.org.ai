@@ -1,11 +1,29 @@
 ---
-title: Components
-description: UI component specifications for building MDX applications
+title: UI Components
+description: Component specifications and rendering packages for MDX applications
 root: true
 defaultOpen: true
 ---
 
-MDX.org.ai includes a comprehensive set of UI component specifications. Each component is defined with:
+The **UI Components** layer provides component specifications and rendering packages for building interfaces from MDX documents.
+
+## mdxui Package
+
+Render MDX to various output formats:
+
+- **@mdxui/html** - HTML strings (SSR)
+- **@mdxui/json** - JSON / JSON-LD
+- **@mdxui/markdown** - Markdown strings
+- **@mdxui/shadcn** - shadcn/ui components
+- **@mdxui/fumadocs** - Documentation sites
+
+```bash
+npm install mdxui
+```
+
+## Component Specifications
+
+Each component is defined with:
 
 - **Props** - Input properties with types
 - **Parts** - CSS `::part()` slots for styling
