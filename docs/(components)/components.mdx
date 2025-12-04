@@ -1,0 +1,123 @@
+---
+title: Components
+description: UI component specifications for building MDX applications
+root: true
+defaultOpen: true
+pages: [components, Site, App, Page, Section, View, Layout, Hero, LandingPage, Features, Pricing, CTA, Testimonials, Team, FAQ, Blog, BlogPost, Article, Docs, API, Dashboard, Directory, Card, Header, Footer, Nav, Sidebar, Modal, Table, ListView, DetailView, FormView]
+---
+
+# Component Specifications
+
+MDX.org.ai includes a comprehensive set of UI component specifications. Each component is defined with:
+
+- **Props** - Input properties with types
+- **Parts** - CSS `::part()` slots for styling
+- **CSS Variables** - Themeable design tokens
+- **Semantic HTML** - Accessibility-first structure
+
+## Layout Components
+
+| Component | Description |
+|-----------|-------------|
+| [Site](/Site) | Website wrapper with header, nav, footer |
+| [App](/App) | Root application with providers |
+| [Page](/Page) | Individual page container |
+| [Section](/Section) | Content section with heading |
+| [View](/View) | Generic view container |
+| [Layout](/Layout) | Flexible layout system |
+
+## Marketing Components
+
+| Component | Description |
+|-----------|-------------|
+| [Hero](/Hero) | Hero section with CTA |
+| [LandingPage](/LandingPage) | Complete landing page |
+| [Features](/Features) | Feature grid |
+| [Pricing](/Pricing) | Pricing table |
+| [CTA](/CTA) | Call-to-action section |
+| [Testimonials](/Testimonials) | Customer testimonials |
+| [Team](/Team) | Team member grid |
+| [FAQ](/FAQ) | FAQ accordion |
+
+## Content Components
+
+| Component | Description |
+|-----------|-------------|
+| [Blog](/Blog) | Blog listing page |
+| [BlogPost](/BlogPost) | Individual blog post |
+| [Article](/Article) | Long-form article |
+| [Docs](/Docs) | Documentation page |
+| [API](/API) | API documentation |
+
+## Data Components
+
+| Component | Description |
+|-----------|-------------|
+| [Dashboard](/Dashboard) | Dashboard layout |
+| [Directory](/Directory) | Directory listing |
+| [Card](/Card) | Content card |
+| [Table](/Table) | Data table |
+| [ListView](/ListView) | List view |
+| [DetailView](/DetailView) | Detail page |
+| [FormView](/FormView) | Form layout |
+
+## Navigation Components
+
+| Component | Description |
+|-----------|-------------|
+| [Header](/Header) | Page header |
+| [Footer](/Footer) | Page footer |
+| [Nav](/Nav) | Navigation menu |
+| [Sidebar](/Sidebar) | Sidebar navigation |
+| [Modal](/Modal) | Modal dialog |
+
+## Output Formats
+
+Components can render to multiple formats:
+
+- **html** - React/HTML output
+- **markdown** - Plain markdown
+- **json** - JSON-LD structured data
+- **svg** - Vector graphics
+- **png** - Raster images
+
+## Styling with Parts
+
+Use CSS `::part()` selectors for styling:
+
+```css
+Site::part(header) {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+Site::part(nav-item) {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+Site::part(nav-item):hover {
+  color: var(--color-primary);
+}
+```
+
+## CSS Variables
+
+Each component exposes themeable CSS variables:
+
+```css
+:root {
+  /* Site */
+  --site-max-width: 1280px;
+  --site-header-height: 64px;
+  --site-padding: 1rem;
+
+  /* Hero */
+  --hero-padding: 4rem 2rem;
+  --hero-title-size: 3rem;
+
+  /* Card */
+  --card-padding: 1.5rem;
+  --card-border-radius: 0.5rem;
+}
+```

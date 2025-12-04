@@ -1,0 +1,109 @@
+---
+title: Card
+description: Versatile card component for content display and interaction
+---
+
+# Card
+
+Versatile card component for displaying content in a contained, interactive format.
+
+## Structure
+
+### Vertical Layout (Default)
+
+```
+┌─────────────────────────────────────┐
+│ root                                │
+│ ┌─────────────────────────────────┐ │
+│ │ image-container                 │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ image                       │ │ │
+│ │ │           ┌───────┐         │ │ │
+│ │ │           │ badge │         │ │ │
+│ │ │           └───────┘         │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │
+│ │ content                         │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ header                      │ │ │
+│ │ │ [icon] title                │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ description                 │ │ │
+│ │ │ Card description text...    │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ body (children)             │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ footer                      │ │ │
+│ │ │ metadata · [action] [action]│ │ │
+│ │ └─────────────────────────────┘ │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+### Horizontal Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌───────────────┐ ┌───────────────────────────────┐ │
+│ │ image-container│ │ content                       │ │
+│ │ ┌───────────┐ │ │ ┌───────────────────────────┐ │ │
+│ │ │ image     │ │ │ │ title                     │ │ │
+│ │ │           │ │ │ └───────────────────────────┘ │ │
+│ │ │           │ │ │ ┌───────────────────────────┐ │ │
+│ │ │           │ │ │ │ description               │ │ │
+│ │ └───────────┘ │ │ └───────────────────────────┘ │ │
+│ └───────────────┘ │ [actions]                     │ │
+│                   └───────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Card
+  title="Getting Started"
+  description="Learn how to set up your project and start building."
+  image={{ src: '/images/getting-started.jpg', alt: 'Getting started' }}
+  badge="New"
+  href="/docs/getting-started"
+  interactive
+/>
+```
+
+## With Actions
+
+```mdx
+<Card
+  title="Premium Plan"
+  description="Unlock all features with our premium subscription."
+  actions={[
+    { label: 'Learn More', variant: 'ghost' },
+    { label: 'Subscribe', variant: 'primary' },
+  ]}
+/>
+```
+
+## Icon Card
+
+```mdx
+<Card
+  icon={{ name: 'rocket' }}
+  title="Fast Performance"
+  description="Optimized for speed and efficiency."
+  variant="outline"
+/>
+```
+
+## Variants
+
+```mdx
+<Card variant="default" />   // Filled background
+<Card variant="outline" />   // Border only
+<Card variant="ghost" />     // No border/background
+<Card variant="elevated" />  // Drop shadow
+```

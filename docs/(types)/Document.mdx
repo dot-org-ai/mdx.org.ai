@@ -1,0 +1,170 @@
+---
+title: Document
+description: The core MDXLD document structure combining frontmatter with content
+---
+
+# Document
+
+The `MDXLDDocument` is the fundamental unit of content in MDX.org.ai. It combines structured YAML-LD frontmatter with MDX content body.
+
+## Structure
+
+```typescript
+interface MDXLDDocument<TData extends MDXLDData = MDXLDData> {
+  /** Document identifier (from $id or generated) */
+  id?: string
+  /** Document type (from $type) */
+  type?: string
+  /** JSON-LD context (from $context) */
+  context?: string | Record<string, unknown>
+  /** Structured frontmatter data */
+  data: TData
+  /** Raw MDX content body */
+  content: string
+}
+```
+
+## Frontmatter Data
+
+The `data` field contains parsed YAML frontmatter with special LD properties:
+
+```typescript
+interface MDXLDData {
+  /** Resource identifier - maps to JSON-LD @id */
+  $id?: string
+  /** Type discriminator - maps to JSON-LD @type */
+  $type?: string | string[]
+  /** JSON-LD context */
+  $context?: string | Record<string, unknown>
+  /** Additional properties */
+  [key: string]: unknown
+}
+```
+
+## Example Document
+
+```mdx
+---
+$type: BlogPost
+$id: https://example.com/posts/hello-world
+title: Hello World
+author: https://example.com/authors/jane
+publishedAt: 2024-01-15
+tags:
+  - tutorial
+  - getting-started
+---
+
+# Hello World
+
+Welcome to my first blog post!
+
+<AuthorCard author={frontmatter.author} />
+```
+
+## Parsing & Stringifying
+
+```typescript
+import { parse, stringify } from 'mdxld'
+
+// Parse MDX string → Document
+const doc = parse(mdxContent)
+console.log(doc.type)    // 'BlogPost'
+console.log(doc.data.$id) // 'https://example.com/posts/hello-world'
+
+// Stringify Document → MDX string
+const output = stringify(doc)
+```
+
+## Type-Safe Documents
+
+Use `TypedData` for strongly-typed frontmatter:
+
+```typescript
+import type { MDXLDDocument, TypedData } from 'mdxld'
+
+// Define your schema
+interface BlogPostData extends TypedData<'BlogPost'> {
+  title: string
+  author: string
+  publishedAt: string
+  tags?: string[]
+}
+
+// Use typed document
+type BlogPost = MDXLDDocument<BlogPostData>
+
+function processBlogPost(doc: BlogPost) {
+  // Full autocomplete and type checking
+  console.log(doc.data.title)
+  console.log(doc.data.author)
+}
+```
+
+## Extended Document Types
+
+Documents can be extended with additional data:
+
+| Type | Description |
+|------|-------------|
+| `MDXLDDocumentWithAST` | Includes parsed MDX AST |
+| `MDXLDDocumentWithCode` | Includes compiled JavaScript |
+| `MDXLDDocumentWithRelationships` | Includes extracted links and references |
+| `MDXLDDocumentFull` | All extensions combined |
+
+### With AST
+
+```typescript
+import { parse, toAst } from 'mdxld'
+
+const doc = parse(content)
+const ast = toAst(doc)
+
+// Traverse headings
+for (const node of ast.children) {
+  if (node.type === 'heading') {
+    console.log(`H${node.depth}: ${node.children[0]?.value}`)
+  }
+}
+```
+
+### With Relationships
+
+```typescript
+import { parse, extractRelationships } from 'mdxld'
+
+const doc = parse(content)
+const withRels = extractRelationships(doc)
+
+// Get all outbound links
+for (const rel of withRels.relationships) {
+  console.log(`${rel.type}: ${rel.to}`)
+}
+```
+
+## JSON-LD Compatibility
+
+MDXLD frontmatter maps directly to JSON-LD:
+
+| MDXLD | JSON-LD | Description |
+|-------|---------|-------------|
+| `$type` | `@type` | Type discriminator |
+| `$id` | `@id` | Resource identifier |
+| `$context` | `@context` | Vocabulary context |
+
+Convert to JSON-LD:
+
+```typescript
+import { parse, toJsonLd } from 'mdxld'
+
+const doc = parse(content)
+const jsonld = toJsonLd(doc)
+
+// {
+//   "@context": "https://schema.org",
+//   "@type": "BlogPost",
+//   "@id": "https://example.com/posts/hello",
+//   "title": "Hello World",
+//   ...
+// }
+```

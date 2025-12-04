@@ -1,0 +1,264 @@
+---
+title: Function
+description: AI function definitions for code generation, text generation, agentic execution, and human-in-the-loop
+---
+
+# Function
+
+Functions define reusable AI capabilities. The `AIFunctionDefinition` type provides a unified interface for different execution modes.
+
+## Base Structure
+
+```typescript
+interface AIFunctionDefinition<TInput = unknown, TOutput = unknown> {
+  /** Unique function name */
+  name: string
+  /** Human-readable description */
+  description: string
+  /** JSON Schema for input parameters */
+  parameters: JSONSchema
+  /** Function implementation */
+  handler: (input: TInput, client: AIClient) => Promise<TOutput>
+}
+```
+
+## Function Variants
+
+### Code Functions
+
+Generate and execute code:
+
+```typescript
+interface CodeFunctionDefinition extends AIFunctionDefinition {
+  /** Programming language */
+  language: 'typescript' | 'python' | 'javascript'
+  /** Test cases */
+  tests?: TestCase[]
+  /** Usage examples */
+  examples?: Example[]
+}
+```
+
+Example:
+
+```typescript
+const parseCSV: CodeFunctionDefinition = {
+  name: 'parseCSV',
+  description: 'Parse CSV string into array of objects',
+  language: 'typescript',
+  parameters: {
+    type: 'object',
+    properties: {
+      csv: { type: 'string', description: 'CSV content' },
+      hasHeader: { type: 'boolean', default: true }
+    },
+    required: ['csv']
+  },
+  tests: [
+    { input: { csv: 'a,b\n1,2' }, expected: [{ a: '1', b: '2' }] }
+  ],
+  handler: async (input, client) => {
+    const code = await client.code({
+      prompt: `Parse CSV: ${input.csv}`,
+      language: 'typescript'
+    })
+    return code.execute(input)
+  }
+}
+```
+
+### Generative Functions
+
+Generate text, structured data, or media:
+
+```typescript
+interface GenerativeFunctionDefinition extends AIFunctionDefinition {
+  /** Output type */
+  outputType: 'text' | 'object' | 'image' | 'video' | 'audio'
+  /** Schema for structured output */
+  outputSchema?: JSONSchema
+  /** Model preferences */
+  model?: string
+}
+```
+
+Example:
+
+```typescript
+const summarize: GenerativeFunctionDefinition = {
+  name: 'summarize',
+  description: 'Summarize text into key points',
+  outputType: 'object',
+  outputSchema: {
+    type: 'object',
+    properties: {
+      summary: { type: 'string' },
+      keyPoints: { type: 'array', items: { type: 'string' } }
+    }
+  },
+  parameters: {
+    type: 'object',
+    properties: {
+      text: { type: 'string' },
+      maxPoints: { type: 'number', default: 5 }
+    }
+  },
+  handler: async (input, client) => {
+    return client.generate({
+      prompt: `Summarize: ${input.text}`,
+      schema: summarize.outputSchema
+    })
+  }
+}
+```
+
+### Agentic Functions
+
+Run in a loop with tools until completion:
+
+```typescript
+interface AgenticFunctionDefinition extends AIFunctionDefinition {
+  /** Available tools */
+  tools: AIFunctionDefinition[]
+  /** Maximum iterations */
+  maxIterations?: number
+  /** Stop conditions */
+  stopConditions?: string[]
+}
+```
+
+Example:
+
+```typescript
+const research: AgenticFunctionDefinition = {
+  name: 'research',
+  description: 'Research a topic using web search and analysis',
+  tools: [webSearch, readPage, summarize],
+  maxIterations: 10,
+  parameters: {
+    type: 'object',
+    properties: {
+      topic: { type: 'string' },
+      depth: { type: 'string', enum: ['shallow', 'deep'] }
+    }
+  },
+  handler: async (input, client) => {
+    return client.agent({
+      goal: `Research ${input.topic}`,
+      tools: research.tools,
+      maxIterations: research.maxIterations
+    })
+  }
+}
+```
+
+### Human Functions
+
+Require human input via various channels:
+
+```typescript
+interface HumanFunctionDefinition extends AIFunctionDefinition {
+  /** Input channel */
+  channel: 'slack' | 'email' | 'web' | 'sms'
+  /** Timeout for response */
+  timeout?: number
+  /** Escalation path */
+  escalation?: HumanFunctionDefinition
+}
+```
+
+Example:
+
+```typescript
+const approveExpense: HumanFunctionDefinition = {
+  name: 'approveExpense',
+  description: 'Get manager approval for expense',
+  channel: 'slack',
+  timeout: 86400, // 24 hours
+  parameters: {
+    type: 'object',
+    properties: {
+      amount: { type: 'number' },
+      description: { type: 'string' },
+      approver: { type: 'string' }
+    }
+  },
+  handler: async (input, client) => {
+    return client.human({
+      channel: 'slack',
+      recipient: input.approver,
+      message: `Approve expense: $${input.amount} for ${input.description}?`,
+      options: ['Approve', 'Reject', 'Need more info']
+    })
+  }
+}
+```
+
+## AIClient Interface
+
+Functions receive an `AIClient` for AI operations:
+
+```typescript
+interface AIClient {
+  /** Generate text or structured output */
+  generate<T>(options: GenerateOptions<T>): Promise<T>
+
+  /** Execute an action */
+  do<T>(action: string, input?: unknown): Promise<T>
+
+  /** Make a decision from options */
+  decide(options: DecideOptions): Promise<string>
+
+  /** Generate code */
+  code(options: CodeOptions): Promise<CodeResult>
+
+  /** Generate image */
+  image(options: ImageOptions): Promise<ImageResult>
+
+  /** Generate video */
+  video(options: VideoOptions): Promise<VideoResult>
+
+  /** Write long-form content */
+  write(options: WriteOptions): Promise<string>
+
+  /** Generate list of items */
+  list<T>(options: ListOptions<T>): Promise<T[]>
+}
+```
+
+## MDX Definition
+
+Functions can be defined in MDX:
+
+```mdx
+---
+$type: Function
+name: translateText
+description: Translate text between languages
+outputType: text
+parameters:
+  type: object
+  properties:
+    text:
+      type: string
+    from:
+      type: string
+    to:
+      type: string
+  required: [text, to]
+---
+
+# translateText
+
+Translates text from one language to another using AI.
+
+## Usage
+
+\`\`\`typescript
+const result = await translateText({
+  text: 'Hello, world!',
+  to: 'spanish'
+})
+// 'Hola, mundo!'
+\`\`\`
+```

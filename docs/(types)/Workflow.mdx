@@ -1,0 +1,300 @@
+---
+title: Workflow
+description: Event-driven workflows with the $ context for durable execution
+---
+
+# Workflow
+
+Workflows define event-driven business logic using the `$` context object. They provide durable execution with automatic retries, scheduling, and state management.
+
+## The $ Context
+
+The workflow context `$` is the primary interface for workflow logic:
+
+```typescript
+interface WorkflowContext {
+  /** Fire-and-forget event */
+  send<T>(event: string, data: T): void
+
+  /** Durable action with retries */
+  do<TData, TResult>(
+    action: string,
+    data: TData,
+    options?: ActionOptions
+  ): Promise<TResult>
+
+  /** Simple execution (no durability) */
+  try<TData, TResult>(
+    action: string,
+    data: TData
+  ): Promise<TResult>
+
+  /** Event registration proxy */
+  on: EventProxy
+
+  /** Schedule registration proxy */
+  every: ScheduleProxy
+
+  /** Read/write workflow state */
+  state: StateProxy
+
+  /** Logging */
+  log(message: string, data?: unknown): void
+
+  /** Optional database context */
+  db?: DatabaseContext
+}
+```
+
+## Event Handlers
+
+Register handlers for events using the `$.on` proxy:
+
+```typescript
+// Pattern: $.on.Noun.verb
+$.on.User.created(async (user) => {
+  await $.do('sendWelcomeEmail', { email: user.email })
+  await $.do('createDefaultWorkspace', { userId: user.id })
+})
+
+$.on.Order.placed(async (order) => {
+  await $.do('processPayment', { orderId: order.id })
+  await $.do('notifyWarehouse', { order })
+})
+
+$.on.Payment.failed(async (payment) => {
+  await $.do('notifyCustomer', { paymentId: payment.id })
+  $.send('Order.cancelled', { orderId: payment.orderId })
+})
+```
+
+## Schedule Handlers
+
+Register scheduled tasks using the `$.every` proxy:
+
+```typescript
+// Natural intervals
+$.every.hour(async () => {
+  await $.do('syncInventory')
+})
+
+$.every.day.at('9:00')(async () => {
+  await $.do('sendDailyDigest')
+})
+
+$.every.monday.at('10:00')(async () => {
+  await $.do('generateWeeklyReport')
+})
+
+// Cron expressions
+$.every.cron('0 */6 * * *')(async () => {
+  await $.do('cleanupExpiredSessions')
+})
+```
+
+## Durable Actions
+
+The `$.do()` method provides durable execution:
+
+```typescript
+interface ActionOptions {
+  /** Number of retry attempts */
+  retries?: number
+  /** Backoff strategy */
+  backoff?: 'linear' | 'exponential'
+  /** Timeout in milliseconds */
+  timeout?: number
+  /** Idempotency key */
+  idempotencyKey?: string
+}
+
+// Example with options
+const result = await $.do('processPayment', {
+  orderId: '123',
+  amount: 99.99
+}, {
+  retries: 3,
+  backoff: 'exponential',
+  timeout: 30000,
+  idempotencyKey: `payment-${orderId}`
+})
+```
+
+## State Management
+
+Access workflow state via `$.state`:
+
+```typescript
+// Read state
+const count = $.state.get('processedCount') ?? 0
+
+// Write state
+$.state.set('processedCount', count + 1)
+
+// Atomic update
+$.state.update('processedCount', (prev) => (prev ?? 0) + 1)
+
+// Delete state
+$.state.delete('temporaryData')
+```
+
+## Workflow State
+
+Track workflow execution:
+
+```typescript
+interface WorkflowState {
+  /** Current state name */
+  current: string
+  /** State context data */
+  context: Record<string, unknown>
+  /** Execution history */
+  history: WorkflowHistoryEntry[]
+}
+
+interface WorkflowHistoryEntry {
+  /** Previous state */
+  from: string
+  /** New state */
+  to: string
+  /** Transition event */
+  event: string
+  /** Timestamp */
+  timestamp: Date
+}
+```
+
+## Database Context
+
+For persistent workflows:
+
+```typescript
+interface DatabaseContext {
+  /** Record immutable event */
+  recordEvent(event: EventData): Promise<void>
+
+  /** Create pending action */
+  createAction(action: ActionData): Promise<string>
+
+  /** Complete action */
+  completeAction(id: string, result: unknown): Promise<void>
+
+  /** Store artifact */
+  storeArtifact(key: string, data: ArtifactData): Promise<void>
+
+  /** Retrieve artifact */
+  getArtifact(key: string): Promise<ArtifactData | null>
+}
+```
+
+## MDX Definition
+
+Workflows can be defined in MDX:
+
+```mdx
+---
+$type: Workflow
+name: OrderFulfillment
+description: Handle order processing from placement to delivery
+triggers:
+  - Order.placed
+  - Payment.completed
+  - Shipment.delivered
+---
+
+# Order Fulfillment Workflow
+
+Manages the complete order lifecycle.
+
+## Events
+
+### On Order Placed
+
+\`\`\`typescript
+$.on.Order.placed(async (order) => {
+  // Validate inventory
+  const available = await $.do('checkInventory', {
+    items: order.items
+  })
+
+  if (!available) {
+    $.send('Order.backordered', { orderId: order.id })
+    return
+  }
+
+  // Reserve inventory
+  await $.do('reserveInventory', { orderId: order.id })
+
+  // Process payment
+  $.send('Payment.process', {
+    orderId: order.id,
+    amount: order.total
+  })
+})
+\`\`\`
+
+### On Payment Completed
+
+\`\`\`typescript
+$.on.Payment.completed(async (payment) => {
+  // Create shipment
+  await $.do('createShipment', {
+    orderId: payment.orderId
+  })
+
+  // Notify customer
+  await $.do('sendConfirmation', {
+    orderId: payment.orderId,
+    email: payment.customerEmail
+  })
+})
+\`\`\`
+
+## Schedules
+
+\`\`\`typescript
+// Check for stuck orders daily
+$.every.day.at('6:00')(async () => {
+  const stuck = await $.do('findStuckOrders', {
+    stuckAfterHours: 24
+  })
+
+  for (const order of stuck) {
+    $.send('Order.stuck', { orderId: order.id })
+  }
+})
+\`\`\`
+```
+
+## Example Usage
+
+```typescript
+import { createWorkflow } from 'ai-workflows'
+
+const orderWorkflow = createWorkflow({
+  name: 'OrderFulfillment',
+  handlers: {
+    'Order.placed': async ($, order) => {
+      await $.do('validateOrder', { order })
+      await $.do('reserveInventory', { items: order.items })
+      $.send('Payment.process', { orderId: order.id })
+    },
+    'Payment.completed': async ($, payment) => {
+      await $.do('createShipment', { orderId: payment.orderId })
+      await $.do('notifyCustomer', { orderId: payment.orderId })
+    }
+  },
+  schedules: {
+    'every.day.at.6:00': async ($) => {
+      await $.do('cleanupAbandonedOrders')
+    }
+  }
+})
+
+// Trigger workflow
+await orderWorkflow.send('Order.placed', {
+  id: 'order-123',
+  items: [{ sku: 'WIDGET-1', qty: 2 }],
+  total: 49.99
+})
+```

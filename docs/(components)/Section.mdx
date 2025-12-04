@@ -1,0 +1,62 @@
+---
+title: Section
+description: Content section with optional heading, background, and padding
+---
+
+# Section
+
+A content section that provides consistent spacing, backgrounds, and optional headings.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ background (optional overlay/image)             │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ container                                       │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ header                                      │ │ │
+│ │ │ ┌─────────────────────────────────────────┐ │ │ │
+│ │ │ │ title                                   │ │ │ │
+│ │ │ │ subtitle                                │ │ │ │
+│ │ │ │ description                             │ │ │ │
+│ │ │ └─────────────────────────────────────────┘ │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ content                                     │ │ │
+│ │ │                                             │ │ │
+│ │ │   {children}                                │ │ │
+│ │ │                                             │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Section
+  id="features"
+  title="Features"
+  subtitle="Everything you need"
+  background="muted"
+  padding="lg"
+  align="center"
+>
+  <Features items={features} />
+</Section>
+```
+
+## Background Variants
+
+```mdx
+<Section background="default">Default (transparent)</Section>
+<Section background="muted">Muted gray</Section>
+<Section background="accent">Brand accent color</Section>
+<Section background="dark">Dark background</Section>
+<Section background="gradient">Gradient background</Section>
+<Section background="image" backgroundImage="/pattern.svg">Image</Section>
+```

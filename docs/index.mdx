@@ -2,7 +2,7 @@
 title: MDX.org.ai Documentation
 description: The complete MDX ecosystem for building AI-powered applications, databases, and user interfaces
 root: true
-pages: [index, mdxld, mdxdb, mdxe, mdxai, mdxui]
+pages: [index, types, components, packages]
 ---
 
 # MDX.org.ai
@@ -19,37 +19,41 @@ MDX.org.ai is a suite of packages that extend MDX with:
 - **AI Integration** - Build and deploy AI agents with MDX
 - **UI Components** - Render MDX with customizable components
 
-## Packages
+## Documentation
 
-### Core
+### [Types](/types)
+
+Core types and concepts in the MDX.org.ai ecosystem:
+
+| Type | Description |
+|------|-------------|
+| [Document](/Document) | MDXLD document structure with frontmatter and content |
+| [Function](/Function) | AI function definitions (Code, Generative, Agentic, Human) |
+| [Agent](/Agent) | Autonomous AI agents with roles, goals, and teams |
+| [Workflow](/Workflow) | Event-driven workflows with the `$` context |
+| [Database](/Database) | Schema-first database modeling with bi-directional relations |
+
+### [Components](/components)
+
+UI component specifications for building MDX applications:
+
+| Category | Components |
+|----------|------------|
+| Layout | [Site](/Site), [App](/App), [Page](/Page), [Section](/Section), [Layout](/Layout) |
+| Marketing | [Hero](/Hero), [LandingPage](/LandingPage), [Features](/Features), [Pricing](/Pricing), [CTA](/CTA) |
+| Content | [Blog](/Blog), [BlogPost](/BlogPost), [Article](/Article), [Docs](/Docs), [API](/API) |
+| Data | [Dashboard](/Dashboard), [Directory](/Directory), [Card](/Card), [Table](/Table), [ListView](/ListView) |
+| Navigation | [Header](/Header), [Footer](/Footer), [Nav](/Nav), [Sidebar](/Sidebar), [Modal](/Modal) |
+
+### [Packages](/packages)
 
 | Package | Description |
 |---------|-------------|
-| [mdxld](/docs/mdxld) | Parse, stringify, validate, and compile MDXLD documents |
-
-### Storage
-
-| Package | Description |
-|---------|-------------|
-| [mdxdb](/docs/mdxdb) | MDX document database with multiple storage adapters |
-
-### Execution
-
-| Package | Description |
-|---------|-------------|
-| [mdxe](/docs/mdxe) | Execute MDX in various runtime environments |
-
-### AI
-
-| Package | Description |
-|---------|-------------|
-| [mdxai](/docs/mdxai) | Build and deploy MDX-based AI agents |
-
-### UI
-
-| Package | Description |
-|---------|-------------|
-| [mdxui](/docs/mdxui) | Render MDX with customizable UI components |
+| [mdxld](/mdxld) | Parse, stringify, validate, and compile MDXLD documents |
+| [mdxdb](/mdxdb) | MDX document database with multiple storage adapters |
+| [mdxe](/mdxe) | Execute MDX in various runtime environments |
+| [mdxai](/mdxai) | Build and deploy MDX-based AI agents |
+| [mdxui](/mdxui) | Render MDX with customizable UI components |
 
 ## Quick Start
 

@@ -1,0 +1,289 @@
+---
+title: Database
+description: Schema-first database modeling with automatic bi-directional relationships
+---
+
+# Database
+
+The database system provides schema-first data modeling with automatic bi-directional relationships. Define your schema once and get type-safe, provider-agnostic database access.
+
+## Database Schema
+
+```typescript
+interface DatabaseSchema {
+  [entityName: string]: EntitySchema
+}
+
+interface EntitySchema {
+  [fieldName: string]: FieldDefinition
+}
+```
+
+## Field Definitions
+
+Fields can be primitives, relations, or arrays:
+
+```typescript
+type FieldDefinition =
+  // Primitives
+  | 'string' | 'number' | 'boolean'
+  | 'date' | 'datetime'
+  | 'json' | 'markdown' | 'url'
+  // Optional primitives
+  | 'string?' | 'number?' | 'boolean?'
+  // Arrays
+  | 'string[]' | 'number[]'
+  // Relations (auto bi-directional)
+  | 'Author.posts'      // One-to-many
+  | 'Category?'         // Optional relation
+  | ['Tag.posts']       // Many-to-many array
+```
+
+## Example Schema
+
+```typescript
+import { DB } from 'ai-database'
+
+const db = DB({
+  Post: {
+    title: 'string',
+    content: 'markdown',
+    slug: 'string',
+    publishedAt: 'datetime?',
+    author: 'Author.posts',      // Creates Post.author and Author.posts
+    category: 'Category.posts',  // Creates Post.category and Category.posts
+    tags: ['Tag.posts'],         // Creates Post.tags[] and Tag.posts[]
+  },
+
+  Author: {
+    name: 'string',
+    email: 'string',
+    bio: 'markdown?',
+    // posts: Post[] - auto-created from backref
+  },
+
+  Category: {
+    name: 'string',
+    slug: 'string',
+    // posts: Post[] - auto-created from backref
+  },
+
+  Tag: {
+    name: 'string',
+    slug: 'string',
+    // posts: Post[] - auto-created from backref
+  },
+})
+```
+
+## Bi-directional Relations
+
+When you define `author: 'Author.posts'`, the system automatically:
+
+1. Creates `Post.author` → single `Author`
+2. Creates `Author.posts` → array of `Post[]`
+3. Maintains referential integrity
+4. Provides typed access in both directions
+
+```typescript
+// Forward relation
+const post = await db.Post.get('hello-world')
+const author = await post.author  // Resolved Author
+
+// Inverse relation
+const author = await db.Author.get('jane')
+const posts = await author.posts  // Post[]
+```
+
+## Parsed Schema
+
+The schema is parsed into a normalized structure:
+
+```typescript
+interface ParsedField {
+  /** Original type string */
+  type: string
+  /** Is this an array? */
+  isArray: boolean
+  /** Is this optional? */
+  isOptional: boolean
+  /** Is this a relation? */
+  isRelation: boolean
+  /** Related entity type (if relation) */
+  relatedType?: string
+  /** Backref field name (if relation) */
+  backref?: string
+}
+
+interface ParsedEntity {
+  /** Entity name */
+  name: string
+  /** Parsed fields */
+  fields: Record<string, ParsedField>
+  /** Fields that are relations */
+  relations: string[]
+  /** Fields created as backrefs */
+  backrefs: string[]
+}
+```
+
+## Database Operations
+
+### Basic CRUD
+
+```typescript
+// Create
+const post = await db.Post.create({
+  title: 'Hello World',
+  content: '# Hello\n\nWelcome!',
+  slug: 'hello-world',
+  author: 'author-jane'  // Reference by ID
+})
+
+// Read
+const post = await db.Post.get('hello-world')
+
+// Update
+await db.Post.update('hello-world', {
+  title: 'Hello World (Updated)'
+})
+
+// Delete
+await db.Post.delete('hello-world')
+```
+
+### Queries
+
+```typescript
+// Find all
+const posts = await db.Post.find()
+
+// Find with filter
+const published = await db.Post.find({
+  where: { publishedAt: { $ne: null } }
+})
+
+// Find with relations
+const posts = await db.Post.find({
+  include: ['author', 'tags']
+})
+
+// Pagination
+const page = await db.Post.find({
+  limit: 10,
+  offset: 20,
+  orderBy: { publishedAt: 'desc' }
+})
+```
+
+### Vector Search
+
+```typescript
+// Semantic search
+const similar = await db.Post.search({
+  query: 'getting started with MDX',
+  limit: 5
+})
+
+// Hybrid search
+const results = await db.Post.search({
+  query: 'MDX tutorial',
+  filter: { category: 'tutorials' },
+  limit: 10
+})
+```
+
+## Provider Configuration
+
+The database provider is resolved from `DATABASE_URL`:
+
+```bash
+# Filesystem (git-friendly .mdx files)
+DATABASE_URL=./content
+
+# SQLite (local, vector search via sqlite-vss)
+DATABASE_URL=sqlite://./content.db
+
+# Turso (distributed SQLite)
+DATABASE_URL=libsql://your-db.turso.io
+
+# PostgreSQL (pgvector)
+DATABASE_URL=postgres://user:pass@host/db
+
+# MongoDB (Atlas Vector Search)
+DATABASE_URL=mongodb+srv://user:pass@cluster/db
+
+# ClickHouse (analytics)
+DATABASE_URL=clickhouse://host:8123/db
+```
+
+## MDX Definition
+
+Database schemas can be defined in MDX:
+
+```mdx
+---
+$type: Database
+name: BlogDB
+description: Blog content database
+---
+
+# BlogDB Schema
+
+## Post
+
+| Field | Type | Description |
+|-------|------|-------------|
+| title | string | Post title |
+| content | markdown | Post content |
+| slug | string | URL slug |
+| publishedAt | datetime? | Publication date |
+| author | Author.posts | Post author |
+| tags | [Tag.posts] | Post tags |
+
+## Author
+
+| Field | Type | Description |
+|-------|------|-------------|
+| name | string | Author name |
+| email | string | Email address |
+| bio | markdown? | Author biography |
+
+## Category
+
+| Field | Type | Description |
+|-------|------|-------------|
+| name | string | Category name |
+| slug | string | URL slug |
+```
+
+## Type Safety
+
+Full TypeScript support:
+
+```typescript
+import { DB, type InferEntity } from 'ai-database'
+
+const schema = {
+  Post: {
+    title: 'string',
+    author: 'Author.posts',
+  },
+  Author: {
+    name: 'string',
+  },
+} as const
+
+const db = DB(schema)
+
+// Infer types from schema
+type Post = InferEntity<typeof schema, 'Post'>
+// { title: string; author: string }
+
+type Author = InferEntity<typeof schema, 'Author'>
+// { name: string; posts: Post[] }
+
+// Typed operations
+const post: Post = await db.Post.get('hello')
+const author: Author = await post.author
+```

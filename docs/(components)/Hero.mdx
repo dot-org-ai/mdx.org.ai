@@ -1,0 +1,94 @@
+---
+title: Hero
+description: Hero section with headline, subtitle, CTAs, and optional media
+---
+
+# Hero
+
+Hero section for landing pages with headline, supporting text, call-to-action buttons, and optional media.
+
+## Structure
+
+### Split Layout (default)
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ container                                       │ │
+│ │ ┌──────────────────────┐ ┌────────────────────┐ │ │
+│ │ │ content              │ │ media-container    │ │ │
+│ │ │ ┌──────────────────┐ │ │ ┌────────────────┐ │ │ │
+│ │ │ │ badge            │ │ │ │                │ │ │ │
+│ │ │ └──────────────────┘ │ │ │                │ │ │ │
+│ │ │ ┌──────────────────┐ │ │ │    media       │ │ │ │
+│ │ │ │ title            │ │ │ │    (image/     │ │ │ │
+│ │ │ │                  │ │ │ │     video)     │ │ │ │
+│ │ │ └──────────────────┘ │ │ │                │ │ │ │
+│ │ │ ┌──────────────────┐ │ │ │                │ │ │ │
+│ │ │ │ subtitle         │ │ │ └────────────────┘ │ │ │
+│ │ │ └──────────────────┘ │ │                    │ │ │
+│ │ │ ┌──────────────────┐ │ │                    │ │ │
+│ │ │ │ actions          │ │ │                    │ │ │
+│ │ │ │ [Primary] [Sec]  │ │ │                    │ │ │
+│ │ │ └──────────────────┘ │ │                    │ │ │
+│ │ │ ┌──────────────────┐ │ │                    │ │ │
+│ │ │ │ logos            │ │ │                    │ │ │
+│ │ │ └──────────────────┘ │ │                    │ │ │
+│ │ └──────────────────────┘ └────────────────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+### Centered Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │                    badge                        │ │
+│ │                    title                        │ │
+│ │                   subtitle                      │ │
+│ │              [Primary] [Secondary]              │ │
+│ │                    logos                        │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │                    media                        │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<Hero
+  badge="New in v2.0"
+  title="Build faster with modern tools"
+  subtitle="The complete platform for building web applications. Ship in days, not months."
+  primaryAction={{ label: 'Get Started', href: '/signup' }}
+  secondaryAction={{ label: 'View Demo', href: '/demo' }}
+  media={{ src: '/hero-screenshot.png', alt: 'Product screenshot' }}
+  logos={[
+    { src: '/logos/company1.svg', alt: 'Company 1' },
+    { src: '/logos/company2.svg', alt: 'Company 2' },
+  ]}
+  rating={{ value: 4.9, count: 2500 }}
+/>
+```
+
+## Layout Variants
+
+```mdx
+<Hero layout="split" mediaPosition="right">Split with media right</Hero>
+<Hero layout="split" mediaPosition="left">Split with media left</Hero>
+<Hero layout="centered">Centered text, media below</Hero>
+<Hero layout="stacked">Full-width stacked sections</Hero>
+```
+
+## Background Variants
+
+```mdx
+<Hero background="gradient">Gradient background</Hero>
+<Hero background="image" backgroundMedia={{ src: '/bg.jpg' }}>Image background</Hero>
+<Hero background="video" backgroundMedia={{ src: '/bg.mp4' }}>Video background</Hero>
+```

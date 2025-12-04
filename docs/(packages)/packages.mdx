@@ -1,0 +1,103 @@
+---
+title: Packages
+description: MDX.org.ai package documentation
+root: true
+defaultOpen: true
+pages: [packages, mdxld, mdxdb, mdxe, mdxai, mdxui]
+---
+
+# Packages
+
+The MDX.org.ai ecosystem consists of five main packages:
+
+## Core
+
+### [mdxld](/mdxld)
+
+Parse, stringify, validate, and compile MDXLD documents. The foundational package for working with MDX + Linked Data.
+
+```bash
+npm install mdxld
+```
+
+## Storage
+
+### [mdxdb](/mdxdb)
+
+MDX document database with multiple storage adapters:
+
+- **@mdxdb/fs** - Filesystem (git-friendly .mdx files)
+- **@mdxdb/sqlite** - SQLite with vector search
+- **@mdxdb/postgres** - PostgreSQL with pgvector
+- **@mdxdb/mongo** - MongoDB with Atlas Vector Search
+- **@mdxdb/clickhouse** - ClickHouse for analytics
+
+```bash
+npm install mdxdb
+```
+
+## Execution
+
+### [mdxe](/mdxe)
+
+Execute MDX in various runtime environments:
+
+- **@mdxe/node** - Node.js runtime
+- **@mdxe/next** - Next.js App Router
+- **@mdxe/hono** - Hono web framework
+- **@mdxe/workers** - Cloudflare Workers
+- **@mdxe/ink** - Terminal UI
+
+```bash
+npm install mdxe
+```
+
+## AI
+
+### [mdxai](/mdxai)
+
+AI integrations for MDX:
+
+- **@mdxai/claude** - Claude AI with MCP tools
+- **@mdxai/mastra** - Mastra agent framework
+- **@mdxai/agentkit** - Agent composition
+- **@mdxai/vapi** - Voice AI
+
+```bash
+npm install mdxai
+```
+
+## UI
+
+### [mdxui](/mdxui)
+
+Render MDX to various output formats:
+
+- **@mdxui/html** - HTML strings
+- **@mdxui/json** - JSON/JSON-LD
+- **@mdxui/markdown** - Markdown strings
+- **@mdxui/shadcn** - shadcn/ui components
+- **@mdxui/fumadocs** - Documentation sites
+
+```bash
+npm install mdxui
+```
+
+## Package Architecture
+
+```
+mdxld (core parsing)
+├── @mdxld/* (AST, compile, validate, jsonld)
+│
+├── mdxdb (database abstraction)
+│   └── @mdxdb/* (fs, sqlite, postgres, mongo, clickhouse)
+│
+├── mdxe (execution)
+│   └── @mdxe/* (node, next, hono, workers, ink)
+│
+├── mdxui (rendering)
+│   └── @mdxui/* (html, json, markdown, shadcn, fumadocs)
+│
+└── mdxai (AI)
+    └── @mdxai/* (claude, mastra, agentkit, vapi)
+```

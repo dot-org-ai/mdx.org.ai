@@ -1,0 +1,101 @@
+---
+title: FormView
+description: Form view for creating or editing items with validation and sections
+---
+
+# FormView
+
+Form view for creating or editing items with sections, validation, and optional preview.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ header                                              │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ breadcrumbs: Users / New User                   │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ title: Create New User                          │ │
+│ │ description                                     │ │
+│ └─────────────────────────────────────────────────┘ │
+├───────────────────────────────────────┬─────────────┤
+│ main                                  │ sidebar     │
+│ ┌───────────────────────────────────┐ │ ┌─────────┐ │
+│ │ section: Basic Info               │ │ │ Preview │ │
+│ │ ┌───────────────────────────────┐ │ │ │         │ │
+│ │ │ Name *                        │ │ │ │ ┌─────┐ │ │
+│ │ │ ┌───────────────────────────┐ │ │ │ │ │     │ │ │
+│ │ │ │ John Doe                  │ │ │ │ │ │     │ │ │
+│ │ │ └───────────────────────────┘ │ │ │ │ └─────┘ │ │
+│ │ │ Email *                       │ │ │ │ John    │ │
+│ │ │ ┌───────────────────────────┐ │ │ │ │ Doe     │ │
+│ │ │ │ john@example.com          │ │ │ │ │         │ │
+│ │ │ └───────────────────────────┘ │ │ │ └─────────┘ │
+│ │ │ ⚠️ Please enter a valid email │ │ │ ┌─────────┐ │
+│ │ └───────────────────────────────┘ │ │ │ Tips    │ │
+│ └───────────────────────────────────┘ │ │ • Tip 1 │ │
+│ ┌───────────────────────────────────┐ │ │ • Tip 2 │ │
+│ │ section: Permissions              │ │ └─────────┘ │
+│ │ ...                               │ │             │
+│ └───────────────────────────────────┘ │             │
+├───────────────────────────────────────┴─────────────┤
+│ footer                                              │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │           [Cancel]  [Reset]  [Create User]      │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<FormView
+  title="Create New User"
+  description="Add a new team member to your organization"
+  mode="create"
+  breadcrumbs={[
+    { label: 'Users', href: '/users' },
+    { label: 'New User' },
+  ]}
+  sections={[
+    {
+      title: 'Basic Information',
+      description: 'Enter the user\'s basic details',
+      fields: [
+        { name: 'name', label: 'Full Name', type: 'text', required: true },
+        { name: 'email', label: 'Email', type: 'email', required: true },
+        { name: 'role', label: 'Role', type: 'select', options: roles },
+      ],
+    },
+    {
+      title: 'Permissions',
+      fields: [
+        { name: 'permissions', label: 'Permissions', type: 'checkbox-group', options: permissions },
+      ],
+    },
+  ]}
+  values={formValues}
+  errors={formErrors}
+  submitLabel="Create User"
+  cancelHref="/users"
+  sidebar={{
+    sections: [
+      { title: 'Preview', content: <UserPreview values={formValues} /> },
+    ],
+  }}
+  onSubmit={handleSubmit}
+/>
+```
+
+## Edit Mode
+
+```mdx
+<FormView
+  title="Edit User"
+  mode="edit"
+  values={existingUser}
+  submitLabel="Save Changes"
+  autosave
+/>
+```

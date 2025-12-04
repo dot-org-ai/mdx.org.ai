@@ -1,0 +1,276 @@
+---
+title: Agent
+description: Autonomous AI agents with roles, goals, and team coordination
+---
+
+# Agent
+
+Agents are autonomous AI entities that execute goals, make decisions, and coordinate with other agents and humans.
+
+## Agent Structure
+
+```typescript
+interface Agent {
+  /** Agent configuration */
+  config: AgentConfig
+  /** Current execution status */
+  status: AgentStatus
+  /** Runtime state and memory */
+  state: Record<string, unknown>
+
+  /** Execute an action */
+  do<T>(action: string, input?: unknown): Promise<T>
+  /** Ask a question */
+  ask(question: string): Promise<string>
+  /** Make a decision from options */
+  decide(options: string[]): Promise<string>
+  /** Request human approval */
+  approve(request: ApprovalRequest): Promise<ApprovalResult>
+  /** Generate content */
+  generate<T>(prompt: string, schema?: JSONSchema): Promise<T>
+  /** Send notification */
+  notify(channel: string, message: string): Promise<void>
+}
+```
+
+## Agent Configuration
+
+```typescript
+interface AgentConfig {
+  /** Unique agent name */
+  name: string
+  /** Human-readable description */
+  description: string
+  /** Agent's role definition */
+  role: Role
+
+  /** Execution mode */
+  mode: 'autonomous' | 'supervised' | 'manual'
+
+  /** Goals to achieve */
+  goals: Goal[]
+  /** Available tools */
+  tools: AIFunctionDefinition[]
+  /** Initial context */
+  context?: Record<string, unknown>
+
+  /** Actions requiring approval */
+  requiresApproval?: string[]
+  /** Supervisor agent or human */
+  supervisor?: string
+}
+```
+
+## Agent Status
+
+```typescript
+type AgentStatus =
+  | 'idle'       // Waiting for work
+  | 'thinking'   // Planning next action
+  | 'acting'     // Executing action
+  | 'waiting'    // Waiting for external input
+  | 'completed'  // Goal achieved
+  | 'error'      // Error state
+```
+
+## Roles
+
+Roles define agent capabilities and permissions:
+
+```typescript
+interface Role {
+  /** Role name */
+  name: string
+  /** Role description */
+  description: string
+  /** Skills this role has */
+  skills: string[]
+  /** Permissions granted */
+  permissions: Permission[]
+  /** Tools available to this role */
+  tools: string[]
+  /** Expected output types */
+  expectedOutputs: string[]
+}
+```
+
+Example roles:
+
+```typescript
+const researcher: Role = {
+  name: 'Researcher',
+  description: 'Gathers and analyzes information',
+  skills: ['web-search', 'summarization', 'fact-checking'],
+  permissions: ['read:web', 'read:docs'],
+  tools: ['webSearch', 'readPage', 'summarize'],
+  expectedOutputs: ['report', 'summary', 'citations']
+}
+
+const developer: Role = {
+  name: 'Developer',
+  description: 'Writes and reviews code',
+  skills: ['coding', 'debugging', 'testing'],
+  permissions: ['read:code', 'write:code', 'execute:tests'],
+  tools: ['writeCode', 'runTests', 'reviewPR'],
+  expectedOutputs: ['code', 'tests', 'review']
+}
+```
+
+## Goals
+
+Goals define measurable outcomes:
+
+```typescript
+interface Goal {
+  /** Goal identifier */
+  id: string
+  /** Goal description */
+  description: string
+  /** Target outcome */
+  target: string
+  /** Current progress (0-100) */
+  progress: number
+  /** Deadline */
+  deadline?: Date
+  /** Success criteria */
+  successCriteria: string[]
+  /** Dependencies on other goals */
+  dependencies?: string[]
+}
+```
+
+## Teams
+
+Multiple agents can work together:
+
+```typescript
+interface Team {
+  /** Team name */
+  name: string
+  /** Team description */
+  description: string
+  /** Team members */
+  members: TeamMember[]
+  /** Team goals */
+  goals: Goal[]
+  /** Communication channels */
+  channels: string[]
+}
+
+interface TeamMember {
+  /** Member identifier */
+  id: string
+  /** Agent or human */
+  type: 'agent' | 'human'
+  /** Member's role */
+  role: Role
+  /** Current status */
+  status: 'active' | 'away' | 'busy'
+}
+```
+
+## Approval Workflow
+
+For supervised mode:
+
+```typescript
+interface ApprovalRequest {
+  /** Request identifier */
+  id: string
+  /** Action requiring approval */
+  action: string
+  /** Request reason */
+  reason: string
+  /** Risk level */
+  risk: 'low' | 'medium' | 'high'
+  /** Additional context */
+  context: Record<string, unknown>
+}
+
+interface ApprovalResult {
+  /** Approved or rejected */
+  approved: boolean
+  /** Approver identifier */
+  approver: string
+  /** Optional feedback */
+  feedback?: string
+  /** Conditions if approved */
+  conditions?: string[]
+}
+```
+
+## MDX Definition
+
+Agents can be defined in MDX:
+
+```mdx
+---
+$type: Agent
+name: ContentWriter
+description: Creates and edits content
+role:
+  name: Writer
+  skills: [writing, editing, research]
+  permissions: [read:docs, write:content]
+mode: supervised
+goals:
+  - id: daily-posts
+    description: Write 3 blog posts per day
+    target: 3 posts
+    successCriteria:
+      - Post is at least 500 words
+      - Post includes relevant images
+      - Post passes grammar check
+tools:
+  - writeContent
+  - searchImages
+  - grammarCheck
+---
+
+# ContentWriter Agent
+
+An agent specialized in creating blog content.
+
+## Capabilities
+
+- Research topics and gather information
+- Write engaging blog posts
+- Find and include relevant images
+- Edit and proofread content
+
+## Workflow
+
+1. Receive topic assignment
+2. Research the topic
+3. Create outline
+4. Write draft
+5. Add images
+6. Edit and proofread
+7. Submit for review
+```
+
+## Example Usage
+
+```typescript
+import { createAgent } from 'mdxai'
+
+const writer = await createAgent({
+  name: 'ContentWriter',
+  role: writerRole,
+  mode: 'supervised',
+  goals: [dailyPostsGoal],
+  tools: [writeContent, searchImages, grammarCheck]
+})
+
+// Execute goal
+await writer.do('write-post', {
+  topic: 'Getting Started with MDX',
+  style: 'tutorial'
+})
+
+// Check status
+console.log(writer.status) // 'acting'
+
+// Wait for completion
+const result = await writer.waitFor('completed')
+```

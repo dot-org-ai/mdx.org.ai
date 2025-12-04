@@ -1,0 +1,66 @@
+---
+title: CTA
+description: Call-to-action section with headline, description, and action buttons
+---
+
+# CTA
+
+Call-to-action section designed to encourage user conversion with compelling headline and prominent buttons.
+
+## Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│ root                                                │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ background                                      │ │
+│ └─────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ container                                       │ │
+│ │ ┌─────────────────────────────────────────────┐ │ │
+│ │ │ content                                     │ │ │
+│ │ │ ┌─────────────────────────────────────────┐ │ │ │
+│ │ │ │             title                       │ │ │ │
+│ │ │ └─────────────────────────────────────────┘ │ │ │
+│ │ │ ┌─────────────────────────────────────────┐ │ │ │
+│ │ │ │           description                   │ │ │ │
+│ │ │ └─────────────────────────────────────────┘ │ │ │
+│ │ │ ┌─────────────────────────────────────────┐ │ │ │
+│ │ │ │ actions                                 │ │ │ │
+│ │ │ │     [Primary CTA]    [Secondary]        │ │ │ │
+│ │ │ └─────────────────────────────────────────┘ │ │ │
+│ │ └─────────────────────────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```mdx
+<CTA
+  title="Ready to get started?"
+  description="Join thousands of developers building with our platform."
+  primaryAction={{ label: 'Start Free Trial', href: '/signup' }}
+  secondaryAction={{ label: 'Talk to Sales', href: '/contact' }}
+  background="gradient"
+  size="lg"
+/>
+```
+
+## Background Variants
+
+```mdx
+<CTA background="default" title="Default">Transparent</CTA>
+<CTA background="accent" title="Accent">Brand color</CTA>
+<CTA background="gradient" title="Gradient">Gradient</CTA>
+<CTA background="dark" title="Dark">Dark mode</CTA>
+<CTA background="image" backgroundImage="/cta-bg.jpg" title="Image">With background</CTA>
+```
+
+## Size Variants
+
+```mdx
+<CTA size="sm" title="Small">Compact padding</CTA>
+<CTA size="md" title="Medium">Standard padding (default)</CTA>
+<CTA size="lg" title="Large">Generous padding</CTA>
+```
