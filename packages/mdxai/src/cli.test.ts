@@ -194,7 +194,7 @@ describe('MCP Server', () => {
   let db: Database
 
   beforeEach(async () => {
-    db = await createSqliteDatabase({ filename: ':memory:' })
+    db = await createSqliteDatabase({ url: ':memory:' })
   })
 
   afterEach(async () => {
@@ -220,7 +220,7 @@ describe('Database Operations (used by MCP tools)', () => {
   let db: Database
 
   beforeEach(async () => {
-    db = await createSqliteDatabase({ filename: ':memory:' })
+    db = await createSqliteDatabase({ url: ':memory:' })
   })
 
   afterEach(async () => {
@@ -228,57 +228,56 @@ describe('Database Operations (used by MCP tools)', () => {
   })
 
   it('should list documents', async () => {
-    await db.set('doc1', { data: { title: 'Doc 1' }, content: '# Doc 1' })
-    await db.set('doc2', { data: { title: 'Doc 2' }, content: '# Doc 2' })
+    await db.set('https://test.example.com/Doc/doc1', { data: { title: 'Doc 1' }, content: '# Doc 1' })
+    await db.set('https://test.example.com/Doc/doc2', { data: { title: 'Doc 2' }, content: '# Doc 2' })
 
     const result = await db.list({})
 
-    expect(result.documents).toHaveLength(2)
-    expect(result.documents.map((d) => d.id)).toContain('doc1')
-    expect(result.documents.map((d) => d.id)).toContain('doc2')
+    expect(result).toHaveLength(2)
+    expect(result.map((d) => d.id)).toContain('doc1')
+    expect(result.map((d) => d.id)).toContain('doc2')
   })
 
   it('should set and get document', async () => {
-    await db.set('new-doc', {
-      type: 'Article',
-      data: { title: 'New Document' },
+    await db.set('https://test.example.com/Article/new-doc', {
+      title: 'New Document',
       content: '# New Document\n\nContent here.',
     })
 
-    const doc = await db.get('new-doc')
+    const doc = await db.get('https://test.example.com/Article/new-doc')
     expect(doc).not.toBeNull()
     expect(doc?.type).toBe('Article')
     expect(doc?.data.title).toBe('New Document')
   })
 
   it('should search documents', async () => {
-    await db.set('search-1', {
-      data: { title: 'Hello World' },
+    await db.set('https://test.example.com/Doc/search-1', {
+      title: 'Hello World',
       content: '# Hello World\n\nThis is searchable content.',
     })
-    await db.set('search-2', {
-      data: { title: 'Goodbye' },
+    await db.set('https://test.example.com/Doc/search-2', {
+      title: 'Goodbye',
       content: '# Goodbye\n\nDifferent content.',
     })
 
     const result = await db.search({ query: 'searchable' })
 
-    expect(result.documents.length).toBeGreaterThan(0)
-    expect(result.documents.map((d) => d.id)).toContain('search-1')
+    expect(result.length).toBeGreaterThan(0)
+    expect(result.map((d) => d.id)).toContain('search-1')
   })
 
   it('should delete document', async () => {
-    await db.set('to-delete', { data: {}, content: '# Delete me' })
+    await db.set('https://test.example.com/Doc/to-delete', { content: '# Delete me' })
 
-    const result = await db.delete('to-delete')
-    expect(result.deleted).toBe(true)
+    const deleted = await db.delete('https://test.example.com/Doc/to-delete')
+    expect(deleted).toBe(true)
 
-    const doc = await db.get('to-delete')
+    const doc = await db.get('https://test.example.com/Doc/to-delete')
     expect(doc).toBeNull()
   })
 
   it('should return null for non-existent document', async () => {
-    const doc = await db.get('non-existent')
+    const doc = await db.get('https://test.example.com/Doc/non-existent')
     expect(doc).toBeNull()
   })
 })

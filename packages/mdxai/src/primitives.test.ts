@@ -75,8 +75,8 @@ describe('AI Experiments', () => {
     expect(createFileBackend).toBeDefined()
   })
 
-  it('should work with cartesian product', () => {
-    const { cartesian } = require('./index.js')
+  it('should work with cartesian product', async () => {
+    const { cartesian } = await import('./index.js')
 
     const result = cartesian({ a: [1, 2], b: ['x', 'y'] })
     expect(result).toHaveLength(4)
@@ -330,26 +330,26 @@ describe('Language Models', () => {
     expect(MODEL_ALIASES).toBeDefined()
   })
 
-  it('should list models', () => {
-    const { listModels } = require('./index.js')
+  it('should list models', async () => {
+    const { listModels } = await import('./index.js')
     const models = listModels()
     expect(Array.isArray(models)).toBe(true)
     expect(models.length).toBeGreaterThan(0)
   })
 
-  it('should search models', () => {
-    const { searchModels } = require('./index.js')
+  it('should search models', async () => {
+    const { searchModels } = await import('./index.js')
     const claudeModels = searchModels('claude')
     expect(Array.isArray(claudeModels)).toBe(true)
     expect(claudeModels.length).toBeGreaterThan(0)
     expect(claudeModels.every((m) => m.id.toLowerCase().includes('claude'))).toBe(true)
   })
 
-  it('should resolve model aliases', () => {
-    const { resolveModel } = require('./index.js')
+  it('should resolve model aliases', async () => {
+    const { resolveModel } = await import('./index.js')
     const resolved = resolveModel('sonnet')
     expect(resolved).toBeDefined()
-    expect(resolved.id).toContain('claude')
+    expect(resolved).toContain('claude')
   })
 })
 
@@ -365,8 +365,8 @@ describe('Helper Factories', () => {
     expect(createModelContext).toBeDefined()
   })
 
-  it('should create experiment context', () => {
-    const { createExperimentContext } = require('./index.js')
+  it('should create experiment context', async () => {
+    const { createExperimentContext } = await import('./index.js')
     const ctx = createExperimentContext({ name: 'test' })
 
     expect(ctx.Experiment).toBeDefined()
@@ -375,8 +375,8 @@ describe('Helper Factories', () => {
     expect(ctx.cartesian).toBeDefined()
   })
 
-  it('should create model context', () => {
-    const { createModelContext } = require('./index.js')
+  it('should create model context', async () => {
+    const { createModelContext } = await import('./index.js')
     const ctx = createModelContext()
 
     expect(ctx.model).toBeDefined()
@@ -385,8 +385,8 @@ describe('Helper Factories', () => {
     expect(ctx.resolve).toBeDefined()
   })
 
-  it('should use model context to search models', () => {
-    const { createModelContext } = require('./index.js')
+  it('should use model context to search models', async () => {
+    const { createModelContext } = await import('./index.js')
     const ctx = createModelContext()
 
     const models = ctx.list()
