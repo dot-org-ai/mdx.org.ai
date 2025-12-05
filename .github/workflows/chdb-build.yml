@@ -52,6 +52,8 @@ jobs:
             ccache \
             git
           pip3 install setuptools
+          # Verify ccache is installed and in PATH
+          which ccache && ccache --version
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-19 100
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-19 100
           sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-19 100
@@ -71,6 +73,13 @@ jobs:
           cd /tmp/chdb
           export CC=clang-19
           export CXX=clang++-19
+          # Configure ccache for clang
+          ccache --set-config=cache_dir=/tmp/ccache
+          ccache --set-config=max_size=5G
+          export CCACHE_DIR=/tmp/ccache
+          export PATH="/usr/lib/ccache:$PATH"
+          # Create ccache symlinks if needed
+          sudo ln -sf /usr/bin/ccache /usr/local/bin/ccache || true
           make buildlib
         timeout-minutes: 90
 
@@ -136,6 +145,9 @@ jobs:
 
   build-macos-arm64:
     runs-on: macos-14  # Apple Silicon
+    env:
+      # Set PATH for all steps in this job (GNU tools needed by cmake)
+      PATH: /opt/homebrew/opt/llvm@19/bin:/opt/homebrew/opt/grep/libexec/gnubin:/opt/homebrew/opt/findutils/libexec/gnubin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
     steps:
       - uses: actions/checkout@v4
 
@@ -148,8 +160,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cmake ninja llvm@19 findutils grep
-          pip3 install --break-system-packages setuptools || pip3 install setuptools
+          brew install cmake ninja llvm@19 findutils grep python-setuptools
+          # Verify GNU find is available
+          gfind --version || find --version
+          # Install setuptools for Python
+          python3 -m pip install --break-system-packages setuptools || pip3 install setuptools || true
           # Symlink llvm@19 for chdb build script
           brew link llvm@19 --force || true
 
@@ -166,7 +181,6 @@ jobs:
       - name: Build chdb core
         run: |
           cd /tmp/chdb
-          export PATH="/opt/homebrew/opt/llvm@19/bin:/opt/homebrew/opt/grep/libexec/gnubin:/opt/homebrew/opt/findutils/libexec/gnubin:$PATH"
           export CC=/opt/homebrew/opt/llvm@19/bin/clang
           export CXX=/opt/homebrew/opt/llvm@19/bin/clang++
           make buildlib
@@ -190,6 +204,9 @@ jobs:
 
   build-macos-x64:
     runs-on: macos-13  # Intel
+    env:
+      # Set PATH for all steps in this job (GNU tools needed by cmake)
+      PATH: /usr/local/opt/llvm@19/bin:/usr/local/opt/grep/libexec/gnubin:/usr/local/opt/findutils/libexec/gnubin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
     steps:
       - uses: actions/checkout@v4
 
@@ -202,8 +219,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cmake ninja llvm@19 findutils grep
-          pip3 install --break-system-packages setuptools || pip3 install setuptools
+          brew install cmake ninja llvm@19 findutils grep python-setuptools
+          # Verify GNU find is available
+          gfind --version || find --version
+          # Install setuptools for Python
+          python3 -m pip install --break-system-packages setuptools || pip3 install setuptools || true
           brew link llvm@19 --force || true
 
       - name: Clone chdb (with vector support)
@@ -219,7 +239,6 @@ jobs:
       - name: Build chdb core
         run: |
           cd /tmp/chdb
-          export PATH="/usr/local/opt/llvm@19/bin:/usr/local/opt/grep/libexec/gnubin:/usr/local/opt/findutils/libexec/gnubin:$PATH"
           export CC=/usr/local/opt/llvm@19/bin/clang
           export CXX=/usr/local/opt/llvm@19/bin/clang++
           make buildlib
