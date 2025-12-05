@@ -1,0 +1,140 @@
+---
+$type: Site
+$id: https://headless.ly
+name: headless.ly
+title: Headless CMS - Content is Code
+description: A headless CMS powered by MDX and AI. Version-controlled content with AI superpowers.
+layout: lumen
+theme:
+  accentColor: violet
+---
+
+import { LumenLayout } from '@mdxui/shadcnblocks/templates'
+
+<LumenLayout
+  header={{
+    brand: { name: 'headless.ly', href: '/' },
+    navigation: [
+      { label: 'Content', href: '/content' },
+      { label: 'Docs', href: '/docs' },
+      { label: 'API', href: '/api' },
+      { label: 'MCP', href: '/mcp' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'GitHub', href: 'https://github.com/mdx-org/headless.ly', variant: 'ghost' },
+      { label: 'Start Free', href: '/signup', variant: 'primary' },
+    ],
+  }}
+  hero={{
+    eyebrow: 'Git-Based CMS',
+    headline: 'Content is Code',
+    description: 'Store content in MDX files. Version with Git. Generate with AI. Deploy anywhere. The CMS for developers who want control.',
+    primaryAction: { label: 'Get Started', href: '/docs/quickstart' },
+    secondaryAction: { label: 'View Demo', href: '/demo' },
+  }}
+  features={{
+    headline: 'CMS Done Differently',
+    description: 'All the power of a CMS, none of the lock-in.',
+    features: [
+      {
+        title: 'Git-Native',
+        description: 'Content lives in your repo. Branch, PR, merge. Full version history.',
+      },
+      {
+        title: 'MDX-Powered',
+        description: 'Rich content with components. Markdown simplicity, React flexibility.',
+      },
+      {
+        title: 'AI Generation',
+        description: 'Generate drafts, improve SEO, translate content. AI as your writing assistant.',
+      },
+      {
+        title: 'Type-Safe',
+        description: 'Define content types in TypeScript. Validate at build time.',
+      },
+      {
+        title: 'Instant Preview',
+        description: 'See changes live as you edit. No build step for previews.',
+      },
+      {
+        title: 'Framework Agnostic',
+        description: 'Works with Next.js, Astro, Remix, or any framework.',
+      },
+    ],
+  }}
+  testimonials={{
+    headline: 'Trusted by Content Teams',
+    testimonials: [
+      {
+        quote: 'We finally have a CMS that developers and writers both love. Git for versioning, AI for writing.',
+        author: {
+          name: 'Emma Watson',
+          title: 'Content Lead',
+          company: 'TechBlog',
+        },
+      },
+      {
+        quote: 'Migrated from Contentful and never looked back. Our content is portable and we own it.',
+        author: {
+          name: 'Ryan Park',
+          title: 'CTO',
+          company: 'MediaCo',
+        },
+      },
+    ],
+  }}
+  pricing={{
+    headline: 'Start Free, Scale Later',
+    description: 'Free tier for personal projects. Pro for teams.',
+    tiers: [
+      {
+        name: 'Free',
+        price: { monthly: '$0' },
+        features: ['1 project', 'Unlimited content', 'Git storage', 'Community support'],
+        cta: 'Start Free',
+      },
+      {
+        name: 'Pro',
+        price: { monthly: '$29' },
+        features: ['Unlimited projects', 'AI features', 'Team collaboration', 'Priority support', 'Analytics'],
+        cta: 'Go Pro',
+        featured: true,
+      },
+      {
+        name: 'Enterprise',
+        price: { monthly: 'Custom' },
+        features: ['Custom deployment', 'SSO', 'Dedicated support', 'SLA', 'Custom AI models'],
+        cta: 'Contact Sales',
+      },
+    ],
+  }}
+  footer={{
+    brand: {
+      name: 'headless.ly',
+      description: 'Content management for developers.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Documentation', href: '/docs' },
+          { text: 'Content Types', href: '/content' },
+          { text: 'API', href: '/api' },
+          { text: 'Pricing', href: '#pricing' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'GitHub', href: 'https://github.com/mdx-org/headless.ly' },
+          { text: 'Discord', href: '/discord' },
+          { text: 'Blog', href: '/blog' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 headless.ly',
+    },
+  }}
+/>

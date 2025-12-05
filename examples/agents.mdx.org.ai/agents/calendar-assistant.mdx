@@ -1,0 +1,101 @@
+---
+$type: Agent
+$id: https://agents.mdx.org.ai/agents/calendar-assistant
+name: Calendar Assistant
+description: An AI agent that manages your calendar—scheduling meetings, finding available slots, sending reminders, and coordinating across time zones.
+author:
+  name: MDX Team
+  slug: mdx-team
+version: 1.2.0
+downloads: 45230
+stars: 892
+capabilities:
+  - Schedule meetings with natural language
+  - Find available time slots across attendees
+  - Send calendar invites and reminders
+  - Handle time zone conversions
+  - Reschedule and cancel meetings
+  - Summarize upcoming schedule
+tools:
+  - calendar_read
+  - calendar_write
+  - email_send
+  - contacts_read
+models:
+  - claude-3-opus
+  - claude-3-sonnet
+  - gpt-4
+  - gpt-4-turbo
+license: MIT
+repository: https://github.com/mdx-org/agents/calendar-assistant
+homepage: https://agents.mdx.org.ai/agents/calendar-assistant
+---
+
+# Calendar Assistant
+
+The Calendar Assistant agent handles all your scheduling needs using natural language. Tell it "Schedule a meeting with Sarah next week" and it figures out the rest.
+
+## Usage
+
+```typescript
+import { CalendarAssistant } from '@agents/calendar-assistant'
+
+const calendar = new CalendarAssistant({
+  model: 'claude-3-sonnet',
+  calendar: googleCalendar,
+  contacts: googleContacts,
+})
+
+// Natural language scheduling
+await calendar.run('Schedule a 30-minute call with the engineering team tomorrow afternoon')
+
+// Find available slots
+const slots = await calendar.findSlots({
+  attendees: ['sarah@company.com', 'john@company.com'],
+  duration: 60,
+  preferredTimes: ['morning'],
+})
+
+// Get schedule summary
+const summary = await calendar.summarize({ days: 7 })
+```
+
+## Configuration
+
+```yaml
+# agent.yaml
+name: calendar-assistant
+model: claude-3-sonnet
+tools:
+  - calendar_read
+  - calendar_write
+  - email_send
+settings:
+  timezone: America/New_York
+  workingHours:
+    start: "09:00"
+    end: "17:00"
+  bufferTime: 15  # minutes between meetings
+```
+
+## Example Interactions
+
+**User:** "Find time for a team standup next week, 15 minutes, mornings only"
+
+**Agent:** "I found 3 available slots for a 15-minute team standup:
+- Monday 9:30 AM - Everyone available
+- Wednesday 10:00 AM - Everyone available
+- Friday 9:00 AM - Sarah has a conflict, but others available
+
+Would you like me to schedule any of these?"
+
+**User:** "Monday works. Send invites."
+
+**Agent:** "Done! I've scheduled 'Team Standup' for Monday at 9:30 AM and sent calendar invites to all team members."
+
+## Integrations
+
+- Google Calendar
+- Microsoft Outlook
+- Apple Calendar (via CalDAV)
+- Calendly (for external scheduling)

@@ -1,0 +1,154 @@
+---
+$type: LandingPage
+$id: https://example.com.ai
+name: example.com.ai
+title: The Template for AI-Powered Websites
+description: Fork, customize, ship. The production-ready starter template for building with MDX.
+layout: dusk
+---
+
+import { DuskLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'example.com.ai',
+  title: 'The Template for AI-Powered Websites',
+  description: 'Fork, customize, ship. The production-ready starter template for building with MDX.',
+  layout: 'dusk',
+
+  gradient: 'slate-blue' as const,
+  glow: false,
+
+  header: {
+    brand: { name: 'example.com.ai', href: '/' },
+    navigation: [
+      { label: 'Demo', href: '/demo' },
+      { label: 'Features', href: '#features' },
+      { label: 'Docs', href: '/docs' },
+    ],
+    actions: [
+      { label: 'View Demo', href: '/demo', variant: 'ghost' as const },
+      { label: 'Fork Template', href: 'https://github.com/mdx-org/example.com.ai', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    announcement: { text: 'Now with Claude integration pre-configured', href: '/blog/claude-integration' },
+    headline: 'Skip the Boilerplate. Build Features.',
+    description: 'Every new AI project starts with the same setup—auth, API routes, AI integration, deployment. We packaged our best practices into a template. Fork it, customize it, ship in days instead of weeks.',
+    primaryAction: { label: 'Fork the Template', href: 'https://github.com/mdx-org/example.com.ai' },
+    secondaryAction: { label: 'View Live Demo', href: '/demo' },
+    trustedBy: [
+      { name: 'Vercel' },
+      { name: 'Cloudflare' },
+      { name: 'Netlify' },
+    ],
+  },
+
+  features: {
+    headline: 'Everything Pre-Built',
+    description: 'Production patterns from day one.',
+    features: [
+      {
+        title: 'AI Chat Widget',
+        description: 'Claude integration ready to go. Streaming responses, tool calls, context management—all included.',
+      },
+      {
+        title: 'MCP Server Setup',
+        description: 'Model Context Protocol server configured. Define tools, expose to AI, handle requests.',
+      },
+      {
+        title: 'Auth Ready',
+        description: 'Authentication scaffolded. Swap in your provider—Clerk, Auth0, NextAuth—or use the built-in solution.',
+      },
+      {
+        title: 'Content Types',
+        description: 'Common entity types defined—User, Post, Comment, etc. Extend with your own.',
+      },
+      {
+        title: 'API Routes',
+        description: 'REST and GraphQL patterns included. Type-safe endpoints with Zod validation.',
+      },
+      {
+        title: 'One-Click Deploy',
+        description: 'Deploy to Cloudflare Workers, Vercel, or any platform. Environment configs included.',
+      },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Developers Ship Faster',
+    testimonials: [
+      {
+        quote: 'I used to spend the first week on setup. Now I fork example.com.ai and start building features immediately.',
+        author: {
+          name: 'Lisa Park',
+          title: 'Full-Stack Developer',
+          company: 'Indie Hacker',
+        },
+      },
+      {
+        quote: 'We use this as our internal starter for every AI project. Consistent architecture across the team.',
+        author: {
+          name: 'Marcus Johnson',
+          title: 'Engineering Manager',
+          company: 'TechCorp',
+        },
+      },
+    ],
+  },
+
+  pricing: {
+    headline: 'Open Source & Free',
+    description: 'MIT licensed. Use for anything.',
+    tiers: [
+      {
+        name: 'Template',
+        price: { monthly: '$0' },
+        features: ['Full source code', 'MIT licensed', 'Community support', 'All features'],
+        cta: 'Fork Now',
+      },
+      {
+        name: 'Support',
+        price: { monthly: '$49' },
+        features: ['Priority support', 'Architecture review', 'Discord access', 'Feature requests'],
+        cta: 'Get Support',
+        featured: true,
+      },
+    ],
+  },
+
+  cta: {
+    headline: 'Start Building Today',
+    description: 'The foundation you wish you had.',
+    action: { label: 'Fork the Template', href: 'https://github.com/mdx-org/example.com.ai' },
+  },
+
+  footer: {
+    brand: {
+      name: 'example.com.ai',
+      description: 'The template for AI-powered websites.',
+    },
+    columns: [
+      {
+        title: 'Template',
+        links: [
+          { text: 'Features', href: '#features' },
+          { text: 'Demo', href: '/demo' },
+          { text: 'Documentation', href: '/docs' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'GitHub', href: 'https://github.com/mdx-org/example.com.ai' },
+          { text: 'Discord', href: '/discord' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 example.com.ai • MIT License',
+    },
+  },
+}
+
+<DuskLayout {...siteData} />

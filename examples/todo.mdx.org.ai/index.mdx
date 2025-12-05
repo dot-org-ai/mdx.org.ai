@@ -1,0 +1,81 @@
+---
+$type: LandingPage
+$id: https://todo.mdx.org.ai
+name: todo.mdx.org.ai
+title: Learn MDX by Building
+description: A complete, working AI-powered todo app built entirely in MDX. Study the code, run it yourself, make it yours.
+layout: mist
+---
+
+import { MistLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'todo.mdx.org.ai',
+  title: 'Learn MDX by Building',
+  description: 'A complete, working AI-powered todo app built entirely in MDX. Study the code, run it yourself, make it yours.',
+  layout: 'mist',
+
+  accentColor: 'violet' as const,
+  warmth: 'neutral' as const,
+
+  header: {
+    brand: { name: 'todo.mdx', href: '/' },
+    navigation: [
+      { label: 'Try It', href: '/app' },
+      { label: 'Code', href: '/code' },
+      { label: 'Tutorial', href: '/tutorial' },
+    ],
+    actions: [
+      { label: 'View Code', href: 'https://github.com/mdx-org/todo.mdx', variant: 'ghost' as const },
+      { label: 'Try the App', href: '/app', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    headline: 'A Complete Example, Not a Toy',
+    description: 'Documentation teaches concepts. This teaches patterns. A fully-functional, AI-enhanced todo application built entirely in MDX—every line documented, every pattern explained. Clone it, run it, learn from it, extend it.',
+    primaryAction: { label: 'Try the App', href: '/app' },
+    secondaryAction: { label: 'Read the Tutorial', href: '/tutorial' },
+  },
+
+  features: {
+    headline: 'Everything You Need to Learn',
+    description: 'Real patterns from a real application.',
+    features: [
+      { title: 'Core MDX Patterns', description: 'Components, state management, event handling, styling—all demonstrated in context.' },
+      { title: 'AI Integration', description: 'Natural language task creation, smart categorization, priority suggestions—see how AI tools work.' },
+      { title: 'Database Layer', description: 'Using @mdxdb for persistence. Local storage, SQLite, Postgres—swap as needed.' },
+      { title: 'Type Safety', description: 'Full TypeScript throughout. Types, interfaces, and Zod validation in practice.' },
+      { title: 'Testing Patterns', description: 'Unit tests, integration tests, E2E tests—all in MDX format.' },
+      { title: 'Deployment', description: 'One-command deploy to Cloudflare Workers. Production patterns included.' },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Developers Learn Faster',
+    testimonials: [
+      { quote: 'I learned more from studying this todo app than from hours of documentation. Seeing patterns in context makes all the difference.', author: { name: 'Jamie Chen', title: 'Full-Stack Developer' } },
+      { quote: 'I cloned it, ran it, broke it, fixed it. That\'s how I learned MDX. The AI integration patterns were exactly what I needed.', author: { name: 'Sam Patel', title: 'AI Developer' } },
+    ],
+  },
+
+  pricing: {
+    headline: 'Completely Open Source',
+    description: 'MIT licensed. Free forever. Contribute back if you\'d like.',
+    tiers: [
+      { name: 'Free', price: { monthly: '$0' }, features: ['Full source code', 'All documentation', 'MIT licensed', 'Community support'], cta: 'Clone Repo' },
+      { name: 'Sponsor', price: { monthly: '$9' }, features: ['Support development', 'Early access to updates', 'Discord access', 'Recognition'], cta: 'Become a Sponsor', featured: true },
+    ],
+  },
+
+  footer: {
+    brand: { name: 'todo.mdx.org.ai', description: 'Learn MDX by building.' },
+    columns: [
+      { title: 'Learn', links: [{ text: 'Tutorial', href: '/tutorial' }, { text: 'Code Walkthrough', href: '/code' }, { text: 'API Reference', href: '/api' }] },
+      { title: 'Resources', links: [{ text: 'GitHub', href: 'https://github.com/mdx-org/todo.mdx' }, { text: 'Discord', href: '/discord' }] },
+    ],
+    legal: { copyright: '© 2024 todo.mdx.org.ai • MIT License' },
+  },
+}
+
+<MistLayout {...siteData} />

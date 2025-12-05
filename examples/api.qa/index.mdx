@@ -1,0 +1,161 @@
+---
+$type: LandingPage
+$id: https://api.qa
+name: api.qa
+title: AI-Powered API Testing
+description: Test everything. Write nothing. AI generates comprehensive tests from your API spec.
+layout: dusk
+---
+
+import { DuskLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'api.qa',
+  title: 'AI-Powered API Testing',
+  description: 'Test everything. Write nothing. AI generates comprehensive tests from your API spec.',
+  layout: 'dusk',
+
+  gradient: 'green-cyan' as const,
+  glow: true,
+
+  header: {
+    brand: { name: 'api.qa', href: '/' },
+    navigation: [
+      { label: 'Features', href: '#features' },
+      { label: 'Docs', href: '/docs' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'Login', href: '/login', variant: 'ghost' as const },
+      { label: 'Test Your API', href: '/test', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    announcement: { text: '100% endpoint coverage, 0% test maintenance', href: '/blog/ai-testing' },
+    headline: 'Ship with Confidence',
+    description: 'Stop writing API tests manually. Point API.qa at your endpoints—AI analyzes your spec, generates comprehensive tests, and catches bugs before users do. Coverage without the effort.',
+    primaryAction: { label: 'Test Your API Now', href: '/test' },
+    secondaryAction: { label: 'See Example Tests', href: '/examples' },
+    trustedBy: [
+      { name: 'Stripe' },
+      { name: 'Twilio' },
+      { name: 'Plaid' },
+    ],
+  },
+
+  features: {
+    headline: 'Tests That Write Themselves',
+    description: 'Connect your API. Get coverage. Sleep better.',
+    features: [
+      {
+        title: 'Auto-Discovery',
+        description: 'Point at your API or OpenAPI spec. We find every endpoint, parameter, and response type.',
+      },
+      {
+        title: 'Smart Generation',
+        description: 'AI creates tests for happy paths, edge cases, error conditions, and authentication flows.',
+      },
+      {
+        title: 'Real-Time Monitoring',
+        description: 'Tests run on every deploy. Get alerted instantly when something breaks.',
+      },
+      {
+        title: 'Self-Updating',
+        description: 'API changed? Tests update automatically. No maintenance burden.',
+      },
+      {
+        title: 'CI Integration',
+        description: 'Works with GitHub Actions, GitLab CI, Jenkins, CircleCI. Block broken deploys.',
+      },
+      {
+        title: 'Coverage Reports',
+        description: 'See exactly what\'s tested. Identify gaps. Prove quality to stakeholders.',
+      },
+    ],
+  },
+
+  testimonials: {
+    headline: 'QA Teams Rejoice',
+    testimonials: [
+      {
+        quote: 'We had 30% API coverage. API.qa got us to 100% in an afternoon. Our deploy confidence transformed overnight.',
+        author: {
+          name: 'James Chen',
+          title: 'Backend Lead',
+          company: 'FinTech Co',
+        },
+      },
+      {
+        quote: 'Manual test maintenance was killing us. Now tests update themselves. We haven\'t touched them in months.',
+        author: {
+          name: 'Priya Patel',
+          title: 'QA Manager',
+          company: 'SaaSify',
+        },
+      },
+    ],
+  },
+
+  pricing: {
+    headline: 'Start Testing Free',
+    description: 'Full features. Unlimited endpoints. Pay when you scale.',
+    tiers: [
+      {
+        name: 'Free',
+        price: { monthly: '$0' },
+        features: ['1 API', '50 endpoints', 'Daily test runs', 'Basic reports'],
+        cta: 'Start Free',
+      },
+      {
+        name: 'Pro',
+        price: { monthly: '$49' },
+        features: ['5 APIs', 'Unlimited endpoints', 'Continuous testing', 'CI integration', 'Slack alerts'],
+        cta: 'Go Pro',
+        featured: true,
+      },
+      {
+        name: 'Enterprise',
+        price: { monthly: '$199' },
+        features: ['Unlimited APIs', 'Custom test logic', 'SSO', 'On-prem option', 'Dedicated support'],
+        cta: 'Contact Sales',
+      },
+    ],
+  },
+
+  cta: {
+    headline: 'Stop Writing Tests',
+    description: 'AI catches the bugs. You build the features.',
+    action: { label: 'Test Your API', href: '/test' },
+  },
+
+  footer: {
+    brand: {
+      name: 'api.qa',
+      description: 'AI-powered API testing.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Features', href: '#features' },
+          { text: 'Pricing', href: '#pricing' },
+          { text: 'Documentation', href: '/docs' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'Blog', href: '/blog' },
+          { text: 'Examples', href: '/examples' },
+          { text: 'Status', href: '/status' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 api.qa',
+    },
+  },
+}
+
+<DuskLayout {...siteData} />

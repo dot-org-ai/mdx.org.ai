@@ -1,0 +1,93 @@
+---
+$type: Post
+title: "MDXLD: The Format for AI-Native Content"
+date: "2024-12-10"
+author: tom
+description: How MDXLD combines structured data, content, and components for optimal AI discoverability.
+tags:
+  - structured-data
+  - llm
+  - ai-native
+---
+
+MDXLD (MDX Linked Data) is a document format designed from the ground up for AI consumption. It combines the best of structured data, readable content, and executable components.
+
+## The Three Layers
+
+### 1. Structured Data (YAML-LD Frontmatter)
+
+```yaml
+---
+$type: BlogPost
+$id: https://blogg.ng/posts/the-mdxld-format
+$context: https://schema.org
+title: "MDXLD: The Format for AI-Native Content"
+author:
+  $type: Person
+  name: Claude
+datePublished: 2024-12-10
+---
+```
+
+This layer is pure machine-readable data using JSON-LD semantics in YAML syntax.
+
+### 2. Content (Markdown)
+
+The body is standard Markdown—readable by humans and parseable by machines:
+
+```markdown
+## Clear Section Headings
+
+Paragraph content that explains concepts in natural language.
+
+- Bullet points for key information
+- Structured but human-readable
+```
+
+### 3. Components (JSX)
+
+Dynamic data rendering via React components:
+
+```jsx
+<Posts where={{ author: "claude" }} />
+<RelatedContent tags={["ai-native", "structured-data"]} />
+```
+
+## Why MDXLD for AI?
+
+### Machine-Readable by Default
+
+Every MDXLD document can be parsed into structured data:
+
+```typescript
+const doc = parse(mdxContent)
+// { type: 'BlogPost', data: {...}, content: '...' }
+```
+
+### Schema-Validated
+
+Types can be validated against schemas:
+
+```yaml
+$type: BlogPost
+$schema: https://schema.org/BlogPosting
+```
+
+### URL-Centric
+
+Every entity has a URL identity, enabling linked data traversal.
+
+### Format-Agnostic Output
+
+The same MDXLD source renders to HTML, JSON-LD, Markdown, or any target format.
+
+## The AI-First CMS
+
+MDXLD enables content management systems where:
+
+- Content is queryable like a database
+- Relationships are explicit and bidirectional
+- AI agents can traverse the entire content graph
+- Humans still edit readable Markdown
+
+Structure meets readability. That's MDXLD.

@@ -1,0 +1,145 @@
+---
+$type: Site
+$id: https://db.ht
+name: db.ht
+title: HyperText Database - Click Your Data
+description: A database you can browse. Every record is a URL. Every query is a link.
+layout: sonic
+theme:
+  accentColor: emerald
+---
+
+import { SonicLayout } from '@mdxui/shadcnblocks/templates'
+
+<SonicLayout
+  header={{
+    brand: { name: 'db.ht', href: '/' },
+    navigation: [
+      { label: 'Docs', href: '/docs' },
+      { label: 'API', href: '/api' },
+      { label: 'MCP', href: '/mcp' },
+      { label: 'Collections', href: '/collections' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'GitHub', href: 'https://github.com/mdx-org/db.ht', variant: 'ghost' },
+      { label: 'Start Free', href: '/signup', variant: 'primary' },
+    ],
+  }}
+  hero={{
+    eyebrow: 'Database + API + UI',
+    headline: 'A Database You Can Browse',
+    description: 'Every record has a URL. View data in your browser, query via API, or connect with Claude via MCP. Your data, accessible everywhere.',
+    primaryAction: { label: 'Get Started', href: '/docs/quickstart' },
+    secondaryAction: { label: 'Browse Demo', href: '/demo' },
+    stats: [
+      { value: '10M+', label: 'Records stored' },
+      { value: '<10ms', label: 'Query latency' },
+      { value: '99.99%', label: 'Uptime' },
+    ],
+  }}
+  features={{
+    headline: 'Data Made Accessible',
+    description: 'The simplest way to store and retrieve structured data.',
+    features: [
+      {
+        title: 'URL-First',
+        description: 'Every record has a permanent, shareable URL. db.ht/users/alice is a real link.',
+      },
+      {
+        title: 'Browser-Native',
+        description: 'Navigate your data like a website. Click through relationships. Bookmark records.',
+      },
+      {
+        title: 'Instant API',
+        description: 'Every collection is automatically an API. CRUD operations with zero config.',
+      },
+      {
+        title: 'MCP Ready',
+        description: 'Let Claude query your data directly. Natural language meets structured data.',
+      },
+      {
+        title: 'Vector Search',
+        description: 'Semantic search built-in. Find similar records without writing embeddings code.',
+      },
+      {
+        title: 'Edge-Native',
+        description: 'Deployed to 200+ locations. Your data is fast everywhere.',
+      },
+    ],
+  }}
+  testimonials={{
+    headline: 'Loved by Teams',
+    testimonials: [
+      {
+        quote: 'db.ht replaced our entire backend. We just define collections in MDX and everything works.',
+        author: {
+          name: 'Maya Patel',
+          title: 'Founder',
+          company: 'StartupXYZ',
+        },
+      },
+      {
+        quote: 'The MCP integration is game-changing. Our team queries production data via Claude Desktop.',
+        author: {
+          name: 'James Chen',
+          title: 'Engineering Lead',
+          company: 'DataFirst',
+        },
+      },
+    ],
+  }}
+  pricing={{
+    headline: 'Simple, Predictable Pricing',
+    description: 'No surprises. Pay for what you use.',
+    tiers: [
+      {
+        name: 'Free',
+        price: { monthly: '$0' },
+        features: ['1 database', '10K records', '100K reads/month', 'Community support'],
+        cta: 'Start Free',
+      },
+      {
+        name: 'Pro',
+        price: { monthly: '$29' },
+        features: ['Unlimited databases', '1M records', 'Unlimited reads', 'Vector search', 'Priority support'],
+        cta: 'Go Pro',
+        featured: true,
+      },
+      {
+        name: 'Scale',
+        price: { monthly: '$99' },
+        features: ['Everything in Pro', '10M records', 'Dedicated support', 'SLA', 'Custom domains'],
+        cta: 'Contact Sales',
+      },
+    ],
+  }}
+  footer={{
+    brand: {
+      name: 'db.ht',
+      description: 'The browsable database.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Documentation', href: '/docs' },
+          { text: 'API Reference', href: '/api' },
+          { text: 'MCP Server', href: '/mcp' },
+          { text: 'Collections', href: '/collections' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'GitHub', href: 'https://github.com/mdx-org/db.ht' },
+          { text: 'Discord', href: '/discord' },
+          { text: 'Status', href: '/status' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 db.ht. All rights reserved.',
+    },
+  }}
+/>

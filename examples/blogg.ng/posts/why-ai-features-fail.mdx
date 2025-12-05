@@ -1,0 +1,115 @@
+---
+$type: BlogPost
+$id: https://blogg.ng/posts/why-ai-features-fail
+title: Why Your AI Feature Will Fail
+slug: why-ai-features-fail
+description: Most AI features fail not because the AI doesn't work, but because the product wasn't designed for how AI actually behaves.
+author:
+  $ref: /authors/sarah-chen
+publishedAt: 2024-11-15T10:00:00Z
+updatedAt: 2024-11-15T10:00:00Z
+readingTime: 8 min
+tags:
+  - AI Product
+  - Product Strategy
+  - LLMs
+featured: true
+---
+
+# Why Your AI Feature Will Fail
+
+Most AI features fail not because the AI doesn't work, but because the product wasn't designed for how AI actually behaves.
+
+I've watched dozens of companies add AI features. Most fail. Not because the models are bad—GPT-4 is remarkably capable—but because product teams design as if AI were deterministic software.
+
+**AI is not software. AI is a new kind of collaborator.** Design accordingly.
+
+## The Three Failure Modes
+
+### 1. The "Magic Button" Fallacy
+
+You've seen this: a product adds an "AI Generate" button that produces... something. Users click, get output they don't understand, and never click again.
+
+The problem isn't the AI. The problem is treating AI as a vending machine when it's actually more like a brainstorming partner.
+
+**What works instead:**
+- Iterative refinement, not one-shot generation
+- Showing AI reasoning, not just output
+- Making regeneration easy and instructive
+- Setting clear expectations about what AI can and can't do
+
+### 2. The Accuracy Obsession
+
+"Our AI is only 85% accurate, we can't ship it."
+
+This misses that humans are also not 100% accurate. The question isn't "is the AI perfect?" but "is the AI + human workflow better than human alone?"
+
+A spellchecker that catches 85% of errors is incredibly valuable even though it's not perfect. Your AI feature can be too.
+
+**What works instead:**
+- Design for human oversight, not AI autonomy
+- Make errors recoverable and obvious
+- Position AI as suggestion, not decision
+- Measure human+AI performance, not AI alone
+
+### 3. The Latency Surprise
+
+LLM calls take 2-10 seconds. That's an eternity in software terms. Products that treat AI calls like database queries create terrible experiences.
+
+**What works instead:**
+- Streaming responses (show output as it generates)
+- Background processing with notifications
+- Caching and precomputation where possible
+- Clear loading states with useful information
+
+## The Design Patterns That Work
+
+### Pattern 1: Human-in-the-Loop by Default
+
+Never let AI take action without human confirmation for anything that matters. This seems obvious but requires discipline.
+
+```
+Good: "AI suggests archiving these 12 emails. [Review] [Approve All]"
+Bad:  "AI archived 12 emails for you!"
+```
+
+### Pattern 2: Visible Reasoning
+
+Show why AI made suggestions. This builds trust and helps users learn when to trust or override.
+
+```
+Good: "Summarized as action items because the email contained
+       'please' and 'by Friday'. [See original]"
+Bad:  "Summary: Action needed by Friday"
+```
+
+### Pattern 3: Graceful Degradation
+
+AI will fail sometimes. Design for it.
+
+```
+Good: "I couldn't understand this message well. Here's my best
+       guess, but you might want to read the original."
+Bad:  "Error: Unable to process request"
+```
+
+### Pattern 4: Progressive Disclosure
+
+Start with AI's best guess, let users drill down.
+
+```
+Good: Summary → Key points → Full context → Original
+Bad:  Wall of AI-generated text
+```
+
+## The Meta-Lesson
+
+The teams that succeed with AI share one trait: they prototype fast, ship small, and iterate based on real usage.
+
+AI features are impossible to evaluate in a design doc. You have to see how users actually interact with unpredictable output.
+
+Ship something small. Watch users. Iterate. That's the only reliable playbook.
+
+---
+
+*What AI features have you seen work well? What failed? I'd love to hear examples—reply or comment below.*

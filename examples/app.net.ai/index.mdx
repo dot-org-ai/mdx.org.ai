@@ -1,0 +1,169 @@
+---
+$type: LandingPage
+$id: https://app.net.ai
+name: app.net.ai
+title: Vibe Code Your App in Minutes
+description: Generate complete, deployable applications from natural language. Describe your vibe, get a running app.
+layout: dusk
+---
+
+import { DuskLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'app.net.ai',
+  title: 'Vibe Code Your App in Minutes',
+  description: 'Generate complete, deployable applications from natural language. Describe your vibe, get a running app.',
+  layout: 'dusk',
+
+  gradient: 'purple-blue' as const,
+  glow: true,
+
+  header: {
+    brand: { name: 'app.net.ai', href: '/' },
+    navigation: [
+      { label: 'Examples', href: '/examples' },
+      { label: 'Docs', href: '/docs' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'Login', href: '/login', variant: 'ghost' as const },
+      { label: 'Vibe Code Your App', href: '/create', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    announcement: { text: 'Now with database & auth built-in', href: '/blog/full-stack' },
+    headline: 'Vibe Code Your App in Minutes',
+    description: 'Stop planning. Start building. Describe what you want in plain English and watch AI generate a complete, working application. Frontend, backend, database, auth—all deployed and running.',
+    primaryAction: { label: 'Vibe Code Your App', href: '/create' },
+    secondaryAction: { label: 'See What Others Built', href: '/examples' },
+    trustedBy: [
+      { name: 'Y Combinator' },
+      { name: 'Indie Hackers' },
+      { name: 'Product Hunt' },
+    ],
+  },
+
+  features: {
+    headline: 'From Idea to App in One Conversation',
+    description: 'No frameworks to learn. No boilerplate to write. Just describe your vision.',
+    features: [
+      {
+        title: 'Natural Language Input',
+        description: 'Describe your app like you\'d tell a friend. "I want a todo app with categories and due dates" becomes a running application.',
+      },
+      {
+        title: 'Full-Stack Generation',
+        description: 'Frontend, backend, database, authentication—all generated and wired together. Real code, real infrastructure.',
+      },
+      {
+        title: 'Instant Deployment',
+        description: 'Your app is live the moment it\'s generated. Share a URL, get feedback, iterate immediately.',
+      },
+      {
+        title: 'Iterate by Talking',
+        description: '"Add user profiles" or "make the sidebar collapsible"—describe changes and watch them happen.',
+      },
+      {
+        title: 'Export Anytime',
+        description: 'Download the source code. Deploy to your own infrastructure. No lock-in, just acceleration.',
+      },
+      {
+        title: 'Free Domain Included',
+        description: 'Every app gets a yourapp.hq.com.ai domain free via builder.domains. Upgrade for custom domains.',
+      },
+    ],
+  },
+
+  testimonials: {
+    headline: 'From Idea to Launch',
+    testimonials: [
+      {
+        quote: 'I described my SaaS idea over lunch and had a working prototype by dinner. My investors couldn\'t believe it.',
+        author: {
+          name: 'Sarah Kim',
+          title: 'Founder',
+          company: 'LaunchFast',
+        },
+      },
+      {
+        quote: 'I\'m not a developer but I built and launched my own app. Vibe coding changed everything for me.',
+        author: {
+          name: 'Marcus Johnson',
+          title: 'Creator',
+          company: 'SoloBuilder',
+        },
+      },
+      {
+        quote: 'We use it to prototype client projects in hours instead of weeks. Game changer for our agency.',
+        author: {
+          name: 'Elena Rodriguez',
+          title: 'Head of Product',
+          company: 'DigitalCraft',
+        },
+      },
+    ],
+  },
+
+  pricing: {
+    headline: 'Start Free, Scale When Ready',
+    description: 'Your first app is free. Upgrade for unlimited generation and premium features.',
+    tiers: [
+      {
+        name: 'Free',
+        price: { monthly: '$0' },
+        features: ['1 app', 'builder.domains subdomain', 'Community support', 'Export code'],
+        cta: 'Get Started',
+      },
+      {
+        name: 'Pro',
+        price: { monthly: '$49' },
+        features: ['Unlimited apps', 'Custom domains', 'Priority generation', 'Advanced features', 'Email support'],
+        cta: 'Go Pro',
+        featured: true,
+      },
+      {
+        name: 'Team',
+        price: { monthly: '$149' },
+        features: ['Everything in Pro', 'Team collaboration', 'Version history', 'Analytics', 'Priority support'],
+        cta: 'Start Team Trial',
+      },
+    ],
+  },
+
+  cta: {
+    headline: 'What Will You Build?',
+    description: 'Your next app is one conversation away. Start vibe coding now.',
+    action: { label: 'Vibe Code Your App', href: '/create' },
+  },
+
+  footer: {
+    brand: {
+      name: 'app.net.ai',
+      description: 'Vibe code your app in minutes.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Examples', href: '/examples' },
+          { text: 'Pricing', href: '#pricing' },
+          { text: 'Documentation', href: '/docs' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'Blog', href: '/blog' },
+          { text: 'Discord', href: '/discord' },
+          { text: 'Twitter', href: 'https://twitter.com/appnetai' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 app.net.ai',
+    },
+  },
+}
+
+<DuskLayout {...siteData} />

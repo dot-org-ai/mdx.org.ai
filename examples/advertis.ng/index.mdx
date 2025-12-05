@@ -1,0 +1,148 @@
+---
+$type: Site
+$id: https://advertis.ng
+name: advertis.ng
+title: AI Advertising Platform - Ads That Optimize Themselves
+description: Generate, test, and optimize ads with AI. Multi-platform campaigns in minutes.
+layout: dusk
+theme:
+  gradient: orange-red
+  glow: true
+---
+
+import { DuskLayout } from '@mdxui/tailark/templates'
+
+<DuskLayout
+  gradient="orange-red"
+  glow={true}
+  header={{
+    brand: { name: 'advertis.ng', href: '/' },
+    navigation: [
+      { label: 'Docs', href: '/docs' },
+      { label: 'API', href: '/api' },
+      { label: 'MCP', href: '/mcp' },
+      { label: 'Templates', href: '/templates' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'Login', href: '/login', variant: 'ghost' },
+      { label: 'Start Free', href: '/signup', variant: 'primary' },
+    ],
+  }}
+  hero={{
+    announcement: { text: 'Now with Meta & Google Ads integration', href: '/blog/integrations' },
+    headline: 'Ads That Optimize Themselves',
+    description: 'AI generates copy, images, and targeting. A/B tests automatically. Optimizes spend in real-time. You just set the goal.',
+    primaryAction: { label: 'Start Campaign', href: '/signup' },
+    secondaryAction: { label: 'See Examples', href: '/templates' },
+    trustedBy: [
+      { name: 'Shopify' },
+      { name: 'BigCommerce' },
+      { name: 'WooCommerce' },
+    ],
+  }}
+  features={{
+    headline: 'AI-Powered Advertising',
+    description: 'From concept to conversion, AI handles it all.',
+    features: [
+      {
+        title: 'AI Copywriting',
+        description: 'Generate headlines, body copy, and CTAs. Claude writes, you approve.',
+      },
+      {
+        title: 'Image Generation',
+        description: 'DALL-E 3 creates visuals that convert. Product shots, lifestyle images, banners.',
+      },
+      {
+        title: 'Smart Targeting',
+        description: 'AI analyzes your best customers and finds more like them.',
+      },
+      {
+        title: 'Auto A/B Testing',
+        description: 'Continuously test variants. Budget flows to winners automatically.',
+      },
+      {
+        title: 'Multi-Platform',
+        description: 'Meta, Google, LinkedIn, TikTok. One campaign, everywhere.',
+      },
+      {
+        title: 'Real-Time Optimization',
+        description: 'AI adjusts bids, pauses underperformers, scales winners. 24/7.',
+      },
+    ],
+  }}
+  testimonials={{
+    headline: 'Results That Speak',
+    testimonials: [
+      {
+        quote: 'Our ROAS went from 2x to 5x in the first month. The AI found audiences we never would have.',
+        author: {
+          name: 'Jessica Mills',
+          title: 'CMO',
+          company: 'ShopDirect',
+        },
+      },
+      {
+        quote: 'I used to spend hours writing ad copy. Now I review AI drafts over coffee.',
+        author: {
+          name: 'Tom Bradley',
+          title: 'Marketing Director',
+          company: 'BrandCo',
+        },
+      },
+    ],
+  }}
+  pricing={{
+    headline: 'Pricing That Scales',
+    description: 'Pay based on ad spend. No hidden fees.',
+    tiers: [
+      {
+        name: 'Starter',
+        price: { monthly: '$99' },
+        features: ['Up to $5K ad spend', 'AI copywriting', 'Basic targeting', 'Email support'],
+        cta: 'Start Free Trial',
+      },
+      {
+        name: 'Growth',
+        price: { monthly: '$299' },
+        features: ['Up to $25K ad spend', 'Image generation', 'Advanced targeting', 'A/B testing', 'Priority support'],
+        cta: 'Start Free Trial',
+        featured: true,
+      },
+      {
+        name: 'Enterprise',
+        price: { monthly: 'Custom' },
+        features: ['Unlimited spend', 'Custom AI models', 'Dedicated manager', 'API access', 'SLA'],
+        cta: 'Contact Sales',
+      },
+    ],
+  }}
+  footer={{
+    brand: {
+      name: 'advertis.ng',
+      description: 'AI-powered advertising.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Features', href: '/features' },
+          { text: 'Templates', href: '/templates' },
+          { text: 'Pricing', href: '#pricing' },
+          { text: 'API', href: '/api' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'Documentation', href: '/docs' },
+          { text: 'Case Studies', href: '/cases' },
+          { text: 'Blog', href: '/blog' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 advertis.ng',
+    },
+  }}
+/>

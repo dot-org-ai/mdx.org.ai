@@ -1,0 +1,178 @@
+---
+$type: BlogPost
+$id: https://blogg.ng/posts/ai-augmented-engineer
+title: The AI-Augmented Engineer
+slug: ai-augmented-engineer
+description: After six months using AI coding tools extensively, here's how my development workflow has fundamentally changed—and what I wish I'd known earlier.
+author:
+  $ref: /authors/marcus-johnson
+publishedAt: 2024-11-10T10:00:00Z
+updatedAt: 2024-11-10T10:00:00Z
+readingTime: 12 min
+tags:
+  - AI Development
+  - Engineering
+  - Productivity
+featured: true
+---
+
+# The AI-Augmented Engineer
+
+Six months ago, I was skeptical. "AI coding tools are fancy autocomplete," I told my team. "Good for boilerplate, useless for real engineering."
+
+I was wrong. Dramatically wrong.
+
+After six months of intensive AI-assisted development—Claude, Copilot, Cursor, and a dozen other tools—my workflow has fundamentally transformed. I'm not just faster; I think differently about what engineering work should be.
+
+This is what I've learned.
+
+## The Productivity Multiplier Is Real (But Not How You'd Expect)
+
+Let me be specific about the gains:
+
+**What 10x'd:**
+- Writing tests (what used to take an hour takes 5 minutes)
+- Boilerplate and scaffolding
+- Documentation
+- Learning new codebases
+- Debugging obvious issues
+- Code refactoring
+
+**What 2-3x'd:**
+- Feature implementation
+- Code review preparation
+- Technical writing
+
+**What stayed the same:**
+- Architecture decisions
+- Debugging subtle issues
+- Performance optimization
+- Understanding requirements
+- Stakeholder communication
+
+The pattern: AI dramatically accelerates execution but barely touches judgment. My bottleneck shifted from "fingers on keyboard" to "brain deciding what to type."
+
+## The New Workflow
+
+Here's my actual daily workflow now:
+
+### Morning: Planning in Natural Language
+
+Before touching code, I write out what I'm trying to accomplish in a markdown file. Not for documentation—for Claude.
+
+```markdown
+## Goal
+Add user authentication to the API
+
+## Context
+- Using Hono framework
+- Postgres database via Drizzle
+- JWT tokens preferred
+- Need routes for signup, login, logout, refresh
+
+## Constraints
+- Must work with existing user table
+- Password hashing with bcrypt
+- Tokens expire in 1 hour
+```
+
+This document becomes my prompt. The thinking I do writing it is more valuable than the code Claude generates from it.
+
+### Implementation: Conversation, Not Generation
+
+I don't ask Claude to "write authentication." I have a conversation:
+
+1. "What's the standard approach for JWT auth in Hono?"
+2. "Show me the signup route with validation"
+3. "How should I handle token refresh?"
+4. "What's wrong with this approach? What am I missing?"
+
+Each response I review critically. I accept about 70%, modify 20%, reject 10%. The rejection rate tells me I'm engaging properly—if I accept everything, I'm not thinking hard enough.
+
+### Review: AI as Second Brain
+
+Before committing, I ask Claude to review my changes:
+
+"Review this diff for security issues, bugs, and improvements."
+
+It catches things I miss. Not always—AI has blind spots too. But the combination of my review plus AI review catches more than either alone.
+
+### Documentation: Finally Happens
+
+Documentation used to be what I did when I had time (never). Now it's automatic:
+
+"Document this function with JSDoc. Include examples."
+
+The psychological barrier is gone. Documentation happens because it costs almost nothing.
+
+## The Mindset Shifts
+
+### From Writer to Editor
+
+I used to think of myself as someone who writes code. Now I'm someone who directs and edits code.
+
+This felt like cheating at first. It's not. Editing is harder than writing. You need to understand what good code looks like, catch subtle bugs, know when the AI is confidently wrong.
+
+The skill has shifted from "can you write this?" to "can you recognize if this is right?"
+
+### From Memorization to Pattern Recognition
+
+I used to pride myself on knowing syntax and APIs by heart. That's useless now. Claude knows every API better than I ever could.
+
+What matters is recognizing patterns: "This looks like a cache invalidation problem." "This feels like we need eventual consistency." "This pattern will cause issues at scale."
+
+AI can implement any pattern. Knowing which pattern to apply is the human skill.
+
+### From Solo to Pair Programming (with a tireless partner)
+
+I pair program all day now—with Claude. It's like having a junior developer who knows every library but lacks judgment.
+
+The collaboration style matters. I'm most productive when I:
+- Explain my thinking out loud (in text)
+- Ask for alternatives before accepting suggestions
+- Challenge AI reasoning when it seems off
+- Use AI to stress-test my own ideas
+
+## The Dark Sides
+
+It's not all upside:
+
+### Context Window Frustration
+
+AI forgets what you told it. Constantly re-explaining context is maddening. I've built elaborate systems of markdown files just to maintain context.
+
+### Confidence Calibration
+
+AI is confidently wrong about 5-10% of the time. Learning to calibrate—when to trust, when to verify—took months. I still get burned occasionally.
+
+### Atrophy Risk
+
+Skills I don't use fade. I type slower than I used to. I remember fewer APIs. I'm betting that these skills won't matter. I might be wrong.
+
+### Dependency
+
+When AI is down, I feel slower. That vulnerability concerns me.
+
+## Advice for Engineers Just Starting
+
+1. **Start with tests.** AI is incredibly good at writing tests. This is the safest place to build trust.
+
+2. **Explain your thinking.** The more context you give, the better the output. Good prompts are like good commit messages.
+
+3. **Stay skeptical.** Review AI output like you'd review a junior developer's code. Be thorough.
+
+4. **Learn your tools.** Copilot, Claude, and Cursor all have different strengths. Know when to use each.
+
+5. **Don't hide it.** Using AI isn't cheating. The best engineers I know are the most aggressive AI adopters.
+
+## The Future We're Building
+
+I'm convinced AI-augmented development is the future. Engineers who refuse to adopt will be left behind—not because AI replaces them, but because AI-augmented engineers outcompete them.
+
+But I'm equally convinced that AI alone won't replace engineers. The judgment, taste, and human skills will remain valuable for a long time.
+
+The winning play is human+AI, not human vs. AI.
+
+---
+
+*What's your experience with AI coding tools? What patterns have worked for you? I'm @marcusjohnson on Twitter.*

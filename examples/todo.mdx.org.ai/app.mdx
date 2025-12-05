@@ -1,0 +1,193 @@
+---
+$type: Application
+$id: https://todo.mdx.org.ai/app
+name: AI Todo
+description: A smart todo application with AI-powered task management
+version: 1.0.0
+---
+
+import { useState, useCallback } from 'react'
+import { Card, CardHeader, CardTitle, CardContent } from '@mdxui/shadcn/card'
+import { Button } from '@mdxui/shadcn/button'
+import { Input } from '@mdxui/shadcn/input'
+import { Badge } from '@mdxui/shadcn/badge'
+import { Checkbox } from '@mdxui/shadcn/checkbox'
+
+export const priorities = {
+  high: { label: 'High', color: 'destructive' },
+  medium: { label: 'Medium', color: 'warning' },
+  low: { label: 'Low', color: 'secondary' },
+}
+
+export const categories = ['Work', 'Personal', 'Shopping', 'Health', 'Learning']
+
+export function TodoApp() {
+  const [todos, setTodos] = useState([
+    { id: 1, text: 'Review pull request for auth feature', completed: false, priority: 'high', category: 'Work', dueDate: '2024-12-06' },
+    { id: 2, text: 'Buy groceries for the week', completed: false, priority: 'medium', category: 'Shopping', dueDate: '2024-12-05' },
+    { id: 3, text: 'Read chapter 5 of AI book', completed: true, priority: 'low', category: 'Learning', dueDate: '2024-12-07' },
+    { id: 4, text: 'Schedule dentist appointment', completed: false, priority: 'medium', category: 'Health', dueDate: '2024-12-10' },
+  ])
+  const [input, setInput] = useState('')
+  const [filter, setFilter] = useState('all')
+
+  const addTodo = useCallback(() => {
+    if (!input.trim()) return
+    // AI would parse natural language here
+    const newTodo = {
+      id: Date.now(),
+      text: input,
+      completed: false,
+      priority: 'medium',
+      category: 'Personal',
+      dueDate: null,
+    }
+    setTodos(prev => [...prev, newTodo])
+    setInput('')
+  }, [input])
+
+  const toggleTodo = useCallback((id) => {
+    setTodos(prev => prev.map(todo =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ))
+  }, [])
+
+  const filteredTodos = todos.filter(todo => {
+    if (filter === 'active') return !todo.completed
+    if (filter === 'completed') return todo.completed
+    return true
+  })
+
+  return (
+    <div className="max-w-2xl mx-auto p-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span>AI Todo</span>
+            <Badge variant="outline">Beta</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* AI Input */}
+          <div className="flex gap-2">
+            <Input
+              placeholder="Add task in natural language... 'Buy milk tomorrow high priority'"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && addTodo()}
+              className="flex-1"
+            />
+            <Button onClick={addTodo}>Add</Button>
+          </div>
+
+          {/* Filters */}
+          <div className="flex gap-2">
+            {['all', 'active', 'completed'].map(f => (
+              <Button
+                key={f}
+                variant={filter === f ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter(f)}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </Button>
+            ))}
+          </div>
+
+          {/* Todo List */}
+          <div className="space-y-2">
+            {filteredTodos.map(todo => (
+              <div
+                key={todo.id}
+                className={`flex items-center gap-3 p-3 rounded-lg border ${
+                  todo.completed ? 'bg-muted opacity-60' : 'bg-card'
+                }`}
+              >
+                <Checkbox
+                  checked={todo.completed}
+                  onCheckedChange={() => toggleTodo(todo.id)}
+                />
+                <div className="flex-1">
+                  <p className={todo.completed ? 'line-through' : ''}>
+                    {todo.text}
+                  </p>
+                  <div className="flex gap-2 mt-1">
+                    <Badge variant={priorities[todo.priority].color} size="sm">
+                      {priorities[todo.priority].label}
+                    </Badge>
+                    <Badge variant="outline" size="sm">
+                      {todo.category}
+                    </Badge>
+                    {todo.dueDate && (
+                      <span className="text-xs text-muted-foreground">
+                        Due: {todo.dueDate}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Summary */}
+          <div className="text-sm text-muted-foreground border-t pt-4">
+            {todos.filter(t => !t.completed).length} tasks remaining
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+<TodoApp />
+
+---
+
+## How This App Works
+
+This todo application demonstrates key MDX patterns:
+
+### Natural Language Input
+The input field accepts natural language like:
+- "Buy milk tomorrow high priority"
+- "Call mom on Sunday"
+- "Review PR for work"
+
+AI parses the text to extract:
+- Task description
+- Due date
+- Priority level
+- Category
+
+### State Management
+Uses React's `useState` for local state. In production, you'd connect to:
+- `@mdxdb/sqlite` for local persistence
+- `@mdxdb/api` for cloud sync
+
+### AI Integration Points
+1. **Task Parsing** - Extract structured data from natural language
+2. **Priority Suggestion** - AI suggests priority based on keywords
+3. **Category Detection** - Auto-categorize based on content
+4. **Due Date Extraction** - Parse dates like "tomorrow", "next week"
+
+### Extending the App
+
+```typescript
+import { useAI } from '@mdxai/claude'
+
+// Add AI parsing to task creation
+const { parse } = useAI()
+
+const addTodo = async (input: string) => {
+  const parsed = await parse(input, {
+    schema: todoSchema,
+    prompt: 'Extract task, priority, category, and due date',
+  })
+
+  setTodos(prev => [...prev, { id: Date.now(), ...parsed }])
+}
+```
+
+## Source Code
+
+View the complete source: [GitHub](https://github.com/mdx-org/todo.mdx)

@@ -1,0 +1,210 @@
+---
+$type: Application
+$id: https://app.net.ai/app
+name: App Generator
+description: Vibe code your app in natural language
+version: 1.0.0
+---
+
+import { useState } from 'react'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@mdxui/shadcn/card'
+import { Button } from '@mdxui/shadcn/button'
+import { Textarea } from '@mdxui/shadcn/textarea'
+import { Badge } from '@mdxui/shadcn/badge'
+import { Progress } from '@mdxui/shadcn/progress'
+
+export function AppGenerator() {
+  const [prompt, setPrompt] = useState('')
+  const [generating, setGenerating] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [stage, setStage] = useState('')
+  const [result, setResult] = useState(null)
+
+  const generateApp = async () => {
+    if (!prompt.trim()) return
+    setGenerating(true)
+    setProgress(0)
+
+    // Simulate generation stages
+    const stages = [
+      { name: 'Analyzing requirements...', progress: 10 },
+      { name: 'Designing data models...', progress: 25 },
+      { name: 'Generating components...', progress: 45 },
+      { name: 'Building API routes...', progress: 65 },
+      { name: 'Setting up authentication...', progress: 80 },
+      { name: 'Deploying to edge...', progress: 95 },
+      { name: 'Complete!', progress: 100 },
+    ]
+
+    for (const s of stages) {
+      setStage(s.name)
+      setProgress(s.progress)
+      await new Promise(r => setTimeout(r, 800))
+    }
+
+    setResult({
+      url: 'https://your-app.hq.com.ai',
+      repo: 'https://github.com/your-app',
+      features: [
+        'User authentication',
+        'CRUD operations',
+        'Real-time updates',
+        'Mobile responsive',
+      ],
+    })
+    setGenerating(false)
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+          Vibe Code Your App
+        </h1>
+        <p className="text-muted-foreground">
+          Describe your app in plain English. Get a deployed, working application.
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>What do you want to build?</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea
+            placeholder="Example: I want a todo app with categories, due dates, and the ability to share lists with friends. Users should be able to sign up with email or Google."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            rows={6}
+            disabled={generating}
+          />
+
+          <div className="flex flex-wrap gap-2">
+            <span className="text-sm text-muted-foreground">Try:</span>
+            {[
+              'A blog with comments',
+              'An expense tracker',
+              'A recipe collection',
+              'A habit tracker',
+            ].map(example => (
+              <Badge
+                key={example}
+                variant="outline"
+                className="cursor-pointer hover:bg-accent"
+                onClick={() => setPrompt(example)}
+              >
+                {example}
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button
+            onClick={generateApp}
+            disabled={generating || !prompt.trim()}
+            className="w-full"
+            size="lg"
+          >
+            {generating ? stage : 'Generate App'}
+          </Button>
+        </CardFooter>
+      </Card>
+
+      {generating && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>{stage}</span>
+                <span>{progress}%</span>
+              </div>
+              <Progress value={progress} />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {result && (
+        <Card className="border-green-500">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <span className="text-green-500">✓</span>
+              Your App is Live!
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Live URL</p>
+                <a href={result.url} className="text-blue-500 hover:underline">
+                  {result.url}
+                </a>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Source Code</p>
+                <a href={result.repo} className="text-blue-500 hover:underline">
+                  View on GitHub
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Generated Features</p>
+              <div className="flex flex-wrap gap-2">
+                {result.features.map(f => (
+                  <Badge key={f} variant="secondary">{f}</Badge>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setResult(null)}>
+              Create Another
+            </Button>
+            <Button>Customize App</Button>
+          </CardFooter>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+<AppGenerator />
+
+---
+
+## How It Works
+
+### 1. Natural Language Input
+Describe your app like you'd tell a friend:
+- "A todo app with categories and due dates"
+- "A blog with comments and likes"
+- "An expense tracker that sends weekly reports"
+
+### 2. AI Analysis
+Our AI breaks down your description into:
+- **Data Models** - What entities and relationships you need
+- **Features** - User authentication, CRUD, real-time, etc.
+- **UI Components** - Pages, forms, lists, dashboards
+
+### 3. Code Generation
+AI generates:
+- React components with Tailwind CSS
+- API routes with type-safe endpoints
+- Database schema with migrations
+- Authentication flows
+
+### 4. Instant Deployment
+Your app deploys automatically to:
+- **Frontend** - Cloudflare Pages
+- **API** - Cloudflare Workers
+- **Database** - Cloudflare D1 + Turso
+- **Domain** - yourapp.hq.com.ai (via builder.domains)
+
+## Iteration
+Tell us what to change:
+- "Add a dark mode toggle"
+- "Make the sidebar collapsible"
+- "Add email notifications when tasks are due"
+
+Each iteration takes seconds, not hours.

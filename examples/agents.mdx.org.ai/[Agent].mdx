@@ -1,0 +1,53 @@
+---
+$type: Agent
+$id: https://agents.mdx.org.ai/{slug}
+name: string
+description: string
+author: Author
+version: string
+downloads: number
+stars: number
+capabilities: string[]
+tools: string[]
+models: string[]
+license: string
+repository: string
+homepage: string
+---
+
+import { AgentDetail } from '@mdxui/shadcn/components'
+import { Badge } from '@mdxui/shadcn/badge'
+
+# {name}
+
+<div className="flex gap-2 mb-4">
+  <Badge>{version}</Badge>
+  <Badge variant="outline">{license}</Badge>
+  <Badge variant="secondary">{downloads.toLocaleString()} downloads</Badge>
+</div>
+
+{description}
+
+## Installation
+
+```bash
+npx agents install {$id.split('/').pop()}
+```
+
+## Capabilities
+
+{capabilities.map(cap => `- ${cap}`).join('\n')}
+
+## Required Tools
+
+{tools.map(tool => `- \`${tool}\``).join('\n')}
+
+## Supported Models
+
+{models.map(model => `- ${model}`).join('\n')}
+
+## Links
+
+- [Repository]({repository})
+- [Homepage]({homepage})
+- [Author](/{author.slug})

@@ -1,0 +1,149 @@
+---
+$type: Agent
+$id: https://agents.mdx.org.ai/agents/data-analyst
+name: Data Analyst
+description: An AI agent that analyzes data, generates insights, creates visualizations, and answers questions in natural language.
+author:
+  name: Analytics Co
+  slug: analytics-co
+version: 1.5.0
+downloads: 67890
+stars: 1456
+capabilities:
+  - Query databases with natural language
+  - Generate statistical summaries
+  - Create charts and visualizations
+  - Identify trends and anomalies
+  - Export reports in multiple formats
+  - Schedule recurring analyses
+tools:
+  - sql_query
+  - python_execute
+  - chart_create
+  - export_file
+models:
+  - claude-3-opus
+  - claude-3-sonnet
+  - gpt-4
+license: MIT
+repository: https://github.com/analytics-co/data-analyst
+homepage: https://agents.mdx.org.ai/agents/data-analyst
+---
+
+# Data Analyst
+
+The Data Analyst agent turns natural language questions into insights. Ask "What were our top products last quarter?" and get charts, numbers, and explanations.
+
+## Usage
+
+```typescript
+import { DataAnalyst } from '@agents/data-analyst'
+
+const analyst = new DataAnalyst({
+  model: 'claude-3-opus',
+  database: postgresConnection,
+  allowedTables: ['orders', 'products', 'customers'],
+})
+
+// Ask questions in natural language
+const result = await analyst.ask(
+  'What are the top 5 products by revenue this month?'
+)
+
+// Get visualizations
+const chart = await analyst.visualize({
+  data: result.data,
+  type: 'bar',
+  title: 'Top Products by Revenue',
+})
+
+// Generate reports
+const report = await analyst.report({
+  questions: [
+    'Monthly revenue trend',
+    'Customer acquisition by channel',
+    'Product category performance',
+  ],
+  format: 'pdf',
+})
+```
+
+## Example Questions
+
+**User:** "How has our revenue changed compared to last year?"
+
+**Agent:**
+```
+Revenue Comparison: This Year vs Last Year
+
+Total Revenue:
+- This Year: $2.4M (+18% YoY)
+- Last Year: $2.0M
+
+Monthly Breakdown:
+[Chart showing monthly comparison]
+
+Key Insights:
+1. Q2 showed strongest growth (+32%)
+2. December was the highest revenue month ($340K)
+3. New product line contributed 23% of growth
+```
+
+**User:** "Which customers are at risk of churning?"
+
+**Agent:**
+```
+Churn Risk Analysis
+
+High Risk (15 customers):
+- 30+ days since last order
+- Order frequency decreased >50%
+- Support tickets increased
+
+Recommendations:
+1. Reach out to top 5 highest-value at-risk customers
+2. Consider win-back campaign for dormant accounts
+3. Review support tickets for common issues
+
+[Export to CSV] [Create Segment in CRM]
+```
+
+## Supported Databases
+
+- PostgreSQL
+- MySQL
+- BigQuery
+- Snowflake
+- SQLite
+- MongoDB (via aggregation)
+
+## Security
+
+- Read-only access by default
+- Query validation and sanitization
+- Table/column allowlisting
+- Query cost estimation
+- Audit logging
+
+## Configuration
+
+```yaml
+# analyst.yaml
+database:
+  type: postgres
+  allowedTables:
+    - orders
+    - products
+    - customers
+  deniedColumns:
+    - customers.ssn
+    - customers.credit_card
+
+limits:
+  maxRows: 10000
+  queryTimeout: 30s
+
+visualizations:
+  theme: light
+  colors: ['#3B82F6', '#10B981', '#F59E0B']
+```

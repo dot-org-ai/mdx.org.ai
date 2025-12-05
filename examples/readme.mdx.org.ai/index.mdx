@@ -1,0 +1,81 @@
+---
+$type: LandingPage
+$id: https://readme.mdx.org.ai
+name: readme.mdx.org.ai
+title: AI-Powered README Generation
+description: Great docs without the effort. AI analyzes your code and generates beautiful, accurate READMEs.
+layout: quartz
+---
+
+import { QuartzLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'readme.mdx.org.ai',
+  title: 'AI-Powered README Generation',
+  description: 'Great docs without the effort. AI analyzes your code and generates beautiful, accurate READMEs.',
+  layout: 'quartz',
+
+  accentColor: 'blue' as const,
+
+  header: {
+    brand: { name: 'readme.mdx', href: '/' },
+    navigation: [
+      { label: 'Examples', href: '/examples' },
+      { label: 'Docs', href: '/docs' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'Login', href: '/login', variant: 'ghost' as const },
+      { label: 'Generate README', href: '/generate', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    headline: 'AI Writes. You Code.',
+    description: 'Your README is out of date. We know. Point us at your repo—AI analyzes your code, comments, and existing docs to generate a comprehensive README. It updates automatically when your code changes.',
+    primaryAction: { label: 'Generate Your README', href: '/generate' },
+    secondaryAction: { label: 'See Examples', href: '/examples' },
+  },
+
+  features: {
+    headline: 'Documentation That Stays Current',
+    description: 'First impressions matter. Make them count.',
+    features: [
+      { title: 'Code Analysis', description: 'AI reads your entire codebase—functions, types, exports, comments—to understand what it does.' },
+      { title: 'Smart Sections', description: 'Installation, usage, API reference, configuration—all generated from actual code behavior.' },
+      { title: 'Working Examples', description: 'Code examples that actually run, generated from your tests and type signatures.' },
+      { title: 'Auto-Updates', description: 'GitHub Action runs on push. README stays in sync with your code automatically.' },
+      { title: 'Your Voice', description: 'Configure tone and style. Technical, friendly, minimal—documentation that fits your project.' },
+      { title: 'Badge Generation', description: 'Build status, coverage, npm version—badges configured and included.' },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Maintainers Love It',
+    testimonials: [
+      { quote: 'My README had "TODO: add docs" for two years. Now it\'s the best documentation I\'ve ever had. Took 30 seconds.', author: { name: 'Alex Rivera', title: 'OSS Maintainer' } },
+      { quote: 'We use it for every repo. Consistent documentation across 50+ packages. The auto-update alone is worth it.', author: { name: 'Jordan Lee', title: 'Platform Lead' } },
+    ],
+  },
+
+  pricing: {
+    headline: 'Free for Open Source',
+    description: 'Public repos are free forever. Private repos for teams.',
+    tiers: [
+      { name: 'Open Source', price: { monthly: '$0' }, features: ['Unlimited public repos', 'Auto-updates on push', 'All sections', 'Community support'], cta: 'Generate Free' },
+      { name: 'Pro', price: { monthly: '$19' }, features: ['Private repos', 'Custom templates', 'API access', 'Priority support'], cta: 'Go Pro', featured: true },
+      { name: 'Team', price: { monthly: '$49' }, features: ['Org-wide consistency', 'Shared templates', 'Usage analytics', 'SSO'], cta: 'Start Team' },
+    ],
+  },
+
+  footer: {
+    brand: { name: 'readme.mdx.org.ai', description: 'AI-powered README generation.' },
+    columns: [
+      { title: 'Product', links: [{ text: 'Generate', href: '/generate' }, { text: 'Examples', href: '/examples' }, { text: 'Pricing', href: '#pricing' }] },
+      { title: 'Resources', links: [{ text: 'Documentation', href: '/docs' }, { text: 'GitHub', href: 'https://github.com/mdx-org/readme' }] },
+    ],
+    legal: { copyright: '© 2024 readme.mdx.org.ai' },
+  },
+}
+
+<QuartzLayout {...siteData} />

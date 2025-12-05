@@ -1,0 +1,161 @@
+---
+$type: LandingPage
+$id: https://api.net.ai
+name: api.net.ai
+title: Vibe Code Your API in Minutes
+description: Generate production-ready APIs from natural language. Describe your data, get a deployed API instantly.
+layout: dusk
+---
+
+import { DuskLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'api.net.ai',
+  title: 'Vibe Code Your API in Minutes',
+  description: 'Generate production-ready APIs from natural language. Describe your data, get a deployed API instantly.',
+  layout: 'dusk',
+
+  gradient: 'cyan-blue' as const,
+  glow: true,
+
+  header: {
+    brand: { name: 'api.net.ai', href: '/' },
+    navigation: [
+      { label: 'Examples', href: '/examples' },
+      { label: 'Docs', href: '/docs' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'Login', href: '/login', variant: 'ghost' as const },
+      { label: 'Vibe Code Your API', href: '/create', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    announcement: { text: 'REST + GraphQL from one description', href: '/blog/dual-api' },
+    headline: 'Vibe Code Your API in Minutes',
+    description: 'Skip the boilerplate forever. Describe your data model in plain English and get a production-ready API with database, authentication, and documentation—deployed and ready to call.',
+    primaryAction: { label: 'Vibe Code Your API', href: '/create' },
+    secondaryAction: { label: 'See API Examples', href: '/examples' },
+    trustedBy: [
+      { name: 'Vercel' },
+      { name: 'Supabase' },
+      { name: 'Railway' },
+    ],
+  },
+
+  features: {
+    headline: 'Backend in Five Minutes',
+    description: 'Stop setting up. Start building features.',
+    features: [
+      {
+        title: 'Natural Language Schema',
+        description: '"Users have posts, posts have comments, comments have likes"—that\'s all you need to say.',
+      },
+      {
+        title: 'REST & GraphQL',
+        description: 'Get both REST endpoints and a GraphQL API from one description. Use what works for you.',
+      },
+      {
+        title: 'Database Included',
+        description: 'PostgreSQL provisioned automatically. Migrations handled. Backups configured.',
+      },
+      {
+        title: 'Auth Built-In',
+        description: 'API keys, JWT tokens, OAuth—authentication ready out of the box.',
+      },
+      {
+        title: 'Auto Documentation',
+        description: 'OpenAPI spec generated automatically. Interactive docs for every endpoint.',
+      },
+      {
+        title: 'Instant Deployment',
+        description: 'Your API is live immediately. Global CDN. Auto-scaling. SSL included.',
+      },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Developers Ship Faster',
+    testimonials: [
+      {
+        quote: 'I used to spend two days on backend setup. Now I describe my models and start building frontend in ten minutes.',
+        author: {
+          name: 'Alex Chen',
+          title: 'Frontend Developer',
+          company: 'StartupCo',
+        },
+      },
+      {
+        quote: 'We prototype client APIs in the sales meeting. They see a working backend before they sign the contract.',
+        author: {
+          name: 'Jordan Taylor',
+          title: 'CTO',
+          company: 'AgencyX',
+        },
+      },
+    ],
+  },
+
+  pricing: {
+    headline: 'Pay for What You Use',
+    description: 'Start free. Scale with request volume.',
+    tiers: [
+      {
+        name: 'Free',
+        price: { monthly: '$0' },
+        features: ['1 API', '10K requests/month', 'Shared database', 'Community support'],
+        cta: 'Get Started',
+      },
+      {
+        name: 'Pro',
+        price: { monthly: '$29' },
+        features: ['5 APIs', '100K requests/month', 'Dedicated database', 'Custom domains', 'Priority support'],
+        cta: 'Go Pro',
+        featured: true,
+      },
+      {
+        name: 'Scale',
+        price: { monthly: '$99' },
+        features: ['25 APIs', '1M requests/month', 'Webhooks & cron', 'Team collaboration', 'SLA'],
+        cta: 'Start Scale Trial',
+      },
+    ],
+  },
+
+  cta: {
+    headline: 'Your Backend, Ready in Minutes',
+    description: 'Stop writing boilerplate. Start shipping features.',
+    action: { label: 'Vibe Code Your API', href: '/create' },
+  },
+
+  footer: {
+    brand: {
+      name: 'api.net.ai',
+      description: 'Vibe code your API in minutes.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Examples', href: '/examples' },
+          { text: 'Pricing', href: '#pricing' },
+          { text: 'Documentation', href: '/docs' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'Blog', href: '/blog' },
+          { text: 'Discord', href: '/discord' },
+          { text: 'Status', href: '/status' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 api.net.ai',
+    },
+  },
+}
+
+<DuskLayout {...siteData} />

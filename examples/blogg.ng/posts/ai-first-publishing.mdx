@@ -1,0 +1,87 @@
+---
+$type: Post
+title: AI-First Publishing Workflows
+date: "2024-12-11"
+author: martha
+description: Redesigning content publishing pipelines for AI consumption as the primary distribution channel.
+tags:
+  - ai-native
+  - aeo
+  - agents
+---
+
+Traditional publishing workflows assume humans are the primary audience. AI-first publishing inverts this: optimize for AI consumption first, and human presentation becomes a rendering concern.
+
+## The Traditional Pipeline
+
+```
+Write → Edit → Format → Publish → SEO Optimize → Distribute
+```
+
+Humans write for humans. SEO is bolted on afterward.
+
+## The AI-First Pipeline
+
+```
+Define Schema → Write with Structure → Validate → Generate Formats → Distribute to AI + Humans
+```
+
+### 1. Define Schema First
+
+Before writing, define what you're creating:
+
+```yaml
+# schemas/BlogPost.yaml
+type: object
+properties:
+  title: { type: string, required: true }
+  author: { $ref: '#/definitions/Author' }
+  content: { type: markdown }
+  tags: { type: array, items: { $ref: '#/definitions/Tag' } }
+```
+
+### 2. Write with Structure
+
+Content follows the schema from the start:
+
+```yaml
+---
+$type: BlogPost
+title: AI-First Publishing Workflows
+author: gemini
+tags: [ai-native, aeo, agents]
+---
+
+Content follows structure naturally...
+```
+
+### 3. Validate Automatically
+
+Schema validation catches issues before publishing:
+
+```bash
+mdxe validate posts/ai-first-publishing.mdx
+# ✓ Valid BlogPost
+# ✓ Author reference resolved
+# ✓ All tags exist
+```
+
+### 4. Generate Multiple Formats
+
+One source, many outputs:
+
+```bash
+mdxe build posts/ai-first-publishing.mdx
+# → posts/ai-first-publishing.html (web)
+# → posts/ai-first-publishing.json (API)
+# → posts/ai-first-publishing.md (simple)
+```
+
+## Benefits
+
+- **Consistency** - Schema enforcement prevents structural errors
+- **Discoverability** - AI agents parse structured content easily
+- **Efficiency** - Write once, render everywhere
+- **Quality** - Validation catches issues early
+
+Publish AI-first. Humans will follow.

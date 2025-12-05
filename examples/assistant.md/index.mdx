@@ -1,0 +1,113 @@
+---
+$type: LandingPage
+$id: https://assistant.md
+name: assistant.md
+title: Your Personal AI, Defined in Markdown
+description: Design your perfect AI assistant in a single markdown file—personality, tools, knowledge, all in one place.
+layout: sonic
+---
+
+import { SonicLayout } from '@mdxui/shadcnblocks/templates'
+
+export const siteData = {
+  name: 'assistant.md',
+  title: 'Your Personal AI, Defined in Markdown',
+  description: 'Design your perfect AI assistant in a single markdown file—personality, tools, knowledge, all in one place.',
+  layout: 'sonic',
+
+  gradient: 'indigo' as const,
+  style: 'minimal' as const,
+
+  header: {
+    brand: { name: 'assistant.md', href: '/' },
+    navigation: [
+      { label: 'Examples', href: '/examples' },
+      { label: 'Docs', href: '/docs' },
+      { label: 'API', href: '/api' },
+    ],
+    actions: [
+      { label: 'GitHub', href: 'https://github.com/mdx-org/assistant.md', variant: 'ghost' as const },
+      { label: 'Design Your Assistant', href: '/start', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    badge: 'AI That Knows You',
+    title: 'Your Personal AI, Defined in Markdown',
+    description: 'Generic AI assistants treat everyone the same. Define your perfect assistant in one file—personality, tools, integrations, knowledge. Version control it. Run it anywhere.',
+    primaryAction: { label: 'Design Your Assistant', href: '/start' },
+    secondaryAction: { label: 'See Examples', href: '/examples' },
+  },
+
+  features: {
+    headline: 'Finally, an AI That Knows You',
+    description: 'Everything about your assistant in one place.',
+    features: [
+      {
+        title: 'Define Personality',
+        description: 'Friendly, professional, concise, thorough—describe exactly how your assistant should communicate.',
+      },
+      {
+        title: 'Connect Your Tools',
+        description: 'Calendar, email, tasks, Slack, databases—hook up the services your assistant needs.',
+      },
+      {
+        title: 'Add Knowledge',
+        description: 'Include files, folders, URLs. Your assistant knows your context.',
+      },
+      {
+        title: 'Voice Interface',
+        description: 'Talk to your assistant naturally. Hands-free interaction when you need it.',
+      },
+      {
+        title: 'Proactive Alerts',
+        description: 'Daily briefings, deadline reminders, important updates—your assistant reaches out first.',
+      },
+      {
+        title: 'Run Anywhere',
+        description: 'Locally for privacy or cloud for access everywhere. Mobile apps included.',
+      },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Assistants That Actually Assist',
+    testimonials: [
+      {
+        quote: 'My assistant knows my calendar, my preferences, my projects. It feels like having a chief of staff who never forgets.',
+        author: { name: 'Sarah Chen', title: 'CEO', company: 'TechStartup' },
+      },
+      {
+        quote: 'I defined my assistant once. Now it handles daily briefings, meeting prep, and follow-ups. I got 2 hours back.',
+        author: { name: 'Marcus Williams', title: 'Engineering Manager', company: 'BigCorp' },
+      },
+    ],
+  },
+
+  pricing: {
+    headline: 'Run Free, Scale When Ready',
+    description: 'Full local deployment at no cost. Cloud features when you need them.',
+    tiers: [
+      { name: 'Local', price: { monthly: '$0' }, features: ['Full assistant features', 'All integrations', 'Voice interface', 'Run locally'], cta: 'Get Started' },
+      { name: 'Cloud', price: { monthly: '$19' }, features: ['Cloud deployment', 'Mobile apps', 'Cross-device sync', 'Priority support'], cta: 'Start Trial', featured: true },
+      { name: 'Team', price: { monthly: '$49' }, features: ['Shared configurations', 'Team knowledge bases', 'Admin controls', 'SSO'], cta: 'Contact Sales' },
+    ],
+  },
+
+  cta: {
+    headline: 'Build Your Perfect Assistant',
+    description: 'Stop adapting to generic AI. Define an assistant that adapts to you.',
+    action: { label: 'Get Started Free', href: '/start' },
+  },
+
+  footer: {
+    brand: { name: 'assistant.md', description: 'Personal AI, defined in markdown.' },
+    columns: [
+      { title: 'Product', links: [{ text: 'Examples', href: '/examples' }, { text: 'Documentation', href: '/docs' }, { text: 'API', href: '/api' }] },
+      { title: 'Resources', links: [{ text: 'GitHub', href: 'https://github.com/mdx-org/assistant.md' }, { text: 'Discord', href: '/discord' }] },
+    ],
+    legal: { copyright: '© 2024 assistant.md' },
+  },
+}
+
+<SonicLayout {...siteData} />

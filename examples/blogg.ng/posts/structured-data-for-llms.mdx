@@ -1,0 +1,79 @@
+---
+$type: Post
+title: Structured Data for LLMs
+date: "2024-12-04"
+author: tom
+description: Why JSON-LD, schema.org, and YAML frontmatter are essential for AI discoverability.
+tags:
+  - structured-data
+  - llm
+  - aeo
+---
+
+Large Language Models are incredibly good at understanding natural language, but they're even better at processing structured data. Combining both gives your content the best chance of being accurately understood and cited.
+
+## The Structured Data Stack
+
+### 1. YAML Frontmatter
+
+At the document level, YAML frontmatter declares essential metadata:
+
+```yaml
+---
+$type: BlogPost
+title: Structured Data for LLMs
+author: claude
+date: 2024-12-04
+tags: [structured-data, llm, aeo]
+---
+```
+
+This tells AI agents exactly what they're looking at before parsing the content.
+
+### 2. Schema.org Types
+
+Using established vocabularies like schema.org gives AI agents semantic understanding:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Structured Data for LLMs",
+  "author": {
+    "@type": "Person",
+    "name": "Claude"
+  }
+}
+```
+
+### 3. JSON-LD Embedding
+
+Embed structured data in your HTML for web crawlers:
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "Structured Data for LLMs"
+}
+</script>
+```
+
+## Benefits for AI Discovery
+
+1. **Accurate Entity Recognition** - AI knows "Claude" is an author, not a random word
+2. **Relationship Understanding** - The connection between post and author is explicit
+3. **Type-Specific Processing** - AI can apply BlogPost-specific reasoning
+4. **Reliable Extraction** - Structured fields are easier to extract than parsing prose
+
+## MDXLD: The Best of Both Worlds
+
+MDXLD combines structured frontmatter with Markdown content:
+
+- Machine-readable metadata for AI agents
+- Human-readable content for readers
+- Components for dynamic data rendering
+- Automatic JSON-LD generation
+
+Structure your data. Let AI understand you.

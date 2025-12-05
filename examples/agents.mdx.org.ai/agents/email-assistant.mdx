@@ -1,0 +1,92 @@
+---
+$type: Agent
+$id: https://agents.mdx.org.ai/agents/email-assistant
+name: Email Assistant
+description: An AI agent that drafts, summarizes, and manages email—handling replies, follow-ups, and inbox organization.
+author:
+  name: Productivity Labs
+  slug: productivity-labs
+version: 1.8.0
+downloads: 89340
+stars: 1876
+capabilities:
+  - Draft email responses
+  - Summarize long email threads
+  - Organize inbox into categories
+  - Schedule follow-up reminders
+  - Detect and flag urgent messages
+  - Unsubscribe from newsletters
+tools:
+  - email_read
+  - email_send
+  - email_organize
+  - contacts_read
+models:
+  - claude-3-opus
+  - claude-3-sonnet
+  - gpt-4
+license: MIT
+repository: https://github.com/productivity-labs/email-assistant
+homepage: https://agents.mdx.org.ai/agents/email-assistant
+---
+
+# Email Assistant
+
+The Email Assistant agent helps you manage your inbox efficiently—drafting replies in your voice, summarizing threads, and keeping important messages from getting buried.
+
+## Usage
+
+```typescript
+import { EmailAssistant } from '@agents/email-assistant'
+
+const email = new EmailAssistant({
+  model: 'claude-3-sonnet',
+  provider: 'gmail',
+  voiceSamples: './my-writing-samples/',
+})
+
+// Draft a reply
+const draft = await email.draftReply({
+  threadId: 'abc123',
+  instruction: 'Politely decline but suggest meeting next quarter',
+})
+
+// Summarize inbox
+const summary = await email.summarize({
+  since: '24h',
+  highlight: ['urgent', 'requires-action'],
+})
+
+// Auto-organize
+await email.organize({
+  rules: [
+    { from: '@company.com', label: 'Work' },
+    { subject: /invoice/i, label: 'Finance' },
+  ],
+})
+```
+
+## Features
+
+### Voice Matching
+The agent learns your writing style from samples and drafts emails that sound like you.
+
+### Smart Prioritization
+- 🔴 Urgent: Needs immediate attention
+- 🟡 Action Required: Waiting for your response
+- 🟢 FYI: Informational, no action needed
+- ⚪ Newsletter: Can be batch-processed
+
+### Thread Summaries
+Long email chains? Get the key points:
+```
+Thread: Project Alpha Launch (12 messages)
+
+Summary:
+- Marketing approved launch date: March 15
+- Engineering needs 2 more weeks for testing
+- Legal flagged trademark issue (resolved)
+- Action: You need to confirm budget allocation
+
+Key participants: Sarah (PM), John (Eng), Lisa (Legal)
+```

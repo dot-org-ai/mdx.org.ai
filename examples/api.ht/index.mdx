@@ -1,0 +1,192 @@
+---
+$type: Site
+$id: https://api.ht
+name: api.ht
+title: HyperText API - Simple, Clickable APIs
+description: Build APIs the way the web was meant to work. Every resource is a URL. Every response is a link.
+layout: scalar
+theme:
+  primaryColor: blue
+  radius: md
+---
+
+import { ScalarLayout } from '@mdxui/shadcnblocks/templates'
+
+<ScalarLayout
+  header={{
+    brand: { name: 'api.ht', href: '/' },
+    navigation: [
+      { label: 'Docs', href: '/docs' },
+      { label: 'API', href: '/api' },
+      { label: 'MCP', href: '/mcp' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'GitHub', href: 'https://github.com/mdx-org/api.ht', variant: 'ghost' },
+      { label: 'Get Started', href: '/docs/quickstart', variant: 'primary' },
+    ],
+  }}
+  hero={{
+    badge: 'HATEOAS Made Simple',
+    title: 'APIs You Can Click',
+    description: 'Build hypermedia APIs that are self-documenting and explorable. Every resource is a URL. Every response tells you where to go next.',
+    primaryAction: { label: 'Read the Docs', href: '/docs' },
+    secondaryAction: { label: 'Try the API', href: '/api' },
+  }}
+  features={{
+    headline: 'The Web as Your API',
+    description: 'REST the way Roy Fielding intended.',
+    features: [
+      {
+        title: 'Hypermedia Controls',
+        description: 'Responses include links to related resources. Clients discover the API by following links.',
+      },
+      {
+        title: 'Content Negotiation',
+        description: 'Request JSON, HTML, or Markdown. Same URL, different representation.',
+      },
+      {
+        title: 'Self-Documenting',
+        description: 'Every endpoint returns human-readable HTML when viewed in a browser.',
+      },
+      {
+        title: 'URL-First',
+        description: 'Resources have stable, meaningful URLs. Share them, bookmark them, link to them.',
+      },
+      {
+        title: 'Type-Safe',
+        description: 'Full TypeScript support with automatic type generation from your schema.',
+      },
+      {
+        title: 'Edge-Ready',
+        description: 'Deploy to Cloudflare Workers, Vercel Edge, or any serverless platform.',
+      },
+    ],
+  }}
+  testimonials={{
+    headline: 'What Developers Say',
+    testimonials: [
+      {
+        quote: 'api.ht finally made REST make sense. Our API is so intuitive now that we barely need documentation.',
+        author: {
+          name: 'Alex Thompson',
+          title: 'Backend Lead',
+          company: 'DataFlow',
+          avatar: 'https://i.pravatar.cc/150?u=alex',
+        },
+      },
+      {
+        quote: 'The content negotiation is brilliant. Our API serves JSON for apps and HTML for debugging.',
+        author: {
+          name: 'Jordan Lee',
+          title: 'Senior Engineer',
+          company: 'APIFirst',
+          avatar: 'https://i.pravatar.cc/150?u=jordan',
+        },
+      },
+      {
+        quote: 'Finally, an API framework that respects the web. No more fighting against HTTP.',
+        author: {
+          name: 'Sam Wilson',
+          title: 'CTO',
+          company: 'WebNative',
+          avatar: 'https://i.pravatar.cc/150?u=sam',
+        },
+      },
+    ],
+  }}
+  pricing={{
+    headline: 'Open Source First',
+    description: 'Free forever for open source. Paid plans for teams.',
+    tiers: [
+      {
+        name: 'Open Source',
+        description: 'Everything you need to build great APIs.',
+        price: { monthly: '$0', yearly: '$0' },
+        features: ['Unlimited endpoints', 'All features', 'Community support', 'MIT License'],
+        cta: 'Get Started',
+      },
+      {
+        name: 'Pro',
+        description: 'For teams building production APIs.',
+        price: { monthly: '$19', yearly: '$190' },
+        features: ['Priority support', 'Team collaboration', 'Analytics dashboard', 'Custom domains', 'SLA'],
+        cta: 'Start Trial',
+        featured: true,
+      },
+      {
+        name: 'Enterprise',
+        description: 'For organizations with advanced needs.',
+        price: { monthly: 'Custom', yearly: 'Custom' },
+        features: ['Dedicated support', 'Custom integrations', 'On-premise deployment', 'SSO', 'Audit logs'],
+        cta: 'Contact Us',
+      },
+    ],
+  }}
+  faq={{
+    headline: 'FAQ',
+    items: [
+      {
+        question: 'What is HATEOAS?',
+        answer: 'Hypermedia as the Engine of Application State. It means API responses include links telling clients what actions are available and where related resources live.',
+      },
+      {
+        question: 'How is this different from OpenAPI/Swagger?',
+        answer: 'OpenAPI documents your API externally. api.ht makes your API self-documenting - the responses themselves contain the documentation.',
+      },
+      {
+        question: 'Can I use this with my existing API?',
+        answer: 'Yes! api.ht can wrap existing APIs or be used for new projects. The migration path is incremental.',
+      },
+      {
+        question: 'What about GraphQL?',
+        answer: 'GraphQL is great for complex queries. api.ht is ideal when you want URLs, caching, and web-native semantics.',
+      },
+    ],
+  }}
+  cta={{
+    headline: 'Ready to build better APIs?',
+    description: 'Join developers building APIs the way the web intended.',
+    action: { label: 'Get Started Free', href: '/docs/quickstart' },
+  }}
+  footer={{
+    brand: {
+      name: 'api.ht',
+      description: 'HyperText APIs for the modern web.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Documentation', href: '/docs' },
+          { text: 'API Reference', href: '/api' },
+          { text: 'MCP Server', href: '/mcp' },
+          { text: 'Examples', href: '/examples' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'GitHub', href: 'https://github.com/mdx-org/api.ht' },
+          { text: 'Discord', href: '/discord' },
+          { text: 'Blog', href: '/blog' },
+        ],
+      },
+      {
+        title: 'Company',
+        links: [
+          { text: 'About', href: '/about' },
+          { text: 'Pricing', href: '#pricing' },
+          { text: 'Contact', href: '/contact' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 api.ht. Open source under MIT.',
+      links: [
+        { text: 'Privacy', href: '/privacy' },
+        { text: 'Terms', href: '/terms' },
+      ],
+    },
+  }}
+/>

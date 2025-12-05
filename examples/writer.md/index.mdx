@@ -1,0 +1,82 @@
+---
+$type: LandingPage
+$id: https://writer.md
+name: writer.md
+title: AI Writing in Markdown
+description: Stay in the terminal. Get AI help. Markdown in, markdown out.
+layout: mist
+---
+
+import { MistLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'writer.md',
+  title: 'AI Writing in Markdown',
+  description: 'Stay in the terminal. Get AI help. Markdown in, markdown out.',
+  layout: 'mist',
+
+  accentColor: 'slate' as const,
+  warmth: 'neutral' as const,
+
+  header: {
+    brand: { name: 'writer.md', href: '/' },
+    navigation: [
+      { label: 'Docs', href: '/docs' },
+      { label: 'Commands', href: '/commands' },
+      { label: 'API', href: '/api' },
+    ],
+    actions: [
+      { label: 'GitHub', href: 'https://github.com/mdx-org/writer.md', variant: 'ghost' as const },
+      { label: 'Install', href: '/docs/install', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    headline: 'AI Writing, Native to Your Workflow',
+    description: 'Stop switching between your editor and web AI tools. Generate, edit, and expand markdown content from your terminal. Your writing stays in your workflow.',
+    primaryAction: { label: 'npm install -g writer.md', href: '/docs/install' },
+    secondaryAction: { label: 'See Commands', href: '/commands' },
+  },
+
+  features: {
+    headline: 'Stay in Your Flow',
+    description: 'No context switching. No copy-paste. Just write.',
+    features: [
+      { title: 'Generate Content', description: 'writer generate "Getting Started Guide" --type docs' },
+      { title: 'Improve Existing', description: 'writer edit article.md --improve clarity --fix grammar' },
+      { title: 'Expand Sections', description: 'writer expand readme.md --section "API Reference"' },
+      { title: 'Summarize Anything', description: 'writer summarize long-article.md --length short' },
+      { title: 'Change Tone', description: 'writer edit post.md --tone professional' },
+      { title: 'Git Friendly', description: 'Output is clean markdown. Commit, diff, and review like any code.' },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Writers Stay in Flow',
+    testimonials: [
+      { quote: 'I write docs in vim. Now I get AI help without leaving. My workflow is finally complete.', author: { name: 'Dev Nguyen', title: 'Staff Engineer' } },
+      { quote: 'We pipe writer.md into our CI. READMEs get improved automatically before merge.', author: { name: 'Priya Sharma', title: 'DevOps Lead' } },
+    ],
+  },
+
+  pricing: {
+    headline: 'Open Source + Cloud',
+    description: 'CLI is free and open source. Cloud API for teams.',
+    tiers: [
+      { name: 'CLI', price: { monthly: '$0' }, features: ['Full CLI features', 'Local LLM support', 'MIT licensed', 'Community support'], cta: 'Install Free' },
+      { name: 'Pro', price: { monthly: '$19' }, features: ['Cloud API', 'No local LLM needed', 'Advanced models', 'Priority support'], cta: 'Go Pro', featured: true },
+      { name: 'Team', price: { monthly: '$49' }, features: ['Team API keys', 'Usage analytics', 'Custom fine-tuning', 'SLA'], cta: 'Start Team' },
+    ],
+  },
+
+  footer: {
+    brand: { name: 'writer.md', description: 'AI writing in your terminal.' },
+    columns: [
+      { title: 'Product', links: [{ text: 'Documentation', href: '/docs' }, { text: 'Commands', href: '/commands' }, { text: 'API', href: '/api' }] },
+      { title: 'Resources', links: [{ text: 'GitHub', href: 'https://github.com/mdx-org/writer.md' }, { text: 'npm', href: 'https://npmjs.com/package/writer.md' }] },
+    ],
+    legal: { copyright: '© 2024 writer.md' },
+  },
+}
+
+<MistLayout {...siteData} />

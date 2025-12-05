@@ -1,0 +1,78 @@
+---
+$type: Post
+title: Semantic Linking for AI Discovery
+date: "2024-12-08"
+author: martha
+description: Building meaningful content relationships that AI agents can traverse and understand.
+tags:
+  - structured-data
+  - ai-native
+  - aeo
+---
+
+Traditional linking focused on PageRank—accumulating link equity. AI-native linking focuses on semantic relationships—helping AI understand how concepts connect.
+
+## From Links to Relationships
+
+### Old Model: Links as Votes
+
+```html
+<a href="/related-post">Click here</a>
+```
+
+Links were primarily votes of confidence. The text didn't matter much beyond anchor text optimization.
+
+### New Model: Links as Relationships
+
+```yaml
+related:
+  - concept: Answer Engine Optimization
+    relationship: prerequisite
+    url: /posts/what-is-aeo
+  - concept: Structured Data
+    relationship: implements
+    url: /posts/structured-data-for-llms
+```
+
+AI agents understand not just *that* things are connected, but *how* they're connected.
+
+## Relationship Types That Matter
+
+### 1. Hierarchical
+
+```yaml
+parent: /topics/ai-native
+children:
+  - /posts/structured-data
+  - /posts/semantic-linking
+```
+
+### 2. Sequential
+
+```yaml
+prerequisites: [/posts/intro-to-aeo]
+next_steps: [/posts/advanced-aeo]
+```
+
+### 3. Semantic
+
+```yaml
+related_concepts:
+  - term: Knowledge Graph
+    relation: implements
+  - term: JSON-LD
+    relation: uses
+```
+
+## Building a Content Graph
+
+Your content should form a traversable knowledge graph:
+
+1. **Every post links to related concepts**
+2. **Relationships are typed and explicit**
+3. **Bidirectional links are maintained**
+4. **The graph is queryable by AI agents**
+
+When AI agents can traverse your content graph, they can synthesize comprehensive answers drawing from your entire corpus.
+
+Link semantically. Be discovered completely.

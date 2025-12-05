@@ -1,0 +1,23 @@
+---
+$type: TypeDefinition
+$generateMarkdown: true
+title: string
+date: string
+author: Author.posts
+description: string
+tags: array
+---
+
+# {data.title}
+
+*By [{data.author}](../authors/{data.author}.md) on {data.date}*
+
+{content}
+
+## Related Posts
+
+<Posts />
+
+## Tags
+
+<Tags />

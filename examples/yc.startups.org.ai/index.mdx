@@ -1,0 +1,81 @@
+---
+$type: LandingPage
+$id: https://yc.startups.org.ai
+name: yc.startups.org.ai
+title: The AI-Enhanced YC Directory
+description: Search 4,000+ Y Combinator companies with AI. Find startups by what they do, not just their name.
+layout: quartz
+---
+
+import { QuartzLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'yc.startups.org.ai',
+  title: 'The AI-Enhanced YC Directory',
+  description: 'Search 4,000+ Y Combinator companies with AI. Find startups by what they do, not just their name.',
+  layout: 'quartz',
+
+  accentColor: 'orange' as const,
+
+  header: {
+    brand: { name: 'YC Directory', href: '/' },
+    navigation: [
+      { label: 'Browse', href: '/browse' },
+      { label: 'Batches', href: '/batches' },
+      { label: 'Industries', href: '/industries' },
+      { label: 'Trends', href: '/trends' },
+    ],
+    actions: [
+      { label: 'Explore Companies', href: '/browse', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    headline: 'Search YC Like You Think',
+    description: 'The official YC directory has thousands of companies but limited search. Find startups by describing what you\'re looking for in plain English. "Companies doing AI for healthcare in the latest batch" just works.',
+    primaryAction: { label: 'Explore Companies', href: '/browse' },
+    secondaryAction: { label: 'Latest Batch (W24)', href: '/batches/w24' },
+  },
+
+  features: {
+    headline: 'Discover the YC Ecosystem',
+    description: 'Powerful tools for founders, investors, and job seekers.',
+    features: [
+      { title: 'Semantic Search', description: 'Search by describing what you need: "B2B SaaS for construction" finds relevant companies.' },
+      { title: 'Batch Exploration', description: 'Browse by cohort. Compare batches. See how YC focus areas evolve.' },
+      { title: 'Industry Analysis', description: 'Deep dives by sector. Healthcare, fintech, dev tools—see who\'s building what.' },
+      { title: 'Trend Detection', description: 'What\'s hot in YC? See emerging themes across recent batches.' },
+      { title: 'Company Comparisons', description: 'Side-by-side analysis. Funding, team size, tech stack—all the details.' },
+      { title: 'Export & API', description: 'Download lists. Build on our data. Power your research workflows.' },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Researchers Love It',
+    testimonials: [
+      { quote: 'I research competitive landscapes for VCs. This tool cut my research time by 80%. Semantic search is a game changer.', author: { name: 'Lisa Chang', title: 'VC Analyst' } },
+      { quote: 'Found my next job here. Filtered to AI companies in my area hiring engineers. Applied, interviewed, hired.', author: { name: 'Marcus Johnson', title: 'Software Engineer' } },
+    ],
+  },
+
+  pricing: {
+    headline: 'Free to Explore',
+    description: 'Basic access is free. Pro features for power users.',
+    tiers: [
+      { name: 'Free', price: { monthly: '$0' }, features: ['Full company database', 'Basic search', 'Batch browsing', 'Limited exports'], cta: 'Start Exploring' },
+      { name: 'Pro', price: { monthly: '$29' }, features: ['Semantic search', 'Advanced filters', 'Unlimited exports', 'API access', 'Saved searches'], cta: 'Go Pro', featured: true },
+      { name: 'Team', price: { monthly: '$99' }, features: ['Everything in Pro', 'Team collaboration', 'Custom lists', 'CRM integration', 'Priority support'], cta: 'Start Team' },
+    ],
+  },
+
+  footer: {
+    brand: { name: 'yc.startups.org.ai', description: 'The AI-enhanced YC directory.' },
+    columns: [
+      { title: 'Explore', links: [{ text: 'Browse Companies', href: '/browse' }, { text: 'By Batch', href: '/batches' }, { text: 'By Industry', href: '/industries' }] },
+      { title: 'Resources', links: [{ text: 'API', href: '/api' }, { text: 'Blog', href: '/blog' }] },
+    ],
+    legal: { copyright: '© 2024 yc.startups.org.ai • Not affiliated with Y Combinator' },
+  },
+}
+
+<QuartzLayout {...siteData} />

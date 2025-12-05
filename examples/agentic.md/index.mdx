@@ -1,0 +1,171 @@
+---
+$type: Site
+$id: https://agentic.md
+name: agentic.md
+title: AI Agents in Markdown
+description: Build and deploy AI agents using only Markdown. No code required.
+layout: dusk
+theme:
+  gradient: purple-blue
+  glow: true
+---
+
+import { DuskLayout } from '@mdxui/tailark/templates'
+
+<DuskLayout
+  gradient="purple-blue"
+  glow={true}
+  header={{
+    brand: { name: 'agentic.md', href: '/' },
+    navigation: [
+      { label: 'Docs', href: '/docs' },
+      { label: 'API', href: '/api' },
+      { label: 'MCP', href: '/mcp' },
+      { label: 'Gallery', href: '/gallery' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'GitHub', href: 'https://github.com/mdx-org/agentic.md', variant: 'ghost' },
+      { label: 'Get Started', href: '/docs/quickstart', variant: 'primary' },
+    ],
+  }}
+  hero={{
+    announcement: { text: 'Claude, GPT-4, and Gemini support', href: '/docs/models' },
+    headline: 'AI Agents in Markdown',
+    description: 'Build powerful AI agents using only Markdown. Define tools, memory, and behaviors in a format anyone can read and understand.',
+    primaryAction: { label: 'Start Building', href: '/docs/quickstart' },
+    secondaryAction: { label: 'View Examples', href: '/gallery' },
+    trustedBy: [
+      { name: 'Anthropic' },
+      { name: 'Vercel' },
+      { name: 'Supabase' },
+      { name: 'Resend' },
+    ],
+    codePreview: `---
+$type: Agent
+name: Research Assistant
+model: claude-sonnet-4-20250514
+---
+
+# Research Assistant
+
+You are a helpful research assistant.
+Search the web and summarize findings.
+
+## Tools
+
+### search
+Search the web for information.
+
+\`\`\`ts
+async function search(query: string) {
+  return await scrape.md(query)
+}
+\`\`\``,
+  }}
+  features={{
+    headline: 'Everything an Agent Needs',
+    description: 'From simple chatbots to complex multi-step agents.',
+    features: [
+      {
+        title: 'Markdown-First',
+        description: 'Define your agent in a format that reads like documentation. No DSL to learn.',
+      },
+      {
+        title: 'Multi-Model',
+        description: 'Works with Claude, GPT-4, Gemini, and any OpenAI-compatible API.',
+      },
+      {
+        title: 'Type-Safe Tools',
+        description: 'Define tools with TypeScript. Get full type inference and validation.',
+      },
+      {
+        title: 'Built-in Memory',
+        description: 'Conversation history, vector storage, and persistent state out of the box.',
+      },
+      {
+        title: 'MCP Compatible',
+        description: 'Expose your agents via Model Context Protocol for Claude Desktop integration.',
+      },
+      {
+        title: 'Deploy Anywhere',
+        description: 'Run locally, deploy to Cloudflare Workers, or self-host on any platform.',
+      },
+    ],
+  }}
+  testimonials={{
+    headline: 'Trusted by AI Builders',
+    testimonials: [
+      {
+        quote: 'agentic.md let us prototype AI features in hours instead of weeks. The Markdown format makes it easy for non-engineers to contribute.',
+        author: {
+          name: 'Sarah Chen',
+          title: 'Head of AI',
+          company: 'DevTools Inc',
+        },
+      },
+      {
+        quote: 'Finally, an agent framework that prioritizes readability. Our agents are now documented by default.',
+        author: {
+          name: 'Marcus Rivera',
+          title: 'CTO',
+          company: 'AIStartup',
+        },
+      },
+    ],
+  }}
+  pricing={{
+    headline: 'Simple Pricing',
+    description: 'Start free, scale as you grow.',
+    tiers: [
+      {
+        name: 'Open Source',
+        price: { monthly: '$0' },
+        features: ['Unlimited agents', 'All models', 'Local development', 'Community support'],
+        cta: 'Get Started',
+      },
+      {
+        name: 'Cloud',
+        price: { monthly: '$29' },
+        features: ['Managed hosting', 'Auto-scaling', 'Analytics', 'Priority support', 'Team collaboration'],
+        cta: 'Start Trial',
+        featured: true,
+      },
+      {
+        name: 'Enterprise',
+        price: { monthly: 'Custom' },
+        features: ['Dedicated infrastructure', 'SLA', 'SSO', 'Custom integrations', 'On-premise option'],
+        cta: 'Contact Sales',
+      },
+    ],
+  }}
+  footer={{
+    brand: {
+      name: 'agentic.md',
+      description: 'AI agents that read like documentation.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Documentation', href: '/docs' },
+          { text: 'API Reference', href: '/api' },
+          { text: 'MCP Server', href: '/mcp' },
+          { text: 'Agent Gallery', href: '/gallery' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'GitHub', href: 'https://github.com/mdx-org/agentic.md' },
+          { text: 'Discord', href: '/discord' },
+          { text: 'Blog', href: '/blog' },
+          { text: 'Changelog', href: '/changelog' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 agentic.md. Open source under MIT.',
+    },
+  }}
+/>

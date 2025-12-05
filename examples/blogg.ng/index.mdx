@@ -1,0 +1,113 @@
+---
+$type: LandingPage
+$id: https://blogg.ng
+name: blogg.ng
+title: AI-Powered Blogging That Writes Itself
+description: Transform your ideas into published posts. You provide the direction, AI handles the writing.
+layout: lumen
+---
+
+import { LumenLayout } from '@mdxui/shadcnblocks/templates'
+
+export const siteData = {
+  name: 'blogg.ng',
+  title: 'AI-Powered Blogging That Writes Itself',
+  description: 'Transform your ideas into published posts. You provide the direction, AI handles the writing.',
+  layout: 'lumen',
+
+  gradient: 'rose' as const,
+  style: 'editorial' as const,
+
+  header: {
+    brand: { name: 'blogg.ng', href: '/' },
+    navigation: [
+      { label: 'Features', href: '#features' },
+      { label: 'Examples', href: '/examples' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'Login', href: '/login', variant: 'ghost' as const },
+      { label: 'Start Your Blog', href: '/create', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    badge: 'Ideas in, Posts Out',
+    title: 'Never Face the Blank Page Again',
+    description: 'You have ideas worth sharing but no time to write. Drop in rough notes, voice memos, or bullet points—AI expands them into polished blog posts in your voice.',
+    primaryAction: { label: 'Start Your AI Blog', href: '/create' },
+    secondaryAction: { label: 'See Sample Posts', href: '/examples' },
+  },
+
+  features: {
+    headline: 'Your Voice, Amplified',
+    description: 'AI learns how you write. Every post sounds authentically you.',
+    features: [
+      {
+        title: 'Voice Training',
+        description: 'Share past writing samples. AI learns your tone, style, and vocabulary.',
+      },
+      {
+        title: 'Idea Expansion',
+        description: 'Drop in rough ideas—bullet points, voice memos, notes. Get back full draft posts.',
+      },
+      {
+        title: 'SEO Built-In',
+        description: 'Every post optimized for search. Keywords, meta descriptions, structure—handled.',
+      },
+      {
+        title: 'Scheduled Publishing',
+        description: 'Set your calendar. AI drafts, you review, posts publish automatically.',
+      },
+      {
+        title: 'Consistent Quality',
+        description: 'Publish weekly without the grind. AI maintains your standards post after post.',
+      },
+      {
+        title: 'Full Platform',
+        description: 'Not just writing—hosting, analytics, comments, newsletters included.',
+      },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Writers Stay Productive',
+    testimonials: [
+      {
+        quote: 'I went from posting once a month to once a week. Same time investment, 4x output. The AI really does learn your voice.',
+        author: { name: 'Rachel Kim', title: 'Thought Leader', company: 'TechThoughts' },
+      },
+      {
+        quote: 'Our content team uses Blogg.ng for first drafts. We edit rather than write from scratch. Productivity doubled.',
+        author: { name: 'David Chen', title: 'Content Director', company: 'ScaleUp' },
+      },
+    ],
+  },
+
+  pricing: {
+    headline: 'Publish More, Write Less',
+    description: 'Start free. Scale when your audience grows.',
+    tiers: [
+      { name: 'Free', price: { monthly: '$0' }, features: ['5 posts/month', 'AI voice training', 'Basic SEO', 'Blogg.ng subdomain'], cta: 'Start Free' },
+      { name: 'Pro', price: { monthly: '$29' }, features: ['Unlimited posts', 'Custom domain', 'Advanced SEO', 'Newsletter integration', 'Priority support'], cta: 'Go Pro', featured: true },
+      { name: 'Team', price: { monthly: '$99' }, features: ['Multiple authors', 'Brand voice consistency', 'Team workflows', 'Analytics dashboard', 'API access'], cta: 'Start Team' },
+    ],
+  },
+
+  cta: {
+    headline: 'Ideas Deserve to Be Shared',
+    description: 'Stop letting thoughts die in your notes app. Transform them into posts.',
+    action: { label: 'Start Your AI Blog', href: '/create' },
+  },
+
+  footer: {
+    brand: { name: 'blogg.ng', description: 'AI-powered blogging that writes itself.' },
+    columns: [
+      { title: 'Product', links: [{ text: 'Features', href: '#features' }, { text: 'Pricing', href: '#pricing' }, { text: 'Examples', href: '/examples' }] },
+      { title: 'Resources', links: [{ text: 'Documentation', href: '/docs' }, { text: 'Blog', href: '/blog' }] },
+    ],
+    legal: { copyright: '© 2024 blogg.ng' },
+  },
+}
+
+<LumenLayout {...siteData} />

@@ -1,0 +1,81 @@
+---
+$type: LandingPage
+$id: https://builder.domains
+name: builder.domains
+title: Free Domains for AI Agents
+description: Every AI agent deserves an identity. Get yourname.hq.com.ai free, upgrade for custom domains at scale.
+layout: quartz
+---
+
+import { QuartzLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'builder.domains',
+  title: 'Free Domains for AI Agents',
+  description: 'Every AI agent deserves an identity. Get yourname.hq.com.ai free, upgrade for custom domains at scale.',
+  layout: 'quartz',
+
+  accentColor: 'emerald' as const,
+
+  header: {
+    brand: { name: 'builder.domains', href: '/' },
+    navigation: [
+      { label: 'Available TLDs', href: '/tlds' },
+      { label: 'Docs', href: '/docs' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'Login', href: '/login', variant: 'ghost' as const },
+      { label: 'Claim Your Domain', href: '/claim', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    headline: 'Free Domains for AI Agents',
+    description: 'Stop paying $12/year for every experiment. Get instant subdomains on premium TLDs like hq.com.ai, io.mw, and llc.st. SSL and DNS configured automatically.',
+    primaryAction: { label: 'Claim Your Free Domain', href: '/claim' },
+    secondaryAction: { label: 'Browse Available TLDs', href: '/tlds' },
+  },
+
+  features: {
+    headline: 'Every Project Deserves a Home',
+    description: 'Build now, upgrade later. No commitment required.',
+    features: [
+      { title: 'Instant Setup', description: 'Claim your subdomain and it\'s live. No DNS propagation wait, no configuration.' },
+      { title: 'Premium TLDs', description: 'hq.com.ai, io.mw, llc.st, api.ht—professional domains, completely free.' },
+      { title: 'SSL Included', description: 'HTTPS automatically configured. Secure from minute one.' },
+      { title: 'Scale When Ready', description: 'Upgrade for custom domains, bulk management, and team features.' },
+      { title: 'No Lock-in', description: 'Point your subdomain anywhere. Switch hosting anytime.' },
+      { title: 'API Access', description: 'Programmatically manage domains. Perfect for platforms and agencies.' },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Builders Love Free Domains',
+    testimonials: [
+      { quote: 'I used to hesitate starting new projects because of domain costs. Now every idea gets a home instantly.', author: { name: 'Maya Patel', title: 'Indie Hacker' } },
+      { quote: 'We give every client project a builder.domains subdomain during development. It\'s become part of our workflow.', author: { name: 'Chris Lee', title: 'Agency Owner' } },
+    ],
+  },
+
+  pricing: {
+    headline: 'Free Forever. Upgrade for Power.',
+    description: 'One free subdomain per account. Upgrade when you need more.',
+    tiers: [
+      { name: 'Free', price: { monthly: '$0' }, features: ['1 subdomain', 'SSL included', 'DNS managed', 'Community support'], cta: 'Get Started' },
+      { name: 'Pro', price: { monthly: '$19' }, features: ['10 subdomains', 'Custom TLDs', 'Analytics', 'Priority support'], cta: 'Go Pro', featured: true },
+      { name: 'Scale', price: { monthly: '$99' }, features: ['100 subdomains', 'Bulk API', 'Team management', 'Dedicated support'], cta: 'Start Scale' },
+    ],
+  },
+
+  footer: {
+    brand: { name: 'builder.domains', description: 'Free domains for builders.' },
+    columns: [
+      { title: 'Product', links: [{ text: 'Available TLDs', href: '/tlds' }, { text: 'Pricing', href: '#pricing' }, { text: 'API', href: '/api' }] },
+      { title: 'Resources', links: [{ text: 'Documentation', href: '/docs' }, { text: 'Blog', href: '/blog' }] },
+    ],
+    legal: { copyright: '© 2024 builder.domains' },
+  },
+}
+
+<QuartzLayout {...siteData} />

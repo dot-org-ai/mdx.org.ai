@@ -1,0 +1,82 @@
+---
+$type: LandingPage
+$id: https://hacker.news.org.ai
+name: hacker.news.org.ai
+title: Hacker News, Enhanced by AI
+description: All the value of HN, none of the FOMO. AI summaries, personalized feeds, and insights from every thread.
+layout: mist
+---
+
+import { MistLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'hacker.news.org.ai',
+  title: 'Hacker News, Enhanced by AI',
+  description: 'All the value of HN, none of the FOMO. AI summaries, personalized feeds, and insights from every thread.',
+  layout: 'mist',
+
+  accentColor: 'orange' as const,
+  warmth: 'warm' as const,
+
+  header: {
+    brand: { name: 'HN Enhanced', href: '/' },
+    navigation: [
+      { label: 'Feed', href: '/feed' },
+      { label: 'Summaries', href: '/summaries' },
+      { label: 'Trends', href: '/trends' },
+      { label: 'Settings', href: '/settings' },
+    ],
+    actions: [
+      { label: 'Try Your Feed', href: '/feed', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    headline: 'Stay Informed in 5 Minutes, Not 2 Hours',
+    description: 'Hacker News is invaluable but overwhelming. We add AI summaries, personalized feeds, and smart filtering—so you get the insights without the infinite scroll. TLDR every post. Highlights from every thread.',
+    primaryAction: { label: 'Try Your Personalized Feed', href: '/feed' },
+    secondaryAction: { label: 'See Today\'s Top Insights', href: '/today' },
+  },
+
+  features: {
+    headline: 'HN Without the FOMO',
+    description: 'Every post summarized. Every thread distilled. Your interests prioritized.',
+    features: [
+      { title: 'Post Summaries', description: 'TLDR for every article before you click. Know what it\'s about in seconds.' },
+      { title: 'Thread Highlights', description: 'AI extracts the best comments. Skip to the insights in 300-comment threads.' },
+      { title: 'Personalized Feed', description: 'Tell us your interests. AI learns what you like. Your HN, curated for you.' },
+      { title: 'Trend Detection', description: 'What\'s the community buzzing about? See patterns across discussions.' },
+      { title: 'Daily Digest', description: 'Don\'t have time today? Get a morning email with everything that mattered.' },
+      { title: 'Topic Filters', description: 'Hide what you don\'t care about. More signal, less noise.' },
+    ],
+  },
+
+  testimonials: {
+    headline: 'HN Readers Stay Efficient',
+    testimonials: [
+      { quote: 'I used to refresh HN 20 times a day. Now I check my personalized feed once and I\'m caught up. Productivity recovered.', author: { name: 'Jake Wilson', title: 'Engineering Manager' } },
+      { quote: 'The thread summaries are incredible. 500 comments distilled to 5 key insights. This is how HN should work.', author: { name: 'Nina Patel', title: 'Product Designer' } },
+    ],
+  },
+
+  pricing: {
+    headline: 'Read Smarter',
+    description: 'Basic feed is free. Premium for power users.',
+    tiers: [
+      { name: 'Free', price: { monthly: '$0' }, features: ['Post summaries', 'Basic personalization', 'Daily digest', 'Web access'], cta: 'Get Started' },
+      { name: 'Pro', price: { monthly: '$9' }, features: ['Thread highlights', 'Advanced personalization', 'Trend analysis', 'API access', 'No ads'], cta: 'Go Pro', featured: true },
+      { name: 'Team', price: { monthly: '$29' }, features: ['Shared collections', 'Team trending', 'Slack integration', 'Priority support'], cta: 'Start Team' },
+    ],
+  },
+
+  footer: {
+    brand: { name: 'hacker.news.org.ai', description: 'Hacker News, enhanced by AI.' },
+    columns: [
+      { title: 'Product', links: [{ text: 'Feed', href: '/feed' }, { text: 'Summaries', href: '/summaries' }, { text: 'Trends', href: '/trends' }] },
+      { title: 'Resources', links: [{ text: 'API', href: '/api' }, { text: 'Blog', href: '/blog' }] },
+    ],
+    legal: { copyright: '© 2024 hacker.news.org.ai • Not affiliated with Y Combinator' },
+  },
+}
+
+<MistLayout {...siteData} />

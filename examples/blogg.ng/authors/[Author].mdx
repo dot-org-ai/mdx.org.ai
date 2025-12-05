@@ -1,0 +1,18 @@
+---
+$type: TypeDefinition
+$generateMarkdown: true
+name: string
+bio: string
+avatar: string
+twitter: string
+github: string
+posts: Post.author
+---
+
+# {data.name}
+
+{data.bio}
+
+## Posts by {data.name}
+
+<Posts />

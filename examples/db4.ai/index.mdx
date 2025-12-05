@@ -1,0 +1,161 @@
+---
+$type: LandingPage
+$id: https://db4.ai
+name: db4.ai
+title: The Database Built for AI
+description: One database for vectors, tables, and semantic queries. Stop duct-taping databases together.
+layout: dusk
+---
+
+import { DuskLayout } from '@mdxui/tailark/templates'
+
+export const siteData = {
+  name: 'db4.ai',
+  title: 'The Database Built for AI',
+  description: 'One database for vectors, tables, and semantic queries. Stop duct-taping databases together.',
+  layout: 'dusk',
+
+  gradient: 'amber-orange' as const,
+  glow: true,
+
+  header: {
+    brand: { name: 'db4.ai', href: '/' },
+    navigation: [
+      { label: 'Features', href: '#features' },
+      { label: 'Docs', href: '/docs' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+    actions: [
+      { label: 'Login', href: '/login', variant: 'ghost' as const },
+      { label: 'Start Building', href: '/start', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    announcement: { text: 'Vectors + Tables + Natural Language', href: '/blog/unified-data' },
+    headline: 'One Database. All of AI.',
+    description: 'Stop managing Postgres + Pinecone + Redis for one AI app. DB4.ai gives you vectors, relational data, and semantic queries in a single database—designed from the ground up for AI workloads.',
+    primaryAction: { label: 'Start Building', href: '/start' },
+    secondaryAction: { label: 'See Query Examples', href: '/examples' },
+    trustedBy: [
+      { name: 'OpenAI' },
+      { name: 'Anthropic' },
+      { name: 'Cohere' },
+    ],
+  },
+
+  features: {
+    headline: 'Everything AI Needs',
+    description: 'Native capabilities, not bolted-on extensions.',
+    features: [
+      {
+        title: 'Native Vector Search',
+        description: 'Vector similarity at any scale. No separate vector database needed. Indexes built for AI.',
+      },
+      {
+        title: 'Natural Language Queries',
+        description: '"Find users who asked about pricing last week"—query your data in English.',
+      },
+      {
+        title: 'Auto Embeddings',
+        description: 'Insert text, get embeddings automatically. No manual embedding generation required.',
+      },
+      {
+        title: 'Hybrid Queries',
+        description: 'Combine vector search with SQL filters. The best of both worlds in one query.',
+      },
+      {
+        title: 'Works with ORMs',
+        description: 'Drop-in compatible with Prisma, Drizzle, TypeORM. Migration path from Postgres.',
+      },
+      {
+        title: 'Scales with You',
+        description: 'From prototype to production. Serverless or dedicated. Global distribution.',
+      },
+    ],
+  },
+
+  testimonials: {
+    headline: 'AI Teams Ship Faster',
+    testimonials: [
+      {
+        quote: 'We were managing four different data stores. DB4 consolidated everything. Our architecture diagrams got much simpler.',
+        author: {
+          name: 'Maria Rodriguez',
+          title: 'CTO',
+          company: 'AIStartup',
+        },
+      },
+      {
+        quote: 'Natural language queries changed everything. Our non-technical team can now explore customer conversations directly.',
+        author: {
+          name: 'Tom Wilson',
+          title: 'Head of Product',
+          company: 'ChatCorp',
+        },
+      },
+    ],
+  },
+
+  pricing: {
+    headline: 'Simple, Predictable Pricing',
+    description: 'Pay for storage and compute. No surprise vector search fees.',
+    tiers: [
+      {
+        name: 'Free',
+        price: { monthly: '$0' },
+        features: ['1GB storage', '1M vectors', 'Shared compute', 'Community support'],
+        cta: 'Start Free',
+      },
+      {
+        name: 'Pro',
+        price: { monthly: '$29' },
+        features: ['10GB storage', 'Unlimited vectors', 'Dedicated compute', 'Priority support'],
+        cta: 'Go Pro',
+        featured: true,
+      },
+      {
+        name: 'Scale',
+        price: { monthly: '$199' },
+        features: ['100GB storage', 'Global replication', 'Custom models', 'SLA & support'],
+        cta: 'Contact Sales',
+      },
+    ],
+  },
+
+  cta: {
+    headline: 'The Database AI Deserves',
+    description: 'Stop duct-taping. Start building.',
+    action: { label: 'Start Building', href: '/start' },
+  },
+
+  footer: {
+    brand: {
+      name: 'db4.ai',
+      description: 'The database built for AI.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Features', href: '#features' },
+          { text: 'Pricing', href: '#pricing' },
+          { text: 'Documentation', href: '/docs' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'Blog', href: '/blog' },
+          { text: 'Examples', href: '/examples' },
+          { text: 'Status', href: '/status' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 db4.ai',
+    },
+  },
+}
+
+<DuskLayout {...siteData} />

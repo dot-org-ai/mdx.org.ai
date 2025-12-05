@@ -1,0 +1,135 @@
+---
+$type: Site
+$id: https://workflow.md
+name: workflow.md
+title: Workflows in Markdown - Automation That Reads Like Docs
+description: Design and run automation workflows with Markdown. Version-controlled, readable, powerful.
+layout: quartz
+theme:
+  accentColor: amber
+---
+
+import { QuartzLayout } from '@mdxui/tailark/templates'
+
+<QuartzLayout
+  accentColor="amber"
+  header={{
+    brand: { name: 'workflow.md', href: '/' },
+    navigation: [
+      { label: 'Docs', href: '/docs' },
+      { label: 'API', href: '/api' },
+      { label: 'MCP', href: '/mcp' },
+      { label: 'Templates', href: '/templates' },
+    ],
+    actions: [
+      { label: 'GitHub', href: 'https://github.com/mdx-org/workflow.md', variant: 'ghost' },
+      { label: 'Get Started', href: '/docs/quickstart', variant: 'primary' },
+    ],
+  }}
+  hero={{
+    headline: 'Workflows That Read Like Documentation',
+    description: 'Define automation in Markdown. Each step is a heading. Each action is a code block. Review workflows like you review code.',
+    primaryAction: { label: 'Start Building', href: '/docs/quickstart' },
+    secondaryAction: { label: 'Browse Templates', href: '/templates' },
+  }}
+  features={{
+    headline: 'Automation Done Right',
+    description: 'Powerful workflows that anyone can understand.',
+    features: [
+      {
+        title: 'Markdown-Native',
+        description: 'Workflows are MDX files. Document as you build. Review in GitHub PRs.',
+      },
+      {
+        title: 'Event-Driven',
+        description: 'Trigger on webhooks, schedules, or events. React to anything.',
+      },
+      {
+        title: 'Branching Logic',
+        description: 'Conditionals, loops, and parallel execution. Real programming, readable format.',
+      },
+      {
+        title: 'Integrations',
+        description: 'Slack, GitHub, Stripe, databases, APIs. Connect everything.',
+      },
+      {
+        title: 'AI-Powered',
+        description: 'Call AI models as workflow steps. Human-in-the-loop approvals.',
+      },
+      {
+        title: 'Observable',
+        description: 'Full execution logs. Debug with confidence. Replay failed runs.',
+      },
+    ],
+  }}
+  testimonials={{
+    headline: 'Teams Love workflow.md',
+    testimonials: [
+      {
+        quote: 'Our ops workflows used to be scattered scripts. Now they are documented, versioned, and reviewable.',
+        author: {
+          name: 'Rachel Torres',
+          title: 'DevOps Lead',
+        },
+      },
+      {
+        quote: 'Non-engineers can finally understand our automation. That changes everything.',
+        author: {
+          name: 'Mike Chen',
+          title: 'VP Engineering',
+        },
+      },
+    ],
+  }}
+  pricing={{
+    headline: 'Free to Start',
+    description: 'Open source core. Managed service for teams.',
+    tiers: [
+      {
+        name: 'Open Source',
+        price: { monthly: '$0' },
+        features: ['Unlimited workflows', 'Self-hosted', 'All integrations', 'Community support'],
+        cta: 'Get Started',
+      },
+      {
+        name: 'Cloud',
+        price: { monthly: '$49' },
+        features: ['Managed hosting', 'Team collaboration', 'Execution history', 'Monitoring', 'Priority support'],
+        cta: 'Start Trial',
+        featured: true,
+      },
+      {
+        name: 'Enterprise',
+        price: { monthly: 'Custom' },
+        features: ['Dedicated infrastructure', 'SSO', 'Audit logs', 'SLA', 'Custom integrations'],
+        cta: 'Contact Sales',
+      },
+    ],
+  }}
+  footer={{
+    brand: {
+      name: 'workflow.md',
+      description: 'Automation in Markdown.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Documentation', href: '/docs' },
+          { text: 'Templates', href: '/templates' },
+          { text: 'API', href: '/api' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'GitHub', href: 'https://github.com/mdx-org/workflow.md' },
+          { text: 'Discord', href: '/discord' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 workflow.md',
+    },
+  }}
+/>

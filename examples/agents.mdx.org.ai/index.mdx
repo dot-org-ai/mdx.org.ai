@@ -1,0 +1,121 @@
+---
+$type: LandingPage
+$id: https://agents.mdx.org.ai
+name: agents.mdx.org.ai
+title: The npm for AI Agents
+description: Discover, share, and deploy pre-built AI agents in seconds. Stop building from scratch.
+layout: scalar
+---
+
+import { ScalarLayout } from '@mdxui/shadcnblocks/templates'
+
+export const siteData = {
+  name: 'agents.mdx.org.ai',
+  title: 'The npm for AI Agents',
+  description: 'Discover, share, and deploy pre-built AI agents in seconds. Stop building from scratch.',
+  layout: 'scalar',
+
+  gradient: 'violet' as const,
+  style: 'minimal' as const,
+
+  header: {
+    brand: { name: 'agents', href: '/' },
+    navigation: [
+      { label: 'Browse', href: '/browse' },
+      { label: 'Docs', href: '/docs' },
+      { label: 'Publish', href: '/publish' },
+    ],
+    actions: [
+      { label: 'Login', href: '/login', variant: 'ghost' as const },
+      { label: 'Browse Registry', href: '/browse', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    badge: 'Discover. Install. Compose.',
+    title: 'Why Build When You Can Install?',
+    description: 'The agent ecosystem for AI developers. Search 1,000+ pre-built agents by capability. Install with one command. Compose into powerful workflows. Ship AI features in hours.',
+    primaryAction: { label: 'Browse the Registry', href: '/browse' },
+    secondaryAction: { label: 'Publish Your Agent', href: '/publish' },
+    code: `# Search for what you need
+npx agents search "calendar scheduling"
+
+# Install in seconds
+npx agents install @assistant/calendar
+
+# Use immediately
+import { CalendarAgent } from '@assistant/calendar'`,
+  },
+
+  features: {
+    headline: 'The Agent Ecosystem',
+    description: 'Build on the work of thousands of developers.',
+    features: [
+      {
+        title: 'Semantic Search',
+        description: 'Find agents by describing what you need. "Handle email responses" finds the right agents.',
+      },
+      {
+        title: 'One-Command Install',
+        description: 'npx agents install @scope/agent. Dependencies resolved. Types included. Ready to use.',
+      },
+      {
+        title: 'Composable Design',
+        description: 'Chain agents into workflows. Calendar + Email + Slack = your AI assistant.',
+      },
+      {
+        title: 'Safety Verified',
+        description: 'Automated security scanning. Behavior testing. Community reviews. Trust what you install.',
+      },
+      {
+        title: 'Type-Safe',
+        description: 'Full TypeScript support. Autocomplete, documentation, and type checking included.',
+      },
+      {
+        title: 'Publish & Share',
+        description: 'Share your agents with the world. Get stars, feedback, and recognition.',
+      },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Developers Ship Faster',
+    testimonials: [
+      {
+        quote: 'I found an agent that does exactly what I spent a week building manually. Now I compose rather than code from scratch.',
+        author: { name: 'Alex Rivera', title: 'AI Developer', company: 'BuildFast' },
+      },
+      {
+        quote: 'We published our internal agents. The community improved them faster than we ever could. Open source wins again.',
+        author: { name: 'Sarah Park', title: 'Engineering Lead', company: 'AgentLabs' },
+      },
+    ],
+  },
+
+  pricing: {
+    headline: 'Free for Everyone',
+    description: 'Open source registry. Premium features for teams.',
+    tiers: [
+      { name: 'Open Source', price: { monthly: '$0' }, features: ['Browse & install', 'Publish unlimited', 'Community support', 'Basic analytics'], cta: 'Get Started' },
+      { name: 'Pro', price: { monthly: '$19' }, features: ['Private agents', 'Team management', 'Priority search', 'Advanced analytics'], cta: 'Go Pro', featured: true },
+      { name: 'Enterprise', price: { monthly: '$99' }, features: ['Private registry', 'SSO/SAML', 'Audit logs', 'SLA & support'], cta: 'Contact Sales' },
+    ],
+  },
+
+  cta: {
+    headline: 'Join the Agent Ecosystem',
+    description: 'Why build alone when you can build together?',
+    action: { label: 'Browse Agents', href: '/browse' },
+  },
+
+  footer: {
+    brand: { name: 'agents.mdx.org.ai', description: 'The npm for AI agents.' },
+    columns: [
+      { title: 'Registry', links: [{ text: 'Browse', href: '/browse' }, { text: 'Publish', href: '/publish' }, { text: 'Documentation', href: '/docs' }] },
+      { title: 'Community', links: [{ text: 'GitHub', href: 'https://github.com/mdx-org/agents' }, { text: 'Discord', href: '/discord' }] },
+    ],
+    legal: { copyright: '© 2024 agents.mdx.org.ai' },
+  },
+}
+
+<ScalarLayout {...siteData} />

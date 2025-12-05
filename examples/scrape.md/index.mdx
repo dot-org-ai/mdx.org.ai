@@ -1,0 +1,154 @@
+---
+$type: Site
+$id: https://scrape.md
+name: scrape.md
+title: Web Scraping for AI - Clean Markdown from Any URL
+description: Turn any webpage into clean Markdown. Built for AI context windows.
+layout: mist
+theme:
+  accentColor: cyan
+  warmth: cool
+---
+
+import { MistLayout } from '@mdxui/tailark/templates'
+
+<MistLayout
+  accentColor="cyan"
+  warmth="cool"
+  header={{
+    brand: { name: 'scrape.md', href: '/' },
+    navigation: [
+      { label: 'Docs', href: '/docs' },
+      { label: 'API', href: '/api' },
+      { label: 'MCP', href: '/mcp' },
+      { label: 'Try It', href: '/try' },
+    ],
+    actions: [
+      { label: 'GitHub', href: 'https://github.com/mdx-org/scrape.md', variant: 'ghost' },
+      { label: 'Get API Key', href: '/signup', variant: 'primary' },
+    ],
+  }}
+  hero={{
+    headline: 'Web → Markdown',
+    description: 'Turn any webpage into clean, readable Markdown. Optimized for AI context windows. No boilerplate, no ads, just content.',
+    primaryAction: { label: 'Try It Free', href: '/try' },
+    secondaryAction: { label: 'API Docs', href: '/api' },
+  }}
+  features={{
+    headline: 'Built for AI Workflows',
+    description: 'The missing piece between the web and your AI.',
+    features: [
+      {
+        title: 'Clean Output',
+        description: 'Removes navigation, ads, and boilerplate. Just the main content, beautifully formatted.',
+      },
+      {
+        title: 'JavaScript Rendering',
+        description: 'Full browser rendering for dynamic sites. SPAs, client-rendered content, infinite scroll.',
+      },
+      {
+        title: 'Structured Extraction',
+        description: 'Extract specific elements with CSS selectors. Get just what you need.',
+      },
+      {
+        title: 'Fast & Cached',
+        description: 'Results cached at the edge. Subsequent requests return in milliseconds.',
+      },
+      {
+        title: 'MCP Integration',
+        description: 'Use as a tool in Claude Desktop. Give your AI the ability to browse.',
+      },
+      {
+        title: 'Batch Processing',
+        description: 'Scrape hundreds of URLs in parallel. Build datasets efficiently.',
+      },
+    ],
+  }}
+  testimonials={{
+    headline: 'Powering AI Workflows',
+    testimonials: [
+      {
+        quote: 'scrape.md is how our AI agents browse the web. The Markdown output fits perfectly in context windows.',
+        author: {
+          name: 'Lisa Park',
+          title: 'ML Engineer',
+        },
+      },
+      {
+        quote: 'We use it to keep our RAG system updated. Fresh content, clean formatting, zero hassle.',
+        author: {
+          name: 'David Kim',
+          title: 'AI Lead',
+        },
+      },
+    ],
+  }}
+  pricing={{
+    headline: 'Pay Per Page',
+    description: 'Simple pricing. No monthly minimums.',
+    tiers: [
+      {
+        name: 'Free',
+        price: { monthly: '$0' },
+        features: ['100 pages/month', 'Basic rendering', 'Community support'],
+        cta: 'Start Free',
+      },
+      {
+        name: 'Pro',
+        price: { monthly: '$19' },
+        features: ['10K pages/month', 'JavaScript rendering', 'Priority queue', 'API support'],
+        cta: 'Go Pro',
+        featured: true,
+      },
+      {
+        name: 'Scale',
+        price: { monthly: '$99' },
+        features: ['100K pages/month', 'Dedicated workers', 'Custom selectors', 'SLA'],
+        cta: 'Contact Sales',
+      },
+    ],
+  }}
+  faq={{
+    headline: 'Common Questions',
+    items: [
+      {
+        question: 'How is this different from other scrapers?',
+        answer: 'scrape.md is optimized for AI. Output is clean Markdown designed to fit in context windows, not raw HTML.',
+      },
+      {
+        question: 'Can it handle JavaScript-heavy sites?',
+        answer: 'Yes. Full Chromium rendering is available. SPAs, client-side content, even infinite scroll.',
+      },
+      {
+        question: 'Is there rate limiting?',
+        answer: 'We respect robots.txt and implement polite delays. For aggressive scraping, use dedicated workers.',
+      },
+    ],
+  }}
+  footer={{
+    brand: {
+      name: 'scrape.md',
+      description: 'The web, as Markdown.',
+    },
+    columns: [
+      {
+        title: 'Product',
+        links: [
+          { text: 'Documentation', href: '/docs' },
+          { text: 'API', href: '/api' },
+          { text: 'Try It', href: '/try' },
+        ],
+      },
+      {
+        title: 'Resources',
+        links: [
+          { text: 'GitHub', href: 'https://github.com/mdx-org/scrape.md' },
+          { text: 'Status', href: '/status' },
+        ],
+      },
+    ],
+    legal: {
+      copyright: '© 2024 scrape.md',
+    },
+  }}
+/>

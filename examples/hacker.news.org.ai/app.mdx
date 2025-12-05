@@ -1,0 +1,181 @@
+---
+$type: Application
+$id: https://hacker.news.org.ai/app
+name: HN Enhanced Reader
+description: Hacker News with AI-powered summaries and personalization
+version: 1.0.0
+---
+
+import { useState } from 'react'
+import { Card, CardHeader, CardTitle, CardContent } from '@mdxui/shadcn/card'
+import { Button } from '@mdxui/shadcn/button'
+import { Badge } from '@mdxui/shadcn/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@mdxui/shadcn/tabs'
+
+export const sampleStories = [
+  {
+    id: 1,
+    title: 'Show HN: I built a compiler from scratch in Rust',
+    url: 'https://example.com/rust-compiler',
+    points: 342,
+    comments: 89,
+    time: '3 hours ago',
+    author: 'rustfan',
+    summary: 'A detailed walkthrough of building a compiler from lexer to code generation. Uses LLVM backend. Good for learning compiler theory with modern tooling.',
+    sentiment: 'positive',
+    topics: ['rust', 'compilers', 'programming'],
+  },
+  {
+    id: 2,
+    title: 'The hidden costs of microservices',
+    url: 'https://example.com/microservices-costs',
+    points: 567,
+    comments: 234,
+    time: '5 hours ago',
+    author: 'archblogger',
+    summary: 'Critical take on microservices adoption. Main arguments: operational complexity, debugging difficulties, and team coordination overhead often outweigh benefits for small teams.',
+    sentiment: 'mixed',
+    topics: ['architecture', 'microservices', 'devops'],
+    controversial: true,
+  },
+  {
+    id: 3,
+    title: 'Anthropic releases Claude 3.5 with improved coding',
+    url: 'https://example.com/claude-35',
+    points: 892,
+    comments: 456,
+    time: '7 hours ago',
+    author: 'aitimes',
+    summary: 'Anthropic announces Claude 3.5 with significant improvements in coding tasks, longer context window, and better instruction following. Benchmarks show competitive performance with GPT-4.',
+    sentiment: 'positive',
+    topics: ['ai', 'llm', 'anthropic'],
+  },
+]
+
+export function HNReader() {
+  const [feed, setFeed] = useState('personalized')
+  const [expanded, setExpanded] = useState({})
+
+  const toggleExpand = (id) => {
+    setExpanded(prev => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-orange-500">HN Enhanced</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm">Settings</Button>
+          <Button size="sm">Daily Digest</Button>
+        </div>
+      </div>
+
+      <Tabs value={feed} onValueChange={setFeed}>
+        <TabsList>
+          <TabsTrigger value="personalized">For You</TabsTrigger>
+          <TabsTrigger value="top">Top</TabsTrigger>
+          <TabsTrigger value="new">New</TabsTrigger>
+          <TabsTrigger value="ask">Ask HN</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value={feed} className="mt-4 space-y-4">
+          {sampleStories.map(story => (
+            <Card key={story.id} className={story.controversial ? 'border-amber-500' : ''}>
+              <CardContent className="pt-4">
+                <div className="space-y-2">
+                  {/* Header */}
+                  <div className="flex items-start gap-2">
+                    <span className="text-orange-500 font-bold">{story.points}</span>
+                    <div className="flex-1">
+                      <a href={story.url} className="font-medium hover:text-orange-500">
+                        {story.title}
+                      </a>
+                      <div className="text-sm text-muted-foreground">
+                        {story.time} by {story.author} | {story.comments} comments
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI Summary */}
+                  <div className="bg-muted/50 rounded p-3 text-sm">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="outline" size="sm">AI Summary</Badge>
+                      <Badge
+                        variant={story.sentiment === 'positive' ? 'success' : story.sentiment === 'mixed' ? 'warning' : 'secondary'}
+                        size="sm"
+                      >
+                        {story.sentiment}
+                      </Badge>
+                      {story.controversial && (
+                        <Badge variant="destructive" size="sm">Controversial</Badge>
+                      )}
+                    </div>
+                    <p>{story.summary}</p>
+                  </div>
+
+                  {/* Topics */}
+                  <div className="flex gap-2">
+                    {story.topics.map(topic => (
+                      <Badge key={topic} variant="secondary" size="sm">
+                        {topic}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  {/* Thread Summary (expandable) */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleExpand(story.id)}
+                  >
+                    {expanded[story.id] ? 'Hide' : 'Show'} Thread Summary
+                  </Button>
+
+                  {expanded[story.id] && (
+                    <div className="border-l-2 border-orange-500 pl-4 space-y-2 text-sm">
+                      <p className="font-medium">Top Insights from Comments:</p>
+                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                        <li>Several commenters shared their own implementation experiences</li>
+                        <li>Debate about LLVM vs custom backend tradeoffs</li>
+                        <li>Resources shared: "Crafting Interpreters", LLVM tutorial</li>
+                        <li>Author answered 12 questions about design decisions</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
+
+<HNReader />
+
+---
+
+## Features
+
+### AI-Powered Summaries
+- **Article TLDR** - Know what it's about before clicking
+- **Thread Highlights** - Key insights from 300+ comment threads
+- **Sentiment Analysis** - Is the community positive or skeptical?
+- **Controversy Detection** - Know when discussions are heated
+
+### Personalized Feed
+- Tell us your interests (languages, frameworks, topics)
+- AI learns from what you read and engage with
+- "More like this" and "Less like this" feedback
+- Hide topics you don't care about
+
+### Daily Digest
+- Morning email with everything that mattered
+- Customizable length and topics
+- Weekend edition with best of the week
+
+### Time Savings
+- Average HN user: 45 min/day scrolling
+- With HN Enhanced: 10 min/day, same or better coverage
+- Thread summaries alone save hours on popular posts

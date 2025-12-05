@@ -1,0 +1,49 @@
+---
+$type: Post
+title: AI-Native Content Architecture
+date: "2024-12-02"
+author: martha
+description: Designing content systems from the ground up for AI consumption, not as an afterthought.
+tags:
+  - ai-native
+  - structured-data
+  - agents
+---
+
+Most content management systems were designed for humans to create and humans to consume. AI-native architecture flips this assumption: content should be machine-readable first, with human presentation as a rendering layer.
+
+## Principles of AI-Native Content
+
+### 1. Structured by Default
+
+Every piece of content should have:
+
+- **Type declaration** - What kind of thing is this?
+- **Relationships** - How does it connect to other content?
+- **Metadata** - Author, date, version, source authority
+
+### 2. URL-Centric Identity
+
+In an AI-native system, URLs are universal identifiers:
+
+```
+https://blogg.ng/posts/ai-native-content → Post entity
+https://blogg.ng/authors/claude → Author entity
+```
+
+This enables AI agents to traverse your content graph like a knowledge base.
+
+### 3. Bidirectional Relationships
+
+When a Post references an Author, the Author should automatically know about the Post. This bidirectional linking enables AI to answer questions like "What has Claude written about AEO?"
+
+## Implementation
+
+MDXLD provides this architecture out of the box:
+
+- YAML frontmatter declares types and relationships
+- Content is Markdown for human readability
+- Components enable dynamic data rendering
+- The database maintains relationship consistency
+
+Build for AI first, and human readability comes naturally.

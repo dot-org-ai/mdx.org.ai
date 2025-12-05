@@ -1,0 +1,201 @@
+---
+$type: Application
+$id: https://api.net.ai/app
+name: API Generator
+description: Vibe code your API in natural language
+version: 1.0.0
+---
+
+import { useState } from 'react'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@mdxui/shadcn/card'
+import { Button } from '@mdxui/shadcn/button'
+import { Textarea } from '@mdxui/shadcn/textarea'
+import { Badge } from '@mdxui/shadcn/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@mdxui/shadcn/tabs'
+
+export function APIGenerator() {
+  const [schema, setSchema] = useState('')
+  const [generated, setGenerated] = useState(null)
+
+  const exampleSchema = `Users have posts.
+Posts have comments.
+Comments have likes.
+Users can follow other users.`
+
+  const generateAPI = () => {
+    if (!schema.trim()) return
+
+    setGenerated({
+      baseUrl: 'https://your-api.api.net.ai',
+      endpoints: [
+        { method: 'GET', path: '/users', description: 'List all users' },
+        { method: 'POST', path: '/users', description: 'Create a user' },
+        { method: 'GET', path: '/users/:id', description: 'Get a user' },
+        { method: 'GET', path: '/users/:id/posts', description: 'Get user posts' },
+        { method: 'POST', path: '/posts', description: 'Create a post' },
+        { method: 'GET', path: '/posts/:id/comments', description: 'Get post comments' },
+        { method: 'POST', path: '/posts/:id/comments', description: 'Add a comment' },
+        { method: 'POST', path: '/comments/:id/likes', description: 'Like a comment' },
+        { method: 'POST', path: '/users/:id/follow', description: 'Follow a user' },
+      ],
+      graphql: `type User {
+  id: ID!
+  name: String!
+  email: String!
+  posts: [Post!]!
+  followers: [User!]!
+  following: [User!]!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  author: User!
+  comments: [Comment!]!
+}
+
+type Comment {
+  id: ID!
+  text: String!
+  author: User!
+  post: Post!
+  likes: [Like!]!
+}`,
+    })
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent">
+          Vibe Code Your API
+        </h1>
+        <p className="text-muted-foreground">
+          Describe your data model in plain English. Get REST + GraphQL instantly.
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Describe Your Data Model</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea
+            placeholder="Example: Users have posts. Posts have comments. Comments have likes."
+            value={schema}
+            onChange={(e) => setSchema(e.target.value)}
+            rows={5}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSchema(exampleSchema)}
+          >
+            Use Example
+          </Button>
+        </CardContent>
+        <CardFooter>
+          <Button onClick={generateAPI} className="w-full" size="lg">
+            Generate API
+          </Button>
+        </CardFooter>
+      </Card>
+
+      {generated && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <span className="text-green-500">✓</span>
+              API Generated
+              <Badge variant="outline">{generated.baseUrl}</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="rest">
+              <TabsList>
+                <TabsTrigger value="rest">REST Endpoints</TabsTrigger>
+                <TabsTrigger value="graphql">GraphQL Schema</TabsTrigger>
+                <TabsTrigger value="docs">API Docs</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="rest" className="space-y-2 mt-4">
+                {generated.endpoints.map((ep, i) => (
+                  <div key={i} className="flex items-center gap-3 p-2 border rounded">
+                    <Badge variant={ep.method === 'GET' ? 'secondary' : 'default'}>
+                      {ep.method}
+                    </Badge>
+                    <code className="flex-1 text-sm">{ep.path}</code>
+                    <span className="text-sm text-muted-foreground">{ep.description}</span>
+                  </div>
+                ))}
+              </TabsContent>
+
+              <TabsContent value="graphql" className="mt-4">
+                <pre className="bg-muted p-4 rounded text-sm overflow-x-auto">
+                  {generated.graphql}
+                </pre>
+              </TabsContent>
+
+              <TabsContent value="docs" className="mt-4">
+                <div className="space-y-2">
+                  <p>Interactive API documentation available at:</p>
+                  <a
+                    href={`${generated.baseUrl}/docs`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {generated.baseUrl}/docs
+                  </a>
+                  <p className="text-sm text-muted-foreground mt-4">
+                    OpenAPI spec: {generated.baseUrl}/openapi.json
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+          <CardFooter className="flex gap-2">
+            <Button variant="outline">Download OpenAPI</Button>
+            <Button variant="outline">View in Swagger</Button>
+            <Button>Deploy to Production</Button>
+          </CardFooter>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+<APIGenerator />
+
+---
+
+## Features
+
+### Natural Language Schema
+Just describe relationships:
+- "Users have posts"
+- "Posts belong to categories"
+- "Users can follow other users"
+
+AI generates the full schema with proper types, relationships, and indexes.
+
+### REST + GraphQL
+Every API comes with both:
+- **REST** - Standard endpoints with OpenAPI spec
+- **GraphQL** - Full schema with queries, mutations, subscriptions
+
+### Database Included
+- PostgreSQL provisioned automatically
+- Migrations handled
+- Backups configured
+- Vector search ready (pgvector)
+
+### Authentication Built-In
+Choose your auth strategy:
+- API Keys (default)
+- JWT Tokens
+- OAuth (Google, GitHub, etc.)
+
+### Auto Documentation
+- OpenAPI/Swagger spec generated
+- Interactive docs at /docs
+- SDK generation (TypeScript, Python, Go)

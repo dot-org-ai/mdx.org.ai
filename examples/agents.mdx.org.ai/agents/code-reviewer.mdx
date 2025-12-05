@@ -1,0 +1,154 @@
+---
+$type: Agent
+$id: https://agents.mdx.org.ai/agents/code-reviewer
+name: Code Reviewer
+description: An AI agent that reviews pull requests—checking for bugs, security issues, style violations, and suggesting improvements.
+author:
+  name: DevTools Inc
+  slug: devtools-inc
+version: 2.1.0
+downloads: 128450
+stars: 2341
+capabilities:
+  - Review code for bugs and logic errors
+  - Detect security vulnerabilities
+  - Check style guide compliance
+  - Suggest performance improvements
+  - Provide actionable feedback
+  - Learn team patterns over time
+tools:
+  - read_file
+  - github_api
+  - run_tests
+  - lint_code
+models:
+  - claude-3-opus
+  - claude-3-sonnet
+  - gpt-4
+license: Apache-2.0
+repository: https://github.com/devtools-inc/code-reviewer
+homepage: https://agents.mdx.org.ai/agents/code-reviewer
+---
+
+# Code Reviewer
+
+The Code Reviewer agent provides thorough, actionable code reviews for every pull request. It catches bugs, security issues, and style violations before they reach production.
+
+## Usage
+
+```typescript
+import { CodeReviewer } from '@agents/code-reviewer'
+
+const reviewer = new CodeReviewer({
+  model: 'claude-3-opus',
+  github: githubClient,
+  styleGuide: './docs/style-guide.md',
+  securityRules: 'owasp-top-10',
+})
+
+// Review a PR
+const review = await reviewer.review({
+  repo: 'myorg/myapp',
+  pr: 123,
+})
+
+// Get specific analysis
+const security = await reviewer.checkSecurity(diff)
+const performance = await reviewer.checkPerformance(diff)
+```
+
+## GitHub Action
+
+```yaml
+# .github/workflows/review.yml
+name: AI Code Review
+on: [pull_request]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: agents/code-reviewer@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          model: claude-3-sonnet
+          style-guide: ./docs/style-guide.md
+```
+
+## Review Categories
+
+### Security
+- SQL injection vulnerabilities
+- XSS attack vectors
+- Authentication bypasses
+- Sensitive data exposure
+- Insecure dependencies
+
+### Bugs
+- Logic errors
+- Null pointer dereferences
+- Race conditions
+- Memory leaks
+- Incorrect error handling
+
+### Style
+- Naming conventions
+- Code formatting
+- Documentation requirements
+- File organization
+- Import ordering
+
+### Performance
+- N+1 queries
+- Unnecessary re-renders
+- Memory-intensive operations
+- Missing caching opportunities
+
+## Example Review
+
+```markdown
+## Code Review for PR #123
+
+### 🔴 Critical Issues
+
+**Security: SQL Injection (line 45)**
+```javascript
+// Current
+const query = `SELECT * FROM users WHERE id = ${userId}`
+
+// Suggested
+const query = 'SELECT * FROM users WHERE id = ?'
+await db.query(query, [userId])
+```
+
+### 🟡 Suggestions
+
+**Performance: Consider memoization (line 78)**
+This expensive calculation runs on every render. Consider using `useMemo`.
+
+### ✅ Looks Good
+- Error handling is comprehensive
+- Tests cover main use cases
+- Documentation is clear
+```
+
+## Configuration
+
+```yaml
+# .code-reviewer.yml
+severity:
+  security: critical
+  bugs: high
+  style: low
+  performance: medium
+
+ignore:
+  - "**/*.test.ts"
+  - "**/fixtures/**"
+
+customRules:
+  - name: no-console-log
+    pattern: "console.log"
+    message: "Use logger instead of console.log"
+    severity: warning
+```
