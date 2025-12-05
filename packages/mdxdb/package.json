@@ -46,12 +46,15 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "ai-database": "workspace:*"
+    "ai-database": "workspace:*",
+    "oauth.do": "^0.1.2"
   },
   "peerDependencies": {
     "mdxld": "workspace:*"
   },
   "devDependencies": {
+    "@mdxdb/clickhouse": "workspace:*",
+    "chdb": "^1.2.0",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

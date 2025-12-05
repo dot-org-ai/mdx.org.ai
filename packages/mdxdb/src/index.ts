@@ -64,13 +64,33 @@ export type { MDXLDDocument, MDXLDData, LDProperties } from 'mdxld'
 
 // Re-export ai-database types and functions
 export {
+  // Core DB factory
   DB,
+  // Schema utilities
   parseSchema,
   setProvider,
+  setNLQueryGenerator,
+  // Memory provider
   MemoryProvider,
   createMemoryProvider,
+  Semaphore,
+  // Thing conversion utilities
+  toExpanded,
+  toFlat,
+  // Noun & Verb definition
+  defineNoun,
+  defineVerb,
+  nounToSchema,
+  Verbs,
+  // AI linguistic inference
+  conjugate,
+  pluralize,
+  singularize,
+  inferNoun,
+  Type,
 } from 'ai-database'
 export type {
+  // Schema types
   DatabaseSchema,
   EntitySchema,
   FieldDefinition,
@@ -78,10 +98,42 @@ export type {
   ParsedSchema,
   ParsedEntity,
   ParsedField,
+  // DB types
   TypedDB,
   EntityOperations,
   DBProvider,
+  DBResult,
   ListOptions as DBListOptions,
   SearchOptions as DBSearchOptions,
+  GenerateOptions,
   InferEntity,
+  // Thing types (mdxld-based)
+  ThingFlat,
+  ThingExpanded,
+  // Noun & Verb semantic types
+  Noun,
+  NounProperty,
+  NounRelationship,
+  Verb,
+  TypeMeta,
+  // API types
+  EventsAPI,
+  ActionsAPI,
+  ArtifactsAPI,
+  NounsAPI,
+  VerbsAPI,
+  DBEvent,
+  DBAction,
+  DBArtifact,
+  // Natural Language Query types
+  NLQueryResult,
+  NLQueryFn,
+  NLQueryGenerator,
+  NLQueryContext,
+  NLQueryPlan,
+  // Memory provider types
+  Event as MemoryEvent,
+  Action as MemoryAction,
+  Artifact as MemoryArtifact,
+  MemoryProviderOptions,
 } from 'ai-database'

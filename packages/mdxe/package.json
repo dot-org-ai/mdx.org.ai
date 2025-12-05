@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "@mdxe/hono": "workspace:*",
+    "oauth.do": "^0.1.2",
     "ai-sandbox": "file:../../primitives/packages/ai-sandbox",
     "ai-functions": "file:../../primitives/packages/ai-functions",
     "ai-workflows": "file:../../primitives/packages/ai-workflows",
