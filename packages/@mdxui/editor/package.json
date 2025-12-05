@@ -1,0 +1,52 @@
+{
+  "name": "@mdxui/editor",
+  "version": "0.0.0",
+  "description": "Database editor UI for mdxdb - built with Next.js, Monaco, and ClickHouse",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./components/*": {
+      "import": "./app/components/*.tsx"
+    }
+  },
+  "files": [
+    "src",
+    "app"
+  ],
+  "scripts": {
+    "dev": "cd app && next dev --turbopack --port 3333",
+    "build": "cd app && next build",
+    "start": "cd app && next start --port 3333",
+    "test": "cd app && vitest run",
+    "test:e2e": "cd app && playwright test",
+    "test:e2e:ui": "cd app && playwright test --ui",
+    "lint": "cd app && next lint"
+  },
+  "keywords": [
+    "mdxui",
+    "editor",
+    "database",
+    "clickhouse",
+    "next.js",
+    "monaco"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "monaco-editor": "^0.52.2"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  }
+}

@@ -1,0 +1,400 @@
+/**
+ * Layout Styles
+ *
+ * Defines page-level layouts based on data-layout attribute.
+ * Key principle: same HTML structure, different layout behavior.
+ *
+ * Layouts:
+ * - site: Marketing/landing pages (stacked sections)
+ * - docs: Documentation (sidebar + content + TOC)
+ * - app: Application shell (sidebar + main)
+ * - dashboard: Admin/analytics (sidebar + grid)
+ */
+
+/* ==========================================================================
+   Site Layout (Marketing/Landing Pages)
+   ========================================================================== */
+
+body[data-layout="site"] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+body[data-layout="site"] > header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+body[data-layout="site"] > main {
+  flex: 1;
+}
+
+body[data-layout="site"] > footer {
+  border-top: 1px solid var(--border);
+  padding: var(--spacing-8) var(--spacing-4);
+}
+
+/* Alternating section backgrounds for visual rhythm */
+body[data-layout="site"] > main > section:nth-child(even) {
+  background: var(--muted);
+}
+
+/* ==========================================================================
+   Docs Layout (Documentation Sites)
+   ========================================================================== */
+
+body[data-layout="docs"] {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  min-height: 100vh;
+}
+
+body[data-layout="docs"] > header {
+  grid-area: header;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Left sidebar (navigation) */
+body[data-layout="docs"] > aside {
+  grid-area: sidebar;
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  padding: var(--spacing-4);
+}
+
+/* Main area with nested grid for content + TOC */
+body[data-layout="docs"] > main {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: 1fr var(--toc-width);
+  gap: var(--spacing-8);
+  padding: var(--spacing-6);
+  max-width: var(--max-width-wide);
+}
+
+/* Article content */
+body[data-layout="docs"] > main > article {
+  min-width: 0;
+  max-width: var(--max-width-prose);
+}
+
+/* Right sidebar (TOC - Table of Contents) */
+body[data-layout="docs"] > main > aside {
+  position: sticky;
+  top: calc(var(--header-height) + var(--spacing-6));
+  height: fit-content;
+  max-height: calc(100vh - var(--header-height) - var(--spacing-12));
+  overflow-y: auto;
+}
+
+body[data-layout="docs"] > footer {
+  grid-area: footer;
+  border-top: 1px solid var(--border);
+  padding: var(--spacing-6) var(--spacing-4);
+}
+
+/* Docs Responsive: Hide TOC on medium screens */
+@media (max-width: 1280px) {
+  body[data-layout="docs"] > main {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-layout="docs"] > main > aside {
+    display: none;
+  }
+}
+
+/* Docs Responsive: Hide sidebar on mobile */
+@media (max-width: 768px) {
+  body[data-layout="docs"] {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "main"
+      "footer";
+  }
+
+  body[data-layout="docs"] > aside {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   App Layout (Application Shell)
+   ========================================================================== */
+
+body[data-layout="app"] {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main";
+  min-height: 100vh;
+}
+
+/* App header spans only main area */
+body[data-layout="app"] > header {
+  grid-area: header;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+/* App sidebar (persistent navigation) */
+body[data-layout="app"] > aside {
+  grid-area: sidebar;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+}
+
+body[data-layout="app"] > main {
+  grid-area: main;
+  overflow-y: auto;
+  padding: var(--spacing-6);
+}
+
+/* App Responsive: Collapsible sidebar */
+@media (max-width: 1024px) {
+  body[data-layout="app"] {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+  }
+
+  body[data-layout="app"] > aside {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    z-index: var(--z-overlay);
+    transition: transform var(--transition-normal) var(--ease-default);
+  }
+
+  body[data-layout="app"] > aside[data-open="true"] {
+    transform: translateX(0);
+  }
+}
+
+/* ==========================================================================
+   Dashboard Layout (Admin/Analytics)
+   ========================================================================== */
+
+body[data-layout="dashboard"] {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main";
+  min-height: 100vh;
+}
+
+/* Dashboard has a narrower collapsed sidebar */
+body[data-layout="dashboard"] > aside {
+  grid-area: sidebar;
+  width: var(--spacing-16);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  transition: width var(--transition-normal) var(--ease-default);
+}
+
+body[data-layout="dashboard"] > aside[data-expanded="true"] {
+  width: var(--sidebar-width);
+}
+
+body[data-layout="dashboard"] > header {
+  grid-area: header;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+body[data-layout="dashboard"] > main {
+  grid-area: main;
+  padding: var(--spacing-6);
+  overflow-y: auto;
+}
+
+/* Dashboard Responsive */
+@media (max-width: 768px) {
+  body[data-layout="dashboard"] {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+  }
+
+  body[data-layout="dashboard"] > aside {
+    position: fixed;
+    width: var(--sidebar-width);
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    z-index: var(--z-overlay);
+  }
+
+  body[data-layout="dashboard"] > aside[data-open="true"] {
+    transform: translateX(0);
+  }
+}
+
+/* ==========================================================================
+   Fullscreen Layout (Editors, Presentations)
+   ========================================================================== */
+
+body[data-layout="fullscreen"] {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+body[data-layout="fullscreen"] > header {
+  flex-shrink: 0;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+body[data-layout="fullscreen"] > main {
+  flex: 1;
+  overflow: hidden;
+}
+
+body[data-layout="fullscreen"] > footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+
+/* ==========================================================================
+   Centered Layout (Auth pages, Single forms)
+   ========================================================================== */
+
+body[data-layout="centered"] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-4);
+}
+
+body[data-layout="centered"] > main {
+  width: 100%;
+  max-width: 400px;
+}
+
+body[data-layout="centered"] > header,
+body[data-layout="centered"] > footer {
+  position: absolute;
+}
+
+body[data-layout="centered"] > header {
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-4);
+}
+
+body[data-layout="centered"] > footer {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-4);
+  text-align: center;
+}
+
+/* ==========================================================================
+   Split Layout (Two-pane: editor/preview, master/detail)
+   ========================================================================== */
+
+body[data-layout="split"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "header header"
+    "left right";
+  height: 100vh;
+  overflow: hidden;
+}
+
+body[data-layout="split"] > header {
+  grid-area: header;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+body[data-layout="split"] > main {
+  grid-area: left;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+}
+
+body[data-layout="split"] > aside {
+  grid-area: right;
+  overflow-y: auto;
+}
+
+/* Vertical split variant */
+body[data-layout="split"][data-direction="vertical"] {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr 1fr;
+  grid-template-areas:
+    "header"
+    "left"
+    "right";
+}
+
+body[data-layout="split"][data-direction="vertical"] > main {
+  border-right: none;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Split Responsive: Stack on mobile */
+@media (max-width: 768px) {
+  body[data-layout="split"] {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr 1fr;
+    grid-template-areas:
+      "header"
+      "left"
+      "right";
+  }
+
+  body[data-layout="split"] > main {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}

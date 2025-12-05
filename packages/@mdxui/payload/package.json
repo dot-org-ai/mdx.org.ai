@@ -1,0 +1,97 @@
+{
+  "name": "@mdxui/payload",
+  "version": "0.0.0",
+  "description": "Custom Payload CMS UI components for MDX editing",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./plugin": {
+      "types": "./dist/plugin.d.ts",
+      "import": "./dist/plugin.js",
+      "require": "./dist/plugin.cjs"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js",
+      "require": "./dist/components/index.cjs"
+    },
+    "./components/MDXLDEditor": {
+      "types": "./dist/components/MDXLDEditor.d.ts",
+      "import": "./dist/components/MDXLDEditor.js",
+      "require": "./dist/components/MDXLDEditor.cjs"
+    },
+    "./components/MDXLDJSONField": {
+      "types": "./dist/components/MDXLDJSONField.d.ts",
+      "import": "./dist/components/MDXLDJSONField.js",
+      "require": "./dist/components/MDXLDJSONField.cjs"
+    },
+    "./views": {
+      "types": "./dist/views/index.d.ts",
+      "import": "./dist/views/index.js",
+      "require": "./dist/views/index.cjs"
+    },
+    "./views/CardView": {
+      "types": "./dist/views/CardView.d.ts",
+      "import": "./dist/views/CardView.js",
+      "require": "./dist/views/CardView.cjs"
+    },
+    "./views/ListView": {
+      "types": "./dist/views/ListView.d.ts",
+      "import": "./dist/views/ListView.js",
+      "require": "./dist/views/ListView.cjs"
+    },
+    "./views/ViewToggle": {
+      "types": "./dist/views/ViewToggle.d.ts",
+      "import": "./dist/views/ViewToggle.js",
+      "require": "./dist/views/ViewToggle.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "payload",
+    "mdx",
+    "mdxld",
+    "editor",
+    "json-ld",
+    "yaml",
+    "ui"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "payload": "^3.0.0",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-markdown": "^6.3.0",
+    "@codemirror/lang-yaml": "^6.1.2",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@uiw/react-codemirror": "^4.23.7",
+    "mdxld": "workspace:*"
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:*",
+    "@types/react": "^18.3.12",
+    "payload": "^3.0.0",
+    "react": "^19.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

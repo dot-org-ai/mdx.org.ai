@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@mdxui/css Worker Demo</title>
+
+  <!-- Base CSS (static asset) -->
+  <link rel="stylesheet" href="/">
+
+  <!-- Theme customization (runtime transform) -->
+  <link rel="stylesheet" id="theme" href="/transform?theme=light">
+
+  <style>
+    body {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .demo-section {
+      margin: 2rem 0;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      color: var(--card-foreground);
+    }
+
+    .theme-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: var(--primary-foreground);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button.secondary {
+      background: var(--secondary);
+      color: var(--secondary-foreground);
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .color-swatch {
+      height: 60px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .code-block {
+      padding: 1rem;
+      background: var(--muted);
+      color: var(--muted-foreground);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>@mdxui/css Worker Demo</h1>
+    <p>Pre-compiled CSS served as static assets with runtime theme customization</p>
+  </header>
+
+  <section class="demo-section">
+    <h2>Theme Presets</h2>
+    <p>Switch between pre-defined themes (runtime transform):</p>
+    <div class="theme-buttons">
+      <button onclick="switchTheme('light')">Light</button>
+      <button onclick="switchTheme('dark')">Dark</button>
+      <button onclick="switchTheme('dim')">Dim</button>
+      <button onclick="switchTheme('midnight')">Midnight</button>
+    </div>
+  </section>
+
+  <section class="demo-section">
+    <h2>Custom Primary Color</h2>
+    <p>Override primary color with Tailwind tokens:</p>
+    <div class="theme-buttons">
+      <button onclick="setPrimaryColor('blue-500')">Blue</button>
+      <button onclick="setPrimaryColor('indigo-500')">Indigo</button>
+      <button onclick="setPrimaryColor('violet-500')">Violet</button>
+      <button onclick="setPrimaryColor('purple-500')">Purple</button>
+      <button onclick="setPrimaryColor('pink-500')">Pink</button>
+      <button onclick="setPrimaryColor('emerald-500')">Emerald</button>
+      <button onclick="setPrimaryColor('cyan-500')">Cyan</button>
+    </div>
+  </section>
+
+  <section class="demo-section">
+    <h2>Border Radius</h2>
+    <p>Adjust global border radius:</p>
+    <div class="theme-buttons">
+      <button onclick="setRadius('none')">None</button>
+      <button onclick="setRadius('sm')">Small</button>
+      <button onclick="setRadius('md')">Medium</button>
+      <button onclick="setRadius('lg')">Large</button>
+      <button onclick="setRadius('xl')">XL</button>
+      <button onclick="setRadius('2xl')">2XL</button>
+      <button onclick="setRadius('full')">Full</button>
+    </div>
+  </section>
+
+  <section class="demo-section">
+    <h2>Color Variables</h2>
+    <p>CSS variables applied by current theme:</p>
+    <div class="color-grid">
+      <div>
+        <div class="color-swatch" style="background: var(--background)"></div>
+        <small>--background</small>
+      </div>
+      <div>
+        <div class="color-swatch" style="background: var(--foreground)"></div>
+        <small>--foreground</small>
+      </div>
+      <div>
+        <div class="color-swatch" style="background: var(--primary)"></div>
+        <small>--primary</small>
+      </div>
+      <div>
+        <div class="color-swatch" style="background: var(--secondary)"></div>
+        <small>--secondary</small>
+      </div>
+      <div>
+        <div class="color-swatch" style="background: var(--muted)"></div>
+        <small>--muted</small>
+      </div>
+      <div>
+        <div class="color-swatch" style="background: var(--border)"></div>
+        <small>--border</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo-section">
+    <h2>Current Theme URL</h2>
+    <p>Generated transform endpoint:</p>
+    <div class="code-block" id="theme-url"></div>
+  </section>
+
+  <section class="demo-section">
+    <h2>API Endpoints</h2>
+    <div class="code-block">
+GET /                    → Full CSS bundle (static)
+GET /colors.css          → Color utilities (static)
+GET /themes.css          → Theme presets (static)
+GET /variables.css       → CSS variables (static)
+GET /transform?params    → Runtime customization
+
+Examples:
+/transform?theme=dark
+/transform?primary=indigo-500&radius=lg
+/transform?theme=midnight&primary=violet-400
+    </div>
+  </section>
+
+  <footer style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+    <p><small>Built with @mdxui/css • Cloudflare Workers + Static Assets</small></p>
+  </footer>
+
+  <script>
+    let currentTheme = 'light'
+    let currentPrimary = null
+    let currentRadius = null
+
+    function updateThemeLink() {
+      const params = new URLSearchParams()
+      if (currentTheme) params.set('theme', currentTheme)
+      if (currentPrimary) params.set('primary', currentPrimary)
+      if (currentRadius) params.set('radius', currentRadius)
+
+      const url = `/transform?${params.toString()}`
+      document.getElementById('theme').href = url
+      document.getElementById('theme-url').textContent = url
+    }
+
+    function switchTheme(theme) {
+      currentTheme = theme
+      updateThemeLink()
+    }
+
+    function setPrimaryColor(color) {
+      currentPrimary = color
+      updateThemeLink()
+    }
+
+    function setRadius(radius) {
+      currentRadius = radius
+      updateThemeLink()
+    }
+
+    // Initialize display
+    updateThemeLink()
+  </script>
+</body>
+</html>

@@ -1,8 +1,26 @@
 /**
- * @mdxui/html - Render MDXLD documents to HTML strings
+ * @mdxui/html - Semantic HTML5 components and MDXLD document renderer
+ *
+ * This package provides:
+ * - React components for semantic HTML5 structure (no classes needed)
+ * - MDXLD document to HTML string rendering
+ *
+ * CSS is provided by @mdxui/css - import separately:
+ * import '@mdxui/css'
  */
 
 export const name = '@mdxui/html'
+
+// Re-export all semantic HTML components
+export * from './components/layouts'
+export * from './components/sections'
+export * from './components/views'
+export * from './components/containers'
+export * from './components/waitlist'
+export * from './components/pages'
+
+// Re-export types
+export * from './types/layouts'
 
 import { createElement, type ReactElement, type ReactNode } from 'react'
 import { renderToString, renderToStaticMarkup } from 'react-dom/server'

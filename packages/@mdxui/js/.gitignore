@@ -1,0 +1,25 @@
+# Build output
+dist/
+*.tsbuildinfo
+
+# Node modules
+node_modules/
+
+# Wrangler
+.wrangler/
+wrangler.toml.local
+.dev.vars
+.dev.vars.local
+
+# Cloudflare
+.mf/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

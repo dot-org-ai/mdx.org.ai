@@ -1,0 +1,54 @@
+{
+  "name": "@mdxui/css",
+  "version": "0.0.0",
+  "description": "Pure CSS framework for semantic HTML - variables, themes, layouts, backgrounds, with Cloudflare Worker for dynamic CSS",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.css",
+    "./styles": "./dist/index.css",
+    "./colors": "./dist/colors.css",
+    "./themes": "./dist/themes.css",
+    "./variables": "./dist/variables.css",
+    "./base": "./dist/base.css",
+    "./layouts": "./dist/layouts.css",
+    "./sections": "./dist/sections.css",
+    "./nav": "./dist/nav.css",
+    "./views": "./dist/views.css",
+    "./containers": "./dist/containers.css",
+    "./backgrounds": "./dist/backgrounds.css",
+    "./worker": "./src/worker/index.ts"
+  },
+  "files": [
+    "dist",
+    "src/worker"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "build:watch": "node scripts/build.js --watch",
+    "build:worker": "pnpm build",
+    "dev": "pnpm build:watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "worker:dev": "wrangler dev",
+    "worker:deploy": "pnpm build && wrangler deploy",
+    "deploy": "pnpm worker:deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.0.0",
+    "vitest": "^1.0.0",
+    "wrangler": "^3.0.0"
+  },
+  "keywords": [
+    "css",
+    "semantic",
+    "html",
+    "framework",
+    "themes",
+    "variables",
+    "tailwind",
+    "oklch",
+    "cloudflare",
+    "worker"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,421 @@
+/**
+ * Base Styles - Reset and Element Defaults
+ *
+ * Provides a clean foundation for semantic HTML styling.
+ * No classes - just element selectors.
+ */
+
+/* Box Sizing Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margins */
+* {
+  margin: 0;
+}
+
+/* Document */
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--text-4xl);
+  letter-spacing: -0.025em;
+}
+
+h2 {
+  font-size: var(--text-3xl);
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-size: var(--text-2xl);
+}
+
+h4 {
+  font-size: var(--text-xl);
+}
+
+h5 {
+  font-size: var(--text-lg);
+}
+
+h6 {
+  font-size: var(--text-base);
+}
+
+p {
+  line-height: var(--leading-relaxed);
+  text-wrap: pretty;
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-fast) var(--ease-default);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Lists */
+ul, ol {
+  padding-left: var(--spacing-6);
+}
+
+li {
+  margin-bottom: var(--spacing-1);
+}
+
+/* Remove list styles for menu/nav */
+menu, nav ul, nav ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+menu li, nav li {
+  margin-bottom: 0;
+}
+
+/* Code */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--muted);
+  padding: 0.125em 0.375em;
+  border-radius: var(--radius-sm);
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  background: var(--muted);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Blockquote */
+blockquote {
+  border-left: 4px solid var(--border);
+  padding-left: var(--spacing-4);
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+/* Horizontal Rule */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: var(--spacing-8) 0;
+}
+
+/* Images */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+th, td {
+  text-align: left;
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-weight: var(--font-semibold);
+  background: var(--muted);
+}
+
+tbody tr:hover {
+  background: var(--muted);
+}
+
+/* Forms */
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius-md);
+  transition: opacity var(--transition-fast) var(--ease-default);
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Secondary button via data attribute */
+button[data-variant="secondary"] {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+button[data-variant="outline"] {
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+button[data-variant="ghost"] {
+  background: transparent;
+  color: var(--foreground);
+}
+
+button[data-variant="ghost"]:hover {
+  background: var(--accent);
+}
+
+button[data-variant="destructive"] {
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+/* Inputs */
+input, textarea, select {
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--text-sm);
+  background: var(--background);
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast) var(--ease-default),
+              box-shadow var(--transition-fast) var(--ease-default);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px oklch(from var(--ring) l c h / 0.2);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--muted-foreground);
+}
+
+/* Checkbox and Radio */
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  cursor: pointer;
+}
+
+/* Label */
+label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  margin-bottom: var(--spacing-1);
+}
+
+/* Details/Summary */
+details {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+summary {
+  padding: var(--spacing-4);
+  cursor: pointer;
+  font-weight: var(--font-medium);
+  user-select: none;
+}
+
+summary:hover {
+  background: var(--muted);
+}
+
+details[open] summary {
+  border-bottom: 1px solid var(--border);
+}
+
+details > :not(summary) {
+  padding: var(--spacing-4);
+}
+
+/* Small Text */
+small {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+/* Strong */
+strong {
+  font-weight: var(--font-semibold);
+}
+
+/* Mark (highlight) */
+mark {
+  background: oklch(from var(--warning) l c h / 0.3);
+  padding: 0.125em 0.25em;
+  border-radius: var(--radius-sm);
+}
+
+/* Abbreviation */
+abbr[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+/* Address */
+address {
+  font-style: normal;
+}
+
+/* Data element for stats/values */
+data {
+  font-weight: var(--font-semibold);
+}
+
+/* Time element */
+time {
+  color: var(--muted-foreground);
+}
+
+/* Keyboard input */
+kbd {
+  display: inline-block;
+  padding: 0.125em 0.375em;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 0 var(--border);
+}
+
+/* Sample output */
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* Variable */
+var {
+  font-family: var(--font-mono);
+  font-style: italic;
+}
+
+/* Definition List */
+dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--spacing-2) var(--spacing-4);
+}
+
+dt {
+  font-weight: var(--font-semibold);
+}
+
+dd {
+  margin: 0;
+}
+
+/* Progress */
+progress {
+  width: 100%;
+  height: var(--spacing-2);
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+progress::-webkit-progress-bar {
+  background: var(--muted);
+  border-radius: var(--radius-full);
+}
+
+progress::-webkit-progress-value {
+  background: var(--primary);
+  border-radius: var(--radius-full);
+}
+
+progress::-moz-progress-bar {
+  background: var(--primary);
+  border-radius: var(--radius-full);
+}
+
+/* Meter */
+meter {
+  width: 100%;
+  height: var(--spacing-2);
+}
+
+/* Figure */
+figure {
+  margin: var(--spacing-4) 0;
+}
+
+figcaption {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  text-align: center;
+  margin-top: var(--spacing-2);
+}
+
+/* Selection */
+::selection {
+  background: oklch(from var(--primary) l c h / 0.2);
+}
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}

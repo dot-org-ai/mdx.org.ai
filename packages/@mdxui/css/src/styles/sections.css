@@ -1,0 +1,757 @@
+/**
+ * Section Styles
+ *
+ * Styles for semantic sections using aria-label as the hook.
+ * Pattern: section[aria-label="SectionType"]
+ *
+ * Sections:
+ * - Hero: Main landing hero with headline and CTA
+ * - Features: Feature grid/list
+ * - Pricing: Pricing cards
+ * - FAQ: Frequently asked questions
+ * - Testimonials: Customer quotes
+ * - Team: Team member grid
+ * - Stats: Statistics/metrics display
+ * - Logos: Partner/client logos
+ * - Newsletter: Email signup
+ * - CTA: Call-to-action banner
+ * - Gallery: Image gallery
+ * - Timeline: Event timeline
+ * - Comparison: Feature comparison table
+ */
+
+/* ==========================================================================
+   Hero Section
+   ========================================================================== */
+
+section[aria-label="Hero"] {
+  text-align: center;
+  padding: var(--spacing-20) var(--spacing-4);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+section[aria-label="Hero"] > small:first-child {
+  display: inline-block;
+  color: var(--primary);
+  font-weight: var(--font-medium);
+  font-size: var(--text-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: var(--eyebrow-letter-spacing);
+  margin-bottom: var(--spacing-4);
+}
+
+section[aria-label="Hero"] h1 {
+  font-size: var(--text-hero-1);
+  font-weight: var(--font-semibold);
+  line-height: var(--hero-line-height);
+  margin-bottom: var(--spacing-6);
+  letter-spacing: var(--hero-letter-spacing);
+}
+
+section[aria-label="Hero"] > p {
+  font-size: var(--text-xl);
+  color: var(--muted-foreground);
+  max-width: 600px;
+  margin: 0 auto var(--spacing-8);
+  line-height: var(--leading-relaxed);
+}
+
+section[aria-label="Hero"] form {
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+section[aria-label="Hero"] form input {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Hero with background image */
+section[aria-label="Hero"][data-background] {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+
+section[aria-label="Hero"][data-background]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: oklch(from var(--background) l c h / 0.85);
+}
+
+section[aria-label="Hero"][data-background] > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   Waitlist Section (Full-screen Hero with Form)
+   ========================================================================== */
+
+section[aria-label="Waitlist"] {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--spacing-4);
+  overflow: hidden;
+}
+
+section[aria-label="Waitlist"] > div {
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+  padding: var(--spacing-4);
+}
+
+section[aria-label="Waitlist"] small {
+  display: inline-block;
+  color: var(--primary);
+  font-weight: var(--font-medium);
+  font-size: var(--text-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: var(--eyebrow-letter-spacing);
+  margin-bottom: var(--spacing-4);
+}
+
+section[aria-label="Waitlist"] h1 {
+  font-size: var(--text-hero-1);
+  font-weight: var(--font-semibold);
+  line-height: var(--hero-line-height);
+  letter-spacing: var(--hero-letter-spacing);
+  margin-bottom: var(--spacing-6);
+  text-wrap: balance;
+}
+
+section[aria-label="Waitlist"] > div > p {
+  font-size: var(--text-xl);
+  color: var(--muted-foreground);
+  max-width: 600px;
+  margin: 0 auto var(--spacing-8);
+  line-height: var(--leading-relaxed);
+}
+
+/* Waitlist Form */
+section[aria-label="Waitlist"] form {
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+section[aria-label="Waitlist"] form input[type="email"] {
+  flex: 1;
+  min-width: 250px;
+  height: var(--spacing-12);
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--text-base);
+  background: var(--background);
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+section[aria-label="Waitlist"] form input[type="email"]:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.2);
+}
+
+section[aria-label="Waitlist"] form button {
+  height: var(--spacing-12);
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+}
+
+/* Inline form variant */
+section[aria-label="Waitlist"] form[data-variant="inline"] {
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 640px) {
+  section[aria-label="Waitlist"] form[data-variant="inline"] {
+    flex-wrap: wrap;
+  }
+
+  section[aria-label="Waitlist"] form button {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Features Section
+   ========================================================================== */
+
+section[aria-label="Features"] {
+  padding: var(--spacing-20) var(--spacing-4);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+section[aria-label="Features"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+section[aria-label="Features"] > header h2 {
+  margin-bottom: var(--spacing-4);
+}
+
+section[aria-label="Features"] > header p {
+  font-size: var(--text-lg);
+  color: var(--muted-foreground);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+section[aria-label="Features"] > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-8);
+}
+
+section[aria-label="Features"] article {
+  text-align: center;
+  padding: var(--spacing-6);
+}
+
+section[aria-label="Features"] article > :first-child:not(h3) {
+  /* Icon container */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-12);
+  height: var(--spacing-12);
+  margin: 0 auto var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-lg);
+}
+
+section[aria-label="Features"] article h3 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--spacing-2);
+}
+
+section[aria-label="Features"] article p {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+/* Features with cards */
+section[aria-label="Features"][data-style="cards"] article {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+}
+
+/* ==========================================================================
+   Pricing Section
+   ========================================================================== */
+
+section[aria-label="Pricing"] {
+  padding: var(--spacing-20) var(--spacing-4);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+section[aria-label="Pricing"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+section[aria-label="Pricing"] > header h2 {
+  margin-bottom: var(--spacing-4);
+}
+
+section[aria-label="Pricing"] > header p {
+  font-size: var(--text-lg);
+  color: var(--muted-foreground);
+}
+
+section[aria-label="Pricing"] > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-6);
+  align-items: start;
+}
+
+section[aria-label="Pricing"] article {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Featured pricing card */
+section[aria-label="Pricing"] article[data-featured="true"] {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.02);
+}
+
+section[aria-label="Pricing"] article header {
+  margin-bottom: var(--spacing-4);
+}
+
+section[aria-label="Pricing"] article header h3 {
+  font-size: var(--text-xl);
+  margin-bottom: var(--spacing-1);
+}
+
+section[aria-label="Pricing"] article header p {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+section[aria-label="Pricing"] article [data-price] {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  margin: var(--spacing-4) 0;
+}
+
+section[aria-label="Pricing"] article [data-price] small {
+  font-size: var(--text-base);
+  font-weight: var(--font-normal);
+  color: var(--muted-foreground);
+}
+
+section[aria-label="Pricing"] article ul {
+  flex: 1;
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-6) 0;
+}
+
+section[aria-label="Pricing"] article li {
+  padding: var(--spacing-2) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+
+section[aria-label="Pricing"] article li:last-child {
+  border-bottom: none;
+}
+
+section[aria-label="Pricing"] article button {
+  width: 100%;
+}
+
+/* ==========================================================================
+   FAQ Section
+   ========================================================================== */
+
+section[aria-label="FAQ"] {
+  padding: var(--spacing-20) var(--spacing-4);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+section[aria-label="FAQ"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+section[aria-label="FAQ"] > header h2 {
+  margin-bottom: var(--spacing-4);
+}
+
+section[aria-label="FAQ"] > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+section[aria-label="FAQ"] details {
+  background: var(--card);
+}
+
+section[aria-label="FAQ"] summary {
+  font-size: var(--text-base);
+}
+
+/* ==========================================================================
+   Testimonials Section
+   ========================================================================== */
+
+section[aria-label="Testimonials"] {
+  padding: var(--spacing-20) var(--spacing-4);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+section[aria-label="Testimonials"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+section[aria-label="Testimonials"] > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-6);
+}
+
+section[aria-label="Testimonials"] blockquote {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  font-style: normal;
+  color: var(--foreground);
+}
+
+section[aria-label="Testimonials"] blockquote p {
+  margin-bottom: var(--spacing-4);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+}
+
+section[aria-label="Testimonials"] blockquote footer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--text-sm);
+}
+
+section[aria-label="Testimonials"] blockquote footer img {
+  width: var(--spacing-10);
+  height: var(--spacing-10);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+section[aria-label="Testimonials"] blockquote footer strong {
+  display: block;
+}
+
+section[aria-label="Testimonials"] blockquote footer span {
+  color: var(--muted-foreground);
+}
+
+/* ==========================================================================
+   Team Section
+   ========================================================================== */
+
+section[aria-label="Team"] {
+  padding: var(--spacing-20) var(--spacing-4);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+section[aria-label="Team"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+section[aria-label="Team"] > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-8);
+}
+
+section[aria-label="Team"] article {
+  text-align: center;
+}
+
+section[aria-label="Team"] article img {
+  width: 150px;
+  height: 150px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  margin: 0 auto var(--spacing-4);
+}
+
+section[aria-label="Team"] article h3 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--spacing-1);
+}
+
+section[aria-label="Team"] article p {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+/* ==========================================================================
+   Stats Section
+   ========================================================================== */
+
+section[aria-label="Stats"] {
+  padding: var(--spacing-16) var(--spacing-4);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+section[aria-label="Stats"] > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-8);
+  text-align: center;
+}
+
+section[aria-label="Stats"] dl {
+  display: block;
+}
+
+section[aria-label="Stats"] dt {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--font-normal);
+  margin-bottom: var(--spacing-2);
+}
+
+section[aria-label="Stats"] dd {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  color: var(--primary);
+}
+
+/* ==========================================================================
+   Logos Section
+   ========================================================================== */
+
+section[aria-label="Logos"] {
+  padding: var(--spacing-12) var(--spacing-4);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+section[aria-label="Logos"] > p {
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-8);
+}
+
+section[aria-label="Logos"] > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+section[aria-label="Logos"] img {
+  height: var(--spacing-8);
+  width: auto;
+  opacity: 0.6;
+  filter: grayscale(100%);
+  transition: all var(--transition-normal) var(--ease-default);
+}
+
+section[aria-label="Logos"] img:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+/* ==========================================================================
+   Newsletter Section
+   ========================================================================== */
+
+section[aria-label="Newsletter"] {
+  padding: var(--spacing-16) var(--spacing-4);
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+section[aria-label="Newsletter"] h2 {
+  margin-bottom: var(--spacing-4);
+}
+
+section[aria-label="Newsletter"] p {
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-6);
+}
+
+section[aria-label="Newsletter"] form {
+  display: flex;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+}
+
+section[aria-label="Newsletter"] form input {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ==========================================================================
+   CTA Section (Call-to-Action)
+   ========================================================================== */
+
+section[aria-label="CTA"] {
+  padding: var(--spacing-16) var(--spacing-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  text-align: center;
+}
+
+section[aria-label="CTA"] h2 {
+  margin-bottom: var(--spacing-4);
+}
+
+section[aria-label="CTA"] p {
+  opacity: 0.9;
+  margin-bottom: var(--spacing-6);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+section[aria-label="CTA"] button {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* ==========================================================================
+   Gallery Section
+   ========================================================================== */
+
+section[aria-label="Gallery"] {
+  padding: var(--spacing-16) var(--spacing-4);
+  max-width: var(--max-width-wide);
+  margin: 0 auto;
+}
+
+section[aria-label="Gallery"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-8);
+}
+
+section[aria-label="Gallery"] > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--spacing-4);
+}
+
+section[aria-label="Gallery"] figure {
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+section[aria-label="Gallery"] figure img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform var(--transition-slow) var(--ease-default);
+}
+
+section[aria-label="Gallery"] figure:hover img {
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   Timeline Section
+   ========================================================================== */
+
+section[aria-label="Timeline"] {
+  padding: var(--spacing-20) var(--spacing-4);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+section[aria-label="Timeline"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+section[aria-label="Timeline"] > ol {
+  list-style: none;
+  padding: 0;
+  position: relative;
+}
+
+section[aria-label="Timeline"] > ol::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+section[aria-label="Timeline"] > ol > li {
+  position: relative;
+  padding-left: var(--spacing-12);
+  padding-bottom: var(--spacing-8);
+  margin-bottom: 0;
+}
+
+section[aria-label="Timeline"] > ol > li::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  border: 3px solid var(--background);
+}
+
+section[aria-label="Timeline"] > ol > li time {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: var(--spacing-1);
+}
+
+section[aria-label="Timeline"] > ol > li h3 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--spacing-2);
+}
+
+section[aria-label="Timeline"] > ol > li p {
+  color: var(--muted-foreground);
+}
+
+/* ==========================================================================
+   Comparison Section
+   ========================================================================== */
+
+section[aria-label="Comparison"] {
+  padding: var(--spacing-20) var(--spacing-4);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  overflow-x: auto;
+}
+
+section[aria-label="Comparison"] > header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+section[aria-label="Comparison"] table {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+section[aria-label="Comparison"] th:first-child {
+  text-align: left;
+}
+
+section[aria-label="Comparison"] th:not(:first-child),
+section[aria-label="Comparison"] td:not(:first-child) {
+  text-align: center;
+}
+
+section[aria-label="Comparison"] th[data-featured="true"] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}

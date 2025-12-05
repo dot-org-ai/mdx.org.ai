@@ -1,0 +1,309 @@
+/**
+ * Theme Presets
+ *
+ * Pre-configured themes using CSS custom properties.
+ * Apply via data-theme attribute or .theme-* classes.
+ *
+ * Inspired by tweakcn and shadcn/ui theme system.
+ */
+
+/* ==========================================================================
+   Base Theme (Light - Default)
+   ========================================================================== */
+
+:root,
+[data-theme="light"],
+.theme-light {
+  --background: oklch(100% 0 0);
+  --foreground: oklch(14.1% 0.005 285.82);
+
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(14.1% 0.005 285.82);
+
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(14.1% 0.005 285.82);
+
+  --primary: oklch(20.5% 0.006 285.88);
+  --primary-foreground: oklch(98.5% 0 0);
+
+  --secondary: oklch(96.7% 0.003 264.54);
+  --secondary-foreground: oklch(20.5% 0.006 285.88);
+
+  --muted: oklch(96.7% 0.003 264.54);
+  --muted-foreground: oklch(55.1% 0.027 264.36);
+
+  --accent: oklch(96.7% 0.003 264.54);
+  --accent-foreground: oklch(20.5% 0.006 285.88);
+
+  --destructive: oklch(57.7% 0.245 27.33);
+  --destructive-foreground: oklch(98.5% 0 0);
+
+  --border: oklch(92.8% 0.006 264.53);
+  --input: oklch(92.8% 0.006 264.53);
+  --ring: oklch(70.7% 0.022 261.32);
+
+  --radius: 0.5rem;
+
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   Dark Theme
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: oklch(14.1% 0.005 285.82);
+    --foreground: oklch(98.5% 0 0);
+    --card: oklch(17.1% 0.005 285.82);
+    --card-foreground: oklch(98.5% 0 0);
+    --popover: oklch(17.1% 0.005 285.82);
+    --popover-foreground: oklch(98.5% 0 0);
+    --primary: oklch(98.5% 0 0);
+    --primary-foreground: oklch(20.5% 0.006 285.88);
+    --secondary: oklch(26.9% 0.006 286.03);
+    --secondary-foreground: oklch(98.5% 0 0);
+    --muted: oklch(26.9% 0.006 286.03);
+    --muted-foreground: oklch(70.7% 0.022 261.32);
+    --accent: oklch(26.9% 0.006 286.03);
+    --accent-foreground: oklch(98.5% 0 0);
+    --destructive: oklch(57.7% 0.245 27.33);
+    --destructive-foreground: oklch(98.5% 0 0);
+    --border: oklch(26.9% 0.006 286.03);
+    --input: oklch(26.9% 0.006 286.03);
+    --ring: oklch(83.9% 0.022 261.32);
+    color-scheme: dark;
+  }
+}
+
+[data-theme="dark"],
+.dark,
+.theme-dark {
+  --background: oklch(14.1% 0.005 285.82);
+  --foreground: oklch(98.5% 0 0);
+  --card: oklch(17.1% 0.005 285.82);
+  --card-foreground: oklch(98.5% 0 0);
+  --popover: oklch(17.1% 0.005 285.82);
+  --popover-foreground: oklch(98.5% 0 0);
+  --primary: oklch(98.5% 0 0);
+  --primary-foreground: oklch(20.5% 0.006 285.88);
+  --secondary: oklch(26.9% 0.006 286.03);
+  --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(26.9% 0.006 286.03);
+  --muted-foreground: oklch(70.7% 0.022 261.32);
+  --accent: oklch(26.9% 0.006 286.03);
+  --accent-foreground: oklch(98.5% 0 0);
+  --destructive: oklch(57.7% 0.245 27.33);
+  --destructive-foreground: oklch(98.5% 0 0);
+  --border: oklch(26.9% 0.006 286.03);
+  --input: oklch(26.9% 0.006 286.03);
+  --ring: oklch(83.9% 0.022 261.32);
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Themed Variants (Color Accents)
+   ========================================================================== */
+
+/* Blue Theme */
+[data-theme="blue"],
+.theme-blue {
+  --primary: var(--color-blue-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-blue-400);
+}
+
+.dark[data-theme="blue"],
+[data-theme="dark"][data-accent="blue"],
+.theme-dark.theme-blue {
+  --primary: var(--color-blue-500);
+  --primary-foreground: oklch(10% 0 0);
+}
+
+/* Indigo Theme */
+[data-theme="indigo"],
+.theme-indigo {
+  --primary: var(--color-indigo-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-indigo-400);
+}
+
+/* Violet Theme */
+[data-theme="violet"],
+.theme-violet {
+  --primary: var(--color-violet-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-violet-400);
+}
+
+/* Purple Theme */
+[data-theme="purple"],
+.theme-purple {
+  --primary: var(--color-purple-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-purple-400);
+}
+
+/* Pink Theme */
+[data-theme="pink"],
+.theme-pink {
+  --primary: var(--color-pink-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-pink-400);
+}
+
+/* Rose Theme */
+[data-theme="rose"],
+.theme-rose {
+  --primary: var(--color-rose-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-rose-400);
+}
+
+/* Red Theme */
+[data-theme="red"],
+.theme-red {
+  --primary: var(--color-red-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-red-400);
+}
+
+/* Orange Theme */
+[data-theme="orange"],
+.theme-orange {
+  --primary: var(--color-orange-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-orange-400);
+}
+
+/* Emerald Theme */
+[data-theme="emerald"],
+.theme-emerald {
+  --primary: var(--color-emerald-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-emerald-400);
+}
+
+/* Cyan Theme */
+[data-theme="cyan"],
+.theme-cyan {
+  --primary: var(--color-cyan-600);
+  --primary-foreground: oklch(98.5% 0 0);
+  --ring: var(--color-cyan-400);
+}
+
+/* ==========================================================================
+   Special Themes
+   ========================================================================== */
+
+/* Dim Theme - Soft dark mode */
+[data-theme="dim"],
+.theme-dim {
+  --background: oklch(20% 0.01 260);
+  --foreground: oklch(90% 0.01 260);
+  --card: oklch(23% 0.01 260);
+  --card-foreground: oklch(90% 0.01 260);
+  --popover: oklch(23% 0.01 260);
+  --popover-foreground: oklch(90% 0.01 260);
+  --primary: oklch(70% 0.15 260);
+  --primary-foreground: oklch(98% 0 0);
+  --secondary: oklch(28% 0.01 260);
+  --secondary-foreground: oklch(90% 0 0);
+  --muted: oklch(30% 0.01 260);
+  --muted-foreground: oklch(65% 0.02 260);
+  --accent: oklch(30% 0.02 260);
+  --accent-foreground: oklch(90% 0 0);
+  --border: oklch(30% 0.02 260);
+  --input: oklch(30% 0.02 260);
+  --ring: oklch(60% 0.15 260);
+  color-scheme: dark;
+}
+
+/* Midnight Theme - Deep blue-black */
+[data-theme="midnight"],
+.theme-midnight {
+  --background: oklch(10% 0.02 280);
+  --foreground: oklch(95% 0.01 280);
+  --card: oklch(14% 0.02 280);
+  --card-foreground: oklch(95% 0.01 280);
+  --popover: oklch(14% 0.02 280);
+  --popover-foreground: oklch(95% 0.01 280);
+  --primary: oklch(70% 0.2 280);
+  --primary-foreground: oklch(98% 0 0);
+  --secondary: oklch(20% 0.02 280);
+  --secondary-foreground: oklch(95% 0 0);
+  --muted: oklch(20% 0.02 280);
+  --muted-foreground: oklch(60% 0.03 280);
+  --accent: oklch(25% 0.03 280);
+  --accent-foreground: oklch(95% 0 0);
+  --border: oklch(25% 0.03 280);
+  --input: oklch(25% 0.03 280);
+  --ring: oklch(60% 0.2 280);
+  color-scheme: dark;
+}
+
+/* Forest Theme - Natural greens */
+[data-theme="forest"],
+.theme-forest {
+  --background: oklch(12% 0.02 150);
+  --foreground: oklch(92% 0.02 150);
+  --card: oklch(16% 0.02 150);
+  --card-foreground: oklch(92% 0.02 150);
+  --primary: oklch(60% 0.15 150);
+  --primary-foreground: oklch(98% 0 0);
+  --secondary: oklch(22% 0.02 150);
+  --secondary-foreground: oklch(92% 0 0);
+  --muted: oklch(22% 0.02 150);
+  --muted-foreground: oklch(60% 0.04 150);
+  --border: oklch(28% 0.03 150);
+  --ring: oklch(55% 0.12 150);
+  color-scheme: dark;
+}
+
+/* Ocean Theme - Deep blues */
+[data-theme="ocean"],
+.theme-ocean {
+  --background: oklch(12% 0.03 230);
+  --foreground: oklch(92% 0.02 230);
+  --card: oklch(16% 0.03 230);
+  --card-foreground: oklch(92% 0.02 230);
+  --primary: oklch(65% 0.18 230);
+  --primary-foreground: oklch(98% 0 0);
+  --secondary: oklch(22% 0.03 230);
+  --secondary-foreground: oklch(92% 0 0);
+  --muted: oklch(22% 0.03 230);
+  --muted-foreground: oklch(60% 0.05 230);
+  --border: oklch(28% 0.04 230);
+  --ring: oklch(60% 0.15 230);
+  color-scheme: dark;
+}
+
+/* Sunset Theme - Warm oranges and pinks */
+[data-theme="sunset"],
+.theme-sunset {
+  --background: oklch(98% 0.01 50);
+  --foreground: oklch(20% 0.03 30);
+  --card: oklch(96% 0.02 50);
+  --card-foreground: oklch(20% 0.03 30);
+  --primary: oklch(65% 0.2 30);
+  --primary-foreground: oklch(98% 0 0);
+  --secondary: oklch(92% 0.03 50);
+  --secondary-foreground: oklch(30% 0.03 30);
+  --muted: oklch(92% 0.03 50);
+  --muted-foreground: oklch(50% 0.05 30);
+  --border: oklch(88% 0.04 50);
+  --ring: oklch(60% 0.18 30);
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   Radius Presets
+   ========================================================================== */
+
+[data-radius="none"] { --radius: 0; }
+[data-radius="sm"] { --radius: 0.25rem; }
+[data-radius="md"] { --radius: 0.5rem; }
+[data-radius="lg"] { --radius: 0.75rem; }
+[data-radius="xl"] { --radius: 1rem; }
+[data-radius="2xl"] { --radius: 1.5rem; }
+[data-radius="full"] { --radius: 9999px; }

@@ -1,0 +1,74 @@
+# Wrangler Configuration for @mdxui/js Worker
+#
+# This worker serves pre-compiled JS component bundles as static assets
+# with a snippet-based hydration system for selective component activation.
+#
+# Endpoints:
+# - /dist/* - Pre-compiled component bundles
+# - /hydrate - Selective hydration script
+# - /theme - Theme context injection
+# - /runtime - Minimal hydration runtime
+# - /components/:name - Individual component bundles
+
+name = "mdxui-js"
+main = "src/worker/index.ts"
+compatibility_date = "2024-01-01"
+
+# Cloudflare Static Assets binding
+# Serves files from the ./dist directory
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+# Environment variables
+[vars]
+CSS_WORKER_URL = "https://css.mdxui.org"
+
+# Development configuration
+[env.development]
+name = "mdxui-js-dev"
+vars = { CSS_WORKER_URL = "http://localhost:8788" }
+
+# Staging configuration
+[env.staging]
+name = "mdxui-js-staging"
+vars = { CSS_WORKER_URL = "https://css-staging.mdxui.org" }
+
+# Production configuration
+[env.production]
+name = "mdxui-js"
+vars = { CSS_WORKER_URL = "https://css.mdxui.org" }
+
+# Routes for production deployment
+# Uncomment and configure based on your domain setup
+# [[env.production.routes]]
+# pattern = "js.mdxui.org/*"
+# zone_name = "mdxui.org"
+
+# [[env.production.routes]]
+# pattern = "*.mdxui.org/js/*"
+# zone_name = "mdxui.org"
+
+# Build configuration
+[build]
+command = "pnpm build"
+
+# Observability
+[observability]
+enabled = true
+
+# Worker limits and performance
+[limits]
+# Max CPU time per request (ms)
+cpu_ms = 50
+
+# Caching configuration
+# Cache static assets aggressively
+[site]
+bucket = "./dist"
+
+# Compatibility flags
+compatibility_flags = [
+  "nodejs_compat",
+  "streams_enable_constructors",
+]

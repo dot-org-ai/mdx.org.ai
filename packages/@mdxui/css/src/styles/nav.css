@@ -1,0 +1,459 @@
+/**
+ * Navigation Styles
+ *
+ * Styles for navigation patterns based on element structure.
+ * Key patterns:
+ * - body > header nav: Site header navigation
+ * - body > aside nav: Sidebar navigation
+ * - body > main > aside nav: TOC navigation
+ * - body > footer nav: Footer navigation
+ */
+
+/* ==========================================================================
+   Header Navigation
+   ========================================================================== */
+
+body > header nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  padding: var(--spacing-3) var(--spacing-4);
+  height: var(--header-height);
+  max-width: var(--max-width-wide);
+  margin: 0 auto;
+}
+
+/* Brand/logo - first child */
+body > header nav > :first-child {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-weight: var(--font-bold);
+  font-size: var(--text-lg);
+  text-decoration: none;
+  color: var(--foreground);
+}
+
+body > header nav > :first-child img {
+  height: var(--spacing-8);
+  width: auto;
+}
+
+/* Main navigation menu */
+body > header nav > ul,
+body > header nav > menu {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-6);
+}
+
+body > header nav > ul a,
+body > header nav > menu a {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  text-decoration: none;
+  transition: color var(--transition-fast) var(--ease-default);
+}
+
+body > header nav > ul a:hover,
+body > header nav > menu a:hover {
+  color: var(--foreground);
+}
+
+body > header nav > ul a[aria-current="page"],
+body > header nav > menu a[aria-current="page"] {
+  color: var(--foreground);
+}
+
+/* Search in header */
+body > header nav input[type="search"] {
+  width: 200px;
+}
+
+/* Right actions (buttons, user menu) */
+body > header nav > :last-child:not(ul):not(menu):not(input) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+/* Mobile menu button */
+body > header nav > button[aria-label*="menu"],
+body > header nav > button[aria-label*="Menu"] {
+  display: none;
+  padding: var(--spacing-2);
+  background: transparent;
+}
+
+@media (max-width: 768px) {
+  body > header nav > ul,
+  body > header nav > menu {
+    display: none;
+  }
+
+  body > header nav input[type="search"] {
+    display: none;
+  }
+
+  body > header nav > button[aria-label*="menu"],
+  body > header nav > button[aria-label*="Menu"] {
+    display: flex;
+  }
+}
+
+/* ==========================================================================
+   Sidebar Navigation (Left)
+   ========================================================================== */
+
+body > aside nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding: var(--spacing-2);
+}
+
+/* Sidebar logo/brand (optional) */
+body > aside nav > :first-child:has(img) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+  font-weight: var(--font-bold);
+  text-decoration: none;
+  color: var(--foreground);
+}
+
+body > aside nav > :first-child img {
+  height: var(--spacing-8);
+  width: auto;
+}
+
+/* Sidebar links */
+body > aside nav a {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast) var(--ease-default);
+}
+
+body > aside nav a:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+body > aside nav a[aria-current="page"] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-weight: var(--font-medium);
+}
+
+/* Sidebar sections */
+body > aside nav > section {
+  margin-top: var(--spacing-4);
+}
+
+body > aside nav > section > h2,
+body > aside nav > section > h3 {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  padding: var(--spacing-2) var(--spacing-3);
+  margin-bottom: var(--spacing-1);
+}
+
+body > aside nav > section menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+/* Nested navigation (collapsible) */
+body > aside nav details {
+  border: none;
+  border-radius: 0;
+}
+
+body > aside nav details summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  border-radius: var(--radius-md);
+}
+
+body > aside nav details summary:hover {
+  background: var(--accent);
+}
+
+body > aside nav details > menu,
+body > aside nav details > ul {
+  padding-left: var(--spacing-4);
+  margin-top: var(--spacing-1);
+}
+
+/* ==========================================================================
+   TOC Navigation (Right Sidebar)
+   ========================================================================== */
+
+body > main > aside nav,
+main > aside nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+body > main > aside nav > h2,
+main > aside nav > h2 {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--foreground);
+  margin-bottom: var(--spacing-2);
+}
+
+body > main > aside nav a,
+main > aside nav a {
+  display: block;
+  padding: var(--spacing-1) 0;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  padding-left: var(--spacing-3);
+  transition: all var(--transition-fast) var(--ease-default);
+}
+
+body > main > aside nav a:hover,
+main > aside nav a:hover {
+  color: var(--foreground);
+}
+
+body > main > aside nav a[aria-current="true"],
+main > aside nav a[aria-current="true"] {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: var(--font-medium);
+}
+
+/* Nested TOC items */
+body > main > aside nav menu menu,
+body > main > aside nav ul ul,
+main > aside nav menu menu,
+main > aside nav ul ul {
+  padding-left: var(--spacing-3);
+}
+
+body > main > aside nav menu menu a,
+body > main > aside nav ul ul a,
+main > aside nav menu menu a,
+main > aside nav ul ul a {
+  font-size: var(--text-xs);
+}
+
+/* ==========================================================================
+   Footer Navigation
+   ========================================================================== */
+
+body > footer nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-8);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+body > footer nav > section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+body > footer nav > section > h3 {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--spacing-1);
+}
+
+body > footer nav > section menu,
+body > footer nav > section ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+body > footer nav > section a {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: color var(--transition-fast) var(--ease-default);
+}
+
+body > footer nav > section a:hover {
+  color: var(--foreground);
+}
+
+/* ==========================================================================
+   Breadcrumb Navigation
+   ========================================================================== */
+
+nav[aria-label="Breadcrumb"],
+nav[aria-label="breadcrumb"] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--text-sm);
+}
+
+nav[aria-label="Breadcrumb"] ol,
+nav[aria-label="breadcrumb"] ol {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav[aria-label="Breadcrumb"] li,
+nav[aria-label="breadcrumb"] li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  margin: 0;
+}
+
+nav[aria-label="Breadcrumb"] li:not(:last-child)::after,
+nav[aria-label="breadcrumb"] li:not(:last-child)::after {
+  content: '/';
+  color: var(--muted-foreground);
+}
+
+nav[aria-label="Breadcrumb"] a,
+nav[aria-label="breadcrumb"] a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+nav[aria-label="Breadcrumb"] a:hover,
+nav[aria-label="breadcrumb"] a:hover {
+  color: var(--foreground);
+}
+
+nav[aria-label="Breadcrumb"] li:last-child,
+nav[aria-label="breadcrumb"] li:last-child {
+  color: var(--foreground);
+  font-weight: var(--font-medium);
+}
+
+/* ==========================================================================
+   Pagination Navigation
+   ========================================================================== */
+
+nav[aria-label="Pagination"],
+nav[aria-label="pagination"] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+nav[aria-label="Pagination"] a,
+nav[aria-label="Pagination"] button,
+nav[aria-label="pagination"] a,
+nav[aria-label="pagination"] button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--spacing-8);
+  height: var(--spacing-8);
+  padding: 0 var(--spacing-2);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition-fast) var(--ease-default);
+}
+
+nav[aria-label="Pagination"] a:hover,
+nav[aria-label="Pagination"] button:hover,
+nav[aria-label="pagination"] a:hover,
+nav[aria-label="pagination"] button:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+nav[aria-label="Pagination"] a[aria-current="page"],
+nav[aria-label="pagination"] a[aria-current="page"] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+
+/* ==========================================================================
+   Tabs Navigation
+   ========================================================================== */
+
+nav[role="tablist"] {
+  display: flex;
+  gap: var(--spacing-1);
+  border-bottom: 1px solid var(--border);
+}
+
+nav[role="tablist"] a,
+nav[role="tablist"] button {
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--muted-foreground);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  text-decoration: none;
+  transition: all var(--transition-fast) var(--ease-default);
+}
+
+nav[role="tablist"] a:hover,
+nav[role="tablist"] button:hover {
+  color: var(--foreground);
+}
+
+nav[role="tablist"] a[aria-selected="true"],
+nav[role="tablist"] button[aria-selected="true"] {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Vertical tabs */
+nav[role="tablist"][data-orientation="vertical"] {
+  flex-direction: column;
+  border-bottom: none;
+  border-right: 1px solid var(--border);
+  padding-right: var(--spacing-1);
+}
+
+nav[role="tablist"][data-orientation="vertical"] a,
+nav[role="tablist"][data-orientation="vertical"] button {
+  border-bottom: none;
+  border-right: 2px solid transparent;
+  margin-bottom: 0;
+  margin-right: -1px;
+  text-align: left;
+}
+
+nav[role="tablist"][data-orientation="vertical"] a[aria-selected="true"],
+nav[role="tablist"][data-orientation="vertical"] button[aria-selected="true"] {
+  border-right-color: var(--primary);
+}

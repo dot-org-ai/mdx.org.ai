@@ -1,7 +1,7 @@
 {
   "name": "@mdxui/html",
   "version": "0.0.1",
-  "description": "Render MDXLD documents to HTML strings",
+  "description": "Semantic HTML5 components and MDXLD document renderer - no classes, just structure",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -11,7 +11,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./styles": "@mdxui/css"
   },
   "files": [
     "dist"
@@ -34,6 +35,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@mdxui/css": "workspace:^",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {

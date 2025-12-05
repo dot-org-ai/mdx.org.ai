@@ -1,0 +1,22 @@
+name = "mdxui-css"
+main = "src/worker/index.ts"
+compatibility_date = "2024-01-01"
+
+# Static Assets - serves pre-compiled CSS from /dist directory
+# This provides zero-cost static file serving with edge caching
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+# Build step - compile CSS before deployment
+[build]
+command = "pnpm build"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# Route configuration (update with your domain)
+# [[routes]]
+# pattern = "css.mdx.org.ai/*"
+# zone_name = "mdx.org.ai"
