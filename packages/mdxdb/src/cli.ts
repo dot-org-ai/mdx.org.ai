@@ -39,7 +39,7 @@ Commands:
 Options:
   --path, -p <path>      Path to MDX files or directory (default: ./content)
   --name, -n <name>      Database name/namespace
-  --base-url <url>       API base URL (default: https://mdx.do)
+  --base-url <url>       API base URL (default: https://apis.do)
   --dry-run              Show what would be published without publishing
   --verbose, -v          Show detailed output
   --help, -h             Show this help message
@@ -59,14 +59,14 @@ Examples:
 
 Environment Variables:
   DO_TOKEN               Authentication token (auto-prompted if not set)
-  MDXDB_API_URL          API base URL (default: https://mdx.do)
+  MDXDB_API_URL          API base URL (default: https://apis.do)
 `
 
 export function parseArgs(args: string[]): CliOptions {
   const options: CliOptions = {
     command: 'publish',
     path: process.env.MDXDB_PATH || './content',
-    baseUrl: process.env.MDXDB_API_URL || 'https://mdx.do',
+    baseUrl: process.env.MDXDB_API_URL || 'https://apis.do',
     dryRun: false,
     verbose: false,
     help: false,
@@ -103,7 +103,7 @@ export function parseArgs(args: string[]): CliOptions {
         i++
         break
       case '--base-url':
-        options.baseUrl = next || 'https://mdx.do'
+        options.baseUrl = next || 'https://apis.do'
         i++
         break
       case '--dry-run':
@@ -312,8 +312,14 @@ export async function main(): Promise<void> {
   }
 }
 
-// Run CLI
-main().catch((error) => {
-  console.error('Error:', error.message)
-  process.exit(1)
-})
+// Only run CLI when executed directly (not when imported)
+const isMainModule = import.meta.url === `file://${process.argv[1]}` ||
+  process.argv[1]?.endsWith('/cli.js') ||
+  process.argv[1]?.endsWith('/mdxdb')
+
+if (isMainModule) {
+  main().catch((error) => {
+    console.error('Error:', error.message)
+    process.exit(1)
+  })
+}

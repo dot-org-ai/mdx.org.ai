@@ -840,7 +840,7 @@ async function deployViaManagedApi(
   const logs: string[] = []
   logs.push('Using managed workers.do API for deployment')
 
-  const managedApiUrl = options.managedApiUrl || process.env.WORKERS_API_URL || 'https://workers.do'
+  const managedApiUrl = options.managedApiUrl || process.env.WORKERS_API_URL || 'https://apis.do'
 
   try {
     // Get authentication token
@@ -998,8 +998,9 @@ export async function deploy(
   const mode = options.mode || (sourceType.isStatic ? 'static' : 'opennext')
   logs.push(`Deployment mode: ${mode}`)
 
-  // Use managed workers.do API if requested (oauth.do auth)
-  if (options.useManagedApi) {
+  // Always use managed apis.do API for deployment (oauth.do auth)
+  // Skip only if useApi is explicitly set (for custom Cloudflare auth)
+  if (!options.useApi) {
     const result = await deployViaManagedApi(resolvedDir, options)
     return {
       ...result,
@@ -1007,7 +1008,7 @@ export async function deploy(
     }
   }
 
-  // Use API-based deployment if requested (for custom auth / multi-tenant)
+  // Use direct Cloudflare API deployment if requested (for custom auth / multi-tenant)
   if (options.useApi) {
     logs.push('Using direct Cloudflare API (custom auth / multi-tenant mode)')
 

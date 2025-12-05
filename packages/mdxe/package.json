@@ -60,13 +60,13 @@
   },
   "dependencies": {
     "@mdxe/hono": "workspace:*",
-    "oauth.do": "^0.1.2",
-    "ai-sandbox": "file:../../primitives/packages/ai-sandbox",
     "ai-functions": "file:../../primitives/packages/ai-functions",
+    "ai-sandbox": "file:../../primitives/packages/ai-sandbox",
     "ai-workflows": "file:../../primitives/packages/ai-workflows",
     "esbuild": "^0.27.0",
     "glob": "^10.4.5",
-    "hono": "^4.6.0"
+    "hono": "^4.6.0",
+    "oauth.do": "^0.1.4"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.9",

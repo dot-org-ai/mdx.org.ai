@@ -45,7 +45,6 @@
   "license": "MIT",
   "dependencies": {
     "@mdxai/claude": "workspace:*",
-    "oauth.do": "^0.1.2",
     "@mdxdb/fs": "workspace:*",
     "@mdxdb/sqlite": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.23.0",
@@ -58,6 +57,7 @@
     "digital-workers": "workspace:*",
     "human-in-the-loop": "workspace:*",
     "language-models": "workspace:*",
+    "oauth.do": "^0.1.4",
     "services-as-software": "workspace:*",
     "zod": "^3.24.0"
   },
