@@ -9,6 +9,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@mdxui/semantic": "workspace:^",
     "@mdxui/shadcn": "workspace:^",
     "@mdxui/widgets": "workspace:^",
     "lucide-react": "^0.555.0",
