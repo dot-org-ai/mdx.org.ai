@@ -59,7 +59,9 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           if [ ! -d /tmp/chdb ]; then
-            git clone --depth 1 -b $CHDB_BRANCH $CHDB_REPO /tmp/chdb
+            git clone -b $CHDB_BRANCH $CHDB_REPO /tmp/chdb
+            cd /tmp/chdb
+            git fetch --tags
           fi
 
       - name: Build chdb core
@@ -144,14 +146,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cmake ninja llvm
-          pip3 install setuptools
+          brew install cmake ninja llvm python-setuptools
 
       - name: Clone chdb (with vector support)
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           if [ ! -d /tmp/chdb ]; then
-            git clone --depth 1 -b $CHDB_BRANCH $CHDB_REPO /tmp/chdb
+            git clone -b $CHDB_BRANCH $CHDB_REPO /tmp/chdb
+            cd /tmp/chdb
+            git fetch --tags
           fi
 
       - name: Build chdb core
@@ -193,14 +196,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cmake ninja llvm
-          pip3 install setuptools
+          brew install cmake ninja llvm python-setuptools
 
       - name: Clone chdb (with vector support)
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           if [ ! -d /tmp/chdb ]; then
-            git clone --depth 1 -b $CHDB_BRANCH $CHDB_REPO /tmp/chdb
+            git clone -b $CHDB_BRANCH $CHDB_REPO /tmp/chdb
+            cd /tmp/chdb
+            git fetch --tags
           fi
 
       - name: Build chdb core
