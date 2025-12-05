@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LegalValueLevel
+$context: https://schema.org
+$type: Class
+name: LegalValueLevel
+description: A list of possible levels for the legal validity of a legislation.
+subClassOf: ["Enumeration"]
+---
+
+# LegalValueLevel
+
+A list of possible levels for the legal validity of a legislation.
+
+## Type Hierarchy
+
+**LegalValueLevel**
+
+
+
+## Properties
+
+See [Schema.org LegalValueLevel properties](https://schema.org/LegalValueLevel#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LegalValueLevel } from 'schema.org.ai'
+
+// Create a LegalValueLevel
+const item: LegalValueLevel = {
+  $type: 'LegalValueLevel',
+  name: 'Example LegalValueLevel'
+}
+
+// Use semantic patterns
+await $.LegalValueLevel.create(item)
+const result = await $.LegalValueLevel.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LegalValueLevel](https://schema.org/LegalValueLevel)
+- [LegalValueLevel Properties](https://schema.org/LegalValueLevel#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

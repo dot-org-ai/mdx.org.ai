@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HairSalon
+$context: https://schema.org
+$type: Class
+name: HairSalon
+description: A hair salon.
+subClassOf: ["HealthAndBeautyBusiness"]
+---
+
+# HairSalon
+
+A hair salon.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HealthAndBeautyBusiness](HealthAndBeautyBusiness.mdx) > **HairSalon**
+
+
+
+## Properties
+
+See [Schema.org HairSalon properties](https://schema.org/HairSalon#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HairSalon } from 'schema.org.ai'
+
+// Create a HairSalon
+const item: HairSalon = {
+  $type: 'HairSalon',
+  name: 'Example HairSalon'
+}
+
+// Use semantic patterns
+await $.HairSalon.create(item)
+const result = await $.HairSalon.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HairSalon](https://schema.org/HairSalon)
+- [HairSalon Properties](https://schema.org/HairSalon#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

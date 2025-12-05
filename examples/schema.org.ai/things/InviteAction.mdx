@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/InviteAction
+$context: https://schema.org
+$type: Class
+name: InviteAction
+description: The act of asking someone to attend an event. Reciprocal of RsvpAction.
+subClassOf: ["CommunicateAction"]
+---
+
+# InviteAction
+
+The act of asking someone to attend an event. Reciprocal of RsvpAction.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > **InviteAction**
+
+
+
+## Properties
+
+See [Schema.org InviteAction properties](https://schema.org/InviteAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InviteAction } from 'schema.org.ai'
+
+// Create a InviteAction
+const item: InviteAction = {
+  $type: 'InviteAction',
+  name: 'Example InviteAction'
+}
+
+// Use semantic patterns
+await $.InviteAction.create(item)
+const result = await $.InviteAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InviteAction](https://schema.org/InviteAction)
+- [InviteAction Properties](https://schema.org/InviteAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

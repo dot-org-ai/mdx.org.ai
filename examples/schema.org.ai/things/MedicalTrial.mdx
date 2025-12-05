@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalTrial
+$context: https://schema.org
+$type: Class
+name: MedicalTrial
+description: A medical trial is a type of medical study that uses a scientific process to compare the safety and efficacy of medical therapies or medical procedures. In general, medical trials are controlled and subjects are allocated at random to the different treatment and/or control groups.
+subClassOf: ["MedicalStudy"]
+---
+
+# MedicalTrial
+
+A medical trial is a type of medical study that uses a scientific process to compare the safety and efficacy of medical therapies or medical procedures. In general, medical trials are controlled and subjects are allocated at random to the different treatment and/or control groups.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalStudy](MedicalStudy.mdx) > **MedicalTrial**
+
+
+
+## Properties
+
+See [Schema.org MedicalTrial properties](https://schema.org/MedicalTrial#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalTrial } from 'schema.org.ai'
+
+// Create a MedicalTrial
+const item: MedicalTrial = {
+  $type: 'MedicalTrial',
+  name: 'Example MedicalTrial'
+}
+
+// Use semantic patterns
+await $.MedicalTrial.create(item)
+const result = await $.MedicalTrial.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalTrial](https://schema.org/MedicalTrial)
+- [MedicalTrial Properties](https://schema.org/MedicalTrial#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WearableMeasurementTypeEnumeration
+$context: https://schema.org
+$type: Class
+name: WearableMeasurementTypeEnumeration
+description: Enumerates common types of measurement for wearables products.
+subClassOf: ["MeasurementTypeEnumeration"]
+---
+
+# WearableMeasurementTypeEnumeration
+
+Enumerates common types of measurement for wearables products.
+
+## Type Hierarchy
+
+**WearableMeasurementTypeEnumeration**
+
+
+
+## Properties
+
+See [Schema.org WearableMeasurementTypeEnumeration properties](https://schema.org/WearableMeasurementTypeEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WearableMeasurementTypeEnumeration } from 'schema.org.ai'
+
+// Create a WearableMeasurementTypeEnumeration
+const item: WearableMeasurementTypeEnumeration = {
+  $type: 'WearableMeasurementTypeEnumeration',
+  name: 'Example WearableMeasurementTypeEnumeration'
+}
+
+// Use semantic patterns
+await $.WearableMeasurementTypeEnumeration.create(item)
+const result = await $.WearableMeasurementTypeEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WearableMeasurementTypeEnumeration](https://schema.org/WearableMeasurementTypeEnumeration)
+- [WearableMeasurementTypeEnumeration Properties](https://schema.org/WearableMeasurementTypeEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

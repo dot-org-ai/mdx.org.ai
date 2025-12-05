@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BedType
+$context: https://schema.org
+$type: Class
+name: BedType
+description: A type of bed. This is used for indicating the bed or beds available in an accommodation.
+subClassOf: ["QualitativeValue"]
+---
+
+# BedType
+
+A type of bed. This is used for indicating the bed or beds available in an accommodation.
+
+## Type Hierarchy
+
+**BedType**
+
+
+
+## Properties
+
+See [Schema.org BedType properties](https://schema.org/BedType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BedType } from 'schema.org.ai'
+
+// Create a BedType
+const item: BedType = {
+  $type: 'BedType',
+  name: 'Example BedType'
+}
+
+// Use semantic patterns
+await $.BedType.create(item)
+const result = await $.BedType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BedType](https://schema.org/BedType)
+- [BedType Properties](https://schema.org/BedType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

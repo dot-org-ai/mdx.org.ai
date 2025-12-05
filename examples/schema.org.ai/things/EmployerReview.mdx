@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EmployerReview
+$context: https://schema.org
+$type: Class
+name: EmployerReview
+description: An [[EmployerReview]] is a review of an [[Organization]] regarding its role as an employer, written by a current or former employee of that organization.
+subClassOf: ["Review"]
+---
+
+# EmployerReview
+
+An [[EmployerReview]] is a review of an [[Organization]] regarding its role as an employer, written by a current or former employee of that organization.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Review](Review.mdx) > **EmployerReview**
+
+
+
+## Properties
+
+See [Schema.org EmployerReview properties](https://schema.org/EmployerReview#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EmployerReview } from 'schema.org.ai'
+
+// Create a EmployerReview
+const item: EmployerReview = {
+  $type: 'EmployerReview',
+  name: 'Example EmployerReview'
+}
+
+// Use semantic patterns
+await $.EmployerReview.create(item)
+const result = await $.EmployerReview.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EmployerReview](https://schema.org/EmployerReview)
+- [EmployerReview Properties](https://schema.org/EmployerReview#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/IndividualPhysician
+$context: https://schema.org
+$type: Class
+name: IndividualPhysician
+description: An individual medical practitioner. For their official address use [[address]], for affiliations to hospitals use [[hospitalAffiliation]].  The [[practicesAt]] property can be used to indicate [[MedicalOrganization]] hospitals, clinics, pharmacies etc. where this physician practices.
+subClassOf: ["Physician"]
+---
+
+# IndividualPhysician
+
+An individual medical practitioner. For their official address use [[address]], for affiliations to hospitals use [[hospitalAffiliation]].  The [[practicesAt]] property can be used to indicate [[MedicalOrganization]] hospitals, clinics, pharmacies etc. where this physician practices.
+
+## Type Hierarchy
+
+**IndividualPhysician**
+
+
+
+## Properties
+
+See [Schema.org IndividualPhysician properties](https://schema.org/IndividualPhysician#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { IndividualPhysician } from 'schema.org.ai'
+
+// Create a IndividualPhysician
+const item: IndividualPhysician = {
+  $type: 'IndividualPhysician',
+  name: 'Example IndividualPhysician'
+}
+
+// Use semantic patterns
+await $.IndividualPhysician.create(item)
+const result = await $.IndividualPhysician.get('item-id')
+```
+
+## Resources
+
+- [Schema.org IndividualPhysician](https://schema.org/IndividualPhysician)
+- [IndividualPhysician Properties](https://schema.org/IndividualPhysician#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

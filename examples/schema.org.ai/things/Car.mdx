@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Car
+$context: https://schema.org
+$type: Class
+name: Car
+description: A car is a wheeled, self-powered motor vehicle used for transportation.
+subClassOf: ["Vehicle"]
+---
+
+# Car
+
+A car is a wheeled, self-powered motor vehicle used for transportation.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > [Vehicle](Vehicle.mdx) > **Car**
+
+
+
+## Properties
+
+See [Schema.org Car properties](https://schema.org/Car#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Car } from 'schema.org.ai'
+
+// Create a Car
+const item: Car = {
+  $type: 'Car',
+  name: 'Example Car'
+}
+
+// Use semantic patterns
+await $.Car.create(item)
+const result = await $.Car.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Car](https://schema.org/Car)
+- [Car Properties](https://schema.org/Car#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

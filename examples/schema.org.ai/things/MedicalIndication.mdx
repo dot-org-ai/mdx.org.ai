@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/MedicalIndication
+$context: https://schema.org
+$type: Class
+name: MedicalIndication
+description: A condition or factor that indicates use of a medical therapy, including signs, symptoms, risk factors, anatomical states, etc.
+subClassOf: ["MedicalEntity"]
+---
+
+# MedicalIndication
+
+A condition or factor that indicates use of a medical therapy, including signs, symptoms, risk factors, anatomical states, etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **MedicalIndication**
+
+## Direct Subclasses
+
+- **[ApprovedIndication](ApprovedIndication.mdx)**: An indication for a medical therapy that has been formally specified or approved by a regulatory body that regulates use of the therapy; for example, the US FDA approves indications for most drugs in the US
+- **[PreventionIndication](PreventionIndication.mdx)**: An indication for preventing an underlying condition, symptom, etc
+- **[TreatmentIndication](TreatmentIndication.mdx)**: An indication for treating an underlying condition, symptom, etc
+
+## Properties
+
+See [Schema.org MedicalIndication properties](https://schema.org/MedicalIndication#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalIndication } from 'schema.org.ai'
+
+// Create a MedicalIndication
+const item: MedicalIndication = {
+  $type: 'MedicalIndication',
+  name: 'Example MedicalIndication'
+}
+
+// Use semantic patterns
+await $.MedicalIndication.create(item)
+const result = await $.MedicalIndication.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalIndication](https://schema.org/MedicalIndication)
+- [MedicalIndication Properties](https://schema.org/MedicalIndication#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

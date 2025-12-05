@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/ReceiveAction
+$context: https://schema.org
+$type: Class
+name: ReceiveAction
+description: The act of physically/electronically taking delivery of an object that has been transferred from an origin to a destination. Reciprocal of SendAction.\
+subClassOf: ["TransferAction"]
+---
+
+# ReceiveAction
+
+The act of physically/electronically taking delivery of an object that has been transferred from an origin to a destination. Reciprocal of SendAction.\
+\
+Related actions:\
+\
+* [[SendAction]]: The reciprocal of ReceiveAction.\
+* [[TakeAction]]: Unlike TakeAction, ReceiveAction does not imply that the ownership has been transferred (e.g. I can receive a package, but it does not mean the package is now mine).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TransferAction](TransferAction.mdx) > **ReceiveAction**
+
+
+
+## Properties
+
+See [Schema.org ReceiveAction properties](https://schema.org/ReceiveAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReceiveAction } from 'schema.org.ai'
+
+// Create a ReceiveAction
+const item: ReceiveAction = {
+  $type: 'ReceiveAction',
+  name: 'Example ReceiveAction'
+}
+
+// Use semantic patterns
+await $.ReceiveAction.create(item)
+const result = await $.ReceiveAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReceiveAction](https://schema.org/ReceiveAction)
+- [ReceiveAction Properties](https://schema.org/ReceiveAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

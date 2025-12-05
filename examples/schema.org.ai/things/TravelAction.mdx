@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TravelAction
+$context: https://schema.org
+$type: Class
+name: TravelAction
+description: The act of traveling from a fromLocation to a destination by a specified mode of transport, optionally with participants.
+subClassOf: ["MoveAction"]
+---
+
+# TravelAction
+
+The act of traveling from a fromLocation to a destination by a specified mode of transport, optionally with participants.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [MoveAction](MoveAction.mdx) > **TravelAction**
+
+
+
+## Properties
+
+See [Schema.org TravelAction properties](https://schema.org/TravelAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TravelAction } from 'schema.org.ai'
+
+// Create a TravelAction
+const item: TravelAction = {
+  $type: 'TravelAction',
+  name: 'Example TravelAction'
+}
+
+// Use semantic patterns
+await $.TravelAction.create(item)
+const result = await $.TravelAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TravelAction](https://schema.org/TravelAction)
+- [TravelAction Properties](https://schema.org/TravelAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicComposition
+$context: https://schema.org
+$type: Class
+name: MusicComposition
+description: A musical composition.
+subClassOf: ["CreativeWork"]
+---
+
+# MusicComposition
+
+A musical composition.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **MusicComposition**
+
+
+
+## Properties
+
+See [Schema.org MusicComposition properties](https://schema.org/MusicComposition#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicComposition } from 'schema.org.ai'
+
+// Create a MusicComposition
+const item: MusicComposition = {
+  $type: 'MusicComposition',
+  name: 'Example MusicComposition'
+}
+
+// Use semantic patterns
+await $.MusicComposition.create(item)
+const result = await $.MusicComposition.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicComposition](https://schema.org/MusicComposition)
+- [MusicComposition Properties](https://schema.org/MusicComposition#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

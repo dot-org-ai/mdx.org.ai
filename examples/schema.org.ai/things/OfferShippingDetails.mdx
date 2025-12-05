@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OfferShippingDetails
+$context: https://schema.org
+$type: Class
+name: OfferShippingDetails
+description: OfferShippingDetails represents information about shipping destinations. Multiple of these entities can be used to represent different shipping rates for different destinations: One entity for Alaska/Hawaii. A different one for continental US. A different one for all France. Multiple of these entities can be used to represent different shipping costs and delivery times. Two entities that are identical but differ in rate and time: E.g. Cheaper and slower: $5 in 5-7 days or Fast and expensive: $15 in 1-2 days.
+subClassOf: ["StructuredValue"]
+---
+
+# OfferShippingDetails
+
+OfferShippingDetails represents information about shipping destinations. Multiple of these entities can be used to represent different shipping rates for different destinations: One entity for Alaska/Hawaii. A different one for continental US. A different one for all France. Multiple of these entities can be used to represent different shipping costs and delivery times. Two entities that are identical but differ in rate and time: E.g. Cheaper and slower: $5 in 5-7 days or Fast and expensive: $15 in 1-2 days.
+
+## Type Hierarchy
+
+**OfferShippingDetails**
+
+
+
+## Properties
+
+See [Schema.org OfferShippingDetails properties](https://schema.org/OfferShippingDetails#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OfferShippingDetails } from 'schema.org.ai'
+
+// Create a OfferShippingDetails
+const item: OfferShippingDetails = {
+  $type: 'OfferShippingDetails',
+  name: 'Example OfferShippingDetails'
+}
+
+// Use semantic patterns
+await $.OfferShippingDetails.create(item)
+const result = await $.OfferShippingDetails.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OfferShippingDetails](https://schema.org/OfferShippingDetails)
+- [OfferShippingDetails Properties](https://schema.org/OfferShippingDetails#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

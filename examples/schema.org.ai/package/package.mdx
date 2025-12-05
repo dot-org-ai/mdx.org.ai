@@ -1,0 +1,135 @@
+---
+$id: https://schema.org.ai
+$context: https://schema.org
+$type: https://schema.org.ai/Package
+name: schema.org.ai
+description: Schema.org vocabulary with 920 types plus AI-native extensions for Business-as-Code
+version: 1.0.0
+license: CC-BY-SA-4.0
+author:
+  $type: https://schema.org/Organization
+  name: .do Platform Team
+  url: https://platform.do
+repository:
+  $type: https://schema.org/SoftwareSourceCode
+  type: git
+  url: https://github.com/dot-org-ai/schema.org.ai
+homepage: https://schema.org.ai
+keywords:
+  - ontology
+  - semantic-web
+  - business-as-code
+  - mdxld
+  - schema
+  - org-ai
+programmingLanguage: TypeScript
+runtimePlatform: node
+exports:
+  ".":
+    import: ./dist/index.mjs
+    require: ./dist/index.js
+    types: ./dist/index.d.ts
+  "./types":
+    import: ./dist/types.mjs
+    require: ./dist/types.js
+    types: ./dist/types.d.ts
+  "./data":
+    import: ./dist/data.mjs
+    require: ./dist/data.js
+    types: ./dist/data.d.ts
+  "./schemas":
+    import: ./dist/schemas.mjs
+    require: ./dist/schemas.js
+    types: ./dist/schemas.d.ts
+dependencies:
+  zod: ^3.22.0
+devDependencies:
+  "@types/node": ^20.0.0
+  mdxe: ^1.0.0
+  typescript: ^5.3.0
+  vitest: ^1.0.0
+peerDependencies:
+  sdk.do: ^1.0.0
+engines:
+  node: ">=18.0.0"
+scripts:
+  build: mdxe build
+  dev: mdxe dev
+  test: vitest
+  typecheck: tsc --noEmit
+  prepublishOnly: pnpm build && pnpm test
+---
+
+# schema.org.ai
+
+Schema.org vocabulary with 920 types plus AI-native extensions for Business-as-Code
+
+## Installation
+
+```bash
+npm install schema.org.ai
+# or
+pnpm add schema.org.ai
+# or
+yarn add schema.org.ai
+```
+
+## Usage
+
+```typescript
+import {{ $ }} from 'sdk.do'
+import type {{ Thing }} from 'schema.org.ai'
+
+// Semantic patterns
+const item = await $.Thing.create({{
+  $type: 'Thing',
+  name: 'Example'
+}})
+
+const result = await $.Thing.get('item-id')
+```
+
+## Tree-Shakable Exports
+
+```typescript
+// Import specific types
+import {{ Thing }} from 'schema.org.ai/types'
+
+// Import specific data
+import {{ ThingData }} from 'schema.org.ai/data'
+
+// Import Zod schemas
+import {{ ThingSchema }} from 'schema.org.ai/schemas'
+```
+
+## Build Process
+
+This package is built using **mdxe** (MDX Execution Engine) with zero configuration:
+
+1. **Parse MDX** - All `.mdx` files in `things/` directory
+2. **Extract Frontmatter** - YAML frontmatter becomes structured data
+3. **Generate Types** - TypeScript interfaces from frontmatter
+4. **Generate Schemas** - Zod schemas for validation
+5. **Generate Data** - Tree-shakable metadata exports
+6. **Build Hierarchy** - Parent-child relationships from `subClassOf`
+7. **Compile** - ESM + CJS bundles with declarations
+
+No config files needed - everything is derived from MDX frontmatter with `$type: https://schema.org.ai/Package`.
+
+## Features
+
+- **871 MDX files** with complete type hierarchy
+- Breadcrumb navigation (Thing > Action > CreateAction)
+- Direct subclasses listing with links
+- Business-as-Code usage examples
+- Schema.org resource links
+- AI-native extensions (Agent, Tool, Model, etc.)
+- Digital scoring property (0.0-1.0)
+
+## License
+
+Licensed under [CC BY-SA 4.0](../LICENSE).
+
+Based on Schema.org (https://schema.org) - CC BY-SA 3.0.
+
+See [ATTRIBUTION.md](../ATTRIBUTION.md) for details.

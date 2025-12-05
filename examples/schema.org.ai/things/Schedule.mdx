@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Schedule
+$context: https://schema.org
+$type: Class
+name: Schedule
+description: A schedule defines a repeating time period used to describe a regularly occurring [[Event]]. At a minimum a schedule will specify [[repeatFrequency]] which describes the interval between occurrences of the event. Additional information can be provided to specify the schedule more precisely. This includes identifying the day(s) of the week or month when the recurring event will take place, in addition to its start and end time. Schedules may also have start and end dates to indicate when they are active, e.g. to define a limited calendar of events.
+subClassOf: ["Intangible"]
+---
+
+# Schedule
+
+A schedule defines a repeating time period used to describe a regularly occurring [[Event]]. At a minimum a schedule will specify [[repeatFrequency]] which describes the interval between occurrences of the event. Additional information can be provided to specify the schedule more precisely. This includes identifying the day(s) of the week or month when the recurring event will take place, in addition to its start and end time. Schedules may also have start and end dates to indicate when they are active, e.g. to define a limited calendar of events.
+
+## Type Hierarchy
+
+**Schedule**
+
+
+
+## Properties
+
+See [Schema.org Schedule properties](https://schema.org/Schedule#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Schedule } from 'schema.org.ai'
+
+// Create a Schedule
+const item: Schedule = {
+  $type: 'Schedule',
+  name: 'Example Schedule'
+}
+
+// Use semantic patterns
+await $.Schedule.create(item)
+const result = await $.Schedule.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Schedule](https://schema.org/Schedule)
+- [Schedule Properties](https://schema.org/Schedule#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

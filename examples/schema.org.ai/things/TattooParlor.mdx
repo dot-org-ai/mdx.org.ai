@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TattooParlor
+$context: https://schema.org
+$type: Class
+name: TattooParlor
+description: A tattoo parlor.
+subClassOf: ["HealthAndBeautyBusiness"]
+---
+
+# TattooParlor
+
+A tattoo parlor.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HealthAndBeautyBusiness](HealthAndBeautyBusiness.mdx) > **TattooParlor**
+
+
+
+## Properties
+
+See [Schema.org TattooParlor properties](https://schema.org/TattooParlor#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TattooParlor } from 'schema.org.ai'
+
+// Create a TattooParlor
+const item: TattooParlor = {
+  $type: 'TattooParlor',
+  name: 'Example TattooParlor'
+}
+
+// Use semantic patterns
+await $.TattooParlor.create(item)
+const result = await $.TattooParlor.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TattooParlor](https://schema.org/TattooParlor)
+- [TattooParlor Properties](https://schema.org/TattooParlor#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

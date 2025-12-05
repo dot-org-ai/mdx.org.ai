@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CookAction
+$context: https://schema.org
+$type: Class
+name: CookAction
+description: The act of producing/preparing food.
+subClassOf: ["CreateAction"]
+---
+
+# CookAction
+
+The act of producing/preparing food.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [CreateAction](CreateAction.mdx) > **CookAction**
+
+
+
+## Properties
+
+See [Schema.org CookAction properties](https://schema.org/CookAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CookAction } from 'schema.org.ai'
+
+// Create a CookAction
+const item: CookAction = {
+  $type: 'CookAction',
+  name: 'Example CookAction'
+}
+
+// Use semantic patterns
+await $.CookAction.create(item)
+const result = await $.CookAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CookAction](https://schema.org/CookAction)
+- [CookAction Properties](https://schema.org/CookAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

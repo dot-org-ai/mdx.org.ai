@@ -1,0 +1,63 @@
+---
+$id: https://schema.org.ai/PaymentMethod
+$context: https://schema.org
+$type: Class
+name: PaymentMethod
+description: A payment method is a standardized procedure for transferring the monetary amount for a purchase. Payment methods are characterized by the legal and technical structures used, and by the organization or group carrying out the transaction. The following legacy values should be accepted: \
+subClassOf: ["Intangible"]
+---
+
+# PaymentMethod
+
+A payment method is a standardized procedure for transferring the monetary amount for a purchase. Payment methods are characterized by the legal and technical structures used, and by the organization or group carrying out the transaction. The following legacy values should be accepted: \
+\
+* http://purl.org/goodrelations/v1#ByBankTransferInAdvance\
+* http://purl.org/goodrelations/v1#ByInvoice\
+* http://purl.org/goodrelations/v1#Cash\
+* http://purl.org/goodrelations/v1#CheckInAdvance\
+* http://purl.org/goodrelations/v1#COD\
+* http://purl.org/goodrelations/v1#DirectDebit\
+* http://purl.org/goodrelations/v1#GoogleCheckout\
+* http://purl.org/goodrelations/v1#PayPal\
+* http://purl.org/goodrelations/v1#PaySwarm\
+\
+Structured values are recommended for newer payment methods.
+
+## Type Hierarchy
+
+**PaymentMethod**
+
+## Direct Subclasses
+
+- **[PaymentCard](PaymentCard.mdx)**: A payment method using a credit, debit, store or other card to associate the payment with an account
+- **[PaymentService](PaymentService.mdx)**: A Service to transfer funds from a person or organization to a beneficiary person or organization
+
+## Properties
+
+See [Schema.org PaymentMethod properties](https://schema.org/PaymentMethod#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PaymentMethod } from 'schema.org.ai'
+
+// Create a PaymentMethod
+const item: PaymentMethod = {
+  $type: 'PaymentMethod',
+  name: 'Example PaymentMethod'
+}
+
+// Use semantic patterns
+await $.PaymentMethod.create(item)
+const result = await $.PaymentMethod.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PaymentMethod](https://schema.org/PaymentMethod)
+- [PaymentMethod Properties](https://schema.org/PaymentMethod#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

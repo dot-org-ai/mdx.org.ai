@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ContactPointOption
+$context: https://schema.org
+$type: Class
+name: ContactPointOption
+description: Enumerated options related to a ContactPoint.
+subClassOf: ["Enumeration"]
+---
+
+# ContactPointOption
+
+Enumerated options related to a ContactPoint.
+
+## Type Hierarchy
+
+**ContactPointOption**
+
+
+
+## Properties
+
+See [Schema.org ContactPointOption properties](https://schema.org/ContactPointOption#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ContactPointOption } from 'schema.org.ai'
+
+// Create a ContactPointOption
+const item: ContactPointOption = {
+  $type: 'ContactPointOption',
+  name: 'Example ContactPointOption'
+}
+
+// Use semantic patterns
+await $.ContactPointOption.create(item)
+const result = await $.ContactPointOption.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ContactPointOption](https://schema.org/ContactPointOption)
+- [ContactPointOption Properties](https://schema.org/ContactPointOption#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

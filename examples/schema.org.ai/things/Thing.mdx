@@ -1,0 +1,59 @@
+---
+$id: https://schema.org.ai/Thing
+$context: https://schema.org
+$type: Class
+name: Thing
+description: The most generic type of item.
+subClassOf: []
+---
+
+# Thing
+
+The most generic type of item.
+
+## Type Hierarchy
+
+**Thing**
+
+## Direct Subclasses
+
+- **[Action](Action.mdx)**: An action performed by a direct agent and indirect participants upon a direct object
+- **[BioChemEntity](BioChemEntity.mdx)**: Any biological, chemical, or biochemical thing
+- **[CreativeWork](CreativeWork.mdx)**: The most generic kind of creative work, including books, movies, photographs, software programs, etc
+- **[Event](Event.mdx)**: An event happening at a certain time and location, such as a concert, lecture, or festival
+- **[MedicalEntity](MedicalEntity.mdx)**: The most generic type of entity related to health and the practice of medicine
+- **[Organization](Organization.mdx)**: An organization such as a school, NGO, corporation, club, etc
+- **[Person](Person.mdx)**: A person (alive, dead, undead, or fictional)
+- **[Place](Place.mdx)**: Entities that have a somewhat fixed, physical extension
+- **[Product](Product.mdx)**: Any offered product or service
+- **[Taxon](Taxon.mdx)**: A set of organisms asserted to represent a natural cohesive biological unit
+
+## Properties
+
+See [Schema.org Thing properties](https://schema.org/Thing#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Thing } from 'schema.org.ai'
+
+// Create a Thing
+const item: Thing = {
+  $type: 'Thing',
+  name: 'Example Thing'
+}
+
+// Use semantic patterns
+await $.Thing.create(item)
+const result = await $.Thing.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Thing](https://schema.org/Thing)
+- [Thing Properties](https://schema.org/Thing#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

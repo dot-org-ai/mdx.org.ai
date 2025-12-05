@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WebAPI
+$context: https://schema.org
+$type: Class
+name: WebAPI
+description: An application programming interface accessible over Web/Internet technologies.
+subClassOf: ["Service"]
+---
+
+# WebAPI
+
+An application programming interface accessible over Web/Internet technologies.
+
+## Type Hierarchy
+
+**WebAPI**
+
+
+
+## Properties
+
+See [Schema.org WebAPI properties](https://schema.org/WebAPI#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WebAPI } from 'schema.org.ai'
+
+// Create a WebAPI
+const item: WebAPI = {
+  $type: 'WebAPI',
+  name: 'Example WebAPI'
+}
+
+// Use semantic patterns
+await $.WebAPI.create(item)
+const result = await $.WebAPI.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WebAPI](https://schema.org/WebAPI)
+- [WebAPI Properties](https://schema.org/WebAPI#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

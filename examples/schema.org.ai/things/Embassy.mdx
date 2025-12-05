@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Embassy
+$context: https://schema.org
+$type: Class
+name: Embassy
+description: An embassy.
+subClassOf: ["GovernmentBuilding"]
+---
+
+# Embassy
+
+An embassy.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [GovernmentBuilding](GovernmentBuilding.mdx) > **Embassy**
+
+
+
+## Properties
+
+See [Schema.org Embassy properties](https://schema.org/Embassy#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Embassy } from 'schema.org.ai'
+
+// Create a Embassy
+const item: Embassy = {
+  $type: 'Embassy',
+  name: 'Example Embassy'
+}
+
+// Use semantic patterns
+await $.Embassy.create(item)
+const result = await $.Embassy.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Embassy](https://schema.org/Embassy)
+- [Embassy Properties](https://schema.org/Embassy#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

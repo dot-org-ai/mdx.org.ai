@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SportsEvent
+$context: https://schema.org
+$type: Class
+name: SportsEvent
+description: Event type: Sports event.
+subClassOf: ["Event"]
+---
+
+# SportsEvent
+
+Event type: Sports event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **SportsEvent**
+
+
+
+## Properties
+
+See [Schema.org SportsEvent properties](https://schema.org/SportsEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SportsEvent } from 'schema.org.ai'
+
+// Create a SportsEvent
+const item: SportsEvent = {
+  $type: 'SportsEvent',
+  name: 'Example SportsEvent'
+}
+
+// Use semantic patterns
+await $.SportsEvent.create(item)
+const result = await $.SportsEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SportsEvent](https://schema.org/SportsEvent)
+- [SportsEvent Properties](https://schema.org/SportsEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

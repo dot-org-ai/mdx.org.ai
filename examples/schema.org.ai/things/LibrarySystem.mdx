@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LibrarySystem
+$context: https://schema.org
+$type: Class
+name: LibrarySystem
+description: A [[LibrarySystem]] is a collaborative system amongst several libraries.
+subClassOf: ["Organization"]
+---
+
+# LibrarySystem
+
+A [[LibrarySystem]] is a collaborative system amongst several libraries.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **LibrarySystem**
+
+
+
+## Properties
+
+See [Schema.org LibrarySystem properties](https://schema.org/LibrarySystem#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LibrarySystem } from 'schema.org.ai'
+
+// Create a LibrarySystem
+const item: LibrarySystem = {
+  $type: 'LibrarySystem',
+  name: 'Example LibrarySystem'
+}
+
+// Use semantic patterns
+await $.LibrarySystem.create(item)
+const result = await $.LibrarySystem.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LibrarySystem](https://schema.org/LibrarySystem)
+- [LibrarySystem Properties](https://schema.org/LibrarySystem#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

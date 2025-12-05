@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PaymentChargeSpecification
+$context: https://schema.org
+$type: Class
+name: PaymentChargeSpecification
+description: The costs of settling the payment using a particular payment method.
+subClassOf: ["PriceSpecification"]
+---
+
+# PaymentChargeSpecification
+
+The costs of settling the payment using a particular payment method.
+
+## Type Hierarchy
+
+**PaymentChargeSpecification**
+
+
+
+## Properties
+
+See [Schema.org PaymentChargeSpecification properties](https://schema.org/PaymentChargeSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PaymentChargeSpecification } from 'schema.org.ai'
+
+// Create a PaymentChargeSpecification
+const item: PaymentChargeSpecification = {
+  $type: 'PaymentChargeSpecification',
+  name: 'Example PaymentChargeSpecification'
+}
+
+// Use semantic patterns
+await $.PaymentChargeSpecification.create(item)
+const result = await $.PaymentChargeSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PaymentChargeSpecification](https://schema.org/PaymentChargeSpecification)
+- [PaymentChargeSpecification Properties](https://schema.org/PaymentChargeSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

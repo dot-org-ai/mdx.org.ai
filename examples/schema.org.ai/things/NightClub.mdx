@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/NightClub
+$context: https://schema.org
+$type: Class
+name: NightClub
+description: A nightclub or discotheque.
+subClassOf: ["EntertainmentBusiness"]
+---
+
+# NightClub
+
+A nightclub or discotheque.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [EntertainmentBusiness](EntertainmentBusiness.mdx) > **NightClub**
+
+
+
+## Properties
+
+See [Schema.org NightClub properties](https://schema.org/NightClub#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { NightClub } from 'schema.org.ai'
+
+// Create a NightClub
+const item: NightClub = {
+  $type: 'NightClub',
+  name: 'Example NightClub'
+}
+
+// Use semantic patterns
+await $.NightClub.create(item)
+const result = await $.NightClub.get('item-id')
+```
+
+## Resources
+
+- [Schema.org NightClub](https://schema.org/NightClub)
+- [NightClub Properties](https://schema.org/NightClub#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalImagingTechnique
+$context: https://schema.org
+$type: Class
+name: MedicalImagingTechnique
+description: Any medical imaging modality typically used for diagnostic purposes. Enumerated type.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# MedicalImagingTechnique
+
+Any medical imaging modality typically used for diagnostic purposes. Enumerated type.
+
+## Type Hierarchy
+
+**MedicalImagingTechnique**
+
+
+
+## Properties
+
+See [Schema.org MedicalImagingTechnique properties](https://schema.org/MedicalImagingTechnique#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalImagingTechnique } from 'schema.org.ai'
+
+// Create a MedicalImagingTechnique
+const item: MedicalImagingTechnique = {
+  $type: 'MedicalImagingTechnique',
+  name: 'Example MedicalImagingTechnique'
+}
+
+// Use semantic patterns
+await $.MedicalImagingTechnique.create(item)
+const result = await $.MedicalImagingTechnique.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalImagingTechnique](https://schema.org/MedicalImagingTechnique)
+- [MedicalImagingTechnique Properties](https://schema.org/MedicalImagingTechnique#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

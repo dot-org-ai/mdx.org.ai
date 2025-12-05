@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Pond
+$context: https://schema.org
+$type: Class
+name: Pond
+description: A pond.
+subClassOf: ["BodyOfWater"]
+---
+
+# Pond
+
+A pond.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > [BodyOfWater](BodyOfWater.mdx) > **Pond**
+
+
+
+## Properties
+
+See [Schema.org Pond properties](https://schema.org/Pond#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Pond } from 'schema.org.ai'
+
+// Create a Pond
+const item: Pond = {
+  $type: 'Pond',
+  name: 'Example Pond'
+}
+
+// Use semantic patterns
+await $.Pond.create(item)
+const result = await $.Pond.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Pond](https://schema.org/Pond)
+- [Pond Properties](https://schema.org/Pond#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

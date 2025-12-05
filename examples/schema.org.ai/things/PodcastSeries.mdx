@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PodcastSeries
+$context: https://schema.org
+$type: Class
+name: PodcastSeries
+description: A podcast is an episodic series of digital audio or video files which a user can download and listen to.
+subClassOf: ["CreativeWorkSeries"]
+---
+
+# PodcastSeries
+
+A podcast is an episodic series of digital audio or video files which a user can download and listen to.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [CreativeWorkSeries](CreativeWorkSeries.mdx) > **PodcastSeries**
+
+
+
+## Properties
+
+See [Schema.org PodcastSeries properties](https://schema.org/PodcastSeries#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PodcastSeries } from 'schema.org.ai'
+
+// Create a PodcastSeries
+const item: PodcastSeries = {
+  $type: 'PodcastSeries',
+  name: 'Example PodcastSeries'
+}
+
+// Use semantic patterns
+await $.PodcastSeries.create(item)
+const result = await $.PodcastSeries.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PodcastSeries](https://schema.org/PodcastSeries)
+- [PodcastSeries Properties](https://schema.org/PodcastSeries#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

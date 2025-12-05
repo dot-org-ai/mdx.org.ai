@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BackgroundNewsArticle
+$context: https://schema.org
+$type: Class
+name: BackgroundNewsArticle
+description: A [[NewsArticle]] providing historical context, definition and detail on a specific topic (aka "explainer" or "backgrounder"). For example, an in-depth article or frequently-asked-questions ([FAQ](https://en.wikipedia.org/wiki/FAQ)) document on topics such as Climate Change or the European Union. Other kinds of background material from a non-news setting are often described using [[Book]] or [[Article]], in particular [[ScholarlyArticle]]. See also [[NewsArticle]] for related vocabulary from a learning/education perspective.
+subClassOf: ["NewsArticle"]
+---
+
+# BackgroundNewsArticle
+
+A [[NewsArticle]] providing historical context, definition and detail on a specific topic (aka "explainer" or "backgrounder"). For example, an in-depth article or frequently-asked-questions ([FAQ](https://en.wikipedia.org/wiki/FAQ)) document on topics such as Climate Change or the European Union. Other kinds of background material from a non-news setting are often described using [[Book]] or [[Article]], in particular [[ScholarlyArticle]]. See also [[NewsArticle]] for related vocabulary from a learning/education perspective.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > [NewsArticle](NewsArticle.mdx) > **BackgroundNewsArticle**
+
+
+
+## Properties
+
+See [Schema.org BackgroundNewsArticle properties](https://schema.org/BackgroundNewsArticle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BackgroundNewsArticle } from 'schema.org.ai'
+
+// Create a BackgroundNewsArticle
+const item: BackgroundNewsArticle = {
+  $type: 'BackgroundNewsArticle',
+  name: 'Example BackgroundNewsArticle'
+}
+
+// Use semantic patterns
+await $.BackgroundNewsArticle.create(item)
+const result = await $.BackgroundNewsArticle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BackgroundNewsArticle](https://schema.org/BackgroundNewsArticle)
+- [BackgroundNewsArticle Properties](https://schema.org/BackgroundNewsArticle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

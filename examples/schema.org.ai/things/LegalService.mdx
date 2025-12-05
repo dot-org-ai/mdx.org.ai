@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/LegalService
+$context: https://schema.org
+$type: Class
+name: LegalService
+description: A LegalService is a business that provides legally-oriented services, advice and representation, e.g. law firms.\
+subClassOf: ["LocalBusiness"]
+---
+
+# LegalService
+
+A LegalService is a business that provides legally-oriented services, advice and representation, e.g. law firms.\
+\
+As a [[LocalBusiness]] it can be described as a [[provider]] of one or more [[Service]]\\(s).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **LegalService**
+
+## Direct Subclasses
+
+- **[Attorney](Attorney.mdx)**: Professional service: Attorney
+- **[Notary](Notary.mdx)**: A notary
+
+## Properties
+
+See [Schema.org LegalService properties](https://schema.org/LegalService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LegalService } from 'schema.org.ai'
+
+// Create a LegalService
+const item: LegalService = {
+  $type: 'LegalService',
+  name: 'Example LegalService'
+}
+
+// Use semantic patterns
+await $.LegalService.create(item)
+const result = await $.LegalService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LegalService](https://schema.org/LegalService)
+- [LegalService Properties](https://schema.org/LegalService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

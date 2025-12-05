@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WebApplication
+$context: https://schema.org
+$type: Class
+name: WebApplication
+description: Web applications.
+subClassOf: ["SoftwareApplication"]
+---
+
+# WebApplication
+
+Web applications.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [SoftwareApplication](SoftwareApplication.mdx) > **WebApplication**
+
+
+
+## Properties
+
+See [Schema.org WebApplication properties](https://schema.org/WebApplication#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WebApplication } from 'schema.org.ai'
+
+// Create a WebApplication
+const item: WebApplication = {
+  $type: 'WebApplication',
+  name: 'Example WebApplication'
+}
+
+// Use semantic patterns
+await $.WebApplication.create(item)
+const result = await $.WebApplication.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WebApplication](https://schema.org/WebApplication)
+- [WebApplication Properties](https://schema.org/WebApplication#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

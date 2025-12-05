@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DrawAction
+$context: https://schema.org
+$type: Class
+name: DrawAction
+description: The act of producing a visual/graphical representation of an object, typically with a pen/pencil and paper as instruments.
+subClassOf: ["CreateAction"]
+---
+
+# DrawAction
+
+The act of producing a visual/graphical representation of an object, typically with a pen/pencil and paper as instruments.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [CreateAction](CreateAction.mdx) > **DrawAction**
+
+
+
+## Properties
+
+See [Schema.org DrawAction properties](https://schema.org/DrawAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DrawAction } from 'schema.org.ai'
+
+// Create a DrawAction
+const item: DrawAction = {
+  $type: 'DrawAction',
+  name: 'Example DrawAction'
+}
+
+// Use semantic patterns
+await $.DrawAction.create(item)
+const result = await $.DrawAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DrawAction](https://schema.org/DrawAction)
+- [DrawAction Properties](https://schema.org/DrawAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

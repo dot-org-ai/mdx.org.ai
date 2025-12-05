@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DeactivateAction
+$context: https://schema.org
+$type: Class
+name: DeactivateAction
+description: The act of stopping or deactivating a device or application (e.g. stopping a timer or turning off a flashlight).
+subClassOf: ["ControlAction"]
+---
+
+# DeactivateAction
+
+The act of stopping or deactivating a device or application (e.g. stopping a timer or turning off a flashlight).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ControlAction](ControlAction.mdx) > **DeactivateAction**
+
+
+
+## Properties
+
+See [Schema.org DeactivateAction properties](https://schema.org/DeactivateAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DeactivateAction } from 'schema.org.ai'
+
+// Create a DeactivateAction
+const item: DeactivateAction = {
+  $type: 'DeactivateAction',
+  name: 'Example DeactivateAction'
+}
+
+// Use semantic patterns
+await $.DeactivateAction.create(item)
+const result = await $.DeactivateAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DeactivateAction](https://schema.org/DeactivateAction)
+- [DeactivateAction Properties](https://schema.org/DeactivateAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

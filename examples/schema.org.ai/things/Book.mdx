@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Book
+$context: https://schema.org
+$type: Class
+name: Book
+description: A book.
+subClassOf: ["CreativeWork"]
+---
+
+# Book
+
+A book.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Book**
+
+## Direct Subclasses
+
+- **[Audiobook](Audiobook.mdx)**: An audiobook
+
+## Properties
+
+See [Schema.org Book properties](https://schema.org/Book#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Book } from 'schema.org.ai'
+
+// Create a Book
+const item: Book = {
+  $type: 'Book',
+  name: 'Example Book'
+}
+
+// Use semantic patterns
+await $.Book.create(item)
+const result = await $.Book.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Book](https://schema.org/Book)
+- [Book Properties](https://schema.org/Book#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

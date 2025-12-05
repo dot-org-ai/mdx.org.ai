@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WPAdBlock
+$context: https://schema.org
+$type: Class
+name: WPAdBlock
+description: An advertising section of the page.
+subClassOf: ["WebPageElement"]
+---
+
+# WPAdBlock
+
+An advertising section of the page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPageElement](WebPageElement.mdx) > **WPAdBlock**
+
+
+
+## Properties
+
+See [Schema.org WPAdBlock properties](https://schema.org/WPAdBlock#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WPAdBlock } from 'schema.org.ai'
+
+// Create a WPAdBlock
+const item: WPAdBlock = {
+  $type: 'WPAdBlock',
+  name: 'Example WPAdBlock'
+}
+
+// Use semantic patterns
+await $.WPAdBlock.create(item)
+const result = await $.WPAdBlock.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WPAdBlock](https://schema.org/WPAdBlock)
+- [WPAdBlock Properties](https://schema.org/WPAdBlock#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

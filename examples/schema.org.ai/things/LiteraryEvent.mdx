@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LiteraryEvent
+$context: https://schema.org
+$type: Class
+name: LiteraryEvent
+description: Event type: Literary event.
+subClassOf: ["Event"]
+---
+
+# LiteraryEvent
+
+Event type: Literary event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **LiteraryEvent**
+
+
+
+## Properties
+
+See [Schema.org LiteraryEvent properties](https://schema.org/LiteraryEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LiteraryEvent } from 'schema.org.ai'
+
+// Create a LiteraryEvent
+const item: LiteraryEvent = {
+  $type: 'LiteraryEvent',
+  name: 'Example LiteraryEvent'
+}
+
+// Use semantic patterns
+await $.LiteraryEvent.create(item)
+const result = await $.LiteraryEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LiteraryEvent](https://schema.org/LiteraryEvent)
+- [LiteraryEvent Properties](https://schema.org/LiteraryEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

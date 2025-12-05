@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TVClip
+$context: https://schema.org
+$type: Class
+name: TVClip
+description: A short TV program or a segment/part of a TV program.
+subClassOf: ["Clip"]
+---
+
+# TVClip
+
+A short TV program or a segment/part of a TV program.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Clip](Clip.mdx) > **TVClip**
+
+
+
+## Properties
+
+See [Schema.org TVClip properties](https://schema.org/TVClip#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TVClip } from 'schema.org.ai'
+
+// Create a TVClip
+const item: TVClip = {
+  $type: 'TVClip',
+  name: 'Example TVClip'
+}
+
+// Use semantic patterns
+await $.TVClip.create(item)
+const result = await $.TVClip.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TVClip](https://schema.org/TVClip)
+- [TVClip Properties](https://schema.org/TVClip#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

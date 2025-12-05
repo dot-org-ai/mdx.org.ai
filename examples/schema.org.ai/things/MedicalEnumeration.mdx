@@ -1,0 +1,64 @@
+---
+$id: https://schema.org.ai/MedicalEnumeration
+$context: https://schema.org
+$type: Class
+name: MedicalEnumeration
+description: Enumerations related to health and the practice of medicine: A concept that is used to attribute a quality to another concept, as a qualifier, a collection of items or a listing of all of the elements of a set in medicine practice.
+subClassOf: ["Enumeration"]
+---
+
+# MedicalEnumeration
+
+Enumerations related to health and the practice of medicine: A concept that is used to attribute a quality to another concept, as a qualifier, a collection of items or a listing of all of the elements of a set in medicine practice.
+
+## Type Hierarchy
+
+**MedicalEnumeration**
+
+## Direct Subclasses
+
+- **[DrugCostCategory](DrugCostCategory.mdx)**: Enumerated categories of medical drug costs
+- **[DrugPregnancyCategory](DrugPregnancyCategory.mdx)**: Categories that represent an assessment of the risk of fetal injury due to a drug or pharmaceutical used as directed by the mother during pregnancy
+- **[DrugPrescriptionStatus](DrugPrescriptionStatus.mdx)**: Indicates whether this drug is available by prescription or over-the-counter
+- **[InfectiousAgentClass](InfectiousAgentClass.mdx)**: Classes of agents or pathogens that transmit infectious diseases
+- **[MedicalAudienceType](MedicalAudienceType.mdx)**: Target audiences types for medical web pages
+- **[MedicalDevicePurpose](MedicalDevicePurpose.mdx)**: Categories of medical devices, organized by the purpose or intended use of the device
+- **[MedicalEvidenceLevel](MedicalEvidenceLevel.mdx)**: Level of evidence for a medical guideline
+- **[MedicalImagingTechnique](MedicalImagingTechnique.mdx)**: Any medical imaging modality typically used for diagnostic purposes
+- **[MedicalObservationalStudyDesign](MedicalObservationalStudyDesign.mdx)**: Design models for observational medical studies
+- **[MedicalProcedureType](MedicalProcedureType.mdx)**: An enumeration that describes different types of medical procedures
+- **[MedicalSpecialty](MedicalSpecialty.mdx)**: Any specific branch of medical science or practice
+- **[MedicalStudyStatus](MedicalStudyStatus.mdx)**: The status of a medical study
+- **[MedicalTrialDesign](MedicalTrialDesign.mdx)**: Design models for medical trials
+- **[MedicineSystem](MedicineSystem.mdx)**: Systems of medical practice
+- **[PhysicalExam](PhysicalExam.mdx)**: A type of physical examination of a patient performed by a physician
+
+## Properties
+
+See [Schema.org MedicalEnumeration properties](https://schema.org/MedicalEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalEnumeration } from 'schema.org.ai'
+
+// Create a MedicalEnumeration
+const item: MedicalEnumeration = {
+  $type: 'MedicalEnumeration',
+  name: 'Example MedicalEnumeration'
+}
+
+// Use semantic patterns
+await $.MedicalEnumeration.create(item)
+const result = await $.MedicalEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalEnumeration](https://schema.org/MedicalEnumeration)
+- [MedicalEnumeration Properties](https://schema.org/MedicalEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AnimalShelter
+$context: https://schema.org
+$type: Class
+name: AnimalShelter
+description: Animal shelter.
+subClassOf: ["LocalBusiness"]
+---
+
+# AnimalShelter
+
+Animal shelter.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **AnimalShelter**
+
+
+
+## Properties
+
+See [Schema.org AnimalShelter properties](https://schema.org/AnimalShelter#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AnimalShelter } from 'schema.org.ai'
+
+// Create a AnimalShelter
+const item: AnimalShelter = {
+  $type: 'AnimalShelter',
+  name: 'Example AnimalShelter'
+}
+
+// Use semantic patterns
+await $.AnimalShelter.create(item)
+const result = await $.AnimalShelter.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AnimalShelter](https://schema.org/AnimalShelter)
+- [AnimalShelter Properties](https://schema.org/AnimalShelter#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

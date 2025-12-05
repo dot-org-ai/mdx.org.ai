@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/InformAction
+$context: https://schema.org
+$type: Class
+name: InformAction
+description: The act of notifying someone of information pertinent to them, with no expectation of a response.
+subClassOf: ["CommunicateAction"]
+---
+
+# InformAction
+
+The act of notifying someone of information pertinent to them, with no expectation of a response.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > **InformAction**
+
+## Direct Subclasses
+
+- **[ConfirmAction](ConfirmAction.mdx)**: The act of notifying someone that a future event/action is going to happen as expected
+- **[RsvpAction](RsvpAction.mdx)**: The act of notifying an event organizer as to whether you expect to attend the event
+
+## Properties
+
+See [Schema.org InformAction properties](https://schema.org/InformAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InformAction } from 'schema.org.ai'
+
+// Create a InformAction
+const item: InformAction = {
+  $type: 'InformAction',
+  name: 'Example InformAction'
+}
+
+// Use semantic patterns
+await $.InformAction.create(item)
+const result = await $.InformAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InformAction](https://schema.org/InformAction)
+- [InformAction Properties](https://schema.org/InformAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

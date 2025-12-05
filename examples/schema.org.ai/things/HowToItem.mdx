@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/HowToItem
+$context: https://schema.org
+$type: Class
+name: HowToItem
+description: An item used as either a tool or supply when performing the instructions for how to achieve a result.
+subClassOf: ["ListItem"]
+---
+
+# HowToItem
+
+An item used as either a tool or supply when performing the instructions for how to achieve a result.
+
+## Type Hierarchy
+
+**HowToItem**
+
+## Direct Subclasses
+
+- **[HowToSupply](HowToSupply.mdx)**: A supply consumed when performing the instructions for how to achieve a result
+- **[HowToTool](HowToTool.mdx)**: A tool used (but not consumed) when performing instructions for how to achieve a result
+
+## Properties
+
+See [Schema.org HowToItem properties](https://schema.org/HowToItem#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HowToItem } from 'schema.org.ai'
+
+// Create a HowToItem
+const item: HowToItem = {
+  $type: 'HowToItem',
+  name: 'Example HowToItem'
+}
+
+// Use semantic patterns
+await $.HowToItem.create(item)
+const result = await $.HowToItem.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HowToItem](https://schema.org/HowToItem)
+- [HowToItem Properties](https://schema.org/HowToItem#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

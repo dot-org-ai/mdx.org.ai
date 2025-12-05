@@ -1,0 +1,79 @@
+---
+$id: https://schema.org.ai/LocalBusiness
+$context: https://schema.org
+$type: Class
+name: LocalBusiness
+description: A particular physical business or branch of an organization. Examples of LocalBusiness include a restaurant, a particular branch of a restaurant chain, a branch of a bank, a medical practice, a club, a bowling alley, etc.
+subClassOf: ["Place","Organization"]
+---
+
+# LocalBusiness
+
+A particular physical business or branch of an organization. Examples of LocalBusiness include a restaurant, a particular branch of a restaurant chain, a branch of a bank, a medical practice, a club, a bowling alley, etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > **LocalBusiness**
+
+## Direct Subclasses
+
+- **[AnimalShelter](AnimalShelter.mdx)**: Animal shelter
+- **[ArchiveOrganization](ArchiveOrganization.mdx)**: An organization with archival holdings
+- **[AutomotiveBusiness](AutomotiveBusiness.mdx)**: Car repair, sales, or parts
+- **[ChildCare](ChildCare.mdx)**: A Childcare center
+- **[Dentist](Dentist.mdx)**: A dentist
+- **[DryCleaningOrLaundry](DryCleaningOrLaundry.mdx)**: A dry-cleaning business
+- **[EmergencyService](EmergencyService.mdx)**: An emergency service, such as a fire station or ER
+- **[EmploymentAgency](EmploymentAgency.mdx)**: An employment agency
+- **[EntertainmentBusiness](EntertainmentBusiness.mdx)**: A business providing entertainment
+- **[FinancialService](FinancialService.mdx)**: Financial services business
+- **[FoodEstablishment](FoodEstablishment.mdx)**: A food-related business
+- **[GovernmentOffice](GovernmentOffice.mdx)**: A government office&#x2014;for example, an IRS or DMV office
+- **[HealthAndBeautyBusiness](HealthAndBeautyBusiness.mdx)**: Health and beauty
+- **[HomeAndConstructionBusiness](HomeAndConstructionBusiness.mdx)**: A construction business
+- **[InternetCafe](InternetCafe.mdx)**: An internet cafe
+- **[LegalService](LegalService.mdx)**: A LegalService is a business that provides legally-oriented services, advice and representation, e
+- **[Library](Library.mdx)**: A library
+- **[LodgingBusiness](LodgingBusiness.mdx)**: A lodging business, such as a motel, hotel, or inn
+- **[MedicalBusiness](MedicalBusiness.mdx)**: A particular physical or virtual business of an organization for medical purposes
+- **[ProfessionalService](ProfessionalService.mdx)**: Original definition: "provider of professional services
+- **[RadioStation](RadioStation.mdx)**: A radio station
+- **[RealEstateAgent](RealEstateAgent.mdx)**: A real-estate agent
+- **[RecyclingCenter](RecyclingCenter.mdx)**: A recycling center
+- **[SelfStorage](SelfStorage.mdx)**: A self-storage facility
+- **[ShoppingCenter](ShoppingCenter.mdx)**: A shopping center or mall
+- **[SportsActivityLocation](SportsActivityLocation.mdx)**: A sports location, such as a playing field
+- **[Store](Store.mdx)**: A retail good store
+- **[TelevisionStation](TelevisionStation.mdx)**: A television station
+- **[TouristInformationCenter](TouristInformationCenter.mdx)**: A tourist information center
+- **[TravelAgency](TravelAgency.mdx)**: A travel agency
+
+## Properties
+
+See [Schema.org LocalBusiness properties](https://schema.org/LocalBusiness#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LocalBusiness } from 'schema.org.ai'
+
+// Create a LocalBusiness
+const item: LocalBusiness = {
+  $type: 'LocalBusiness',
+  name: 'Example LocalBusiness'
+}
+
+// Use semantic patterns
+await $.LocalBusiness.create(item)
+const result = await $.LocalBusiness.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LocalBusiness](https://schema.org/LocalBusiness)
+- [LocalBusiness Properties](https://schema.org/LocalBusiness#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HowToStep
+$context: https://schema.org
+$type: Class
+name: HowToStep
+description: A step in the instructions for how to achieve a result. It is an ordered list with HowToDirection and/or HowToTip items.
+subClassOf: ["ItemList","CreativeWork","ListItem"]
+---
+
+# HowToStep
+
+A step in the instructions for how to achieve a result. It is an ordered list with HowToDirection and/or HowToTip items.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **HowToStep**
+
+
+
+## Properties
+
+See [Schema.org HowToStep properties](https://schema.org/HowToStep#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HowToStep } from 'schema.org.ai'
+
+// Create a HowToStep
+const item: HowToStep = {
+  $type: 'HowToStep',
+  name: 'Example HowToStep'
+}
+
+// Use semantic patterns
+await $.HowToStep.create(item)
+const result = await $.HowToStep.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HowToStep](https://schema.org/HowToStep)
+- [HowToStep Properties](https://schema.org/HowToStep#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

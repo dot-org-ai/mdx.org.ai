@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/InsuranceAgency
+$context: https://schema.org
+$type: Class
+name: InsuranceAgency
+description: An Insurance agency.
+subClassOf: ["FinancialService"]
+---
+
+# InsuranceAgency
+
+An Insurance agency.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FinancialService](FinancialService.mdx) > **InsuranceAgency**
+
+
+
+## Properties
+
+See [Schema.org InsuranceAgency properties](https://schema.org/InsuranceAgency#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InsuranceAgency } from 'schema.org.ai'
+
+// Create a InsuranceAgency
+const item: InsuranceAgency = {
+  $type: 'InsuranceAgency',
+  name: 'Example InsuranceAgency'
+}
+
+// Use semantic patterns
+await $.InsuranceAgency.create(item)
+const result = await $.InsuranceAgency.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InsuranceAgency](https://schema.org/InsuranceAgency)
+- [InsuranceAgency Properties](https://schema.org/InsuranceAgency#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

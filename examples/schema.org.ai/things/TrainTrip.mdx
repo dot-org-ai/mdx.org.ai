@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TrainTrip
+$context: https://schema.org
+$type: Class
+name: TrainTrip
+description: A trip on a commercial train line.
+subClassOf: ["Trip"]
+---
+
+# TrainTrip
+
+A trip on a commercial train line.
+
+## Type Hierarchy
+
+**TrainTrip**
+
+
+
+## Properties
+
+See [Schema.org TrainTrip properties](https://schema.org/TrainTrip#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TrainTrip } from 'schema.org.ai'
+
+// Create a TrainTrip
+const item: TrainTrip = {
+  $type: 'TrainTrip',
+  name: 'Example TrainTrip'
+}
+
+// Use semantic patterns
+await $.TrainTrip.create(item)
+const result = await $.TrainTrip.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TrainTrip](https://schema.org/TrainTrip)
+- [TrainTrip Properties](https://schema.org/TrainTrip#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

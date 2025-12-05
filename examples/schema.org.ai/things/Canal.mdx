@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Canal
+$context: https://schema.org
+$type: Class
+name: Canal
+description: A canal, like the Panama Canal.
+subClassOf: ["BodyOfWater"]
+---
+
+# Canal
+
+A canal, like the Panama Canal.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > [BodyOfWater](BodyOfWater.mdx) > **Canal**
+
+
+
+## Properties
+
+See [Schema.org Canal properties](https://schema.org/Canal#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Canal } from 'schema.org.ai'
+
+// Create a Canal
+const item: Canal = {
+  $type: 'Canal',
+  name: 'Example Canal'
+}
+
+// Use semantic patterns
+await $.Canal.create(item)
+const result = await $.Canal.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Canal](https://schema.org/Canal)
+- [Canal Properties](https://schema.org/Canal#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

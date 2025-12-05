@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ArchiveOrganization
+$context: https://schema.org
+$type: Class
+name: ArchiveOrganization
+description: An organization with archival holdings. An organization which keeps and preserves archival material and typically makes it accessible to the public.
+subClassOf: ["LocalBusiness"]
+---
+
+# ArchiveOrganization
+
+An organization with archival holdings. An organization which keeps and preserves archival material and typically makes it accessible to the public.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **ArchiveOrganization**
+
+
+
+## Properties
+
+See [Schema.org ArchiveOrganization properties](https://schema.org/ArchiveOrganization#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ArchiveOrganization } from 'schema.org.ai'
+
+// Create a ArchiveOrganization
+const item: ArchiveOrganization = {
+  $type: 'ArchiveOrganization',
+  name: 'Example ArchiveOrganization'
+}
+
+// Use semantic patterns
+await $.ArchiveOrganization.create(item)
+const result = await $.ArchiveOrganization.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ArchiveOrganization](https://schema.org/ArchiveOrganization)
+- [ArchiveOrganization Properties](https://schema.org/ArchiveOrganization#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

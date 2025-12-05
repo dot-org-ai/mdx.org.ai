@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/State
+$context: https://schema.org
+$type: Class
+name: State
+description: A state or province of a country.
+subClassOf: ["AdministrativeArea"]
+---
+
+# State
+
+A state or province of a country.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [AdministrativeArea](AdministrativeArea.mdx) > **State**
+
+
+
+## Properties
+
+See [Schema.org State properties](https://schema.org/State#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { State } from 'schema.org.ai'
+
+// Create a State
+const item: State = {
+  $type: 'State',
+  name: 'Example State'
+}
+
+// Use semantic patterns
+await $.State.create(item)
+const result = await $.State.get('item-id')
+```
+
+## Resources
+
+- [Schema.org State](https://schema.org/State)
+- [State Properties](https://schema.org/State#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

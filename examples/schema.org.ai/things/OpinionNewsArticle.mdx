@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OpinionNewsArticle
+$context: https://schema.org
+$type: Class
+name: OpinionNewsArticle
+description: An [[OpinionNewsArticle]] is a [[NewsArticle]] that primarily expresses opinions rather than journalistic reporting of news and events. For example, a [[NewsArticle]] consisting of a column or [[Blog]]/[[BlogPosting]] entry in the Opinions section of a news publication.
+subClassOf: ["NewsArticle"]
+---
+
+# OpinionNewsArticle
+
+An [[OpinionNewsArticle]] is a [[NewsArticle]] that primarily expresses opinions rather than journalistic reporting of news and events. For example, a [[NewsArticle]] consisting of a column or [[Blog]]/[[BlogPosting]] entry in the Opinions section of a news publication.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > [NewsArticle](NewsArticle.mdx) > **OpinionNewsArticle**
+
+
+
+## Properties
+
+See [Schema.org OpinionNewsArticle properties](https://schema.org/OpinionNewsArticle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OpinionNewsArticle } from 'schema.org.ai'
+
+// Create a OpinionNewsArticle
+const item: OpinionNewsArticle = {
+  $type: 'OpinionNewsArticle',
+  name: 'Example OpinionNewsArticle'
+}
+
+// Use semantic patterns
+await $.OpinionNewsArticle.create(item)
+const result = await $.OpinionNewsArticle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OpinionNewsArticle](https://schema.org/OpinionNewsArticle)
+- [OpinionNewsArticle Properties](https://schema.org/OpinionNewsArticle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

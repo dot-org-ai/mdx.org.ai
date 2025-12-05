@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PreventionIndication
+$context: https://schema.org
+$type: Class
+name: PreventionIndication
+description: An indication for preventing an underlying condition, symptom, etc.
+subClassOf: ["MedicalIndication"]
+---
+
+# PreventionIndication
+
+An indication for preventing an underlying condition, symptom, etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalIndication](MedicalIndication.mdx) > **PreventionIndication**
+
+
+
+## Properties
+
+See [Schema.org PreventionIndication properties](https://schema.org/PreventionIndication#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PreventionIndication } from 'schema.org.ai'
+
+// Create a PreventionIndication
+const item: PreventionIndication = {
+  $type: 'PreventionIndication',
+  name: 'Example PreventionIndication'
+}
+
+// Use semantic patterns
+await $.PreventionIndication.create(item)
+const result = await $.PreventionIndication.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PreventionIndication](https://schema.org/PreventionIndication)
+- [PreventionIndication Properties](https://schema.org/PreventionIndication#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

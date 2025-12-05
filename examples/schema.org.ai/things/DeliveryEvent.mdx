@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DeliveryEvent
+$context: https://schema.org
+$type: Class
+name: DeliveryEvent
+description: An event involving the delivery of an item.
+subClassOf: ["Event"]
+---
+
+# DeliveryEvent
+
+An event involving the delivery of an item.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **DeliveryEvent**
+
+
+
+## Properties
+
+See [Schema.org DeliveryEvent properties](https://schema.org/DeliveryEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DeliveryEvent } from 'schema.org.ai'
+
+// Create a DeliveryEvent
+const item: DeliveryEvent = {
+  $type: 'DeliveryEvent',
+  name: 'Example DeliveryEvent'
+}
+
+// Use semantic patterns
+await $.DeliveryEvent.create(item)
+const result = await $.DeliveryEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DeliveryEvent](https://schema.org/DeliveryEvent)
+- [DeliveryEvent Properties](https://schema.org/DeliveryEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

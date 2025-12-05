@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/SportsOrganization
+$context: https://schema.org
+$type: Class
+name: SportsOrganization
+description: Represents the collection of all sports organizations, including sports teams, governing bodies, and sports associations.
+subClassOf: ["Organization"]
+---
+
+# SportsOrganization
+
+Represents the collection of all sports organizations, including sports teams, governing bodies, and sports associations.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **SportsOrganization**
+
+## Direct Subclasses
+
+- **[SportsTeam](SportsTeam.mdx)**: Organization: Sports team
+
+## Properties
+
+See [Schema.org SportsOrganization properties](https://schema.org/SportsOrganization#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SportsOrganization } from 'schema.org.ai'
+
+// Create a SportsOrganization
+const item: SportsOrganization = {
+  $type: 'SportsOrganization',
+  name: 'Example SportsOrganization'
+}
+
+// Use semantic patterns
+await $.SportsOrganization.create(item)
+const result = await $.SportsOrganization.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SportsOrganization](https://schema.org/SportsOrganization)
+- [SportsOrganization Properties](https://schema.org/SportsOrganization#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BusinessEvent
+$context: https://schema.org
+$type: Class
+name: BusinessEvent
+description: Event type: Business event.
+subClassOf: ["Event"]
+---
+
+# BusinessEvent
+
+Event type: Business event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **BusinessEvent**
+
+
+
+## Properties
+
+See [Schema.org BusinessEvent properties](https://schema.org/BusinessEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BusinessEvent } from 'schema.org.ai'
+
+// Create a BusinessEvent
+const item: BusinessEvent = {
+  $type: 'BusinessEvent',
+  name: 'Example BusinessEvent'
+}
+
+// Use semantic patterns
+await $.BusinessEvent.create(item)
+const result = await $.BusinessEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BusinessEvent](https://schema.org/BusinessEvent)
+- [BusinessEvent Properties](https://schema.org/BusinessEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

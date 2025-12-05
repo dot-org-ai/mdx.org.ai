@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicVideoObject
+$context: https://schema.org
+$type: Class
+name: MusicVideoObject
+description: A music video file.
+subClassOf: ["MediaObject"]
+---
+
+# MusicVideoObject
+
+A music video file.
+
+## Type Hierarchy
+
+**MusicVideoObject**
+
+
+
+## Properties
+
+See [Schema.org MusicVideoObject properties](https://schema.org/MusicVideoObject#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicVideoObject } from 'schema.org.ai'
+
+// Create a MusicVideoObject
+const item: MusicVideoObject = {
+  $type: 'MusicVideoObject',
+  name: 'Example MusicVideoObject'
+}
+
+// Use semantic patterns
+await $.MusicVideoObject.create(item)
+const result = await $.MusicVideoObject.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicVideoObject](https://schema.org/MusicVideoObject)
+- [MusicVideoObject Properties](https://schema.org/MusicVideoObject#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

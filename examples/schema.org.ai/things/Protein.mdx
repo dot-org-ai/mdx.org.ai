@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Protein
+$context: https://schema.org
+$type: Class
+name: Protein
+description: Protein is here used in its widest possible definition, as classes of amino acid based molecules. Amyloid-beta Protein in human (UniProt P05067), eukaryota (e.g. an OrthoDB group) or even a single molecule that one can point to are all of type :Protein. A protein can thus be a subclass of another protein, e.g. :Protein as a UniProt record can have multiple isoforms inside it which would also be :Protein. They can be imagined, synthetic, hypothetical or naturally occurring.
+subClassOf: ["BioChemEntity"]
+---
+
+# Protein
+
+Protein is here used in its widest possible definition, as classes of amino acid based molecules. Amyloid-beta Protein in human (UniProt P05067), eukaryota (e.g. an OrthoDB group) or even a single molecule that one can point to are all of type :Protein. A protein can thus be a subclass of another protein, e.g. :Protein as a UniProt record can have multiple isoforms inside it which would also be :Protein. They can be imagined, synthetic, hypothetical or naturally occurring.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [BioChemEntity](BioChemEntity.mdx) > **Protein**
+
+
+
+## Properties
+
+See [Schema.org Protein properties](https://schema.org/Protein#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Protein } from 'schema.org.ai'
+
+// Create a Protein
+const item: Protein = {
+  $type: 'Protein',
+  name: 'Example Protein'
+}
+
+// Use semantic patterns
+await $.Protein.create(item)
+const result = await $.Protein.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Protein](https://schema.org/Protein)
+- [Protein Properties](https://schema.org/Protein#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

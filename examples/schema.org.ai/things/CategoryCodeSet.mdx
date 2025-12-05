@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CategoryCodeSet
+$context: https://schema.org
+$type: Class
+name: CategoryCodeSet
+description: A set of Category Code values.
+subClassOf: ["DefinedTermSet"]
+---
+
+# CategoryCodeSet
+
+A set of Category Code values.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [DefinedTermSet](DefinedTermSet.mdx) > **CategoryCodeSet**
+
+
+
+## Properties
+
+See [Schema.org CategoryCodeSet properties](https://schema.org/CategoryCodeSet#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CategoryCodeSet } from 'schema.org.ai'
+
+// Create a CategoryCodeSet
+const item: CategoryCodeSet = {
+  $type: 'CategoryCodeSet',
+  name: 'Example CategoryCodeSet'
+}
+
+// Use semantic patterns
+await $.CategoryCodeSet.create(item)
+const result = await $.CategoryCodeSet.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CategoryCodeSet](https://schema.org/CategoryCodeSet)
+- [CategoryCodeSet Properties](https://schema.org/CategoryCodeSet#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

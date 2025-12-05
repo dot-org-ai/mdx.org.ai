@@ -1,0 +1,69 @@
+---
+$id: https://schema.org.ai/Organization
+$context: https://schema.org
+$type: Class
+name: Organization
+description: An organization such as a school, NGO, corporation, club, etc.
+subClassOf: ["Thing"]
+---
+
+# Organization
+
+An organization such as a school, NGO, corporation, club, etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > **Organization**
+
+## Direct Subclasses
+
+- **[Airline](Airline.mdx)**: An organization that provides flights for passengers
+- **[Consortium](Consortium.mdx)**: A Consortium is a membership [[Organization]] whose members are typically Organizations
+- **[Cooperative](Cooperative.mdx)**: An organization that is a joint project of multiple organizations or persons
+- **[Corporation](Corporation.mdx)**: Organization: A business corporation
+- **[EducationalOrganization](EducationalOrganization.mdx)**: An educational organization
+- **[FundingScheme](FundingScheme.mdx)**: A FundingScheme combines organizational, project and policy aspects of grant-based funding that sets guidelines, principles and mechanisms to support other kinds of projects and activities
+- **[GovernmentOrganization](GovernmentOrganization.mdx)**: A governmental organization or agency
+- **[LibrarySystem](LibrarySystem.mdx)**: A [[LibrarySystem]] is a collaborative system amongst several libraries
+- **[LocalBusiness](LocalBusiness.mdx)**: A particular physical business or branch of an organization
+- **[MedicalOrganization](MedicalOrganization.mdx)**: A medical organization (physical or not), such as hospital, institution or clinic
+- **[NewsMediaOrganization](NewsMediaOrganization.mdx)**: A News/Media organization such as a newspaper or TV station
+- **[NGO](NGO.mdx)**: Organization: Non-governmental Organization
+- **[OnlineBusiness](OnlineBusiness.mdx)**: A particular online business, either standalone or the online part of a broader organization
+- **[PerformingGroup](PerformingGroup.mdx)**: A performance group, such as a band, an orchestra, or a circus
+- **[PoliticalParty](PoliticalParty.mdx)**: Organization: Political Party
+- **[Project](Project.mdx)**: An enterprise (potentially individual but typically collaborative), planned to achieve a particular aim
+- **[ResearchOrganization](ResearchOrganization.mdx)**: A Research Organization (e
+- **[SearchRescueOrganization](SearchRescueOrganization.mdx)**: A Search and Rescue organization of some kind
+- **[SportsOrganization](SportsOrganization.mdx)**: Represents the collection of all sports organizations, including sports teams, governing bodies, and sports associations
+- **[WorkersUnion](WorkersUnion.mdx)**: A Workers Union (also known as a Labor Union, Labour Union, or Trade Union) is an organization that promotes the interests of its worker members by collectively bargaining with management, organizing, and political lobbying
+
+## Properties
+
+See [Schema.org Organization properties](https://schema.org/Organization#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Organization } from 'schema.org.ai'
+
+// Create a Organization
+const item: Organization = {
+  $type: 'Organization',
+  name: 'Example Organization'
+}
+
+// Use semantic patterns
+await $.Organization.create(item)
+const result = await $.Organization.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Organization](https://schema.org/Organization)
+- [Organization Properties](https://schema.org/Organization#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

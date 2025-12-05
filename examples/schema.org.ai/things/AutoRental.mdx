@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AutoRental
+$context: https://schema.org
+$type: Class
+name: AutoRental
+description: A car rental business.
+subClassOf: ["AutomotiveBusiness"]
+---
+
+# AutoRental
+
+A car rental business.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [AutomotiveBusiness](AutomotiveBusiness.mdx) > **AutoRental**
+
+
+
+## Properties
+
+See [Schema.org AutoRental properties](https://schema.org/AutoRental#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AutoRental } from 'schema.org.ai'
+
+// Create a AutoRental
+const item: AutoRental = {
+  $type: 'AutoRental',
+  name: 'Example AutoRental'
+}
+
+// Use semantic patterns
+await $.AutoRental.create(item)
+const result = await $.AutoRental.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AutoRental](https://schema.org/AutoRental)
+- [AutoRental Properties](https://schema.org/AutoRental#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

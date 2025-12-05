@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/BioChemEntity
+$context: https://schema.org
+$type: Class
+name: BioChemEntity
+description: Any biological, chemical, or biochemical thing. For example: a protein; a gene; a chemical; a synthetic chemical.
+subClassOf: ["Thing"]
+---
+
+# BioChemEntity
+
+Any biological, chemical, or biochemical thing. For example: a protein; a gene; a chemical; a synthetic chemical.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > **BioChemEntity**
+
+## Direct Subclasses
+
+- **[Gene](Gene.mdx)**: A discrete unit of inheritance which affects one or more biological traits (Source: [https://en
+- **[MolecularEntity](MolecularEntity.mdx)**: Any constitutionally or isotopically distinct atom, molecule, ion, ion pair, radical, radical ion, complex, conformer etc
+- **[Protein](Protein.mdx)**: Protein is here used in its widest possible definition, as classes of amino acid based molecules
+
+## Properties
+
+See [Schema.org BioChemEntity properties](https://schema.org/BioChemEntity#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BioChemEntity } from 'schema.org.ai'
+
+// Create a BioChemEntity
+const item: BioChemEntity = {
+  $type: 'BioChemEntity',
+  name: 'Example BioChemEntity'
+}
+
+// Use semantic patterns
+await $.BioChemEntity.create(item)
+const result = await $.BioChemEntity.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BioChemEntity](https://schema.org/BioChemEntity)
+- [BioChemEntity Properties](https://schema.org/BioChemEntity#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

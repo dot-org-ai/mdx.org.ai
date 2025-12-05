@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/Text
+$context: https://schema.org
+$type: Class
+name: Text
+description: Data type: Text.
+subClassOf: []
+---
+
+# Text
+
+Data type: Text.
+
+## Type Hierarchy
+
+**Text**
+
+## Direct Subclasses
+
+- **[CssSelectorType](CssSelectorType.mdx)**: Text representing a CSS selector
+- **[PronounceableText](PronounceableText.mdx)**: Data type: PronounceableText
+- **[URL](URL.mdx)**: Data type: URL
+- **[XPathType](XPathType.mdx)**: Text representing an XPath (typically but not necessarily version 1
+
+## Properties
+
+See [Schema.org Text properties](https://schema.org/Text#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Text } from 'schema.org.ai'
+
+// Create a Text
+const item: Text = {
+  $type: 'Text',
+  name: 'Example Text'
+}
+
+// Use semantic patterns
+await $.Text.create(item)
+const result = await $.Text.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Text](https://schema.org/Text)
+- [Text Properties](https://schema.org/Text#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

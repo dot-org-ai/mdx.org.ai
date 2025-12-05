@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EmployerAggregateRating
+$context: https://schema.org
+$type: Class
+name: EmployerAggregateRating
+description: An aggregate rating of an Organization related to its role as an employer.
+subClassOf: ["AggregateRating"]
+---
+
+# EmployerAggregateRating
+
+An aggregate rating of an Organization related to its role as an employer.
+
+## Type Hierarchy
+
+**EmployerAggregateRating**
+
+
+
+## Properties
+
+See [Schema.org EmployerAggregateRating properties](https://schema.org/EmployerAggregateRating#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EmployerAggregateRating } from 'schema.org.ai'
+
+// Create a EmployerAggregateRating
+const item: EmployerAggregateRating = {
+  $type: 'EmployerAggregateRating',
+  name: 'Example EmployerAggregateRating'
+}
+
+// Use semantic patterns
+await $.EmployerAggregateRating.create(item)
+const result = await $.EmployerAggregateRating.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EmployerAggregateRating](https://schema.org/EmployerAggregateRating)
+- [EmployerAggregateRating Properties](https://schema.org/EmployerAggregateRating#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

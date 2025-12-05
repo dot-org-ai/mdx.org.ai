@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Brewery
+$context: https://schema.org
+$type: Class
+name: Brewery
+description: Brewery.
+subClassOf: ["FoodEstablishment"]
+---
+
+# Brewery
+
+Brewery.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FoodEstablishment](FoodEstablishment.mdx) > **Brewery**
+
+
+
+## Properties
+
+See [Schema.org Brewery properties](https://schema.org/Brewery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Brewery } from 'schema.org.ai'
+
+// Create a Brewery
+const item: Brewery = {
+  $type: 'Brewery',
+  name: 'Example Brewery'
+}
+
+// Use semantic patterns
+await $.Brewery.create(item)
+const result = await $.Brewery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Brewery](https://schema.org/Brewery)
+- [Brewery Properties](https://schema.org/Brewery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

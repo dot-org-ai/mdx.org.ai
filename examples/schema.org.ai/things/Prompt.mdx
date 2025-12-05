@@ -1,0 +1,288 @@
+---
+$id: https://schema.org.ai/Prompt
+$context: https://schema.org.ai
+$type: Class
+name: Prompt
+description: An AI prompt or prompt template used to instruct language models and generate specific outputs.
+subClassOf:
+  - https://schema.org/Thing
+digital: 1.0
+---
+
+[Thing](Thing.mdx)
+
+# Prompt
+
+An AI prompt or prompt template used to instruct language models and generate specific outputs. Prompts can be simple text instructions or complex templates with variables, system messages, and structured formats.
+
+## Properties
+
+| Property | Type | Description | Inherited From |
+|----------|------|-------------|----------------|
+| `$type` | Text | Always "Prompt" | - |
+| `$id` | URL | Unique identifier for the prompt | Thing |
+| `name` | Text | The name of the prompt | Thing |
+| `description` | Text | Description of what the prompt does | Thing |
+| `identifier` | Text or PropertyValue | An identifier for the prompt | Thing |
+| `url` | URL | URL to the prompt definition | Thing |
+| `digital` | Number (0.0-1.0) | Always 1.0 for prompts | Thing |
+| `text` | Text | The prompt text or template | Prompt |
+| `systemMessage` | Text | System message/instructions | Prompt |
+| `variables` | PropertyValue[] | Template variables | Prompt |
+| `temperature` | Number | Sampling temperature (0.0-2.0) | Prompt |
+| `maxTokens` | Number | Maximum tokens to generate | Prompt |
+| `topP` | Number | Nucleus sampling parameter | Prompt |
+| `frequencyPenalty` | Number | Frequency penalty (-2.0 to 2.0) | Prompt |
+| `presencePenalty` | Number | Presence penalty (-2.0 to 2.0) | Prompt |
+| `stopSequences` | Text[] | Stop sequences | Prompt |
+| `model` | Model | Recommended model for this prompt | Prompt |
+| `category` | Text | Prompt category (coding, writing, analysis, etc.) | Prompt |
+| `creator` | Person or Organization | The entity that created the prompt | Thing |
+
+## Types
+
+The following types extend Prompt:
+
+- **SystemPrompt**: System-level instructions for model behavior
+- **UserPrompt**: User-provided input prompts
+- **TemplatePrompt**: Reusable prompt templates with variables
+- **ChainPrompt**: Multi-step prompt chains
+- **FewShotPrompt**: Prompts with example inputs/outputs
+
+## Examples
+
+### Example 1: Blog Post Writing Prompt
+
+```typescript
+import { $ } from 'sdk.do'
+
+const blogPrompt = {
+  $type: 'Prompt',
+  $id: 'https://platform.do/prompts/blog-writer',
+  name: 'Blog Post Writer',
+  description: 'Generates comprehensive blog posts on technical topics',
+  digital: 1.0,
+  systemMessage: 'You are an expert technical writer who creates engaging, informative blog posts. Use clear examples, maintain a professional yet conversational tone, and structure content with headings and bullet points.',
+  text: 'Write a comprehensive blog post about {{topic}}. Include:\n\n1. An engaging introduction\n2. 3-5 main sections with examples\n3. Practical takeaways\n4. A conclusion with call-to-action\n\nTarget length: {{wordCount}} words\nAudience: {{audience}}',
+  variables: [
+    {
+      $type: 'PropertyValue',
+      name: 'topic',
+      description: 'The blog post topic',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'wordCount',
+      description: 'Target word count',
+      valueRequired: false,
+      valueType: 'Number',
+      defaultValue: 1500
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'audience',
+      description: 'Target audience',
+      valueRequired: false,
+      valueType: 'Text',
+      defaultValue: 'developers'
+    }
+  ],
+  temperature: 0.7,
+  maxTokens: 3000,
+  topP: 0.9,
+  model: {
+    $type: 'Model',
+    name: 'gpt-5'
+  },
+  category: 'writing',
+  creator: {
+    $type: 'Organization',
+    name: '.do Platform Team',
+    url: 'https://platform.do'
+  }
+}
+
+await $.Prompt.create(blogPrompt)
+```
+
+### Example 2: Code Review Prompt
+
+```typescript
+import { $ } from 'sdk.do'
+
+const codeReviewPrompt = {
+  $type: 'Prompt',
+  $id: 'https://platform.do/prompts/code-reviewer',
+  name: 'Code Review Assistant',
+  description: 'Reviews code for quality, security, and best practices',
+  digital: 1.0,
+  systemMessage: 'You are an expert code reviewer with deep knowledge of software engineering best practices, security vulnerabilities, and performance optimization. Provide constructive feedback focused on correctness, security, performance, and maintainability.',
+  text: `Review the following {{language}} code:
+
+\`\`\`{{language}}
+{{code}}
+\`\`\`
+
+Context: {{context}}
+
+Provide:
+1. Security issues (OWASP Top 10, injection vulnerabilities, etc.)
+2. Performance concerns
+3. Code quality and maintainability
+4. Best practice violations
+5. Specific recommendations for improvements
+
+Format as structured markdown with severity levels (Critical, High, Medium, Low).`,
+  variables: [
+    {
+      $type: 'PropertyValue',
+      name: 'code',
+      description: 'The code to review',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'language',
+      description: 'Programming language',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'context',
+      description: 'Additional context about the code',
+      valueRequired: false,
+      valueType: 'Text'
+    }
+  ],
+  temperature: 0.3,
+  maxTokens: 2000,
+  model: {
+    $type: 'Model',
+    name: 'claude-sonnet-4.5'
+  },
+  category: 'coding',
+  creator: {
+    $type: 'Agent',
+    $id: 'https://Cody.do',
+    name: 'Cody'
+  }
+}
+
+await $.Prompt.create(codeReviewPrompt)
+```
+
+### Example 3: Data Analysis Prompt
+
+```typescript
+import { $ } from 'sdk.do'
+
+const analysisPrompt = {
+  $type: 'Prompt',
+  $id: 'https://platform.do/prompts/data-analyst',
+  name: 'Data Analysis Assistant',
+  description: 'Analyzes data and provides insights with visualizations',
+  digital: 1.0,
+  systemMessage: 'You are a data analyst expert who excels at finding patterns, trends, and actionable insights from data. Always support conclusions with specific data points and suggest visualizations.',
+  text: `Analyze the following data:
+
+{{data}}
+
+Analysis type: {{analysisType}}
+Focus areas: {{focusAreas}}
+
+Provide:
+1. Key metrics and summary statistics
+2. Trends and patterns identified
+3. Anomalies or outliers
+4. Actionable insights and recommendations
+5. Suggested visualizations (chart types, axes, filters)
+
+Include specific data points to support each conclusion.`,
+  variables: [
+    {
+      $type: 'PropertyValue',
+      name: 'data',
+      description: 'The data to analyze (JSON, CSV, or text)',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'analysisType',
+      description: 'Type of analysis (trend, comparison, correlation, etc.)',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'focusAreas',
+      description: 'Specific areas to focus on',
+      valueRequired: false,
+      valueType: 'Text'
+    }
+  ],
+  temperature: 0.4,
+  maxTokens: 2500,
+  topP: 0.95,
+  frequencyPenalty: 0.3,
+  model: {
+    $type: 'Model',
+    name: 'gpt-5'
+  },
+  category: 'analysis',
+  creator: {
+    $type: 'Organization',
+    name: '.do Platform Team',
+    url: 'https://platform.do'
+  }
+}
+
+await $.Prompt.create(analysisPrompt)
+```
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Prompt, Generation } from 'schema.org.ai'
+
+// Create a prompt
+const prompt: Prompt = {
+  $type: 'Prompt',
+  $id: 'https://myapp.do/prompts/my-prompt',
+  name: 'My Prompt',
+  text: 'Generate {{output}} based on {{input}}',
+  digital: 1.0
+}
+
+await $.Prompt.create(prompt)
+
+// Use prompt to create a generation
+const generation: Generation = {
+  $type: 'Generation',
+  prompt: prompt,
+  model: { $type: 'Model', name: 'gpt-5' },
+  output: 'Generated content'
+}
+
+await $.Generation.create(generation)
+
+// Query prompts by category
+const codingPrompts = await $.Prompt.find({
+  category: 'coding'
+})
+```
+
+## Resources
+
+- [Schema.org Thing](https://schema.org/Thing)
+- [Prompt Engineering Guide](https://docs.platform.do/ai/prompts)
+- [Template Variables](https://docs.platform.do/ai/templates)
+
+## License
+
+This is an extension to Schema.org vocabulary created by the .do Platform Team. The base Schema.org vocabulary is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

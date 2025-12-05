@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Library
+$context: https://schema.org
+$type: Class
+name: Library
+description: A library.
+subClassOf: ["LocalBusiness"]
+---
+
+# Library
+
+A library.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **Library**
+
+
+
+## Properties
+
+See [Schema.org Library properties](https://schema.org/Library#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Library } from 'schema.org.ai'
+
+// Create a Library
+const item: Library = {
+  $type: 'Library',
+  name: 'Example Library'
+}
+
+// Use semantic patterns
+await $.Library.create(item)
+const result = await $.Library.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Library](https://schema.org/Library)
+- [Library Properties](https://schema.org/Library#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

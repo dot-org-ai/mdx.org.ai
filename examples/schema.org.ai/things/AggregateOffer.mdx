@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/AggregateOffer
+$context: https://schema.org
+$type: Class
+name: AggregateOffer
+description: When a single product is associated with multiple offers (for example, the same pair of shoes is offered by different merchants), then AggregateOffer can be used.\
+subClassOf: ["Offer"]
+---
+
+# AggregateOffer
+
+When a single product is associated with multiple offers (for example, the same pair of shoes is offered by different merchants), then AggregateOffer can be used.\
+\
+Note: AggregateOffers are normally expected to associate multiple offers that all share the same defined [[businessFunction]] value, or default to http://purl.org/goodrelations/v1#Sell if businessFunction is not explicitly defined.
+
+## Type Hierarchy
+
+**AggregateOffer**
+
+
+
+## Properties
+
+See [Schema.org AggregateOffer properties](https://schema.org/AggregateOffer#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AggregateOffer } from 'schema.org.ai'
+
+// Create a AggregateOffer
+const item: AggregateOffer = {
+  $type: 'AggregateOffer',
+  name: 'Example AggregateOffer'
+}
+
+// Use semantic patterns
+await $.AggregateOffer.create(item)
+const result = await $.AggregateOffer.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AggregateOffer](https://schema.org/AggregateOffer)
+- [AggregateOffer Properties](https://schema.org/AggregateOffer#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

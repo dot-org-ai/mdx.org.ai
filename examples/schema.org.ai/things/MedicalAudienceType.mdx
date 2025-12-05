@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalAudienceType
+$context: https://schema.org
+$type: Class
+name: MedicalAudienceType
+description: Target audiences types for medical web pages. Enumerated type.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# MedicalAudienceType
+
+Target audiences types for medical web pages. Enumerated type.
+
+## Type Hierarchy
+
+**MedicalAudienceType**
+
+
+
+## Properties
+
+See [Schema.org MedicalAudienceType properties](https://schema.org/MedicalAudienceType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalAudienceType } from 'schema.org.ai'
+
+// Create a MedicalAudienceType
+const item: MedicalAudienceType = {
+  $type: 'MedicalAudienceType',
+  name: 'Example MedicalAudienceType'
+}
+
+// Use semantic patterns
+await $.MedicalAudienceType.create(item)
+const result = await $.MedicalAudienceType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalAudienceType](https://schema.org/MedicalAudienceType)
+- [MedicalAudienceType Properties](https://schema.org/MedicalAudienceType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

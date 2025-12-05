@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ContactPage
+$context: https://schema.org
+$type: Class
+name: ContactPage
+description: Web page type: Contact page.
+subClassOf: ["WebPage"]
+---
+
+# ContactPage
+
+Web page type: Contact page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **ContactPage**
+
+
+
+## Properties
+
+See [Schema.org ContactPage properties](https://schema.org/ContactPage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ContactPage } from 'schema.org.ai'
+
+// Create a ContactPage
+const item: ContactPage = {
+  $type: 'ContactPage',
+  name: 'Example ContactPage'
+}
+
+// Use semantic patterns
+await $.ContactPage.create(item)
+const result = await $.ContactPage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ContactPage](https://schema.org/ContactPage)
+- [ContactPage Properties](https://schema.org/ContactPage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

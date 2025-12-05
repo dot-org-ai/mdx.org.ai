@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UserDownloads
+$context: https://schema.org
+$type: Class
+name: UserDownloads
+description: UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+subClassOf: ["UserInteraction"]
+---
+
+# UserDownloads
+
+UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [UserInteraction](UserInteraction.mdx) > **UserDownloads**
+
+
+
+## Properties
+
+See [Schema.org UserDownloads properties](https://schema.org/UserDownloads#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserDownloads } from 'schema.org.ai'
+
+// Create a UserDownloads
+const item: UserDownloads = {
+  $type: 'UserDownloads',
+  name: 'Example UserDownloads'
+}
+
+// Use semantic patterns
+await $.UserDownloads.create(item)
+const result = await $.UserDownloads.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserDownloads](https://schema.org/UserDownloads)
+- [UserDownloads Properties](https://schema.org/UserDownloads#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

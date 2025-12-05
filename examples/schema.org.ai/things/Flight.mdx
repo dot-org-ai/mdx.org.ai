@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Flight
+$context: https://schema.org
+$type: Class
+name: Flight
+description: An airline flight.
+subClassOf: ["Trip"]
+---
+
+# Flight
+
+An airline flight.
+
+## Type Hierarchy
+
+**Flight**
+
+
+
+## Properties
+
+See [Schema.org Flight properties](https://schema.org/Flight#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Flight } from 'schema.org.ai'
+
+// Create a Flight
+const item: Flight = {
+  $type: 'Flight',
+  name: 'Example Flight'
+}
+
+// Use semantic patterns
+await $.Flight.create(item)
+const result = await $.Flight.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Flight](https://schema.org/Flight)
+- [Flight Properties](https://schema.org/Flight#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

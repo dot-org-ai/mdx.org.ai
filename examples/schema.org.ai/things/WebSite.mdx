@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WebSite
+$context: https://schema.org
+$type: Class
+name: WebSite
+description: A WebSite is a set of related web pages and other items typically served from a single web domain and accessible via URLs.
+subClassOf: ["CreativeWork"]
+---
+
+# WebSite
+
+A WebSite is a set of related web pages and other items typically served from a single web domain and accessible via URLs.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **WebSite**
+
+
+
+## Properties
+
+See [Schema.org WebSite properties](https://schema.org/WebSite#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WebSite } from 'schema.org.ai'
+
+// Create a WebSite
+const item: WebSite = {
+  $type: 'WebSite',
+  name: 'Example WebSite'
+}
+
+// Use semantic patterns
+await $.WebSite.create(item)
+const result = await $.WebSite.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WebSite](https://schema.org/WebSite)
+- [WebSite Properties](https://schema.org/WebSite#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

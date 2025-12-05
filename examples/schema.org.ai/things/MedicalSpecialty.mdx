@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalSpecialty
+$context: https://schema.org
+$type: Class
+name: MedicalSpecialty
+description: Any specific branch of medical science or practice. Medical specialities include clinical specialties that pertain to particular organ systems and their respective disease states, as well as allied health specialties. Enumerated type.
+subClassOf: ["Specialty","MedicalEnumeration"]
+---
+
+# MedicalSpecialty
+
+Any specific branch of medical science or practice. Medical specialities include clinical specialties that pertain to particular organ systems and their respective disease states, as well as allied health specialties. Enumerated type.
+
+## Type Hierarchy
+
+**MedicalSpecialty**
+
+
+
+## Properties
+
+See [Schema.org MedicalSpecialty properties](https://schema.org/MedicalSpecialty#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalSpecialty } from 'schema.org.ai'
+
+// Create a MedicalSpecialty
+const item: MedicalSpecialty = {
+  $type: 'MedicalSpecialty',
+  name: 'Example MedicalSpecialty'
+}
+
+// Use semantic patterns
+await $.MedicalSpecialty.create(item)
+const result = await $.MedicalSpecialty.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalSpecialty](https://schema.org/MedicalSpecialty)
+- [MedicalSpecialty Properties](https://schema.org/MedicalSpecialty#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

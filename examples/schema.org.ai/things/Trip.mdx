@@ -1,0 +1,54 @@
+---
+$id: https://schema.org.ai/Trip
+$context: https://schema.org
+$type: Class
+name: Trip
+description: A trip or journey. An itinerary of visits to one or more places.
+subClassOf: ["Intangible"]
+---
+
+# Trip
+
+A trip or journey. An itinerary of visits to one or more places.
+
+## Type Hierarchy
+
+**Trip**
+
+## Direct Subclasses
+
+- **[BoatTrip](BoatTrip.mdx)**: A trip on a commercial ferry line
+- **[BusTrip](BusTrip.mdx)**: A trip on a commercial bus line
+- **[Flight](Flight.mdx)**: An airline flight
+- **[TouristTrip](TouristTrip.mdx)**: A tourist trip
+- **[TrainTrip](TrainTrip.mdx)**: A trip on a commercial train line
+
+## Properties
+
+See [Schema.org Trip properties](https://schema.org/Trip#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Trip } from 'schema.org.ai'
+
+// Create a Trip
+const item: Trip = {
+  $type: 'Trip',
+  name: 'Example Trip'
+}
+
+// Use semantic patterns
+await $.Trip.create(item)
+const result = await $.Trip.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Trip](https://schema.org/Trip)
+- [Trip Properties](https://schema.org/Trip#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

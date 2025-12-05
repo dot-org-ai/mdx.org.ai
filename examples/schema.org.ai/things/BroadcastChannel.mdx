@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/BroadcastChannel
+$context: https://schema.org
+$type: Class
+name: BroadcastChannel
+description: A unique instance of a BroadcastService on a CableOrSatelliteService lineup.
+subClassOf: ["Intangible"]
+---
+
+# BroadcastChannel
+
+A unique instance of a BroadcastService on a CableOrSatelliteService lineup.
+
+## Type Hierarchy
+
+**BroadcastChannel**
+
+## Direct Subclasses
+
+- **[RadioChannel](RadioChannel.mdx)**: A unique instance of a radio BroadcastService on a CableOrSatelliteService lineup
+- **[TelevisionChannel](TelevisionChannel.mdx)**: A unique instance of a television BroadcastService on a CableOrSatelliteService lineup
+
+## Properties
+
+See [Schema.org BroadcastChannel properties](https://schema.org/BroadcastChannel#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BroadcastChannel } from 'schema.org.ai'
+
+// Create a BroadcastChannel
+const item: BroadcastChannel = {
+  $type: 'BroadcastChannel',
+  name: 'Example BroadcastChannel'
+}
+
+// Use semantic patterns
+await $.BroadcastChannel.create(item)
+const result = await $.BroadcastChannel.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BroadcastChannel](https://schema.org/BroadcastChannel)
+- [BroadcastChannel Properties](https://schema.org/BroadcastChannel#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

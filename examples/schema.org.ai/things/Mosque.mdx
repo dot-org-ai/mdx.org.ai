@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Mosque
+$context: https://schema.org
+$type: Class
+name: Mosque
+description: A mosque.
+subClassOf: ["PlaceOfWorship"]
+---
+
+# Mosque
+
+A mosque.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [PlaceOfWorship](PlaceOfWorship.mdx) > **Mosque**
+
+
+
+## Properties
+
+See [Schema.org Mosque properties](https://schema.org/Mosque#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Mosque } from 'schema.org.ai'
+
+// Create a Mosque
+const item: Mosque = {
+  $type: 'Mosque',
+  name: 'Example Mosque'
+}
+
+// Use semantic patterns
+await $.Mosque.create(item)
+const result = await $.Mosque.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Mosque](https://schema.org/Mosque)
+- [Mosque Properties](https://schema.org/Mosque#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

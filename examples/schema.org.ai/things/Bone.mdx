@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Bone
+$context: https://schema.org
+$type: Class
+name: Bone
+description: Rigid connective tissue that comprises up the skeletal structure of the human body.
+subClassOf: ["AnatomicalStructure"]
+---
+
+# Bone
+
+Rigid connective tissue that comprises up the skeletal structure of the human body.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [AnatomicalStructure](AnatomicalStructure.mdx) > **Bone**
+
+
+
+## Properties
+
+See [Schema.org Bone properties](https://schema.org/Bone#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Bone } from 'schema.org.ai'
+
+// Create a Bone
+const item: Bone = {
+  $type: 'Bone',
+  name: 'Example Bone'
+}
+
+// Use semantic patterns
+await $.Bone.create(item)
+const result = await $.Bone.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Bone](https://schema.org/Bone)
+- [Bone Properties](https://schema.org/Bone#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

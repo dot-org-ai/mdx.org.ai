@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/EnergyEfficiencyEnumeration
+$context: https://schema.org
+$type: Class
+name: EnergyEfficiencyEnumeration
+description: Enumerates energy efficiency levels (also known as "classes" or "ratings") and certifications that are part of several international energy efficiency standards.
+subClassOf: ["Enumeration"]
+---
+
+# EnergyEfficiencyEnumeration
+
+Enumerates energy efficiency levels (also known as "classes" or "ratings") and certifications that are part of several international energy efficiency standards.
+
+## Type Hierarchy
+
+**EnergyEfficiencyEnumeration**
+
+## Direct Subclasses
+
+- **[EnergyStarEnergyEfficiencyEnumeration](EnergyStarEnergyEfficiencyEnumeration.mdx)**: Used to indicate whether a product is EnergyStar certified
+- **[EUEnergyEfficiencyEnumeration](EUEnergyEfficiencyEnumeration.mdx)**: Enumerates the EU energy efficiency classes A-G as well as A+, A++, and A+++ as defined in EU directive 2017/1369
+
+## Properties
+
+See [Schema.org EnergyEfficiencyEnumeration properties](https://schema.org/EnergyEfficiencyEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EnergyEfficiencyEnumeration } from 'schema.org.ai'
+
+// Create a EnergyEfficiencyEnumeration
+const item: EnergyEfficiencyEnumeration = {
+  $type: 'EnergyEfficiencyEnumeration',
+  name: 'Example EnergyEfficiencyEnumeration'
+}
+
+// Use semantic patterns
+await $.EnergyEfficiencyEnumeration.create(item)
+const result = await $.EnergyEfficiencyEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EnergyEfficiencyEnumeration](https://schema.org/EnergyEfficiencyEnumeration)
+- [EnergyEfficiencyEnumeration Properties](https://schema.org/EnergyEfficiencyEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

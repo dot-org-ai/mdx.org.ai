@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalGuidelineRecommendation
+$context: https://schema.org
+$type: Class
+name: MedicalGuidelineRecommendation
+description: A guideline recommendation that is regarded as efficacious and where quality of the data supporting the recommendation is sound.
+subClassOf: ["MedicalGuideline"]
+---
+
+# MedicalGuidelineRecommendation
+
+A guideline recommendation that is regarded as efficacious and where quality of the data supporting the recommendation is sound.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalGuideline](MedicalGuideline.mdx) > **MedicalGuidelineRecommendation**
+
+
+
+## Properties
+
+See [Schema.org MedicalGuidelineRecommendation properties](https://schema.org/MedicalGuidelineRecommendation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalGuidelineRecommendation } from 'schema.org.ai'
+
+// Create a MedicalGuidelineRecommendation
+const item: MedicalGuidelineRecommendation = {
+  $type: 'MedicalGuidelineRecommendation',
+  name: 'Example MedicalGuidelineRecommendation'
+}
+
+// Use semantic patterns
+await $.MedicalGuidelineRecommendation.create(item)
+const result = await $.MedicalGuidelineRecommendation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalGuidelineRecommendation](https://schema.org/MedicalGuidelineRecommendation)
+- [MedicalGuidelineRecommendation Properties](https://schema.org/MedicalGuidelineRecommendation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

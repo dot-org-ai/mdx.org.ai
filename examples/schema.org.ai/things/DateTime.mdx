@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DateTime
+$context: https://schema.org
+$type: Class
+name: DateTime
+description: A combination of date and time of day in the form [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601).
+subClassOf: []
+---
+
+# DateTime
+
+A combination of date and time of day in the form [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601).
+
+## Type Hierarchy
+
+**DateTime**
+
+
+
+## Properties
+
+See [Schema.org DateTime properties](https://schema.org/DateTime#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DateTime } from 'schema.org.ai'
+
+// Create a DateTime
+const item: DateTime = {
+  $type: 'DateTime',
+  name: 'Example DateTime'
+}
+
+// Use semantic patterns
+await $.DateTime.create(item)
+const result = await $.DateTime.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DateTime](https://schema.org/DateTime)
+- [DateTime Properties](https://schema.org/DateTime#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

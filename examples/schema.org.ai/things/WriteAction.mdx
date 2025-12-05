@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WriteAction
+$context: https://schema.org
+$type: Class
+name: WriteAction
+description: The act of authoring written creative content.
+subClassOf: ["CreateAction"]
+---
+
+# WriteAction
+
+The act of authoring written creative content.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [CreateAction](CreateAction.mdx) > **WriteAction**
+
+
+
+## Properties
+
+See [Schema.org WriteAction properties](https://schema.org/WriteAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WriteAction } from 'schema.org.ai'
+
+// Create a WriteAction
+const item: WriteAction = {
+  $type: 'WriteAction',
+  name: 'Example WriteAction'
+}
+
+// Use semantic patterns
+await $.WriteAction.create(item)
+const result = await $.WriteAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WriteAction](https://schema.org/WriteAction)
+- [WriteAction Properties](https://schema.org/WriteAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PriceTypeEnumeration
+$context: https://schema.org
+$type: Class
+name: PriceTypeEnumeration
+description: Enumerates different price types, for example list price, invoice price, and sale price.
+subClassOf: ["Enumeration"]
+---
+
+# PriceTypeEnumeration
+
+Enumerates different price types, for example list price, invoice price, and sale price.
+
+## Type Hierarchy
+
+**PriceTypeEnumeration**
+
+
+
+## Properties
+
+See [Schema.org PriceTypeEnumeration properties](https://schema.org/PriceTypeEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PriceTypeEnumeration } from 'schema.org.ai'
+
+// Create a PriceTypeEnumeration
+const item: PriceTypeEnumeration = {
+  $type: 'PriceTypeEnumeration',
+  name: 'Example PriceTypeEnumeration'
+}
+
+// Use semantic patterns
+await $.PriceTypeEnumeration.create(item)
+const result = await $.PriceTypeEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PriceTypeEnumeration](https://schema.org/PriceTypeEnumeration)
+- [PriceTypeEnumeration Properties](https://schema.org/PriceTypeEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

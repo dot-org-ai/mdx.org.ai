@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Collection
+$context: https://schema.org
+$type: Class
+name: Collection
+description: A collection of items, e.g. creative works or products.
+subClassOf: ["CreativeWork"]
+---
+
+# Collection
+
+A collection of items, e.g. creative works or products.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Collection**
+
+## Direct Subclasses
+
+- **[ProductCollection](ProductCollection.mdx)**: A set of products (either [[ProductGroup]]s or specific variants) that are listed together e
+
+## Properties
+
+See [Schema.org Collection properties](https://schema.org/Collection#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Collection } from 'schema.org.ai'
+
+// Create a Collection
+const item: Collection = {
+  $type: 'Collection',
+  name: 'Example Collection'
+}
+
+// Use semantic patterns
+await $.Collection.create(item)
+const result = await $.Collection.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Collection](https://schema.org/Collection)
+- [Collection Properties](https://schema.org/Collection#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

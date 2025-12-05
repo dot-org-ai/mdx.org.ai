@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ReportedDoseSchedule
+$context: https://schema.org
+$type: Class
+name: ReportedDoseSchedule
+description: A patient-reported or observed dosing schedule for a drug or supplement.
+subClassOf: ["DoseSchedule"]
+---
+
+# ReportedDoseSchedule
+
+A patient-reported or observed dosing schedule for a drug or supplement.
+
+## Type Hierarchy
+
+**ReportedDoseSchedule**
+
+
+
+## Properties
+
+See [Schema.org ReportedDoseSchedule properties](https://schema.org/ReportedDoseSchedule#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReportedDoseSchedule } from 'schema.org.ai'
+
+// Create a ReportedDoseSchedule
+const item: ReportedDoseSchedule = {
+  $type: 'ReportedDoseSchedule',
+  name: 'Example ReportedDoseSchedule'
+}
+
+// Use semantic patterns
+await $.ReportedDoseSchedule.create(item)
+const result = await $.ReportedDoseSchedule.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReportedDoseSchedule](https://schema.org/ReportedDoseSchedule)
+- [ReportedDoseSchedule Properties](https://schema.org/ReportedDoseSchedule#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

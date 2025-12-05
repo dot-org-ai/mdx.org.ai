@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/OrganizationRole
+$context: https://schema.org
+$type: Class
+name: OrganizationRole
+description: A subclass of Role used to describe roles within organizations.
+subClassOf: ["Role"]
+---
+
+# OrganizationRole
+
+A subclass of Role used to describe roles within organizations.
+
+## Type Hierarchy
+
+**OrganizationRole**
+
+## Direct Subclasses
+
+- **[EmployeeRole](EmployeeRole.mdx)**: A subclass of OrganizationRole used to describe employee relationships
+
+## Properties
+
+See [Schema.org OrganizationRole properties](https://schema.org/OrganizationRole#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OrganizationRole } from 'schema.org.ai'
+
+// Create a OrganizationRole
+const item: OrganizationRole = {
+  $type: 'OrganizationRole',
+  name: 'Example OrganizationRole'
+}
+
+// Use semantic patterns
+await $.OrganizationRole.create(item)
+const result = await $.OrganizationRole.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OrganizationRole](https://schema.org/OrganizationRole)
+- [OrganizationRole Properties](https://schema.org/OrganizationRole#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

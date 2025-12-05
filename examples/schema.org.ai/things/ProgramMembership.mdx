@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ProgramMembership
+$context: https://schema.org
+$type: Class
+name: ProgramMembership
+description: Used to describe membership in a loyalty programs (e.g. "StarAliance"), traveler clubs (e.g. "AAA"), purchase clubs ("Safeway Club"), etc.
+subClassOf: ["Intangible"]
+---
+
+# ProgramMembership
+
+Used to describe membership in a loyalty programs (e.g. "StarAliance"), traveler clubs (e.g. "AAA"), purchase clubs ("Safeway Club"), etc.
+
+## Type Hierarchy
+
+**ProgramMembership**
+
+
+
+## Properties
+
+See [Schema.org ProgramMembership properties](https://schema.org/ProgramMembership#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ProgramMembership } from 'schema.org.ai'
+
+// Create a ProgramMembership
+const item: ProgramMembership = {
+  $type: 'ProgramMembership',
+  name: 'Example ProgramMembership'
+}
+
+// Use semantic patterns
+await $.ProgramMembership.create(item)
+const result = await $.ProgramMembership.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ProgramMembership](https://schema.org/ProgramMembership)
+- [ProgramMembership Properties](https://schema.org/ProgramMembership#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

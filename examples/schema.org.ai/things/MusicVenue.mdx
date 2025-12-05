@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicVenue
+$context: https://schema.org
+$type: Class
+name: MusicVenue
+description: A music venue.
+subClassOf: ["CivicStructure"]
+---
+
+# MusicVenue
+
+A music venue.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **MusicVenue**
+
+
+
+## Properties
+
+See [Schema.org MusicVenue properties](https://schema.org/MusicVenue#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicVenue } from 'schema.org.ai'
+
+// Create a MusicVenue
+const item: MusicVenue = {
+  $type: 'MusicVenue',
+  name: 'Example MusicVenue'
+}
+
+// Use semantic patterns
+await $.MusicVenue.create(item)
+const result = await $.MusicVenue.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicVenue](https://schema.org/MusicVenue)
+- [MusicVenue Properties](https://schema.org/MusicVenue#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

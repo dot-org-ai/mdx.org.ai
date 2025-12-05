@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AutoPartsStore
+$context: https://schema.org
+$type: Class
+name: AutoPartsStore
+description: An auto parts store.
+subClassOf: ["Store","AutomotiveBusiness"]
+---
+
+# AutoPartsStore
+
+An auto parts store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **AutoPartsStore**
+
+
+
+## Properties
+
+See [Schema.org AutoPartsStore properties](https://schema.org/AutoPartsStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AutoPartsStore } from 'schema.org.ai'
+
+// Create a AutoPartsStore
+const item: AutoPartsStore = {
+  $type: 'AutoPartsStore',
+  name: 'Example AutoPartsStore'
+}
+
+// Use semantic patterns
+await $.AutoPartsStore.create(item)
+const result = await $.AutoPartsStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AutoPartsStore](https://schema.org/AutoPartsStore)
+- [AutoPartsStore Properties](https://schema.org/AutoPartsStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

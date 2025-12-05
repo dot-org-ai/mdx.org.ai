@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicEvent
+$context: https://schema.org
+$type: Class
+name: MusicEvent
+description: Event type: Music event.
+subClassOf: ["Event"]
+---
+
+# MusicEvent
+
+Event type: Music event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **MusicEvent**
+
+
+
+## Properties
+
+See [Schema.org MusicEvent properties](https://schema.org/MusicEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicEvent } from 'schema.org.ai'
+
+// Create a MusicEvent
+const item: MusicEvent = {
+  $type: 'MusicEvent',
+  name: 'Example MusicEvent'
+}
+
+// Use semantic patterns
+await $.MusicEvent.create(item)
+const result = await $.MusicEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicEvent](https://schema.org/MusicEvent)
+- [MusicEvent Properties](https://schema.org/MusicEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

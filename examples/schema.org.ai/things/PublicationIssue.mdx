@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/PublicationIssue
+$context: https://schema.org
+$type: Class
+name: PublicationIssue
+description: A part of a successively published publication such as a periodical or publication volume, often numbered, usually containing a grouping of works such as articles.\
+subClassOf: ["CreativeWork"]
+---
+
+# PublicationIssue
+
+A part of a successively published publication such as a periodical or publication volume, often numbered, usually containing a grouping of works such as articles.\
+\
+See also [blog post](https://blog-schema.org/2014/09/02/schema-org-support-for-bibliographic-relationships-and-periodicals/).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **PublicationIssue**
+
+## Direct Subclasses
+
+- **[ComicIssue](ComicIssue.mdx)**: Individual comic issues are serially published as part of a larger series
+
+## Properties
+
+See [Schema.org PublicationIssue properties](https://schema.org/PublicationIssue#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PublicationIssue } from 'schema.org.ai'
+
+// Create a PublicationIssue
+const item: PublicationIssue = {
+  $type: 'PublicationIssue',
+  name: 'Example PublicationIssue'
+}
+
+// Use semantic patterns
+await $.PublicationIssue.create(item)
+const result = await $.PublicationIssue.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PublicationIssue](https://schema.org/PublicationIssue)
+- [PublicationIssue Properties](https://schema.org/PublicationIssue#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

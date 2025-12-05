@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Boolean
+$context: https://schema.org
+$type: Class
+name: Boolean
+description: Boolean: True or False.
+subClassOf: []
+---
+
+# Boolean
+
+Boolean: True or False.
+
+## Type Hierarchy
+
+**Boolean**
+
+
+
+## Properties
+
+See [Schema.org Boolean properties](https://schema.org/Boolean#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Boolean } from 'schema.org.ai'
+
+// Create a Boolean
+const item: Boolean = {
+  $type: 'Boolean',
+  name: 'Example Boolean'
+}
+
+// Use semantic patterns
+await $.Boolean.create(item)
+const result = await $.Boolean.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Boolean](https://schema.org/Boolean)
+- [Boolean Properties](https://schema.org/Boolean#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

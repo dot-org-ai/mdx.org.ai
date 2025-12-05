@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WPHeader
+$context: https://schema.org
+$type: Class
+name: WPHeader
+description: The header section of the page.
+subClassOf: ["WebPageElement"]
+---
+
+# WPHeader
+
+The header section of the page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPageElement](WebPageElement.mdx) > **WPHeader**
+
+
+
+## Properties
+
+See [Schema.org WPHeader properties](https://schema.org/WPHeader#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WPHeader } from 'schema.org.ai'
+
+// Create a WPHeader
+const item: WPHeader = {
+  $type: 'WPHeader',
+  name: 'Example WPHeader'
+}
+
+// Use semantic patterns
+await $.WPHeader.create(item)
+const result = await $.WPHeader.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WPHeader](https://schema.org/WPHeader)
+- [WPHeader Properties](https://schema.org/WPHeader#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

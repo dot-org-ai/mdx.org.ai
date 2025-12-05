@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ExchangeRateSpecification
+$context: https://schema.org
+$type: Class
+name: ExchangeRateSpecification
+description: A structured value representing exchange rate.
+subClassOf: ["StructuredValue"]
+---
+
+# ExchangeRateSpecification
+
+A structured value representing exchange rate.
+
+## Type Hierarchy
+
+**ExchangeRateSpecification**
+
+
+
+## Properties
+
+See [Schema.org ExchangeRateSpecification properties](https://schema.org/ExchangeRateSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ExchangeRateSpecification } from 'schema.org.ai'
+
+// Create a ExchangeRateSpecification
+const item: ExchangeRateSpecification = {
+  $type: 'ExchangeRateSpecification',
+  name: 'Example ExchangeRateSpecification'
+}
+
+// Use semantic patterns
+await $.ExchangeRateSpecification.create(item)
+const result = await $.ExchangeRateSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ExchangeRateSpecification](https://schema.org/ExchangeRateSpecification)
+- [ExchangeRateSpecification Properties](https://schema.org/ExchangeRateSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

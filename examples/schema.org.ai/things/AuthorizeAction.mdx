@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AuthorizeAction
+$context: https://schema.org
+$type: Class
+name: AuthorizeAction
+description: The act of granting permission to an object.
+subClassOf: ["AllocateAction"]
+---
+
+# AuthorizeAction
+
+The act of granting permission to an object.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [OrganizeAction](OrganizeAction.mdx) > [AllocateAction](AllocateAction.mdx) > **AuthorizeAction**
+
+
+
+## Properties
+
+See [Schema.org AuthorizeAction properties](https://schema.org/AuthorizeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AuthorizeAction } from 'schema.org.ai'
+
+// Create a AuthorizeAction
+const item: AuthorizeAction = {
+  $type: 'AuthorizeAction',
+  name: 'Example AuthorizeAction'
+}
+
+// Use semantic patterns
+await $.AuthorizeAction.create(item)
+const result = await $.AuthorizeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AuthorizeAction](https://schema.org/AuthorizeAction)
+- [AuthorizeAction Properties](https://schema.org/AuthorizeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

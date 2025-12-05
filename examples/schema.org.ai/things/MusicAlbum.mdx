@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicAlbum
+$context: https://schema.org
+$type: Class
+name: MusicAlbum
+description: A collection of music tracks.
+subClassOf: ["MusicPlaylist"]
+---
+
+# MusicAlbum
+
+A collection of music tracks.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [MusicPlaylist](MusicPlaylist.mdx) > **MusicAlbum**
+
+
+
+## Properties
+
+See [Schema.org MusicAlbum properties](https://schema.org/MusicAlbum#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicAlbum } from 'schema.org.ai'
+
+// Create a MusicAlbum
+const item: MusicAlbum = {
+  $type: 'MusicAlbum',
+  name: 'Example MusicAlbum'
+}
+
+// Use semantic patterns
+await $.MusicAlbum.create(item)
+const result = await $.MusicAlbum.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicAlbum](https://schema.org/MusicAlbum)
+- [MusicAlbum Properties](https://schema.org/MusicAlbum#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

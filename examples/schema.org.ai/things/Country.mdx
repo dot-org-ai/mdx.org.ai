@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Country
+$context: https://schema.org
+$type: Class
+name: Country
+description: A country.
+subClassOf: ["AdministrativeArea"]
+---
+
+# Country
+
+A country.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [AdministrativeArea](AdministrativeArea.mdx) > **Country**
+
+
+
+## Properties
+
+See [Schema.org Country properties](https://schema.org/Country#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Country } from 'schema.org.ai'
+
+// Create a Country
+const item: Country = {
+  $type: 'Country',
+  name: 'Example Country'
+}
+
+// Use semantic patterns
+await $.Country.create(item)
+const result = await $.Country.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Country](https://schema.org/Country)
+- [Country Properties](https://schema.org/Country#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

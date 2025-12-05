@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/PaymentCard
+$context: https://schema.org
+$type: Class
+name: PaymentCard
+description: A payment method using a credit, debit, store or other card to associate the payment with an account.
+subClassOf: ["FinancialProduct","PaymentMethod"]
+---
+
+# PaymentCard
+
+A payment method using a credit, debit, store or other card to associate the payment with an account.
+
+## Type Hierarchy
+
+**PaymentCard**
+
+## Direct Subclasses
+
+- **[CreditCard](CreditCard.mdx)**: A card payment method of a particular brand or name
+
+## Properties
+
+See [Schema.org PaymentCard properties](https://schema.org/PaymentCard#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PaymentCard } from 'schema.org.ai'
+
+// Create a PaymentCard
+const item: PaymentCard = {
+  $type: 'PaymentCard',
+  name: 'Example PaymentCard'
+}
+
+// Use semantic patterns
+await $.PaymentCard.create(item)
+const result = await $.PaymentCard.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PaymentCard](https://schema.org/PaymentCard)
+- [PaymentCard Properties](https://schema.org/PaymentCard#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

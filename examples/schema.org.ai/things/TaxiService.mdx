@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TaxiService
+$context: https://schema.org
+$type: Class
+name: TaxiService
+description: A service for a vehicle for hire with a driver for local travel. Fares are usually calculated based on distance traveled.
+subClassOf: ["Service"]
+---
+
+# TaxiService
+
+A service for a vehicle for hire with a driver for local travel. Fares are usually calculated based on distance traveled.
+
+## Type Hierarchy
+
+**TaxiService**
+
+
+
+## Properties
+
+See [Schema.org TaxiService properties](https://schema.org/TaxiService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TaxiService } from 'schema.org.ai'
+
+// Create a TaxiService
+const item: TaxiService = {
+  $type: 'TaxiService',
+  name: 'Example TaxiService'
+}
+
+// Use semantic patterns
+await $.TaxiService.create(item)
+const result = await $.TaxiService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TaxiService](https://schema.org/TaxiService)
+- [TaxiService Properties](https://schema.org/TaxiService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

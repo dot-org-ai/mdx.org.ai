@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UserCheckins
+$context: https://schema.org
+$type: Class
+name: UserCheckins
+description: UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+subClassOf: ["UserInteraction"]
+---
+
+# UserCheckins
+
+UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [UserInteraction](UserInteraction.mdx) > **UserCheckins**
+
+
+
+## Properties
+
+See [Schema.org UserCheckins properties](https://schema.org/UserCheckins#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserCheckins } from 'schema.org.ai'
+
+// Create a UserCheckins
+const item: UserCheckins = {
+  $type: 'UserCheckins',
+  name: 'Example UserCheckins'
+}
+
+// Use semantic patterns
+await $.UserCheckins.create(item)
+const result = await $.UserCheckins.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserCheckins](https://schema.org/UserCheckins)
+- [UserCheckins Properties](https://schema.org/UserCheckins#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

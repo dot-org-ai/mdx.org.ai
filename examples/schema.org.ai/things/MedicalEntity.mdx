@@ -1,0 +1,65 @@
+---
+$id: https://schema.org.ai/MedicalEntity
+$context: https://schema.org
+$type: Class
+name: MedicalEntity
+description: The most generic type of entity related to health and the practice of medicine.
+subClassOf: ["Thing"]
+---
+
+# MedicalEntity
+
+The most generic type of entity related to health and the practice of medicine.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > **MedicalEntity**
+
+## Direct Subclasses
+
+- **[AnatomicalStructure](AnatomicalStructure.mdx)**: Any part of the human body, typically a component of an anatomical system
+- **[AnatomicalSystem](AnatomicalSystem.mdx)**: An anatomical system is a group of anatomical structures that work together to perform a certain task
+- **[DrugClass](DrugClass.mdx)**: A class of medical drugs, e
+- **[LifestyleModification](LifestyleModification.mdx)**: A process of care involving exercise, changes to diet, fitness routines, and other lifestyle changes aimed at improving a health condition
+- **[MedicalCause](MedicalCause.mdx)**: The causative agent(s) that are responsible for the pathophysiologic process that eventually results in a medical condition, symptom or sign
+- **[MedicalCondition](MedicalCondition.mdx)**: Any condition of the human body that affects the normal functioning of a person, whether physically or mentally
+- **[MedicalContraindication](MedicalContraindication.mdx)**: A condition or factor that serves as a reason to withhold a certain medical therapy
+- **[MedicalDevice](MedicalDevice.mdx)**: Any object used in a medical capacity, such as to diagnose or treat a patient
+- **[MedicalGuideline](MedicalGuideline.mdx)**: Any recommendation made by a standard society (e
+- **[MedicalIndication](MedicalIndication.mdx)**: A condition or factor that indicates use of a medical therapy, including signs, symptoms, risk factors, anatomical states, etc
+- **[MedicalProcedure](MedicalProcedure.mdx)**: A process of care used in either a diagnostic, therapeutic, preventive or palliative capacity that relies on invasive (surgical), non-invasive, or other techniques
+- **[MedicalRiskEstimator](MedicalRiskEstimator.mdx)**: Any rule set or interactive tool for estimating the risk of developing a complication or condition
+- **[MedicalStudy](MedicalStudy.mdx)**: A medical study is an umbrella type covering all kinds of research studies relating to human medicine or health, including observational studies and interventional trials and registries, randomized, controlled or not
+- **[MedicalTest](MedicalTest.mdx)**: Any medical test, typically performed for diagnostic purposes
+- **[Substance](Substance.mdx)**: Any matter of defined composition that has discrete existence, whose origin may be biological, mineral or chemical
+- **[SuperficialAnatomy](SuperficialAnatomy.mdx)**: Anatomical features that can be observed by sight (without dissection), including the form and proportions of the human body as well as surface landmarks that correspond to deeper subcutaneous structures
+
+## Properties
+
+See [Schema.org MedicalEntity properties](https://schema.org/MedicalEntity#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalEntity } from 'schema.org.ai'
+
+// Create a MedicalEntity
+const item: MedicalEntity = {
+  $type: 'MedicalEntity',
+  name: 'Example MedicalEntity'
+}
+
+// Use semantic patterns
+await $.MedicalEntity.create(item)
+const result = await $.MedicalEntity.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalEntity](https://schema.org/MedicalEntity)
+- [MedicalEntity Properties](https://schema.org/MedicalEntity#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

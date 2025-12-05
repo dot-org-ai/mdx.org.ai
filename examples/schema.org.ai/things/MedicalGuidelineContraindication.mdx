@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalGuidelineContraindication
+$context: https://schema.org
+$type: Class
+name: MedicalGuidelineContraindication
+description: A guideline contraindication that designates a process as harmful and where quality of the data supporting the contraindication is sound.
+subClassOf: ["MedicalGuideline"]
+---
+
+# MedicalGuidelineContraindication
+
+A guideline contraindication that designates a process as harmful and where quality of the data supporting the contraindication is sound.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalGuideline](MedicalGuideline.mdx) > **MedicalGuidelineContraindication**
+
+
+
+## Properties
+
+See [Schema.org MedicalGuidelineContraindication properties](https://schema.org/MedicalGuidelineContraindication#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalGuidelineContraindication } from 'schema.org.ai'
+
+// Create a MedicalGuidelineContraindication
+const item: MedicalGuidelineContraindication = {
+  $type: 'MedicalGuidelineContraindication',
+  name: 'Example MedicalGuidelineContraindication'
+}
+
+// Use semantic patterns
+await $.MedicalGuidelineContraindication.create(item)
+const result = await $.MedicalGuidelineContraindication.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalGuidelineContraindication](https://schema.org/MedicalGuidelineContraindication)
+- [MedicalGuidelineContraindication Properties](https://schema.org/MedicalGuidelineContraindication#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

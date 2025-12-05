@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WearAction
+$context: https://schema.org
+$type: Class
+name: WearAction
+description: The act of dressing oneself in clothing.
+subClassOf: ["UseAction"]
+---
+
+# WearAction
+
+The act of dressing oneself in clothing.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > [UseAction](UseAction.mdx) > **WearAction**
+
+
+
+## Properties
+
+See [Schema.org WearAction properties](https://schema.org/WearAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WearAction } from 'schema.org.ai'
+
+// Create a WearAction
+const item: WearAction = {
+  $type: 'WearAction',
+  name: 'Example WearAction'
+}
+
+// Use semantic patterns
+await $.WearAction.create(item)
+const result = await $.WearAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WearAction](https://schema.org/WearAction)
+- [WearAction Properties](https://schema.org/WearAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

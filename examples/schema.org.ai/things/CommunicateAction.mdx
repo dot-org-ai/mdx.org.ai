@@ -1,0 +1,57 @@
+---
+$id: https://schema.org.ai/CommunicateAction
+$context: https://schema.org
+$type: Class
+name: CommunicateAction
+description: The act of conveying information to another person via a communication medium (instrument) such as speech, email, or telephone conversation.
+subClassOf: ["InteractAction"]
+---
+
+# CommunicateAction
+
+The act of conveying information to another person via a communication medium (instrument) such as speech, email, or telephone conversation.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > **CommunicateAction**
+
+## Direct Subclasses
+
+- **[AskAction](AskAction.mdx)**: The act of posing a question / favor to someone
+- **[CheckInAction](CheckInAction.mdx)**: The act of an agent communicating (service provider, social media, etc) their arrival by registering/confirming for a previously reserved service (e
+- **[CheckOutAction](CheckOutAction.mdx)**: The act of an agent communicating (service provider, social media, etc) their departure of a previously reserved service (e
+- **[CommentAction](CommentAction.mdx)**: The act of generating a comment about a subject
+- **[InformAction](InformAction.mdx)**: The act of notifying someone of information pertinent to them, with no expectation of a response
+- **[InviteAction](InviteAction.mdx)**: The act of asking someone to attend an event
+- **[ReplyAction](ReplyAction.mdx)**: The act of responding to a question/message asked/sent by the object
+- **[ShareAction](ShareAction.mdx)**: The act of distributing content to people for their amusement or edification
+
+## Properties
+
+See [Schema.org CommunicateAction properties](https://schema.org/CommunicateAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CommunicateAction } from 'schema.org.ai'
+
+// Create a CommunicateAction
+const item: CommunicateAction = {
+  $type: 'CommunicateAction',
+  name: 'Example CommunicateAction'
+}
+
+// Use semantic patterns
+await $.CommunicateAction.create(item)
+const result = await $.CommunicateAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CommunicateAction](https://schema.org/CommunicateAction)
+- [CommunicateAction Properties](https://schema.org/CommunicateAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

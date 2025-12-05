@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PaymentStatusType
+$context: https://schema.org
+$type: Class
+name: PaymentStatusType
+description: A specific payment status. For example, PaymentDue, PaymentComplete, etc.
+subClassOf: ["StatusEnumeration"]
+---
+
+# PaymentStatusType
+
+A specific payment status. For example, PaymentDue, PaymentComplete, etc.
+
+## Type Hierarchy
+
+**PaymentStatusType**
+
+
+
+## Properties
+
+See [Schema.org PaymentStatusType properties](https://schema.org/PaymentStatusType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PaymentStatusType } from 'schema.org.ai'
+
+// Create a PaymentStatusType
+const item: PaymentStatusType = {
+  $type: 'PaymentStatusType',
+  name: 'Example PaymentStatusType'
+}
+
+// Use semantic patterns
+await $.PaymentStatusType.create(item)
+const result = await $.PaymentStatusType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PaymentStatusType](https://schema.org/PaymentStatusType)
+- [PaymentStatusType Properties](https://schema.org/PaymentStatusType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

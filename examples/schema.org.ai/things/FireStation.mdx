@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FireStation
+$context: https://schema.org
+$type: Class
+name: FireStation
+description: A fire station. With firemen.
+subClassOf: ["CivicStructure","EmergencyService"]
+---
+
+# FireStation
+
+A fire station. With firemen.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [EmergencyService](EmergencyService.mdx) > **FireStation**
+
+
+
+## Properties
+
+See [Schema.org FireStation properties](https://schema.org/FireStation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FireStation } from 'schema.org.ai'
+
+// Create a FireStation
+const item: FireStation = {
+  $type: 'FireStation',
+  name: 'Example FireStation'
+}
+
+// Use semantic patterns
+await $.FireStation.create(item)
+const result = await $.FireStation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FireStation](https://schema.org/FireStation)
+- [FireStation Properties](https://schema.org/FireStation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

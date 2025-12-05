@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TieAction
+$context: https://schema.org
+$type: Class
+name: TieAction
+description: The act of reaching a draw in a competitive activity.
+subClassOf: ["AchieveAction"]
+---
+
+# TieAction
+
+The act of reaching a draw in a competitive activity.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [AchieveAction](AchieveAction.mdx) > **TieAction**
+
+
+
+## Properties
+
+See [Schema.org TieAction properties](https://schema.org/TieAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TieAction } from 'schema.org.ai'
+
+// Create a TieAction
+const item: TieAction = {
+  $type: 'TieAction',
+  name: 'Example TieAction'
+}
+
+// Use semantic patterns
+await $.TieAction.create(item)
+const result = await $.TieAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TieAction](https://schema.org/TieAction)
+- [TieAction Properties](https://schema.org/TieAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

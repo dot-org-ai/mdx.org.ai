@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Conversation
+$context: https://schema.org
+$type: Class
+name: Conversation
+description: One or more messages between organizations or people on a particular topic. Individual messages can be linked to the conversation with isPartOf or hasPart properties.
+subClassOf: ["CreativeWork"]
+---
+
+# Conversation
+
+One or more messages between organizations or people on a particular topic. Individual messages can be linked to the conversation with isPartOf or hasPart properties.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Conversation**
+
+
+
+## Properties
+
+See [Schema.org Conversation properties](https://schema.org/Conversation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Conversation } from 'schema.org.ai'
+
+// Create a Conversation
+const item: Conversation = {
+  $type: 'Conversation',
+  name: 'Example Conversation'
+}
+
+// Use semantic patterns
+await $.Conversation.create(item)
+const result = await $.Conversation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Conversation](https://schema.org/Conversation)
+- [Conversation Properties](https://schema.org/Conversation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

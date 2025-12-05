@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalObservationalStudyDesign
+$context: https://schema.org
+$type: Class
+name: MedicalObservationalStudyDesign
+description: Design models for observational medical studies. Enumerated type.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# MedicalObservationalStudyDesign
+
+Design models for observational medical studies. Enumerated type.
+
+## Type Hierarchy
+
+**MedicalObservationalStudyDesign**
+
+
+
+## Properties
+
+See [Schema.org MedicalObservationalStudyDesign properties](https://schema.org/MedicalObservationalStudyDesign#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalObservationalStudyDesign } from 'schema.org.ai'
+
+// Create a MedicalObservationalStudyDesign
+const item: MedicalObservationalStudyDesign = {
+  $type: 'MedicalObservationalStudyDesign',
+  name: 'Example MedicalObservationalStudyDesign'
+}
+
+// Use semantic patterns
+await $.MedicalObservationalStudyDesign.create(item)
+const result = await $.MedicalObservationalStudyDesign.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalObservationalStudyDesign](https://schema.org/MedicalObservationalStudyDesign)
+- [MedicalObservationalStudyDesign Properties](https://schema.org/MedicalObservationalStudyDesign#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

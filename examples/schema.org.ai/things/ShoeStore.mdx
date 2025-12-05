@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ShoeStore
+$context: https://schema.org
+$type: Class
+name: ShoeStore
+description: A shoe store.
+subClassOf: ["Store"]
+---
+
+# ShoeStore
+
+A shoe store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **ShoeStore**
+
+
+
+## Properties
+
+See [Schema.org ShoeStore properties](https://schema.org/ShoeStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ShoeStore } from 'schema.org.ai'
+
+// Create a ShoeStore
+const item: ShoeStore = {
+  $type: 'ShoeStore',
+  name: 'Example ShoeStore'
+}
+
+// Use semantic patterns
+await $.ShoeStore.create(item)
+const result = await $.ShoeStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ShoeStore](https://schema.org/ShoeStore)
+- [ShoeStore Properties](https://schema.org/ShoeStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

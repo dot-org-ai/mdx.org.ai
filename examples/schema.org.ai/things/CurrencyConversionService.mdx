@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CurrencyConversionService
+$context: https://schema.org
+$type: Class
+name: CurrencyConversionService
+description: A service to convert funds from one currency to another currency.
+subClassOf: ["FinancialProduct"]
+---
+
+# CurrencyConversionService
+
+A service to convert funds from one currency to another currency.
+
+## Type Hierarchy
+
+**CurrencyConversionService**
+
+
+
+## Properties
+
+See [Schema.org CurrencyConversionService properties](https://schema.org/CurrencyConversionService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CurrencyConversionService } from 'schema.org.ai'
+
+// Create a CurrencyConversionService
+const item: CurrencyConversionService = {
+  $type: 'CurrencyConversionService',
+  name: 'Example CurrencyConversionService'
+}
+
+// Use semantic patterns
+await $.CurrencyConversionService.create(item)
+const result = await $.CurrencyConversionService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CurrencyConversionService](https://schema.org/CurrencyConversionService)
+- [CurrencyConversionService Properties](https://schema.org/CurrencyConversionService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

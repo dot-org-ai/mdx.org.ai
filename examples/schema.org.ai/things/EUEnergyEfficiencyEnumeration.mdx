@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EUEnergyEfficiencyEnumeration
+$context: https://schema.org
+$type: Class
+name: EUEnergyEfficiencyEnumeration
+description: Enumerates the EU energy efficiency classes A-G as well as A+, A++, and A+++ as defined in EU directive 2017/1369.
+subClassOf: ["EnergyEfficiencyEnumeration"]
+---
+
+# EUEnergyEfficiencyEnumeration
+
+Enumerates the EU energy efficiency classes A-G as well as A+, A++, and A+++ as defined in EU directive 2017/1369.
+
+## Type Hierarchy
+
+**EUEnergyEfficiencyEnumeration**
+
+
+
+## Properties
+
+See [Schema.org EUEnergyEfficiencyEnumeration properties](https://schema.org/EUEnergyEfficiencyEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EUEnergyEfficiencyEnumeration } from 'schema.org.ai'
+
+// Create a EUEnergyEfficiencyEnumeration
+const item: EUEnergyEfficiencyEnumeration = {
+  $type: 'EUEnergyEfficiencyEnumeration',
+  name: 'Example EUEnergyEfficiencyEnumeration'
+}
+
+// Use semantic patterns
+await $.EUEnergyEfficiencyEnumeration.create(item)
+const result = await $.EUEnergyEfficiencyEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EUEnergyEfficiencyEnumeration](https://schema.org/EUEnergyEfficiencyEnumeration)
+- [EUEnergyEfficiencyEnumeration Properties](https://schema.org/EUEnergyEfficiencyEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

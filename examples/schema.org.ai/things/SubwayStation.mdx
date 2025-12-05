@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SubwayStation
+$context: https://schema.org
+$type: Class
+name: SubwayStation
+description: A subway station.
+subClassOf: ["CivicStructure"]
+---
+
+# SubwayStation
+
+A subway station.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **SubwayStation**
+
+
+
+## Properties
+
+See [Schema.org SubwayStation properties](https://schema.org/SubwayStation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SubwayStation } from 'schema.org.ai'
+
+// Create a SubwayStation
+const item: SubwayStation = {
+  $type: 'SubwayStation',
+  name: 'Example SubwayStation'
+}
+
+// Use semantic patterns
+await $.SubwayStation.create(item)
+const result = await $.SubwayStation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SubwayStation](https://schema.org/SubwayStation)
+- [SubwayStation Properties](https://schema.org/SubwayStation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

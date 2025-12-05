@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Time
+$context: https://schema.org
+$type: Class
+name: Time
+description: A point in time recurring on multiple days in the form hh:mm:ss[Z|(+|-)hh:mm] (see [XML schema for details](http://www.w3.org/TR/xmlschema-2/#time)).
+subClassOf: []
+---
+
+# Time
+
+A point in time recurring on multiple days in the form hh:mm:ss[Z|(+|-)hh:mm] (see [XML schema for details](http://www.w3.org/TR/xmlschema-2/#time)).
+
+## Type Hierarchy
+
+**Time**
+
+
+
+## Properties
+
+See [Schema.org Time properties](https://schema.org/Time#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Time } from 'schema.org.ai'
+
+// Create a Time
+const item: Time = {
+  $type: 'Time',
+  name: 'Example Time'
+}
+
+// Use semantic patterns
+await $.Time.create(item)
+const result = await $.Time.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Time](https://schema.org/Time)
+- [Time Properties](https://schema.org/Time#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

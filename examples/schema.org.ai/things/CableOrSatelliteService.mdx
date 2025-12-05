@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CableOrSatelliteService
+$context: https://schema.org
+$type: Class
+name: CableOrSatelliteService
+description: A service which provides access to media programming like TV or radio. Access may be via cable or satellite.
+subClassOf: ["Service"]
+---
+
+# CableOrSatelliteService
+
+A service which provides access to media programming like TV or radio. Access may be via cable or satellite.
+
+## Type Hierarchy
+
+**CableOrSatelliteService**
+
+
+
+## Properties
+
+See [Schema.org CableOrSatelliteService properties](https://schema.org/CableOrSatelliteService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CableOrSatelliteService } from 'schema.org.ai'
+
+// Create a CableOrSatelliteService
+const item: CableOrSatelliteService = {
+  $type: 'CableOrSatelliteService',
+  name: 'Example CableOrSatelliteService'
+}
+
+// Use semantic patterns
+await $.CableOrSatelliteService.create(item)
+const result = await $.CableOrSatelliteService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CableOrSatelliteService](https://schema.org/CableOrSatelliteService)
+- [CableOrSatelliteService Properties](https://schema.org/CableOrSatelliteService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

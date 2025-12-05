@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Order
+$context: https://schema.org
+$type: Class
+name: Order
+description: An order is a confirmation of a transaction (a receipt), which can contain multiple line items, each represented by an Offer that has been accepted by the customer.
+subClassOf: ["Intangible"]
+---
+
+# Order
+
+An order is a confirmation of a transaction (a receipt), which can contain multiple line items, each represented by an Offer that has been accepted by the customer.
+
+## Type Hierarchy
+
+**Order**
+
+
+
+## Properties
+
+See [Schema.org Order properties](https://schema.org/Order#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Order } from 'schema.org.ai'
+
+// Create a Order
+const item: Order = {
+  $type: 'Order',
+  name: 'Example Order'
+}
+
+// Use semantic patterns
+await $.Order.create(item)
+const result = await $.Order.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Order](https://schema.org/Order)
+- [Order Properties](https://schema.org/Order#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

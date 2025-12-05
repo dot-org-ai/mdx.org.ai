@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BookFormatType
+$context: https://schema.org
+$type: Class
+name: BookFormatType
+description: The publication format of the book.
+subClassOf: ["Enumeration"]
+---
+
+# BookFormatType
+
+The publication format of the book.
+
+## Type Hierarchy
+
+**BookFormatType**
+
+
+
+## Properties
+
+See [Schema.org BookFormatType properties](https://schema.org/BookFormatType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BookFormatType } from 'schema.org.ai'
+
+// Create a BookFormatType
+const item: BookFormatType = {
+  $type: 'BookFormatType',
+  name: 'Example BookFormatType'
+}
+
+// Use semantic patterns
+await $.BookFormatType.create(item)
+const result = await $.BookFormatType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BookFormatType](https://schema.org/BookFormatType)
+- [BookFormatType Properties](https://schema.org/BookFormatType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

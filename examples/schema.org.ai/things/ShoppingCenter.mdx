@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ShoppingCenter
+$context: https://schema.org
+$type: Class
+name: ShoppingCenter
+description: A shopping center or mall.
+subClassOf: ["LocalBusiness"]
+---
+
+# ShoppingCenter
+
+A shopping center or mall.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **ShoppingCenter**
+
+
+
+## Properties
+
+See [Schema.org ShoppingCenter properties](https://schema.org/ShoppingCenter#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ShoppingCenter } from 'schema.org.ai'
+
+// Create a ShoppingCenter
+const item: ShoppingCenter = {
+  $type: 'ShoppingCenter',
+  name: 'Example ShoppingCenter'
+}
+
+// Use semantic patterns
+await $.ShoppingCenter.create(item)
+const result = await $.ShoppingCenter.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ShoppingCenter](https://schema.org/ShoppingCenter)
+- [ShoppingCenter Properties](https://schema.org/ShoppingCenter#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

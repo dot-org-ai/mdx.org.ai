@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Sculpture
+$context: https://schema.org
+$type: Class
+name: Sculpture
+description: A piece of sculpture.
+subClassOf: ["CreativeWork"]
+---
+
+# Sculpture
+
+A piece of sculpture.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Sculpture**
+
+
+
+## Properties
+
+See [Schema.org Sculpture properties](https://schema.org/Sculpture#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Sculpture } from 'schema.org.ai'
+
+// Create a Sculpture
+const item: Sculpture = {
+  $type: 'Sculpture',
+  name: 'Example Sculpture'
+}
+
+// Use semantic patterns
+await $.Sculpture.create(item)
+const result = await $.Sculpture.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Sculpture](https://schema.org/Sculpture)
+- [Sculpture Properties](https://schema.org/Sculpture#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HealthPlanFormulary
+$context: https://schema.org
+$type: Class
+name: HealthPlanFormulary
+description: For a given health insurance plan, the specification for costs and coverage of prescription drugs.
+subClassOf: ["Intangible"]
+---
+
+# HealthPlanFormulary
+
+For a given health insurance plan, the specification for costs and coverage of prescription drugs.
+
+## Type Hierarchy
+
+**HealthPlanFormulary**
+
+
+
+## Properties
+
+See [Schema.org HealthPlanFormulary properties](https://schema.org/HealthPlanFormulary#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HealthPlanFormulary } from 'schema.org.ai'
+
+// Create a HealthPlanFormulary
+const item: HealthPlanFormulary = {
+  $type: 'HealthPlanFormulary',
+  name: 'Example HealthPlanFormulary'
+}
+
+// Use semantic patterns
+await $.HealthPlanFormulary.create(item)
+const result = await $.HealthPlanFormulary.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HealthPlanFormulary](https://schema.org/HealthPlanFormulary)
+- [HealthPlanFormulary Properties](https://schema.org/HealthPlanFormulary#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

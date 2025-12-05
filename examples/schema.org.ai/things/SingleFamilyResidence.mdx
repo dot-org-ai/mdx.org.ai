@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SingleFamilyResidence
+$context: https://schema.org
+$type: Class
+name: SingleFamilyResidence
+description: Residence type: Single-family home.
+subClassOf: ["House"]
+---
+
+# SingleFamilyResidence
+
+Residence type: Single-family home.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Accommodation](Accommodation.mdx) > [House](House.mdx) > **SingleFamilyResidence**
+
+
+
+## Properties
+
+See [Schema.org SingleFamilyResidence properties](https://schema.org/SingleFamilyResidence#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SingleFamilyResidence } from 'schema.org.ai'
+
+// Create a SingleFamilyResidence
+const item: SingleFamilyResidence = {
+  $type: 'SingleFamilyResidence',
+  name: 'Example SingleFamilyResidence'
+}
+
+// Use semantic patterns
+await $.SingleFamilyResidence.create(item)
+const result = await $.SingleFamilyResidence.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SingleFamilyResidence](https://schema.org/SingleFamilyResidence)
+- [SingleFamilyResidence Properties](https://schema.org/SingleFamilyResidence#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

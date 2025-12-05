@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/EventReservation
+$context: https://schema.org
+$type: Class
+name: EventReservation
+description: A reservation for an event like a concert, sporting event, or lecture.\
+subClassOf: ["Reservation"]
+---
+
+# EventReservation
+
+A reservation for an event like a concert, sporting event, or lecture.\
+\
+Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, use [[Offer]].
+
+## Type Hierarchy
+
+**EventReservation**
+
+
+
+## Properties
+
+See [Schema.org EventReservation properties](https://schema.org/EventReservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EventReservation } from 'schema.org.ai'
+
+// Create a EventReservation
+const item: EventReservation = {
+  $type: 'EventReservation',
+  name: 'Example EventReservation'
+}
+
+// Use semantic patterns
+await $.EventReservation.create(item)
+const result = await $.EventReservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EventReservation](https://schema.org/EventReservation)
+- [EventReservation Properties](https://schema.org/EventReservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

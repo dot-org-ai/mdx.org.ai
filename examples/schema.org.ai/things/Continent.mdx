@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Continent
+$context: https://schema.org
+$type: Class
+name: Continent
+description: One of the continents (for example, Europe or Africa).
+subClassOf: ["Landform"]
+---
+
+# Continent
+
+One of the continents (for example, Europe or Africa).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > **Continent**
+
+
+
+## Properties
+
+See [Schema.org Continent properties](https://schema.org/Continent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Continent } from 'schema.org.ai'
+
+// Create a Continent
+const item: Continent = {
+  $type: 'Continent',
+  name: 'Example Continent'
+}
+
+// Use semantic patterns
+await $.Continent.create(item)
+const result = await $.Continent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Continent](https://schema.org/Continent)
+- [Continent Properties](https://schema.org/Continent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

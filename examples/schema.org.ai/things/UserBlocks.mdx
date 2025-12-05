@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UserBlocks
+$context: https://schema.org
+$type: Class
+name: UserBlocks
+description: UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+subClassOf: ["UserInteraction"]
+---
+
+# UserBlocks
+
+UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [UserInteraction](UserInteraction.mdx) > **UserBlocks**
+
+
+
+## Properties
+
+See [Schema.org UserBlocks properties](https://schema.org/UserBlocks#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserBlocks } from 'schema.org.ai'
+
+// Create a UserBlocks
+const item: UserBlocks = {
+  $type: 'UserBlocks',
+  name: 'Example UserBlocks'
+}
+
+// Use semantic patterns
+await $.UserBlocks.create(item)
+const result = await $.UserBlocks.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserBlocks](https://schema.org/UserBlocks)
+- [UserBlocks Properties](https://schema.org/UserBlocks#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OrderItem
+$context: https://schema.org
+$type: Class
+name: OrderItem
+description: An order item is a line of an order. It includes the quantity and shipping details of a bought offer.
+subClassOf: ["Intangible"]
+---
+
+# OrderItem
+
+An order item is a line of an order. It includes the quantity and shipping details of a bought offer.
+
+## Type Hierarchy
+
+**OrderItem**
+
+
+
+## Properties
+
+See [Schema.org OrderItem properties](https://schema.org/OrderItem#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OrderItem } from 'schema.org.ai'
+
+// Create a OrderItem
+const item: OrderItem = {
+  $type: 'OrderItem',
+  name: 'Example OrderItem'
+}
+
+// Use semantic patterns
+await $.OrderItem.create(item)
+const result = await $.OrderItem.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OrderItem](https://schema.org/OrderItem)
+- [OrderItem Properties](https://schema.org/OrderItem#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

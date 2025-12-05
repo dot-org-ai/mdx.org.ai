@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LegislationObject
+$context: https://schema.org
+$type: Class
+name: LegislationObject
+description: A specific object or file containing a Legislation. Note that the same Legislation can be published in multiple files. For example, a digitally signed PDF, a plain PDF and an HTML version.
+subClassOf: ["Legislation","MediaObject"]
+---
+
+# LegislationObject
+
+A specific object or file containing a Legislation. Note that the same Legislation can be published in multiple files. For example, a digitally signed PDF, a plain PDF and an HTML version.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Legislation](Legislation.mdx) > **LegislationObject**
+
+
+
+## Properties
+
+See [Schema.org LegislationObject properties](https://schema.org/LegislationObject#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LegislationObject } from 'schema.org.ai'
+
+// Create a LegislationObject
+const item: LegislationObject = {
+  $type: 'LegislationObject',
+  name: 'Example LegislationObject'
+}
+
+// Use semantic patterns
+await $.LegislationObject.create(item)
+const result = await $.LegislationObject.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LegislationObject](https://schema.org/LegislationObject)
+- [LegislationObject Properties](https://schema.org/LegislationObject#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

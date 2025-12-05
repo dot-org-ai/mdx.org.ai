@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/VirtualLocation
+$context: https://schema.org
+$type: Class
+name: VirtualLocation
+description: An online or virtual location for attending events. For example, one may attend an online seminar or educational event. While a virtual location may be used as the location of an event, virtual locations should not be confused with physical locations in the real world.
+subClassOf: ["Intangible"]
+---
+
+# VirtualLocation
+
+An online or virtual location for attending events. For example, one may attend an online seminar or educational event. While a virtual location may be used as the location of an event, virtual locations should not be confused with physical locations in the real world.
+
+## Type Hierarchy
+
+**VirtualLocation**
+
+
+
+## Properties
+
+See [Schema.org VirtualLocation properties](https://schema.org/VirtualLocation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { VirtualLocation } from 'schema.org.ai'
+
+// Create a VirtualLocation
+const item: VirtualLocation = {
+  $type: 'VirtualLocation',
+  name: 'Example VirtualLocation'
+}
+
+// Use semantic patterns
+await $.VirtualLocation.create(item)
+const result = await $.VirtualLocation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org VirtualLocation](https://schema.org/VirtualLocation)
+- [VirtualLocation Properties](https://schema.org/VirtualLocation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

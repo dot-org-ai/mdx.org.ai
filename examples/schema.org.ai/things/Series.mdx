@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/Series
+$context: https://schema.org
+$type: Class
+name: Series
+description: A Series in schema.org is a group of related items, typically but not necessarily of the same kind. See also [[CreativeWorkSeries]], [[EventSeries]].
+subClassOf: ["Intangible"]
+---
+
+# Series
+
+A Series in schema.org is a group of related items, typically but not necessarily of the same kind. See also [[CreativeWorkSeries]], [[EventSeries]].
+
+## Type Hierarchy
+
+**Series**
+
+## Direct Subclasses
+
+- **[CreativeWorkSeries](CreativeWorkSeries.mdx)**: A CreativeWorkSeries in schema
+- **[EventSeries](EventSeries.mdx)**: A series of [[Event]]s
+
+## Properties
+
+See [Schema.org Series properties](https://schema.org/Series#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Series } from 'schema.org.ai'
+
+// Create a Series
+const item: Series = {
+  $type: 'Series',
+  name: 'Example Series'
+}
+
+// Use semantic patterns
+await $.Series.create(item)
+const result = await $.Series.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Series](https://schema.org/Series)
+- [Series Properties](https://schema.org/Series#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

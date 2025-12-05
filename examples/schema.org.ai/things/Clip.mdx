@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/Clip
+$context: https://schema.org
+$type: Class
+name: Clip
+description: A short TV or radio program or a segment/part of a program.
+subClassOf: ["CreativeWork"]
+---
+
+# Clip
+
+A short TV or radio program or a segment/part of a program.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Clip**
+
+## Direct Subclasses
+
+- **[MovieClip](MovieClip.mdx)**: A short segment/part of a movie
+- **[RadioClip](RadioClip.mdx)**: A short radio program or a segment/part of a radio program
+- **[TVClip](TVClip.mdx)**: A short TV program or a segment/part of a TV program
+- **[VideoGameClip](VideoGameClip.mdx)**: A short segment/part of a video game
+
+## Properties
+
+See [Schema.org Clip properties](https://schema.org/Clip#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Clip } from 'schema.org.ai'
+
+// Create a Clip
+const item: Clip = {
+  $type: 'Clip',
+  name: 'Example Clip'
+}
+
+// Use semantic patterns
+await $.Clip.create(item)
+const result = await $.Clip.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Clip](https://schema.org/Clip)
+- [Clip Properties](https://schema.org/Clip#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OccupationalTherapy
+$context: https://schema.org
+$type: Class
+name: OccupationalTherapy
+description: A treatment of people with physical, emotional, or social problems, using purposeful activity to help them overcome or learn to deal with their problems.
+subClassOf: ["MedicalTherapy"]
+---
+
+# OccupationalTherapy
+
+A treatment of people with physical, emotional, or social problems, using purposeful activity to help them overcome or learn to deal with their problems.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalProcedure](MedicalProcedure.mdx) > [TherapeuticProcedure](TherapeuticProcedure.mdx) > [MedicalTherapy](MedicalTherapy.mdx) > **OccupationalTherapy**
+
+
+
+## Properties
+
+See [Schema.org OccupationalTherapy properties](https://schema.org/OccupationalTherapy#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OccupationalTherapy } from 'schema.org.ai'
+
+// Create a OccupationalTherapy
+const item: OccupationalTherapy = {
+  $type: 'OccupationalTherapy',
+  name: 'Example OccupationalTherapy'
+}
+
+// Use semantic patterns
+await $.OccupationalTherapy.create(item)
+const result = await $.OccupationalTherapy.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OccupationalTherapy](https://schema.org/OccupationalTherapy)
+- [OccupationalTherapy Properties](https://schema.org/OccupationalTherapy#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

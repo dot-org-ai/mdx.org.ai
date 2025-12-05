@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SportingGoodsStore
+$context: https://schema.org
+$type: Class
+name: SportingGoodsStore
+description: A sporting goods store.
+subClassOf: ["Store"]
+---
+
+# SportingGoodsStore
+
+A sporting goods store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **SportingGoodsStore**
+
+
+
+## Properties
+
+See [Schema.org SportingGoodsStore properties](https://schema.org/SportingGoodsStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SportingGoodsStore } from 'schema.org.ai'
+
+// Create a SportingGoodsStore
+const item: SportingGoodsStore = {
+  $type: 'SportingGoodsStore',
+  name: 'Example SportingGoodsStore'
+}
+
+// Use semantic patterns
+await $.SportingGoodsStore.create(item)
+const result = await $.SportingGoodsStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SportingGoodsStore](https://schema.org/SportingGoodsStore)
+- [SportingGoodsStore Properties](https://schema.org/SportingGoodsStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

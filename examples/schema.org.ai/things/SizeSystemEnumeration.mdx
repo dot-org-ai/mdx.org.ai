@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/SizeSystemEnumeration
+$context: https://schema.org
+$type: Class
+name: SizeSystemEnumeration
+description: Enumerates common size systems for different categories of products, for example "EN-13402" or "UK" for wearables or "Imperial" for screws.
+subClassOf: ["Enumeration"]
+---
+
+# SizeSystemEnumeration
+
+Enumerates common size systems for different categories of products, for example "EN-13402" or "UK" for wearables or "Imperial" for screws.
+
+## Type Hierarchy
+
+**SizeSystemEnumeration**
+
+## Direct Subclasses
+
+- **[WearableSizeSystemEnumeration](WearableSizeSystemEnumeration.mdx)**: Enumerates common size systems specific for wearable products
+
+## Properties
+
+See [Schema.org SizeSystemEnumeration properties](https://schema.org/SizeSystemEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SizeSystemEnumeration } from 'schema.org.ai'
+
+// Create a SizeSystemEnumeration
+const item: SizeSystemEnumeration = {
+  $type: 'SizeSystemEnumeration',
+  name: 'Example SizeSystemEnumeration'
+}
+
+// Use semantic patterns
+await $.SizeSystemEnumeration.create(item)
+const result = await $.SizeSystemEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SizeSystemEnumeration](https://schema.org/SizeSystemEnumeration)
+- [SizeSystemEnumeration Properties](https://schema.org/SizeSystemEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

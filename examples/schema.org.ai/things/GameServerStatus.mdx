@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GameServerStatus
+$context: https://schema.org
+$type: Class
+name: GameServerStatus
+description: Status of a game server.
+subClassOf: ["StatusEnumeration"]
+---
+
+# GameServerStatus
+
+Status of a game server.
+
+## Type Hierarchy
+
+**GameServerStatus**
+
+
+
+## Properties
+
+See [Schema.org GameServerStatus properties](https://schema.org/GameServerStatus#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GameServerStatus } from 'schema.org.ai'
+
+// Create a GameServerStatus
+const item: GameServerStatus = {
+  $type: 'GameServerStatus',
+  name: 'Example GameServerStatus'
+}
+
+// Use semantic patterns
+await $.GameServerStatus.create(item)
+const result = await $.GameServerStatus.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GameServerStatus](https://schema.org/GameServerStatus)
+- [GameServerStatus Properties](https://schema.org/GameServerStatus#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

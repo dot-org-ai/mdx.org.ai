@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Preschool
+$context: https://schema.org
+$type: Class
+name: Preschool
+description: A preschool.
+subClassOf: ["EducationalOrganization"]
+---
+
+# Preschool
+
+A preschool.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [EducationalOrganization](EducationalOrganization.mdx) > **Preschool**
+
+
+
+## Properties
+
+See [Schema.org Preschool properties](https://schema.org/Preschool#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Preschool } from 'schema.org.ai'
+
+// Create a Preschool
+const item: Preschool = {
+  $type: 'Preschool',
+  name: 'Example Preschool'
+}
+
+// Use semantic patterns
+await $.Preschool.create(item)
+const result = await $.Preschool.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Preschool](https://schema.org/Preschool)
+- [Preschool Properties](https://schema.org/Preschool#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

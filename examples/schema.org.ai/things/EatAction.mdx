@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EatAction
+$context: https://schema.org
+$type: Class
+name: EatAction
+description: The act of swallowing solid objects.
+subClassOf: ["ConsumeAction"]
+---
+
+# EatAction
+
+The act of swallowing solid objects.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > **EatAction**
+
+
+
+## Properties
+
+See [Schema.org EatAction properties](https://schema.org/EatAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EatAction } from 'schema.org.ai'
+
+// Create a EatAction
+const item: EatAction = {
+  $type: 'EatAction',
+  name: 'Example EatAction'
+}
+
+// Use semantic patterns
+await $.EatAction.create(item)
+const result = await $.EatAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EatAction](https://schema.org/EatAction)
+- [EatAction Properties](https://schema.org/EatAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

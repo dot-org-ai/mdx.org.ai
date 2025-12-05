@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AboutPage
+$context: https://schema.org
+$type: Class
+name: AboutPage
+description: Web page type: About page.
+subClassOf: ["WebPage"]
+---
+
+# AboutPage
+
+Web page type: About page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **AboutPage**
+
+
+
+## Properties
+
+See [Schema.org AboutPage properties](https://schema.org/AboutPage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AboutPage } from 'schema.org.ai'
+
+// Create a AboutPage
+const item: AboutPage = {
+  $type: 'AboutPage',
+  name: 'Example AboutPage'
+}
+
+// Use semantic patterns
+await $.AboutPage.create(item)
+const result = await $.AboutPage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AboutPage](https://schema.org/AboutPage)
+- [AboutPage Properties](https://schema.org/AboutPage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

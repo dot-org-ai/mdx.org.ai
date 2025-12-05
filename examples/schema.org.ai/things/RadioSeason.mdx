@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RadioSeason
+$context: https://schema.org
+$type: Class
+name: RadioSeason
+description: Season dedicated to radio broadcast and associated online delivery.
+subClassOf: ["CreativeWorkSeason"]
+---
+
+# RadioSeason
+
+Season dedicated to radio broadcast and associated online delivery.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [CreativeWorkSeason](CreativeWorkSeason.mdx) > **RadioSeason**
+
+
+
+## Properties
+
+See [Schema.org RadioSeason properties](https://schema.org/RadioSeason#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RadioSeason } from 'schema.org.ai'
+
+// Create a RadioSeason
+const item: RadioSeason = {
+  $type: 'RadioSeason',
+  name: 'Example RadioSeason'
+}
+
+// Use semantic patterns
+await $.RadioSeason.create(item)
+const result = await $.RadioSeason.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RadioSeason](https://schema.org/RadioSeason)
+- [RadioSeason Properties](https://schema.org/RadioSeason#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TreatmentIndication
+$context: https://schema.org
+$type: Class
+name: TreatmentIndication
+description: An indication for treating an underlying condition, symptom, etc.
+subClassOf: ["MedicalIndication"]
+---
+
+# TreatmentIndication
+
+An indication for treating an underlying condition, symptom, etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalIndication](MedicalIndication.mdx) > **TreatmentIndication**
+
+
+
+## Properties
+
+See [Schema.org TreatmentIndication properties](https://schema.org/TreatmentIndication#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TreatmentIndication } from 'schema.org.ai'
+
+// Create a TreatmentIndication
+const item: TreatmentIndication = {
+  $type: 'TreatmentIndication',
+  name: 'Example TreatmentIndication'
+}
+
+// Use semantic patterns
+await $.TreatmentIndication.create(item)
+const result = await $.TreatmentIndication.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TreatmentIndication](https://schema.org/TreatmentIndication)
+- [TreatmentIndication Properties](https://schema.org/TreatmentIndication#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/CreativeWorkSeason
+$context: https://schema.org
+$type: Class
+name: CreativeWorkSeason
+description: A media season, e.g. TV, radio, video game etc.
+subClassOf: ["CreativeWork"]
+---
+
+# CreativeWorkSeason
+
+A media season, e.g. TV, radio, video game etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **CreativeWorkSeason**
+
+## Direct Subclasses
+
+- **[PodcastSeason](PodcastSeason.mdx)**: A single season of a podcast
+- **[RadioSeason](RadioSeason.mdx)**: Season dedicated to radio broadcast and associated online delivery
+- **[TVSeason](TVSeason.mdx)**: Season dedicated to TV broadcast and associated online delivery
+
+## Properties
+
+See [Schema.org CreativeWorkSeason properties](https://schema.org/CreativeWorkSeason#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CreativeWorkSeason } from 'schema.org.ai'
+
+// Create a CreativeWorkSeason
+const item: CreativeWorkSeason = {
+  $type: 'CreativeWorkSeason',
+  name: 'Example CreativeWorkSeason'
+}
+
+// Use semantic patterns
+await $.CreativeWorkSeason.create(item)
+const result = await $.CreativeWorkSeason.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CreativeWorkSeason](https://schema.org/CreativeWorkSeason)
+- [CreativeWorkSeason Properties](https://schema.org/CreativeWorkSeason#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

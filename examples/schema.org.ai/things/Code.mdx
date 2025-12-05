@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Code
+$context: https://schema.org
+$type: Class
+name: Code
+description: Computer programming source code. Example: Full (compile ready) solutions, code snippet samples, scripts, templates.
+subClassOf: ["CreativeWork"]
+---
+
+# Code
+
+Computer programming source code. Example: Full (compile ready) solutions, code snippet samples, scripts, templates.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Code**
+
+
+
+## Properties
+
+See [Schema.org Code properties](https://schema.org/Code#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Code } from 'schema.org.ai'
+
+// Create a Code
+const item: Code = {
+  $type: 'Code',
+  name: 'Example Code'
+}
+
+// Use semantic patterns
+await $.Code.create(item)
+const result = await $.Code.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Code](https://schema.org/Code)
+- [Code Properties](https://schema.org/Code#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

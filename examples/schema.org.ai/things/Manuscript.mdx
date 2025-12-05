@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Manuscript
+$context: https://schema.org
+$type: Class
+name: Manuscript
+description: A book, document, or piece of music written by hand rather than typed or printed.
+subClassOf: ["CreativeWork"]
+---
+
+# Manuscript
+
+A book, document, or piece of music written by hand rather than typed or printed.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Manuscript**
+
+
+
+## Properties
+
+See [Schema.org Manuscript properties](https://schema.org/Manuscript#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Manuscript } from 'schema.org.ai'
+
+// Create a Manuscript
+const item: Manuscript = {
+  $type: 'Manuscript',
+  name: 'Example Manuscript'
+}
+
+// Use semantic patterns
+await $.Manuscript.create(item)
+const result = await $.Manuscript.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Manuscript](https://schema.org/Manuscript)
+- [Manuscript Properties](https://schema.org/Manuscript#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

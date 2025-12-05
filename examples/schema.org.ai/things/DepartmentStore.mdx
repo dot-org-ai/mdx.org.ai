@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DepartmentStore
+$context: https://schema.org
+$type: Class
+name: DepartmentStore
+description: A department store.
+subClassOf: ["Store"]
+---
+
+# DepartmentStore
+
+A department store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **DepartmentStore**
+
+
+
+## Properties
+
+See [Schema.org DepartmentStore properties](https://schema.org/DepartmentStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DepartmentStore } from 'schema.org.ai'
+
+// Create a DepartmentStore
+const item: DepartmentStore = {
+  $type: 'DepartmentStore',
+  name: 'Example DepartmentStore'
+}
+
+// Use semantic patterns
+await $.DepartmentStore.create(item)
+const result = await $.DepartmentStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DepartmentStore](https://schema.org/DepartmentStore)
+- [DepartmentStore Properties](https://schema.org/DepartmentStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

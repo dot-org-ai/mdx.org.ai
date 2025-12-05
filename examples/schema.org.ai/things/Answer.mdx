@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Answer
+$context: https://schema.org
+$type: Class
+name: Answer
+description: An answer offered to a question; perhaps correct, perhaps opinionated or wrong.
+subClassOf: ["Comment"]
+---
+
+# Answer
+
+An answer offered to a question; perhaps correct, perhaps opinionated or wrong.
+
+## Type Hierarchy
+
+**Answer**
+
+
+
+## Properties
+
+See [Schema.org Answer properties](https://schema.org/Answer#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Answer } from 'schema.org.ai'
+
+// Create a Answer
+const item: Answer = {
+  $type: 'Answer',
+  name: 'Example Answer'
+}
+
+// Use semantic patterns
+await $.Answer.create(item)
+const result = await $.Answer.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Answer](https://schema.org/Answer)
+- [Answer Properties](https://schema.org/Answer#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

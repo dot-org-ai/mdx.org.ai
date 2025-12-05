@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WearableSizeGroupEnumeration
+$context: https://schema.org
+$type: Class
+name: WearableSizeGroupEnumeration
+description: Enumerates common size groups (also known as "size types") for wearable products.
+subClassOf: ["SizeGroupEnumeration"]
+---
+
+# WearableSizeGroupEnumeration
+
+Enumerates common size groups (also known as "size types") for wearable products.
+
+## Type Hierarchy
+
+**WearableSizeGroupEnumeration**
+
+
+
+## Properties
+
+See [Schema.org WearableSizeGroupEnumeration properties](https://schema.org/WearableSizeGroupEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WearableSizeGroupEnumeration } from 'schema.org.ai'
+
+// Create a WearableSizeGroupEnumeration
+const item: WearableSizeGroupEnumeration = {
+  $type: 'WearableSizeGroupEnumeration',
+  name: 'Example WearableSizeGroupEnumeration'
+}
+
+// Use semantic patterns
+await $.WearableSizeGroupEnumeration.create(item)
+const result = await $.WearableSizeGroupEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WearableSizeGroupEnumeration](https://schema.org/WearableSizeGroupEnumeration)
+- [WearableSizeGroupEnumeration Properties](https://schema.org/WearableSizeGroupEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

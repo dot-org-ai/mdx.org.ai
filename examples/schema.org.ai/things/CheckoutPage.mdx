@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CheckoutPage
+$context: https://schema.org
+$type: Class
+name: CheckoutPage
+description: Web page type: Checkout page.
+subClassOf: ["WebPage"]
+---
+
+# CheckoutPage
+
+Web page type: Checkout page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **CheckoutPage**
+
+
+
+## Properties
+
+See [Schema.org CheckoutPage properties](https://schema.org/CheckoutPage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CheckoutPage } from 'schema.org.ai'
+
+// Create a CheckoutPage
+const item: CheckoutPage = {
+  $type: 'CheckoutPage',
+  name: 'Example CheckoutPage'
+}
+
+// Use semantic patterns
+await $.CheckoutPage.create(item)
+const result = await $.CheckoutPage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CheckoutPage](https://schema.org/CheckoutPage)
+- [CheckoutPage Properties](https://schema.org/CheckoutPage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

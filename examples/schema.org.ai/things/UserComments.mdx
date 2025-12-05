@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UserComments
+$context: https://schema.org
+$type: Class
+name: UserComments
+description: UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+subClassOf: ["UserInteraction"]
+---
+
+# UserComments
+
+UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [UserInteraction](UserInteraction.mdx) > **UserComments**
+
+
+
+## Properties
+
+See [Schema.org UserComments properties](https://schema.org/UserComments#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserComments } from 'schema.org.ai'
+
+// Create a UserComments
+const item: UserComments = {
+  $type: 'UserComments',
+  name: 'Example UserComments'
+}
+
+// Use semantic patterns
+await $.UserComments.create(item)
+const result = await $.UserComments.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserComments](https://schema.org/UserComments)
+- [UserComments Properties](https://schema.org/UserComments#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

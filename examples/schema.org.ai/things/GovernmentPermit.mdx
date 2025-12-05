@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GovernmentPermit
+$context: https://schema.org
+$type: Class
+name: GovernmentPermit
+description: A permit issued by a government agency.
+subClassOf: ["Permit"]
+---
+
+# GovernmentPermit
+
+A permit issued by a government agency.
+
+## Type Hierarchy
+
+**GovernmentPermit**
+
+
+
+## Properties
+
+See [Schema.org GovernmentPermit properties](https://schema.org/GovernmentPermit#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GovernmentPermit } from 'schema.org.ai'
+
+// Create a GovernmentPermit
+const item: GovernmentPermit = {
+  $type: 'GovernmentPermit',
+  name: 'Example GovernmentPermit'
+}
+
+// Use semantic patterns
+await $.GovernmentPermit.create(item)
+const result = await $.GovernmentPermit.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GovernmentPermit](https://schema.org/GovernmentPermit)
+- [GovernmentPermit Properties](https://schema.org/GovernmentPermit#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

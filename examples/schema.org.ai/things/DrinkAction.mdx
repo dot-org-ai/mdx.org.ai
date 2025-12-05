@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DrinkAction
+$context: https://schema.org
+$type: Class
+name: DrinkAction
+description: The act of swallowing liquids.
+subClassOf: ["ConsumeAction"]
+---
+
+# DrinkAction
+
+The act of swallowing liquids.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > **DrinkAction**
+
+
+
+## Properties
+
+See [Schema.org DrinkAction properties](https://schema.org/DrinkAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DrinkAction } from 'schema.org.ai'
+
+// Create a DrinkAction
+const item: DrinkAction = {
+  $type: 'DrinkAction',
+  name: 'Example DrinkAction'
+}
+
+// Use semantic patterns
+await $.DrinkAction.create(item)
+const result = await $.DrinkAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DrinkAction](https://schema.org/DrinkAction)
+- [DrinkAction Properties](https://schema.org/DrinkAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

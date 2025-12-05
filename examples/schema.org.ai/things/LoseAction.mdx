@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LoseAction
+$context: https://schema.org
+$type: Class
+name: LoseAction
+description: The act of being defeated in a competitive activity.
+subClassOf: ["AchieveAction"]
+---
+
+# LoseAction
+
+The act of being defeated in a competitive activity.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [AchieveAction](AchieveAction.mdx) > **LoseAction**
+
+
+
+## Properties
+
+See [Schema.org LoseAction properties](https://schema.org/LoseAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LoseAction } from 'schema.org.ai'
+
+// Create a LoseAction
+const item: LoseAction = {
+  $type: 'LoseAction',
+  name: 'Example LoseAction'
+}
+
+// Use semantic patterns
+await $.LoseAction.create(item)
+const result = await $.LoseAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LoseAction](https://schema.org/LoseAction)
+- [LoseAction Properties](https://schema.org/LoseAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

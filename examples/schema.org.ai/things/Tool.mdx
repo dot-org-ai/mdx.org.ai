@@ -1,0 +1,283 @@
+---
+$id: https://schema.org.ai/Tool
+$context: https://schema.org.ai
+$type: Class
+name: Tool
+description: A tool, API, function, or service that can be used by agents to accomplish tasks and extend their capabilities.
+subClassOf:
+  - https://schema.org/Thing
+digital: 1.0
+---
+
+[Thing](Thing.mdx)
+
+# Tool
+
+A tool, API, function, or service that can be used by agents to accomplish tasks and extend their capabilities. Tools enable agents to interact with external systems, perform computations, access data, and execute actions beyond their base model capabilities.
+
+## Properties
+
+| Property | Type | Description | Inherited From |
+|----------|------|-------------|----------------|
+| `$type` | Text | Always "Tool" | - |
+| `$id` | URL | Unique identifier for the tool | Thing |
+| `name` | Text | The name of the tool | Thing |
+| `description` | Text | Description of what the tool does | Thing |
+| `identifier` | Text or PropertyValue | An identifier for the tool | Thing |
+| `url` | URL | URL endpoint for the tool | Thing |
+| `image` | URL or ImageObject | Icon or image representing the tool | Thing |
+| `digital` | Number (0.0-1.0) | Digital maturity score (1.0 for digital tools) | Thing |
+| `function` | Text or Function | The function or method signature | Tool |
+| `parameters` | PropertyValue[] | Input parameters the tool accepts | Tool |
+| `returns` | PropertyValue | Return value specification | Tool |
+| `api` | API | The API providing this tool | Tool |
+| `authentication` | Text | Authentication method required | Tool |
+| `rateLimit` | QuantitativeValue | Rate limiting constraints | Tool |
+| `creator` | Person or Organization | The entity that created the tool | Thing |
+
+## Types
+
+The following types extend Tool:
+
+- **APITool**: Tools exposed via API endpoints
+- **FunctionTool**: Direct function calls
+- **MCPTool**: Tools provided via Model Context Protocol
+- **DatabaseTool**: Database query and manipulation tools
+- **SearchTool**: Search and retrieval tools
+
+## Examples
+
+### Example 1: GitHub API Tool
+
+```typescript
+import { $ } from 'sdk.do'
+
+const githubTool = {
+  $type: 'Tool',
+  $id: 'https://api.github.com/tools/create-issue',
+  name: 'Create GitHub Issue',
+  description: 'Creates a new issue in a GitHub repository',
+  digital: 1.0,
+  url: 'https://api.github.com/repos/{owner}/{repo}/issues',
+  function: 'createIssue',
+  parameters: [
+    {
+      $type: 'PropertyValue',
+      name: 'owner',
+      description: 'Repository owner username',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'repo',
+      description: 'Repository name',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'title',
+      description: 'Issue title',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'body',
+      description: 'Issue description',
+      valueRequired: false,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'labels',
+      description: 'Issue labels',
+      valueRequired: false,
+      valueType: 'Text[]'
+    }
+  ],
+  returns: {
+    $type: 'PropertyValue',
+    name: 'issue',
+    description: 'Created issue object',
+    valueType: 'Issue'
+  },
+  authentication: 'Bearer token',
+  rateLimit: {
+    $type: 'QuantitativeValue',
+    value: 5000,
+    unitText: 'requests per hour'
+  },
+  api: {
+    $type: 'API',
+    name: 'GitHub REST API',
+    url: 'https://api.github.com'
+  }
+}
+
+await $.Tool.create(githubTool)
+```
+
+### Example 2: Database Query Tool
+
+```typescript
+import { $ } from 'sdk.do'
+
+const databaseTool = {
+  $type: 'Tool',
+  $id: 'https://platform.do/tools/query-database',
+  name: 'Query Database',
+  description: 'Executes SQL queries against the platform database',
+  digital: 1.0,
+  function: 'executeQuery',
+  parameters: [
+    {
+      $type: 'PropertyValue',
+      name: 'query',
+      description: 'SQL query to execute',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'params',
+      description: 'Query parameters',
+      valueRequired: false,
+      valueType: 'Object'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'timeout',
+      description: 'Query timeout in milliseconds',
+      valueRequired: false,
+      valueType: 'Number',
+      defaultValue: 5000
+    }
+  ],
+  returns: {
+    $type: 'PropertyValue',
+    name: 'results',
+    description: 'Query results as array of objects',
+    valueType: 'Object[]'
+  },
+  authentication: 'API key',
+  rateLimit: {
+    $type: 'QuantitativeValue',
+    value: 1000,
+    unitText: 'queries per minute'
+  }
+}
+
+await $.Tool.create(databaseTool)
+```
+
+### Example 3: Web Search Tool
+
+```typescript
+import { $ } from 'sdk.do'
+
+const searchTool = {
+  $type: 'Tool',
+  $id: 'https://search.do/tools/web-search',
+  name: 'Web Search',
+  description: 'Searches the web and returns relevant results',
+  digital: 1.0,
+  url: 'https://api.search.do/search',
+  function: 'search',
+  parameters: [
+    {
+      $type: 'PropertyValue',
+      name: 'query',
+      description: 'Search query',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'limit',
+      description: 'Maximum number of results',
+      valueRequired: false,
+      valueType: 'Number',
+      defaultValue: 10
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'domains',
+      description: 'Restrict search to specific domains',
+      valueRequired: false,
+      valueType: 'Text[]'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'dateRange',
+      description: 'Filter by date range',
+      valueRequired: false,
+      valueType: 'Text'
+    }
+  ],
+  returns: {
+    $type: 'PropertyValue',
+    name: 'results',
+    description: 'Array of search results with title, url, snippet',
+    valueType: 'SearchResult[]'
+  },
+  authentication: 'API key',
+  rateLimit: {
+    $type: 'QuantitativeValue',
+    value: 100,
+    unitText: 'searches per day'
+  },
+  creator: {
+    $type: 'Organization',
+    name: '.do Platform Team',
+    url: 'https://platform.do'
+  }
+}
+
+await $.Tool.create(searchTool)
+```
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Tool, Agent } from 'schema.org.ai'
+
+// Create a tool
+const tool: Tool = {
+  $type: 'Tool',
+  $id: 'https://myapp.do/tools/my-tool',
+  name: 'My Custom Tool',
+  description: 'A tool that does something useful',
+  digital: 1.0,
+  function: 'executeAction'
+}
+
+await $.Tool.create(tool)
+
+// Assign tool to an agent
+const agent: Agent = {
+  $type: 'Agent',
+  $id: 'https://MyAgent.do',
+  name: 'My Agent',
+  tool: [tool]
+}
+
+await $.Agent.create(agent)
+
+// Query tools by capability
+const apiTools = await $.Tool.find({
+  api: { $exists: true }
+})
+```
+
+## Resources
+
+- [Schema.org Thing](https://schema.org/Thing)
+- [MCP Tools Documentation](https://docs.platform.do/mcp/tools)
+- [Function Calling with AI](https://docs.platform.do/agents/function-calling)
+
+## License
+
+This is an extension to Schema.org vocabulary created by the .do Platform Team. The base Schema.org vocabulary is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

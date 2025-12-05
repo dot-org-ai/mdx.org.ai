@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SheetMusic
+$context: https://schema.org
+$type: Class
+name: SheetMusic
+description: Printed music, as opposed to performed or recorded music.
+subClassOf: ["CreativeWork"]
+---
+
+# SheetMusic
+
+Printed music, as opposed to performed or recorded music.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **SheetMusic**
+
+
+
+## Properties
+
+See [Schema.org SheetMusic properties](https://schema.org/SheetMusic#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SheetMusic } from 'schema.org.ai'
+
+// Create a SheetMusic
+const item: SheetMusic = {
+  $type: 'SheetMusic',
+  name: 'Example SheetMusic'
+}
+
+// Use semantic patterns
+await $.SheetMusic.create(item)
+const result = await $.SheetMusic.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SheetMusic](https://schema.org/SheetMusic)
+- [SheetMusic Properties](https://schema.org/SheetMusic#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

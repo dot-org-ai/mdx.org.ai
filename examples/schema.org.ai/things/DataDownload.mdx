@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DataDownload
+$context: https://schema.org
+$type: Class
+name: DataDownload
+description: All or part of a [[Dataset]] in downloadable form.
+subClassOf: ["MediaObject"]
+---
+
+# DataDownload
+
+All or part of a [[Dataset]] in downloadable form.
+
+## Type Hierarchy
+
+**DataDownload**
+
+
+
+## Properties
+
+See [Schema.org DataDownload properties](https://schema.org/DataDownload#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DataDownload } from 'schema.org.ai'
+
+// Create a DataDownload
+const item: DataDownload = {
+  $type: 'DataDownload',
+  name: 'Example DataDownload'
+}
+
+// Use semantic patterns
+await $.DataDownload.create(item)
+const result = await $.DataDownload.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DataDownload](https://schema.org/DataDownload)
+- [DataDownload Properties](https://schema.org/DataDownload#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

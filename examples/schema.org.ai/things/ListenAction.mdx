@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ListenAction
+$context: https://schema.org
+$type: Class
+name: ListenAction
+description: The act of consuming audio content.
+subClassOf: ["ConsumeAction"]
+---
+
+# ListenAction
+
+The act of consuming audio content.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > **ListenAction**
+
+
+
+## Properties
+
+See [Schema.org ListenAction properties](https://schema.org/ListenAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ListenAction } from 'schema.org.ai'
+
+// Create a ListenAction
+const item: ListenAction = {
+  $type: 'ListenAction',
+  name: 'Example ListenAction'
+}
+
+// Use semantic patterns
+await $.ListenAction.create(item)
+const result = await $.ListenAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ListenAction](https://schema.org/ListenAction)
+- [ListenAction Properties](https://schema.org/ListenAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

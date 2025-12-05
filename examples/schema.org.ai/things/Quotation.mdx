@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Quotation
+$context: https://schema.org
+$type: Class
+name: Quotation
+description: A quotation. Often but not necessarily from some written work, attributable to a real world author and - if associated with a fictional character - to any fictional Person. Use [[isBasedOn]] to link to source/origin. The [[recordedIn]] property can be used to reference a Quotation from an [[Event]].
+subClassOf: ["CreativeWork"]
+---
+
+# Quotation
+
+A quotation. Often but not necessarily from some written work, attributable to a real world author and - if associated with a fictional character - to any fictional Person. Use [[isBasedOn]] to link to source/origin. The [[recordedIn]] property can be used to reference a Quotation from an [[Event]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Quotation**
+
+
+
+## Properties
+
+See [Schema.org Quotation properties](https://schema.org/Quotation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Quotation } from 'schema.org.ai'
+
+// Create a Quotation
+const item: Quotation = {
+  $type: 'Quotation',
+  name: 'Example Quotation'
+}
+
+// Use semantic patterns
+await $.Quotation.create(item)
+const result = await $.Quotation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Quotation](https://schema.org/Quotation)
+- [Quotation Properties](https://schema.org/Quotation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

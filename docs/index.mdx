@@ -1,75 +1,58 @@
 ---
 title: MDX.org.ai Documentation
-description: The complete MDX ecosystem for building AI-powered applications, databases, and user interfaces
+description: The complete MDX ecosystem combining structured data, unstructured content, executable code, and UI components
 root: true
 pages: [index, structured-data, unstructured-content, executable-code, ui-components]
 ---
 
-MDX.org.ai extends MDX with four integrated layers that mirror MDX's own structure:
+# MDX.org.ai
+
+MDX.org.ai extends MDX to combine four integrated layers in a single document format:
+
+- **Structured Data** - YAML-LD frontmatter with JSON-LD semantics
+- **Unstructured Content** - Markdown prose with rich formatting
+- **Executable Code** - TypeScript/JSX for logic and interactions
+- **UI Components** - React components for rendering
 
 ## The Four Layers
 
+Every MDX document naturally contains these four distinct layers:
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     MDX Document                            │
-├─────────────────────────────────────────────────────────────┤
-│  ---                        ← Structured Data (YAML-LD)     │
+│  ---                        ← STRUCTURED DATA (YAML-LD)     │
 │  $type: BlogPost                                            │
-│  title: Hello World                                         │
+│  $id: /posts/hello-world                                    │
+│  author: /authors/jane                                      │
+│  publishedAt: 2024-01-15                                    │
 │  ---                                                        │
 ├─────────────────────────────────────────────────────────────┤
-│  # Hello World              ← Unstructured Content (MD)     │
+│  # Hello World              ← UNSTRUCTURED CONTENT (MD)     │
 │                                                             │
-│  Welcome to my blog...                                      │
+│  Welcome to my blog. This is **prose** that can be         │
+│  parsed, extracted, and rendered in multiple formats.       │
 ├─────────────────────────────────────────────────────────────┤
-│  <Chart data={sales} />     ← Executable Code (TS/JSX)      │
+│  export const views = 1234  ← EXECUTABLE CODE (TS/JSX)      │
 │                                                             │
-│  {posts.map(p => ...)}                                      │
+│  {posts.filter(p =>                                         │
+│    p.author === data.author                                 │
+│  ).map(p => <Card {...p} />)}                              │
 ├─────────────────────────────────────────────────────────────┤
-│  <Hero />                   ← UI Components (React)         │
-│  <Features items={...} />                                   │
+│  <Hero title={data.title} />  ← UI COMPONENTS (React)       │
+│  <RelatedPosts author={data.author} />                      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### [Structured Data](/structured-data)
+## Why MDX.org.ai?
 
-YAML-LD frontmatter with schemas, validation, and database storage.
+Traditional content systems force you to choose between:
+- **CMS databases** - structured but not code-friendly
+- **Markdown files** - portable but no schema validation
+- **React apps** - powerful but content is buried in code
 
-| | |
-|---|---|
-| **Types** | [Document](/Document), [Database](/Database) |
-| **Packages** | [mdxld](/mdxld), [mdxdb](/mdxdb) |
-
-### [Unstructured Content](/unstructured-content)
-
-Markdown content body with parsing and bi-directional extraction.
-
-| | |
-|---|---|
-| **Features** | Markdown processing, round-trip extraction |
-| **Package** | [@mdxld/extract](/mdxld) |
-
-### [Executable Code](/executable-code)
-
-TypeScript functions, AI agents, and event-driven workflows.
-
-| | |
-|---|---|
-| **Types** | [Function](/Function), [Agent](/Agent), [Workflow](/Workflow) |
-| **Packages** | [mdxe](/mdxe), [mdxai](/mdxai) |
-
-### [UI Components](/ui-components)
-
-Component specifications and multi-format rendering.
-
-| | |
-|---|---|
-| **Components** | 31 specs: Site, Hero, Blog, Dashboard, etc. |
-| **Package** | [mdxui](/mdxui) |
+MDX.org.ai unifies all four concerns in a single, portable file format that works with any database, any framework, and any rendering target.
 
 ## Quick Start
-
-Install the core package:
 
 ```bash
 npm install mdxld
@@ -82,8 +65,9 @@ import { parse } from 'mdxld'
 
 const doc = parse(`---
 $type: Article
+$id: /articles/hello-world
 title: Hello World
-author: https://example.com/authors/jane
+author: /authors/jane
 ---
 
 # Hello World
@@ -91,44 +75,99 @@ author: https://example.com/authors/jane
 This is an **MDXLD** document with linked data.
 `)
 
-console.log(doc.data.$type) // 'Article'
-console.log(doc.data.title) // 'Hello World'
+console.log(doc.data.$type)  // 'Article'
+console.log(doc.data.title)  // 'Hello World'
+console.log(doc.content)     // '# Hello World\n\nThis is an **MDXLD**...'
 ```
+
+## The Four Layers in Detail
+
+### [Structured Data](/docs/structured-data)
+
+YAML-LD frontmatter provides typed, validated, linked data:
+
+| Package | Description |
+|---------|-------------|
+| [mdxld](/docs/structured-data/mdxld) | Core parser for YAML-LD frontmatter |
+| [mdxdb](/docs/structured-data/mdxdb) | Database storage for MDX documents |
+| [@mdxld/jsonld](/docs/structured-data/mdxld/jsonld) | JSON-LD conversion and vocabularies |
+| [@mdxld/validate](/docs/structured-data/mdxld/validate) | Schema validation with ArkType |
+
+### [Unstructured Content](/docs/unstructured-content)
+
+Markdown content body with parsing and bi-directional extraction:
+
+| Package | Description |
+|---------|-------------|
+| [@mdxld/extract](/docs/unstructured-content/extract) | Extract structured data from rendered markdown |
+| [@mdxld/ast](/docs/unstructured-content/ast) | AST manipulation and traversal |
+
+### [Executable Code](/docs/executable-code)
+
+TypeScript functions, AI agents, and multi-runtime execution:
+
+| Package | Description |
+|---------|-------------|
+| [mdxe](/docs/executable-code/mdxe) | MDX execution runtime |
+| [mdxai](/docs/executable-code/mdxai) | AI agents with MCP server integration |
+| [@mdxe/next](/docs/executable-code/mdxe/next) | Next.js App Router integration |
+| [@mdxe/workers](/docs/executable-code/mdxe/workers) | Cloudflare Workers runtime |
+| [@mdxe/hono](/docs/executable-code/mdxe/hono) | Hono web framework middleware |
+
+### [UI Components](/docs/ui-components)
+
+Component specifications and multi-format rendering:
+
+| Package | Description |
+|---------|-------------|
+| [mdxui](/docs/ui-components/mdxui) | Component specifications (31 components) |
+| [@mdxui/html](/docs/ui-components/mdxui/html) | Render to HTML strings |
+| [@mdxui/json](/docs/ui-components/mdxui/json) | Render to JSON-LD |
+| [@mdxui/shadcn](/docs/ui-components/mdxui/shadcn) | Render with shadcn/ui |
+| [@mdxui/fumadocs](/docs/ui-components/mdxui/fumadocs) | Documentation site rendering |
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        mdxai                                │
-│              (AI Agents & MCP Server)                       │
+│              AI Agents & MCP Server Integration             │
 ├─────────────────────────────────────────────────────────────┤
 │                         mdxe                                │
-│        (Execution: Next.js, Hono, Workers, etc.)           │
+│        Execution: Next.js, Hono, Workers, Node, Bun        │
 ├─────────────────────────────────────────────────────────────┤
 │                        mdxdb                                │
-│     (Storage: FS, SQLite, Postgres, MongoDB, etc.)         │
+│     Storage: Filesystem, SQLite, Postgres, MongoDB, etc.   │
 ├─────────────────────────────────────────────────────────────┤
 │                        mdxld                                │
-│           (Core: Parse, Validate, Compile)                  │
+│           Core: Parse, Validate, Compile, Extract           │
 ├─────────────────────────────────────────────────────────────┤
 │                        mdxui                                │
-│         (Rendering: HTML, Markdown, Shadcn)                 │
+│       Rendering: HTML, Markdown, JSON, Shadcn, Email        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Features
+## Key Features
 
-### Linked Data Support
+### Linked Data with YAML-LD
 
-MDXLD extends standard MDX frontmatter with JSON-LD compatible properties:
+MDXLD extends frontmatter with JSON-LD compatible properties:
 
-- `$type` / `@type` - Document type (maps to schema.org or custom types)
-- `$id` / `@id` - Unique document identifier
-- `$context` / `@context` - JSON-LD context for vocabulary
+```yaml
+---
+$type: BlogPost           # JSON-LD @type
+$id: /posts/hello         # JSON-LD @id
+$context: https://schema.org  # JSON-LD @context
+author: /authors/jane     # Linked reference
+tags:
+  - typescript
+  - mdx
+---
+```
 
 ### Type-Safe Validation
 
-Use ArkType schemas to validate your documents:
+Validate documents with ArkType schemas:
 
 ```typescript
 import { parse } from 'mdxld'
@@ -147,25 +186,48 @@ const result = Article(doc.data)
 
 ### Multiple Storage Backends
 
-Store MDX documents in your preferred database:
+Store MDX documents anywhere:
 
 ```typescript
 import { createDatabase } from '@mdxdb/fs'
-// or @mdxdb/sqlite, @mdxdb/postgres, @mdxdb/mongo, etc.
+// or @mdxdb/sqlite, @mdxdb/postgres, @mdxdb/mongo
 
 const db = createDatabase({ path: './content' })
 await db.set('posts/hello-world', doc)
+const post = await db.get('posts/hello-world')
 ```
 
-### Execution Environments
+### Multi-Runtime Execution
 
-Run MDX in various environments:
+Run MDX in any environment:
 
-- **@mdxe/next** - Next.js App Router integration
-- **@mdxe/hono** - Hono web framework
-- **@mdxe/workers** - Cloudflare Workers
-- **@mdxe/node** - Node.js runtime
-- **@mdxe/vitest** - Test MDX with Vitest
+```typescript
+// Next.js
+import { createMDXPage } from '@mdxe/next'
+
+// Cloudflare Workers
+import { createMDXHandler } from '@mdxe/workers'
+
+// Hono
+import { mdx } from '@mdxe/hono'
+```
+
+### Multi-Format Rendering
+
+Render components to any output:
+
+```typescript
+import { Hero } from 'mdxui'
+import { toHTML } from '@mdxui/html'
+import { toJSON } from '@mdxui/json'
+import { toMarkdown } from '@mdxui/markdown'
+
+const hero = <Hero title="Welcome" subtitle="Get started" />
+
+await toHTML(hero)      // HTML string
+await toJSON(hero)      // JSON-LD object
+await toMarkdown(hero)  // Markdown string
+```
 
 ## License
 

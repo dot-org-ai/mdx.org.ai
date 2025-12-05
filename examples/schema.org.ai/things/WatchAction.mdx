@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WatchAction
+$context: https://schema.org
+$type: Class
+name: WatchAction
+description: The act of consuming dynamic/moving visual content.
+subClassOf: ["ConsumeAction"]
+---
+
+# WatchAction
+
+The act of consuming dynamic/moving visual content.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > **WatchAction**
+
+
+
+## Properties
+
+See [Schema.org WatchAction properties](https://schema.org/WatchAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WatchAction } from 'schema.org.ai'
+
+// Create a WatchAction
+const item: WatchAction = {
+  $type: 'WatchAction',
+  name: 'Example WatchAction'
+}
+
+// Use semantic patterns
+await $.WatchAction.create(item)
+const result = await $.WatchAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WatchAction](https://schema.org/WatchAction)
+- [WatchAction Properties](https://schema.org/WatchAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

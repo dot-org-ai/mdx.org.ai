@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/AggregateRating
+$context: https://schema.org
+$type: Class
+name: AggregateRating
+description: The average rating based on multiple ratings or reviews.
+subClassOf: ["Rating"]
+---
+
+# AggregateRating
+
+The average rating based on multiple ratings or reviews.
+
+## Type Hierarchy
+
+**AggregateRating**
+
+## Direct Subclasses
+
+- **[EmployerAggregateRating](EmployerAggregateRating.mdx)**: An aggregate rating of an Organization related to its role as an employer
+
+## Properties
+
+See [Schema.org AggregateRating properties](https://schema.org/AggregateRating#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AggregateRating } from 'schema.org.ai'
+
+// Create a AggregateRating
+const item: AggregateRating = {
+  $type: 'AggregateRating',
+  name: 'Example AggregateRating'
+}
+
+// Use semantic patterns
+await $.AggregateRating.create(item)
+const result = await $.AggregateRating.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AggregateRating](https://schema.org/AggregateRating)
+- [AggregateRating Properties](https://schema.org/AggregateRating#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

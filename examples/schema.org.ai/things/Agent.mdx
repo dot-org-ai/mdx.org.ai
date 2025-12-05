@@ -1,0 +1,276 @@
+---
+$id: https://schema.org.ai/Agent
+$context: https://schema.org.ai
+$type: Class
+name: Agent
+description: An autonomous AI agent that can perform actions, use tools, and make decisions to accomplish goals.
+subClassOf:
+  - https://schema.org/Thing
+digital: 1.0
+---
+
+[Thing](Thing.mdx)
+
+# Agent
+
+An autonomous AI agent that can perform actions, use tools, and make decisions to accomplish goals. Agents can be role-based (like a CMO or CTO) or named entities (like Cody or Priya) that operate autonomously within Business-as-Code systems.
+
+## Properties
+
+| Property | Type | Description | Inherited From |
+|----------|------|-------------|----------------|
+| `$type` | Text | Always "Agent" | - |
+| `$id` | URL | Unique identifier for the agent | Thing |
+| `name` | Text | The name of the agent | Thing |
+| `description` | Text | Description of the agent's purpose and capabilities | Thing |
+| `identifier` | Text or PropertyValue | An identifier for the agent | Thing |
+| `url` | URL | URL of the agent's profile or endpoint | Thing |
+| `image` | URL or ImageObject | Image representing the agent | Thing |
+| `digital` | Number (0.0-1.0) | Digital maturity score (1.0 for autonomous agents) | Thing |
+| `capability` | Capability | Capabilities and skills the agent possesses | Agent |
+| `tool` | Tool | Tools available to the agent | Agent |
+| `goal` | Text or Goal | The agent's goals and objectives | Agent |
+| `model` | Model | The AI model(s) powering the agent | Agent |
+| `workflow` | Workflow | Workflows the agent can execute | Agent |
+| `creator` | Person or Organization | The entity that created the agent | Thing |
+
+## Types
+
+The following types extend Agent:
+
+- **RoleAgent**: Role-based agents (CMO, CTO, CFO, etc.)
+- **NamedAgent**: Named autonomous agents (Cody, Priya, Quinn, etc.)
+- **AssistantAgent**: Conversational assistant agents
+- **WorkflowAgent**: Agents specialized in executing workflows
+
+## Examples
+
+### Example 1: CMO Agent (Role-based)
+
+```typescript
+import { $ } from 'sdk.do'
+
+const cmoAgent = {
+  $type: 'Agent',
+  $id: 'https://CMO.do',
+  name: 'Chief Marketing Officer',
+  description: 'Autonomous CMO agent responsible for growth strategy, marketing campaigns, and funnel optimization',
+  digital: 1.0,
+  capability: [
+    {
+      $type: 'Capability',
+      name: 'Growth Strategy',
+      description: 'Develops and executes growth strategies based on ARR targets'
+    },
+    {
+      $type: 'Capability',
+      name: 'Campaign Management',
+      description: 'Creates, manages, and optimizes marketing campaigns'
+    },
+    {
+      $type: 'Capability',
+      name: 'Funnel Analysis',
+      description: 'Analyzes conversion funnels and identifies optimization opportunities'
+    }
+  ],
+  tool: [
+    {
+      $type: 'Tool',
+      name: 'Analytics API',
+      url: 'https://api.platform.do/analytics'
+    },
+    {
+      $type: 'Tool',
+      name: 'Campaign Manager',
+      url: 'https://api.platform.do/campaigns'
+    }
+  ],
+  goal: 'Achieve $10M ARR through optimized marketing funnels and data-driven campaigns',
+  model: {
+    $type: 'Model',
+    name: 'gpt-5',
+    version: '2025-01'
+  }
+}
+
+await $.Agent.create(cmoAgent)
+```
+
+### Example 2: Cody Agent (Named Coding Agent)
+
+```typescript
+import { $ } from 'sdk.do'
+
+const codyAgent = {
+  $type: 'Agent',
+  $id: 'https://Cody.do',
+  name: 'Cody',
+  description: 'Autonomous coding agent specialized in full-stack development, code review, and architecture',
+  digital: 1.0,
+  capability: [
+    {
+      $type: 'Capability',
+      name: 'Full-Stack Development',
+      description: 'Develops features across frontend, backend, and infrastructure'
+    },
+    {
+      $type: 'Capability',
+      name: 'Code Review',
+      description: 'Reviews pull requests for quality, security, and best practices'
+    },
+    {
+      $type: 'Capability',
+      name: 'Architecture Design',
+      description: 'Designs system architecture and technical solutions'
+    },
+    {
+      $type: 'Capability',
+      name: 'Testing',
+      description: 'Writes and maintains comprehensive test coverage'
+    }
+  ],
+  tool: [
+    {
+      $type: 'Tool',
+      name: 'GitHub API',
+      url: 'https://api.github.com'
+    },
+    {
+      $type: 'Tool',
+      name: 'TypeScript Compiler',
+      url: 'https://www.typescriptlang.org'
+    },
+    {
+      $type: 'Tool',
+      name: 'Cloudflare Workers',
+      url: 'https://workers.cloudflare.com'
+    }
+  ],
+  workflow: [
+    {
+      $type: 'Workflow',
+      name: 'Feature Development',
+      description: 'End-to-end feature development from issue to deployment'
+    },
+    {
+      $type: 'Workflow',
+      name: 'Bug Triage and Fix',
+      description: 'Investigate, reproduce, and fix reported bugs'
+    }
+  ],
+  model: {
+    $type: 'Model',
+    name: 'claude-sonnet-4.5',
+    version: '2025-01'
+  }
+}
+
+await $.Agent.create(codyAgent)
+```
+
+### Example 3: Priya Agent (Named Product Agent)
+
+```typescript
+import { $ } from 'sdk.do'
+
+const priyaAgent = {
+  $type: 'Agent',
+  $id: 'https://Priya.do',
+  name: 'Priya',
+  description: 'Autonomous product management agent responsible for roadmap, prioritization, and user research',
+  digital: 1.0,
+  capability: [
+    {
+      $type: 'Capability',
+      name: 'Product Strategy',
+      description: 'Develops product vision, strategy, and roadmap'
+    },
+    {
+      $type: 'Capability',
+      name: 'User Research',
+      description: 'Conducts user interviews, surveys, and analyzes feedback'
+    },
+    {
+      $type: 'Capability',
+      name: 'Prioritization',
+      description: 'Prioritizes features based on impact, effort, and strategic alignment'
+    },
+    {
+      $type: 'Capability',
+      name: 'Requirements Definition',
+      description: 'Creates detailed product requirements and user stories'
+    }
+  ],
+  tool: [
+    {
+      $type: 'Tool',
+      name: 'GitHub Issues API',
+      url: 'https://api.github.com/issues'
+    },
+    {
+      $type: 'Tool',
+      name: 'Analytics API',
+      url: 'https://api.platform.do/analytics'
+    },
+    {
+      $type: 'Tool',
+      name: 'User Feedback API',
+      url: 'https://api.platform.do/feedback'
+    }
+  ],
+  workflow: [
+    {
+      $type: 'Workflow',
+      name: 'Feature Prioritization',
+      description: 'Evaluate and prioritize feature requests based on multiple criteria'
+    },
+    {
+      $type: 'Workflow',
+      name: 'User Research Synthesis',
+      description: 'Collect, analyze, and synthesize user research into actionable insights'
+    }
+  ],
+  goal: 'Deliver high-impact features that drive user adoption and retention',
+  model: {
+    $type: 'Model',
+    name: 'gpt-5',
+    version: '2025-01'
+  }
+}
+
+await $.Agent.create(priyaAgent)
+```
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Agent } from 'schema.org.ai'
+
+// Create an agent
+const agent: Agent = {
+  $type: 'Agent',
+  $id: 'https://MyAgent.do',
+  name: 'My Autonomous Agent',
+  description: 'An agent that automates business processes',
+  digital: 1.0
+}
+
+// Use semantic patterns
+await $.Agent.create(agent)
+const result = await $.Agent.get('https://MyAgent.do')
+
+// Query agents by capability
+const codingAgents = await $.Agent.find({
+  capability: { name: 'Full-Stack Development' }
+})
+```
+
+## Resources
+
+- [Schema.org Thing](https://schema.org/Thing)
+- [AI Agents in Business-as-Code](https://docs.platform.do/agents)
+
+## License
+
+This is an extension to Schema.org vocabulary created by the .do Platform Team. The base Schema.org vocabulary is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

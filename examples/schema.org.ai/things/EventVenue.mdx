@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EventVenue
+$context: https://schema.org
+$type: Class
+name: EventVenue
+description: An event venue.
+subClassOf: ["CivicStructure"]
+---
+
+# EventVenue
+
+An event venue.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **EventVenue**
+
+
+
+## Properties
+
+See [Schema.org EventVenue properties](https://schema.org/EventVenue#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EventVenue } from 'schema.org.ai'
+
+// Create a EventVenue
+const item: EventVenue = {
+  $type: 'EventVenue',
+  name: 'Example EventVenue'
+}
+
+// Use semantic patterns
+await $.EventVenue.create(item)
+const result = await $.EventVenue.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EventVenue](https://schema.org/EventVenue)
+- [EventVenue Properties](https://schema.org/EventVenue#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,58 @@
+---
+$id: https://schema.org.ai/UserInteraction
+$context: https://schema.org
+$type: Class
+name: UserInteraction
+description: UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+subClassOf: ["Event"]
+---
+
+# UserInteraction
+
+UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **UserInteraction**
+
+## Direct Subclasses
+
+- **[UserBlocks](UserBlocks.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+- **[UserCheckins](UserCheckins.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+- **[UserComments](UserComments.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+- **[UserDownloads](UserDownloads.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+- **[UserLikes](UserLikes.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+- **[UserPageVisits](UserPageVisits.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+- **[UserPlays](UserPlays.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+- **[UserPlusOnes](UserPlusOnes.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+- **[UserTweets](UserTweets.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+
+## Properties
+
+See [Schema.org UserInteraction properties](https://schema.org/UserInteraction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserInteraction } from 'schema.org.ai'
+
+// Create a UserInteraction
+const item: UserInteraction = {
+  $type: 'UserInteraction',
+  name: 'Example UserInteraction'
+}
+
+// Use semantic patterns
+await $.UserInteraction.create(item)
+const result = await $.UserInteraction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserInteraction](https://schema.org/UserInteraction)
+- [UserInteraction Properties](https://schema.org/UserInteraction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

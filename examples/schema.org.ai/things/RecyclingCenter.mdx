@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RecyclingCenter
+$context: https://schema.org
+$type: Class
+name: RecyclingCenter
+description: A recycling center.
+subClassOf: ["LocalBusiness"]
+---
+
+# RecyclingCenter
+
+A recycling center.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **RecyclingCenter**
+
+
+
+## Properties
+
+See [Schema.org RecyclingCenter properties](https://schema.org/RecyclingCenter#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RecyclingCenter } from 'schema.org.ai'
+
+// Create a RecyclingCenter
+const item: RecyclingCenter = {
+  $type: 'RecyclingCenter',
+  name: 'Example RecyclingCenter'
+}
+
+// Use semantic patterns
+await $.RecyclingCenter.create(item)
+const result = await $.RecyclingCenter.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RecyclingCenter](https://schema.org/RecyclingCenter)
+- [RecyclingCenter Properties](https://schema.org/RecyclingCenter#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

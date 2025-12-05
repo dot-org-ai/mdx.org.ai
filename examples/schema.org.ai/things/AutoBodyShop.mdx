@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AutoBodyShop
+$context: https://schema.org
+$type: Class
+name: AutoBodyShop
+description: Auto body shop.
+subClassOf: ["AutomotiveBusiness"]
+---
+
+# AutoBodyShop
+
+Auto body shop.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [AutomotiveBusiness](AutomotiveBusiness.mdx) > **AutoBodyShop**
+
+
+
+## Properties
+
+See [Schema.org AutoBodyShop properties](https://schema.org/AutoBodyShop#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AutoBodyShop } from 'schema.org.ai'
+
+// Create a AutoBodyShop
+const item: AutoBodyShop = {
+  $type: 'AutoBodyShop',
+  name: 'Example AutoBodyShop'
+}
+
+// Use semantic patterns
+await $.AutoBodyShop.create(item)
+const result = await $.AutoBodyShop.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AutoBodyShop](https://schema.org/AutoBodyShop)
+- [AutoBodyShop Properties](https://schema.org/AutoBodyShop#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

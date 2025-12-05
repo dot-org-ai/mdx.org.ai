@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PayAction
+$context: https://schema.org
+$type: Class
+name: PayAction
+description: An agent pays a price to a participant.
+subClassOf: ["TradeAction"]
+---
+
+# PayAction
+
+An agent pays a price to a participant.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TradeAction](TradeAction.mdx) > **PayAction**
+
+
+
+## Properties
+
+See [Schema.org PayAction properties](https://schema.org/PayAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PayAction } from 'schema.org.ai'
+
+// Create a PayAction
+const item: PayAction = {
+  $type: 'PayAction',
+  name: 'Example PayAction'
+}
+
+// Use semantic patterns
+await $.PayAction.create(item)
+const result = await $.PayAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PayAction](https://schema.org/PayAction)
+- [PayAction Properties](https://schema.org/PayAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

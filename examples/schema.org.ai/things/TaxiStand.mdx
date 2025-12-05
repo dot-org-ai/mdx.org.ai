@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TaxiStand
+$context: https://schema.org
+$type: Class
+name: TaxiStand
+description: A taxi stand.
+subClassOf: ["CivicStructure"]
+---
+
+# TaxiStand
+
+A taxi stand.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **TaxiStand**
+
+
+
+## Properties
+
+See [Schema.org TaxiStand properties](https://schema.org/TaxiStand#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TaxiStand } from 'schema.org.ai'
+
+// Create a TaxiStand
+const item: TaxiStand = {
+  $type: 'TaxiStand',
+  name: 'Example TaxiStand'
+}
+
+// Use semantic patterns
+await $.TaxiStand.create(item)
+const result = await $.TaxiStand.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TaxiStand](https://schema.org/TaxiStand)
+- [TaxiStand Properties](https://schema.org/TaxiStand#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

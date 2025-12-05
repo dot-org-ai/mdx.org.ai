@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/CollectionPage
+$context: https://schema.org
+$type: Class
+name: CollectionPage
+description: Web page type: Collection page.
+subClassOf: ["WebPage"]
+---
+
+# CollectionPage
+
+Web page type: Collection page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **CollectionPage**
+
+## Direct Subclasses
+
+- **[MediaGallery](MediaGallery.mdx)**: Web page type: Media gallery page
+
+## Properties
+
+See [Schema.org CollectionPage properties](https://schema.org/CollectionPage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CollectionPage } from 'schema.org.ai'
+
+// Create a CollectionPage
+const item: CollectionPage = {
+  $type: 'CollectionPage',
+  name: 'Example CollectionPage'
+}
+
+// Use semantic patterns
+await $.CollectionPage.create(item)
+const result = await $.CollectionPage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CollectionPage](https://schema.org/CollectionPage)
+- [CollectionPage Properties](https://schema.org/CollectionPage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

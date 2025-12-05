@@ -1,0 +1,55 @@
+---
+$id: https://schema.org.ai/InteractAction
+$context: https://schema.org
+$type: Class
+name: InteractAction
+description: The act of interacting with another person or organization.
+subClassOf: ["Action"]
+---
+
+# InteractAction
+
+The act of interacting with another person or organization.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **InteractAction**
+
+## Direct Subclasses
+
+- **[BefriendAction](BefriendAction.mdx)**: The act of forming a personal connection with someone (object) mutually/bidirectionally/symmetrically
+- **[CommunicateAction](CommunicateAction.mdx)**: The act of conveying information to another person via a communication medium (instrument) such as speech, email, or telephone conversation
+- **[LeaveAction](LeaveAction.mdx)**: An agent leaves an event / group with participants/friends at a location
+- **[MarryAction](MarryAction.mdx)**: The act of marrying a person
+- **[SubscribeAction](SubscribeAction.mdx)**: The act of forming a personal connection with someone/something (object) unidirectionally/asymmetrically to get updates pushed to
+- **[UnRegisterAction](UnRegisterAction.mdx)**: The act of un-registering from a service
+
+## Properties
+
+See [Schema.org InteractAction properties](https://schema.org/InteractAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InteractAction } from 'schema.org.ai'
+
+// Create a InteractAction
+const item: InteractAction = {
+  $type: 'InteractAction',
+  name: 'Example InteractAction'
+}
+
+// Use semantic patterns
+await $.InteractAction.create(item)
+const result = await $.InteractAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InteractAction](https://schema.org/InteractAction)
+- [InteractAction Properties](https://schema.org/InteractAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

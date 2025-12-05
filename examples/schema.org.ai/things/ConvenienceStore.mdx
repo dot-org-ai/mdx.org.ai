@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ConvenienceStore
+$context: https://schema.org
+$type: Class
+name: ConvenienceStore
+description: A convenience store.
+subClassOf: ["Store"]
+---
+
+# ConvenienceStore
+
+A convenience store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **ConvenienceStore**
+
+
+
+## Properties
+
+See [Schema.org ConvenienceStore properties](https://schema.org/ConvenienceStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ConvenienceStore } from 'schema.org.ai'
+
+// Create a ConvenienceStore
+const item: ConvenienceStore = {
+  $type: 'ConvenienceStore',
+  name: 'Example ConvenienceStore'
+}
+
+// Use semantic patterns
+await $.ConvenienceStore.create(item)
+const result = await $.ConvenienceStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ConvenienceStore](https://schema.org/ConvenienceStore)
+- [ConvenienceStore Properties](https://schema.org/ConvenienceStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

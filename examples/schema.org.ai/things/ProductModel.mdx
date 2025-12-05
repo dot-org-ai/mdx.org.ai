@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ProductModel
+$context: https://schema.org
+$type: Class
+name: ProductModel
+description: A datasheet or vendor specification of a product (in the sense of a prototypical description).
+subClassOf: ["Product"]
+---
+
+# ProductModel
+
+A datasheet or vendor specification of a product (in the sense of a prototypical description).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > **ProductModel**
+
+
+
+## Properties
+
+See [Schema.org ProductModel properties](https://schema.org/ProductModel#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ProductModel } from 'schema.org.ai'
+
+// Create a ProductModel
+const item: ProductModel = {
+  $type: 'ProductModel',
+  name: 'Example ProductModel'
+}
+
+// Use semantic patterns
+await $.ProductModel.create(item)
+const result = await $.ProductModel.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ProductModel](https://schema.org/ProductModel)
+- [ProductModel Properties](https://schema.org/ProductModel#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TierBenefitEnumeration
+$context: https://schema.org
+$type: Class
+name: TierBenefitEnumeration
+description: An enumeration of possible benefits as part of a loyalty (members) program.
+subClassOf: ["Enumeration"]
+---
+
+# TierBenefitEnumeration
+
+An enumeration of possible benefits as part of a loyalty (members) program.
+
+## Type Hierarchy
+
+**TierBenefitEnumeration**
+
+
+
+## Properties
+
+See [Schema.org TierBenefitEnumeration properties](https://schema.org/TierBenefitEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TierBenefitEnumeration } from 'schema.org.ai'
+
+// Create a TierBenefitEnumeration
+const item: TierBenefitEnumeration = {
+  $type: 'TierBenefitEnumeration',
+  name: 'Example TierBenefitEnumeration'
+}
+
+// Use semantic patterns
+await $.TierBenefitEnumeration.create(item)
+const result = await $.TierBenefitEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TierBenefitEnumeration](https://schema.org/TierBenefitEnumeration)
+- [TierBenefitEnumeration Properties](https://schema.org/TierBenefitEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

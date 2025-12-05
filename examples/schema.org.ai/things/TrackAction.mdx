@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/TrackAction
+$context: https://schema.org
+$type: Class
+name: TrackAction
+description: An agent tracks an object for updates.\
+subClassOf: ["FindAction"]
+---
+
+# TrackAction
+
+An agent tracks an object for updates.\
+\
+Related actions:\
+\
+* [[FollowAction]]: Unlike FollowAction, TrackAction refers to the interest on the location of innanimates objects.\
+* [[SubscribeAction]]: Unlike SubscribeAction, TrackAction refers to  the interest on the location of innanimate objects.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [FindAction](FindAction.mdx) > **TrackAction**
+
+
+
+## Properties
+
+See [Schema.org TrackAction properties](https://schema.org/TrackAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TrackAction } from 'schema.org.ai'
+
+// Create a TrackAction
+const item: TrackAction = {
+  $type: 'TrackAction',
+  name: 'Example TrackAction'
+}
+
+// Use semantic patterns
+await $.TrackAction.create(item)
+const result = await $.TrackAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TrackAction](https://schema.org/TrackAction)
+- [TrackAction Properties](https://schema.org/TrackAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

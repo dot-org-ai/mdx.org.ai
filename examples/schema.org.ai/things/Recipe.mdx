@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Recipe
+$context: https://schema.org
+$type: Class
+name: Recipe
+description: A recipe. For dietary restrictions covered by the recipe, a few common restrictions are enumerated via [[suitableForDiet]]. The [[keywords]] property can also be used to add more detail.
+subClassOf: ["HowTo"]
+---
+
+# Recipe
+
+A recipe. For dietary restrictions covered by the recipe, a few common restrictions are enumerated via [[suitableForDiet]]. The [[keywords]] property can also be used to add more detail.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [HowTo](HowTo.mdx) > **Recipe**
+
+
+
+## Properties
+
+See [Schema.org Recipe properties](https://schema.org/Recipe#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Recipe } from 'schema.org.ai'
+
+// Create a Recipe
+const item: Recipe = {
+  $type: 'Recipe',
+  name: 'Example Recipe'
+}
+
+// Use semantic patterns
+await $.Recipe.create(item)
+const result = await $.Recipe.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Recipe](https://schema.org/Recipe)
+- [Recipe Properties](https://schema.org/Recipe#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

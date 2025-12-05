@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ElementarySchool
+$context: https://schema.org
+$type: Class
+name: ElementarySchool
+description: An elementary school.
+subClassOf: ["EducationalOrganization"]
+---
+
+# ElementarySchool
+
+An elementary school.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [EducationalOrganization](EducationalOrganization.mdx) > **ElementarySchool**
+
+
+
+## Properties
+
+See [Schema.org ElementarySchool properties](https://schema.org/ElementarySchool#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ElementarySchool } from 'schema.org.ai'
+
+// Create a ElementarySchool
+const item: ElementarySchool = {
+  $type: 'ElementarySchool',
+  name: 'Example ElementarySchool'
+}
+
+// Use semantic patterns
+await $.ElementarySchool.create(item)
+const result = await $.ElementarySchool.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ElementarySchool](https://schema.org/ElementarySchool)
+- [ElementarySchool Properties](https://schema.org/ElementarySchool#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

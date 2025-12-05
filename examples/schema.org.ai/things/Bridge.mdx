@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Bridge
+$context: https://schema.org
+$type: Class
+name: Bridge
+description: A bridge.
+subClassOf: ["CivicStructure"]
+---
+
+# Bridge
+
+A bridge.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **Bridge**
+
+
+
+## Properties
+
+See [Schema.org Bridge properties](https://schema.org/Bridge#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Bridge } from 'schema.org.ai'
+
+// Create a Bridge
+const item: Bridge = {
+  $type: 'Bridge',
+  name: 'Example Bridge'
+}
+
+// Use semantic patterns
+await $.Bridge.create(item)
+const result = await $.Bridge.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Bridge](https://schema.org/Bridge)
+- [Bridge Properties](https://schema.org/Bridge#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

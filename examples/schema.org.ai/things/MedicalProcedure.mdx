@@ -1,0 +1,54 @@
+---
+$id: https://schema.org.ai/MedicalProcedure
+$context: https://schema.org
+$type: Class
+name: MedicalProcedure
+description: A process of care used in either a diagnostic, therapeutic, preventive or palliative capacity that relies on invasive (surgical), non-invasive, or other techniques.
+subClassOf: ["MedicalEntity"]
+---
+
+# MedicalProcedure
+
+A process of care used in either a diagnostic, therapeutic, preventive or palliative capacity that relies on invasive (surgical), non-invasive, or other techniques.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **MedicalProcedure**
+
+## Direct Subclasses
+
+- **[DiagnosticProcedure](DiagnosticProcedure.mdx)**: A medical procedure intended primarily for diagnostic, as opposed to therapeutic, purposes
+- **[PalliativeProcedure](PalliativeProcedure.mdx)**: A medical procedure intended primarily for palliative purposes, aimed at relieving the symptoms of an underlying health condition
+- **[PhysicalExam](PhysicalExam.mdx)**: A type of physical examination of a patient performed by a physician
+- **[SurgicalProcedure](SurgicalProcedure.mdx)**: A medical procedure involving an incision with instruments; performed for diagnose, or therapeutic purposes
+- **[TherapeuticProcedure](TherapeuticProcedure.mdx)**: A medical procedure intended primarily for therapeutic purposes, aimed at improving a health condition
+
+## Properties
+
+See [Schema.org MedicalProcedure properties](https://schema.org/MedicalProcedure#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalProcedure } from 'schema.org.ai'
+
+// Create a MedicalProcedure
+const item: MedicalProcedure = {
+  $type: 'MedicalProcedure',
+  name: 'Example MedicalProcedure'
+}
+
+// Use semantic patterns
+await $.MedicalProcedure.create(item)
+const result = await $.MedicalProcedure.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalProcedure](https://schema.org/MedicalProcedure)
+- [MedicalProcedure Properties](https://schema.org/MedicalProcedure#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

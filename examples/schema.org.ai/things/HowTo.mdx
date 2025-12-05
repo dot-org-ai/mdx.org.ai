@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/HowTo
+$context: https://schema.org
+$type: Class
+name: HowTo
+description: Instructions that explain how to achieve a result by performing a sequence of steps.
+subClassOf: ["CreativeWork"]
+---
+
+# HowTo
+
+Instructions that explain how to achieve a result by performing a sequence of steps.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **HowTo**
+
+## Direct Subclasses
+
+- **[Recipe](Recipe.mdx)**: A recipe
+
+## Properties
+
+See [Schema.org HowTo properties](https://schema.org/HowTo#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HowTo } from 'schema.org.ai'
+
+// Create a HowTo
+const item: HowTo = {
+  $type: 'HowTo',
+  name: 'Example HowTo'
+}
+
+// Use semantic patterns
+await $.HowTo.create(item)
+const result = await $.HowTo.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HowTo](https://schema.org/HowTo)
+- [HowTo Properties](https://schema.org/HowTo#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

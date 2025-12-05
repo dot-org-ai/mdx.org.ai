@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ProductGroup
+$context: https://schema.org
+$type: Class
+name: ProductGroup
+description: A ProductGroup represents a group of [[Product]]s that vary only in certain well-described ways, such as by [[size]], [[color]], [[material]] etc. While a ProductGroup itself is not directly offered for sale, the various varying products that it represents can be. The ProductGroup serves as a prototype or template, standing in for all of the products who have an [[isVariantOf]] relationship to it. As such, properties (including additional types) can be applied to the ProductGroup to represent characteristics shared by each of the (possibly very many) variants. Properties that reference a ProductGroup are not included in this mechanism; neither are the following specific properties [[variesBy]], [[hasVariant]], [[url]].
+subClassOf: ["Product"]
+---
+
+# ProductGroup
+
+A ProductGroup represents a group of [[Product]]s that vary only in certain well-described ways, such as by [[size]], [[color]], [[material]] etc. While a ProductGroup itself is not directly offered for sale, the various varying products that it represents can be. The ProductGroup serves as a prototype or template, standing in for all of the products who have an [[isVariantOf]] relationship to it. As such, properties (including additional types) can be applied to the ProductGroup to represent characteristics shared by each of the (possibly very many) variants. Properties that reference a ProductGroup are not included in this mechanism; neither are the following specific properties [[variesBy]], [[hasVariant]], [[url]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > **ProductGroup**
+
+
+
+## Properties
+
+See [Schema.org ProductGroup properties](https://schema.org/ProductGroup#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ProductGroup } from 'schema.org.ai'
+
+// Create a ProductGroup
+const item: ProductGroup = {
+  $type: 'ProductGroup',
+  name: 'Example ProductGroup'
+}
+
+// Use semantic patterns
+await $.ProductGroup.create(item)
+const result = await $.ProductGroup.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ProductGroup](https://schema.org/ProductGroup)
+- [ProductGroup Properties](https://schema.org/ProductGroup#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LocationFeatureSpecification
+$context: https://schema.org
+$type: Class
+name: LocationFeatureSpecification
+description: Specifies a location feature by providing a structured value representing a feature of an accommodation as a property-value pair of varying degrees of formality.
+subClassOf: ["PropertyValue"]
+---
+
+# LocationFeatureSpecification
+
+Specifies a location feature by providing a structured value representing a feature of an accommodation as a property-value pair of varying degrees of formality.
+
+## Type Hierarchy
+
+**LocationFeatureSpecification**
+
+
+
+## Properties
+
+See [Schema.org LocationFeatureSpecification properties](https://schema.org/LocationFeatureSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LocationFeatureSpecification } from 'schema.org.ai'
+
+// Create a LocationFeatureSpecification
+const item: LocationFeatureSpecification = {
+  $type: 'LocationFeatureSpecification',
+  name: 'Example LocationFeatureSpecification'
+}
+
+// Use semantic patterns
+await $.LocationFeatureSpecification.create(item)
+const result = await $.LocationFeatureSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LocationFeatureSpecification](https://schema.org/LocationFeatureSpecification)
+- [LocationFeatureSpecification Properties](https://schema.org/LocationFeatureSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/AddAction
+$context: https://schema.org
+$type: Class
+name: AddAction
+description: The act of editing by adding an object to a collection.
+subClassOf: ["UpdateAction"]
+---
+
+# AddAction
+
+The act of editing by adding an object to a collection.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [UpdateAction](UpdateAction.mdx) > **AddAction**
+
+## Direct Subclasses
+
+- **[InsertAction](InsertAction.mdx)**: The act of adding at a specific location in an ordered collection
+
+## Properties
+
+See [Schema.org AddAction properties](https://schema.org/AddAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AddAction } from 'schema.org.ai'
+
+// Create a AddAction
+const item: AddAction = {
+  $type: 'AddAction',
+  name: 'Example AddAction'
+}
+
+// Use semantic patterns
+await $.AddAction.create(item)
+const result = await $.AddAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AddAction](https://schema.org/AddAction)
+- [AddAction Properties](https://schema.org/AddAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

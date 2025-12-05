@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MortgageLoan
+$context: https://schema.org
+$type: Class
+name: MortgageLoan
+description: A loan in which property or real estate is used as collateral. (A loan securitized against some real estate.)
+subClassOf: ["LoanOrCredit"]
+---
+
+# MortgageLoan
+
+A loan in which property or real estate is used as collateral. (A loan securitized against some real estate.)
+
+## Type Hierarchy
+
+**MortgageLoan**
+
+
+
+## Properties
+
+See [Schema.org MortgageLoan properties](https://schema.org/MortgageLoan#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MortgageLoan } from 'schema.org.ai'
+
+// Create a MortgageLoan
+const item: MortgageLoan = {
+  $type: 'MortgageLoan',
+  name: 'Example MortgageLoan'
+}
+
+// Use semantic patterns
+await $.MortgageLoan.create(item)
+const result = await $.MortgageLoan.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MortgageLoan](https://schema.org/MortgageLoan)
+- [MortgageLoan Properties](https://schema.org/MortgageLoan#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

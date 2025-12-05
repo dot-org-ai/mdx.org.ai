@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Newspaper
+$context: https://schema.org
+$type: Class
+name: Newspaper
+description: A publication containing information about varied topics that are pertinent to general information, a geographic area, or a specific subject matter (i.e. business, culture, education). Often published daily.
+subClassOf: ["Periodical"]
+---
+
+# Newspaper
+
+A publication containing information about varied topics that are pertinent to general information, a geographic area, or a specific subject matter (i.e. business, culture, education). Often published daily.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [CreativeWorkSeries](CreativeWorkSeries.mdx) > [Periodical](Periodical.mdx) > **Newspaper**
+
+
+
+## Properties
+
+See [Schema.org Newspaper properties](https://schema.org/Newspaper#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Newspaper } from 'schema.org.ai'
+
+// Create a Newspaper
+const item: Newspaper = {
+  $type: 'Newspaper',
+  name: 'Example Newspaper'
+}
+
+// Use semantic patterns
+await $.Newspaper.create(item)
+const result = await $.Newspaper.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Newspaper](https://schema.org/Newspaper)
+- [Newspaper Properties](https://schema.org/Newspaper#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

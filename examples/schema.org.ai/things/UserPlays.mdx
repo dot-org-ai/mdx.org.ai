@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UserPlays
+$context: https://schema.org
+$type: Class
+name: UserPlays
+description: UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+subClassOf: ["UserInteraction"]
+---
+
+# UserPlays
+
+UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [UserInteraction](UserInteraction.mdx) > **UserPlays**
+
+
+
+## Properties
+
+See [Schema.org UserPlays properties](https://schema.org/UserPlays#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserPlays } from 'schema.org.ai'
+
+// Create a UserPlays
+const item: UserPlays = {
+  $type: 'UserPlays',
+  name: 'Example UserPlays'
+}
+
+// Use semantic patterns
+await $.UserPlays.create(item)
+const result = await $.UserPlays.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserPlays](https://schema.org/UserPlays)
+- [UserPlays Properties](https://schema.org/UserPlays#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

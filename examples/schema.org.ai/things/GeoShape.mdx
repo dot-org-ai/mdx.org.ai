@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GeoShape
+$context: https://schema.org
+$type: Class
+name: GeoShape
+description: The geographic shape of a place. A GeoShape can be described using several properties whose values are based on latitude/longitude pairs. Either whitespace or commas can be used to separate latitude and longitude; whitespace should be used when writing a list of several such points.
+subClassOf: ["StructuredValue"]
+---
+
+# GeoShape
+
+The geographic shape of a place. A GeoShape can be described using several properties whose values are based on latitude/longitude pairs. Either whitespace or commas can be used to separate latitude and longitude; whitespace should be used when writing a list of several such points.
+
+## Type Hierarchy
+
+**GeoShape**
+
+
+
+## Properties
+
+See [Schema.org GeoShape properties](https://schema.org/GeoShape#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GeoShape } from 'schema.org.ai'
+
+// Create a GeoShape
+const item: GeoShape = {
+  $type: 'GeoShape',
+  name: 'Example GeoShape'
+}
+
+// Use semantic patterns
+await $.GeoShape.create(item)
+const result = await $.GeoShape.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GeoShape](https://schema.org/GeoShape)
+- [GeoShape Properties](https://schema.org/GeoShape#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

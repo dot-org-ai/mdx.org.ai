@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/ContactPoint
+$context: https://schema.org
+$type: Class
+name: ContactPoint
+description: A contact point&#x2014;for example, a Customer Complaints department.
+subClassOf: ["StructuredValue"]
+---
+
+# ContactPoint
+
+A contact point&#x2014;for example, a Customer Complaints department.
+
+## Type Hierarchy
+
+**ContactPoint**
+
+## Direct Subclasses
+
+- **[PostalAddress](PostalAddress.mdx)**: The mailing address
+
+## Properties
+
+See [Schema.org ContactPoint properties](https://schema.org/ContactPoint#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ContactPoint } from 'schema.org.ai'
+
+// Create a ContactPoint
+const item: ContactPoint = {
+  $type: 'ContactPoint',
+  name: 'Example ContactPoint'
+}
+
+// Use semantic patterns
+await $.ContactPoint.create(item)
+const result = await $.ContactPoint.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ContactPoint](https://schema.org/ContactPoint)
+- [ContactPoint Properties](https://schema.org/ContactPoint#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

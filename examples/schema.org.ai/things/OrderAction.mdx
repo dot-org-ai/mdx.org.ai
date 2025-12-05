@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OrderAction
+$context: https://schema.org
+$type: Class
+name: OrderAction
+description: An agent orders an object/product/service to be delivered/sent.
+subClassOf: ["TradeAction"]
+---
+
+# OrderAction
+
+An agent orders an object/product/service to be delivered/sent.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TradeAction](TradeAction.mdx) > **OrderAction**
+
+
+
+## Properties
+
+See [Schema.org OrderAction properties](https://schema.org/OrderAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OrderAction } from 'schema.org.ai'
+
+// Create a OrderAction
+const item: OrderAction = {
+  $type: 'OrderAction',
+  name: 'Example OrderAction'
+}
+
+// Use semantic patterns
+await $.OrderAction.create(item)
+const result = await $.OrderAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OrderAction](https://schema.org/OrderAction)
+- [OrderAction Properties](https://schema.org/OrderAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

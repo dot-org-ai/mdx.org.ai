@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SpreadsheetDigitalDocument
+$context: https://schema.org
+$type: Class
+name: SpreadsheetDigitalDocument
+description: A spreadsheet file.
+subClassOf: ["DigitalDocument"]
+---
+
+# SpreadsheetDigitalDocument
+
+A spreadsheet file.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [DigitalDocument](DigitalDocument.mdx) > **SpreadsheetDigitalDocument**
+
+
+
+## Properties
+
+See [Schema.org SpreadsheetDigitalDocument properties](https://schema.org/SpreadsheetDigitalDocument#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SpreadsheetDigitalDocument } from 'schema.org.ai'
+
+// Create a SpreadsheetDigitalDocument
+const item: SpreadsheetDigitalDocument = {
+  $type: 'SpreadsheetDigitalDocument',
+  name: 'Example SpreadsheetDigitalDocument'
+}
+
+// Use semantic patterns
+await $.SpreadsheetDigitalDocument.create(item)
+const result = await $.SpreadsheetDigitalDocument.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SpreadsheetDigitalDocument](https://schema.org/SpreadsheetDigitalDocument)
+- [SpreadsheetDigitalDocument Properties](https://schema.org/SpreadsheetDigitalDocument#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

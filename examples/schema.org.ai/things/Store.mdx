@@ -1,0 +1,78 @@
+---
+$id: https://schema.org.ai/Store
+$context: https://schema.org
+$type: Class
+name: Store
+description: A retail good store.
+subClassOf: ["LocalBusiness"]
+---
+
+# Store
+
+A retail good store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **Store**
+
+## Direct Subclasses
+
+- **[AutoPartsStore](AutoPartsStore.mdx)**: An auto parts store
+- **[BikeStore](BikeStore.mdx)**: A bike store
+- **[BookStore](BookStore.mdx)**: A bookstore
+- **[ClothingStore](ClothingStore.mdx)**: A clothing store
+- **[ComputerStore](ComputerStore.mdx)**: A computer store
+- **[ConvenienceStore](ConvenienceStore.mdx)**: A convenience store
+- **[DepartmentStore](DepartmentStore.mdx)**: A department store
+- **[ElectronicsStore](ElectronicsStore.mdx)**: An electronics store
+- **[Florist](Florist.mdx)**: A florist
+- **[FurnitureStore](FurnitureStore.mdx)**: A furniture store
+- **[GardenStore](GardenStore.mdx)**: A garden store
+- **[GroceryStore](GroceryStore.mdx)**: A grocery store
+- **[HardwareStore](HardwareStore.mdx)**: A hardware store
+- **[HobbyShop](HobbyShop.mdx)**: A store that sells materials useful or necessary for various hobbies
+- **[HomeGoodsStore](HomeGoodsStore.mdx)**: A home goods store
+- **[JewelryStore](JewelryStore.mdx)**: A jewelry store
+- **[LiquorStore](LiquorStore.mdx)**: A shop that sells alcoholic drinks such as wine, beer, whisky and other spirits
+- **[MobilePhoneStore](MobilePhoneStore.mdx)**: A store that sells mobile phones and related accessories
+- **[MovieRentalStore](MovieRentalStore.mdx)**: A movie rental store
+- **[MusicStore](MusicStore.mdx)**: A music store
+- **[OfficeEquipmentStore](OfficeEquipmentStore.mdx)**: An office equipment store
+- **[OutletStore](OutletStore.mdx)**: An outlet store
+- **[PawnShop](PawnShop.mdx)**: A shop that will buy, or lend money against the security of, personal possessions
+- **[PetStore](PetStore.mdx)**: A pet store
+- **[ShoeStore](ShoeStore.mdx)**: A shoe store
+- **[SportingGoodsStore](SportingGoodsStore.mdx)**: A sporting goods store
+- **[TireShop](TireShop.mdx)**: A tire shop
+- **[ToyStore](ToyStore.mdx)**: A toy store
+- **[WholesaleStore](WholesaleStore.mdx)**: A wholesale store
+
+## Properties
+
+See [Schema.org Store properties](https://schema.org/Store#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Store } from 'schema.org.ai'
+
+// Create a Store
+const item: Store = {
+  $type: 'Store',
+  name: 'Example Store'
+}
+
+// Use semantic patterns
+await $.Store.create(item)
+const result = await $.Store.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Store](https://schema.org/Store)
+- [Store Properties](https://schema.org/Store#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

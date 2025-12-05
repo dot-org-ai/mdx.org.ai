@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RsvpAction
+$context: https://schema.org
+$type: Class
+name: RsvpAction
+description: The act of notifying an event organizer as to whether you expect to attend the event.
+subClassOf: ["InformAction"]
+---
+
+# RsvpAction
+
+The act of notifying an event organizer as to whether you expect to attend the event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > [InformAction](InformAction.mdx) > **RsvpAction**
+
+
+
+## Properties
+
+See [Schema.org RsvpAction properties](https://schema.org/RsvpAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RsvpAction } from 'schema.org.ai'
+
+// Create a RsvpAction
+const item: RsvpAction = {
+  $type: 'RsvpAction',
+  name: 'Example RsvpAction'
+}
+
+// Use semantic patterns
+await $.RsvpAction.create(item)
+const result = await $.RsvpAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RsvpAction](https://schema.org/RsvpAction)
+- [RsvpAction Properties](https://schema.org/RsvpAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ReplaceAction
+$context: https://schema.org
+$type: Class
+name: ReplaceAction
+description: The act of editing a recipient by replacing an old object with a new object.
+subClassOf: ["UpdateAction"]
+---
+
+# ReplaceAction
+
+The act of editing a recipient by replacing an old object with a new object.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [UpdateAction](UpdateAction.mdx) > **ReplaceAction**
+
+
+
+## Properties
+
+See [Schema.org ReplaceAction properties](https://schema.org/ReplaceAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReplaceAction } from 'schema.org.ai'
+
+// Create a ReplaceAction
+const item: ReplaceAction = {
+  $type: 'ReplaceAction',
+  name: 'Example ReplaceAction'
+}
+
+// Use semantic patterns
+await $.ReplaceAction.create(item)
+const result = await $.ReplaceAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReplaceAction](https://schema.org/ReplaceAction)
+- [ReplaceAction Properties](https://schema.org/ReplaceAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

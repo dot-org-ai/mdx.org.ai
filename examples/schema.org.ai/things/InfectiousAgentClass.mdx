@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/InfectiousAgentClass
+$context: https://schema.org
+$type: Class
+name: InfectiousAgentClass
+description: Classes of agents or pathogens that transmit infectious diseases. Enumerated type.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# InfectiousAgentClass
+
+Classes of agents or pathogens that transmit infectious diseases. Enumerated type.
+
+## Type Hierarchy
+
+**InfectiousAgentClass**
+
+
+
+## Properties
+
+See [Schema.org InfectiousAgentClass properties](https://schema.org/InfectiousAgentClass#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InfectiousAgentClass } from 'schema.org.ai'
+
+// Create a InfectiousAgentClass
+const item: InfectiousAgentClass = {
+  $type: 'InfectiousAgentClass',
+  name: 'Example InfectiousAgentClass'
+}
+
+// Use semantic patterns
+await $.InfectiousAgentClass.create(item)
+const result = await $.InfectiousAgentClass.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InfectiousAgentClass](https://schema.org/InfectiousAgentClass)
+- [InfectiousAgentClass Properties](https://schema.org/InfectiousAgentClass#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

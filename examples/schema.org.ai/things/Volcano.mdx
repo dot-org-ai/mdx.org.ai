@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Volcano
+$context: https://schema.org
+$type: Class
+name: Volcano
+description: A volcano, like Fujisan.
+subClassOf: ["Landform"]
+---
+
+# Volcano
+
+A volcano, like Fujisan.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > **Volcano**
+
+
+
+## Properties
+
+See [Schema.org Volcano properties](https://schema.org/Volcano#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Volcano } from 'schema.org.ai'
+
+// Create a Volcano
+const item: Volcano = {
+  $type: 'Volcano',
+  name: 'Example Volcano'
+}
+
+// Use semantic patterns
+await $.Volcano.create(item)
+const result = await $.Volcano.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Volcano](https://schema.org/Volcano)
+- [Volcano Properties](https://schema.org/Volcano#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/InstallAction
+$context: https://schema.org
+$type: Class
+name: InstallAction
+description: The act of installing an application.
+subClassOf: ["ConsumeAction"]
+---
+
+# InstallAction
+
+The act of installing an application.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > **InstallAction**
+
+
+
+## Properties
+
+See [Schema.org InstallAction properties](https://schema.org/InstallAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InstallAction } from 'schema.org.ai'
+
+// Create a InstallAction
+const item: InstallAction = {
+  $type: 'InstallAction',
+  name: 'Example InstallAction'
+}
+
+// Use semantic patterns
+await $.InstallAction.create(item)
+const result = await $.InstallAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InstallAction](https://schema.org/InstallAction)
+- [InstallAction Properties](https://schema.org/InstallAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

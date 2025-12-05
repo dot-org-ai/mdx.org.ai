@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FAQPage
+$context: https://schema.org
+$type: Class
+name: FAQPage
+description: A [[FAQPage]] is a [[WebPage]] presenting one or more "[Frequently asked questions](https://en.wikipedia.org/wiki/FAQ)" (see also [[QAPage]]).
+subClassOf: ["WebPage"]
+---
+
+# FAQPage
+
+A [[FAQPage]] is a [[WebPage]] presenting one or more "[Frequently asked questions](https://en.wikipedia.org/wiki/FAQ)" (see also [[QAPage]]).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **FAQPage**
+
+
+
+## Properties
+
+See [Schema.org FAQPage properties](https://schema.org/FAQPage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FAQPage } from 'schema.org.ai'
+
+// Create a FAQPage
+const item: FAQPage = {
+  $type: 'FAQPage',
+  name: 'Example FAQPage'
+}
+
+// Use semantic patterns
+await $.FAQPage.create(item)
+const result = await $.FAQPage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FAQPage](https://schema.org/FAQPage)
+- [FAQPage Properties](https://schema.org/FAQPage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

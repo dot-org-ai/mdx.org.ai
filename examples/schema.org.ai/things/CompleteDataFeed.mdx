@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CompleteDataFeed
+$context: https://schema.org
+$type: Class
+name: CompleteDataFeed
+description: A [[CompleteDataFeed]] is a [[DataFeed]] whose standard representation includes content for every item currently in the feed. This is the equivalent of Atom\
+subClassOf: ["DataFeed"]
+---
+
+# CompleteDataFeed
+
+A [[CompleteDataFeed]] is a [[DataFeed]] whose standard representation includes content for every item currently in the feed. This is the equivalent of Atom\
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Dataset](Dataset.mdx) > [DataFeed](DataFeed.mdx) > **CompleteDataFeed**
+
+
+
+## Properties
+
+See [Schema.org CompleteDataFeed properties](https://schema.org/CompleteDataFeed#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CompleteDataFeed } from 'schema.org.ai'
+
+// Create a CompleteDataFeed
+const item: CompleteDataFeed = {
+  $type: 'CompleteDataFeed',
+  name: 'Example CompleteDataFeed'
+}
+
+// Use semantic patterns
+await $.CompleteDataFeed.create(item)
+const result = await $.CompleteDataFeed.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CompleteDataFeed](https://schema.org/CompleteDataFeed)
+- [CompleteDataFeed Properties](https://schema.org/CompleteDataFeed#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

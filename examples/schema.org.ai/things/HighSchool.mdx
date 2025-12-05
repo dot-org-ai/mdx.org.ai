@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HighSchool
+$context: https://schema.org
+$type: Class
+name: HighSchool
+description: A high school.
+subClassOf: ["EducationalOrganization"]
+---
+
+# HighSchool
+
+A high school.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [EducationalOrganization](EducationalOrganization.mdx) > **HighSchool**
+
+
+
+## Properties
+
+See [Schema.org HighSchool properties](https://schema.org/HighSchool#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HighSchool } from 'schema.org.ai'
+
+// Create a HighSchool
+const item: HighSchool = {
+  $type: 'HighSchool',
+  name: 'Example HighSchool'
+}
+
+// Use semantic patterns
+await $.HighSchool.create(item)
+const result = await $.HighSchool.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HighSchool](https://schema.org/HighSchool)
+- [HighSchool Properties](https://schema.org/HighSchool#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

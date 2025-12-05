@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RVPark
+$context: https://schema.org
+$type: Class
+name: RVPark
+description: A place offering space for "Recreational Vehicles", Caravans, mobile homes and the like.
+subClassOf: ["CivicStructure"]
+---
+
+# RVPark
+
+A place offering space for "Recreational Vehicles", Caravans, mobile homes and the like.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **RVPark**
+
+
+
+## Properties
+
+See [Schema.org RVPark properties](https://schema.org/RVPark#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RVPark } from 'schema.org.ai'
+
+// Create a RVPark
+const item: RVPark = {
+  $type: 'RVPark',
+  name: 'Example RVPark'
+}
+
+// Use semantic patterns
+await $.RVPark.create(item)
+const result = await $.RVPark.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RVPark](https://schema.org/RVPark)
+- [RVPark Properties](https://schema.org/RVPark#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

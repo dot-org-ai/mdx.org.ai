@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DietarySupplement
+$context: https://schema.org
+$type: Class
+name: DietarySupplement
+description: A product taken by mouth that contains a dietary ingredient intended to supplement the diet. Dietary ingredients may include vitamins, minerals, herbs or other botanicals, amino acids, and substances such as enzymes, organ tissues, glandulars and metabolites.
+subClassOf: ["Substance","Product"]
+---
+
+# DietarySupplement
+
+A product taken by mouth that contains a dietary ingredient intended to supplement the diet. Dietary ingredients may include vitamins, minerals, herbs or other botanicals, amino acids, and substances such as enzymes, organ tissues, glandulars and metabolites.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > **DietarySupplement**
+
+
+
+## Properties
+
+See [Schema.org DietarySupplement properties](https://schema.org/DietarySupplement#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DietarySupplement } from 'schema.org.ai'
+
+// Create a DietarySupplement
+const item: DietarySupplement = {
+  $type: 'DietarySupplement',
+  name: 'Example DietarySupplement'
+}
+
+// Use semantic patterns
+await $.DietarySupplement.create(item)
+const result = await $.DietarySupplement.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DietarySupplement](https://schema.org/DietarySupplement)
+- [DietarySupplement Properties](https://schema.org/DietarySupplement#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

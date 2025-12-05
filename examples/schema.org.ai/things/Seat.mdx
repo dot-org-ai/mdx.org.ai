@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Seat
+$context: https://schema.org
+$type: Class
+name: Seat
+description: Used to describe a seat, such as a reserved seat in an event reservation.
+subClassOf: ["Intangible"]
+---
+
+# Seat
+
+Used to describe a seat, such as a reserved seat in an event reservation.
+
+## Type Hierarchy
+
+**Seat**
+
+
+
+## Properties
+
+See [Schema.org Seat properties](https://schema.org/Seat#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Seat } from 'schema.org.ai'
+
+// Create a Seat
+const item: Seat = {
+  $type: 'Seat',
+  name: 'Example Seat'
+}
+
+// Use semantic patterns
+await $.Seat.create(item)
+const result = await $.Seat.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Seat](https://schema.org/Seat)
+- [Seat Properties](https://schema.org/Seat#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

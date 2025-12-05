@@ -1,0 +1,59 @@
+---
+$id: https://schema.org.ai/BusinessFunction
+$context: https://schema.org
+$type: Class
+name: BusinessFunction
+description: The business function specifies the type of activity or access (i.e., the bundle of rights) offered by the organization or business person through the offer. Typical are sell, rental or lease, maintenance or repair, manufacture / produce, recycle / dispose, engineering / construction, or installation. Proprietary specifications of access rights are also instances of this class.\
+subClassOf: ["Enumeration"]
+---
+
+# BusinessFunction
+
+The business function specifies the type of activity or access (i.e., the bundle of rights) offered by the organization or business person through the offer. Typical are sell, rental or lease, maintenance or repair, manufacture / produce, recycle / dispose, engineering / construction, or installation. Proprietary specifications of access rights are also instances of this class.\
+\
+Commonly used values:\
+\
+* http://purl.org/goodrelations/v1#ConstructionInstallation\
+* http://purl.org/goodrelations/v1#Dispose\
+* http://purl.org/goodrelations/v1#LeaseOut\
+* http://purl.org/goodrelations/v1#Maintain\
+* http://purl.org/goodrelations/v1#ProvideService\
+* http://purl.org/goodrelations/v1#Repair\
+* http://purl.org/goodrelations/v1#Sell\
+* http://purl.org/goodrelations/v1#Buy
+
+## Type Hierarchy
+
+**BusinessFunction**
+
+
+
+## Properties
+
+See [Schema.org BusinessFunction properties](https://schema.org/BusinessFunction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BusinessFunction } from 'schema.org.ai'
+
+// Create a BusinessFunction
+const item: BusinessFunction = {
+  $type: 'BusinessFunction',
+  name: 'Example BusinessFunction'
+}
+
+// Use semantic patterns
+await $.BusinessFunction.create(item)
+const result = await $.BusinessFunction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BusinessFunction](https://schema.org/BusinessFunction)
+- [BusinessFunction Properties](https://schema.org/BusinessFunction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

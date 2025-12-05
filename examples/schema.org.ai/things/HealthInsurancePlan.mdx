@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HealthInsurancePlan
+$context: https://schema.org
+$type: Class
+name: HealthInsurancePlan
+description: A US-style health insurance plan, including PPOs, EPOs, and HMOs.
+subClassOf: ["Intangible"]
+---
+
+# HealthInsurancePlan
+
+A US-style health insurance plan, including PPOs, EPOs, and HMOs.
+
+## Type Hierarchy
+
+**HealthInsurancePlan**
+
+
+
+## Properties
+
+See [Schema.org HealthInsurancePlan properties](https://schema.org/HealthInsurancePlan#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HealthInsurancePlan } from 'schema.org.ai'
+
+// Create a HealthInsurancePlan
+const item: HealthInsurancePlan = {
+  $type: 'HealthInsurancePlan',
+  name: 'Example HealthInsurancePlan'
+}
+
+// Use semantic patterns
+await $.HealthInsurancePlan.create(item)
+const result = await $.HealthInsurancePlan.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HealthInsurancePlan](https://schema.org/HealthInsurancePlan)
+- [HealthInsurancePlan Properties](https://schema.org/HealthInsurancePlan#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,61 @@
+---
+$id: https://schema.org.ai/HomeAndConstructionBusiness
+$context: https://schema.org
+$type: Class
+name: HomeAndConstructionBusiness
+description: A construction business.\
+subClassOf: ["LocalBusiness"]
+---
+
+# HomeAndConstructionBusiness
+
+A construction business.\
+\
+A HomeAndConstructionBusiness is a [[LocalBusiness]] that provides services around homes and buildings.\
+\
+As a [[LocalBusiness]] it can be described as a [[provider]] of one or more [[Service]]\\(s).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **HomeAndConstructionBusiness**
+
+## Direct Subclasses
+
+- **[Electrician](Electrician.mdx)**: An electrician
+- **[GeneralContractor](GeneralContractor.mdx)**: A general contractor
+- **[HousePainter](HousePainter.mdx)**: A house painting service
+- **[HVACBusiness](HVACBusiness.mdx)**: A business that provides Heating, Ventilation and Air Conditioning services
+- **[Locksmith](Locksmith.mdx)**: A locksmith
+- **[MovingCompany](MovingCompany.mdx)**: A moving company
+- **[Plumber](Plumber.mdx)**: A plumbing service
+- **[RoofingContractor](RoofingContractor.mdx)**: A roofing contractor
+
+## Properties
+
+See [Schema.org HomeAndConstructionBusiness properties](https://schema.org/HomeAndConstructionBusiness#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HomeAndConstructionBusiness } from 'schema.org.ai'
+
+// Create a HomeAndConstructionBusiness
+const item: HomeAndConstructionBusiness = {
+  $type: 'HomeAndConstructionBusiness',
+  name: 'Example HomeAndConstructionBusiness'
+}
+
+// Use semantic patterns
+await $.HomeAndConstructionBusiness.create(item)
+const result = await $.HomeAndConstructionBusiness.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HomeAndConstructionBusiness](https://schema.org/HomeAndConstructionBusiness)
+- [HomeAndConstructionBusiness Properties](https://schema.org/HomeAndConstructionBusiness#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

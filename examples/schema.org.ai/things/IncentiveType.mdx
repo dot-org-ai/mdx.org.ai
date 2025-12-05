@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/IncentiveType
+$context: https://schema.org
+$type: Class
+name: IncentiveType
+description: Enumerates common financial incentives for products, including tax credits, tax deductions, rebates and subsidies, etc.
+subClassOf: ["Enumeration"]
+---
+
+# IncentiveType
+
+Enumerates common financial incentives for products, including tax credits, tax deductions, rebates and subsidies, etc.
+
+## Type Hierarchy
+
+**IncentiveType**
+
+
+
+## Properties
+
+See [Schema.org IncentiveType properties](https://schema.org/IncentiveType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { IncentiveType } from 'schema.org.ai'
+
+// Create a IncentiveType
+const item: IncentiveType = {
+  $type: 'IncentiveType',
+  name: 'Example IncentiveType'
+}
+
+// Use semantic patterns
+await $.IncentiveType.create(item)
+const result = await $.IncentiveType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org IncentiveType](https://schema.org/IncentiveType)
+- [IncentiveType Properties](https://schema.org/IncentiveType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

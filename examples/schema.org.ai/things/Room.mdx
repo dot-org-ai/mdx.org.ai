@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/Room
+$context: https://schema.org
+$type: Class
+name: Room
+description: A room is a distinguishable space within a structure, usually separated from other spaces by interior walls (source: Wikipedia, the free encyclopedia, see <a href="http://en.wikipedia.org/wiki/Room">http://en.wikipedia.org/wiki/Room</a>). <br /><br /> See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.
+subClassOf: ["Accommodation"]
+---
+
+# Room
+
+A room is a distinguishable space within a structure, usually separated from other spaces by interior walls (source: Wikipedia, the free encyclopedia, see <a href="http://en.wikipedia.org/wiki/Room">http://en.wikipedia.org/wiki/Room</a>). <br /><br /> See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Accommodation](Accommodation.mdx) > **Room**
+
+## Direct Subclasses
+
+- **[HotelRoom](HotelRoom.mdx)**: A hotel room is a single room in a hotel
+- **[MeetingRoom](MeetingRoom.mdx)**: A meeting room, conference room, or conference hall is a room provided for singular events such as business conferences and meetings (source: Wikipedia, the free encyclopedia, see <a href="http://en
+
+## Properties
+
+See [Schema.org Room properties](https://schema.org/Room#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Room } from 'schema.org.ai'
+
+// Create a Room
+const item: Room = {
+  $type: 'Room',
+  name: 'Example Room'
+}
+
+// Use semantic patterns
+await $.Room.create(item)
+const result = await $.Room.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Room](https://schema.org/Room)
+- [Room Properties](https://schema.org/Room#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PaymentMethodType
+$context: https://schema.org
+$type: Class
+name: PaymentMethodType
+description: The type of payment method, only for generic payment types, specific forms of payments, like card payment should be expressed using subclasses of PaymentMethod.
+subClassOf: ["Enumeration"]
+---
+
+# PaymentMethodType
+
+The type of payment method, only for generic payment types, specific forms of payments, like card payment should be expressed using subclasses of PaymentMethod.
+
+## Type Hierarchy
+
+**PaymentMethodType**
+
+
+
+## Properties
+
+See [Schema.org PaymentMethodType properties](https://schema.org/PaymentMethodType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PaymentMethodType } from 'schema.org.ai'
+
+// Create a PaymentMethodType
+const item: PaymentMethodType = {
+  $type: 'PaymentMethodType',
+  name: 'Example PaymentMethodType'
+}
+
+// Use semantic patterns
+await $.PaymentMethodType.create(item)
+const result = await $.PaymentMethodType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PaymentMethodType](https://schema.org/PaymentMethodType)
+- [PaymentMethodType Properties](https://schema.org/PaymentMethodType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

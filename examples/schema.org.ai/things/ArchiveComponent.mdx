@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ArchiveComponent
+$context: https://schema.org
+$type: Class
+name: ArchiveComponent
+description: An intangible type to be applied to any archive content, carrying with it a set of properties required to describe archival items and collections.
+subClassOf: ["CreativeWork"]
+---
+
+# ArchiveComponent
+
+An intangible type to be applied to any archive content, carrying with it a set of properties required to describe archival items and collections.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **ArchiveComponent**
+
+
+
+## Properties
+
+See [Schema.org ArchiveComponent properties](https://schema.org/ArchiveComponent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ArchiveComponent } from 'schema.org.ai'
+
+// Create a ArchiveComponent
+const item: ArchiveComponent = {
+  $type: 'ArchiveComponent',
+  name: 'Example ArchiveComponent'
+}
+
+// Use semantic patterns
+await $.ArchiveComponent.create(item)
+const result = await $.ArchiveComponent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ArchiveComponent](https://schema.org/ArchiveComponent)
+- [ArchiveComponent Properties](https://schema.org/ArchiveComponent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

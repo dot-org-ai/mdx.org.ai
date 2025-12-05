@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Language
+$context: https://schema.org
+$type: Class
+name: Language
+description: Natural languages such as Spanish, Tamil, Hindi, English, etc. Formal language code tags expressed in [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag) can be used via the [[alternateName]] property. The Language type previously also covered programming languages such as Scheme and Lisp, which are now best represented using [[ComputerLanguage]].
+subClassOf: ["Intangible"]
+---
+
+# Language
+
+Natural languages such as Spanish, Tamil, Hindi, English, etc. Formal language code tags expressed in [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag) can be used via the [[alternateName]] property. The Language type previously also covered programming languages such as Scheme and Lisp, which are now best represented using [[ComputerLanguage]].
+
+## Type Hierarchy
+
+**Language**
+
+
+
+## Properties
+
+See [Schema.org Language properties](https://schema.org/Language#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Language } from 'schema.org.ai'
+
+// Create a Language
+const item: Language = {
+  $type: 'Language',
+  name: 'Example Language'
+}
+
+// Use semantic patterns
+await $.Language.create(item)
+const result = await $.Language.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Language](https://schema.org/Language)
+- [Language Properties](https://schema.org/Language#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

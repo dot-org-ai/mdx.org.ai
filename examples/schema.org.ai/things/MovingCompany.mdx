@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MovingCompany
+$context: https://schema.org
+$type: Class
+name: MovingCompany
+description: A moving company.
+subClassOf: ["HomeAndConstructionBusiness"]
+---
+
+# MovingCompany
+
+A moving company.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HomeAndConstructionBusiness](HomeAndConstructionBusiness.mdx) > **MovingCompany**
+
+
+
+## Properties
+
+See [Schema.org MovingCompany properties](https://schema.org/MovingCompany#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MovingCompany } from 'schema.org.ai'
+
+// Create a MovingCompany
+const item: MovingCompany = {
+  $type: 'MovingCompany',
+  name: 'Example MovingCompany'
+}
+
+// Use semantic patterns
+await $.MovingCompany.create(item)
+const result = await $.MovingCompany.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MovingCompany](https://schema.org/MovingCompany)
+- [MovingCompany Properties](https://schema.org/MovingCompany#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

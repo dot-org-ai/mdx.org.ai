@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FloorPlan
+$context: https://schema.org
+$type: Class
+name: FloorPlan
+description: A FloorPlan is an explicit representation of a collection of similar accommodations, allowing the provision of common information (room counts, sizes, layout diagrams) and offers for rental or sale. In typical use, some [[ApartmentComplex]] has an [[accommodationFloorPlan]] which is a [[FloorPlan]].  A FloorPlan is always in the context of a particular place, either a larger [[ApartmentComplex]] or a single [[Apartment]]. The visual/spatial aspects of a floor plan (i.e. room layout, [see wikipedia](https://en.wikipedia.org/wiki/Floor_plan)) can be indicated using [[image]].
+subClassOf: ["Intangible"]
+---
+
+# FloorPlan
+
+A FloorPlan is an explicit representation of a collection of similar accommodations, allowing the provision of common information (room counts, sizes, layout diagrams) and offers for rental or sale. In typical use, some [[ApartmentComplex]] has an [[accommodationFloorPlan]] which is a [[FloorPlan]].  A FloorPlan is always in the context of a particular place, either a larger [[ApartmentComplex]] or a single [[Apartment]]. The visual/spatial aspects of a floor plan (i.e. room layout, [see wikipedia](https://en.wikipedia.org/wiki/Floor_plan)) can be indicated using [[image]].
+
+## Type Hierarchy
+
+**FloorPlan**
+
+
+
+## Properties
+
+See [Schema.org FloorPlan properties](https://schema.org/FloorPlan#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FloorPlan } from 'schema.org.ai'
+
+// Create a FloorPlan
+const item: FloorPlan = {
+  $type: 'FloorPlan',
+  name: 'Example FloorPlan'
+}
+
+// Use semantic patterns
+await $.FloorPlan.create(item)
+const result = await $.FloorPlan.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FloorPlan](https://schema.org/FloorPlan)
+- [FloorPlan Properties](https://schema.org/FloorPlan#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

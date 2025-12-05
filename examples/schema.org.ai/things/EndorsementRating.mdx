@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EndorsementRating
+$context: https://schema.org
+$type: Class
+name: EndorsementRating
+description: An EndorsementRating is a rating that expresses some level of endorsement, for example inclusion in a "critic\
+subClassOf: ["Rating"]
+---
+
+# EndorsementRating
+
+An EndorsementRating is a rating that expresses some level of endorsement, for example inclusion in a "critic\
+
+## Type Hierarchy
+
+**EndorsementRating**
+
+
+
+## Properties
+
+See [Schema.org EndorsementRating properties](https://schema.org/EndorsementRating#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EndorsementRating } from 'schema.org.ai'
+
+// Create a EndorsementRating
+const item: EndorsementRating = {
+  $type: 'EndorsementRating',
+  name: 'Example EndorsementRating'
+}
+
+// Use semantic patterns
+await $.EndorsementRating.create(item)
+const result = await $.EndorsementRating.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EndorsementRating](https://schema.org/EndorsementRating)
+- [EndorsementRating Properties](https://schema.org/EndorsementRating#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

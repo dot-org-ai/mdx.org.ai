@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Dataset
+$context: https://schema.org
+$type: Class
+name: Dataset
+description: A body of structured information describing some topic(s) of interest.
+subClassOf: ["CreativeWork"]
+---
+
+# Dataset
+
+A body of structured information describing some topic(s) of interest.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Dataset**
+
+## Direct Subclasses
+
+- **[DataFeed](DataFeed.mdx)**: A single feed providing structured information about one or more entities or topics
+
+## Properties
+
+See [Schema.org Dataset properties](https://schema.org/Dataset#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Dataset } from 'schema.org.ai'
+
+// Create a Dataset
+const item: Dataset = {
+  $type: 'Dataset',
+  name: 'Example Dataset'
+}
+
+// Use semantic patterns
+await $.Dataset.create(item)
+const result = await $.Dataset.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Dataset](https://schema.org/Dataset)
+- [Dataset Properties](https://schema.org/Dataset#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

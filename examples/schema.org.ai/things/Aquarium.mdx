@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Aquarium
+$context: https://schema.org
+$type: Class
+name: Aquarium
+description: Aquarium.
+subClassOf: ["CivicStructure"]
+---
+
+# Aquarium
+
+Aquarium.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **Aquarium**
+
+
+
+## Properties
+
+See [Schema.org Aquarium properties](https://schema.org/Aquarium#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Aquarium } from 'schema.org.ai'
+
+// Create a Aquarium
+const item: Aquarium = {
+  $type: 'Aquarium',
+  name: 'Example Aquarium'
+}
+
+// Use semantic patterns
+await $.Aquarium.create(item)
+const result = await $.Aquarium.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Aquarium](https://schema.org/Aquarium)
+- [Aquarium Properties](https://schema.org/Aquarium#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

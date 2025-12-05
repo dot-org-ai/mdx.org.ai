@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/VisualArtsEvent
+$context: https://schema.org
+$type: Class
+name: VisualArtsEvent
+description: Event type: Visual arts event.
+subClassOf: ["Event"]
+---
+
+# VisualArtsEvent
+
+Event type: Visual arts event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **VisualArtsEvent**
+
+
+
+## Properties
+
+See [Schema.org VisualArtsEvent properties](https://schema.org/VisualArtsEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { VisualArtsEvent } from 'schema.org.ai'
+
+// Create a VisualArtsEvent
+const item: VisualArtsEvent = {
+  $type: 'VisualArtsEvent',
+  name: 'Example VisualArtsEvent'
+}
+
+// Use semantic patterns
+await $.VisualArtsEvent.create(item)
+const result = await $.VisualArtsEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org VisualArtsEvent](https://schema.org/VisualArtsEvent)
+- [VisualArtsEvent Properties](https://schema.org/VisualArtsEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

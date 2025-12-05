@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/InternetCafe
+$context: https://schema.org
+$type: Class
+name: InternetCafe
+description: An internet cafe.
+subClassOf: ["LocalBusiness"]
+---
+
+# InternetCafe
+
+An internet cafe.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **InternetCafe**
+
+
+
+## Properties
+
+See [Schema.org InternetCafe properties](https://schema.org/InternetCafe#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InternetCafe } from 'schema.org.ai'
+
+// Create a InternetCafe
+const item: InternetCafe = {
+  $type: 'InternetCafe',
+  name: 'Example InternetCafe'
+}
+
+// Use semantic patterns
+await $.InternetCafe.create(item)
+const result = await $.InternetCafe.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InternetCafe](https://schema.org/InternetCafe)
+- [InternetCafe Properties](https://schema.org/InternetCafe#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

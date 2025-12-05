@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FoodService
+$context: https://schema.org
+$type: Class
+name: FoodService
+description: A food service, like breakfast, lunch, or dinner.
+subClassOf: ["Service"]
+---
+
+# FoodService
+
+A food service, like breakfast, lunch, or dinner.
+
+## Type Hierarchy
+
+**FoodService**
+
+
+
+## Properties
+
+See [Schema.org FoodService properties](https://schema.org/FoodService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FoodService } from 'schema.org.ai'
+
+// Create a FoodService
+const item: FoodService = {
+  $type: 'FoodService',
+  name: 'Example FoodService'
+}
+
+// Use semantic patterns
+await $.FoodService.create(item)
+const result = await $.FoodService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FoodService](https://schema.org/FoodService)
+- [FoodService Properties](https://schema.org/FoodService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

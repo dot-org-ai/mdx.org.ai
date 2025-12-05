@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GamePlayMode
+$context: https://schema.org
+$type: Class
+name: GamePlayMode
+description: Indicates whether this game is multi-player, co-op or single-player.
+subClassOf: ["Enumeration"]
+---
+
+# GamePlayMode
+
+Indicates whether this game is multi-player, co-op or single-player.
+
+## Type Hierarchy
+
+**GamePlayMode**
+
+
+
+## Properties
+
+See [Schema.org GamePlayMode properties](https://schema.org/GamePlayMode#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GamePlayMode } from 'schema.org.ai'
+
+// Create a GamePlayMode
+const item: GamePlayMode = {
+  $type: 'GamePlayMode',
+  name: 'Example GamePlayMode'
+}
+
+// Use semantic patterns
+await $.GamePlayMode.create(item)
+const result = await $.GamePlayMode.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GamePlayMode](https://schema.org/GamePlayMode)
+- [GamePlayMode Properties](https://schema.org/GamePlayMode#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

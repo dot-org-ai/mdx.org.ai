@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AmpStory
+$context: https://schema.org
+$type: Class
+name: AmpStory
+description: A creative work with a visual storytelling format intended to be viewed online, particularly on mobile devices.
+subClassOf: ["MediaObject","CreativeWork"]
+---
+
+# AmpStory
+
+A creative work with a visual storytelling format intended to be viewed online, particularly on mobile devices.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **AmpStory**
+
+
+
+## Properties
+
+See [Schema.org AmpStory properties](https://schema.org/AmpStory#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AmpStory } from 'schema.org.ai'
+
+// Create a AmpStory
+const item: AmpStory = {
+  $type: 'AmpStory',
+  name: 'Example AmpStory'
+}
+
+// Use semantic patterns
+await $.AmpStory.create(item)
+const result = await $.AmpStory.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AmpStory](https://schema.org/AmpStory)
+- [AmpStory Properties](https://schema.org/AmpStory#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

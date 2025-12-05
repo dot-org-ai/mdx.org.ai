@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AmusementPark
+$context: https://schema.org
+$type: Class
+name: AmusementPark
+description: An amusement park.
+subClassOf: ["EntertainmentBusiness"]
+---
+
+# AmusementPark
+
+An amusement park.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [EntertainmentBusiness](EntertainmentBusiness.mdx) > **AmusementPark**
+
+
+
+## Properties
+
+See [Schema.org AmusementPark properties](https://schema.org/AmusementPark#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AmusementPark } from 'schema.org.ai'
+
+// Create a AmusementPark
+const item: AmusementPark = {
+  $type: 'AmusementPark',
+  name: 'Example AmusementPark'
+}
+
+// Use semantic patterns
+await $.AmusementPark.create(item)
+const result = await $.AmusementPark.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AmusementPark](https://schema.org/AmusementPark)
+- [AmusementPark Properties](https://schema.org/AmusementPark#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

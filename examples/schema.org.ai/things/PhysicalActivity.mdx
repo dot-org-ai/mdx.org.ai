@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/PhysicalActivity
+$context: https://schema.org
+$type: Class
+name: PhysicalActivity
+description: Any bodily activity that enhances or maintains physical fitness and overall health and wellness. Includes activity that is part of daily living and routine, structured exercise, and exercise prescribed as part of a medical treatment or recovery plan.
+subClassOf: ["LifestyleModification"]
+---
+
+# PhysicalActivity
+
+Any bodily activity that enhances or maintains physical fitness and overall health and wellness. Includes activity that is part of daily living and routine, structured exercise, and exercise prescribed as part of a medical treatment or recovery plan.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [LifestyleModification](LifestyleModification.mdx) > **PhysicalActivity**
+
+## Direct Subclasses
+
+- **[ExercisePlan](ExercisePlan.mdx)**: Fitness-related activity designed for a specific health-related purpose, including defined exercise routines as well as activity prescribed by a clinician
+
+## Properties
+
+See [Schema.org PhysicalActivity properties](https://schema.org/PhysicalActivity#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PhysicalActivity } from 'schema.org.ai'
+
+// Create a PhysicalActivity
+const item: PhysicalActivity = {
+  $type: 'PhysicalActivity',
+  name: 'Example PhysicalActivity'
+}
+
+// Use semantic patterns
+await $.PhysicalActivity.create(item)
+const result = await $.PhysicalActivity.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PhysicalActivity](https://schema.org/PhysicalActivity)
+- [PhysicalActivity Properties](https://schema.org/PhysicalActivity#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Date
+$context: https://schema.org
+$type: Class
+name: Date
+description: A date value in [ISO 8601 date format](http://en.wikipedia.org/wiki/ISO_8601).
+subClassOf: []
+---
+
+# Date
+
+A date value in [ISO 8601 date format](http://en.wikipedia.org/wiki/ISO_8601).
+
+## Type Hierarchy
+
+**Date**
+
+
+
+## Properties
+
+See [Schema.org Date properties](https://schema.org/Date#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Date } from 'schema.org.ai'
+
+// Create a Date
+const item: Date = {
+  $type: 'Date',
+  name: 'Example Date'
+}
+
+// Use semantic patterns
+await $.Date.create(item)
+const result = await $.Date.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Date](https://schema.org/Date)
+- [Date Properties](https://schema.org/Date#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

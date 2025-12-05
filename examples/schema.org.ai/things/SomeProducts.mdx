@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SomeProducts
+$context: https://schema.org
+$type: Class
+name: SomeProducts
+description: A placeholder for multiple similar products of the same kind.
+subClassOf: ["Product"]
+---
+
+# SomeProducts
+
+A placeholder for multiple similar products of the same kind.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > **SomeProducts**
+
+
+
+## Properties
+
+See [Schema.org SomeProducts properties](https://schema.org/SomeProducts#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SomeProducts } from 'schema.org.ai'
+
+// Create a SomeProducts
+const item: SomeProducts = {
+  $type: 'SomeProducts',
+  name: 'Example SomeProducts'
+}
+
+// Use semantic patterns
+await $.SomeProducts.create(item)
+const result = await $.SomeProducts.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SomeProducts](https://schema.org/SomeProducts)
+- [SomeProducts Properties](https://schema.org/SomeProducts#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BedDetails
+$context: https://schema.org
+$type: Class
+name: BedDetails
+description: An entity holding detailed information about the available bed types, e.g. the quantity of twin beds for a hotel room. For the single case of just one bed of a certain type, you can use bed directly with a text. See also [[BedType]] (under development).
+subClassOf: ["Intangible"]
+---
+
+# BedDetails
+
+An entity holding detailed information about the available bed types, e.g. the quantity of twin beds for a hotel room. For the single case of just one bed of a certain type, you can use bed directly with a text. See also [[BedType]] (under development).
+
+## Type Hierarchy
+
+**BedDetails**
+
+
+
+## Properties
+
+See [Schema.org BedDetails properties](https://schema.org/BedDetails#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BedDetails } from 'schema.org.ai'
+
+// Create a BedDetails
+const item: BedDetails = {
+  $type: 'BedDetails',
+  name: 'Example BedDetails'
+}
+
+// Use semantic patterns
+await $.BedDetails.create(item)
+const result = await $.BedDetails.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BedDetails](https://schema.org/BedDetails)
+- [BedDetails Properties](https://schema.org/BedDetails#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

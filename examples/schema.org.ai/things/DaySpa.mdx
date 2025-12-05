@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DaySpa
+$context: https://schema.org
+$type: Class
+name: DaySpa
+description: A day spa.
+subClassOf: ["HealthAndBeautyBusiness"]
+---
+
+# DaySpa
+
+A day spa.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HealthAndBeautyBusiness](HealthAndBeautyBusiness.mdx) > **DaySpa**
+
+
+
+## Properties
+
+See [Schema.org DaySpa properties](https://schema.org/DaySpa#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DaySpa } from 'schema.org.ai'
+
+// Create a DaySpa
+const item: DaySpa = {
+  $type: 'DaySpa',
+  name: 'Example DaySpa'
+}
+
+// Use semantic patterns
+await $.DaySpa.create(item)
+const result = await $.DaySpa.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DaySpa](https://schema.org/DaySpa)
+- [DaySpa Properties](https://schema.org/DaySpa#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

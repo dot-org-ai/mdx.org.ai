@@ -1,0 +1,54 @@
+---
+$id: https://schema.org.ai/Accommodation
+$context: https://schema.org
+$type: Class
+name: Accommodation
+description: An accommodation is a place that can accommodate human beings, e.g. a hotel room, a camping pitch, or a meeting room. Many accommodations are for overnight stays, but this is not a mandatory requirement. For more specific types of accommodations not defined in schema.org, one can use [[additionalType]] with external vocabularies. <br /><br /> See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.
+subClassOf: ["Place"]
+---
+
+# Accommodation
+
+An accommodation is a place that can accommodate human beings, e.g. a hotel room, a camping pitch, or a meeting room. Many accommodations are for overnight stays, but this is not a mandatory requirement. For more specific types of accommodations not defined in schema.org, one can use [[additionalType]] with external vocabularies. <br /><br /> See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > **Accommodation**
+
+## Direct Subclasses
+
+- **[Apartment](Apartment.mdx)**: An apartment (in American English) or flat (in British English) is a self-contained housing unit (a type of residential real estate) that occupies only part of a building (source: Wikipedia, the free encyclopedia, see <a href="http://en
+- **[CampingPitch](CampingPitch.mdx)**: A [[CampingPitch]] is an individual place for overnight stay in the outdoors, typically being part of a larger camping site, or [[Campground]]
+- **[House](House.mdx)**: A house is a building or structure that has the ability to be occupied for habitation by humans or other creatures (source: Wikipedia, the free encyclopedia, see <a href="http://en
+- **[Room](Room.mdx)**: A room is a distinguishable space within a structure, usually separated from other spaces by interior walls (source: Wikipedia, the free encyclopedia, see <a href="http://en
+- **[Suite](Suite.mdx)**: A suite in a hotel or other public accommodation, denotes a class of luxury accommodations, the key feature of which is multiple rooms (source: Wikipedia, the free encyclopedia, see <a href="http://en
+
+## Properties
+
+See [Schema.org Accommodation properties](https://schema.org/Accommodation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Accommodation } from 'schema.org.ai'
+
+// Create a Accommodation
+const item: Accommodation = {
+  $type: 'Accommodation',
+  name: 'Example Accommodation'
+}
+
+// Use semantic patterns
+await $.Accommodation.create(item)
+const result = await $.Accommodation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Accommodation](https://schema.org/Accommodation)
+- [Accommodation Properties](https://schema.org/Accommodation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

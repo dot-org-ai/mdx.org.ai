@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HardwareStore
+$context: https://schema.org
+$type: Class
+name: HardwareStore
+description: A hardware store.
+subClassOf: ["Store"]
+---
+
+# HardwareStore
+
+A hardware store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **HardwareStore**
+
+
+
+## Properties
+
+See [Schema.org HardwareStore properties](https://schema.org/HardwareStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HardwareStore } from 'schema.org.ai'
+
+// Create a HardwareStore
+const item: HardwareStore = {
+  $type: 'HardwareStore',
+  name: 'Example HardwareStore'
+}
+
+// Use semantic patterns
+await $.HardwareStore.create(item)
+const result = await $.HardwareStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HardwareStore](https://schema.org/HardwareStore)
+- [HardwareStore Properties](https://schema.org/HardwareStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

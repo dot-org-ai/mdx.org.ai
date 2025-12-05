@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/TechArticle
+$context: https://schema.org
+$type: Class
+name: TechArticle
+description: A technical article - Example: How-to (task) topics, step-by-step, procedural troubleshooting, specifications, etc.
+subClassOf: ["Article"]
+---
+
+# TechArticle
+
+A technical article - Example: How-to (task) topics, step-by-step, procedural troubleshooting, specifications, etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > **TechArticle**
+
+## Direct Subclasses
+
+- **[APIReference](APIReference.mdx)**: Reference documentation for application programming interfaces (APIs)
+
+## Properties
+
+See [Schema.org TechArticle properties](https://schema.org/TechArticle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TechArticle } from 'schema.org.ai'
+
+// Create a TechArticle
+const item: TechArticle = {
+  $type: 'TechArticle',
+  name: 'Example TechArticle'
+}
+
+// Use semantic patterns
+await $.TechArticle.create(item)
+const result = await $.TechArticle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TechArticle](https://schema.org/TechArticle)
+- [TechArticle Properties](https://schema.org/TechArticle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

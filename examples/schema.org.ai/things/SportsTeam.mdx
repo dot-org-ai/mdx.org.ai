@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SportsTeam
+$context: https://schema.org
+$type: Class
+name: SportsTeam
+description: Organization: Sports team.
+subClassOf: ["SportsOrganization"]
+---
+
+# SportsTeam
+
+Organization: Sports team.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > [SportsOrganization](SportsOrganization.mdx) > **SportsTeam**
+
+
+
+## Properties
+
+See [Schema.org SportsTeam properties](https://schema.org/SportsTeam#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SportsTeam } from 'schema.org.ai'
+
+// Create a SportsTeam
+const item: SportsTeam = {
+  $type: 'SportsTeam',
+  name: 'Example SportsTeam'
+}
+
+// Use semantic patterns
+await $.SportsTeam.create(item)
+const result = await $.SportsTeam.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SportsTeam](https://schema.org/SportsTeam)
+- [SportsTeam Properties](https://schema.org/SportsTeam#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

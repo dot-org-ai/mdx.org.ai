@@ -1,0 +1,56 @@
+---
+$id: https://schema.org.ai/MoveAction
+$context: https://schema.org
+$type: Class
+name: MoveAction
+description: The act of an agent relocating to a place.\
+subClassOf: ["Action"]
+---
+
+# MoveAction
+
+The act of an agent relocating to a place.\
+\
+Related actions:\
+\
+* [[TransferAction]]: Unlike TransferAction, the subject of the move is a living Person or Organization rather than an inanimate object.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **MoveAction**
+
+## Direct Subclasses
+
+- **[ArriveAction](ArriveAction.mdx)**: The act of arriving at a place
+- **[DepartAction](DepartAction.mdx)**: The act of  departing from a place
+- **[TravelAction](TravelAction.mdx)**: The act of traveling from a fromLocation to a destination by a specified mode of transport, optionally with participants
+
+## Properties
+
+See [Schema.org MoveAction properties](https://schema.org/MoveAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MoveAction } from 'schema.org.ai'
+
+// Create a MoveAction
+const item: MoveAction = {
+  $type: 'MoveAction',
+  name: 'Example MoveAction'
+}
+
+// Use semantic patterns
+await $.MoveAction.create(item)
+const result = await $.MoveAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MoveAction](https://schema.org/MoveAction)
+- [MoveAction Properties](https://schema.org/MoveAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

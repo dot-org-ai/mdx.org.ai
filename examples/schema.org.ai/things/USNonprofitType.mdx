@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/USNonprofitType
+$context: https://schema.org
+$type: Class
+name: USNonprofitType
+description: USNonprofitType: Non-profit organization type originating from the United States.
+subClassOf: ["NonprofitType"]
+---
+
+# USNonprofitType
+
+USNonprofitType: Non-profit organization type originating from the United States.
+
+## Type Hierarchy
+
+**USNonprofitType**
+
+
+
+## Properties
+
+See [Schema.org USNonprofitType properties](https://schema.org/USNonprofitType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { USNonprofitType } from 'schema.org.ai'
+
+// Create a USNonprofitType
+const item: USNonprofitType = {
+  $type: 'USNonprofitType',
+  name: 'Example USNonprofitType'
+}
+
+// Use semantic patterns
+await $.USNonprofitType.create(item)
+const result = await $.USNonprofitType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org USNonprofitType](https://schema.org/USNonprofitType)
+- [USNonprofitType Properties](https://schema.org/USNonprofitType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

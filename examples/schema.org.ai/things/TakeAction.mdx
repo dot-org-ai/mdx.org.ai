@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/TakeAction
+$context: https://schema.org
+$type: Class
+name: TakeAction
+description: The act of gaining ownership of an object from an origin. Reciprocal of GiveAction.\
+subClassOf: ["TransferAction"]
+---
+
+# TakeAction
+
+The act of gaining ownership of an object from an origin. Reciprocal of GiveAction.\
+\
+Related actions:\
+\
+* [[GiveAction]]: The reciprocal of TakeAction.\
+* [[ReceiveAction]]: Unlike ReceiveAction, TakeAction implies that ownership has been transferred.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TransferAction](TransferAction.mdx) > **TakeAction**
+
+
+
+## Properties
+
+See [Schema.org TakeAction properties](https://schema.org/TakeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TakeAction } from 'schema.org.ai'
+
+// Create a TakeAction
+const item: TakeAction = {
+  $type: 'TakeAction',
+  name: 'Example TakeAction'
+}
+
+// Use semantic patterns
+await $.TakeAction.create(item)
+const result = await $.TakeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TakeAction](https://schema.org/TakeAction)
+- [TakeAction Properties](https://schema.org/TakeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

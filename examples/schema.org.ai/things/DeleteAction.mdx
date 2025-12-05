@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DeleteAction
+$context: https://schema.org
+$type: Class
+name: DeleteAction
+description: The act of editing a recipient by removing one of its objects.
+subClassOf: ["UpdateAction"]
+---
+
+# DeleteAction
+
+The act of editing a recipient by removing one of its objects.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [UpdateAction](UpdateAction.mdx) > **DeleteAction**
+
+
+
+## Properties
+
+See [Schema.org DeleteAction properties](https://schema.org/DeleteAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DeleteAction } from 'schema.org.ai'
+
+// Create a DeleteAction
+const item: DeleteAction = {
+  $type: 'DeleteAction',
+  name: 'Example DeleteAction'
+}
+
+// Use semantic patterns
+await $.DeleteAction.create(item)
+const result = await $.DeleteAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DeleteAction](https://schema.org/DeleteAction)
+- [DeleteAction Properties](https://schema.org/DeleteAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

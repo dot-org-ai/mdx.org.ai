@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicGroup
+$context: https://schema.org
+$type: Class
+name: MusicGroup
+description: A musical group, such as a band, an orchestra, or a choir. Can also be a solo musician.
+subClassOf: ["PerformingGroup"]
+---
+
+# MusicGroup
+
+A musical group, such as a band, an orchestra, or a choir. Can also be a solo musician.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > [PerformingGroup](PerformingGroup.mdx) > **MusicGroup**
+
+
+
+## Properties
+
+See [Schema.org MusicGroup properties](https://schema.org/MusicGroup#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicGroup } from 'schema.org.ai'
+
+// Create a MusicGroup
+const item: MusicGroup = {
+  $type: 'MusicGroup',
+  name: 'Example MusicGroup'
+}
+
+// Use semantic patterns
+await $.MusicGroup.create(item)
+const result = await $.MusicGroup.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicGroup](https://schema.org/MusicGroup)
+- [MusicGroup Properties](https://schema.org/MusicGroup#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

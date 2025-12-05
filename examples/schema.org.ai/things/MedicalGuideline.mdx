@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/MedicalGuideline
+$context: https://schema.org
+$type: Class
+name: MedicalGuideline
+description: Any recommendation made by a standard society (e.g. ACC/AHA) or consensus statement that denotes how to diagnose and treat a particular condition. Note: this type should be used to tag the actual guideline recommendation; if the guideline recommendation occurs in a larger scholarly article, use MedicalScholarlyArticle to tag the overall article, not this type. Note also: the organization making the recommendation should be captured in the recognizingAuthority base property of MedicalEntity.
+subClassOf: ["MedicalEntity"]
+---
+
+# MedicalGuideline
+
+Any recommendation made by a standard society (e.g. ACC/AHA) or consensus statement that denotes how to diagnose and treat a particular condition. Note: this type should be used to tag the actual guideline recommendation; if the guideline recommendation occurs in a larger scholarly article, use MedicalScholarlyArticle to tag the overall article, not this type. Note also: the organization making the recommendation should be captured in the recognizingAuthority base property of MedicalEntity.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **MedicalGuideline**
+
+## Direct Subclasses
+
+- **[MedicalGuidelineContraindication](MedicalGuidelineContraindication.mdx)**: A guideline contraindication that designates a process as harmful and where quality of the data supporting the contraindication is sound
+- **[MedicalGuidelineRecommendation](MedicalGuidelineRecommendation.mdx)**: A guideline recommendation that is regarded as efficacious and where quality of the data supporting the recommendation is sound
+
+## Properties
+
+See [Schema.org MedicalGuideline properties](https://schema.org/MedicalGuideline#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalGuideline } from 'schema.org.ai'
+
+// Create a MedicalGuideline
+const item: MedicalGuideline = {
+  $type: 'MedicalGuideline',
+  name: 'Example MedicalGuideline'
+}
+
+// Use semantic patterns
+await $.MedicalGuideline.create(item)
+const result = await $.MedicalGuideline.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalGuideline](https://schema.org/MedicalGuideline)
+- [MedicalGuideline Properties](https://schema.org/MedicalGuideline#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

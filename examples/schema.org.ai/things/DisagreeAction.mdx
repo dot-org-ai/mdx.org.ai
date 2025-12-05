@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DisagreeAction
+$context: https://schema.org
+$type: Class
+name: DisagreeAction
+description: The act of expressing a difference of opinion with the object. An agent disagrees to/about an object (a proposition, topic or theme) with participants.
+subClassOf: ["ReactAction"]
+---
+
+# DisagreeAction
+
+The act of expressing a difference of opinion with the object. An agent disagrees to/about an object (a proposition, topic or theme) with participants.
+
+## Type Hierarchy
+
+**DisagreeAction**
+
+
+
+## Properties
+
+See [Schema.org DisagreeAction properties](https://schema.org/DisagreeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DisagreeAction } from 'schema.org.ai'
+
+// Create a DisagreeAction
+const item: DisagreeAction = {
+  $type: 'DisagreeAction',
+  name: 'Example DisagreeAction'
+}
+
+// Use semantic patterns
+await $.DisagreeAction.create(item)
+const result = await $.DisagreeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DisagreeAction](https://schema.org/DisagreeAction)
+- [DisagreeAction Properties](https://schema.org/DisagreeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

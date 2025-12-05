@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ViewAction
+$context: https://schema.org
+$type: Class
+name: ViewAction
+description: The act of consuming static visual content.
+subClassOf: ["ConsumeAction"]
+---
+
+# ViewAction
+
+The act of consuming static visual content.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > **ViewAction**
+
+
+
+## Properties
+
+See [Schema.org ViewAction properties](https://schema.org/ViewAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ViewAction } from 'schema.org.ai'
+
+// Create a ViewAction
+const item: ViewAction = {
+  $type: 'ViewAction',
+  name: 'Example ViewAction'
+}
+
+// Use semantic patterns
+await $.ViewAction.create(item)
+const result = await $.ViewAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ViewAction](https://schema.org/ViewAction)
+- [ViewAction Properties](https://schema.org/ViewAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CafeOrCoffeeShop
+$context: https://schema.org
+$type: Class
+name: CafeOrCoffeeShop
+description: A cafe or coffee shop.
+subClassOf: ["FoodEstablishment"]
+---
+
+# CafeOrCoffeeShop
+
+A cafe or coffee shop.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FoodEstablishment](FoodEstablishment.mdx) > **CafeOrCoffeeShop**
+
+
+
+## Properties
+
+See [Schema.org CafeOrCoffeeShop properties](https://schema.org/CafeOrCoffeeShop#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CafeOrCoffeeShop } from 'schema.org.ai'
+
+// Create a CafeOrCoffeeShop
+const item: CafeOrCoffeeShop = {
+  $type: 'CafeOrCoffeeShop',
+  name: 'Example CafeOrCoffeeShop'
+}
+
+// Use semantic patterns
+await $.CafeOrCoffeeShop.create(item)
+const result = await $.CafeOrCoffeeShop.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CafeOrCoffeeShop](https://schema.org/CafeOrCoffeeShop)
+- [CafeOrCoffeeShop Properties](https://schema.org/CafeOrCoffeeShop#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

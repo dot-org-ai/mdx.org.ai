@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SearchResultsPage
+$context: https://schema.org
+$type: Class
+name: SearchResultsPage
+description: Web page type: Search results page.
+subClassOf: ["WebPage"]
+---
+
+# SearchResultsPage
+
+Web page type: Search results page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **SearchResultsPage**
+
+
+
+## Properties
+
+See [Schema.org SearchResultsPage properties](https://schema.org/SearchResultsPage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SearchResultsPage } from 'schema.org.ai'
+
+// Create a SearchResultsPage
+const item: SearchResultsPage = {
+  $type: 'SearchResultsPage',
+  name: 'Example SearchResultsPage'
+}
+
+// Use semantic patterns
+await $.SearchResultsPage.create(item)
+const result = await $.SearchResultsPage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SearchResultsPage](https://schema.org/SearchResultsPage)
+- [SearchResultsPage Properties](https://schema.org/SearchResultsPage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

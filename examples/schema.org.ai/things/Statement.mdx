@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Statement
+$context: https://schema.org
+$type: Class
+name: Statement
+description: A statement about something, for example a fun or interesting fact. If known, the main entity this statement is about can be indicated using mainEntity. For more formal claims (e.g. in Fact Checking), consider using [[Claim]] instead. Use the [[text]] property to capture the text of the statement.
+subClassOf: ["CreativeWork"]
+---
+
+# Statement
+
+A statement about something, for example a fun or interesting fact. If known, the main entity this statement is about can be indicated using mainEntity. For more formal claims (e.g. in Fact Checking), consider using [[Claim]] instead. Use the [[text]] property to capture the text of the statement.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Statement**
+
+
+
+## Properties
+
+See [Schema.org Statement properties](https://schema.org/Statement#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Statement } from 'schema.org.ai'
+
+// Create a Statement
+const item: Statement = {
+  $type: 'Statement',
+  name: 'Example Statement'
+}
+
+// Use semantic patterns
+await $.Statement.create(item)
+const result = await $.Statement.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Statement](https://schema.org/Statement)
+- [Statement Properties](https://schema.org/Statement#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

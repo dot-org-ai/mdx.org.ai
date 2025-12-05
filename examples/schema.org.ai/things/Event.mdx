@@ -1,0 +1,70 @@
+---
+$id: https://schema.org.ai/Event
+$context: https://schema.org
+$type: Class
+name: Event
+description: An event happening at a certain time and location, such as a concert, lecture, or festival. Ticketing information may be added via the [[offers]] property. Repeated events may be structured as separate Event objects.
+subClassOf: ["Thing"]
+---
+
+# Event
+
+An event happening at a certain time and location, such as a concert, lecture, or festival. Ticketing information may be added via the [[offers]] property. Repeated events may be structured as separate Event objects.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > **Event**
+
+## Direct Subclasses
+
+- **[BusinessEvent](BusinessEvent.mdx)**: Event type: Business event
+- **[ComedyEvent](ComedyEvent.mdx)**: Event type: Comedy event
+- **[CourseInstance](CourseInstance.mdx)**: An instance of a [[Course]] which is distinct from other instances because it is offered at a different time or location or through different media or modes of study or to a specific section of students
+- **[DanceEvent](DanceEvent.mdx)**: Event type: A social dance
+- **[DeliveryEvent](DeliveryEvent.mdx)**: An event involving the delivery of an item
+- **[EducationEvent](EducationEvent.mdx)**: Event type: Education event
+- **[EventSeries](EventSeries.mdx)**: A series of [[Event]]s
+- **[ExhibitionEvent](ExhibitionEvent.mdx)**: Event type: Exhibition event, e
+- **[Festival](Festival.mdx)**: Event type: Festival
+- **[FoodEvent](FoodEvent.mdx)**: Event type: Food event
+- **[Hackathon](Hackathon.mdx)**: A [hackathon](https://en
+- **[LiteraryEvent](LiteraryEvent.mdx)**: Event type: Literary event
+- **[MusicEvent](MusicEvent.mdx)**: Event type: Music event
+- **[PublicationEvent](PublicationEvent.mdx)**: A PublicationEvent corresponds indifferently to the event of publication for a CreativeWork of any type, e
+- **[SaleEvent](SaleEvent.mdx)**: Event type: Sales event
+- **[ScreeningEvent](ScreeningEvent.mdx)**: A screening of a movie or other video
+- **[SocialEvent](SocialEvent.mdx)**: Event type: Social event
+- **[SportsEvent](SportsEvent.mdx)**: Event type: Sports event
+- **[TheaterEvent](TheaterEvent.mdx)**: Event type: Theater performance
+- **[UserInteraction](UserInteraction.mdx)**: UserInteraction and its subtypes is an old way of talking about users interacting with pages
+- **[VisualArtsEvent](VisualArtsEvent.mdx)**: Event type: Visual arts event
+
+## Properties
+
+See [Schema.org Event properties](https://schema.org/Event#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Event } from 'schema.org.ai'
+
+// Create a Event
+const item: Event = {
+  $type: 'Event',
+  name: 'Example Event'
+}
+
+// Use semantic patterns
+await $.Event.create(item)
+const result = await $.Event.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Event](https://schema.org/Event)
+- [Event Properties](https://schema.org/Event#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

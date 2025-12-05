@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Movie
+$context: https://schema.org
+$type: Class
+name: Movie
+description: A movie.
+subClassOf: ["CreativeWork"]
+---
+
+# Movie
+
+A movie.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Movie**
+
+
+
+## Properties
+
+See [Schema.org Movie properties](https://schema.org/Movie#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Movie } from 'schema.org.ai'
+
+// Create a Movie
+const item: Movie = {
+  $type: 'Movie',
+  name: 'Example Movie'
+}
+
+// Use semantic patterns
+await $.Movie.create(item)
+const result = await $.Movie.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Movie](https://schema.org/Movie)
+- [Movie Properties](https://schema.org/Movie#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

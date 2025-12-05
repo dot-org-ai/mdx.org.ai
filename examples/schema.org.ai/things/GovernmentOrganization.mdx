@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GovernmentOrganization
+$context: https://schema.org
+$type: Class
+name: GovernmentOrganization
+description: A governmental organization or agency.
+subClassOf: ["Organization"]
+---
+
+# GovernmentOrganization
+
+A governmental organization or agency.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **GovernmentOrganization**
+
+
+
+## Properties
+
+See [Schema.org GovernmentOrganization properties](https://schema.org/GovernmentOrganization#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GovernmentOrganization } from 'schema.org.ai'
+
+// Create a GovernmentOrganization
+const item: GovernmentOrganization = {
+  $type: 'GovernmentOrganization',
+  name: 'Example GovernmentOrganization'
+}
+
+// Use semantic patterns
+await $.GovernmentOrganization.create(item)
+const result = await $.GovernmentOrganization.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GovernmentOrganization](https://schema.org/GovernmentOrganization)
+- [GovernmentOrganization Properties](https://schema.org/GovernmentOrganization#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

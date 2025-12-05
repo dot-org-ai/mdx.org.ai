@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Play
+$context: https://schema.org
+$type: Class
+name: Play
+description: A play is a form of literature, usually consisting of dialogue between characters, intended for theatrical performance rather than just reading. Note: A performance of a Play would be a [[TheaterEvent]] or [[BroadcastEvent]] - the *Play* being the [[workPerformed]].
+subClassOf: ["CreativeWork"]
+---
+
+# Play
+
+A play is a form of literature, usually consisting of dialogue between characters, intended for theatrical performance rather than just reading. Note: A performance of a Play would be a [[TheaterEvent]] or [[BroadcastEvent]] - the *Play* being the [[workPerformed]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Play**
+
+
+
+## Properties
+
+See [Schema.org Play properties](https://schema.org/Play#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Play } from 'schema.org.ai'
+
+// Create a Play
+const item: Play = {
+  $type: 'Play',
+  name: 'Example Play'
+}
+
+// Use semantic patterns
+await $.Play.create(item)
+const result = await $.Play.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Play](https://schema.org/Play)
+- [Play Properties](https://schema.org/Play#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

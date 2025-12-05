@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Photograph
+$context: https://schema.org
+$type: Class
+name: Photograph
+description: A photograph.
+subClassOf: ["CreativeWork"]
+---
+
+# Photograph
+
+A photograph.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Photograph**
+
+
+
+## Properties
+
+See [Schema.org Photograph properties](https://schema.org/Photograph#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Photograph } from 'schema.org.ai'
+
+// Create a Photograph
+const item: Photograph = {
+  $type: 'Photograph',
+  name: 'Example Photograph'
+}
+
+// Use semantic patterns
+await $.Photograph.create(item)
+const result = await $.Photograph.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Photograph](https://schema.org/Photograph)
+- [Photograph Properties](https://schema.org/Photograph#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

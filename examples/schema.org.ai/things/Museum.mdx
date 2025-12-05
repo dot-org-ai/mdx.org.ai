@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Museum
+$context: https://schema.org
+$type: Class
+name: Museum
+description: A museum.
+subClassOf: ["CivicStructure"]
+---
+
+# Museum
+
+A museum.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **Museum**
+
+
+
+## Properties
+
+See [Schema.org Museum properties](https://schema.org/Museum#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Museum } from 'schema.org.ai'
+
+// Create a Museum
+const item: Museum = {
+  $type: 'Museum',
+  name: 'Example Museum'
+}
+
+// Use semantic patterns
+await $.Museum.create(item)
+const result = await $.Museum.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Museum](https://schema.org/Museum)
+- [Museum Properties](https://schema.org/Museum#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

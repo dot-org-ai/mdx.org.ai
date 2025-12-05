@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/BefriendAction
+$context: https://schema.org
+$type: Class
+name: BefriendAction
+description: The act of forming a personal connection with someone (object) mutually/bidirectionally/symmetrically.\
+subClassOf: ["InteractAction"]
+---
+
+# BefriendAction
+
+The act of forming a personal connection with someone (object) mutually/bidirectionally/symmetrically.\
+\
+Related actions:\
+\
+* [[FollowAction]]: Unlike FollowAction, BefriendAction implies that the connection is reciprocal.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > **BefriendAction**
+
+
+
+## Properties
+
+See [Schema.org BefriendAction properties](https://schema.org/BefriendAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BefriendAction } from 'schema.org.ai'
+
+// Create a BefriendAction
+const item: BefriendAction = {
+  $type: 'BefriendAction',
+  name: 'Example BefriendAction'
+}
+
+// Use semantic patterns
+await $.BefriendAction.create(item)
+const result = await $.BefriendAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BefriendAction](https://schema.org/BefriendAction)
+- [BefriendAction Properties](https://schema.org/BefriendAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

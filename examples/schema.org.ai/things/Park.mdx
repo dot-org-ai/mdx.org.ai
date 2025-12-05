@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Park
+$context: https://schema.org
+$type: Class
+name: Park
+description: A park.
+subClassOf: ["CivicStructure"]
+---
+
+# Park
+
+A park.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **Park**
+
+
+
+## Properties
+
+See [Schema.org Park properties](https://schema.org/Park#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Park } from 'schema.org.ai'
+
+// Create a Park
+const item: Park = {
+  $type: 'Park',
+  name: 'Example Park'
+}
+
+// Use semantic patterns
+await $.Park.create(item)
+const result = await $.Park.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Park](https://schema.org/Park)
+- [Park Properties](https://schema.org/Park#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

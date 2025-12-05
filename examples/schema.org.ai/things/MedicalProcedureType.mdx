@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalProcedureType
+$context: https://schema.org
+$type: Class
+name: MedicalProcedureType
+description: An enumeration that describes different types of medical procedures.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# MedicalProcedureType
+
+An enumeration that describes different types of medical procedures.
+
+## Type Hierarchy
+
+**MedicalProcedureType**
+
+
+
+## Properties
+
+See [Schema.org MedicalProcedureType properties](https://schema.org/MedicalProcedureType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalProcedureType } from 'schema.org.ai'
+
+// Create a MedicalProcedureType
+const item: MedicalProcedureType = {
+  $type: 'MedicalProcedureType',
+  name: 'Example MedicalProcedureType'
+}
+
+// Use semantic patterns
+await $.MedicalProcedureType.create(item)
+const result = await $.MedicalProcedureType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalProcedureType](https://schema.org/MedicalProcedureType)
+- [MedicalProcedureType Properties](https://schema.org/MedicalProcedureType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

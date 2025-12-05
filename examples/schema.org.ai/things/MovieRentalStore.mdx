@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MovieRentalStore
+$context: https://schema.org
+$type: Class
+name: MovieRentalStore
+description: A movie rental store.
+subClassOf: ["Store"]
+---
+
+# MovieRentalStore
+
+A movie rental store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **MovieRentalStore**
+
+
+
+## Properties
+
+See [Schema.org MovieRentalStore properties](https://schema.org/MovieRentalStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MovieRentalStore } from 'schema.org.ai'
+
+// Create a MovieRentalStore
+const item: MovieRentalStore = {
+  $type: 'MovieRentalStore',
+  name: 'Example MovieRentalStore'
+}
+
+// Use semantic patterns
+await $.MovieRentalStore.create(item)
+const result = await $.MovieRentalStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MovieRentalStore](https://schema.org/MovieRentalStore)
+- [MovieRentalStore Properties](https://schema.org/MovieRentalStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WholesaleStore
+$context: https://schema.org
+$type: Class
+name: WholesaleStore
+description: A wholesale store.
+subClassOf: ["Store"]
+---
+
+# WholesaleStore
+
+A wholesale store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **WholesaleStore**
+
+
+
+## Properties
+
+See [Schema.org WholesaleStore properties](https://schema.org/WholesaleStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WholesaleStore } from 'schema.org.ai'
+
+// Create a WholesaleStore
+const item: WholesaleStore = {
+  $type: 'WholesaleStore',
+  name: 'Example WholesaleStore'
+}
+
+// Use semantic patterns
+await $.WholesaleStore.create(item)
+const result = await $.WholesaleStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WholesaleStore](https://schema.org/WholesaleStore)
+- [WholesaleStore Properties](https://schema.org/WholesaleStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

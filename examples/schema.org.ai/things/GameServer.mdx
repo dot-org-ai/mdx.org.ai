@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GameServer
+$context: https://schema.org
+$type: Class
+name: GameServer
+description: Server that provides game interaction in a multiplayer game.
+subClassOf: ["Intangible"]
+---
+
+# GameServer
+
+Server that provides game interaction in a multiplayer game.
+
+## Type Hierarchy
+
+**GameServer**
+
+
+
+## Properties
+
+See [Schema.org GameServer properties](https://schema.org/GameServer#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GameServer } from 'schema.org.ai'
+
+// Create a GameServer
+const item: GameServer = {
+  $type: 'GameServer',
+  name: 'Example GameServer'
+}
+
+// Use semantic patterns
+await $.GameServer.create(item)
+const result = await $.GameServer.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GameServer](https://schema.org/GameServer)
+- [GameServer Properties](https://schema.org/GameServer#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

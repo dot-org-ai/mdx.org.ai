@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RsvpResponseType
+$context: https://schema.org
+$type: Class
+name: RsvpResponseType
+description: RsvpResponseType is an enumeration type whose instances represent responding to an RSVP request.
+subClassOf: ["Enumeration"]
+---
+
+# RsvpResponseType
+
+RsvpResponseType is an enumeration type whose instances represent responding to an RSVP request.
+
+## Type Hierarchy
+
+**RsvpResponseType**
+
+
+
+## Properties
+
+See [Schema.org RsvpResponseType properties](https://schema.org/RsvpResponseType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RsvpResponseType } from 'schema.org.ai'
+
+// Create a RsvpResponseType
+const item: RsvpResponseType = {
+  $type: 'RsvpResponseType',
+  name: 'Example RsvpResponseType'
+}
+
+// Use semantic patterns
+await $.RsvpResponseType.create(item)
+const result = await $.RsvpResponseType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RsvpResponseType](https://schema.org/RsvpResponseType)
+- [RsvpResponseType Properties](https://schema.org/RsvpResponseType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

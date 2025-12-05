@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MemberProgramTier
+$context: https://schema.org
+$type: Class
+name: MemberProgramTier
+description: A MemberProgramTier specifies a tier under a loyalty (member) program, for example "gold".
+subClassOf: ["Intangible"]
+---
+
+# MemberProgramTier
+
+A MemberProgramTier specifies a tier under a loyalty (member) program, for example "gold".
+
+## Type Hierarchy
+
+**MemberProgramTier**
+
+
+
+## Properties
+
+See [Schema.org MemberProgramTier properties](https://schema.org/MemberProgramTier#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MemberProgramTier } from 'schema.org.ai'
+
+// Create a MemberProgramTier
+const item: MemberProgramTier = {
+  $type: 'MemberProgramTier',
+  name: 'Example MemberProgramTier'
+}
+
+// Use semantic patterns
+await $.MemberProgramTier.create(item)
+const result = await $.MemberProgramTier.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MemberProgramTier](https://schema.org/MemberProgramTier)
+- [MemberProgramTier Properties](https://schema.org/MemberProgramTier#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

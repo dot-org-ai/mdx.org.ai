@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicAlbumProductionType
+$context: https://schema.org
+$type: Class
+name: MusicAlbumProductionType
+description: Classification of the album by its type of content: soundtrack, live album, studio album, etc.
+subClassOf: ["Enumeration"]
+---
+
+# MusicAlbumProductionType
+
+Classification of the album by its type of content: soundtrack, live album, studio album, etc.
+
+## Type Hierarchy
+
+**MusicAlbumProductionType**
+
+
+
+## Properties
+
+See [Schema.org MusicAlbumProductionType properties](https://schema.org/MusicAlbumProductionType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicAlbumProductionType } from 'schema.org.ai'
+
+// Create a MusicAlbumProductionType
+const item: MusicAlbumProductionType = {
+  $type: 'MusicAlbumProductionType',
+  name: 'Example MusicAlbumProductionType'
+}
+
+// Use semantic patterns
+await $.MusicAlbumProductionType.create(item)
+const result = await $.MusicAlbumProductionType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicAlbumProductionType](https://schema.org/MusicAlbumProductionType)
+- [MusicAlbumProductionType Properties](https://schema.org/MusicAlbumProductionType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

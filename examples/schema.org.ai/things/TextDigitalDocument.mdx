@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TextDigitalDocument
+$context: https://schema.org
+$type: Class
+name: TextDigitalDocument
+description: A file composed primarily of text.
+subClassOf: ["DigitalDocument"]
+---
+
+# TextDigitalDocument
+
+A file composed primarily of text.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [DigitalDocument](DigitalDocument.mdx) > **TextDigitalDocument**
+
+
+
+## Properties
+
+See [Schema.org TextDigitalDocument properties](https://schema.org/TextDigitalDocument#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TextDigitalDocument } from 'schema.org.ai'
+
+// Create a TextDigitalDocument
+const item: TextDigitalDocument = {
+  $type: 'TextDigitalDocument',
+  name: 'Example TextDigitalDocument'
+}
+
+// Use semantic patterns
+await $.TextDigitalDocument.create(item)
+const result = await $.TextDigitalDocument.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TextDigitalDocument](https://schema.org/TextDigitalDocument)
+- [TextDigitalDocument Properties](https://schema.org/TextDigitalDocument#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

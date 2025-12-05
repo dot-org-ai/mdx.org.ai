@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ResearchProject
+$context: https://schema.org
+$type: Class
+name: ResearchProject
+description: A Research project.
+subClassOf: ["Project"]
+---
+
+# ResearchProject
+
+A Research project.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > [Project](Project.mdx) > **ResearchProject**
+
+
+
+## Properties
+
+See [Schema.org ResearchProject properties](https://schema.org/ResearchProject#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ResearchProject } from 'schema.org.ai'
+
+// Create a ResearchProject
+const item: ResearchProject = {
+  $type: 'ResearchProject',
+  name: 'Example ResearchProject'
+}
+
+// Use semantic patterns
+await $.ResearchProject.create(item)
+const result = await $.ResearchProject.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ResearchProject](https://schema.org/ResearchProject)
+- [ResearchProject Properties](https://schema.org/ResearchProject#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

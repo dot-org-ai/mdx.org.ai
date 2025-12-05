@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Muscle
+$context: https://schema.org
+$type: Class
+name: Muscle
+description: A muscle is an anatomical structure consisting of a contractile form of tissue that animals use to effect movement.
+subClassOf: ["AnatomicalStructure"]
+---
+
+# Muscle
+
+A muscle is an anatomical structure consisting of a contractile form of tissue that animals use to effect movement.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [AnatomicalStructure](AnatomicalStructure.mdx) > **Muscle**
+
+
+
+## Properties
+
+See [Schema.org Muscle properties](https://schema.org/Muscle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Muscle } from 'schema.org.ai'
+
+// Create a Muscle
+const item: Muscle = {
+  $type: 'Muscle',
+  name: 'Example Muscle'
+}
+
+// Use semantic patterns
+await $.Muscle.create(item)
+const result = await $.Muscle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Muscle](https://schema.org/Muscle)
+- [Muscle Properties](https://schema.org/Muscle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

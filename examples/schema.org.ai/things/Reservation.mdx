@@ -1,0 +1,61 @@
+---
+$id: https://schema.org.ai/Reservation
+$context: https://schema.org
+$type: Class
+name: Reservation
+description: Describes a reservation for travel, dining or an event. Some reservations require tickets. \
+subClassOf: ["Intangible"]
+---
+
+# Reservation
+
+Describes a reservation for travel, dining or an event. Some reservations require tickets. \
+\
+Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, restaurant reservations, flights, or rental cars, use [[Offer]].
+
+## Type Hierarchy
+
+**Reservation**
+
+## Direct Subclasses
+
+- **[BoatReservation](BoatReservation.mdx)**: A reservation for boat travel
+- **[BusReservation](BusReservation.mdx)**: A reservation for bus travel
+- **[EventReservation](EventReservation.mdx)**: A reservation for an event like a concert, sporting event, or lecture
+- **[FlightReservation](FlightReservation.mdx)**: A reservation for air travel
+- **[FoodEstablishmentReservation](FoodEstablishmentReservation.mdx)**: A reservation to dine at a food-related business
+- **[LodgingReservation](LodgingReservation.mdx)**: A reservation for lodging at a hotel, motel, inn, etc
+- **[RentalCarReservation](RentalCarReservation.mdx)**: A reservation for a rental car
+- **[ReservationPackage](ReservationPackage.mdx)**: A group of multiple reservations with common values for all sub-reservations
+- **[TaxiReservation](TaxiReservation.mdx)**: A reservation for a taxi
+- **[TrainReservation](TrainReservation.mdx)**: A reservation for train travel
+
+## Properties
+
+See [Schema.org Reservation properties](https://schema.org/Reservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Reservation } from 'schema.org.ai'
+
+// Create a Reservation
+const item: Reservation = {
+  $type: 'Reservation',
+  name: 'Example Reservation'
+}
+
+// Use semantic patterns
+await $.Reservation.create(item)
+const result = await $.Reservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Reservation](https://schema.org/Reservation)
+- [Reservation Properties](https://schema.org/Reservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

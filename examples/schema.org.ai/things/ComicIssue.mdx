@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ComicIssue
+$context: https://schema.org
+$type: Class
+name: ComicIssue
+description: Individual comic issues are serially published as part of a larger series. For the sake of consistency, even one-shot issues belong to a series comprised of a single issue. All comic issues can be uniquely identified by: the combination of the name and volume number of the series to which the issue belongs; the issue number; and the variant description of the issue (if any).
+subClassOf: ["PublicationIssue"]
+---
+
+# ComicIssue
+
+Individual comic issues are serially published as part of a larger series. For the sake of consistency, even one-shot issues belong to a series comprised of a single issue. All comic issues can be uniquely identified by: the combination of the name and volume number of the series to which the issue belongs; the issue number; and the variant description of the issue (if any).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [PublicationIssue](PublicationIssue.mdx) > **ComicIssue**
+
+
+
+## Properties
+
+See [Schema.org ComicIssue properties](https://schema.org/ComicIssue#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ComicIssue } from 'schema.org.ai'
+
+// Create a ComicIssue
+const item: ComicIssue = {
+  $type: 'ComicIssue',
+  name: 'Example ComicIssue'
+}
+
+// Use semantic patterns
+await $.ComicIssue.create(item)
+const result = await $.ComicIssue.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ComicIssue](https://schema.org/ComicIssue)
+- [ComicIssue Properties](https://schema.org/ComicIssue#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

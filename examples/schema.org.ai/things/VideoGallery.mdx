@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/VideoGallery
+$context: https://schema.org
+$type: Class
+name: VideoGallery
+description: Web page type: Video gallery page.
+subClassOf: ["MediaGallery"]
+---
+
+# VideoGallery
+
+Web page type: Video gallery page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > [CollectionPage](CollectionPage.mdx) > [MediaGallery](MediaGallery.mdx) > **VideoGallery**
+
+
+
+## Properties
+
+See [Schema.org VideoGallery properties](https://schema.org/VideoGallery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { VideoGallery } from 'schema.org.ai'
+
+// Create a VideoGallery
+const item: VideoGallery = {
+  $type: 'VideoGallery',
+  name: 'Example VideoGallery'
+}
+
+// Use semantic patterns
+await $.VideoGallery.create(item)
+const result = await $.VideoGallery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org VideoGallery](https://schema.org/VideoGallery)
+- [VideoGallery Properties](https://schema.org/VideoGallery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

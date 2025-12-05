@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/Periodical
+$context: https://schema.org
+$type: Class
+name: Periodical
+description: A publication in any medium issued in successive parts bearing numerical or chronological designations and intended to continue indefinitely, such as a magazine, scholarly journal, or newspaper.\
+subClassOf: ["CreativeWorkSeries"]
+---
+
+# Periodical
+
+A publication in any medium issued in successive parts bearing numerical or chronological designations and intended to continue indefinitely, such as a magazine, scholarly journal, or newspaper.\
+\
+See also [blog post](https://blog.schema.org/2014/09/02/schema-org-support-for-bibliographic-relationships-and-periodicals/).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [CreativeWorkSeries](CreativeWorkSeries.mdx) > **Periodical**
+
+## Direct Subclasses
+
+- **[ComicSeries](ComicSeries.mdx)**: A sequential publication of comic stories under a unifying title, for example "The Amazing Spider-Man" or "Groo the Wanderer"
+- **[Newspaper](Newspaper.mdx)**: A publication containing information about varied topics that are pertinent to general information, a geographic area, or a specific subject matter (i
+
+## Properties
+
+See [Schema.org Periodical properties](https://schema.org/Periodical#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Periodical } from 'schema.org.ai'
+
+// Create a Periodical
+const item: Periodical = {
+  $type: 'Periodical',
+  name: 'Example Periodical'
+}
+
+// Use semantic patterns
+await $.Periodical.create(item)
+const result = await $.Periodical.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Periodical](https://schema.org/Periodical)
+- [Periodical Properties](https://schema.org/Periodical#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

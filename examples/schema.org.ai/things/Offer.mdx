@@ -1,0 +1,56 @@
+---
+$id: https://schema.org.ai/Offer
+$context: https://schema.org
+$type: Class
+name: Offer
+description: An offer to transfer some rights to an item or to provide a service — for example, an offer to sell tickets to an event, to rent the DVD of a movie, to stream a TV show over the internet, to repair a motorcycle, or to loan a book.\
+subClassOf: ["Intangible"]
+---
+
+# Offer
+
+An offer to transfer some rights to an item or to provide a service — for example, an offer to sell tickets to an event, to rent the DVD of a movie, to stream a TV show over the internet, to repair a motorcycle, or to loan a book.\
+\
+Note: As the [[businessFunction]] property, which identifies the form of offer (e.g. sell, lease, repair, dispose), defaults to http://purl.org/goodrelations/v1#Sell; an Offer without a defined businessFunction value can be assumed to be an offer to sell.\
+\
+For [GTIN](http://www.gs1.org/barcodes/technical/idkeys/gtin)-related fields, see [Check Digit calculator](http://www.gs1.org/barcodes/support/check_digit_calculator) and [validation guide](http://www.gs1us.org/resources/standards/gtin-validation-guide) from [GS1](http://www.gs1.org/).
+
+## Type Hierarchy
+
+**Offer**
+
+## Direct Subclasses
+
+- **[AggregateOffer](AggregateOffer.mdx)**: When a single product is associated with multiple offers (for example, the same pair of shoes is offered by different merchants), then AggregateOffer can be used
+- **[OfferForLease](OfferForLease.mdx)**: An [[OfferForLease]] in Schema
+- **[OfferForPurchase](OfferForPurchase.mdx)**: An [[OfferForPurchase]] in Schema
+
+## Properties
+
+See [Schema.org Offer properties](https://schema.org/Offer#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Offer } from 'schema.org.ai'
+
+// Create a Offer
+const item: Offer = {
+  $type: 'Offer',
+  name: 'Example Offer'
+}
+
+// Use semantic patterns
+await $.Offer.create(item)
+const result = await $.Offer.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Offer](https://schema.org/Offer)
+- [Offer Properties](https://schema.org/Offer#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

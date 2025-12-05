@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DownloadAction
+$context: https://schema.org
+$type: Class
+name: DownloadAction
+description: The act of downloading an object.
+subClassOf: ["TransferAction"]
+---
+
+# DownloadAction
+
+The act of downloading an object.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TransferAction](TransferAction.mdx) > **DownloadAction**
+
+
+
+## Properties
+
+See [Schema.org DownloadAction properties](https://schema.org/DownloadAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DownloadAction } from 'schema.org.ai'
+
+// Create a DownloadAction
+const item: DownloadAction = {
+  $type: 'DownloadAction',
+  name: 'Example DownloadAction'
+}
+
+// Use semantic patterns
+await $.DownloadAction.create(item)
+const result = await $.DownloadAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DownloadAction](https://schema.org/DownloadAction)
+- [DownloadAction Properties](https://schema.org/DownloadAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

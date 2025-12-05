@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EnergyStarEnergyEfficiencyEnumeration
+$context: https://schema.org
+$type: Class
+name: EnergyStarEnergyEfficiencyEnumeration
+description: Used to indicate whether a product is EnergyStar certified.
+subClassOf: ["EnergyEfficiencyEnumeration"]
+---
+
+# EnergyStarEnergyEfficiencyEnumeration
+
+Used to indicate whether a product is EnergyStar certified.
+
+## Type Hierarchy
+
+**EnergyStarEnergyEfficiencyEnumeration**
+
+
+
+## Properties
+
+See [Schema.org EnergyStarEnergyEfficiencyEnumeration properties](https://schema.org/EnergyStarEnergyEfficiencyEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EnergyStarEnergyEfficiencyEnumeration } from 'schema.org.ai'
+
+// Create a EnergyStarEnergyEfficiencyEnumeration
+const item: EnergyStarEnergyEfficiencyEnumeration = {
+  $type: 'EnergyStarEnergyEfficiencyEnumeration',
+  name: 'Example EnergyStarEnergyEfficiencyEnumeration'
+}
+
+// Use semantic patterns
+await $.EnergyStarEnergyEfficiencyEnumeration.create(item)
+const result = await $.EnergyStarEnergyEfficiencyEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EnergyStarEnergyEfficiencyEnumeration](https://schema.org/EnergyStarEnergyEfficiencyEnumeration)
+- [EnergyStarEnergyEfficiencyEnumeration Properties](https://schema.org/EnergyStarEnergyEfficiencyEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

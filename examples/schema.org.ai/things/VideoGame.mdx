@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/VideoGame
+$context: https://schema.org
+$type: Class
+name: VideoGame
+description: A video game is an electronic game that involves human interaction with a user interface to generate visual feedback on a video device.
+subClassOf: ["Game","SoftwareApplication"]
+---
+
+# VideoGame
+
+A video game is an electronic game that involves human interaction with a user interface to generate visual feedback on a video device.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [SoftwareApplication](SoftwareApplication.mdx) > **VideoGame**
+
+
+
+## Properties
+
+See [Schema.org VideoGame properties](https://schema.org/VideoGame#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { VideoGame } from 'schema.org.ai'
+
+// Create a VideoGame
+const item: VideoGame = {
+  $type: 'VideoGame',
+  name: 'Example VideoGame'
+}
+
+// Use semantic patterns
+await $.VideoGame.create(item)
+const result = await $.VideoGame.get('item-id')
+```
+
+## Resources
+
+- [Schema.org VideoGame](https://schema.org/VideoGame)
+- [VideoGame Properties](https://schema.org/VideoGame#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

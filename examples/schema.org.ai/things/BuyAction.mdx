@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BuyAction
+$context: https://schema.org
+$type: Class
+name: BuyAction
+description: The act of giving money to a seller in exchange for goods or services rendered. An agent buys an object, product, or service from a seller for a price. Reciprocal of SellAction.
+subClassOf: ["TradeAction"]
+---
+
+# BuyAction
+
+The act of giving money to a seller in exchange for goods or services rendered. An agent buys an object, product, or service from a seller for a price. Reciprocal of SellAction.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TradeAction](TradeAction.mdx) > **BuyAction**
+
+
+
+## Properties
+
+See [Schema.org BuyAction properties](https://schema.org/BuyAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BuyAction } from 'schema.org.ai'
+
+// Create a BuyAction
+const item: BuyAction = {
+  $type: 'BuyAction',
+  name: 'Example BuyAction'
+}
+
+// Use semantic patterns
+await $.BuyAction.create(item)
+const result = await $.BuyAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BuyAction](https://schema.org/BuyAction)
+- [BuyAction Properties](https://schema.org/BuyAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

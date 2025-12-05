@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DepartAction
+$context: https://schema.org
+$type: Class
+name: DepartAction
+description: The act of  departing from a place. An agent departs from a fromLocation for a destination, optionally with participants.
+subClassOf: ["MoveAction"]
+---
+
+# DepartAction
+
+The act of  departing from a place. An agent departs from a fromLocation for a destination, optionally with participants.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [MoveAction](MoveAction.mdx) > **DepartAction**
+
+
+
+## Properties
+
+See [Schema.org DepartAction properties](https://schema.org/DepartAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DepartAction } from 'schema.org.ai'
+
+// Create a DepartAction
+const item: DepartAction = {
+  $type: 'DepartAction',
+  name: 'Example DepartAction'
+}
+
+// Use semantic patterns
+await $.DepartAction.create(item)
+const result = await $.DepartAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DepartAction](https://schema.org/DepartAction)
+- [DepartAction Properties](https://schema.org/DepartAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

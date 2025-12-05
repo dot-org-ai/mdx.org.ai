@@ -1,0 +1,290 @@
+---
+$id: https://schema.org.ai/Generation
+$context: https://schema.org.ai
+$type: Class
+name: Generation
+description: An AI generation instance representing a single execution of content, code, or data generation by an AI model.
+subClassOf:
+  - https://schema.org/Thing
+digital: 1.0
+---
+
+[Thing](Thing.mdx)
+
+# Generation
+
+An AI generation instance representing a single execution of content, code, or data generation by an AI model. Each generation captures the input prompt, model used, parameters, output, and metadata about the generation process.
+
+## Properties
+
+| Property | Type | Description | Inherited From |
+|----------|------|-------------|----------------|
+| `$type` | Text | Always "Generation" | - |
+| `$id` | URL | Unique identifier for the generation | Thing |
+| `name` | Text | Name or title of the generation | Thing |
+| `description` | Text | Description of what was generated | Thing |
+| `identifier` | Text or PropertyValue | An identifier for the generation | Thing |
+| `url` | URL | URL to view the generation | Thing |
+| `digital` | Number (0.0-1.0) | Always 1.0 for AI generations | Thing |
+| `prompt` | Prompt or Text | The input prompt used | Generation |
+| `model` | Model | The AI model that performed the generation | Generation |
+| `parameters` | PropertyValue[] | Generation parameters (temperature, max_tokens, etc.) | Generation |
+| `output` | Text or CreativeWork | The generated output | Generation |
+| `completionTokens` | Number | Number of tokens in the output | Generation |
+| `promptTokens` | Number | Number of tokens in the input | Generation |
+| `totalTokens` | Number | Total tokens used | Generation |
+| `finishReason` | Text | Why generation stopped (stop, length, etc.) | Generation |
+| `createdAt` | DateTime | When the generation was created | Generation |
+| `duration` | Duration | How long the generation took | Generation |
+| `cost` | MonetaryAmount | Cost of the generation | Generation |
+| `agent` | Agent | Agent that requested the generation | Generation |
+| `creator` | Person or Organization | The entity that created the generation | Thing |
+
+## Types
+
+The following types extend Generation:
+
+- **TextGeneration**: Text content generation
+- **CodeGeneration**: Code generation
+- **ImageGeneration**: Image generation
+- **EmbeddingGeneration**: Vector embedding generation
+- **ChatGeneration**: Conversational generation
+
+## Examples
+
+### Example 1: Blog Post Generation
+
+```typescript
+import { $ } from 'sdk.do'
+
+const blogGeneration = {
+  $type: 'Generation',
+  $id: 'https://platform.do/generations/gen_abc123',
+  name: 'Blog Post: AI in Business',
+  description: 'Generated blog post about AI transformation in business',
+  digital: 1.0,
+  prompt: {
+    $type: 'Prompt',
+    name: 'Blog Post Generator',
+    text: 'Write a comprehensive blog post about how AI is transforming business operations. Include specific examples and focus on Business-as-Code patterns.',
+    temperature: 0.7,
+    maxTokens: 2000
+  },
+  model: {
+    $type: 'Model',
+    name: 'gpt-5',
+    version: '2025-01',
+    provider: 'OpenAI'
+  },
+  parameters: [
+    {
+      $type: 'PropertyValue',
+      name: 'temperature',
+      value: 0.7
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'max_tokens',
+      value: 2000
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'top_p',
+      value: 0.9
+    }
+  ],
+  output: {
+    $type: 'Article',
+    headline: 'How AI is Transforming Business Operations',
+    articleBody: '# The AI Revolution in Business\n\nArtificial intelligence is fundamentally changing...',
+    wordCount: 1500
+  },
+  promptTokens: 45,
+  completionTokens: 1847,
+  totalTokens: 1892,
+  finishReason: 'stop',
+  createdAt: '2025-01-17T10:30:00Z',
+  duration: 'PT8.5S',
+  cost: {
+    $type: 'MonetaryAmount',
+    currency: 'USD',
+    value: 0.0378
+  },
+  agent: {
+    $type: 'Agent',
+    $id: 'https://CMO.do',
+    name: 'Chief Marketing Officer'
+  }
+}
+
+await $.Generation.create(blogGeneration)
+```
+
+### Example 2: Code Generation
+
+```typescript
+import { $ } from 'sdk.do'
+
+const codeGeneration = {
+  $type: 'Generation',
+  $id: 'https://platform.do/generations/gen_xyz789',
+  name: 'API Endpoint Implementation',
+  description: 'Generated TypeScript code for user authentication endpoint',
+  digital: 1.0,
+  prompt: {
+    $type: 'Prompt',
+    text: 'Create a TypeScript function for user authentication with JWT tokens. Include input validation, password hashing, and error handling.',
+    temperature: 0.2,
+    maxTokens: 1500
+  },
+  model: {
+    $type: 'Model',
+    name: 'claude-sonnet-4.5',
+    version: '2025-01',
+    provider: 'Anthropic'
+  },
+  parameters: [
+    {
+      $type: 'PropertyValue',
+      name: 'temperature',
+      value: 0.2
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'max_tokens',
+      value: 1500
+    }
+  ],
+  output: {
+    $type: 'SoftwareSourceCode',
+    programmingLanguage: 'TypeScript',
+    codeRepository: 'https://github.com/dot-do/platform',
+    text: 'import { hash, compare } from "bcrypt"\nimport { sign } from "jsonwebtoken"\n\nexport async function authenticate(email: string, password: string) {\n  // Implementation...\n}'
+  },
+  promptTokens: 52,
+  completionTokens: 847,
+  totalTokens: 899,
+  finishReason: 'stop',
+  createdAt: '2025-01-17T11:15:00Z',
+  duration: 'PT6.2S',
+  cost: {
+    $type: 'MonetaryAmount',
+    currency: 'USD',
+    value: 0.0135
+  },
+  agent: {
+    $type: 'Agent',
+    $id: 'https://Cody.do',
+    name: 'Cody'
+  }
+}
+
+await $.Generation.create(codeGeneration)
+```
+
+### Example 3: Product Requirements Generation
+
+```typescript
+import { $ } from 'sdk.do'
+
+const requirementsGeneration = {
+  $type: 'Generation',
+  $id: 'https://platform.do/generations/gen_prd456',
+  name: 'User Dashboard PRD',
+  description: 'Generated product requirements document for user dashboard feature',
+  digital: 1.0,
+  prompt: {
+    $type: 'Prompt',
+    name: 'PRD Generator',
+    text: 'Create a detailed product requirements document for a user analytics dashboard. Include user stories, acceptance criteria, technical requirements, and success metrics.',
+    temperature: 0.5,
+    maxTokens: 3000
+  },
+  model: {
+    $type: 'Model',
+    name: 'gpt-5',
+    version: '2025-01',
+    provider: 'OpenAI'
+  },
+  parameters: [
+    {
+      $type: 'PropertyValue',
+      name: 'temperature',
+      value: 0.5
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'max_tokens',
+      value: 3000
+    }
+  ],
+  output: {
+    $type: 'TechArticle',
+    headline: 'Product Requirements: User Analytics Dashboard',
+    articleBody: '# Overview\n\nThis PRD defines the requirements for a comprehensive user analytics dashboard...\n\n## User Stories\n\n1. As a user, I want to see my activity metrics...',
+    wordCount: 2400
+  },
+  promptTokens: 67,
+  completionTokens: 2756,
+  totalTokens: 2823,
+  finishReason: 'stop',
+  createdAt: '2025-01-17T14:20:00Z',
+  duration: 'PT12.8S',
+  cost: {
+    $type: 'MonetaryAmount',
+    currency: 'USD',
+    value: 0.0565
+  },
+  agent: {
+    $type: 'Agent',
+    $id: 'https://Priya.do',
+    name: 'Priya'
+  }
+}
+
+await $.Generation.create(requirementsGeneration)
+```
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Generation, Agent, Model } from 'schema.org.ai'
+
+// Create a generation
+const generation: Generation = {
+  $type: 'Generation',
+  $id: 'https://platform.do/generations/gen_123',
+  name: 'My Generation',
+  prompt: 'Generate something useful',
+  model: {
+    $type: 'Model',
+    name: 'gpt-5'
+  },
+  output: 'Generated content here',
+  digital: 1.0
+}
+
+await $.Generation.create(generation)
+
+// Query generations by agent
+const codyGenerations = await $.Generation.find({
+  agent: { $id: 'https://Cody.do' }
+})
+
+// Calculate total cost for an agent
+const totalCost = await $.Generation.aggregate([
+  { $match: { 'agent.$id': 'https://CMO.do' } },
+  { $group: { _id: null, total: { $sum: '$cost.value' } } }
+])
+```
+
+## Resources
+
+- [Schema.org Thing](https://schema.org/Thing)
+- [AI Generation Tracking](https://docs.platform.do/ai/generations)
+- [Model Context Protocol](https://docs.platform.do/mcp)
+
+## License
+
+This is an extension to Schema.org vocabulary created by the .do Platform Team. The base Schema.org vocabulary is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

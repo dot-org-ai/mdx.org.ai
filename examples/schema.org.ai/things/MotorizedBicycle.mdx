@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MotorizedBicycle
+$context: https://schema.org
+$type: Class
+name: MotorizedBicycle
+description: A motorized bicycle is a bicycle with an attached motor used to power the vehicle, or to assist with pedaling.
+subClassOf: ["Vehicle"]
+---
+
+# MotorizedBicycle
+
+A motorized bicycle is a bicycle with an attached motor used to power the vehicle, or to assist with pedaling.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > [Vehicle](Vehicle.mdx) > **MotorizedBicycle**
+
+
+
+## Properties
+
+See [Schema.org MotorizedBicycle properties](https://schema.org/MotorizedBicycle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MotorizedBicycle } from 'schema.org.ai'
+
+// Create a MotorizedBicycle
+const item: MotorizedBicycle = {
+  $type: 'MotorizedBicycle',
+  name: 'Example MotorizedBicycle'
+}
+
+// Use semantic patterns
+await $.MotorizedBicycle.create(item)
+const result = await $.MotorizedBicycle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MotorizedBicycle](https://schema.org/MotorizedBicycle)
+- [MotorizedBicycle Properties](https://schema.org/MotorizedBicycle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PerformanceRole
+$context: https://schema.org
+$type: Class
+name: PerformanceRole
+description: A PerformanceRole is a Role that some entity places with regard to a theatrical performance, e.g. in a Movie, TVSeries etc.
+subClassOf: ["Role"]
+---
+
+# PerformanceRole
+
+A PerformanceRole is a Role that some entity places with regard to a theatrical performance, e.g. in a Movie, TVSeries etc.
+
+## Type Hierarchy
+
+**PerformanceRole**
+
+
+
+## Properties
+
+See [Schema.org PerformanceRole properties](https://schema.org/PerformanceRole#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PerformanceRole } from 'schema.org.ai'
+
+// Create a PerformanceRole
+const item: PerformanceRole = {
+  $type: 'PerformanceRole',
+  name: 'Example PerformanceRole'
+}
+
+// Use semantic patterns
+await $.PerformanceRole.create(item)
+const result = await $.PerformanceRole.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PerformanceRole](https://schema.org/PerformanceRole)
+- [PerformanceRole Properties](https://schema.org/PerformanceRole#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

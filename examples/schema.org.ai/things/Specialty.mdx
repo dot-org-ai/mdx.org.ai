@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Specialty
+$context: https://schema.org
+$type: Class
+name: Specialty
+description: Any branch of a field in which people typically develop specific expertise, usually after significant study, time, and effort.
+subClassOf: ["Enumeration"]
+---
+
+# Specialty
+
+Any branch of a field in which people typically develop specific expertise, usually after significant study, time, and effort.
+
+## Type Hierarchy
+
+**Specialty**
+
+## Direct Subclasses
+
+- **[MedicalSpecialty](MedicalSpecialty.mdx)**: Any specific branch of medical science or practice
+
+## Properties
+
+See [Schema.org Specialty properties](https://schema.org/Specialty#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Specialty } from 'schema.org.ai'
+
+// Create a Specialty
+const item: Specialty = {
+  $type: 'Specialty',
+  name: 'Example Specialty'
+}
+
+// Use semantic patterns
+await $.Specialty.create(item)
+const result = await $.Specialty.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Specialty](https://schema.org/Specialty)
+- [Specialty Properties](https://schema.org/Specialty#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Occupation
+$context: https://schema.org
+$type: Class
+name: Occupation
+description: A profession, may involve prolonged training and/or a formal qualification.
+subClassOf: ["Intangible"]
+---
+
+# Occupation
+
+A profession, may involve prolonged training and/or a formal qualification.
+
+## Type Hierarchy
+
+**Occupation**
+
+
+
+## Properties
+
+See [Schema.org Occupation properties](https://schema.org/Occupation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Occupation } from 'schema.org.ai'
+
+// Create a Occupation
+const item: Occupation = {
+  $type: 'Occupation',
+  name: 'Example Occupation'
+}
+
+// Use semantic patterns
+await $.Occupation.create(item)
+const result = await $.Occupation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Occupation](https://schema.org/Occupation)
+- [Occupation Properties](https://schema.org/Occupation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

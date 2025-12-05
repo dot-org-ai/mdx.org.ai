@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EducationalAudience
+$context: https://schema.org
+$type: Class
+name: EducationalAudience
+description: An EducationalAudience.
+subClassOf: ["Audience"]
+---
+
+# EducationalAudience
+
+An EducationalAudience.
+
+## Type Hierarchy
+
+**EducationalAudience**
+
+
+
+## Properties
+
+See [Schema.org EducationalAudience properties](https://schema.org/EducationalAudience#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EducationalAudience } from 'schema.org.ai'
+
+// Create a EducationalAudience
+const item: EducationalAudience = {
+  $type: 'EducationalAudience',
+  name: 'Example EducationalAudience'
+}
+
+// Use semantic patterns
+await $.EducationalAudience.create(item)
+const result = await $.EducationalAudience.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EducationalAudience](https://schema.org/EducationalAudience)
+- [EducationalAudience Properties](https://schema.org/EducationalAudience#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

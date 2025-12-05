@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/FinancialService
+$context: https://schema.org
+$type: Class
+name: FinancialService
+description: Financial services business.
+subClassOf: ["LocalBusiness"]
+---
+
+# FinancialService
+
+Financial services business.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **FinancialService**
+
+## Direct Subclasses
+
+- **[AccountingService](AccountingService.mdx)**: Accountancy business
+- **[AutomatedTeller](AutomatedTeller.mdx)**: ATM/cash machine
+- **[BankOrCreditUnion](BankOrCreditUnion.mdx)**: Bank or credit union
+- **[InsuranceAgency](InsuranceAgency.mdx)**: An Insurance agency
+
+## Properties
+
+See [Schema.org FinancialService properties](https://schema.org/FinancialService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FinancialService } from 'schema.org.ai'
+
+// Create a FinancialService
+const item: FinancialService = {
+  $type: 'FinancialService',
+  name: 'Example FinancialService'
+}
+
+// Use semantic patterns
+await $.FinancialService.create(item)
+const result = await $.FinancialService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FinancialService](https://schema.org/FinancialService)
+- [FinancialService Properties](https://schema.org/FinancialService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

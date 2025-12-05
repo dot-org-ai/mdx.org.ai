@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Question
+$context: https://schema.org
+$type: Class
+name: Question
+description: A specific question - e.g. from a user seeking answers online, or collected in a Frequently Asked Questions (FAQ) document.
+subClassOf: ["Comment"]
+---
+
+# Question
+
+A specific question - e.g. from a user seeking answers online, or collected in a Frequently Asked Questions (FAQ) document.
+
+## Type Hierarchy
+
+**Question**
+
+
+
+## Properties
+
+See [Schema.org Question properties](https://schema.org/Question#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Question } from 'schema.org.ai'
+
+// Create a Question
+const item: Question = {
+  $type: 'Question',
+  name: 'Example Question'
+}
+
+// Use semantic patterns
+await $.Question.create(item)
+const result = await $.Question.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Question](https://schema.org/Question)
+- [Question Properties](https://schema.org/Question#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

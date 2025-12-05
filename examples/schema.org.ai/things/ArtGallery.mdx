@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ArtGallery
+$context: https://schema.org
+$type: Class
+name: ArtGallery
+description: An art gallery.
+subClassOf: ["EntertainmentBusiness"]
+---
+
+# ArtGallery
+
+An art gallery.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [EntertainmentBusiness](EntertainmentBusiness.mdx) > **ArtGallery**
+
+
+
+## Properties
+
+See [Schema.org ArtGallery properties](https://schema.org/ArtGallery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ArtGallery } from 'schema.org.ai'
+
+// Create a ArtGallery
+const item: ArtGallery = {
+  $type: 'ArtGallery',
+  name: 'Example ArtGallery'
+}
+
+// Use semantic patterns
+await $.ArtGallery.create(item)
+const result = await $.ArtGallery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ArtGallery](https://schema.org/ArtGallery)
+- [ArtGallery Properties](https://schema.org/ArtGallery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

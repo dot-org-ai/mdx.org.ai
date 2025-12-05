@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ReviewAction
+$context: https://schema.org
+$type: Class
+name: ReviewAction
+description: The act of producing a balanced opinion about the object for an audience. An agent reviews an object with participants resulting in a review.
+subClassOf: ["AssessAction"]
+---
+
+# ReviewAction
+
+The act of producing a balanced opinion about the object for an audience. An agent reviews an object with participants resulting in a review.
+
+## Type Hierarchy
+
+**ReviewAction**
+
+
+
+## Properties
+
+See [Schema.org ReviewAction properties](https://schema.org/ReviewAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReviewAction } from 'schema.org.ai'
+
+// Create a ReviewAction
+const item: ReviewAction = {
+  $type: 'ReviewAction',
+  name: 'Example ReviewAction'
+}
+
+// Use semantic patterns
+await $.ReviewAction.create(item)
+const result = await $.ReviewAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReviewAction](https://schema.org/ReviewAction)
+- [ReviewAction Properties](https://schema.org/ReviewAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

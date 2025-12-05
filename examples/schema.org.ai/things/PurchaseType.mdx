@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PurchaseType
+$context: https://schema.org
+$type: Class
+name: PurchaseType
+description: Enumerates a purchase type for an item.
+subClassOf: ["Enumeration"]
+---
+
+# PurchaseType
+
+Enumerates a purchase type for an item.
+
+## Type Hierarchy
+
+**PurchaseType**
+
+
+
+## Properties
+
+See [Schema.org PurchaseType properties](https://schema.org/PurchaseType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PurchaseType } from 'schema.org.ai'
+
+// Create a PurchaseType
+const item: PurchaseType = {
+  $type: 'PurchaseType',
+  name: 'Example PurchaseType'
+}
+
+// Use semantic patterns
+await $.PurchaseType.create(item)
+const result = await $.PurchaseType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PurchaseType](https://schema.org/PurchaseType)
+- [PurchaseType Properties](https://schema.org/PurchaseType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

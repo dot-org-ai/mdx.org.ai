@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/CampingPitch
+$context: https://schema.org
+$type: Class
+name: CampingPitch
+description: A [[CampingPitch]] is an individual place for overnight stay in the outdoors, typically being part of a larger camping site, or [[Campground]].\
+subClassOf: ["Accommodation"]
+---
+
+# CampingPitch
+
+A [[CampingPitch]] is an individual place for overnight stay in the outdoors, typically being part of a larger camping site, or [[Campground]].\
+\
+ In British English a campsite, or campground, is an area, usually divided into a number of pitches, where people can camp overnight using tents or camper vans or caravans; this British English use of the word is synonymous with the American English expression campground. In American English the term campsite generally means an area where an individual, family, group, or military unit can pitch a tent or park a camper; a campground may contain many campsites. (Source: Wikipedia, see [https://en.wikipedia.org/wiki/Campsite](https://en.wikipedia.org/wiki/Campsite).)\
+\
+ See also the dedicated [document on the use of schema.org for marking up hotels and other forms of accommodations](/docs/hotels.html).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Accommodation](Accommodation.mdx) > **CampingPitch**
+
+
+
+## Properties
+
+See [Schema.org CampingPitch properties](https://schema.org/CampingPitch#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CampingPitch } from 'schema.org.ai'
+
+// Create a CampingPitch
+const item: CampingPitch = {
+  $type: 'CampingPitch',
+  name: 'Example CampingPitch'
+}
+
+// Use semantic patterns
+await $.CampingPitch.create(item)
+const result = await $.CampingPitch.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CampingPitch](https://schema.org/CampingPitch)
+- [CampingPitch Properties](https://schema.org/CampingPitch#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

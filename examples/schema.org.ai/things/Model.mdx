@@ -1,0 +1,245 @@
+---
+$id: https://schema.org.ai/Model
+$context: https://schema.org.ai
+$type: Class
+name: Model
+description: An AI or machine learning model that can process inputs and generate outputs.
+subClassOf:
+  - https://schema.org/Thing
+digital: 1.0
+---
+
+[Thing](Thing.mdx)
+
+# Model
+
+An AI or machine learning model that can process inputs and generate outputs. Models include large language models (LLMs), vision models, embedding models, and specialized fine-tuned models for specific tasks.
+
+## Properties
+
+| Property | Type | Description | Inherited From |
+|----------|------|-------------|----------------|
+| `$type` | Text | Always "Model" | - |
+| `$id` | URL | Unique identifier for the model | Thing |
+| `name` | Text | The name of the model | Thing |
+| `description` | Text | Description of the model's capabilities | Thing |
+| `identifier` | Text or PropertyValue | Model identifier or ID | Thing |
+| `url` | URL | URL to model documentation | Thing |
+| `digital` | Number (0.0-1.0) | Always 1.0 for AI models | Thing |
+| `version` | Text | Model version | Model |
+| `provider` | Organization | The organization providing the model | Model |
+| `modelType` | Text | Type of model (language, vision, embedding, etc.) | Model |
+| `contextWindow` | Number | Maximum context window size in tokens | Model |
+| `maxTokens` | Number | Maximum output tokens | Model |
+| `trainingCutoff` | Date | Knowledge cutoff date | Model |
+| `capabilities` | Text[] | Model capabilities | Model |
+| `pricing` | PriceSpecification | Pricing information | Model |
+| `inputCost` | MonetaryAmount | Cost per input token | Model |
+| `outputCost` | MonetaryAmount | Cost per output token | Model |
+| `latency` | Duration | Typical response latency | Model |
+| `creator` | Person or Organization | The entity that created the model | Thing |
+
+## Types
+
+The following types extend Model:
+
+- **LanguageModel**: Large language models (LLMs)
+- **VisionModel**: Image and video understanding models
+- **EmbeddingModel**: Vector embedding models
+- **AudioModel**: Speech and audio processing models
+- **MultiModalModel**: Models that handle multiple modalities
+
+## Examples
+
+### Example 1: GPT-5 Language Model
+
+```typescript
+import { $ } from 'sdk.do'
+
+const gpt5 = {
+  $type: 'Model',
+  $id: 'https://openai.com/models/gpt-5',
+  name: 'gpt-5',
+  description: 'OpenAI\'s most capable language model with advanced reasoning and multimodal capabilities',
+  digital: 1.0,
+  version: '2025-01',
+  provider: {
+    $type: 'Organization',
+    name: 'OpenAI',
+    url: 'https://openai.com'
+  },
+  modelType: 'language',
+  contextWindow: 128000,
+  maxTokens: 16384,
+  trainingCutoff: '2024-10-01',
+  capabilities: [
+    'text-generation',
+    'code-generation',
+    'reasoning',
+    'analysis',
+    'vision',
+    'function-calling'
+  ],
+  inputCost: {
+    $type: 'MonetaryAmount',
+    currency: 'USD',
+    value: 0.00001
+  },
+  outputCost: {
+    $type: 'MonetaryAmount',
+    currency: 'USD',
+    value: 0.00003
+  },
+  latency: 'PT2S',
+  url: 'https://platform.openai.com/docs/models/gpt-5'
+}
+
+await $.Model.create(gpt5)
+```
+
+### Example 2: Claude Sonnet 4.5
+
+```typescript
+import { $ } from 'sdk.do'
+
+const claudeSonnet = {
+  $type: 'Model',
+  $id: 'https://anthropic.com/models/claude-sonnet-4.5',
+  name: 'claude-sonnet-4.5',
+  description: 'Anthropic\'s balanced model optimizing intelligence, speed, and cost',
+  digital: 1.0,
+  version: '2025-01',
+  provider: {
+    $type: 'Organization',
+    name: 'Anthropic',
+    url: 'https://anthropic.com'
+  },
+  modelType: 'language',
+  contextWindow: 200000,
+  maxTokens: 8192,
+  trainingCutoff: '2024-11-01',
+  capabilities: [
+    'text-generation',
+    'code-generation',
+    'reasoning',
+    'analysis',
+    'vision',
+    'long-context'
+  ],
+  inputCost: {
+    $type: 'MonetaryAmount',
+    currency: 'USD',
+    value: 0.000003
+  },
+  outputCost: {
+    $type: 'MonetaryAmount',
+    currency: 'USD',
+    value: 0.000015
+  },
+  latency: 'PT1.5S',
+  url: 'https://docs.anthropic.com/claude/docs/models-overview'
+}
+
+await $.Model.create(claudeSonnet)
+```
+
+### Example 3: Embedding Model
+
+```typescript
+import { $ } from 'sdk.do'
+
+const embeddingModel = {
+  $type: 'Model',
+  $id: 'https://openai.com/models/text-embedding-3-large',
+  name: 'text-embedding-3-large',
+  description: 'High-dimensional text embedding model for semantic search and similarity',
+  digital: 1.0,
+  version: '3',
+  provider: {
+    $type: 'Organization',
+    name: 'OpenAI',
+    url: 'https://openai.com'
+  },
+  modelType: 'embedding',
+  contextWindow: 8191,
+  trainingCutoff: '2023-09-01',
+  capabilities: [
+    'text-embedding',
+    'semantic-search',
+    'similarity',
+    'clustering',
+    'classification'
+  ],
+  pricing: {
+    $type: 'PriceSpecification',
+    price: 0.00013,
+    priceCurrency: 'USD',
+    unitText: 'per 1000 tokens'
+  },
+  latency: 'PT0.5S',
+  url: 'https://platform.openai.com/docs/models/embeddings',
+  creator: {
+    $type: 'Organization',
+    name: 'OpenAI',
+    url: 'https://openai.com'
+  }
+}
+
+await $.Model.create(embeddingModel)
+```
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Model, Agent, Generation } from 'schema.org.ai'
+
+// Create a model reference
+const model: Model = {
+  $type: 'Model',
+  name: 'gpt-5',
+  version: '2025-01',
+  provider: {
+    $type: 'Organization',
+    name: 'OpenAI'
+  },
+  digital: 1.0
+}
+
+await $.Model.create(model)
+
+// Assign model to an agent
+const agent: Agent = {
+  $type: 'Agent',
+  $id: 'https://MyAgent.do',
+  name: 'My Agent',
+  model: model
+}
+
+await $.Agent.create(agent)
+
+// Track generations by model
+const gpt5Generations = await $.Generation.find({
+  'model.name': 'gpt-5'
+})
+
+// Calculate costs by model
+const totalCost = await $.Generation.aggregate([
+  { $match: { 'model.name': 'gpt-5' } },
+  { $group: {
+    _id: null,
+    total: { $sum: '$cost.value' },
+    count: { $sum: 1 }
+  }}
+])
+```
+
+## Resources
+
+- [Schema.org Thing](https://schema.org/Thing)
+- [Model Providers](https://docs.platform.do/ai/models)
+- [Cost Optimization](https://docs.platform.do/ai/costs)
+
+## License
+
+This is an extension to Schema.org vocabulary created by the .do Platform Team. The base Schema.org vocabulary is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

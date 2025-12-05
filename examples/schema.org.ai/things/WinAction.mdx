@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WinAction
+$context: https://schema.org
+$type: Class
+name: WinAction
+description: The act of achieving victory in a competitive activity.
+subClassOf: ["AchieveAction"]
+---
+
+# WinAction
+
+The act of achieving victory in a competitive activity.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [AchieveAction](AchieveAction.mdx) > **WinAction**
+
+
+
+## Properties
+
+See [Schema.org WinAction properties](https://schema.org/WinAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WinAction } from 'schema.org.ai'
+
+// Create a WinAction
+const item: WinAction = {
+  $type: 'WinAction',
+  name: 'Example WinAction'
+}
+
+// Use semantic patterns
+await $.WinAction.create(item)
+const result = await $.WinAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WinAction](https://schema.org/WinAction)
+- [WinAction Properties](https://schema.org/WinAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

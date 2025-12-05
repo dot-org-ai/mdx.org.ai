@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MeetingRoom
+$context: https://schema.org
+$type: Class
+name: MeetingRoom
+description: A meeting room, conference room, or conference hall is a room provided for singular events such as business conferences and meetings (source: Wikipedia, the free encyclopedia, see <a href="http://en.wikipedia.org/wiki/Conference_hall">http://en.wikipedia.org/wiki/Conference_hall</a>). <br /><br /> See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.
+subClassOf: ["Room"]
+---
+
+# MeetingRoom
+
+A meeting room, conference room, or conference hall is a room provided for singular events such as business conferences and meetings (source: Wikipedia, the free encyclopedia, see <a href="http://en.wikipedia.org/wiki/Conference_hall">http://en.wikipedia.org/wiki/Conference_hall</a>). <br /><br /> See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Accommodation](Accommodation.mdx) > [Room](Room.mdx) > **MeetingRoom**
+
+
+
+## Properties
+
+See [Schema.org MeetingRoom properties](https://schema.org/MeetingRoom#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MeetingRoom } from 'schema.org.ai'
+
+// Create a MeetingRoom
+const item: MeetingRoom = {
+  $type: 'MeetingRoom',
+  name: 'Example MeetingRoom'
+}
+
+// Use semantic patterns
+await $.MeetingRoom.create(item)
+const result = await $.MeetingRoom.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MeetingRoom](https://schema.org/MeetingRoom)
+- [MeetingRoom Properties](https://schema.org/MeetingRoom#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

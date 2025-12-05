@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/Vehicle
+$context: https://schema.org
+$type: Class
+name: Vehicle
+description: A vehicle is a device that is designed or used to transport people or cargo over land, water, air, or through space.
+subClassOf: ["Product"]
+---
+
+# Vehicle
+
+A vehicle is a device that is designed or used to transport people or cargo over land, water, air, or through space.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > **Vehicle**
+
+## Direct Subclasses
+
+- **[BusOrCoach](BusOrCoach.mdx)**: A bus (also omnibus or autobus) is a road vehicle designed to carry passengers
+- **[Car](Car.mdx)**: A car is a wheeled, self-powered motor vehicle used for transportation
+- **[Motorcycle](Motorcycle.mdx)**: A motorcycle or motorbike is a single-track, two-wheeled motor vehicle
+- **[MotorizedBicycle](MotorizedBicycle.mdx)**: A motorized bicycle is a bicycle with an attached motor used to power the vehicle, or to assist with pedaling
+
+## Properties
+
+See [Schema.org Vehicle properties](https://schema.org/Vehicle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Vehicle } from 'schema.org.ai'
+
+// Create a Vehicle
+const item: Vehicle = {
+  $type: 'Vehicle',
+  name: 'Example Vehicle'
+}
+
+// Use semantic patterns
+await $.Vehicle.create(item)
+const result = await $.Vehicle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Vehicle](https://schema.org/Vehicle)
+- [Vehicle Properties](https://schema.org/Vehicle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

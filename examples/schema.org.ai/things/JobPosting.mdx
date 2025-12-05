@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/JobPosting
+$context: https://schema.org
+$type: Class
+name: JobPosting
+description: A listing that describes a job opening in a certain organization.
+subClassOf: ["Intangible"]
+---
+
+# JobPosting
+
+A listing that describes a job opening in a certain organization.
+
+## Type Hierarchy
+
+**JobPosting**
+
+
+
+## Properties
+
+See [Schema.org JobPosting properties](https://schema.org/JobPosting#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { JobPosting } from 'schema.org.ai'
+
+// Create a JobPosting
+const item: JobPosting = {
+  $type: 'JobPosting',
+  name: 'Example JobPosting'
+}
+
+// Use semantic patterns
+await $.JobPosting.create(item)
+const result = await $.JobPosting.get('item-id')
+```
+
+## Resources
+
+- [Schema.org JobPosting](https://schema.org/JobPosting)
+- [JobPosting Properties](https://schema.org/JobPosting#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

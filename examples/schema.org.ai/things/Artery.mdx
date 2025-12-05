@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Artery
+$context: https://schema.org
+$type: Class
+name: Artery
+description: A type of blood vessel that specifically carries blood away from the heart.
+subClassOf: ["Vessel"]
+---
+
+# Artery
+
+A type of blood vessel that specifically carries blood away from the heart.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [AnatomicalStructure](AnatomicalStructure.mdx) > [Vessel](Vessel.mdx) > **Artery**
+
+
+
+## Properties
+
+See [Schema.org Artery properties](https://schema.org/Artery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Artery } from 'schema.org.ai'
+
+// Create a Artery
+const item: Artery = {
+  $type: 'Artery',
+  name: 'Example Artery'
+}
+
+// Use semantic patterns
+await $.Artery.create(item)
+const result = await $.Artery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Artery](https://schema.org/Artery)
+- [Artery Properties](https://schema.org/Artery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

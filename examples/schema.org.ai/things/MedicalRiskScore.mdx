@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalRiskScore
+$context: https://schema.org
+$type: Class
+name: MedicalRiskScore
+description: A simple system that adds up the number of risk factors to yield a score that is associated with prognosis, e.g. CHAD score, TIMI risk score.
+subClassOf: ["MedicalRiskEstimator"]
+---
+
+# MedicalRiskScore
+
+A simple system that adds up the number of risk factors to yield a score that is associated with prognosis, e.g. CHAD score, TIMI risk score.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalRiskEstimator](MedicalRiskEstimator.mdx) > **MedicalRiskScore**
+
+
+
+## Properties
+
+See [Schema.org MedicalRiskScore properties](https://schema.org/MedicalRiskScore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalRiskScore } from 'schema.org.ai'
+
+// Create a MedicalRiskScore
+const item: MedicalRiskScore = {
+  $type: 'MedicalRiskScore',
+  name: 'Example MedicalRiskScore'
+}
+
+// Use semantic patterns
+await $.MedicalRiskScore.create(item)
+const result = await $.MedicalRiskScore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalRiskScore](https://schema.org/MedicalRiskScore)
+- [MedicalRiskScore Properties](https://schema.org/MedicalRiskScore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

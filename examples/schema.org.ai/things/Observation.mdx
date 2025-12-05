@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Observation
+$context: https://schema.org
+$type: Class
+name: Observation
+description: Instances of the class [[Observation]] are used to specify observations about an entity at a particular time. The principal properties of an [[Observation]] are [[observationAbout]], [[measuredProperty]], [[statType]], [[value] and [[observationDate]]  and [[measuredProperty]]. Some but not all Observations represent a [[QuantitativeValue]]. Quantitative observations can be about a [[StatisticalVariable]], which is an abstract specification about which we can make observations that are grounded at a particular location and time. Observations can also encode a subset of simple RDF-like statements (its observationAbout, a StatisticalVariable, defining the measuredPoperty; its observationAbout property indicating the entity the statement is about, and [[value]] ) In the context of a quantitative knowledge graph, typical properties could include [[measuredProperty]], [[observationAbout]], [[observationDate]], [[value]], [[unitCode]], [[unitText]], [[measurementMethod]].
+subClassOf: ["Intangible","QuantitativeValue"]
+---
+
+# Observation
+
+Instances of the class [[Observation]] are used to specify observations about an entity at a particular time. The principal properties of an [[Observation]] are [[observationAbout]], [[measuredProperty]], [[statType]], [[value] and [[observationDate]]  and [[measuredProperty]]. Some but not all Observations represent a [[QuantitativeValue]]. Quantitative observations can be about a [[StatisticalVariable]], which is an abstract specification about which we can make observations that are grounded at a particular location and time. Observations can also encode a subset of simple RDF-like statements (its observationAbout, a StatisticalVariable, defining the measuredPoperty; its observationAbout property indicating the entity the statement is about, and [[value]] ) In the context of a quantitative knowledge graph, typical properties could include [[measuredProperty]], [[observationAbout]], [[observationDate]], [[value]], [[unitCode]], [[unitText]], [[measurementMethod]].
+
+## Type Hierarchy
+
+**Observation**
+
+
+
+## Properties
+
+See [Schema.org Observation properties](https://schema.org/Observation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Observation } from 'schema.org.ai'
+
+// Create a Observation
+const item: Observation = {
+  $type: 'Observation',
+  name: 'Example Observation'
+}
+
+// Use semantic patterns
+await $.Observation.create(item)
+const result = await $.Observation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Observation](https://schema.org/Observation)
+- [Observation Properties](https://schema.org/Observation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

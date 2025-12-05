@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TelevisionChannel
+$context: https://schema.org
+$type: Class
+name: TelevisionChannel
+description: A unique instance of a television BroadcastService on a CableOrSatelliteService lineup.
+subClassOf: ["BroadcastChannel"]
+---
+
+# TelevisionChannel
+
+A unique instance of a television BroadcastService on a CableOrSatelliteService lineup.
+
+## Type Hierarchy
+
+**TelevisionChannel**
+
+
+
+## Properties
+
+See [Schema.org TelevisionChannel properties](https://schema.org/TelevisionChannel#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TelevisionChannel } from 'schema.org.ai'
+
+// Create a TelevisionChannel
+const item: TelevisionChannel = {
+  $type: 'TelevisionChannel',
+  name: 'Example TelevisionChannel'
+}
+
+// Use semantic patterns
+await $.TelevisionChannel.create(item)
+const result = await $.TelevisionChannel.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TelevisionChannel](https://schema.org/TelevisionChannel)
+- [TelevisionChannel Properties](https://schema.org/TelevisionChannel#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

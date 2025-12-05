@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Vein
+$context: https://schema.org
+$type: Class
+name: Vein
+description: A type of blood vessel that specifically carries blood to the heart.
+subClassOf: ["Vessel"]
+---
+
+# Vein
+
+A type of blood vessel that specifically carries blood to the heart.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [AnatomicalStructure](AnatomicalStructure.mdx) > [Vessel](Vessel.mdx) > **Vein**
+
+
+
+## Properties
+
+See [Schema.org Vein properties](https://schema.org/Vein#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Vein } from 'schema.org.ai'
+
+// Create a Vein
+const item: Vein = {
+  $type: 'Vein',
+  name: 'Example Vein'
+}
+
+// Use semantic patterns
+await $.Vein.create(item)
+const result = await $.Vein.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Vein](https://schema.org/Vein)
+- [Vein Properties](https://schema.org/Vein#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

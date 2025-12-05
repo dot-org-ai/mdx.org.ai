@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ReservationPackage
+$context: https://schema.org
+$type: Class
+name: ReservationPackage
+description: A group of multiple reservations with common values for all sub-reservations.
+subClassOf: ["Reservation"]
+---
+
+# ReservationPackage
+
+A group of multiple reservations with common values for all sub-reservations.
+
+## Type Hierarchy
+
+**ReservationPackage**
+
+
+
+## Properties
+
+See [Schema.org ReservationPackage properties](https://schema.org/ReservationPackage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReservationPackage } from 'schema.org.ai'
+
+// Create a ReservationPackage
+const item: ReservationPackage = {
+  $type: 'ReservationPackage',
+  name: 'Example ReservationPackage'
+}
+
+// Use semantic patterns
+await $.ReservationPackage.create(item)
+const result = await $.ReservationPackage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReservationPackage](https://schema.org/ReservationPackage)
+- [ReservationPackage Properties](https://schema.org/ReservationPackage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PodcastSeason
+$context: https://schema.org
+$type: Class
+name: PodcastSeason
+description: A single season of a podcast. Many podcasts do not break down into separate seasons. In that case, PodcastSeries should be used.
+subClassOf: ["CreativeWorkSeason"]
+---
+
+# PodcastSeason
+
+A single season of a podcast. Many podcasts do not break down into separate seasons. In that case, PodcastSeries should be used.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [CreativeWorkSeason](CreativeWorkSeason.mdx) > **PodcastSeason**
+
+
+
+## Properties
+
+See [Schema.org PodcastSeason properties](https://schema.org/PodcastSeason#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PodcastSeason } from 'schema.org.ai'
+
+// Create a PodcastSeason
+const item: PodcastSeason = {
+  $type: 'PodcastSeason',
+  name: 'Example PodcastSeason'
+}
+
+// Use semantic patterns
+await $.PodcastSeason.create(item)
+const result = await $.PodcastSeason.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PodcastSeason](https://schema.org/PodcastSeason)
+- [PodcastSeason Properties](https://schema.org/PodcastSeason#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

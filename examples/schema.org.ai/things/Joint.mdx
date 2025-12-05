@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Joint
+$context: https://schema.org
+$type: Class
+name: Joint
+description: The anatomical location at which two or more bones make contact.
+subClassOf: ["AnatomicalStructure"]
+---
+
+# Joint
+
+The anatomical location at which two or more bones make contact.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [AnatomicalStructure](AnatomicalStructure.mdx) > **Joint**
+
+
+
+## Properties
+
+See [Schema.org Joint properties](https://schema.org/Joint#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Joint } from 'schema.org.ai'
+
+// Create a Joint
+const item: Joint = {
+  $type: 'Joint',
+  name: 'Example Joint'
+}
+
+// Use semantic patterns
+await $.Joint.create(item)
+const result = await $.Joint.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Joint](https://schema.org/Joint)
+- [Joint Properties](https://schema.org/Joint#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

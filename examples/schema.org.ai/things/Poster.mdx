@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Poster
+$context: https://schema.org
+$type: Class
+name: Poster
+description: A large, usually printed placard, bill, or announcement, often illustrated, that is posted to advertise or publicize something.
+subClassOf: ["CreativeWork"]
+---
+
+# Poster
+
+A large, usually printed placard, bill, or announcement, often illustrated, that is posted to advertise or publicize something.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Poster**
+
+
+
+## Properties
+
+See [Schema.org Poster properties](https://schema.org/Poster#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Poster } from 'schema.org.ai'
+
+// Create a Poster
+const item: Poster = {
+  $type: 'Poster',
+  name: 'Example Poster'
+}
+
+// Use semantic patterns
+await $.Poster.create(item)
+const result = await $.Poster.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Poster](https://schema.org/Poster)
+- [Poster Properties](https://schema.org/Poster#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

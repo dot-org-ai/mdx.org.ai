@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TheaterGroup
+$context: https://schema.org
+$type: Class
+name: TheaterGroup
+description: A theater group or company, for example, the Royal Shakespeare Company or Druid Theatre.
+subClassOf: ["PerformingGroup"]
+---
+
+# TheaterGroup
+
+A theater group or company, for example, the Royal Shakespeare Company or Druid Theatre.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > [PerformingGroup](PerformingGroup.mdx) > **TheaterGroup**
+
+
+
+## Properties
+
+See [Schema.org TheaterGroup properties](https://schema.org/TheaterGroup#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TheaterGroup } from 'schema.org.ai'
+
+// Create a TheaterGroup
+const item: TheaterGroup = {
+  $type: 'TheaterGroup',
+  name: 'Example TheaterGroup'
+}
+
+// Use semantic patterns
+await $.TheaterGroup.create(item)
+const result = await $.TheaterGroup.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TheaterGroup](https://schema.org/TheaterGroup)
+- [TheaterGroup Properties](https://schema.org/TheaterGroup#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

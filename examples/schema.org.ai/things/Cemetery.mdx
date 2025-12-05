@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Cemetery
+$context: https://schema.org
+$type: Class
+name: Cemetery
+description: A graveyard.
+subClassOf: ["CivicStructure"]
+---
+
+# Cemetery
+
+A graveyard.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **Cemetery**
+
+
+
+## Properties
+
+See [Schema.org Cemetery properties](https://schema.org/Cemetery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Cemetery } from 'schema.org.ai'
+
+// Create a Cemetery
+const item: Cemetery = {
+  $type: 'Cemetery',
+  name: 'Example Cemetery'
+}
+
+// Use semantic patterns
+await $.Cemetery.create(item)
+const result = await $.Cemetery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Cemetery](https://schema.org/Cemetery)
+- [Cemetery Properties](https://schema.org/Cemetery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

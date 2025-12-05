@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MonetaryAmount
+$context: https://schema.org
+$type: Class
+name: MonetaryAmount
+description: A monetary value or range. This type can be used to describe an amount of money such as $50 USD, or a range as in describing a bank account being suitable for a balance between £1,000 and £1,000,000 GBP, or the value of a salary, etc. It is recommended to use [[PriceSpecification]] Types to describe the price of an Offer, Invoice, etc.
+subClassOf: ["StructuredValue"]
+---
+
+# MonetaryAmount
+
+A monetary value or range. This type can be used to describe an amount of money such as $50 USD, or a range as in describing a bank account being suitable for a balance between £1,000 and £1,000,000 GBP, or the value of a salary, etc. It is recommended to use [[PriceSpecification]] Types to describe the price of an Offer, Invoice, etc.
+
+## Type Hierarchy
+
+**MonetaryAmount**
+
+
+
+## Properties
+
+See [Schema.org MonetaryAmount properties](https://schema.org/MonetaryAmount#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MonetaryAmount } from 'schema.org.ai'
+
+// Create a MonetaryAmount
+const item: MonetaryAmount = {
+  $type: 'MonetaryAmount',
+  name: 'Example MonetaryAmount'
+}
+
+// Use semantic patterns
+await $.MonetaryAmount.create(item)
+const result = await $.MonetaryAmount.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MonetaryAmount](https://schema.org/MonetaryAmount)
+- [MonetaryAmount Properties](https://schema.org/MonetaryAmount#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

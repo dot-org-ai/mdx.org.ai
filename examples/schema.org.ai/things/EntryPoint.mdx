@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EntryPoint
+$context: https://schema.org
+$type: Class
+name: EntryPoint
+description: An entry point, within some Web-based protocol.
+subClassOf: ["Intangible"]
+---
+
+# EntryPoint
+
+An entry point, within some Web-based protocol.
+
+## Type Hierarchy
+
+**EntryPoint**
+
+
+
+## Properties
+
+See [Schema.org EntryPoint properties](https://schema.org/EntryPoint#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EntryPoint } from 'schema.org.ai'
+
+// Create a EntryPoint
+const item: EntryPoint = {
+  $type: 'EntryPoint',
+  name: 'Example EntryPoint'
+}
+
+// Use semantic patterns
+await $.EntryPoint.create(item)
+const result = await $.EntryPoint.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EntryPoint](https://schema.org/EntryPoint)
+- [EntryPoint Properties](https://schema.org/EntryPoint#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

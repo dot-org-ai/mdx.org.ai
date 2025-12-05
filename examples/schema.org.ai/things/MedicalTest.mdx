@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/MedicalTest
+$context: https://schema.org
+$type: Class
+name: MedicalTest
+description: Any medical test, typically performed for diagnostic purposes.
+subClassOf: ["MedicalEntity"]
+---
+
+# MedicalTest
+
+Any medical test, typically performed for diagnostic purposes.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **MedicalTest**
+
+## Direct Subclasses
+
+- **[ImagingTest](ImagingTest.mdx)**: Any medical imaging modality typically used for diagnostic purposes
+- **[MedicalTestPanel](MedicalTestPanel.mdx)**: Any collection of tests commonly ordered together
+- **[PathologyTest](PathologyTest.mdx)**: A medical test performed by a laboratory that typically involves examination of a tissue sample by a pathologist
+
+## Properties
+
+See [Schema.org MedicalTest properties](https://schema.org/MedicalTest#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalTest } from 'schema.org.ai'
+
+// Create a MedicalTest
+const item: MedicalTest = {
+  $type: 'MedicalTest',
+  name: 'Example MedicalTest'
+}
+
+// Use semantic patterns
+await $.MedicalTest.create(item)
+const result = await $.MedicalTest.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalTest](https://schema.org/MedicalTest)
+- [MedicalTest Properties](https://schema.org/MedicalTest#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

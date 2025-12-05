@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CourseInstance
+$context: https://schema.org
+$type: Class
+name: CourseInstance
+description: An instance of a [[Course]] which is distinct from other instances because it is offered at a different time or location or through different media or modes of study or to a specific section of students.
+subClassOf: ["Event"]
+---
+
+# CourseInstance
+
+An instance of a [[Course]] which is distinct from other instances because it is offered at a different time or location or through different media or modes of study or to a specific section of students.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **CourseInstance**
+
+
+
+## Properties
+
+See [Schema.org CourseInstance properties](https://schema.org/CourseInstance#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CourseInstance } from 'schema.org.ai'
+
+// Create a CourseInstance
+const item: CourseInstance = {
+  $type: 'CourseInstance',
+  name: 'Example CourseInstance'
+}
+
+// Use semantic patterns
+await $.CourseInstance.create(item)
+const result = await $.CourseInstance.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CourseInstance](https://schema.org/CourseInstance)
+- [CourseInstance Properties](https://schema.org/CourseInstance#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WorkersUnion
+$context: https://schema.org
+$type: Class
+name: WorkersUnion
+description: A Workers Union (also known as a Labor Union, Labour Union, or Trade Union) is an organization that promotes the interests of its worker members by collectively bargaining with management, organizing, and political lobbying.
+subClassOf: ["Organization"]
+---
+
+# WorkersUnion
+
+A Workers Union (also known as a Labor Union, Labour Union, or Trade Union) is an organization that promotes the interests of its worker members by collectively bargaining with management, organizing, and political lobbying.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **WorkersUnion**
+
+
+
+## Properties
+
+See [Schema.org WorkersUnion properties](https://schema.org/WorkersUnion#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WorkersUnion } from 'schema.org.ai'
+
+// Create a WorkersUnion
+const item: WorkersUnion = {
+  $type: 'WorkersUnion',
+  name: 'Example WorkersUnion'
+}
+
+// Use semantic patterns
+await $.WorkersUnion.create(item)
+const result = await $.WorkersUnion.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WorkersUnion](https://schema.org/WorkersUnion)
+- [WorkersUnion Properties](https://schema.org/WorkersUnion#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

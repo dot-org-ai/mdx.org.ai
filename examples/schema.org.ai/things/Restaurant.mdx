@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Restaurant
+$context: https://schema.org
+$type: Class
+name: Restaurant
+description: A restaurant.
+subClassOf: ["FoodEstablishment"]
+---
+
+# Restaurant
+
+A restaurant.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FoodEstablishment](FoodEstablishment.mdx) > **Restaurant**
+
+
+
+## Properties
+
+See [Schema.org Restaurant properties](https://schema.org/Restaurant#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Restaurant } from 'schema.org.ai'
+
+// Create a Restaurant
+const item: Restaurant = {
+  $type: 'Restaurant',
+  name: 'Example Restaurant'
+}
+
+// Use semantic patterns
+await $.Restaurant.create(item)
+const result = await $.Restaurant.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Restaurant](https://schema.org/Restaurant)
+- [Restaurant Properties](https://schema.org/Restaurant#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

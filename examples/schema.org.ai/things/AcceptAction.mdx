@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/AcceptAction
+$context: https://schema.org
+$type: Class
+name: AcceptAction
+description: The act of committing to/adopting an object.\
+subClassOf: ["AllocateAction"]
+---
+
+# AcceptAction
+
+The act of committing to/adopting an object.\
+\
+Related actions:\
+\
+* [[RejectAction]]: The antonym of AcceptAction.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [OrganizeAction](OrganizeAction.mdx) > [AllocateAction](AllocateAction.mdx) > **AcceptAction**
+
+
+
+## Properties
+
+See [Schema.org AcceptAction properties](https://schema.org/AcceptAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AcceptAction } from 'schema.org.ai'
+
+// Create a AcceptAction
+const item: AcceptAction = {
+  $type: 'AcceptAction',
+  name: 'Example AcceptAction'
+}
+
+// Use semantic patterns
+await $.AcceptAction.create(item)
+const result = await $.AcceptAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AcceptAction](https://schema.org/AcceptAction)
+- [AcceptAction Properties](https://schema.org/AcceptAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

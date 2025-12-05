@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TouristInformationCenter
+$context: https://schema.org
+$type: Class
+name: TouristInformationCenter
+description: A tourist information center.
+subClassOf: ["LocalBusiness"]
+---
+
+# TouristInformationCenter
+
+A tourist information center.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **TouristInformationCenter**
+
+
+
+## Properties
+
+See [Schema.org TouristInformationCenter properties](https://schema.org/TouristInformationCenter#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TouristInformationCenter } from 'schema.org.ai'
+
+// Create a TouristInformationCenter
+const item: TouristInformationCenter = {
+  $type: 'TouristInformationCenter',
+  name: 'Example TouristInformationCenter'
+}
+
+// Use semantic patterns
+await $.TouristInformationCenter.create(item)
+const result = await $.TouristInformationCenter.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TouristInformationCenter](https://schema.org/TouristInformationCenter)
+- [TouristInformationCenter Properties](https://schema.org/TouristInformationCenter#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

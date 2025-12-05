@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Pharmacy
+$context: https://schema.org
+$type: Class
+name: Pharmacy
+description: A pharmacy or drugstore.
+subClassOf: ["MedicalOrganization","MedicalBusiness"]
+---
+
+# Pharmacy
+
+A pharmacy or drugstore.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [MedicalBusiness](MedicalBusiness.mdx) > **Pharmacy**
+
+
+
+## Properties
+
+See [Schema.org Pharmacy properties](https://schema.org/Pharmacy#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Pharmacy } from 'schema.org.ai'
+
+// Create a Pharmacy
+const item: Pharmacy = {
+  $type: 'Pharmacy',
+  name: 'Example Pharmacy'
+}
+
+// Use semantic patterns
+await $.Pharmacy.create(item)
+const result = await $.Pharmacy.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Pharmacy](https://schema.org/Pharmacy)
+- [Pharmacy Properties](https://schema.org/Pharmacy#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

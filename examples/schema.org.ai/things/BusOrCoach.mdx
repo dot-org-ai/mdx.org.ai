@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BusOrCoach
+$context: https://schema.org
+$type: Class
+name: BusOrCoach
+description: A bus (also omnibus or autobus) is a road vehicle designed to carry passengers. Coaches are luxury buses, usually in service for long distance travel.
+subClassOf: ["Vehicle"]
+---
+
+# BusOrCoach
+
+A bus (also omnibus or autobus) is a road vehicle designed to carry passengers. Coaches are luxury buses, usually in service for long distance travel.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > [Vehicle](Vehicle.mdx) > **BusOrCoach**
+
+
+
+## Properties
+
+See [Schema.org BusOrCoach properties](https://schema.org/BusOrCoach#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BusOrCoach } from 'schema.org.ai'
+
+// Create a BusOrCoach
+const item: BusOrCoach = {
+  $type: 'BusOrCoach',
+  name: 'Example BusOrCoach'
+}
+
+// Use semantic patterns
+await $.BusOrCoach.create(item)
+const result = await $.BusOrCoach.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BusOrCoach](https://schema.org/BusOrCoach)
+- [BusOrCoach Properties](https://schema.org/BusOrCoach#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

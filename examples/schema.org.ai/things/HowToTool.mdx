@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HowToTool
+$context: https://schema.org
+$type: Class
+name: HowToTool
+description: A tool used (but not consumed) when performing instructions for how to achieve a result.
+subClassOf: ["HowToItem"]
+---
+
+# HowToTool
+
+A tool used (but not consumed) when performing instructions for how to achieve a result.
+
+## Type Hierarchy
+
+**HowToTool**
+
+
+
+## Properties
+
+See [Schema.org HowToTool properties](https://schema.org/HowToTool#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HowToTool } from 'schema.org.ai'
+
+// Create a HowToTool
+const item: HowToTool = {
+  $type: 'HowToTool',
+  name: 'Example HowToTool'
+}
+
+// Use semantic patterns
+await $.HowToTool.create(item)
+const result = await $.HowToTool.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HowToTool](https://schema.org/HowToTool)
+- [HowToTool Properties](https://schema.org/HowToTool#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

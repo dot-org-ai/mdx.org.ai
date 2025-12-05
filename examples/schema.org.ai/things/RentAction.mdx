@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RentAction
+$context: https://schema.org
+$type: Class
+name: RentAction
+description: The act of giving money in return for temporary use, but not ownership, of an object such as a vehicle or property. For example, an agent rents a property from a landlord in exchange for a periodic payment.
+subClassOf: ["TradeAction"]
+---
+
+# RentAction
+
+The act of giving money in return for temporary use, but not ownership, of an object such as a vehicle or property. For example, an agent rents a property from a landlord in exchange for a periodic payment.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TradeAction](TradeAction.mdx) > **RentAction**
+
+
+
+## Properties
+
+See [Schema.org RentAction properties](https://schema.org/RentAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RentAction } from 'schema.org.ai'
+
+// Create a RentAction
+const item: RentAction = {
+  $type: 'RentAction',
+  name: 'Example RentAction'
+}
+
+// Use semantic patterns
+await $.RentAction.create(item)
+const result = await $.RentAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RentAction](https://schema.org/RentAction)
+- [RentAction Properties](https://schema.org/RentAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

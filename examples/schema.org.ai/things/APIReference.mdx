@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/APIReference
+$context: https://schema.org
+$type: Class
+name: APIReference
+description: Reference documentation for application programming interfaces (APIs).
+subClassOf: ["TechArticle"]
+---
+
+# APIReference
+
+Reference documentation for application programming interfaces (APIs).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > [TechArticle](TechArticle.mdx) > **APIReference**
+
+
+
+## Properties
+
+See [Schema.org APIReference properties](https://schema.org/APIReference#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { APIReference } from 'schema.org.ai'
+
+// Create a APIReference
+const item: APIReference = {
+  $type: 'APIReference',
+  name: 'Example APIReference'
+}
+
+// Use semantic patterns
+await $.APIReference.create(item)
+const result = await $.APIReference.get('item-id')
+```
+
+## Resources
+
+- [Schema.org APIReference](https://schema.org/APIReference)
+- [APIReference Properties](https://schema.org/APIReference#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

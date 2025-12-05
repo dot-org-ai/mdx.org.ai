@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HealthAspectEnumeration
+$context: https://schema.org
+$type: Class
+name: HealthAspectEnumeration
+description: HealthAspectEnumeration enumerates several aspects of health content online, each of which might be described using [[hasHealthAspect]] and [[HealthTopicContent]].
+subClassOf: ["Enumeration"]
+---
+
+# HealthAspectEnumeration
+
+HealthAspectEnumeration enumerates several aspects of health content online, each of which might be described using [[hasHealthAspect]] and [[HealthTopicContent]].
+
+## Type Hierarchy
+
+**HealthAspectEnumeration**
+
+
+
+## Properties
+
+See [Schema.org HealthAspectEnumeration properties](https://schema.org/HealthAspectEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HealthAspectEnumeration } from 'schema.org.ai'
+
+// Create a HealthAspectEnumeration
+const item: HealthAspectEnumeration = {
+  $type: 'HealthAspectEnumeration',
+  name: 'Example HealthAspectEnumeration'
+}
+
+// Use semantic patterns
+await $.HealthAspectEnumeration.create(item)
+const result = await $.HealthAspectEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HealthAspectEnumeration](https://schema.org/HealthAspectEnumeration)
+- [HealthAspectEnumeration Properties](https://schema.org/HealthAspectEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

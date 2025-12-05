@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TypeAndQuantityNode
+$context: https://schema.org
+$type: Class
+name: TypeAndQuantityNode
+description: A structured value indicating the quantity, unit of measurement, and business function of goods included in a bundle offer.
+subClassOf: ["StructuredValue"]
+---
+
+# TypeAndQuantityNode
+
+A structured value indicating the quantity, unit of measurement, and business function of goods included in a bundle offer.
+
+## Type Hierarchy
+
+**TypeAndQuantityNode**
+
+
+
+## Properties
+
+See [Schema.org TypeAndQuantityNode properties](https://schema.org/TypeAndQuantityNode#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TypeAndQuantityNode } from 'schema.org.ai'
+
+// Create a TypeAndQuantityNode
+const item: TypeAndQuantityNode = {
+  $type: 'TypeAndQuantityNode',
+  name: 'Example TypeAndQuantityNode'
+}
+
+// Use semantic patterns
+await $.TypeAndQuantityNode.create(item)
+const result = await $.TypeAndQuantityNode.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TypeAndQuantityNode](https://schema.org/TypeAndQuantityNode)
+- [TypeAndQuantityNode Properties](https://schema.org/TypeAndQuantityNode#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

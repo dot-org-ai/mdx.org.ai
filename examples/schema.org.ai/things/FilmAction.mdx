@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FilmAction
+$context: https://schema.org
+$type: Class
+name: FilmAction
+description: The act of capturing sound and moving images on film, video, or digitally.
+subClassOf: ["CreateAction"]
+---
+
+# FilmAction
+
+The act of capturing sound and moving images on film, video, or digitally.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [CreateAction](CreateAction.mdx) > **FilmAction**
+
+
+
+## Properties
+
+See [Schema.org FilmAction properties](https://schema.org/FilmAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FilmAction } from 'schema.org.ai'
+
+// Create a FilmAction
+const item: FilmAction = {
+  $type: 'FilmAction',
+  name: 'Example FilmAction'
+}
+
+// Use semantic patterns
+await $.FilmAction.create(item)
+const result = await $.FilmAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FilmAction](https://schema.org/FilmAction)
+- [FilmAction Properties](https://schema.org/FilmAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

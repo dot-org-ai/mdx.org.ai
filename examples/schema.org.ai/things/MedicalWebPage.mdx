@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalWebPage
+$context: https://schema.org
+$type: Class
+name: MedicalWebPage
+description: A web page that provides medical information.
+subClassOf: ["WebPage"]
+---
+
+# MedicalWebPage
+
+A web page that provides medical information.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **MedicalWebPage**
+
+
+
+## Properties
+
+See [Schema.org MedicalWebPage properties](https://schema.org/MedicalWebPage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalWebPage } from 'schema.org.ai'
+
+// Create a MedicalWebPage
+const item: MedicalWebPage = {
+  $type: 'MedicalWebPage',
+  name: 'Example MedicalWebPage'
+}
+
+// Use semantic patterns
+await $.MedicalWebPage.create(item)
+const result = await $.MedicalWebPage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalWebPage](https://schema.org/MedicalWebPage)
+- [MedicalWebPage Properties](https://schema.org/MedicalWebPage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

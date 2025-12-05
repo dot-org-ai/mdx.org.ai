@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/MedicalRiskEstimator
+$context: https://schema.org
+$type: Class
+name: MedicalRiskEstimator
+description: Any rule set or interactive tool for estimating the risk of developing a complication or condition.
+subClassOf: ["MedicalEntity"]
+---
+
+# MedicalRiskEstimator
+
+Any rule set or interactive tool for estimating the risk of developing a complication or condition.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **MedicalRiskEstimator**
+
+## Direct Subclasses
+
+- **[MedicalRiskCalculator](MedicalRiskCalculator.mdx)**: A complex mathematical calculation requiring an online calculator, used to assess prognosis
+- **[MedicalRiskScore](MedicalRiskScore.mdx)**: A simple system that adds up the number of risk factors to yield a score that is associated with prognosis, e
+
+## Properties
+
+See [Schema.org MedicalRiskEstimator properties](https://schema.org/MedicalRiskEstimator#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalRiskEstimator } from 'schema.org.ai'
+
+// Create a MedicalRiskEstimator
+const item: MedicalRiskEstimator = {
+  $type: 'MedicalRiskEstimator',
+  name: 'Example MedicalRiskEstimator'
+}
+
+// Use semantic patterns
+await $.MedicalRiskEstimator.create(item)
+const result = await $.MedicalRiskEstimator.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalRiskEstimator](https://schema.org/MedicalRiskEstimator)
+- [MedicalRiskEstimator Properties](https://schema.org/MedicalRiskEstimator#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

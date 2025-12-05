@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/VacationRental
+$context: https://schema.org
+$type: Class
+name: VacationRental
+description: A kind of lodging business that focuses on renting single properties for limited time.
+subClassOf: ["LodgingBusiness"]
+---
+
+# VacationRental
+
+A kind of lodging business that focuses on renting single properties for limited time.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [LodgingBusiness](LodgingBusiness.mdx) > **VacationRental**
+
+
+
+## Properties
+
+See [Schema.org VacationRental properties](https://schema.org/VacationRental#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { VacationRental } from 'schema.org.ai'
+
+// Create a VacationRental
+const item: VacationRental = {
+  $type: 'VacationRental',
+  name: 'Example VacationRental'
+}
+
+// Use semantic patterns
+await $.VacationRental.create(item)
+const result = await $.VacationRental.get('item-id')
+```
+
+## Resources
+
+- [Schema.org VacationRental](https://schema.org/VacationRental)
+- [VacationRental Properties](https://schema.org/VacationRental#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

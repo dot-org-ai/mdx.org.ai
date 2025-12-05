@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SelfStorage
+$context: https://schema.org
+$type: Class
+name: SelfStorage
+description: A self-storage facility.
+subClassOf: ["LocalBusiness"]
+---
+
+# SelfStorage
+
+A self-storage facility.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **SelfStorage**
+
+
+
+## Properties
+
+See [Schema.org SelfStorage properties](https://schema.org/SelfStorage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SelfStorage } from 'schema.org.ai'
+
+// Create a SelfStorage
+const item: SelfStorage = {
+  $type: 'SelfStorage',
+  name: 'Example SelfStorage'
+}
+
+// Use semantic patterns
+await $.SelfStorage.create(item)
+const result = await $.SelfStorage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SelfStorage](https://schema.org/SelfStorage)
+- [SelfStorage Properties](https://schema.org/SelfStorage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

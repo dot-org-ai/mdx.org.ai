@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/EducationalOccupationalProgram
+$context: https://schema.org
+$type: Class
+name: EducationalOccupationalProgram
+description: A program offered by an institution which determines the learning progress to achieve an outcome, usually a credential like a degree or certificate. This would define a discrete set of opportunities (e.g., job, courses) that together constitute a program with a clear start, end, set of requirements, and transition to a new occupational opportunity (e.g., a job), or sometimes a higher educational opportunity (e.g., an advanced degree).
+subClassOf: ["Intangible"]
+---
+
+# EducationalOccupationalProgram
+
+A program offered by an institution which determines the learning progress to achieve an outcome, usually a credential like a degree or certificate. This would define a discrete set of opportunities (e.g., job, courses) that together constitute a program with a clear start, end, set of requirements, and transition to a new occupational opportunity (e.g., a job), or sometimes a higher educational opportunity (e.g., an advanced degree).
+
+## Type Hierarchy
+
+**EducationalOccupationalProgram**
+
+## Direct Subclasses
+
+- **[WorkBasedProgram](WorkBasedProgram.mdx)**: A program with both an educational and employment component
+
+## Properties
+
+See [Schema.org EducationalOccupationalProgram properties](https://schema.org/EducationalOccupationalProgram#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EducationalOccupationalProgram } from 'schema.org.ai'
+
+// Create a EducationalOccupationalProgram
+const item: EducationalOccupationalProgram = {
+  $type: 'EducationalOccupationalProgram',
+  name: 'Example EducationalOccupationalProgram'
+}
+
+// Use semantic patterns
+await $.EducationalOccupationalProgram.create(item)
+const result = await $.EducationalOccupationalProgram.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EducationalOccupationalProgram](https://schema.org/EducationalOccupationalProgram)
+- [EducationalOccupationalProgram Properties](https://schema.org/EducationalOccupationalProgram#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

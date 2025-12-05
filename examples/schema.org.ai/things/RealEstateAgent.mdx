@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RealEstateAgent
+$context: https://schema.org
+$type: Class
+name: RealEstateAgent
+description: A real-estate agent.
+subClassOf: ["LocalBusiness"]
+---
+
+# RealEstateAgent
+
+A real-estate agent.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **RealEstateAgent**
+
+
+
+## Properties
+
+See [Schema.org RealEstateAgent properties](https://schema.org/RealEstateAgent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RealEstateAgent } from 'schema.org.ai'
+
+// Create a RealEstateAgent
+const item: RealEstateAgent = {
+  $type: 'RealEstateAgent',
+  name: 'Example RealEstateAgent'
+}
+
+// Use semantic patterns
+await $.RealEstateAgent.create(item)
+const result = await $.RealEstateAgent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RealEstateAgent](https://schema.org/RealEstateAgent)
+- [RealEstateAgent Properties](https://schema.org/RealEstateAgent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

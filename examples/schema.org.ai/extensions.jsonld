@@ -1,0 +1,186 @@
+{
+  "@context": {
+    "schema": "https://schema.org/",
+    "schemaai": "https://schema.org.ai/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  },
+  "@graph": [
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:Agent",
+      "rdfs:label": "Agent",
+      "rdfs:comment": "An autonomous AI agent that can perform actions, use tools, and make decisions to accomplish goals.",
+      "rdfs:subClassOf": { "@id": "schema:Thing" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:Tool",
+      "rdfs:label": "Tool",
+      "rdfs:comment": "A tool that can be used by an Agent to perform actions. Tools expose capabilities through defined interfaces.",
+      "rdfs:subClassOf": { "@id": "schema:Thing" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:Capability",
+      "rdfs:label": "Capability",
+      "rdfs:comment": "A capability or skill that an Agent possesses, defining what actions it can perform.",
+      "rdfs:subClassOf": { "@id": "schema:Intangible" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:Model",
+      "rdfs:label": "Model",
+      "rdfs:comment": "An AI/ML model that powers an Agent or provides inference capabilities.",
+      "rdfs:subClassOf": { "@id": "schema:Thing" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:Prompt",
+      "rdfs:label": "Prompt",
+      "rdfs:comment": "A prompt or prompt template used to instruct an AI model or Agent.",
+      "rdfs:subClassOf": { "@id": "schema:CreativeWork" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:Generation",
+      "rdfs:label": "Generation",
+      "rdfs:comment": "An AI generation instance, representing output produced by a Model or Agent.",
+      "rdfs:subClassOf": { "@id": "schema:CreativeWork" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:Workflow",
+      "rdfs:label": "Workflow",
+      "rdfs:comment": "An autonomous workflow definition that specifies a sequence of actions to be performed by Agents.",
+      "rdfs:subClassOf": { "@id": "schema:CreativeWork" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:API",
+      "rdfs:label": "API",
+      "rdfs:comment": "An API endpoint (REST, RPC, GraphQL) that provides programmatic access to services.",
+      "rdfs:subClassOf": { "@id": "schema:WebAPI" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:Webhook",
+      "rdfs:label": "Webhook",
+      "rdfs:comment": "A webhook endpoint that receives event-driven notifications.",
+      "rdfs:subClassOf": { "@id": "schema:WebAPI" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:MCP",
+      "rdfs:label": "MCP",
+      "rdfs:comment": "A Model Context Protocol server that exposes tools and resources to AI models.",
+      "rdfs:subClassOf": { "@id": "schema:WebAPI" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:SDK",
+      "rdfs:label": "SDK",
+      "rdfs:comment": "A Software Development Kit package that provides programmatic access to a platform or service.",
+      "rdfs:subClassOf": { "@id": "schema:SoftwareApplication" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:CLI",
+      "rdfs:label": "CLI",
+      "rdfs:comment": "A Command-Line Interface tool for interacting with services from the terminal.",
+      "rdfs:subClassOf": { "@id": "schema:SoftwareApplication" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:LandingPage",
+      "rdfs:label": "LandingPage",
+      "rdfs:comment": "A conversion-optimized marketing landing page with hero, features, testimonials, and CTA sections.",
+      "rdfs:subClassOf": { "@id": "schema:WebPage" }
+    },
+    {
+      "@type": "rdfs:Class",
+      "@id": "schemaai:Business",
+      "rdfs:label": "Business",
+      "rdfs:comment": "A business entity that can be represented as Business-as-Code, with autonomous operations.",
+      "rdfs:subClassOf": { "@id": "schema:Organization" }
+    },
+    {
+      "@type": "rdf:Property",
+      "@id": "schemaai:digital",
+      "rdfs:label": "digital",
+      "rdfs:comment": "Digital maturity score from 0.0 (fully analog/manual) to 1.0 (fully digital/autonomous). Indicates the degree to which an entity operates digitally.",
+      "schema:domainIncludes": { "@id": "schema:Thing" },
+      "schema:rangeIncludes": { "@id": "schema:Number" }
+    },
+    {
+      "@type": "rdf:Property",
+      "@id": "schemaai:capability",
+      "rdfs:label": "capability",
+      "rdfs:comment": "A capability or skill that this Agent possesses.",
+      "schema:domainIncludes": { "@id": "schemaai:Agent" },
+      "schema:rangeIncludes": { "@id": "schemaai:Capability" }
+    },
+    {
+      "@type": "rdf:Property",
+      "@id": "schemaai:tool",
+      "rdfs:label": "tool",
+      "rdfs:comment": "A tool available to this Agent for performing actions.",
+      "schema:domainIncludes": { "@id": "schemaai:Agent" },
+      "schema:rangeIncludes": { "@id": "schemaai:Tool" }
+    },
+    {
+      "@type": "rdf:Property",
+      "@id": "schemaai:model",
+      "rdfs:label": "model",
+      "rdfs:comment": "The AI model(s) that power this Agent or Generation.",
+      "schema:domainIncludes": [
+        { "@id": "schemaai:Agent" },
+        { "@id": "schemaai:Generation" }
+      ],
+      "schema:rangeIncludes": { "@id": "schemaai:Model" }
+    },
+    {
+      "@type": "rdf:Property",
+      "@id": "schemaai:workflow",
+      "rdfs:label": "workflow",
+      "rdfs:comment": "A workflow that this Agent can execute.",
+      "schema:domainIncludes": { "@id": "schemaai:Agent" },
+      "schema:rangeIncludes": { "@id": "schemaai:Workflow" }
+    },
+    {
+      "@type": "rdf:Property",
+      "@id": "schemaai:goal",
+      "rdfs:label": "goal",
+      "rdfs:comment": "The goal or objective that this Agent is trying to achieve.",
+      "schema:domainIncludes": { "@id": "schemaai:Agent" },
+      "schema:rangeIncludes": [
+        { "@id": "schema:Text" },
+        { "@id": "schema:Thing" }
+      ]
+    },
+    {
+      "@type": "rdf:Property",
+      "@id": "schemaai:prompt",
+      "rdfs:label": "prompt",
+      "rdfs:comment": "The prompt used to generate this output.",
+      "schema:domainIncludes": { "@id": "schemaai:Generation" },
+      "schema:rangeIncludes": { "@id": "schemaai:Prompt" }
+    },
+    {
+      "@type": "rdf:Property",
+      "@id": "schemaai:temperature",
+      "rdfs:label": "temperature",
+      "rdfs:comment": "The temperature parameter used for AI generation (0.0-2.0).",
+      "schema:domainIncludes": { "@id": "schemaai:Generation" },
+      "schema:rangeIncludes": { "@id": "schema:Number" }
+    },
+    {
+      "@type": "rdf:Property",
+      "@id": "schemaai:tokens",
+      "rdfs:label": "tokens",
+      "rdfs:comment": "The number of tokens used or generated.",
+      "schema:domainIncludes": { "@id": "schemaai:Generation" },
+      "schema:rangeIncludes": { "@id": "schema:Integer" }
+    }
+  ]
+}

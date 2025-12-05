@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/VisualArtwork
+$context: https://schema.org
+$type: Class
+name: VisualArtwork
+description: A work of art that is primarily visual in character.
+subClassOf: ["CreativeWork"]
+---
+
+# VisualArtwork
+
+A work of art that is primarily visual in character.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **VisualArtwork**
+
+## Direct Subclasses
+
+- **[CoverArt](CoverArt.mdx)**: The artwork on the outer surface of a CreativeWork
+
+## Properties
+
+See [Schema.org VisualArtwork properties](https://schema.org/VisualArtwork#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { VisualArtwork } from 'schema.org.ai'
+
+// Create a VisualArtwork
+const item: VisualArtwork = {
+  $type: 'VisualArtwork',
+  name: 'Example VisualArtwork'
+}
+
+// Use semantic patterns
+await $.VisualArtwork.create(item)
+const result = await $.VisualArtwork.get('item-id')
+```
+
+## Resources
+
+- [Schema.org VisualArtwork](https://schema.org/VisualArtwork)
+- [VisualArtwork Properties](https://schema.org/VisualArtwork#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

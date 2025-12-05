@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/BroadcastService
+$context: https://schema.org
+$type: Class
+name: BroadcastService
+description: A delivery service through which content is provided via broadcast over the air or online.
+subClassOf: ["Service"]
+---
+
+# BroadcastService
+
+A delivery service through which content is provided via broadcast over the air or online.
+
+## Type Hierarchy
+
+**BroadcastService**
+
+## Direct Subclasses
+
+- **[RadioBroadcastService](RadioBroadcastService.mdx)**: A delivery service through which radio content is provided via broadcast over the air or online
+
+## Properties
+
+See [Schema.org BroadcastService properties](https://schema.org/BroadcastService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BroadcastService } from 'schema.org.ai'
+
+// Create a BroadcastService
+const item: BroadcastService = {
+  $type: 'BroadcastService',
+  name: 'Example BroadcastService'
+}
+
+// Use semantic patterns
+await $.BroadcastService.create(item)
+const result = await $.BroadcastService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BroadcastService](https://schema.org/BroadcastService)
+- [BroadcastService Properties](https://schema.org/BroadcastService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

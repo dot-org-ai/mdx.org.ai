@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Drawing
+$context: https://schema.org
+$type: Class
+name: Drawing
+description: A picture or diagram made with a pencil, pen, or crayon rather than paint.
+subClassOf: ["CreativeWork"]
+---
+
+# Drawing
+
+A picture or diagram made with a pencil, pen, or crayon rather than paint.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Drawing**
+
+
+
+## Properties
+
+See [Schema.org Drawing properties](https://schema.org/Drawing#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Drawing } from 'schema.org.ai'
+
+// Create a Drawing
+const item: Drawing = {
+  $type: 'Drawing',
+  name: 'Example Drawing'
+}
+
+// Use semantic patterns
+await $.Drawing.create(item)
+const result = await $.Drawing.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Drawing](https://schema.org/Drawing)
+- [Drawing Properties](https://schema.org/Drawing#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MovieTheater
+$context: https://schema.org
+$type: Class
+name: MovieTheater
+description: A movie theater.
+subClassOf: ["CivicStructure","EntertainmentBusiness"]
+---
+
+# MovieTheater
+
+A movie theater.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [EntertainmentBusiness](EntertainmentBusiness.mdx) > **MovieTheater**
+
+
+
+## Properties
+
+See [Schema.org MovieTheater properties](https://schema.org/MovieTheater#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MovieTheater } from 'schema.org.ai'
+
+// Create a MovieTheater
+const item: MovieTheater = {
+  $type: 'MovieTheater',
+  name: 'Example MovieTheater'
+}
+
+// Use semantic patterns
+await $.MovieTheater.create(item)
+const result = await $.MovieTheater.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MovieTheater](https://schema.org/MovieTheater)
+- [MovieTheater Properties](https://schema.org/MovieTheater#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

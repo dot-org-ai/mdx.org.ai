@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Optician
+$context: https://schema.org
+$type: Class
+name: Optician
+description: A store that sells reading glasses and similar devices for improving vision.
+subClassOf: ["MedicalBusiness"]
+---
+
+# Optician
+
+A store that sells reading glasses and similar devices for improving vision.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [MedicalBusiness](MedicalBusiness.mdx) > **Optician**
+
+
+
+## Properties
+
+See [Schema.org Optician properties](https://schema.org/Optician#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Optician } from 'schema.org.ai'
+
+// Create a Optician
+const item: Optician = {
+  $type: 'Optician',
+  name: 'Example Optician'
+}
+
+// Use semantic patterns
+await $.Optician.create(item)
+const result = await $.Optician.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Optician](https://schema.org/Optician)
+- [Optician Properties](https://schema.org/Optician#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

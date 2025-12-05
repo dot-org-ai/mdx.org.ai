@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Corporation
+$context: https://schema.org
+$type: Class
+name: Corporation
+description: Organization: A business corporation.
+subClassOf: ["Organization"]
+---
+
+# Corporation
+
+Organization: A business corporation.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **Corporation**
+
+
+
+## Properties
+
+See [Schema.org Corporation properties](https://schema.org/Corporation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Corporation } from 'schema.org.ai'
+
+// Create a Corporation
+const item: Corporation = {
+  $type: 'Corporation',
+  name: 'Example Corporation'
+}
+
+// Use semantic patterns
+await $.Corporation.create(item)
+const result = await $.Corporation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Corporation](https://schema.org/Corporation)
+- [Corporation Properties](https://schema.org/Corporation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

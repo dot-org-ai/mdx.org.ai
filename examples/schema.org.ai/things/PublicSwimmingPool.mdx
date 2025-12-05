@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PublicSwimmingPool
+$context: https://schema.org
+$type: Class
+name: PublicSwimmingPool
+description: A public swimming pool.
+subClassOf: ["SportsActivityLocation"]
+---
+
+# PublicSwimmingPool
+
+A public swimming pool.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [SportsActivityLocation](SportsActivityLocation.mdx) > **PublicSwimmingPool**
+
+
+
+## Properties
+
+See [Schema.org PublicSwimmingPool properties](https://schema.org/PublicSwimmingPool#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PublicSwimmingPool } from 'schema.org.ai'
+
+// Create a PublicSwimmingPool
+const item: PublicSwimmingPool = {
+  $type: 'PublicSwimmingPool',
+  name: 'Example PublicSwimmingPool'
+}
+
+// Use semantic patterns
+await $.PublicSwimmingPool.create(item)
+const result = await $.PublicSwimmingPool.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PublicSwimmingPool](https://schema.org/PublicSwimmingPool)
+- [PublicSwimmingPool Properties](https://schema.org/PublicSwimmingPool#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

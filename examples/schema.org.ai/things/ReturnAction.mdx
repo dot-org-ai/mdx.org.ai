@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ReturnAction
+$context: https://schema.org
+$type: Class
+name: ReturnAction
+description: The act of returning to the origin that which was previously received (concrete objects) or taken (ownership).
+subClassOf: ["TransferAction"]
+---
+
+# ReturnAction
+
+The act of returning to the origin that which was previously received (concrete objects) or taken (ownership).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TransferAction](TransferAction.mdx) > **ReturnAction**
+
+
+
+## Properties
+
+See [Schema.org ReturnAction properties](https://schema.org/ReturnAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReturnAction } from 'schema.org.ai'
+
+// Create a ReturnAction
+const item: ReturnAction = {
+  $type: 'ReturnAction',
+  name: 'Example ReturnAction'
+}
+
+// Use semantic patterns
+await $.ReturnAction.create(item)
+const result = await $.ReturnAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReturnAction](https://schema.org/ReturnAction)
+- [ReturnAction Properties](https://schema.org/ReturnAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

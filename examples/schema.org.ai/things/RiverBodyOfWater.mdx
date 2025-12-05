@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RiverBodyOfWater
+$context: https://schema.org
+$type: Class
+name: RiverBodyOfWater
+description: A river (for example, the broad majestic Shannon).
+subClassOf: ["BodyOfWater"]
+---
+
+# RiverBodyOfWater
+
+A river (for example, the broad majestic Shannon).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > [BodyOfWater](BodyOfWater.mdx) > **RiverBodyOfWater**
+
+
+
+## Properties
+
+See [Schema.org RiverBodyOfWater properties](https://schema.org/RiverBodyOfWater#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RiverBodyOfWater } from 'schema.org.ai'
+
+// Create a RiverBodyOfWater
+const item: RiverBodyOfWater = {
+  $type: 'RiverBodyOfWater',
+  name: 'Example RiverBodyOfWater'
+}
+
+// Use semantic patterns
+await $.RiverBodyOfWater.create(item)
+const result = await $.RiverBodyOfWater.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RiverBodyOfWater](https://schema.org/RiverBodyOfWater)
+- [RiverBodyOfWater Properties](https://schema.org/RiverBodyOfWater#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

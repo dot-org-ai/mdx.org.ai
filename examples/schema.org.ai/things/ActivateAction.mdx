@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ActivateAction
+$context: https://schema.org
+$type: Class
+name: ActivateAction
+description: The act of starting or activating a device or application (e.g. starting a timer or turning on a flashlight).
+subClassOf: ["ControlAction"]
+---
+
+# ActivateAction
+
+The act of starting or activating a device or application (e.g. starting a timer or turning on a flashlight).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ControlAction](ControlAction.mdx) > **ActivateAction**
+
+
+
+## Properties
+
+See [Schema.org ActivateAction properties](https://schema.org/ActivateAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ActivateAction } from 'schema.org.ai'
+
+// Create a ActivateAction
+const item: ActivateAction = {
+  $type: 'ActivateAction',
+  name: 'Example ActivateAction'
+}
+
+// Use semantic patterns
+await $.ActivateAction.create(item)
+const result = await $.ActivateAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ActivateAction](https://schema.org/ActivateAction)
+- [ActivateAction Properties](https://schema.org/ActivateAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

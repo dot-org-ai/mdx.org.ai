@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/ControlAction
+$context: https://schema.org
+$type: Class
+name: ControlAction
+description: An agent controls a device or application.
+subClassOf: ["Action"]
+---
+
+# ControlAction
+
+An agent controls a device or application.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **ControlAction**
+
+## Direct Subclasses
+
+- **[ActivateAction](ActivateAction.mdx)**: The act of starting or activating a device or application (e
+- **[DeactivateAction](DeactivateAction.mdx)**: The act of stopping or deactivating a device or application (e
+- **[ResumeAction](ResumeAction.mdx)**: The act of resuming a device or application which was formerly paused (e
+- **[SuspendAction](SuspendAction.mdx)**: The act of momentarily pausing a device or application (e
+
+## Properties
+
+See [Schema.org ControlAction properties](https://schema.org/ControlAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ControlAction } from 'schema.org.ai'
+
+// Create a ControlAction
+const item: ControlAction = {
+  $type: 'ControlAction',
+  name: 'Example ControlAction'
+}
+
+// Use semantic patterns
+await $.ControlAction.create(item)
+const result = await $.ControlAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ControlAction](https://schema.org/ControlAction)
+- [ControlAction Properties](https://schema.org/ControlAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

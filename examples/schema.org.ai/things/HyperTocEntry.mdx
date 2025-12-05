@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HyperTocEntry
+$context: https://schema.org
+$type: Class
+name: HyperTocEntry
+description: A HyperToEntry is an item within a [[HyperToc]], which represents a hypertext table of contents for complex media objects, such as [[VideoObject]], [[AudioObject]]. The media object itself is indicated using [[associatedMedia]]. Each section of interest within that content can be described with a [[HyperTocEntry]], with associated [[startOffset]] and [[endOffset]]. When several entries are all from the same file, [[associatedMedia]] is used on the overarching [[HyperTocEntry]]; if the content has been split into multiple files, they can be referenced using [[associatedMedia]] on each [[HyperTocEntry]].
+subClassOf: ["CreativeWork"]
+---
+
+# HyperTocEntry
+
+A HyperToEntry is an item within a [[HyperToc]], which represents a hypertext table of contents for complex media objects, such as [[VideoObject]], [[AudioObject]]. The media object itself is indicated using [[associatedMedia]]. Each section of interest within that content can be described with a [[HyperTocEntry]], with associated [[startOffset]] and [[endOffset]]. When several entries are all from the same file, [[associatedMedia]] is used on the overarching [[HyperTocEntry]]; if the content has been split into multiple files, they can be referenced using [[associatedMedia]] on each [[HyperTocEntry]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **HyperTocEntry**
+
+
+
+## Properties
+
+See [Schema.org HyperTocEntry properties](https://schema.org/HyperTocEntry#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HyperTocEntry } from 'schema.org.ai'
+
+// Create a HyperTocEntry
+const item: HyperTocEntry = {
+  $type: 'HyperTocEntry',
+  name: 'Example HyperTocEntry'
+}
+
+// Use semantic patterns
+await $.HyperTocEntry.create(item)
+const result = await $.HyperTocEntry.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HyperTocEntry](https://schema.org/HyperTocEntry)
+- [HyperTocEntry Properties](https://schema.org/HyperTocEntry#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

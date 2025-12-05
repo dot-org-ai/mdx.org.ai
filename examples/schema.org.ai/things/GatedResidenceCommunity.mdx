@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GatedResidenceCommunity
+$context: https://schema.org
+$type: Class
+name: GatedResidenceCommunity
+description: Residence type: Gated community.
+subClassOf: ["Residence"]
+---
+
+# GatedResidenceCommunity
+
+Residence type: Gated community.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Residence](Residence.mdx) > **GatedResidenceCommunity**
+
+
+
+## Properties
+
+See [Schema.org GatedResidenceCommunity properties](https://schema.org/GatedResidenceCommunity#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GatedResidenceCommunity } from 'schema.org.ai'
+
+// Create a GatedResidenceCommunity
+const item: GatedResidenceCommunity = {
+  $type: 'GatedResidenceCommunity',
+  name: 'Example GatedResidenceCommunity'
+}
+
+// Use semantic patterns
+await $.GatedResidenceCommunity.create(item)
+const result = await $.GatedResidenceCommunity.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GatedResidenceCommunity](https://schema.org/GatedResidenceCommunity)
+- [GatedResidenceCommunity Properties](https://schema.org/GatedResidenceCommunity#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/NonprofitType
+$context: https://schema.org
+$type: Class
+name: NonprofitType
+description: NonprofitType enumerates several kinds of official non-profit types of which a non-profit organization can be.
+subClassOf: ["Enumeration"]
+---
+
+# NonprofitType
+
+NonprofitType enumerates several kinds of official non-profit types of which a non-profit organization can be.
+
+## Type Hierarchy
+
+**NonprofitType**
+
+## Direct Subclasses
+
+- **[NLNonprofitType](NLNonprofitType.mdx)**: NLNonprofitType: Non-profit organization type originating from the Netherlands
+- **[UKNonprofitType](UKNonprofitType.mdx)**: UKNonprofitType: Non-profit organization type originating from the United Kingdom
+- **[USNonprofitType](USNonprofitType.mdx)**: USNonprofitType: Non-profit organization type originating from the United States
+
+## Properties
+
+See [Schema.org NonprofitType properties](https://schema.org/NonprofitType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { NonprofitType } from 'schema.org.ai'
+
+// Create a NonprofitType
+const item: NonprofitType = {
+  $type: 'NonprofitType',
+  name: 'Example NonprofitType'
+}
+
+// Use semantic patterns
+await $.NonprofitType.create(item)
+const result = await $.NonprofitType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org NonprofitType](https://schema.org/NonprofitType)
+- [NonprofitType Properties](https://schema.org/NonprofitType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

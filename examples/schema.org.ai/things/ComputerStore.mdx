@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ComputerStore
+$context: https://schema.org
+$type: Class
+name: ComputerStore
+description: A computer store.
+subClassOf: ["Store"]
+---
+
+# ComputerStore
+
+A computer store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **ComputerStore**
+
+
+
+## Properties
+
+See [Schema.org ComputerStore properties](https://schema.org/ComputerStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ComputerStore } from 'schema.org.ai'
+
+// Create a ComputerStore
+const item: ComputerStore = {
+  $type: 'ComputerStore',
+  name: 'Example ComputerStore'
+}
+
+// Use semantic patterns
+await $.ComputerStore.create(item)
+const result = await $.ComputerStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ComputerStore](https://schema.org/ComputerStore)
+- [ComputerStore Properties](https://schema.org/ComputerStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

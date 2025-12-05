@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BrokerageAccount
+$context: https://schema.org
+$type: Class
+name: BrokerageAccount
+description: An account that allows an investor to deposit funds and place investment orders with a licensed broker or brokerage firm.
+subClassOf: ["InvestmentOrDeposit"]
+---
+
+# BrokerageAccount
+
+An account that allows an investor to deposit funds and place investment orders with a licensed broker or brokerage firm.
+
+## Type Hierarchy
+
+**BrokerageAccount**
+
+
+
+## Properties
+
+See [Schema.org BrokerageAccount properties](https://schema.org/BrokerageAccount#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BrokerageAccount } from 'schema.org.ai'
+
+// Create a BrokerageAccount
+const item: BrokerageAccount = {
+  $type: 'BrokerageAccount',
+  name: 'Example BrokerageAccount'
+}
+
+// Use semantic patterns
+await $.BrokerageAccount.create(item)
+const result = await $.BrokerageAccount.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BrokerageAccount](https://schema.org/BrokerageAccount)
+- [BrokerageAccount Properties](https://schema.org/BrokerageAccount#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

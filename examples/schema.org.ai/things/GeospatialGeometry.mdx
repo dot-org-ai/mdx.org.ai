@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GeospatialGeometry
+$context: https://schema.org
+$type: Class
+name: GeospatialGeometry
+description: (Eventually to be defined as) a supertype of GeoShape designed to accommodate definitions from Geo-Spatial best practices.
+subClassOf: ["Intangible"]
+---
+
+# GeospatialGeometry
+
+(Eventually to be defined as) a supertype of GeoShape designed to accommodate definitions from Geo-Spatial best practices.
+
+## Type Hierarchy
+
+**GeospatialGeometry**
+
+
+
+## Properties
+
+See [Schema.org GeospatialGeometry properties](https://schema.org/GeospatialGeometry#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GeospatialGeometry } from 'schema.org.ai'
+
+// Create a GeospatialGeometry
+const item: GeospatialGeometry = {
+  $type: 'GeospatialGeometry',
+  name: 'Example GeospatialGeometry'
+}
+
+// Use semantic patterns
+await $.GeospatialGeometry.create(item)
+const result = await $.GeospatialGeometry.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GeospatialGeometry](https://schema.org/GeospatialGeometry)
+- [GeospatialGeometry Properties](https://schema.org/GeospatialGeometry#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

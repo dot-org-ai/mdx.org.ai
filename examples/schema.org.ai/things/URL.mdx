@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/URL
+$context: https://schema.org
+$type: Class
+name: URL
+description: Data type: URL.
+subClassOf: ["Text"]
+---
+
+# URL
+
+Data type: URL.
+
+## Type Hierarchy
+
+**URL**
+
+
+
+## Properties
+
+See [Schema.org URL properties](https://schema.org/URL#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { URL } from 'schema.org.ai'
+
+// Create a URL
+const item: URL = {
+  $type: 'URL',
+  name: 'Example URL'
+}
+
+// Use semantic patterns
+await $.URL.create(item)
+const result = await $.URL.get('item-id')
+```
+
+## Resources
+
+- [Schema.org URL](https://schema.org/URL)
+- [URL Properties](https://schema.org/URL#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

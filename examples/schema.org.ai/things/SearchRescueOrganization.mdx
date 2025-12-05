@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SearchRescueOrganization
+$context: https://schema.org
+$type: Class
+name: SearchRescueOrganization
+description: A Search and Rescue organization of some kind.
+subClassOf: ["Organization"]
+---
+
+# SearchRescueOrganization
+
+A Search and Rescue organization of some kind.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **SearchRescueOrganization**
+
+
+
+## Properties
+
+See [Schema.org SearchRescueOrganization properties](https://schema.org/SearchRescueOrganization#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SearchRescueOrganization } from 'schema.org.ai'
+
+// Create a SearchRescueOrganization
+const item: SearchRescueOrganization = {
+  $type: 'SearchRescueOrganization',
+  name: 'Example SearchRescueOrganization'
+}
+
+// Use semantic patterns
+await $.SearchRescueOrganization.create(item)
+const result = await $.SearchRescueOrganization.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SearchRescueOrganization](https://schema.org/SearchRescueOrganization)
+- [SearchRescueOrganization Properties](https://schema.org/SearchRescueOrganization#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

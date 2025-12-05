@@ -1,0 +1,57 @@
+---
+$id: https://schema.org.ai/BodyOfWater
+$context: https://schema.org
+$type: Class
+name: BodyOfWater
+description: A body of water, such as a sea, ocean, or lake.
+subClassOf: ["Landform"]
+---
+
+# BodyOfWater
+
+A body of water, such as a sea, ocean, or lake.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > **BodyOfWater**
+
+## Direct Subclasses
+
+- **[Canal](Canal.mdx)**: A canal, like the Panama Canal
+- **[LakeBodyOfWater](LakeBodyOfWater.mdx)**: A lake (for example, Lake Pontrachain)
+- **[OceanBodyOfWater](OceanBodyOfWater.mdx)**: An ocean (for example, the Pacific)
+- **[Pond](Pond.mdx)**: A pond
+- **[Reservoir](Reservoir.mdx)**: A reservoir of water, typically an artificially created lake, like the Lake Kariba reservoir
+- **[RiverBodyOfWater](RiverBodyOfWater.mdx)**: A river (for example, the broad majestic Shannon)
+- **[SeaBodyOfWater](SeaBodyOfWater.mdx)**: A sea (for example, the Caspian sea)
+- **[Waterfall](Waterfall.mdx)**: A waterfall, like Niagara
+
+## Properties
+
+See [Schema.org BodyOfWater properties](https://schema.org/BodyOfWater#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BodyOfWater } from 'schema.org.ai'
+
+// Create a BodyOfWater
+const item: BodyOfWater = {
+  $type: 'BodyOfWater',
+  name: 'Example BodyOfWater'
+}
+
+// Use semantic patterns
+await $.BodyOfWater.create(item)
+const result = await $.BodyOfWater.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BodyOfWater](https://schema.org/BodyOfWater)
+- [BodyOfWater Properties](https://schema.org/BodyOfWater#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

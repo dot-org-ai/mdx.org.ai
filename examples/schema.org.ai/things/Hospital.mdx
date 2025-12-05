@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Hospital
+$context: https://schema.org
+$type: Class
+name: Hospital
+description: A hospital.
+subClassOf: ["CivicStructure","MedicalOrganization","EmergencyService"]
+---
+
+# Hospital
+
+A hospital.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [EmergencyService](EmergencyService.mdx) > **Hospital**
+
+
+
+## Properties
+
+See [Schema.org Hospital properties](https://schema.org/Hospital#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Hospital } from 'schema.org.ai'
+
+// Create a Hospital
+const item: Hospital = {
+  $type: 'Hospital',
+  name: 'Example Hospital'
+}
+
+// Use semantic patterns
+await $.Hospital.create(item)
+const result = await $.Hospital.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Hospital](https://schema.org/Hospital)
+- [Hospital Properties](https://schema.org/Hospital#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

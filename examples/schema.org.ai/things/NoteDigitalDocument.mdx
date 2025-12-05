@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/NoteDigitalDocument
+$context: https://schema.org
+$type: Class
+name: NoteDigitalDocument
+description: A file containing a note, primarily for the author.
+subClassOf: ["DigitalDocument"]
+---
+
+# NoteDigitalDocument
+
+A file containing a note, primarily for the author.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [DigitalDocument](DigitalDocument.mdx) > **NoteDigitalDocument**
+
+
+
+## Properties
+
+See [Schema.org NoteDigitalDocument properties](https://schema.org/NoteDigitalDocument#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { NoteDigitalDocument } from 'schema.org.ai'
+
+// Create a NoteDigitalDocument
+const item: NoteDigitalDocument = {
+  $type: 'NoteDigitalDocument',
+  name: 'Example NoteDigitalDocument'
+}
+
+// Use semantic patterns
+await $.NoteDigitalDocument.create(item)
+const result = await $.NoteDigitalDocument.get('item-id')
+```
+
+## Resources
+
+- [Schema.org NoteDigitalDocument](https://schema.org/NoteDigitalDocument)
+- [NoteDigitalDocument Properties](https://schema.org/NoteDigitalDocument#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

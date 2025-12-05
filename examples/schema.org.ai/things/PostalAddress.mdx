@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PostalAddress
+$context: https://schema.org
+$type: Class
+name: PostalAddress
+description: The mailing address.
+subClassOf: ["ContactPoint"]
+---
+
+# PostalAddress
+
+The mailing address.
+
+## Type Hierarchy
+
+**PostalAddress**
+
+
+
+## Properties
+
+See [Schema.org PostalAddress properties](https://schema.org/PostalAddress#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PostalAddress } from 'schema.org.ai'
+
+// Create a PostalAddress
+const item: PostalAddress = {
+  $type: 'PostalAddress',
+  name: 'Example PostalAddress'
+}
+
+// Use semantic patterns
+await $.PostalAddress.create(item)
+const result = await $.PostalAddress.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PostalAddress](https://schema.org/PostalAddress)
+- [PostalAddress Properties](https://schema.org/PostalAddress#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

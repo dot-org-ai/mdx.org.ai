@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Researcher
+$context: https://schema.org
+$type: Class
+name: Researcher
+description: Researchers.
+subClassOf: ["Audience"]
+---
+
+# Researcher
+
+Researchers.
+
+## Type Hierarchy
+
+**Researcher**
+
+
+
+## Properties
+
+See [Schema.org Researcher properties](https://schema.org/Researcher#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Researcher } from 'schema.org.ai'
+
+// Create a Researcher
+const item: Researcher = {
+  $type: 'Researcher',
+  name: 'Example Researcher'
+}
+
+// Use semantic patterns
+await $.Researcher.create(item)
+const result = await $.Researcher.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Researcher](https://schema.org/Researcher)
+- [Researcher Properties](https://schema.org/Researcher#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

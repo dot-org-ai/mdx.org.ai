@@ -1,0 +1,57 @@
+---
+$id: https://schema.org.ai/Service
+$context: https://schema.org
+$type: Class
+name: Service
+description: A service provided by an organization, e.g. delivery service, print services, etc.
+subClassOf: ["Intangible"]
+---
+
+# Service
+
+A service provided by an organization, e.g. delivery service, print services, etc.
+
+## Type Hierarchy
+
+**Service**
+
+## Direct Subclasses
+
+- **[BroadcastService](BroadcastService.mdx)**: A delivery service through which content is provided via broadcast over the air or online
+- **[CableOrSatelliteService](CableOrSatelliteService.mdx)**: A service which provides access to media programming like TV or radio
+- **[FinancialProduct](FinancialProduct.mdx)**: A product provided to consumers and businesses by financial institutions such as banks, insurance companies, brokerage firms, consumer finance companies, and investment companies which comprise the financial services industry
+- **[FoodService](FoodService.mdx)**: A food service, like breakfast, lunch, or dinner
+- **[GovernmentService](GovernmentService.mdx)**: A service provided by a government organization, e
+- **[Taxi](Taxi.mdx)**: A taxi
+- **[TaxiService](TaxiService.mdx)**: A service for a vehicle for hire with a driver for local travel
+- **[WebAPI](WebAPI.mdx)**: An application programming interface accessible over Web/Internet technologies
+
+## Properties
+
+See [Schema.org Service properties](https://schema.org/Service#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Service } from 'schema.org.ai'
+
+// Create a Service
+const item: Service = {
+  $type: 'Service',
+  name: 'Example Service'
+}
+
+// Use semantic patterns
+await $.Service.create(item)
+const result = await $.Service.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Service](https://schema.org/Service)
+- [Service Properties](https://schema.org/Service#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

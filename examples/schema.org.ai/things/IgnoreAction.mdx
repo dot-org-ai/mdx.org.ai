@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/IgnoreAction
+$context: https://schema.org
+$type: Class
+name: IgnoreAction
+description: The act of intentionally disregarding the object. An agent ignores an object.
+subClassOf: ["AssessAction"]
+---
+
+# IgnoreAction
+
+The act of intentionally disregarding the object. An agent ignores an object.
+
+## Type Hierarchy
+
+**IgnoreAction**
+
+
+
+## Properties
+
+See [Schema.org IgnoreAction properties](https://schema.org/IgnoreAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { IgnoreAction } from 'schema.org.ai'
+
+// Create a IgnoreAction
+const item: IgnoreAction = {
+  $type: 'IgnoreAction',
+  name: 'Example IgnoreAction'
+}
+
+// Use semantic patterns
+await $.IgnoreAction.create(item)
+const result = await $.IgnoreAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org IgnoreAction](https://schema.org/IgnoreAction)
+- [IgnoreAction Properties](https://schema.org/IgnoreAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DiscussionForumPosting
+$context: https://schema.org
+$type: Class
+name: DiscussionForumPosting
+description: A posting to a discussion forum.
+subClassOf: ["SocialMediaPosting"]
+---
+
+# DiscussionForumPosting
+
+A posting to a discussion forum.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > [SocialMediaPosting](SocialMediaPosting.mdx) > **DiscussionForumPosting**
+
+
+
+## Properties
+
+See [Schema.org DiscussionForumPosting properties](https://schema.org/DiscussionForumPosting#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DiscussionForumPosting } from 'schema.org.ai'
+
+// Create a DiscussionForumPosting
+const item: DiscussionForumPosting = {
+  $type: 'DiscussionForumPosting',
+  name: 'Example DiscussionForumPosting'
+}
+
+// Use semantic patterns
+await $.DiscussionForumPosting.create(item)
+const result = await $.DiscussionForumPosting.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DiscussionForumPosting](https://schema.org/DiscussionForumPosting)
+- [DiscussionForumPosting Properties](https://schema.org/DiscussionForumPosting#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

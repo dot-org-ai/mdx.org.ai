@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OceanBodyOfWater
+$context: https://schema.org
+$type: Class
+name: OceanBodyOfWater
+description: An ocean (for example, the Pacific).
+subClassOf: ["BodyOfWater"]
+---
+
+# OceanBodyOfWater
+
+An ocean (for example, the Pacific).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > [BodyOfWater](BodyOfWater.mdx) > **OceanBodyOfWater**
+
+
+
+## Properties
+
+See [Schema.org OceanBodyOfWater properties](https://schema.org/OceanBodyOfWater#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OceanBodyOfWater } from 'schema.org.ai'
+
+// Create a OceanBodyOfWater
+const item: OceanBodyOfWater = {
+  $type: 'OceanBodyOfWater',
+  name: 'Example OceanBodyOfWater'
+}
+
+// Use semantic patterns
+await $.OceanBodyOfWater.create(item)
+const result = await $.OceanBodyOfWater.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OceanBodyOfWater](https://schema.org/OceanBodyOfWater)
+- [OceanBodyOfWater Properties](https://schema.org/OceanBodyOfWater#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

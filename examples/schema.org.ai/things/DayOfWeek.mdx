@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DayOfWeek
+$context: https://schema.org
+$type: Class
+name: DayOfWeek
+description: The day of the week, e.g. used to specify to which day the opening hours of an OpeningHoursSpecification refer. Originally, URLs from [GoodRelations](http://purl.org/goodrelations/v1) were used (for [[Monday]], [[Tuesday]], [[Wednesday]], [[Thursday]], [[Friday]], [[Saturday]], [[Sunday]] plus a special entry for [[PublicHolidays]]); these have now been integrated directly into schema.org.
+subClassOf: ["Enumeration"]
+---
+
+# DayOfWeek
+
+The day of the week, e.g. used to specify to which day the opening hours of an OpeningHoursSpecification refer. Originally, URLs from [GoodRelations](http://purl.org/goodrelations/v1) were used (for [[Monday]], [[Tuesday]], [[Wednesday]], [[Thursday]], [[Friday]], [[Saturday]], [[Sunday]] plus a special entry for [[PublicHolidays]]); these have now been integrated directly into schema.org.
+
+## Type Hierarchy
+
+**DayOfWeek**
+
+
+
+## Properties
+
+See [Schema.org DayOfWeek properties](https://schema.org/DayOfWeek#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DayOfWeek } from 'schema.org.ai'
+
+// Create a DayOfWeek
+const item: DayOfWeek = {
+  $type: 'DayOfWeek',
+  name: 'Example DayOfWeek'
+}
+
+// Use semantic patterns
+await $.DayOfWeek.create(item)
+const result = await $.DayOfWeek.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DayOfWeek](https://schema.org/DayOfWeek)
+- [DayOfWeek Properties](https://schema.org/DayOfWeek#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

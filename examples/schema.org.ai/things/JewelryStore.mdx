@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/JewelryStore
+$context: https://schema.org
+$type: Class
+name: JewelryStore
+description: A jewelry store.
+subClassOf: ["Store"]
+---
+
+# JewelryStore
+
+A jewelry store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **JewelryStore**
+
+
+
+## Properties
+
+See [Schema.org JewelryStore properties](https://schema.org/JewelryStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { JewelryStore } from 'schema.org.ai'
+
+// Create a JewelryStore
+const item: JewelryStore = {
+  $type: 'JewelryStore',
+  name: 'Example JewelryStore'
+}
+
+// Use semantic patterns
+await $.JewelryStore.create(item)
+const result = await $.JewelryStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org JewelryStore](https://schema.org/JewelryStore)
+- [JewelryStore Properties](https://schema.org/JewelryStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

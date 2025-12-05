@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PronounceableText
+$context: https://schema.org
+$type: Class
+name: PronounceableText
+description: Data type: PronounceableText.
+subClassOf: ["Text"]
+---
+
+# PronounceableText
+
+Data type: PronounceableText.
+
+## Type Hierarchy
+
+**PronounceableText**
+
+
+
+## Properties
+
+See [Schema.org PronounceableText properties](https://schema.org/PronounceableText#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PronounceableText } from 'schema.org.ai'
+
+// Create a PronounceableText
+const item: PronounceableText = {
+  $type: 'PronounceableText',
+  name: 'Example PronounceableText'
+}
+
+// Use semantic patterns
+await $.PronounceableText.create(item)
+const result = await $.PronounceableText.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PronounceableText](https://schema.org/PronounceableText)
+- [PronounceableText Properties](https://schema.org/PronounceableText#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

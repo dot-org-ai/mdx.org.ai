@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ApartmentComplex
+$context: https://schema.org
+$type: Class
+name: ApartmentComplex
+description: Residence type: Apartment complex.
+subClassOf: ["Residence"]
+---
+
+# ApartmentComplex
+
+Residence type: Apartment complex.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Residence](Residence.mdx) > **ApartmentComplex**
+
+
+
+## Properties
+
+See [Schema.org ApartmentComplex properties](https://schema.org/ApartmentComplex#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ApartmentComplex } from 'schema.org.ai'
+
+// Create a ApartmentComplex
+const item: ApartmentComplex = {
+  $type: 'ApartmentComplex',
+  name: 'Example ApartmentComplex'
+}
+
+// Use semantic patterns
+await $.ApartmentComplex.create(item)
+const result = await $.ApartmentComplex.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ApartmentComplex](https://schema.org/ApartmentComplex)
+- [ApartmentComplex Properties](https://schema.org/ApartmentComplex#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

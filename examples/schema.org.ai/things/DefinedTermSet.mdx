@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/DefinedTermSet
+$context: https://schema.org
+$type: Class
+name: DefinedTermSet
+description: A set of defined terms, for example a set of categories or a classification scheme, a glossary, dictionary or enumeration.
+subClassOf: ["CreativeWork"]
+---
+
+# DefinedTermSet
+
+A set of defined terms, for example a set of categories or a classification scheme, a glossary, dictionary or enumeration.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **DefinedTermSet**
+
+## Direct Subclasses
+
+- **[CategoryCodeSet](CategoryCodeSet.mdx)**: A set of Category Code values
+
+## Properties
+
+See [Schema.org DefinedTermSet properties](https://schema.org/DefinedTermSet#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DefinedTermSet } from 'schema.org.ai'
+
+// Create a DefinedTermSet
+const item: DefinedTermSet = {
+  $type: 'DefinedTermSet',
+  name: 'Example DefinedTermSet'
+}
+
+// Use semantic patterns
+await $.DefinedTermSet.create(item)
+const result = await $.DefinedTermSet.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DefinedTermSet](https://schema.org/DefinedTermSet)
+- [DefinedTermSet Properties](https://schema.org/DefinedTermSet#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

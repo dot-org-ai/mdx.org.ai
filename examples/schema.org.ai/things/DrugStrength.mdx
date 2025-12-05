@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DrugStrength
+$context: https://schema.org
+$type: Class
+name: DrugStrength
+description: A specific strength in which a medical drug is available in a specific country.
+subClassOf: ["MedicalIntangible"]
+---
+
+# DrugStrength
+
+A specific strength in which a medical drug is available in a specific country.
+
+## Type Hierarchy
+
+**DrugStrength**
+
+
+
+## Properties
+
+See [Schema.org DrugStrength properties](https://schema.org/DrugStrength#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DrugStrength } from 'schema.org.ai'
+
+// Create a DrugStrength
+const item: DrugStrength = {
+  $type: 'DrugStrength',
+  name: 'Example DrugStrength'
+}
+
+// Use semantic patterns
+await $.DrugStrength.create(item)
+const result = await $.DrugStrength.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DrugStrength](https://schema.org/DrugStrength)
+- [DrugStrength Properties](https://schema.org/DrugStrength#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

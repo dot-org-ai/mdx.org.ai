@@ -1,0 +1,55 @@
+---
+$id: https://schema.org.ai/WebPageElement
+$context: https://schema.org
+$type: Class
+name: WebPageElement
+description: A web page element, like a table or an image.
+subClassOf: ["CreativeWork"]
+---
+
+# WebPageElement
+
+A web page element, like a table or an image.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **WebPageElement**
+
+## Direct Subclasses
+
+- **[SiteNavigationElement](SiteNavigationElement.mdx)**: A navigation element of the page
+- **[Table](Table.mdx)**: A table on a Web page
+- **[WPAdBlock](WPAdBlock.mdx)**: An advertising section of the page
+- **[WPFooter](WPFooter.mdx)**: The footer section of the page
+- **[WPHeader](WPHeader.mdx)**: The header section of the page
+- **[WPSideBar](WPSideBar.mdx)**: A sidebar section of the page
+
+## Properties
+
+See [Schema.org WebPageElement properties](https://schema.org/WebPageElement#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WebPageElement } from 'schema.org.ai'
+
+// Create a WebPageElement
+const item: WebPageElement = {
+  $type: 'WebPageElement',
+  name: 'Example WebPageElement'
+}
+
+// Use semantic patterns
+await $.WebPageElement.create(item)
+const result = await $.WebPageElement.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WebPageElement](https://schema.org/WebPageElement)
+- [WebPageElement Properties](https://schema.org/WebPageElement#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Game
+$context: https://schema.org
+$type: Class
+name: Game
+description: The Game type represents things which are games. These are typically rule-governed recreational activities, e.g. role-playing games in which players assume the role of characters in a fictional setting.
+subClassOf: ["CreativeWork"]
+---
+
+# Game
+
+The Game type represents things which are games. These are typically rule-governed recreational activities, e.g. role-playing games in which players assume the role of characters in a fictional setting.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Game**
+
+## Direct Subclasses
+
+- **[VideoGame](VideoGame.mdx)**: A video game is an electronic game that involves human interaction with a user interface to generate visual feedback on a video device
+
+## Properties
+
+See [Schema.org Game properties](https://schema.org/Game#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Game } from 'schema.org.ai'
+
+// Create a Game
+const item: Game = {
+  $type: 'Game',
+  name: 'Example Game'
+}
+
+// Use semantic patterns
+await $.Game.create(item)
+const result = await $.Game.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Game](https://schema.org/Game)
+- [Game Properties](https://schema.org/Game#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

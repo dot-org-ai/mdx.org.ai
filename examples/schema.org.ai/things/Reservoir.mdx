@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Reservoir
+$context: https://schema.org
+$type: Class
+name: Reservoir
+description: A reservoir of water, typically an artificially created lake, like the Lake Kariba reservoir.
+subClassOf: ["BodyOfWater"]
+---
+
+# Reservoir
+
+A reservoir of water, typically an artificially created lake, like the Lake Kariba reservoir.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > [BodyOfWater](BodyOfWater.mdx) > **Reservoir**
+
+
+
+## Properties
+
+See [Schema.org Reservoir properties](https://schema.org/Reservoir#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Reservoir } from 'schema.org.ai'
+
+// Create a Reservoir
+const item: Reservoir = {
+  $type: 'Reservoir',
+  name: 'Example Reservoir'
+}
+
+// Use semantic patterns
+await $.Reservoir.create(item)
+const result = await $.Reservoir.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Reservoir](https://schema.org/Reservoir)
+- [Reservoir Properties](https://schema.org/Reservoir#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/ReplyAction
+$context: https://schema.org
+$type: Class
+name: ReplyAction
+description: The act of responding to a question/message asked/sent by the object. Related to [[AskAction]].\
+subClassOf: ["CommunicateAction"]
+---
+
+# ReplyAction
+
+The act of responding to a question/message asked/sent by the object. Related to [[AskAction]].\
+\
+Related actions:\
+\
+* [[AskAction]]: Appears generally as an origin of a ReplyAction.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > **ReplyAction**
+
+
+
+## Properties
+
+See [Schema.org ReplyAction properties](https://schema.org/ReplyAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReplyAction } from 'schema.org.ai'
+
+// Create a ReplyAction
+const item: ReplyAction = {
+  $type: 'ReplyAction',
+  name: 'Example ReplyAction'
+}
+
+// Use semantic patterns
+await $.ReplyAction.create(item)
+const result = await $.ReplyAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReplyAction](https://schema.org/ReplyAction)
+- [ReplyAction Properties](https://schema.org/ReplyAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

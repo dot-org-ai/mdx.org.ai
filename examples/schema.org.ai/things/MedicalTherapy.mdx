@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/MedicalTherapy
+$context: https://schema.org
+$type: Class
+name: MedicalTherapy
+description: Any medical intervention designed to prevent, treat, and cure human diseases and medical conditions, including both curative and palliative therapies. Medical therapies are typically processes of care relying upon pharmacotherapy, behavioral therapy, supportive therapy (with fluid or nutrition for example), or detoxification (e.g. hemodialysis) aimed at improving or preventing a health condition.
+subClassOf: ["TherapeuticProcedure"]
+---
+
+# MedicalTherapy
+
+Any medical intervention designed to prevent, treat, and cure human diseases and medical conditions, including both curative and palliative therapies. Medical therapies are typically processes of care relying upon pharmacotherapy, behavioral therapy, supportive therapy (with fluid or nutrition for example), or detoxification (e.g. hemodialysis) aimed at improving or preventing a health condition.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalProcedure](MedicalProcedure.mdx) > [TherapeuticProcedure](TherapeuticProcedure.mdx) > **MedicalTherapy**
+
+## Direct Subclasses
+
+- **[OccupationalTherapy](OccupationalTherapy.mdx)**: A treatment of people with physical, emotional, or social problems, using purposeful activity to help them overcome or learn to deal with their problems
+- **[PalliativeProcedure](PalliativeProcedure.mdx)**: A medical procedure intended primarily for palliative purposes, aimed at relieving the symptoms of an underlying health condition
+- **[PhysicalTherapy](PhysicalTherapy.mdx)**: A process of progressive physical care and rehabilitation aimed at improving a health condition
+- **[RadiationTherapy](RadiationTherapy.mdx)**: A process of care using radiation aimed at improving a health condition
+
+## Properties
+
+See [Schema.org MedicalTherapy properties](https://schema.org/MedicalTherapy#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalTherapy } from 'schema.org.ai'
+
+// Create a MedicalTherapy
+const item: MedicalTherapy = {
+  $type: 'MedicalTherapy',
+  name: 'Example MedicalTherapy'
+}
+
+// Use semantic patterns
+await $.MedicalTherapy.create(item)
+const result = await $.MedicalTherapy.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalTherapy](https://schema.org/MedicalTherapy)
+- [MedicalTherapy Properties](https://schema.org/MedicalTherapy#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

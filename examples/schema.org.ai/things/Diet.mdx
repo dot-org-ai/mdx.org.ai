@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Diet
+$context: https://schema.org
+$type: Class
+name: Diet
+description: A strategy of regulating the intake of food to achieve or maintain a specific health-related goal.
+subClassOf: ["LifestyleModification","CreativeWork"]
+---
+
+# Diet
+
+A strategy of regulating the intake of food to achieve or maintain a specific health-related goal.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [LifestyleModification](LifestyleModification.mdx) > **Diet**
+
+
+
+## Properties
+
+See [Schema.org Diet properties](https://schema.org/Diet#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Diet } from 'schema.org.ai'
+
+// Create a Diet
+const item: Diet = {
+  $type: 'Diet',
+  name: 'Example Diet'
+}
+
+// Use semantic patterns
+await $.Diet.create(item)
+const result = await $.Diet.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Diet](https://schema.org/Diet)
+- [Diet Properties](https://schema.org/Diet#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

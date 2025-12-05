@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ShippingConditions
+$context: https://schema.org
+$type: Class
+name: ShippingConditions
+description: ShippingConditions represent a set of constraints and information about the conditions of shipping a product. Such conditions may apply to only a subset of the products being shipped, depending on aspects of the product like weight, size, price, destination, and others. All the specified conditions must be met for this ShippingConditions to apply.
+subClassOf: ["StructuredValue"]
+---
+
+# ShippingConditions
+
+ShippingConditions represent a set of constraints and information about the conditions of shipping a product. Such conditions may apply to only a subset of the products being shipped, depending on aspects of the product like weight, size, price, destination, and others. All the specified conditions must be met for this ShippingConditions to apply.
+
+## Type Hierarchy
+
+**ShippingConditions**
+
+
+
+## Properties
+
+See [Schema.org ShippingConditions properties](https://schema.org/ShippingConditions#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ShippingConditions } from 'schema.org.ai'
+
+// Create a ShippingConditions
+const item: ShippingConditions = {
+  $type: 'ShippingConditions',
+  name: 'Example ShippingConditions'
+}
+
+// Use semantic patterns
+await $.ShippingConditions.create(item)
+const result = await $.ShippingConditions.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ShippingConditions](https://schema.org/ShippingConditions)
+- [ShippingConditions Properties](https://schema.org/ShippingConditions#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

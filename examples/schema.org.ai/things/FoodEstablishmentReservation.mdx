@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/FoodEstablishmentReservation
+$context: https://schema.org
+$type: Class
+name: FoodEstablishmentReservation
+description: A reservation to dine at a food-related business.\
+subClassOf: ["Reservation"]
+---
+
+# FoodEstablishmentReservation
+
+A reservation to dine at a food-related business.\
+\
+Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.
+
+## Type Hierarchy
+
+**FoodEstablishmentReservation**
+
+
+
+## Properties
+
+See [Schema.org FoodEstablishmentReservation properties](https://schema.org/FoodEstablishmentReservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FoodEstablishmentReservation } from 'schema.org.ai'
+
+// Create a FoodEstablishmentReservation
+const item: FoodEstablishmentReservation = {
+  $type: 'FoodEstablishmentReservation',
+  name: 'Example FoodEstablishmentReservation'
+}
+
+// Use semantic patterns
+await $.FoodEstablishmentReservation.create(item)
+const result = await $.FoodEstablishmentReservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FoodEstablishmentReservation](https://schema.org/FoodEstablishmentReservation)
+- [FoodEstablishmentReservation Properties](https://schema.org/FoodEstablishmentReservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

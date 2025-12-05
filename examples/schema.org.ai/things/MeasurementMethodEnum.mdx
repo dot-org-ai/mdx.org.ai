@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MeasurementMethodEnum
+$context: https://schema.org
+$type: Class
+name: MeasurementMethodEnum
+description: Enumeration(s) for use with [[measurementMethod]].
+subClassOf: ["Enumeration"]
+---
+
+# MeasurementMethodEnum
+
+Enumeration(s) for use with [[measurementMethod]].
+
+## Type Hierarchy
+
+**MeasurementMethodEnum**
+
+
+
+## Properties
+
+See [Schema.org MeasurementMethodEnum properties](https://schema.org/MeasurementMethodEnum#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MeasurementMethodEnum } from 'schema.org.ai'
+
+// Create a MeasurementMethodEnum
+const item: MeasurementMethodEnum = {
+  $type: 'MeasurementMethodEnum',
+  name: 'Example MeasurementMethodEnum'
+}
+
+// Use semantic patterns
+await $.MeasurementMethodEnum.create(item)
+const result = await $.MeasurementMethodEnum.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MeasurementMethodEnum](https://schema.org/MeasurementMethodEnum)
+- [MeasurementMethodEnum Properties](https://schema.org/MeasurementMethodEnum#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

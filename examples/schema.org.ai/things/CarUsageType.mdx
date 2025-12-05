@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CarUsageType
+$context: https://schema.org
+$type: Class
+name: CarUsageType
+description: A value indicating a special usage of a car, e.g. commercial rental, driving school, or as a taxi.
+subClassOf: ["Enumeration"]
+---
+
+# CarUsageType
+
+A value indicating a special usage of a car, e.g. commercial rental, driving school, or as a taxi.
+
+## Type Hierarchy
+
+**CarUsageType**
+
+
+
+## Properties
+
+See [Schema.org CarUsageType properties](https://schema.org/CarUsageType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CarUsageType } from 'schema.org.ai'
+
+// Create a CarUsageType
+const item: CarUsageType = {
+  $type: 'CarUsageType',
+  name: 'Example CarUsageType'
+}
+
+// Use semantic patterns
+await $.CarUsageType.create(item)
+const result = await $.CarUsageType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CarUsageType](https://schema.org/CarUsageType)
+- [CarUsageType Properties](https://schema.org/CarUsageType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

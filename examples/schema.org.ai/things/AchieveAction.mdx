@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/AchieveAction
+$context: https://schema.org
+$type: Class
+name: AchieveAction
+description: The act of accomplishing something via previous efforts. It is an instantaneous action rather than an ongoing process.
+subClassOf: ["Action"]
+---
+
+# AchieveAction
+
+The act of accomplishing something via previous efforts. It is an instantaneous action rather than an ongoing process.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **AchieveAction**
+
+## Direct Subclasses
+
+- **[LoseAction](LoseAction.mdx)**: The act of being defeated in a competitive activity
+- **[TieAction](TieAction.mdx)**: The act of reaching a draw in a competitive activity
+- **[WinAction](WinAction.mdx)**: The act of achieving victory in a competitive activity
+
+## Properties
+
+See [Schema.org AchieveAction properties](https://schema.org/AchieveAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AchieveAction } from 'schema.org.ai'
+
+// Create a AchieveAction
+const item: AchieveAction = {
+  $type: 'AchieveAction',
+  name: 'Example AchieveAction'
+}
+
+// Use semantic patterns
+await $.AchieveAction.create(item)
+const result = await $.AchieveAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AchieveAction](https://schema.org/AchieveAction)
+- [AchieveAction Properties](https://schema.org/AchieveAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

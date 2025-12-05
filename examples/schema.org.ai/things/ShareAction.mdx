@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ShareAction
+$context: https://schema.org
+$type: Class
+name: ShareAction
+description: The act of distributing content to people for their amusement or edification.
+subClassOf: ["CommunicateAction"]
+---
+
+# ShareAction
+
+The act of distributing content to people for their amusement or edification.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > **ShareAction**
+
+
+
+## Properties
+
+See [Schema.org ShareAction properties](https://schema.org/ShareAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ShareAction } from 'schema.org.ai'
+
+// Create a ShareAction
+const item: ShareAction = {
+  $type: 'ShareAction',
+  name: 'Example ShareAction'
+}
+
+// Use semantic patterns
+await $.ShareAction.create(item)
+const result = await $.ShareAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ShareAction](https://schema.org/ShareAction)
+- [ShareAction Properties](https://schema.org/ShareAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

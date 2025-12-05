@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WorkBasedProgram
+$context: https://schema.org
+$type: Class
+name: WorkBasedProgram
+description: A program with both an educational and employment component. Typically based at a workplace and structured around work-based learning, with the aim of instilling competencies related to an occupation. WorkBasedProgram is used to distinguish programs such as apprenticeships from school, college or other classroom based educational programs.
+subClassOf: ["EducationalOccupationalProgram"]
+---
+
+# WorkBasedProgram
+
+A program with both an educational and employment component. Typically based at a workplace and structured around work-based learning, with the aim of instilling competencies related to an occupation. WorkBasedProgram is used to distinguish programs such as apprenticeships from school, college or other classroom based educational programs.
+
+## Type Hierarchy
+
+**WorkBasedProgram**
+
+
+
+## Properties
+
+See [Schema.org WorkBasedProgram properties](https://schema.org/WorkBasedProgram#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WorkBasedProgram } from 'schema.org.ai'
+
+// Create a WorkBasedProgram
+const item: WorkBasedProgram = {
+  $type: 'WorkBasedProgram',
+  name: 'Example WorkBasedProgram'
+}
+
+// Use semantic patterns
+await $.WorkBasedProgram.create(item)
+const result = await $.WorkBasedProgram.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WorkBasedProgram](https://schema.org/WorkBasedProgram)
+- [WorkBasedProgram Properties](https://schema.org/WorkBasedProgram#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

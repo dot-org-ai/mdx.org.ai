@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ServiceChannel
+$context: https://schema.org
+$type: Class
+name: ServiceChannel
+description: A means for accessing a service, e.g. a government office location, web site, or phone number.
+subClassOf: ["Intangible"]
+---
+
+# ServiceChannel
+
+A means for accessing a service, e.g. a government office location, web site, or phone number.
+
+## Type Hierarchy
+
+**ServiceChannel**
+
+
+
+## Properties
+
+See [Schema.org ServiceChannel properties](https://schema.org/ServiceChannel#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ServiceChannel } from 'schema.org.ai'
+
+// Create a ServiceChannel
+const item: ServiceChannel = {
+  $type: 'ServiceChannel',
+  name: 'Example ServiceChannel'
+}
+
+// Use semantic patterns
+await $.ServiceChannel.create(item)
+const result = await $.ServiceChannel.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ServiceChannel](https://schema.org/ServiceChannel)
+- [ServiceChannel Properties](https://schema.org/ServiceChannel#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

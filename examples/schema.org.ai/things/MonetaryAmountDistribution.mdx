@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MonetaryAmountDistribution
+$context: https://schema.org
+$type: Class
+name: MonetaryAmountDistribution
+description: A statistical distribution of monetary amounts.
+subClassOf: ["QuantitativeValueDistribution"]
+---
+
+# MonetaryAmountDistribution
+
+A statistical distribution of monetary amounts.
+
+## Type Hierarchy
+
+**MonetaryAmountDistribution**
+
+
+
+## Properties
+
+See [Schema.org MonetaryAmountDistribution properties](https://schema.org/MonetaryAmountDistribution#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MonetaryAmountDistribution } from 'schema.org.ai'
+
+// Create a MonetaryAmountDistribution
+const item: MonetaryAmountDistribution = {
+  $type: 'MonetaryAmountDistribution',
+  name: 'Example MonetaryAmountDistribution'
+}
+
+// Use semantic patterns
+await $.MonetaryAmountDistribution.create(item)
+const result = await $.MonetaryAmountDistribution.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MonetaryAmountDistribution](https://schema.org/MonetaryAmountDistribution)
+- [MonetaryAmountDistribution Properties](https://schema.org/MonetaryAmountDistribution#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

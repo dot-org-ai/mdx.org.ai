@@ -1,0 +1,58 @@
+---
+$id: https://schema.org.ai/SportsActivityLocation
+$context: https://schema.org
+$type: Class
+name: SportsActivityLocation
+description: A sports location, such as a playing field.
+subClassOf: ["LocalBusiness"]
+---
+
+# SportsActivityLocation
+
+A sports location, such as a playing field.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **SportsActivityLocation**
+
+## Direct Subclasses
+
+- **[BowlingAlley](BowlingAlley.mdx)**: A bowling alley
+- **[ExerciseGym](ExerciseGym.mdx)**: A gym
+- **[GolfCourse](GolfCourse.mdx)**: A golf course
+- **[HealthClub](HealthClub.mdx)**: A health club
+- **[PublicSwimmingPool](PublicSwimmingPool.mdx)**: A public swimming pool
+- **[SkiResort](SkiResort.mdx)**: A ski resort
+- **[SportsClub](SportsClub.mdx)**: A sports club
+- **[StadiumOrArena](StadiumOrArena.mdx)**: A stadium
+- **[TennisComplex](TennisComplex.mdx)**: A tennis complex
+
+## Properties
+
+See [Schema.org SportsActivityLocation properties](https://schema.org/SportsActivityLocation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SportsActivityLocation } from 'schema.org.ai'
+
+// Create a SportsActivityLocation
+const item: SportsActivityLocation = {
+  $type: 'SportsActivityLocation',
+  name: 'Example SportsActivityLocation'
+}
+
+// Use semantic patterns
+await $.SportsActivityLocation.create(item)
+const result = await $.SportsActivityLocation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SportsActivityLocation](https://schema.org/SportsActivityLocation)
+- [SportsActivityLocation Properties](https://schema.org/SportsActivityLocation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

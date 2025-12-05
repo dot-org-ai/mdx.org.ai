@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AutoDealer
+$context: https://schema.org
+$type: Class
+name: AutoDealer
+description: An car dealership.
+subClassOf: ["AutomotiveBusiness"]
+---
+
+# AutoDealer
+
+An car dealership.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [AutomotiveBusiness](AutomotiveBusiness.mdx) > **AutoDealer**
+
+
+
+## Properties
+
+See [Schema.org AutoDealer properties](https://schema.org/AutoDealer#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AutoDealer } from 'schema.org.ai'
+
+// Create a AutoDealer
+const item: AutoDealer = {
+  $type: 'AutoDealer',
+  name: 'Example AutoDealer'
+}
+
+// Use semantic patterns
+await $.AutoDealer.create(item)
+const result = await $.AutoDealer.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AutoDealer](https://schema.org/AutoDealer)
+- [AutoDealer Properties](https://schema.org/AutoDealer#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

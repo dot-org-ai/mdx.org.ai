@@ -1,0 +1,58 @@
+---
+$id: https://schema.org.ai/ConsumeAction
+$context: https://schema.org
+$type: Class
+name: ConsumeAction
+description: The act of ingesting information/resources/food.
+subClassOf: ["Action"]
+---
+
+# ConsumeAction
+
+The act of ingesting information/resources/food.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **ConsumeAction**
+
+## Direct Subclasses
+
+- **[DrinkAction](DrinkAction.mdx)**: The act of swallowing liquids
+- **[EatAction](EatAction.mdx)**: The act of swallowing solid objects
+- **[InstallAction](InstallAction.mdx)**: The act of installing an application
+- **[ListenAction](ListenAction.mdx)**: The act of consuming audio content
+- **[PlayGameAction](PlayGameAction.mdx)**: The act of playing a video game
+- **[ReadAction](ReadAction.mdx)**: The act of consuming written content
+- **[UseAction](UseAction.mdx)**: The act of applying an object to its intended purpose
+- **[ViewAction](ViewAction.mdx)**: The act of consuming static visual content
+- **[WatchAction](WatchAction.mdx)**: The act of consuming dynamic/moving visual content
+
+## Properties
+
+See [Schema.org ConsumeAction properties](https://schema.org/ConsumeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ConsumeAction } from 'schema.org.ai'
+
+// Create a ConsumeAction
+const item: ConsumeAction = {
+  $type: 'ConsumeAction',
+  name: 'Example ConsumeAction'
+}
+
+// Use semantic patterns
+await $.ConsumeAction.create(item)
+const result = await $.ConsumeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ConsumeAction](https://schema.org/ConsumeAction)
+- [ConsumeAction Properties](https://schema.org/ConsumeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

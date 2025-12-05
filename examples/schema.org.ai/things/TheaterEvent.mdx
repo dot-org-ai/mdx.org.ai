@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TheaterEvent
+$context: https://schema.org
+$type: Class
+name: TheaterEvent
+description: Event type: Theater performance.
+subClassOf: ["Event"]
+---
+
+# TheaterEvent
+
+Event type: Theater performance.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **TheaterEvent**
+
+
+
+## Properties
+
+See [Schema.org TheaterEvent properties](https://schema.org/TheaterEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TheaterEvent } from 'schema.org.ai'
+
+// Create a TheaterEvent
+const item: TheaterEvent = {
+  $type: 'TheaterEvent',
+  name: 'Example TheaterEvent'
+}
+
+// Use semantic patterns
+await $.TheaterEvent.create(item)
+const result = await $.TheaterEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TheaterEvent](https://schema.org/TheaterEvent)
+- [TheaterEvent Properties](https://schema.org/TheaterEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

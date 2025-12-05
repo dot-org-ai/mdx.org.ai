@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HousePainter
+$context: https://schema.org
+$type: Class
+name: HousePainter
+description: A house painting service.
+subClassOf: ["HomeAndConstructionBusiness"]
+---
+
+# HousePainter
+
+A house painting service.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HomeAndConstructionBusiness](HomeAndConstructionBusiness.mdx) > **HousePainter**
+
+
+
+## Properties
+
+See [Schema.org HousePainter properties](https://schema.org/HousePainter#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HousePainter } from 'schema.org.ai'
+
+// Create a HousePainter
+const item: HousePainter = {
+  $type: 'HousePainter',
+  name: 'Example HousePainter'
+}
+
+// Use semantic patterns
+await $.HousePainter.create(item)
+const result = await $.HousePainter.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HousePainter](https://schema.org/HousePainter)
+- [HousePainter Properties](https://schema.org/HousePainter#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

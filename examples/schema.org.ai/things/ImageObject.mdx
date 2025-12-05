@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/ImageObject
+$context: https://schema.org
+$type: Class
+name: ImageObject
+description: An image file.
+subClassOf: ["MediaObject"]
+---
+
+# ImageObject
+
+An image file.
+
+## Type Hierarchy
+
+**ImageObject**
+
+## Direct Subclasses
+
+- **[Barcode](Barcode.mdx)**: An image of a visual machine-readable code such as a barcode or QR code
+
+## Properties
+
+See [Schema.org ImageObject properties](https://schema.org/ImageObject#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ImageObject } from 'schema.org.ai'
+
+// Create a ImageObject
+const item: ImageObject = {
+  $type: 'ImageObject',
+  name: 'Example ImageObject'
+}
+
+// Use semantic patterns
+await $.ImageObject.create(item)
+const result = await $.ImageObject.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ImageObject](https://schema.org/ImageObject)
+- [ImageObject Properties](https://schema.org/ImageObject#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

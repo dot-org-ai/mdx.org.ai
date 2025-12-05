@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SolveMathAction
+$context: https://schema.org
+$type: Class
+name: SolveMathAction
+description: The action that takes in a math expression and directs users to a page potentially capable of solving/simplifying that expression.
+subClassOf: ["Action"]
+---
+
+# SolveMathAction
+
+The action that takes in a math expression and directs users to a page potentially capable of solving/simplifying that expression.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **SolveMathAction**
+
+
+
+## Properties
+
+See [Schema.org SolveMathAction properties](https://schema.org/SolveMathAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SolveMathAction } from 'schema.org.ai'
+
+// Create a SolveMathAction
+const item: SolveMathAction = {
+  $type: 'SolveMathAction',
+  name: 'Example SolveMathAction'
+}
+
+// Use semantic patterns
+await $.SolveMathAction.create(item)
+const result = await $.SolveMathAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SolveMathAction](https://schema.org/SolveMathAction)
+- [SolveMathAction Properties](https://schema.org/SolveMathAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

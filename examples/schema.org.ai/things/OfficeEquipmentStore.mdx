@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OfficeEquipmentStore
+$context: https://schema.org
+$type: Class
+name: OfficeEquipmentStore
+description: An office equipment store.
+subClassOf: ["Store"]
+---
+
+# OfficeEquipmentStore
+
+An office equipment store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **OfficeEquipmentStore**
+
+
+
+## Properties
+
+See [Schema.org OfficeEquipmentStore properties](https://schema.org/OfficeEquipmentStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OfficeEquipmentStore } from 'schema.org.ai'
+
+// Create a OfficeEquipmentStore
+const item: OfficeEquipmentStore = {
+  $type: 'OfficeEquipmentStore',
+  name: 'Example OfficeEquipmentStore'
+}
+
+// Use semantic patterns
+await $.OfficeEquipmentStore.create(item)
+const result = await $.OfficeEquipmentStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OfficeEquipmentStore](https://schema.org/OfficeEquipmentStore)
+- [OfficeEquipmentStore Properties](https://schema.org/OfficeEquipmentStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

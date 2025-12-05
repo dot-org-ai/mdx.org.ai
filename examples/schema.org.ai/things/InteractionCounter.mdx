@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/InteractionCounter
+$context: https://schema.org
+$type: Class
+name: InteractionCounter
+description: A summary of how users have interacted with this CreativeWork. In most cases, authors will use a subtype to specify the specific type of interaction.
+subClassOf: ["StructuredValue"]
+---
+
+# InteractionCounter
+
+A summary of how users have interacted with this CreativeWork. In most cases, authors will use a subtype to specify the specific type of interaction.
+
+## Type Hierarchy
+
+**InteractionCounter**
+
+
+
+## Properties
+
+See [Schema.org InteractionCounter properties](https://schema.org/InteractionCounter#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InteractionCounter } from 'schema.org.ai'
+
+// Create a InteractionCounter
+const item: InteractionCounter = {
+  $type: 'InteractionCounter',
+  name: 'Example InteractionCounter'
+}
+
+// Use semantic patterns
+await $.InteractionCounter.create(item)
+const result = await $.InteractionCounter.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InteractionCounter](https://schema.org/InteractionCounter)
+- [InteractionCounter Properties](https://schema.org/InteractionCounter#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

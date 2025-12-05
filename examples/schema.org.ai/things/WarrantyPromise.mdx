@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WarrantyPromise
+$context: https://schema.org
+$type: Class
+name: WarrantyPromise
+description: A structured value representing the duration and scope of services that will be provided to a customer free of charge in case of a defect or malfunction of a product.
+subClassOf: ["StructuredValue"]
+---
+
+# WarrantyPromise
+
+A structured value representing the duration and scope of services that will be provided to a customer free of charge in case of a defect or malfunction of a product.
+
+## Type Hierarchy
+
+**WarrantyPromise**
+
+
+
+## Properties
+
+See [Schema.org WarrantyPromise properties](https://schema.org/WarrantyPromise#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WarrantyPromise } from 'schema.org.ai'
+
+// Create a WarrantyPromise
+const item: WarrantyPromise = {
+  $type: 'WarrantyPromise',
+  name: 'Example WarrantyPromise'
+}
+
+// Use semantic patterns
+await $.WarrantyPromise.create(item)
+const result = await $.WarrantyPromise.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WarrantyPromise](https://schema.org/WarrantyPromise)
+- [WarrantyPromise Properties](https://schema.org/WarrantyPromise#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

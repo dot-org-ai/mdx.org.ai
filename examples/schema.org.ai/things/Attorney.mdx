@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Attorney
+$context: https://schema.org
+$type: Class
+name: Attorney
+description: Professional service: Attorney. \
+subClassOf: ["LegalService"]
+---
+
+# Attorney
+
+Professional service: Attorney. \
+\
+This type is deprecated - [[LegalService]] is more inclusive and less ambiguous.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [LegalService](LegalService.mdx) > **Attorney**
+
+
+
+## Properties
+
+See [Schema.org Attorney properties](https://schema.org/Attorney#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Attorney } from 'schema.org.ai'
+
+// Create a Attorney
+const item: Attorney = {
+  $type: 'Attorney',
+  name: 'Example Attorney'
+}
+
+// Use semantic patterns
+await $.Attorney.create(item)
+const result = await $.Attorney.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Attorney](https://schema.org/Attorney)
+- [Attorney Properties](https://schema.org/Attorney#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

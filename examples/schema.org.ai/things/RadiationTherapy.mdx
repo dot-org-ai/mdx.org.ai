@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RadiationTherapy
+$context: https://schema.org
+$type: Class
+name: RadiationTherapy
+description: A process of care using radiation aimed at improving a health condition.
+subClassOf: ["MedicalTherapy"]
+---
+
+# RadiationTherapy
+
+A process of care using radiation aimed at improving a health condition.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalProcedure](MedicalProcedure.mdx) > [TherapeuticProcedure](TherapeuticProcedure.mdx) > [MedicalTherapy](MedicalTherapy.mdx) > **RadiationTherapy**
+
+
+
+## Properties
+
+See [Schema.org RadiationTherapy properties](https://schema.org/RadiationTherapy#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RadiationTherapy } from 'schema.org.ai'
+
+// Create a RadiationTherapy
+const item: RadiationTherapy = {
+  $type: 'RadiationTherapy',
+  name: 'Example RadiationTherapy'
+}
+
+// Use semantic patterns
+await $.RadiationTherapy.create(item)
+const result = await $.RadiationTherapy.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RadiationTherapy](https://schema.org/RadiationTherapy)
+- [RadiationTherapy Properties](https://schema.org/RadiationTherapy#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

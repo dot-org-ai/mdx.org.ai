@@ -1,0 +1,54 @@
+---
+$id: https://schema.org.ai/GovernmentBuilding
+$context: https://schema.org
+$type: Class
+name: GovernmentBuilding
+description: A government building.
+subClassOf: ["CivicStructure"]
+---
+
+# GovernmentBuilding
+
+A government building.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **GovernmentBuilding**
+
+## Direct Subclasses
+
+- **[CityHall](CityHall.mdx)**: A city hall
+- **[Courthouse](Courthouse.mdx)**: A courthouse
+- **[DefenceEstablishment](DefenceEstablishment.mdx)**: A defence establishment, such as an army or navy base
+- **[Embassy](Embassy.mdx)**: An embassy
+- **[LegislativeBuilding](LegislativeBuilding.mdx)**: A legislative building&#x2014;for example, the state capitol
+
+## Properties
+
+See [Schema.org GovernmentBuilding properties](https://schema.org/GovernmentBuilding#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GovernmentBuilding } from 'schema.org.ai'
+
+// Create a GovernmentBuilding
+const item: GovernmentBuilding = {
+  $type: 'GovernmentBuilding',
+  name: 'Example GovernmentBuilding'
+}
+
+// Use semantic patterns
+await $.GovernmentBuilding.create(item)
+const result = await $.GovernmentBuilding.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GovernmentBuilding](https://schema.org/GovernmentBuilding)
+- [GovernmentBuilding Properties](https://schema.org/GovernmentBuilding#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

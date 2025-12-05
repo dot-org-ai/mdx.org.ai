@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/ProfessionalService
+$context: https://schema.org
+$type: Class
+name: ProfessionalService
+description: Original definition: "provider of professional services."\
+subClassOf: ["LocalBusiness"]
+---
+
+# ProfessionalService
+
+Original definition: "provider of professional services."\
+\
+The general [[ProfessionalService]] type for local businesses was deprecated due to confusion with [[Service]]. For reference, the types that it included were: [[Dentist]], [[AccountingService]], [[Attorney]], [[Notary]], as well as types for several kinds of [[HomeAndConstructionBusiness]]: [[Electrician]], [[GeneralContractor]], [[HousePainter]], [[Locksmith]], [[Plumber]], [[RoofingContractor]]. [[LegalService]] was introduced as a more inclusive supertype of [[Attorney]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **ProfessionalService**
+
+
+
+## Properties
+
+See [Schema.org ProfessionalService properties](https://schema.org/ProfessionalService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ProfessionalService } from 'schema.org.ai'
+
+// Create a ProfessionalService
+const item: ProfessionalService = {
+  $type: 'ProfessionalService',
+  name: 'Example ProfessionalService'
+}
+
+// Use semantic patterns
+await $.ProfessionalService.create(item)
+const result = await $.ProfessionalService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ProfessionalService](https://schema.org/ProfessionalService)
+- [ProfessionalService Properties](https://schema.org/ProfessionalService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalTrialDesign
+$context: https://schema.org
+$type: Class
+name: MedicalTrialDesign
+description: Design models for medical trials. Enumerated type.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# MedicalTrialDesign
+
+Design models for medical trials. Enumerated type.
+
+## Type Hierarchy
+
+**MedicalTrialDesign**
+
+
+
+## Properties
+
+See [Schema.org MedicalTrialDesign properties](https://schema.org/MedicalTrialDesign#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalTrialDesign } from 'schema.org.ai'
+
+// Create a MedicalTrialDesign
+const item: MedicalTrialDesign = {
+  $type: 'MedicalTrialDesign',
+  name: 'Example MedicalTrialDesign'
+}
+
+// Use semantic patterns
+await $.MedicalTrialDesign.create(item)
+const result = await $.MedicalTrialDesign.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalTrialDesign](https://schema.org/MedicalTrialDesign)
+- [MedicalTrialDesign Properties](https://schema.org/MedicalTrialDesign#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

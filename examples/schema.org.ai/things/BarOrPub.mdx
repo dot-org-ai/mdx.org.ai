@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BarOrPub
+$context: https://schema.org
+$type: Class
+name: BarOrPub
+description: A bar or pub.
+subClassOf: ["FoodEstablishment"]
+---
+
+# BarOrPub
+
+A bar or pub.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FoodEstablishment](FoodEstablishment.mdx) > **BarOrPub**
+
+
+
+## Properties
+
+See [Schema.org BarOrPub properties](https://schema.org/BarOrPub#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BarOrPub } from 'schema.org.ai'
+
+// Create a BarOrPub
+const item: BarOrPub = {
+  $type: 'BarOrPub',
+  name: 'Example BarOrPub'
+}
+
+// Use semantic patterns
+await $.BarOrPub.create(item)
+const result = await $.BarOrPub.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BarOrPub](https://schema.org/BarOrPub)
+- [BarOrPub Properties](https://schema.org/BarOrPub#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

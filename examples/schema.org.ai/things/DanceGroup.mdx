@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DanceGroup
+$context: https://schema.org
+$type: Class
+name: DanceGroup
+description: A dance group&#x2014;for example, the Alvin Ailey Dance Theater or Riverdance.
+subClassOf: ["PerformingGroup"]
+---
+
+# DanceGroup
+
+A dance group&#x2014;for example, the Alvin Ailey Dance Theater or Riverdance.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > [PerformingGroup](PerformingGroup.mdx) > **DanceGroup**
+
+
+
+## Properties
+
+See [Schema.org DanceGroup properties](https://schema.org/DanceGroup#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DanceGroup } from 'schema.org.ai'
+
+// Create a DanceGroup
+const item: DanceGroup = {
+  $type: 'DanceGroup',
+  name: 'Example DanceGroup'
+}
+
+// Use semantic patterns
+await $.DanceGroup.create(item)
+const result = await $.DanceGroup.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DanceGroup](https://schema.org/DanceGroup)
+- [DanceGroup Properties](https://schema.org/DanceGroup#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

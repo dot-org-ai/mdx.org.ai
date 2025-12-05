@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/QAPage
+$context: https://schema.org
+$type: Class
+name: QAPage
+description: A QAPage is a WebPage focussed on a specific Question and its Answer(s), e.g. in a question answering site or documenting Frequently Asked Questions (FAQs).
+subClassOf: ["WebPage"]
+---
+
+# QAPage
+
+A QAPage is a WebPage focussed on a specific Question and its Answer(s), e.g. in a question answering site or documenting Frequently Asked Questions (FAQs).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **QAPage**
+
+
+
+## Properties
+
+See [Schema.org QAPage properties](https://schema.org/QAPage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { QAPage } from 'schema.org.ai'
+
+// Create a QAPage
+const item: QAPage = {
+  $type: 'QAPage',
+  name: 'Example QAPage'
+}
+
+// Use semantic patterns
+await $.QAPage.create(item)
+const result = await $.QAPage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org QAPage](https://schema.org/QAPage)
+- [QAPage Properties](https://schema.org/QAPage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

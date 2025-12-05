@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OwnershipInfo
+$context: https://schema.org
+$type: Class
+name: OwnershipInfo
+description: A structured value providing information about when a certain organization or person owned a certain product.
+subClassOf: ["StructuredValue"]
+---
+
+# OwnershipInfo
+
+A structured value providing information about when a certain organization or person owned a certain product.
+
+## Type Hierarchy
+
+**OwnershipInfo**
+
+
+
+## Properties
+
+See [Schema.org OwnershipInfo properties](https://schema.org/OwnershipInfo#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OwnershipInfo } from 'schema.org.ai'
+
+// Create a OwnershipInfo
+const item: OwnershipInfo = {
+  $type: 'OwnershipInfo',
+  name: 'Example OwnershipInfo'
+}
+
+// Use semantic patterns
+await $.OwnershipInfo.create(item)
+const result = await $.OwnershipInfo.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OwnershipInfo](https://schema.org/OwnershipInfo)
+- [OwnershipInfo Properties](https://schema.org/OwnershipInfo#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

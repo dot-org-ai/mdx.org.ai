@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/AdministrativeArea
+$context: https://schema.org
+$type: Class
+name: AdministrativeArea
+description: A geographical region, typically under the jurisdiction of a particular government.
+subClassOf: ["Place"]
+---
+
+# AdministrativeArea
+
+A geographical region, typically under the jurisdiction of a particular government.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > **AdministrativeArea**
+
+## Direct Subclasses
+
+- **[City](City.mdx)**: A city or town
+- **[Country](Country.mdx)**: A country
+- **[SchoolDistrict](SchoolDistrict.mdx)**: A School District is an administrative area for the administration of schools
+- **[State](State.mdx)**: A state or province of a country
+
+## Properties
+
+See [Schema.org AdministrativeArea properties](https://schema.org/AdministrativeArea#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AdministrativeArea } from 'schema.org.ai'
+
+// Create a AdministrativeArea
+const item: AdministrativeArea = {
+  $type: 'AdministrativeArea',
+  name: 'Example AdministrativeArea'
+}
+
+// Use semantic patterns
+await $.AdministrativeArea.create(item)
+const result = await $.AdministrativeArea.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AdministrativeArea](https://schema.org/AdministrativeArea)
+- [AdministrativeArea Properties](https://schema.org/AdministrativeArea#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

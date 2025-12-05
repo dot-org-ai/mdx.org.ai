@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CDCPMDRecord
+$context: https://schema.org
+$type: Class
+name: CDCPMDRecord
+description: A CDCPMDRecord is a data structure representing a record in a CDC tabular data format used for hospital data reporting. See [documentation](/docs/cdc-covid.html) for details, and the linked CDC materials for authoritative definitions used as the source here.
+subClassOf: ["StructuredValue"]
+---
+
+# CDCPMDRecord
+
+A CDCPMDRecord is a data structure representing a record in a CDC tabular data format used for hospital data reporting. See [documentation](/docs/cdc-covid.html) for details, and the linked CDC materials for authoritative definitions used as the source here.
+
+## Type Hierarchy
+
+**CDCPMDRecord**
+
+
+
+## Properties
+
+See [Schema.org CDCPMDRecord properties](https://schema.org/CDCPMDRecord#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CDCPMDRecord } from 'schema.org.ai'
+
+// Create a CDCPMDRecord
+const item: CDCPMDRecord = {
+  $type: 'CDCPMDRecord',
+  name: 'Example CDCPMDRecord'
+}
+
+// Use semantic patterns
+await $.CDCPMDRecord.create(item)
+const result = await $.CDCPMDRecord.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CDCPMDRecord](https://schema.org/CDCPMDRecord)
+- [CDCPMDRecord Properties](https://schema.org/CDCPMDRecord#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

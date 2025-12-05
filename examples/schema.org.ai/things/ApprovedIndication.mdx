@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ApprovedIndication
+$context: https://schema.org
+$type: Class
+name: ApprovedIndication
+description: An indication for a medical therapy that has been formally specified or approved by a regulatory body that regulates use of the therapy; for example, the US FDA approves indications for most drugs in the US.
+subClassOf: ["MedicalIndication"]
+---
+
+# ApprovedIndication
+
+An indication for a medical therapy that has been formally specified or approved by a regulatory body that regulates use of the therapy; for example, the US FDA approves indications for most drugs in the US.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalIndication](MedicalIndication.mdx) > **ApprovedIndication**
+
+
+
+## Properties
+
+See [Schema.org ApprovedIndication properties](https://schema.org/ApprovedIndication#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ApprovedIndication } from 'schema.org.ai'
+
+// Create a ApprovedIndication
+const item: ApprovedIndication = {
+  $type: 'ApprovedIndication',
+  name: 'Example ApprovedIndication'
+}
+
+// Use semantic patterns
+await $.ApprovedIndication.create(item)
+const result = await $.ApprovedIndication.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ApprovedIndication](https://schema.org/ApprovedIndication)
+- [ApprovedIndication Properties](https://schema.org/ApprovedIndication#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

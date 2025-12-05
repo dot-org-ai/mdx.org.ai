@@ -1,0 +1,57 @@
+---
+$id: https://schema.org.ai/CreditCard
+$context: https://schema.org
+$type: Class
+name: CreditCard
+description: A card payment method of a particular brand or name.  Used to mark up a particular payment method and/or the financial product/service that supplies the card account.\
+subClassOf: ["PaymentCard","LoanOrCredit"]
+---
+
+# CreditCard
+
+A card payment method of a particular brand or name.  Used to mark up a particular payment method and/or the financial product/service that supplies the card account.\
+\
+Commonly used values:\
+\
+* http://purl.org/goodrelations/v1#AmericanExpress\
+* http://purl.org/goodrelations/v1#DinersClub\
+* http://purl.org/goodrelations/v1#Discover\
+* http://purl.org/goodrelations/v1#JCB\
+* http://purl.org/goodrelations/v1#MasterCard\
+* http://purl.org/goodrelations/v1#VISA
+
+## Type Hierarchy
+
+**CreditCard**
+
+
+
+## Properties
+
+See [Schema.org CreditCard properties](https://schema.org/CreditCard#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CreditCard } from 'schema.org.ai'
+
+// Create a CreditCard
+const item: CreditCard = {
+  $type: 'CreditCard',
+  name: 'Example CreditCard'
+}
+
+// Use semantic patterns
+await $.CreditCard.create(item)
+const result = await $.CreditCard.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CreditCard](https://schema.org/CreditCard)
+- [CreditCard Properties](https://schema.org/CreditCard#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

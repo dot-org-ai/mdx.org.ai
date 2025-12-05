@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ComicSeries
+$context: https://schema.org
+$type: Class
+name: ComicSeries
+description: A sequential publication of comic stories under a unifying title, for example "The Amazing Spider-Man" or "Groo the Wanderer".
+subClassOf: ["Periodical"]
+---
+
+# ComicSeries
+
+A sequential publication of comic stories under a unifying title, for example "The Amazing Spider-Man" or "Groo the Wanderer".
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [CreativeWorkSeries](CreativeWorkSeries.mdx) > [Periodical](Periodical.mdx) > **ComicSeries**
+
+
+
+## Properties
+
+See [Schema.org ComicSeries properties](https://schema.org/ComicSeries#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ComicSeries } from 'schema.org.ai'
+
+// Create a ComicSeries
+const item: ComicSeries = {
+  $type: 'ComicSeries',
+  name: 'Example ComicSeries'
+}
+
+// Use semantic patterns
+await $.ComicSeries.create(item)
+const result = await $.ComicSeries.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ComicSeries](https://schema.org/ComicSeries)
+- [ComicSeries Properties](https://schema.org/ComicSeries#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

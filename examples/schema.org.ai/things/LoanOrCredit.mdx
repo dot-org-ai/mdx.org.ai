@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/LoanOrCredit
+$context: https://schema.org
+$type: Class
+name: LoanOrCredit
+description: A financial product for the loaning of an amount of money, or line of credit, under agreed terms and charges.
+subClassOf: ["FinancialProduct"]
+---
+
+# LoanOrCredit
+
+A financial product for the loaning of an amount of money, or line of credit, under agreed terms and charges.
+
+## Type Hierarchy
+
+**LoanOrCredit**
+
+## Direct Subclasses
+
+- **[CreditCard](CreditCard.mdx)**: A card payment method of a particular brand or name
+- **[MortgageLoan](MortgageLoan.mdx)**: A loan in which property or real estate is used as collateral
+
+## Properties
+
+See [Schema.org LoanOrCredit properties](https://schema.org/LoanOrCredit#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LoanOrCredit } from 'schema.org.ai'
+
+// Create a LoanOrCredit
+const item: LoanOrCredit = {
+  $type: 'LoanOrCredit',
+  name: 'Example LoanOrCredit'
+}
+
+// Use semantic patterns
+await $.LoanOrCredit.create(item)
+const result = await $.LoanOrCredit.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LoanOrCredit](https://schema.org/LoanOrCredit)
+- [LoanOrCredit Properties](https://schema.org/LoanOrCredit#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

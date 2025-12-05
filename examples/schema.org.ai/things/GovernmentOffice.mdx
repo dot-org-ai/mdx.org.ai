@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/GovernmentOffice
+$context: https://schema.org
+$type: Class
+name: GovernmentOffice
+description: A government office&#x2014;for example, an IRS or DMV office.
+subClassOf: ["LocalBusiness"]
+---
+
+# GovernmentOffice
+
+A government office&#x2014;for example, an IRS or DMV office.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **GovernmentOffice**
+
+## Direct Subclasses
+
+- **[PostOffice](PostOffice.mdx)**: A post office
+
+## Properties
+
+See [Schema.org GovernmentOffice properties](https://schema.org/GovernmentOffice#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GovernmentOffice } from 'schema.org.ai'
+
+// Create a GovernmentOffice
+const item: GovernmentOffice = {
+  $type: 'GovernmentOffice',
+  name: 'Example GovernmentOffice'
+}
+
+// Use semantic patterns
+await $.GovernmentOffice.create(item)
+const result = await $.GovernmentOffice.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GovernmentOffice](https://schema.org/GovernmentOffice)
+- [GovernmentOffice Properties](https://schema.org/GovernmentOffice#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

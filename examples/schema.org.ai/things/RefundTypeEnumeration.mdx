@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RefundTypeEnumeration
+$context: https://schema.org
+$type: Class
+name: RefundTypeEnumeration
+description: Enumerates several kinds of product return refund types.
+subClassOf: ["Enumeration"]
+---
+
+# RefundTypeEnumeration
+
+Enumerates several kinds of product return refund types.
+
+## Type Hierarchy
+
+**RefundTypeEnumeration**
+
+
+
+## Properties
+
+See [Schema.org RefundTypeEnumeration properties](https://schema.org/RefundTypeEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RefundTypeEnumeration } from 'schema.org.ai'
+
+// Create a RefundTypeEnumeration
+const item: RefundTypeEnumeration = {
+  $type: 'RefundTypeEnumeration',
+  name: 'Example RefundTypeEnumeration'
+}
+
+// Use semantic patterns
+await $.RefundTypeEnumeration.create(item)
+const result = await $.RefundTypeEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RefundTypeEnumeration](https://schema.org/RefundTypeEnumeration)
+- [RefundTypeEnumeration Properties](https://schema.org/RefundTypeEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

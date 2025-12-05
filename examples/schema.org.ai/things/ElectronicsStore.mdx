@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ElectronicsStore
+$context: https://schema.org
+$type: Class
+name: ElectronicsStore
+description: An electronics store.
+subClassOf: ["Store"]
+---
+
+# ElectronicsStore
+
+An electronics store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **ElectronicsStore**
+
+
+
+## Properties
+
+See [Schema.org ElectronicsStore properties](https://schema.org/ElectronicsStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ElectronicsStore } from 'schema.org.ai'
+
+// Create a ElectronicsStore
+const item: ElectronicsStore = {
+  $type: 'ElectronicsStore',
+  name: 'Example ElectronicsStore'
+}
+
+// Use semantic patterns
+await $.ElectronicsStore.create(item)
+const result = await $.ElectronicsStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ElectronicsStore](https://schema.org/ElectronicsStore)
+- [ElectronicsStore Properties](https://schema.org/ElectronicsStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

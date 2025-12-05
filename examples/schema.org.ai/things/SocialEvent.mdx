@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SocialEvent
+$context: https://schema.org
+$type: Class
+name: SocialEvent
+description: Event type: Social event.
+subClassOf: ["Event"]
+---
+
+# SocialEvent
+
+Event type: Social event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **SocialEvent**
+
+
+
+## Properties
+
+See [Schema.org SocialEvent properties](https://schema.org/SocialEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SocialEvent } from 'schema.org.ai'
+
+// Create a SocialEvent
+const item: SocialEvent = {
+  $type: 'SocialEvent',
+  name: 'Example SocialEvent'
+}
+
+// Use semantic patterns
+await $.SocialEvent.create(item)
+const result = await $.SocialEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SocialEvent](https://schema.org/SocialEvent)
+- [SocialEvent Properties](https://schema.org/SocialEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

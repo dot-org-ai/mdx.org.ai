@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ShortStory
+$context: https://schema.org
+$type: Class
+name: ShortStory
+description: Short story or tale. A brief work of literature, usually written in narrative prose.
+subClassOf: ["CreativeWork"]
+---
+
+# ShortStory
+
+Short story or tale. A brief work of literature, usually written in narrative prose.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **ShortStory**
+
+
+
+## Properties
+
+See [Schema.org ShortStory properties](https://schema.org/ShortStory#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ShortStory } from 'schema.org.ai'
+
+// Create a ShortStory
+const item: ShortStory = {
+  $type: 'ShortStory',
+  name: 'Example ShortStory'
+}
+
+// Use semantic patterns
+await $.ShortStory.create(item)
+const result = await $.ShortStory.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ShortStory](https://schema.org/ShortStory)
+- [ShortStory Properties](https://schema.org/ShortStory#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

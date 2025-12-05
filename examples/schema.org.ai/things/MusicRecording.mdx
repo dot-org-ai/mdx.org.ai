@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicRecording
+$context: https://schema.org
+$type: Class
+name: MusicRecording
+description: A music recording (track), usually a single song.
+subClassOf: ["CreativeWork"]
+---
+
+# MusicRecording
+
+A music recording (track), usually a single song.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **MusicRecording**
+
+
+
+## Properties
+
+See [Schema.org MusicRecording properties](https://schema.org/MusicRecording#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicRecording } from 'schema.org.ai'
+
+// Create a MusicRecording
+const item: MusicRecording = {
+  $type: 'MusicRecording',
+  name: 'Example MusicRecording'
+}
+
+// Use semantic patterns
+await $.MusicRecording.create(item)
+const result = await $.MusicRecording.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicRecording](https://schema.org/MusicRecording)
+- [MusicRecording Properties](https://schema.org/MusicRecording#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

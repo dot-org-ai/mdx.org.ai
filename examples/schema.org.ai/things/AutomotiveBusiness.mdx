@@ -1,0 +1,58 @@
+---
+$id: https://schema.org.ai/AutomotiveBusiness
+$context: https://schema.org
+$type: Class
+name: AutomotiveBusiness
+description: Car repair, sales, or parts.
+subClassOf: ["LocalBusiness"]
+---
+
+# AutomotiveBusiness
+
+Car repair, sales, or parts.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **AutomotiveBusiness**
+
+## Direct Subclasses
+
+- **[AutoBodyShop](AutoBodyShop.mdx)**: Auto body shop
+- **[AutoDealer](AutoDealer.mdx)**: An car dealership
+- **[AutoPartsStore](AutoPartsStore.mdx)**: An auto parts store
+- **[AutoRental](AutoRental.mdx)**: A car rental business
+- **[AutoRepair](AutoRepair.mdx)**: Car repair business
+- **[AutoWash](AutoWash.mdx)**: A car wash business
+- **[GasStation](GasStation.mdx)**: A gas station
+- **[MotorcycleDealer](MotorcycleDealer.mdx)**: A motorcycle dealer
+- **[MotorcycleRepair](MotorcycleRepair.mdx)**: A motorcycle repair shop
+
+## Properties
+
+See [Schema.org AutomotiveBusiness properties](https://schema.org/AutomotiveBusiness#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AutomotiveBusiness } from 'schema.org.ai'
+
+// Create a AutomotiveBusiness
+const item: AutomotiveBusiness = {
+  $type: 'AutomotiveBusiness',
+  name: 'Example AutomotiveBusiness'
+}
+
+// Use semantic patterns
+await $.AutomotiveBusiness.create(item)
+const result = await $.AutomotiveBusiness.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AutomotiveBusiness](https://schema.org/AutomotiveBusiness)
+- [AutomotiveBusiness Properties](https://schema.org/AutomotiveBusiness#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

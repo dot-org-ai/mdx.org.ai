@@ -1,0 +1,55 @@
+---
+$id: https://schema.org.ai/HealthAndBeautyBusiness
+$context: https://schema.org
+$type: Class
+name: HealthAndBeautyBusiness
+description: Health and beauty.
+subClassOf: ["LocalBusiness"]
+---
+
+# HealthAndBeautyBusiness
+
+Health and beauty.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **HealthAndBeautyBusiness**
+
+## Direct Subclasses
+
+- **[BeautySalon](BeautySalon.mdx)**: Beauty salon
+- **[DaySpa](DaySpa.mdx)**: A day spa
+- **[HairSalon](HairSalon.mdx)**: A hair salon
+- **[HealthClub](HealthClub.mdx)**: A health club
+- **[NailSalon](NailSalon.mdx)**: A nail salon
+- **[TattooParlor](TattooParlor.mdx)**: A tattoo parlor
+
+## Properties
+
+See [Schema.org HealthAndBeautyBusiness properties](https://schema.org/HealthAndBeautyBusiness#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HealthAndBeautyBusiness } from 'schema.org.ai'
+
+// Create a HealthAndBeautyBusiness
+const item: HealthAndBeautyBusiness = {
+  $type: 'HealthAndBeautyBusiness',
+  name: 'Example HealthAndBeautyBusiness'
+}
+
+// Use semantic patterns
+await $.HealthAndBeautyBusiness.create(item)
+const result = await $.HealthAndBeautyBusiness.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HealthAndBeautyBusiness](https://schema.org/HealthAndBeautyBusiness)
+- [HealthAndBeautyBusiness Properties](https://schema.org/HealthAndBeautyBusiness#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

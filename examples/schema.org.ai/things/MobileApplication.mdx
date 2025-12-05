@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MobileApplication
+$context: https://schema.org
+$type: Class
+name: MobileApplication
+description: A software application designed specifically to work well on a mobile device such as a telephone.
+subClassOf: ["SoftwareApplication"]
+---
+
+# MobileApplication
+
+A software application designed specifically to work well on a mobile device such as a telephone.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [SoftwareApplication](SoftwareApplication.mdx) > **MobileApplication**
+
+
+
+## Properties
+
+See [Schema.org MobileApplication properties](https://schema.org/MobileApplication#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MobileApplication } from 'schema.org.ai'
+
+// Create a MobileApplication
+const item: MobileApplication = {
+  $type: 'MobileApplication',
+  name: 'Example MobileApplication'
+}
+
+// Use semantic patterns
+await $.MobileApplication.create(item)
+const result = await $.MobileApplication.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MobileApplication](https://schema.org/MobileApplication)
+- [MobileApplication Properties](https://schema.org/MobileApplication#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

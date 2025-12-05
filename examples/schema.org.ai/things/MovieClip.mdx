@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MovieClip
+$context: https://schema.org
+$type: Class
+name: MovieClip
+description: A short segment/part of a movie.
+subClassOf: ["Clip"]
+---
+
+# MovieClip
+
+A short segment/part of a movie.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Clip](Clip.mdx) > **MovieClip**
+
+
+
+## Properties
+
+See [Schema.org MovieClip properties](https://schema.org/MovieClip#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MovieClip } from 'schema.org.ai'
+
+// Create a MovieClip
+const item: MovieClip = {
+  $type: 'MovieClip',
+  name: 'Example MovieClip'
+}
+
+// Use semantic patterns
+await $.MovieClip.create(item)
+const result = await $.MovieClip.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MovieClip](https://schema.org/MovieClip)
+- [MovieClip Properties](https://schema.org/MovieClip#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

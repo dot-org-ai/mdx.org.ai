@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SpeakableSpecification
+$context: https://schema.org
+$type: Class
+name: SpeakableSpecification
+description: A SpeakableSpecification indicates (typically via [[xpath]] or [[cssSelector]]) sections of a document that are highlighted as particularly [[speakable]]. Instances of this type are expected to be used primarily as values of the [[speakable]] property.
+subClassOf: ["Intangible"]
+---
+
+# SpeakableSpecification
+
+A SpeakableSpecification indicates (typically via [[xpath]] or [[cssSelector]]) sections of a document that are highlighted as particularly [[speakable]]. Instances of this type are expected to be used primarily as values of the [[speakable]] property.
+
+## Type Hierarchy
+
+**SpeakableSpecification**
+
+
+
+## Properties
+
+See [Schema.org SpeakableSpecification properties](https://schema.org/SpeakableSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SpeakableSpecification } from 'schema.org.ai'
+
+// Create a SpeakableSpecification
+const item: SpeakableSpecification = {
+  $type: 'SpeakableSpecification',
+  name: 'Example SpeakableSpecification'
+}
+
+// Use semantic patterns
+await $.SpeakableSpecification.create(item)
+const result = await $.SpeakableSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SpeakableSpecification](https://schema.org/SpeakableSpecification)
+- [SpeakableSpecification Properties](https://schema.org/SpeakableSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

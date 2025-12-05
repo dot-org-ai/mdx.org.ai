@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PetStore
+$context: https://schema.org
+$type: Class
+name: PetStore
+description: A pet store.
+subClassOf: ["Store"]
+---
+
+# PetStore
+
+A pet store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **PetStore**
+
+
+
+## Properties
+
+See [Schema.org PetStore properties](https://schema.org/PetStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PetStore } from 'schema.org.ai'
+
+// Create a PetStore
+const item: PetStore = {
+  $type: 'PetStore',
+  name: 'Example PetStore'
+}
+
+// Use semantic patterns
+await $.PetStore.create(item)
+const result = await $.PetStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PetStore](https://schema.org/PetStore)
+- [PetStore Properties](https://schema.org/PetStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

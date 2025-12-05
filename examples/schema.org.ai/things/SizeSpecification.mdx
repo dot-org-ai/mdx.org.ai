@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SizeSpecification
+$context: https://schema.org
+$type: Class
+name: SizeSpecification
+description: Size related properties of a product, typically a size code ([[name]]) and optionally a [[sizeSystem]], [[sizeGroup]], and product measurements ([[hasMeasurement]]). In addition, the intended audience can be defined through [[suggestedAge]], [[suggestedGender]], and suggested body measurements ([[suggestedMeasurement]]).
+subClassOf: ["QualitativeValue"]
+---
+
+# SizeSpecification
+
+Size related properties of a product, typically a size code ([[name]]) and optionally a [[sizeSystem]], [[sizeGroup]], and product measurements ([[hasMeasurement]]). In addition, the intended audience can be defined through [[suggestedAge]], [[suggestedGender]], and suggested body measurements ([[suggestedMeasurement]]).
+
+## Type Hierarchy
+
+**SizeSpecification**
+
+
+
+## Properties
+
+See [Schema.org SizeSpecification properties](https://schema.org/SizeSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SizeSpecification } from 'schema.org.ai'
+
+// Create a SizeSpecification
+const item: SizeSpecification = {
+  $type: 'SizeSpecification',
+  name: 'Example SizeSpecification'
+}
+
+// Use semantic patterns
+await $.SizeSpecification.create(item)
+const result = await $.SizeSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SizeSpecification](https://schema.org/SizeSpecification)
+- [SizeSpecification Properties](https://schema.org/SizeSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

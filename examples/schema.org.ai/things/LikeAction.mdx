@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LikeAction
+$context: https://schema.org
+$type: Class
+name: LikeAction
+description: The act of expressing a positive sentiment about the object. An agent likes an object (a proposition, topic or theme) with participants.
+subClassOf: ["ReactAction"]
+---
+
+# LikeAction
+
+The act of expressing a positive sentiment about the object. An agent likes an object (a proposition, topic or theme) with participants.
+
+## Type Hierarchy
+
+**LikeAction**
+
+
+
+## Properties
+
+See [Schema.org LikeAction properties](https://schema.org/LikeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LikeAction } from 'schema.org.ai'
+
+// Create a LikeAction
+const item: LikeAction = {
+  $type: 'LikeAction',
+  name: 'Example LikeAction'
+}
+
+// Use semantic patterns
+await $.LikeAction.create(item)
+const result = await $.LikeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LikeAction](https://schema.org/LikeAction)
+- [LikeAction Properties](https://schema.org/LikeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Quiz
+$context: https://schema.org
+$type: Class
+name: Quiz
+description: Quiz: A test of knowledge, skills and abilities.
+subClassOf: ["LearningResource"]
+---
+
+# Quiz
+
+Quiz: A test of knowledge, skills and abilities.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [LearningResource](LearningResource.mdx) > **Quiz**
+
+
+
+## Properties
+
+See [Schema.org Quiz properties](https://schema.org/Quiz#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Quiz } from 'schema.org.ai'
+
+// Create a Quiz
+const item: Quiz = {
+  $type: 'Quiz',
+  name: 'Example Quiz'
+}
+
+// Use semantic patterns
+await $.Quiz.create(item)
+const result = await $.Quiz.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Quiz](https://schema.org/Quiz)
+- [Quiz Properties](https://schema.org/Quiz#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

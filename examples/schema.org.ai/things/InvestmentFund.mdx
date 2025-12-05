@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/InvestmentFund
+$context: https://schema.org
+$type: Class
+name: InvestmentFund
+description: A company or fund that gathers capital from a number of investors to create a pool of money that is then re-invested into stocks, bonds and other assets.
+subClassOf: ["InvestmentOrDeposit"]
+---
+
+# InvestmentFund
+
+A company or fund that gathers capital from a number of investors to create a pool of money that is then re-invested into stocks, bonds and other assets.
+
+## Type Hierarchy
+
+**InvestmentFund**
+
+
+
+## Properties
+
+See [Schema.org InvestmentFund properties](https://schema.org/InvestmentFund#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InvestmentFund } from 'schema.org.ai'
+
+// Create a InvestmentFund
+const item: InvestmentFund = {
+  $type: 'InvestmentFund',
+  name: 'Example InvestmentFund'
+}
+
+// Use semantic patterns
+await $.InvestmentFund.create(item)
+const result = await $.InvestmentFund.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InvestmentFund](https://schema.org/InvestmentFund)
+- [InvestmentFund Properties](https://schema.org/InvestmentFund#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

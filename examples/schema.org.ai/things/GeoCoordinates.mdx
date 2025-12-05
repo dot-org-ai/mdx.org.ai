@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GeoCoordinates
+$context: https://schema.org
+$type: Class
+name: GeoCoordinates
+description: The geographic coordinates of a place or event.
+subClassOf: ["StructuredValue"]
+---
+
+# GeoCoordinates
+
+The geographic coordinates of a place or event.
+
+## Type Hierarchy
+
+**GeoCoordinates**
+
+
+
+## Properties
+
+See [Schema.org GeoCoordinates properties](https://schema.org/GeoCoordinates#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GeoCoordinates } from 'schema.org.ai'
+
+// Create a GeoCoordinates
+const item: GeoCoordinates = {
+  $type: 'GeoCoordinates',
+  name: 'Example GeoCoordinates'
+}
+
+// Use semantic patterns
+await $.GeoCoordinates.create(item)
+const result = await $.GeoCoordinates.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GeoCoordinates](https://schema.org/GeoCoordinates)
+- [GeoCoordinates Properties](https://schema.org/GeoCoordinates#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

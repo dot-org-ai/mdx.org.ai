@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RealEstateListing
+$context: https://schema.org
+$type: Class
+name: RealEstateListing
+description: A [[RealEstateListing]] is a listing that describes one or more real-estate [[Offer]]s (whose [[businessFunction]] is typically to lease out, or to sell). The [[RealEstateListing]] type itself represents the overall listing, as manifested in some [[WebPage]].
+subClassOf: ["WebPage"]
+---
+
+# RealEstateListing
+
+A [[RealEstateListing]] is a listing that describes one or more real-estate [[Offer]]s (whose [[businessFunction]] is typically to lease out, or to sell). The [[RealEstateListing]] type itself represents the overall listing, as manifested in some [[WebPage]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **RealEstateListing**
+
+
+
+## Properties
+
+See [Schema.org RealEstateListing properties](https://schema.org/RealEstateListing#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RealEstateListing } from 'schema.org.ai'
+
+// Create a RealEstateListing
+const item: RealEstateListing = {
+  $type: 'RealEstateListing',
+  name: 'Example RealEstateListing'
+}
+
+// Use semantic patterns
+await $.RealEstateListing.create(item)
+const result = await $.RealEstateListing.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RealEstateListing](https://schema.org/RealEstateListing)
+- [RealEstateListing Properties](https://schema.org/RealEstateListing#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

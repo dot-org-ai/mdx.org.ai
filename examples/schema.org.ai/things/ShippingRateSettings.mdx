@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ShippingRateSettings
+$context: https://schema.org
+$type: Class
+name: ShippingRateSettings
+description: A ShippingRateSettings represents re-usable pieces of shipping information. It is designed for publication on an URL that may be referenced via the [[shippingSettingsLink]] property of an [[OfferShippingDetails]]. Several occurrences can be published, distinguished and matched (i.e. identified/referenced) by their different values for [[shippingLabel]].
+subClassOf: ["StructuredValue"]
+---
+
+# ShippingRateSettings
+
+A ShippingRateSettings represents re-usable pieces of shipping information. It is designed for publication on an URL that may be referenced via the [[shippingSettingsLink]] property of an [[OfferShippingDetails]]. Several occurrences can be published, distinguished and matched (i.e. identified/referenced) by their different values for [[shippingLabel]].
+
+## Type Hierarchy
+
+**ShippingRateSettings**
+
+
+
+## Properties
+
+See [Schema.org ShippingRateSettings properties](https://schema.org/ShippingRateSettings#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ShippingRateSettings } from 'schema.org.ai'
+
+// Create a ShippingRateSettings
+const item: ShippingRateSettings = {
+  $type: 'ShippingRateSettings',
+  name: 'Example ShippingRateSettings'
+}
+
+// Use semantic patterns
+await $.ShippingRateSettings.create(item)
+const result = await $.ShippingRateSettings.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ShippingRateSettings](https://schema.org/ShippingRateSettings)
+- [ShippingRateSettings Properties](https://schema.org/ShippingRateSettings#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

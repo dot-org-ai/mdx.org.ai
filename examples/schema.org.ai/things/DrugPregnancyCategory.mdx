@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DrugPregnancyCategory
+$context: https://schema.org
+$type: Class
+name: DrugPregnancyCategory
+description: Categories that represent an assessment of the risk of fetal injury due to a drug or pharmaceutical used as directed by the mother during pregnancy.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# DrugPregnancyCategory
+
+Categories that represent an assessment of the risk of fetal injury due to a drug or pharmaceutical used as directed by the mother during pregnancy.
+
+## Type Hierarchy
+
+**DrugPregnancyCategory**
+
+
+
+## Properties
+
+See [Schema.org DrugPregnancyCategory properties](https://schema.org/DrugPregnancyCategory#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DrugPregnancyCategory } from 'schema.org.ai'
+
+// Create a DrugPregnancyCategory
+const item: DrugPregnancyCategory = {
+  $type: 'DrugPregnancyCategory',
+  name: 'Example DrugPregnancyCategory'
+}
+
+// Use semantic patterns
+await $.DrugPregnancyCategory.create(item)
+const result = await $.DrugPregnancyCategory.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DrugPregnancyCategory](https://schema.org/DrugPregnancyCategory)
+- [DrugPregnancyCategory Properties](https://schema.org/DrugPregnancyCategory#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

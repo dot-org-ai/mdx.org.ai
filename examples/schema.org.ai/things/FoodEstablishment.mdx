@@ -1,0 +1,58 @@
+---
+$id: https://schema.org.ai/FoodEstablishment
+$context: https://schema.org
+$type: Class
+name: FoodEstablishment
+description: A food-related business.
+subClassOf: ["LocalBusiness"]
+---
+
+# FoodEstablishment
+
+A food-related business.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **FoodEstablishment**
+
+## Direct Subclasses
+
+- **[Bakery](Bakery.mdx)**: A bakery
+- **[BarOrPub](BarOrPub.mdx)**: A bar or pub
+- **[Brewery](Brewery.mdx)**: Brewery
+- **[CafeOrCoffeeShop](CafeOrCoffeeShop.mdx)**: A cafe or coffee shop
+- **[Distillery](Distillery.mdx)**: A distillery
+- **[FastFoodRestaurant](FastFoodRestaurant.mdx)**: A fast-food restaurant
+- **[IceCreamShop](IceCreamShop.mdx)**: An ice cream shop
+- **[Restaurant](Restaurant.mdx)**: A restaurant
+- **[Winery](Winery.mdx)**: A winery
+
+## Properties
+
+See [Schema.org FoodEstablishment properties](https://schema.org/FoodEstablishment#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FoodEstablishment } from 'schema.org.ai'
+
+// Create a FoodEstablishment
+const item: FoodEstablishment = {
+  $type: 'FoodEstablishment',
+  name: 'Example FoodEstablishment'
+}
+
+// Use semantic patterns
+await $.FoodEstablishment.create(item)
+const result = await $.FoodEstablishment.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FoodEstablishment](https://schema.org/FoodEstablishment)
+- [FoodEstablishment Properties](https://schema.org/FoodEstablishment#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

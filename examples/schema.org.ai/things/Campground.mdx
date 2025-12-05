@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/Campground
+$context: https://schema.org
+$type: Class
+name: Campground
+description: A camping site, campsite, or [[Campground]] is a place used for overnight stay in the outdoors, typically containing individual [[CampingPitch]] locations. \
+subClassOf: ["LodgingBusiness","CivicStructure"]
+---
+
+# Campground
+
+A camping site, campsite, or [[Campground]] is a place used for overnight stay in the outdoors, typically containing individual [[CampingPitch]] locations. \
+\
+ In British English a campsite is an area, usually divided into a number of pitches, where people can camp overnight using tents or camper vans or caravans; this British English use of the word is synonymous with the American English expression campground. In American English the term campsite generally means an area where an individual, family, group, or military unit can pitch a tent or park a camper; a campground may contain many campsites (source: Wikipedia, see [https://en.wikipedia.org/wiki/Campsite](https://en.wikipedia.org/wiki/Campsite)).\
+\
+ See also the dedicated [document on the use of schema.org for marking up hotels and other forms of accommodations](/docs/hotels.html).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [LodgingBusiness](LodgingBusiness.mdx) > **Campground**
+
+
+
+## Properties
+
+See [Schema.org Campground properties](https://schema.org/Campground#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Campground } from 'schema.org.ai'
+
+// Create a Campground
+const item: Campground = {
+  $type: 'Campground',
+  name: 'Example Campground'
+}
+
+// Use semantic patterns
+await $.Campground.create(item)
+const result = await $.Campground.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Campground](https://schema.org/Campground)
+- [Campground Properties](https://schema.org/Campground#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

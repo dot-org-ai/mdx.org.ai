@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Atlas
+$context: https://schema.org
+$type: Class
+name: Atlas
+description: A collection or bound volume of maps, charts, plates or tables, physical or in media form illustrating any subject.
+subClassOf: ["CreativeWork"]
+---
+
+# Atlas
+
+A collection or bound volume of maps, charts, plates or tables, physical or in media form illustrating any subject.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Atlas**
+
+
+
+## Properties
+
+See [Schema.org Atlas properties](https://schema.org/Atlas#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Atlas } from 'schema.org.ai'
+
+// Create a Atlas
+const item: Atlas = {
+  $type: 'Atlas',
+  name: 'Example Atlas'
+}
+
+// Use semantic patterns
+await $.Atlas.create(item)
+const result = await $.Atlas.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Atlas](https://schema.org/Atlas)
+- [Atlas Properties](https://schema.org/Atlas#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

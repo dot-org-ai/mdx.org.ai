@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/ScheduleAction
+$context: https://schema.org
+$type: Class
+name: ScheduleAction
+description: Scheduling future actions, events, or tasks.\
+subClassOf: ["PlanAction"]
+---
+
+# ScheduleAction
+
+Scheduling future actions, events, or tasks.\
+\
+Related actions:\
+\
+* [[ReserveAction]]: Unlike ReserveAction, ScheduleAction allocates future actions (e.g. an event, a task, etc) towards a time slot / spatial allocation.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [OrganizeAction](OrganizeAction.mdx) > [PlanAction](PlanAction.mdx) > **ScheduleAction**
+
+
+
+## Properties
+
+See [Schema.org ScheduleAction properties](https://schema.org/ScheduleAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ScheduleAction } from 'schema.org.ai'
+
+// Create a ScheduleAction
+const item: ScheduleAction = {
+  $type: 'ScheduleAction',
+  name: 'Example ScheduleAction'
+}
+
+// Use semantic patterns
+await $.ScheduleAction.create(item)
+const result = await $.ScheduleAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ScheduleAction](https://schema.org/ScheduleAction)
+- [ScheduleAction Properties](https://schema.org/ScheduleAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

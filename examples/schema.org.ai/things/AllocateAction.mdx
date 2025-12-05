@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/AllocateAction
+$context: https://schema.org
+$type: Class
+name: AllocateAction
+description: The act of organizing tasks/objects/events by associating resources to it.
+subClassOf: ["OrganizeAction"]
+---
+
+# AllocateAction
+
+The act of organizing tasks/objects/events by associating resources to it.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [OrganizeAction](OrganizeAction.mdx) > **AllocateAction**
+
+## Direct Subclasses
+
+- **[AcceptAction](AcceptAction.mdx)**: The act of committing to/adopting an object
+- **[AssignAction](AssignAction.mdx)**: The act of allocating an action/event/task to some destination (someone or something)
+- **[AuthorizeAction](AuthorizeAction.mdx)**: The act of granting permission to an object
+- **[RejectAction](RejectAction.mdx)**: The act of rejecting to/adopting an object
+
+## Properties
+
+See [Schema.org AllocateAction properties](https://schema.org/AllocateAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AllocateAction } from 'schema.org.ai'
+
+// Create a AllocateAction
+const item: AllocateAction = {
+  $type: 'AllocateAction',
+  name: 'Example AllocateAction'
+}
+
+// Use semantic patterns
+await $.AllocateAction.create(item)
+const result = await $.AllocateAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AllocateAction](https://schema.org/AllocateAction)
+- [AllocateAction Properties](https://schema.org/AllocateAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

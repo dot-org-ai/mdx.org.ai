@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FurnitureStore
+$context: https://schema.org
+$type: Class
+name: FurnitureStore
+description: A furniture store.
+subClassOf: ["Store"]
+---
+
+# FurnitureStore
+
+A furniture store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **FurnitureStore**
+
+
+
+## Properties
+
+See [Schema.org FurnitureStore properties](https://schema.org/FurnitureStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FurnitureStore } from 'schema.org.ai'
+
+// Create a FurnitureStore
+const item: FurnitureStore = {
+  $type: 'FurnitureStore',
+  name: 'Example FurnitureStore'
+}
+
+// Use semantic patterns
+await $.FurnitureStore.create(item)
+const result = await $.FurnitureStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FurnitureStore](https://schema.org/FurnitureStore)
+- [FurnitureStore Properties](https://schema.org/FurnitureStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

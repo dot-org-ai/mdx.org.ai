@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TelevisionStation
+$context: https://schema.org
+$type: Class
+name: TelevisionStation
+description: A television station.
+subClassOf: ["LocalBusiness"]
+---
+
+# TelevisionStation
+
+A television station.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **TelevisionStation**
+
+
+
+## Properties
+
+See [Schema.org TelevisionStation properties](https://schema.org/TelevisionStation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TelevisionStation } from 'schema.org.ai'
+
+// Create a TelevisionStation
+const item: TelevisionStation = {
+  $type: 'TelevisionStation',
+  name: 'Example TelevisionStation'
+}
+
+// Use semantic patterns
+await $.TelevisionStation.create(item)
+const result = await $.TelevisionStation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TelevisionStation](https://schema.org/TelevisionStation)
+- [TelevisionStation Properties](https://schema.org/TelevisionStation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/OnlineStore
+$context: https://schema.org
+$type: Class
+name: OnlineStore
+description: An eCommerce site.
+subClassOf: ["OnlineBusiness"]
+---
+
+# OnlineStore
+
+An eCommerce site.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > [OnlineBusiness](OnlineBusiness.mdx) > **OnlineStore**
+
+## Direct Subclasses
+
+- **[OnlineMarketplace](OnlineMarketplace.mdx)**: An eCommerce marketplace
+
+## Properties
+
+See [Schema.org OnlineStore properties](https://schema.org/OnlineStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OnlineStore } from 'schema.org.ai'
+
+// Create a OnlineStore
+const item: OnlineStore = {
+  $type: 'OnlineStore',
+  name: 'Example OnlineStore'
+}
+
+// Use semantic patterns
+await $.OnlineStore.create(item)
+const result = await $.OnlineStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OnlineStore](https://schema.org/OnlineStore)
+- [OnlineStore Properties](https://schema.org/OnlineStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

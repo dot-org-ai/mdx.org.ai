@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Waterfall
+$context: https://schema.org
+$type: Class
+name: Waterfall
+description: A waterfall, like Niagara.
+subClassOf: ["BodyOfWater"]
+---
+
+# Waterfall
+
+A waterfall, like Niagara.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > [BodyOfWater](BodyOfWater.mdx) > **Waterfall**
+
+
+
+## Properties
+
+See [Schema.org Waterfall properties](https://schema.org/Waterfall#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Waterfall } from 'schema.org.ai'
+
+// Create a Waterfall
+const item: Waterfall = {
+  $type: 'Waterfall',
+  name: 'Example Waterfall'
+}
+
+// Use semantic patterns
+await $.Waterfall.create(item)
+const result = await $.Waterfall.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Waterfall](https://schema.org/Waterfall)
+- [Waterfall Properties](https://schema.org/Waterfall#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

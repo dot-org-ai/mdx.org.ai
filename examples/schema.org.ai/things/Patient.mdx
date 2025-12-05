@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Patient
+$context: https://schema.org
+$type: Class
+name: Patient
+description: A patient is any person recipient of health care services.
+subClassOf: ["MedicalAudience","Person"]
+---
+
+# Patient
+
+A patient is any person recipient of health care services.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Person](Person.mdx) > **Patient**
+
+
+
+## Properties
+
+See [Schema.org Patient properties](https://schema.org/Patient#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Patient } from 'schema.org.ai'
+
+// Create a Patient
+const item: Patient = {
+  $type: 'Patient',
+  name: 'Example Patient'
+}
+
+// Use semantic patterns
+await $.Patient.create(item)
+const result = await $.Patient.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Patient](https://schema.org/Patient)
+- [Patient Properties](https://schema.org/Patient#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

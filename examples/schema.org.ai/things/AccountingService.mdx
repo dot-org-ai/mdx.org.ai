@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/AccountingService
+$context: https://schema.org
+$type: Class
+name: AccountingService
+description: Accountancy business.\
+subClassOf: ["FinancialService"]
+---
+
+# AccountingService
+
+Accountancy business.\
+\
+As a [[LocalBusiness]] it can be described as a [[provider]] of one or more [[Service]]\\(s).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FinancialService](FinancialService.mdx) > **AccountingService**
+
+
+
+## Properties
+
+See [Schema.org AccountingService properties](https://schema.org/AccountingService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AccountingService } from 'schema.org.ai'
+
+// Create a AccountingService
+const item: AccountingService = {
+  $type: 'AccountingService',
+  name: 'Example AccountingService'
+}
+
+// Use semantic patterns
+await $.AccountingService.create(item)
+const result = await $.AccountingService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AccountingService](https://schema.org/AccountingService)
+- [AccountingService Properties](https://schema.org/AccountingService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

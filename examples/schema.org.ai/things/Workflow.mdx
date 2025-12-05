@@ -1,0 +1,434 @@
+---
+$id: https://schema.org.ai/Workflow
+$context: https://schema.org.ai
+$type: Class
+name: Workflow
+description: An autonomous workflow definition that orchestrates multiple steps, tools, and agents to accomplish complex tasks.
+subClassOf:
+  - https://schema.org/Thing
+digital: 1.0
+---
+
+[Thing](Thing.mdx)
+
+# Workflow
+
+An autonomous workflow definition that orchestrates multiple steps, tools, and agents to accomplish complex tasks. Workflows enable Business-as-Code by defining reusable, automated sequences of operations that can be triggered by events, schedules, or API calls.
+
+## Properties
+
+| Property | Type | Description | Inherited From |
+|----------|------|-------------|----------------|
+| `$type` | Text | Always "Workflow" | - |
+| `$id` | URL | Unique identifier for the workflow | Thing |
+| `name` | Text | The name of the workflow | Thing |
+| `description` | Text | Description of what the workflow does | Thing |
+| `identifier` | Text or PropertyValue | Workflow identifier | Thing |
+| `url` | URL | URL to workflow definition | Thing |
+| `digital` | Number (0.0-1.0) | Always 1.0 for autonomous workflows | Thing |
+| `steps` | Action[] | Ordered sequence of workflow steps | Workflow |
+| `trigger` | Action or Event | What triggers the workflow | Workflow |
+| `input` | PropertyValue[] | Input parameters | Workflow |
+| `output` | PropertyValue[] | Output values | Workflow |
+| `agent` | Agent | Agent that executes the workflow | Workflow |
+| `tool` | Tool[] | Tools used in the workflow | Workflow |
+| `condition` | Text | Conditional logic for branching | Workflow |
+| `timeout` | Duration | Maximum execution time | Workflow |
+| `retryPolicy` | Text | Retry behavior on failure | Workflow |
+| `status` | Text | Current status (active, paused, completed) | Workflow |
+| `creator` | Person or Organization | The entity that created the workflow | Thing |
+
+## Types
+
+The following types extend Workflow:
+
+- **EventWorkflow**: Triggered by events (webhooks, messages, etc.)
+- **ScheduledWorkflow**: Runs on a schedule (cron)
+- **ManualWorkflow**: Triggered manually by users
+- **ChainWorkflow**: Sequential steps with dependencies
+- **ParallelWorkflow**: Concurrent execution of multiple branches
+
+## Examples
+
+### Example 1: Pull Request Review Workflow
+
+```typescript
+import { $ } from 'sdk.do'
+
+const prReviewWorkflow = {
+  $type: 'Workflow',
+  $id: 'https://platform.do/workflows/pr-review',
+  name: 'Pull Request Review Workflow',
+  description: 'Automated workflow for reviewing pull requests with code analysis, testing, and feedback',
+  digital: 1.0,
+  trigger: {
+    $type: 'Event',
+    name: 'pull_request.opened',
+    source: 'GitHub'
+  },
+  input: [
+    {
+      $type: 'PropertyValue',
+      name: 'pullRequestUrl',
+      description: 'GitHub PR URL',
+      valueRequired: true,
+      valueType: 'URL'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'repository',
+      description: 'Repository name',
+      valueRequired: true,
+      valueType: 'Text'
+    }
+  ],
+  steps: [
+    {
+      $type: 'Action',
+      name: 'Fetch PR Details',
+      description: 'Get PR diff and metadata from GitHub',
+      tool: {
+        $type: 'Tool',
+        name: 'GitHub API',
+        url: 'https://api.github.com'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Static Analysis',
+      description: 'Run linting and type checking',
+      tool: {
+        $type: 'Tool',
+        name: 'ESLint + TypeScript',
+        url: 'https://platform.do/tools/linter'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Security Scan',
+      description: 'Check for security vulnerabilities',
+      tool: {
+        $type: 'Tool',
+        name: 'Security Scanner',
+        url: 'https://platform.do/tools/security'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'AI Code Review',
+      description: 'Generate code review with suggestions',
+      agent: {
+        $type: 'Agent',
+        $id: 'https://Cody.do',
+        name: 'Cody'
+      },
+      prompt: {
+        $type: 'Prompt',
+        $id: 'https://platform.do/prompts/code-reviewer'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Post Review Comment',
+      description: 'Post review feedback to PR',
+      tool: {
+        $type: 'Tool',
+        name: 'GitHub API',
+        url: 'https://api.github.com'
+      }
+    }
+  ],
+  output: [
+    {
+      $type: 'PropertyValue',
+      name: 'reviewCommentUrl',
+      description: 'URL of posted review comment',
+      valueType: 'URL'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'issuesFound',
+      description: 'Number of issues identified',
+      valueType: 'Number'
+    }
+  ],
+  timeout: 'PT5M',
+  retryPolicy: 'exponential-backoff',
+  status: 'active',
+  creator: {
+    $type: 'Organization',
+    name: '.do Platform Team',
+    url: 'https://platform.do'
+  }
+}
+
+await $.Workflow.create(prReviewWorkflow)
+```
+
+### Example 2: Content Publishing Workflow
+
+```typescript
+import { $ } from 'sdk.do'
+
+const contentWorkflow = {
+  $type: 'Workflow',
+  $id: 'https://platform.do/workflows/content-publisher',
+  name: 'Content Publishing Workflow',
+  description: 'Generates, reviews, and publishes blog content automatically',
+  digital: 1.0,
+  trigger: {
+    $type: 'ScheduleAction',
+    name: 'Weekly Content Generation',
+    schedule: 'cron(0 9 * * MON)'
+  },
+  input: [
+    {
+      $type: 'PropertyValue',
+      name: 'topic',
+      description: 'Content topic from content calendar',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'targetAudience',
+      description: 'Target audience segment',
+      valueRequired: true,
+      valueType: 'Text'
+    }
+  ],
+  steps: [
+    {
+      $type: 'Action',
+      name: 'Generate Blog Post',
+      description: 'Create blog post content',
+      agent: {
+        $type: 'Agent',
+        $id: 'https://CMO.do',
+        name: 'Chief Marketing Officer'
+      },
+      prompt: {
+        $type: 'Prompt',
+        $id: 'https://platform.do/prompts/blog-writer'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'SEO Optimization',
+      description: 'Optimize for search engines',
+      tool: {
+        $type: 'Tool',
+        name: 'SEO Analyzer',
+        url: 'https://platform.do/tools/seo'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Generate Images',
+      description: 'Create featured and inline images',
+      model: {
+        $type: 'Model',
+        name: 'dall-e-3',
+        provider: {
+          $type: 'Organization',
+          name: 'OpenAI'
+        }
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Quality Review',
+      description: 'Review for quality and brand alignment',
+      agent: {
+        $type: 'Agent',
+        $id: 'https://CMO.do'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Publish to CMS',
+      description: 'Publish to content management system',
+      tool: {
+        $type: 'Tool',
+        name: 'Payload CMS API',
+        url: 'https://api.platform.do'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Social Media Promotion',
+      description: 'Create and schedule social posts',
+      agent: {
+        $type: 'Agent',
+        $id: 'https://CMO.do'
+      }
+    }
+  ],
+  output: [
+    {
+      $type: 'PropertyValue',
+      name: 'publishedUrl',
+      description: 'URL of published blog post',
+      valueType: 'URL'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'socialPostIds',
+      description: 'IDs of scheduled social posts',
+      valueType: 'Text[]'
+    }
+  ],
+  timeout: 'PT15M',
+  retryPolicy: 'retry-on-timeout',
+  status: 'active'
+}
+
+await $.Workflow.create(contentWorkflow)
+```
+
+### Example 3: Customer Onboarding Workflow
+
+```typescript
+import { $ } from 'sdk.do'
+
+const onboardingWorkflow = {
+  $type: 'Workflow',
+  $id: 'https://platform.do/workflows/customer-onboarding',
+  name: 'Customer Onboarding Workflow',
+  description: 'Automated customer onboarding with account setup, configuration, and training',
+  digital: 1.0,
+  trigger: {
+    $type: 'Event',
+    name: 'customer.signed_up',
+    source: 'Platform API'
+  },
+  input: [
+    {
+      $type: 'PropertyValue',
+      name: 'customerId',
+      description: 'New customer ID',
+      valueRequired: true,
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'plan',
+      description: 'Subscription plan',
+      valueRequired: true,
+      valueType: 'Text'
+    }
+  ],
+  steps: [
+    {
+      $type: 'Action',
+      name: 'Create Workspace',
+      description: 'Provision customer workspace and resources',
+      tool: {
+        $type: 'Tool',
+        name: 'Platform API',
+        url: 'https://api.platform.do/workspaces'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Send Welcome Email',
+      description: 'Send personalized welcome email',
+      tool: {
+        $type: 'Tool',
+        name: 'Email Service',
+        url: 'https://api.platform.do/email'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Schedule Onboarding Call',
+      description: 'Book onboarding call with customer success',
+      tool: {
+        $type: 'Tool',
+        name: 'Calendar API',
+        url: 'https://api.platform.do/calendar'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Create Starter Projects',
+      description: 'Set up example projects based on use case',
+      agent: {
+        $type: 'Agent',
+        $id: 'https://Priya.do',
+        name: 'Priya'
+      }
+    },
+    {
+      $type: 'Action',
+      name: 'Track Activation Metrics',
+      description: 'Monitor onboarding progress and engagement',
+      tool: {
+        $type: 'Tool',
+        name: 'Analytics API',
+        url: 'https://api.platform.do/analytics'
+      }
+    }
+  ],
+  output: [
+    {
+      $type: 'PropertyValue',
+      name: 'workspaceId',
+      description: 'Created workspace ID',
+      valueType: 'Text'
+    },
+    {
+      $type: 'PropertyValue',
+      name: 'onboardingCallUrl',
+      description: 'Scheduled call URL',
+      valueType: 'URL'
+    }
+  ],
+  timeout: 'PT10M',
+  status: 'active'
+}
+
+await $.Workflow.create(onboardingWorkflow)
+```
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Workflow, Agent } from 'schema.org.ai'
+
+// Create a workflow
+const workflow: Workflow = {
+  $type: 'Workflow',
+  $id: 'https://myapp.do/workflows/my-workflow',
+  name: 'My Workflow',
+  description: 'Automated workflow',
+  digital: 1.0,
+  steps: [
+    { $type: 'Action', name: 'Step 1' },
+    { $type: 'Action', name: 'Step 2' }
+  ]
+}
+
+await $.Workflow.create(workflow)
+
+// Execute a workflow
+const execution = await $.Workflow.execute(workflow.$id, {
+  input: { param: 'value' }
+})
+
+// Query workflows by agent
+const codyWorkflows = await $.Workflow.find({
+  agent: { $id: 'https://Cody.do' }
+})
+```
+
+## Resources
+
+- [Schema.org Thing](https://schema.org/Thing)
+- [Workflow Automation](https://docs.platform.do/workflows)
+- [Event-Driven Architecture](https://docs.platform.do/events)
+
+## License
+
+This is an extension to Schema.org vocabulary created by the .do Platform Team. The base Schema.org vocabulary is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

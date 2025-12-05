@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/ReserveAction
+$context: https://schema.org
+$type: Class
+name: ReserveAction
+description: Reserving a concrete object.\
+subClassOf: ["PlanAction"]
+---
+
+# ReserveAction
+
+Reserving a concrete object.\
+\
+Related actions:\
+\
+* [[ScheduleAction]]: Unlike ScheduleAction, ReserveAction reserves concrete objects (e.g. a table, a hotel) towards a time slot / spatial allocation.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [OrganizeAction](OrganizeAction.mdx) > [PlanAction](PlanAction.mdx) > **ReserveAction**
+
+
+
+## Properties
+
+See [Schema.org ReserveAction properties](https://schema.org/ReserveAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReserveAction } from 'schema.org.ai'
+
+// Create a ReserveAction
+const item: ReserveAction = {
+  $type: 'ReserveAction',
+  name: 'Example ReserveAction'
+}
+
+// Use semantic patterns
+await $.ReserveAction.create(item)
+const result = await $.ReserveAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReserveAction](https://schema.org/ReserveAction)
+- [ReserveAction Properties](https://schema.org/ReserveAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

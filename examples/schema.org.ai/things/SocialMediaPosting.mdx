@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/SocialMediaPosting
+$context: https://schema.org
+$type: Class
+name: SocialMediaPosting
+description: A post to a social media platform, including blog posts, tweets, Facebook posts, etc.
+subClassOf: ["Article"]
+---
+
+# SocialMediaPosting
+
+A post to a social media platform, including blog posts, tweets, Facebook posts, etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > **SocialMediaPosting**
+
+## Direct Subclasses
+
+- **[BlogPosting](BlogPosting.mdx)**: A blog post
+- **[DiscussionForumPosting](DiscussionForumPosting.mdx)**: A posting to a discussion forum
+
+## Properties
+
+See [Schema.org SocialMediaPosting properties](https://schema.org/SocialMediaPosting#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SocialMediaPosting } from 'schema.org.ai'
+
+// Create a SocialMediaPosting
+const item: SocialMediaPosting = {
+  $type: 'SocialMediaPosting',
+  name: 'Example SocialMediaPosting'
+}
+
+// Use semantic patterns
+await $.SocialMediaPosting.create(item)
+const result = await $.SocialMediaPosting.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SocialMediaPosting](https://schema.org/SocialMediaPosting)
+- [SocialMediaPosting Properties](https://schema.org/SocialMediaPosting#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

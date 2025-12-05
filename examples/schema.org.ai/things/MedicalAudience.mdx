@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/MedicalAudience
+$context: https://schema.org
+$type: Class
+name: MedicalAudience
+description: Target audiences for medical web pages.
+subClassOf: ["Audience","PeopleAudience"]
+---
+
+# MedicalAudience
+
+Target audiences for medical web pages.
+
+## Type Hierarchy
+
+**MedicalAudience**
+
+## Direct Subclasses
+
+- **[Patient](Patient.mdx)**: A patient is any person recipient of health care services
+
+## Properties
+
+See [Schema.org MedicalAudience properties](https://schema.org/MedicalAudience#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalAudience } from 'schema.org.ai'
+
+// Create a MedicalAudience
+const item: MedicalAudience = {
+  $type: 'MedicalAudience',
+  name: 'Example MedicalAudience'
+}
+
+// Use semantic patterns
+await $.MedicalAudience.create(item)
+const result = await $.MedicalAudience.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalAudience](https://schema.org/MedicalAudience)
+- [MedicalAudience Properties](https://schema.org/MedicalAudience#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

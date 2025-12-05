@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SurgicalProcedure
+$context: https://schema.org
+$type: Class
+name: SurgicalProcedure
+description: A medical procedure involving an incision with instruments; performed for diagnose, or therapeutic purposes.
+subClassOf: ["MedicalProcedure"]
+---
+
+# SurgicalProcedure
+
+A medical procedure involving an incision with instruments; performed for diagnose, or therapeutic purposes.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalProcedure](MedicalProcedure.mdx) > **SurgicalProcedure**
+
+
+
+## Properties
+
+See [Schema.org SurgicalProcedure properties](https://schema.org/SurgicalProcedure#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SurgicalProcedure } from 'schema.org.ai'
+
+// Create a SurgicalProcedure
+const item: SurgicalProcedure = {
+  $type: 'SurgicalProcedure',
+  name: 'Example SurgicalProcedure'
+}
+
+// Use semantic patterns
+await $.SurgicalProcedure.create(item)
+const result = await $.SurgicalProcedure.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SurgicalProcedure](https://schema.org/SurgicalProcedure)
+- [SurgicalProcedure Properties](https://schema.org/SurgicalProcedure#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

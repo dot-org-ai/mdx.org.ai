@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/IncentiveQualifiedExpenseType
+$context: https://schema.org
+$type: Class
+name: IncentiveQualifiedExpenseType
+description: The types of expenses that are covered by the incentive. For example some incentives are only for the goods (tangible items) but the services (labor) are excluded.
+subClassOf: ["Enumeration"]
+---
+
+# IncentiveQualifiedExpenseType
+
+The types of expenses that are covered by the incentive. For example some incentives are only for the goods (tangible items) but the services (labor) are excluded.
+
+## Type Hierarchy
+
+**IncentiveQualifiedExpenseType**
+
+
+
+## Properties
+
+See [Schema.org IncentiveQualifiedExpenseType properties](https://schema.org/IncentiveQualifiedExpenseType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { IncentiveQualifiedExpenseType } from 'schema.org.ai'
+
+// Create a IncentiveQualifiedExpenseType
+const item: IncentiveQualifiedExpenseType = {
+  $type: 'IncentiveQualifiedExpenseType',
+  name: 'Example IncentiveQualifiedExpenseType'
+}
+
+// Use semantic patterns
+await $.IncentiveQualifiedExpenseType.create(item)
+const result = await $.IncentiveQualifiedExpenseType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org IncentiveQualifiedExpenseType](https://schema.org/IncentiveQualifiedExpenseType)
+- [IncentiveQualifiedExpenseType Properties](https://schema.org/IncentiveQualifiedExpenseType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

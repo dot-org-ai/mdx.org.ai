@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DataFeedItem
+$context: https://schema.org
+$type: Class
+name: DataFeedItem
+description: A single item within a larger data feed.
+subClassOf: ["Intangible"]
+---
+
+# DataFeedItem
+
+A single item within a larger data feed.
+
+## Type Hierarchy
+
+**DataFeedItem**
+
+
+
+## Properties
+
+See [Schema.org DataFeedItem properties](https://schema.org/DataFeedItem#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DataFeedItem } from 'schema.org.ai'
+
+// Create a DataFeedItem
+const item: DataFeedItem = {
+  $type: 'DataFeedItem',
+  name: 'Example DataFeedItem'
+}
+
+// Use semantic patterns
+await $.DataFeedItem.create(item)
+const result = await $.DataFeedItem.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DataFeedItem](https://schema.org/DataFeedItem)
+- [DataFeedItem Properties](https://schema.org/DataFeedItem#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

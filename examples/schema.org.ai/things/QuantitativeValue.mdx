@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/QuantitativeValue
+$context: https://schema.org
+$type: Class
+name: QuantitativeValue
+description: A point value or interval for product characteristics and other purposes.
+subClassOf: ["StructuredValue"]
+---
+
+# QuantitativeValue
+
+A point value or interval for product characteristics and other purposes.
+
+## Type Hierarchy
+
+**QuantitativeValue**
+
+## Direct Subclasses
+
+- **[Observation](Observation.mdx)**: Instances of the class [[Observation]] are used to specify observations about an entity at a particular time
+
+## Properties
+
+See [Schema.org QuantitativeValue properties](https://schema.org/QuantitativeValue#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { QuantitativeValue } from 'schema.org.ai'
+
+// Create a QuantitativeValue
+const item: QuantitativeValue = {
+  $type: 'QuantitativeValue',
+  name: 'Example QuantitativeValue'
+}
+
+// Use semantic patterns
+await $.QuantitativeValue.create(item)
+const result = await $.QuantitativeValue.get('item-id')
+```
+
+## Resources
+
+- [Schema.org QuantitativeValue](https://schema.org/QuantitativeValue)
+- [QuantitativeValue Properties](https://schema.org/QuantitativeValue#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

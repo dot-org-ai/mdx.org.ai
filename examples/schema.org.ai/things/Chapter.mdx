@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Chapter
+$context: https://schema.org
+$type: Class
+name: Chapter
+description: One of the sections into which a book is divided. A chapter usually has a section number or a name.
+subClassOf: ["CreativeWork"]
+---
+
+# Chapter
+
+One of the sections into which a book is divided. A chapter usually has a section number or a name.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Chapter**
+
+
+
+## Properties
+
+See [Schema.org Chapter properties](https://schema.org/Chapter#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Chapter } from 'schema.org.ai'
+
+// Create a Chapter
+const item: Chapter = {
+  $type: 'Chapter',
+  name: 'Example Chapter'
+}
+
+// Use semantic patterns
+await $.Chapter.create(item)
+const result = await $.Chapter.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Chapter](https://schema.org/Chapter)
+- [Chapter Properties](https://schema.org/Chapter#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

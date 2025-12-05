@@ -1,0 +1,127 @@
+---
+$type: LandingPage
+$id: https://schema.org.ai
+name: schema.org.ai
+title: Schema.org Extended for AI
+description: Standard vocabulary for AI systems. Agent, Model, Tool, Workflow—the types Schema.org needs for the AI era.
+layout: scalar
+---
+
+import { ScalarLayout } from '@mdxui/shadcnblocks/templates'
+
+export const siteData = {
+  name: 'schema.org.ai',
+  title: 'Schema.org Extended for AI',
+  description: 'Standard vocabulary for AI systems. Agent, Model, Tool, Workflow—the types Schema.org needs for the AI era.',
+  layout: 'scalar',
+
+  gradient: 'blue' as const,
+  style: 'technical' as const,
+
+  header: {
+    brand: { name: 'schema.org.ai', href: '/' },
+    navigation: [
+      { label: 'Types', href: '/types' },
+      { label: 'Spec', href: '/spec' },
+      { label: 'Examples', href: '/examples' },
+      { label: 'Working Group', href: '/wg' },
+    ],
+    actions: [
+      { label: 'Browse Schema', href: '/types', variant: 'primary' as const },
+    ],
+  },
+
+  hero: {
+    badge: 'Community Standard',
+    title: 'Schema.org for the AI Era',
+    description: 'Schema.org standardized web vocabulary. Now AI needs the same. schema.org.ai extends Schema.org with types for Agents, Models, Tools, Workflows, and Prompts—enabling interoperability across the AI ecosystem.',
+    primaryAction: { label: 'Browse the Schema', href: '/types' },
+    secondaryAction: { label: 'Read the Spec', href: '/spec' },
+    code: `{
+  "@context": "https://schema.org.ai",
+  "@type": "Agent",
+  "name": "CodeReviewer",
+  "model": {
+    "@type": "Model",
+    "provider": "Anthropic",
+    "name": "claude-3-opus"
+  },
+  "tools": [
+    { "@type": "Tool", "name": "read_file" },
+    { "@type": "Tool", "name": "write_file" }
+  ]
+}`,
+  },
+
+  features: {
+    headline: 'AI Types for Everyone',
+    description: 'Standardized vocabulary for the entire AI ecosystem.',
+    features: [
+      {
+        title: 'Agent Type',
+        description: 'Describe AI agents—capabilities, models, tools, behaviors—in a standard format.',
+      },
+      {
+        title: 'Model Type',
+        description: 'Represent AI models with provider, capabilities, context windows, and pricing.',
+      },
+      {
+        title: 'Tool Type',
+        description: 'Define tools agents can use—parameters, permissions, schemas—interoperably.',
+      },
+      {
+        title: 'Workflow Type',
+        description: 'Express multi-step agent workflows with branching, loops, and human-in-the-loop.',
+      },
+      {
+        title: 'Prompt Type',
+        description: 'Template prompts with variables, examples, and validation schemas.',
+      },
+      {
+        title: 'JSON-LD Compatible',
+        description: 'Full JSON-LD support. Link your AI metadata to the semantic web.',
+      },
+    ],
+  },
+
+  testimonials: {
+    headline: 'Adopted by Leaders',
+    testimonials: [
+      {
+        quote: 'Finally, a standard way to describe agents. We integrated schema.org.ai across our framework in a day.',
+        author: { name: 'Sarah Chen', title: 'Framework Author', company: 'AgentLib' },
+      },
+      {
+        quote: 'Interoperability between AI tools was a mess. Schema.org.ai gave us common vocabulary.',
+        author: { name: 'James Wilson', title: 'Platform Lead', company: 'AICloud' },
+      },
+    ],
+  },
+
+  pricing: {
+    headline: 'Open Standard',
+    description: 'Free to use. Open governance. Contribute to shape the future.',
+    tiers: [
+      { name: 'Use', price: { monthly: '$0' }, features: ['All schema types', 'JSON-LD context', 'Validation tools', 'Examples'], cta: 'Start Using' },
+      { name: 'Contribute', price: { monthly: '$0' }, features: ['Propose types', 'Working group access', 'RFC process', 'Community recognition'], cta: 'Join Working Group', featured: true },
+      { name: 'Sponsor', price: { monthly: '$500' }, features: ['Governance vote', 'Priority support', 'Logo placement', 'Direct access'], cta: 'Become Sponsor' },
+    ],
+  },
+
+  cta: {
+    headline: 'Build on Standards',
+    description: 'Stop inventing schemas. Use schema.org.ai.',
+    action: { label: 'Browse Types', href: '/types' },
+  },
+
+  footer: {
+    brand: { name: 'schema.org.ai', description: 'Schema.org extended for AI.' },
+    columns: [
+      { title: 'Schema', links: [{ text: 'Types', href: '/types' }, { text: 'Spec', href: '/spec' }, { text: 'Examples', href: '/examples' }] },
+      { title: 'Community', links: [{ text: 'Working Group', href: '/wg' }, { text: 'GitHub', href: 'https://github.com/schema-org-ai/schema.org.ai' }, { text: 'Discord', href: '/discord' }] },
+    ],
+    legal: { copyright: '© 2024 schema.org.ai • CC BY-SA 4.0' },
+  },
+}
+
+<ScalarLayout {...siteData} />

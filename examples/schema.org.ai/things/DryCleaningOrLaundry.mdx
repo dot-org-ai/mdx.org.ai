@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DryCleaningOrLaundry
+$context: https://schema.org
+$type: Class
+name: DryCleaningOrLaundry
+description: A dry-cleaning business.
+subClassOf: ["LocalBusiness"]
+---
+
+# DryCleaningOrLaundry
+
+A dry-cleaning business.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **DryCleaningOrLaundry**
+
+
+
+## Properties
+
+See [Schema.org DryCleaningOrLaundry properties](https://schema.org/DryCleaningOrLaundry#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DryCleaningOrLaundry } from 'schema.org.ai'
+
+// Create a DryCleaningOrLaundry
+const item: DryCleaningOrLaundry = {
+  $type: 'DryCleaningOrLaundry',
+  name: 'Example DryCleaningOrLaundry'
+}
+
+// Use semantic patterns
+await $.DryCleaningOrLaundry.create(item)
+const result = await $.DryCleaningOrLaundry.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DryCleaningOrLaundry](https://schema.org/DryCleaningOrLaundry)
+- [DryCleaningOrLaundry Properties](https://schema.org/DryCleaningOrLaundry#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

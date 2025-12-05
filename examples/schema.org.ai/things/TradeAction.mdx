@@ -1,0 +1,57 @@
+---
+$id: https://schema.org.ai/TradeAction
+$context: https://schema.org
+$type: Class
+name: TradeAction
+description: The act of participating in an exchange of goods and services for monetary compensation. An agent trades an object, product or service with a participant in exchange for a one time or periodic payment.
+subClassOf: ["Action"]
+---
+
+# TradeAction
+
+The act of participating in an exchange of goods and services for monetary compensation. An agent trades an object, product or service with a participant in exchange for a one time or periodic payment.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **TradeAction**
+
+## Direct Subclasses
+
+- **[BuyAction](BuyAction.mdx)**: The act of giving money to a seller in exchange for goods or services rendered
+- **[OrderAction](OrderAction.mdx)**: An agent orders an object/product/service to be delivered/sent
+- **[PayAction](PayAction.mdx)**: An agent pays a price to a participant
+- **[PreOrderAction](PreOrderAction.mdx)**: An agent orders a (not yet released) object/product/service to be delivered/sent
+- **[QuoteAction](QuoteAction.mdx)**: An agent quotes/estimates/appraises an object/product/service with a price at a location/store
+- **[RentAction](RentAction.mdx)**: The act of giving money in return for temporary use, but not ownership, of an object such as a vehicle or property
+- **[SellAction](SellAction.mdx)**: The act of taking money from a buyer in exchange for goods or services rendered
+- **[TipAction](TipAction.mdx)**: The act of giving money voluntarily to a beneficiary in recognition of services rendered
+
+## Properties
+
+See [Schema.org TradeAction properties](https://schema.org/TradeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TradeAction } from 'schema.org.ai'
+
+// Create a TradeAction
+const item: TradeAction = {
+  $type: 'TradeAction',
+  name: 'Example TradeAction'
+}
+
+// Use semantic patterns
+await $.TradeAction.create(item)
+const result = await $.TradeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TradeAction](https://schema.org/TradeAction)
+- [TradeAction Properties](https://schema.org/TradeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

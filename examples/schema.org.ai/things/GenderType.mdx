@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GenderType
+$context: https://schema.org
+$type: Class
+name: GenderType
+description: An enumeration of genders.
+subClassOf: ["Enumeration"]
+---
+
+# GenderType
+
+An enumeration of genders.
+
+## Type Hierarchy
+
+**GenderType**
+
+
+
+## Properties
+
+See [Schema.org GenderType properties](https://schema.org/GenderType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GenderType } from 'schema.org.ai'
+
+// Create a GenderType
+const item: GenderType = {
+  $type: 'GenderType',
+  name: 'Example GenderType'
+}
+
+// Use semantic patterns
+await $.GenderType.create(item)
+const result = await $.GenderType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GenderType](https://schema.org/GenderType)
+- [GenderType Properties](https://schema.org/GenderType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/UseAction
+$context: https://schema.org
+$type: Class
+name: UseAction
+description: The act of applying an object to its intended purpose.
+subClassOf: ["ConsumeAction"]
+---
+
+# UseAction
+
+The act of applying an object to its intended purpose.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > **UseAction**
+
+## Direct Subclasses
+
+- **[WearAction](WearAction.mdx)**: The act of dressing oneself in clothing
+
+## Properties
+
+See [Schema.org UseAction properties](https://schema.org/UseAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UseAction } from 'schema.org.ai'
+
+// Create a UseAction
+const item: UseAction = {
+  $type: 'UseAction',
+  name: 'Example UseAction'
+}
+
+// Use semantic patterns
+await $.UseAction.create(item)
+const result = await $.UseAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UseAction](https://schema.org/UseAction)
+- [UseAction Properties](https://schema.org/UseAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

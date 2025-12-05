@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TennisComplex
+$context: https://schema.org
+$type: Class
+name: TennisComplex
+description: A tennis complex.
+subClassOf: ["SportsActivityLocation"]
+---
+
+# TennisComplex
+
+A tennis complex.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [SportsActivityLocation](SportsActivityLocation.mdx) > **TennisComplex**
+
+
+
+## Properties
+
+See [Schema.org TennisComplex properties](https://schema.org/TennisComplex#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TennisComplex } from 'schema.org.ai'
+
+// Create a TennisComplex
+const item: TennisComplex = {
+  $type: 'TennisComplex',
+  name: 'Example TennisComplex'
+}
+
+// Use semantic patterns
+await $.TennisComplex.create(item)
+const result = await $.TennisComplex.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TennisComplex](https://schema.org/TennisComplex)
+- [TennisComplex Properties](https://schema.org/TennisComplex#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

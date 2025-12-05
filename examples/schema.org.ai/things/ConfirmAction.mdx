@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/ConfirmAction
+$context: https://schema.org
+$type: Class
+name: ConfirmAction
+description: The act of notifying someone that a future event/action is going to happen as expected.\
+subClassOf: ["InformAction"]
+---
+
+# ConfirmAction
+
+The act of notifying someone that a future event/action is going to happen as expected.\
+\
+Related actions:\
+\
+* [[CancelAction]]: The antonym of ConfirmAction.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > [InformAction](InformAction.mdx) > **ConfirmAction**
+
+
+
+## Properties
+
+See [Schema.org ConfirmAction properties](https://schema.org/ConfirmAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ConfirmAction } from 'schema.org.ai'
+
+// Create a ConfirmAction
+const item: ConfirmAction = {
+  $type: 'ConfirmAction',
+  name: 'Example ConfirmAction'
+}
+
+// Use semantic patterns
+await $.ConfirmAction.create(item)
+const result = await $.ConfirmAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ConfirmAction](https://schema.org/ConfirmAction)
+- [ConfirmAction Properties](https://schema.org/ConfirmAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/MedicalStudy
+$context: https://schema.org
+$type: Class
+name: MedicalStudy
+description: A medical study is an umbrella type covering all kinds of research studies relating to human medicine or health, including observational studies and interventional trials and registries, randomized, controlled or not. When the specific type of study is known, use one of the extensions of this type, such as MedicalTrial or MedicalObservationalStudy. Also, note that this type should be used to mark up data that describes the study itself; to tag an article that publishes the results of a study, use MedicalScholarlyArticle. Note: use the code property of MedicalEntity to store study IDs, e.g. clinicaltrials.gov ID.
+subClassOf: ["MedicalEntity"]
+---
+
+# MedicalStudy
+
+A medical study is an umbrella type covering all kinds of research studies relating to human medicine or health, including observational studies and interventional trials and registries, randomized, controlled or not. When the specific type of study is known, use one of the extensions of this type, such as MedicalTrial or MedicalObservationalStudy. Also, note that this type should be used to mark up data that describes the study itself; to tag an article that publishes the results of a study, use MedicalScholarlyArticle. Note: use the code property of MedicalEntity to store study IDs, e.g. clinicaltrials.gov ID.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **MedicalStudy**
+
+## Direct Subclasses
+
+- **[MedicalObservationalStudy](MedicalObservationalStudy.mdx)**: An observational study is a type of medical study that attempts to infer the possible effect of a treatment through observation of a cohort of subjects over a period of time
+- **[MedicalTrial](MedicalTrial.mdx)**: A medical trial is a type of medical study that uses a scientific process to compare the safety and efficacy of medical therapies or medical procedures
+
+## Properties
+
+See [Schema.org MedicalStudy properties](https://schema.org/MedicalStudy#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalStudy } from 'schema.org.ai'
+
+// Create a MedicalStudy
+const item: MedicalStudy = {
+  $type: 'MedicalStudy',
+  name: 'Example MedicalStudy'
+}
+
+// Use semantic patterns
+await $.MedicalStudy.create(item)
+const result = await $.MedicalStudy.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalStudy](https://schema.org/MedicalStudy)
+- [MedicalStudy Properties](https://schema.org/MedicalStudy#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BuddhistTemple
+$context: https://schema.org
+$type: Class
+name: BuddhistTemple
+description: A Buddhist temple.
+subClassOf: ["PlaceOfWorship"]
+---
+
+# BuddhistTemple
+
+A Buddhist temple.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [PlaceOfWorship](PlaceOfWorship.mdx) > **BuddhistTemple**
+
+
+
+## Properties
+
+See [Schema.org BuddhistTemple properties](https://schema.org/BuddhistTemple#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BuddhistTemple } from 'schema.org.ai'
+
+// Create a BuddhistTemple
+const item: BuddhistTemple = {
+  $type: 'BuddhistTemple',
+  name: 'Example BuddhistTemple'
+}
+
+// Use semantic patterns
+await $.BuddhistTemple.create(item)
+const result = await $.BuddhistTemple.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BuddhistTemple](https://schema.org/BuddhistTemple)
+- [BuddhistTemple Properties](https://schema.org/BuddhistTemple#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

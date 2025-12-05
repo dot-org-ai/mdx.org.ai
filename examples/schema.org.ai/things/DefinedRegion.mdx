@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DefinedRegion
+$context: https://schema.org
+$type: Class
+name: DefinedRegion
+description: A DefinedRegion is a geographic area defined by potentially arbitrary (rather than political, administrative or natural geographical) criteria. Properties are provided for defining a region by reference to sets of postal codes.
+subClassOf: ["StructuredValue"]
+---
+
+# DefinedRegion
+
+A DefinedRegion is a geographic area defined by potentially arbitrary (rather than political, administrative or natural geographical) criteria. Properties are provided for defining a region by reference to sets of postal codes.
+
+## Type Hierarchy
+
+**DefinedRegion**
+
+
+
+## Properties
+
+See [Schema.org DefinedRegion properties](https://schema.org/DefinedRegion#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DefinedRegion } from 'schema.org.ai'
+
+// Create a DefinedRegion
+const item: DefinedRegion = {
+  $type: 'DefinedRegion',
+  name: 'Example DefinedRegion'
+}
+
+// Use semantic patterns
+await $.DefinedRegion.create(item)
+const result = await $.DefinedRegion.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DefinedRegion](https://schema.org/DefinedRegion)
+- [DefinedRegion Properties](https://schema.org/DefinedRegion#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

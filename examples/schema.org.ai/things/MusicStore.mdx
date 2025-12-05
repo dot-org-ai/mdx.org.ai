@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicStore
+$context: https://schema.org
+$type: Class
+name: MusicStore
+description: A music store.
+subClassOf: ["Store"]
+---
+
+# MusicStore
+
+A music store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **MusicStore**
+
+
+
+## Properties
+
+See [Schema.org MusicStore properties](https://schema.org/MusicStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicStore } from 'schema.org.ai'
+
+// Create a MusicStore
+const item: MusicStore = {
+  $type: 'MusicStore',
+  name: 'Example MusicStore'
+}
+
+// Use semantic patterns
+await $.MusicStore.create(item)
+const result = await $.MusicStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicStore](https://schema.org/MusicStore)
+- [MusicStore Properties](https://schema.org/MusicStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

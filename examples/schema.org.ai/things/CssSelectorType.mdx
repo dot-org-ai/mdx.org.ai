@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CssSelectorType
+$context: https://schema.org
+$type: Class
+name: CssSelectorType
+description: Text representing a CSS selector.
+subClassOf: ["Text"]
+---
+
+# CssSelectorType
+
+Text representing a CSS selector.
+
+## Type Hierarchy
+
+**CssSelectorType**
+
+
+
+## Properties
+
+See [Schema.org CssSelectorType properties](https://schema.org/CssSelectorType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CssSelectorType } from 'schema.org.ai'
+
+// Create a CssSelectorType
+const item: CssSelectorType = {
+  $type: 'CssSelectorType',
+  name: 'Example CssSelectorType'
+}
+
+// Use semantic patterns
+await $.CssSelectorType.create(item)
+const result = await $.CssSelectorType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CssSelectorType](https://schema.org/CssSelectorType)
+- [CssSelectorType Properties](https://schema.org/CssSelectorType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

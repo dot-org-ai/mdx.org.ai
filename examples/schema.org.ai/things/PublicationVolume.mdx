@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/PublicationVolume
+$context: https://schema.org
+$type: Class
+name: PublicationVolume
+description: A part of a successively published publication such as a periodical or multi-volume work, often numbered. It may represent a time span, such as a year.\
+subClassOf: ["CreativeWork"]
+---
+
+# PublicationVolume
+
+A part of a successively published publication such as a periodical or multi-volume work, often numbered. It may represent a time span, such as a year.\
+\
+See also [blog post](https://blog-schema.org/2014/09/02/schema-org-support-for-bibliographic-relationships-and-periodicals/).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **PublicationVolume**
+
+
+
+## Properties
+
+See [Schema.org PublicationVolume properties](https://schema.org/PublicationVolume#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PublicationVolume } from 'schema.org.ai'
+
+// Create a PublicationVolume
+const item: PublicationVolume = {
+  $type: 'PublicationVolume',
+  name: 'Example PublicationVolume'
+}
+
+// Use semantic patterns
+await $.PublicationVolume.create(item)
+const result = await $.PublicationVolume.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PublicationVolume](https://schema.org/PublicationVolume)
+- [PublicationVolume Properties](https://schema.org/PublicationVolume#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

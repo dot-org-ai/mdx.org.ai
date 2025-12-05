@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/MeasurementTypeEnumeration
+$context: https://schema.org
+$type: Class
+name: MeasurementTypeEnumeration
+description: Enumeration of common measurement types (or dimensions), for example "chest" for a person, "inseam" for pants, "gauge" for screws, or "wheel" for bicycles.
+subClassOf: ["Enumeration"]
+---
+
+# MeasurementTypeEnumeration
+
+Enumeration of common measurement types (or dimensions), for example "chest" for a person, "inseam" for pants, "gauge" for screws, or "wheel" for bicycles.
+
+## Type Hierarchy
+
+**MeasurementTypeEnumeration**
+
+## Direct Subclasses
+
+- **[WearableMeasurementTypeEnumeration](WearableMeasurementTypeEnumeration.mdx)**: Enumerates common types of measurement for wearables products
+
+## Properties
+
+See [Schema.org MeasurementTypeEnumeration properties](https://schema.org/MeasurementTypeEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MeasurementTypeEnumeration } from 'schema.org.ai'
+
+// Create a MeasurementTypeEnumeration
+const item: MeasurementTypeEnumeration = {
+  $type: 'MeasurementTypeEnumeration',
+  name: 'Example MeasurementTypeEnumeration'
+}
+
+// Use semantic patterns
+await $.MeasurementTypeEnumeration.create(item)
+const result = await $.MeasurementTypeEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MeasurementTypeEnumeration](https://schema.org/MeasurementTypeEnumeration)
+- [MeasurementTypeEnumeration Properties](https://schema.org/MeasurementTypeEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

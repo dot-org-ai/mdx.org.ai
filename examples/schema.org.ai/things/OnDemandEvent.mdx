@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OnDemandEvent
+$context: https://schema.org
+$type: Class
+name: OnDemandEvent
+description: A publication event, e.g. catch-up TV or radio podcast, during which a program is available on-demand.
+subClassOf: ["PublicationEvent"]
+---
+
+# OnDemandEvent
+
+A publication event, e.g. catch-up TV or radio podcast, during which a program is available on-demand.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [PublicationEvent](PublicationEvent.mdx) > **OnDemandEvent**
+
+
+
+## Properties
+
+See [Schema.org OnDemandEvent properties](https://schema.org/OnDemandEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OnDemandEvent } from 'schema.org.ai'
+
+// Create a OnDemandEvent
+const item: OnDemandEvent = {
+  $type: 'OnDemandEvent',
+  name: 'Example OnDemandEvent'
+}
+
+// Use semantic patterns
+await $.OnDemandEvent.create(item)
+const result = await $.OnDemandEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OnDemandEvent](https://schema.org/OnDemandEvent)
+- [OnDemandEvent Properties](https://schema.org/OnDemandEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

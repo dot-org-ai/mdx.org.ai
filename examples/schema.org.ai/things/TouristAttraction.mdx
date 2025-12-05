@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TouristAttraction
+$context: https://schema.org
+$type: Class
+name: TouristAttraction
+description: A tourist attraction.  In principle any Thing can be a [[TouristAttraction]], from a [[Mountain]] and [[LandmarksOrHistoricalBuildings]] to a [[LocalBusiness]].  This Type can be used on its own to describe a general [[TouristAttraction]], or be used as an [[additionalType]] to add tourist attraction properties to any other type.  (See examples below)
+subClassOf: ["Place"]
+---
+
+# TouristAttraction
+
+A tourist attraction.  In principle any Thing can be a [[TouristAttraction]], from a [[Mountain]] and [[LandmarksOrHistoricalBuildings]] to a [[LocalBusiness]].  This Type can be used on its own to describe a general [[TouristAttraction]], or be used as an [[additionalType]] to add tourist attraction properties to any other type.  (See examples below)
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > **TouristAttraction**
+
+
+
+## Properties
+
+See [Schema.org TouristAttraction properties](https://schema.org/TouristAttraction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TouristAttraction } from 'schema.org.ai'
+
+// Create a TouristAttraction
+const item: TouristAttraction = {
+  $type: 'TouristAttraction',
+  name: 'Example TouristAttraction'
+}
+
+// Use semantic patterns
+await $.TouristAttraction.create(item)
+const result = await $.TouristAttraction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TouristAttraction](https://schema.org/TouristAttraction)
+- [TouristAttraction Properties](https://schema.org/TouristAttraction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

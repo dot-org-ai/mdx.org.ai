@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CatholicChurch
+$context: https://schema.org
+$type: Class
+name: CatholicChurch
+description: A Catholic church.
+subClassOf: ["Church"]
+---
+
+# CatholicChurch
+
+A Catholic church.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [PlaceOfWorship](PlaceOfWorship.mdx) > [Church](Church.mdx) > **CatholicChurch**
+
+
+
+## Properties
+
+See [Schema.org CatholicChurch properties](https://schema.org/CatholicChurch#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CatholicChurch } from 'schema.org.ai'
+
+// Create a CatholicChurch
+const item: CatholicChurch = {
+  $type: 'CatholicChurch',
+  name: 'Example CatholicChurch'
+}
+
+// Use semantic patterns
+await $.CatholicChurch.create(item)
+const result = await $.CatholicChurch.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CatholicChurch](https://schema.org/CatholicChurch)
+- [CatholicChurch Properties](https://schema.org/CatholicChurch#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

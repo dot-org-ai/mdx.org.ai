@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/VoteAction
+$context: https://schema.org
+$type: Class
+name: VoteAction
+description: The act of expressing a preference from a fixed/finite/structured set of choices/options.
+subClassOf: ["ChooseAction"]
+---
+
+# VoteAction
+
+The act of expressing a preference from a fixed/finite/structured set of choices/options.
+
+## Type Hierarchy
+
+**VoteAction**
+
+
+
+## Properties
+
+See [Schema.org VoteAction properties](https://schema.org/VoteAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { VoteAction } from 'schema.org.ai'
+
+// Create a VoteAction
+const item: VoteAction = {
+  $type: 'VoteAction',
+  name: 'Example VoteAction'
+}
+
+// Use semantic patterns
+await $.VoteAction.create(item)
+const result = await $.VoteAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org VoteAction](https://schema.org/VoteAction)
+- [VoteAction Properties](https://schema.org/VoteAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

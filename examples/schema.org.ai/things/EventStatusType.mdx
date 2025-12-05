@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EventStatusType
+$context: https://schema.org
+$type: Class
+name: EventStatusType
+description: EventStatusType is an enumeration type whose instances represent several states that an Event may be in.
+subClassOf: ["StatusEnumeration"]
+---
+
+# EventStatusType
+
+EventStatusType is an enumeration type whose instances represent several states that an Event may be in.
+
+## Type Hierarchy
+
+**EventStatusType**
+
+
+
+## Properties
+
+See [Schema.org EventStatusType properties](https://schema.org/EventStatusType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EventStatusType } from 'schema.org.ai'
+
+// Create a EventStatusType
+const item: EventStatusType = {
+  $type: 'EventStatusType',
+  name: 'Example EventStatusType'
+}
+
+// Use semantic patterns
+await $.EventStatusType.create(item)
+const result = await $.EventStatusType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EventStatusType](https://schema.org/EventStatusType)
+- [EventStatusType Properties](https://schema.org/EventStatusType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

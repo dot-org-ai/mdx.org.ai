@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Suite
+$context: https://schema.org
+$type: Class
+name: Suite
+description: A suite in a hotel or other public accommodation, denotes a class of luxury accommodations, the key feature of which is multiple rooms (source: Wikipedia, the free encyclopedia, see <a href="http://en.wikipedia.org/wiki/Suite_(hotel)">http://en.wikipedia.org/wiki/Suite_(hotel)</a>). <br /><br /> See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.
+subClassOf: ["Accommodation"]
+---
+
+# Suite
+
+A suite in a hotel or other public accommodation, denotes a class of luxury accommodations, the key feature of which is multiple rooms (source: Wikipedia, the free encyclopedia, see <a href="http://en.wikipedia.org/wiki/Suite_(hotel)">http://en.wikipedia.org/wiki/Suite_(hotel)</a>). <br /><br /> See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Accommodation](Accommodation.mdx) > **Suite**
+
+
+
+## Properties
+
+See [Schema.org Suite properties](https://schema.org/Suite#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Suite } from 'schema.org.ai'
+
+// Create a Suite
+const item: Suite = {
+  $type: 'Suite',
+  name: 'Example Suite'
+}
+
+// Use semantic patterns
+await $.Suite.create(item)
+const result = await $.Suite.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Suite](https://schema.org/Suite)
+- [Suite Properties](https://schema.org/Suite#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

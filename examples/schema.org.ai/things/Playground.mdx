@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Playground
+$context: https://schema.org
+$type: Class
+name: Playground
+description: A playground.
+subClassOf: ["CivicStructure"]
+---
+
+# Playground
+
+A playground.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **Playground**
+
+
+
+## Properties
+
+See [Schema.org Playground properties](https://schema.org/Playground#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Playground } from 'schema.org.ai'
+
+// Create a Playground
+const item: Playground = {
+  $type: 'Playground',
+  name: 'Example Playground'
+}
+
+// Use semantic patterns
+await $.Playground.create(item)
+const result = await $.Playground.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Playground](https://schema.org/Playground)
+- [Playground Properties](https://schema.org/Playground#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

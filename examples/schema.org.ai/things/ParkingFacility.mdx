@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ParkingFacility
+$context: https://schema.org
+$type: Class
+name: ParkingFacility
+description: A parking lot or other parking facility.
+subClassOf: ["CivicStructure"]
+---
+
+# ParkingFacility
+
+A parking lot or other parking facility.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **ParkingFacility**
+
+
+
+## Properties
+
+See [Schema.org ParkingFacility properties](https://schema.org/ParkingFacility#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ParkingFacility } from 'schema.org.ai'
+
+// Create a ParkingFacility
+const item: ParkingFacility = {
+  $type: 'ParkingFacility',
+  name: 'Example ParkingFacility'
+}
+
+// Use semantic patterns
+await $.ParkingFacility.create(item)
+const result = await $.ParkingFacility.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ParkingFacility](https://schema.org/ParkingFacility)
+- [ParkingFacility Properties](https://schema.org/ParkingFacility#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

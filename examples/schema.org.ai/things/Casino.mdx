@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Casino
+$context: https://schema.org
+$type: Class
+name: Casino
+description: A casino.
+subClassOf: ["EntertainmentBusiness"]
+---
+
+# Casino
+
+A casino.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [EntertainmentBusiness](EntertainmentBusiness.mdx) > **Casino**
+
+
+
+## Properties
+
+See [Schema.org Casino properties](https://schema.org/Casino#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Casino } from 'schema.org.ai'
+
+// Create a Casino
+const item: Casino = {
+  $type: 'Casino',
+  name: 'Example Casino'
+}
+
+// Use semantic patterns
+await $.Casino.create(item)
+const result = await $.Casino.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Casino](https://schema.org/Casino)
+- [Casino Properties](https://schema.org/Casino#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HowToSection
+$context: https://schema.org
+$type: Class
+name: HowToSection
+description: A sub-grouping of steps in the instructions for how to achieve a result (e.g. steps for making a pie crust within a pie recipe).
+subClassOf: ["CreativeWork","ListItem","ItemList"]
+---
+
+# HowToSection
+
+A sub-grouping of steps in the instructions for how to achieve a result (e.g. steps for making a pie crust within a pie recipe).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **HowToSection**
+
+
+
+## Properties
+
+See [Schema.org HowToSection properties](https://schema.org/HowToSection#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HowToSection } from 'schema.org.ai'
+
+// Create a HowToSection
+const item: HowToSection = {
+  $type: 'HowToSection',
+  name: 'Example HowToSection'
+}
+
+// Use semantic patterns
+await $.HowToSection.create(item)
+const result = await $.HowToSection.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HowToSection](https://schema.org/HowToSection)
+- [HowToSection Properties](https://schema.org/HowToSection#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

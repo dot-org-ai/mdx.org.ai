@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GameAvailabilityEnumeration
+$context: https://schema.org
+$type: Class
+name: GameAvailabilityEnumeration
+description: For a [[VideoGame]], such as used with a [[PlayGameAction]], an enumeration of the kind of game availability offered.
+subClassOf: ["Enumeration"]
+---
+
+# GameAvailabilityEnumeration
+
+For a [[VideoGame]], such as used with a [[PlayGameAction]], an enumeration of the kind of game availability offered.
+
+## Type Hierarchy
+
+**GameAvailabilityEnumeration**
+
+
+
+## Properties
+
+See [Schema.org GameAvailabilityEnumeration properties](https://schema.org/GameAvailabilityEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GameAvailabilityEnumeration } from 'schema.org.ai'
+
+// Create a GameAvailabilityEnumeration
+const item: GameAvailabilityEnumeration = {
+  $type: 'GameAvailabilityEnumeration',
+  name: 'Example GameAvailabilityEnumeration'
+}
+
+// Use semantic patterns
+await $.GameAvailabilityEnumeration.create(item)
+const result = await $.GameAvailabilityEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GameAvailabilityEnumeration](https://schema.org/GameAvailabilityEnumeration)
+- [GameAvailabilityEnumeration Properties](https://schema.org/GameAvailabilityEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

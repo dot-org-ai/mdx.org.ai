@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ExerciseGym
+$context: https://schema.org
+$type: Class
+name: ExerciseGym
+description: A gym.
+subClassOf: ["SportsActivityLocation"]
+---
+
+# ExerciseGym
+
+A gym.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [SportsActivityLocation](SportsActivityLocation.mdx) > **ExerciseGym**
+
+
+
+## Properties
+
+See [Schema.org ExerciseGym properties](https://schema.org/ExerciseGym#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ExerciseGym } from 'schema.org.ai'
+
+// Create a ExerciseGym
+const item: ExerciseGym = {
+  $type: 'ExerciseGym',
+  name: 'Example ExerciseGym'
+}
+
+// Use semantic patterns
+await $.ExerciseGym.create(item)
+const result = await $.ExerciseGym.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ExerciseGym](https://schema.org/ExerciseGym)
+- [ExerciseGym Properties](https://schema.org/ExerciseGym#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

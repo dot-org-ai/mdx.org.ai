@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LiquorStore
+$context: https://schema.org
+$type: Class
+name: LiquorStore
+description: A shop that sells alcoholic drinks such as wine, beer, whisky and other spirits.
+subClassOf: ["Store"]
+---
+
+# LiquorStore
+
+A shop that sells alcoholic drinks such as wine, beer, whisky and other spirits.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **LiquorStore**
+
+
+
+## Properties
+
+See [Schema.org LiquorStore properties](https://schema.org/LiquorStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LiquorStore } from 'schema.org.ai'
+
+// Create a LiquorStore
+const item: LiquorStore = {
+  $type: 'LiquorStore',
+  name: 'Example LiquorStore'
+}
+
+// Use semantic patterns
+await $.LiquorStore.create(item)
+const result = await $.LiquorStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LiquorStore](https://schema.org/LiquorStore)
+- [LiquorStore Properties](https://schema.org/LiquorStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

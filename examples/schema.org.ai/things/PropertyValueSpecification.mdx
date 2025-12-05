@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PropertyValueSpecification
+$context: https://schema.org
+$type: Class
+name: PropertyValueSpecification
+description: A Property value specification.
+subClassOf: ["Intangible"]
+---
+
+# PropertyValueSpecification
+
+A Property value specification.
+
+## Type Hierarchy
+
+**PropertyValueSpecification**
+
+
+
+## Properties
+
+See [Schema.org PropertyValueSpecification properties](https://schema.org/PropertyValueSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PropertyValueSpecification } from 'schema.org.ai'
+
+// Create a PropertyValueSpecification
+const item: PropertyValueSpecification = {
+  $type: 'PropertyValueSpecification',
+  name: 'Example PropertyValueSpecification'
+}
+
+// Use semantic patterns
+await $.PropertyValueSpecification.create(item)
+const result = await $.PropertyValueSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PropertyValueSpecification](https://schema.org/PropertyValueSpecification)
+- [PropertyValueSpecification Properties](https://schema.org/PropertyValueSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

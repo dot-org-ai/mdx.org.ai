@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Beach
+$context: https://schema.org
+$type: Class
+name: Beach
+description: Beach.
+subClassOf: ["CivicStructure"]
+---
+
+# Beach
+
+Beach.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **Beach**
+
+
+
+## Properties
+
+See [Schema.org Beach properties](https://schema.org/Beach#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Beach } from 'schema.org.ai'
+
+// Create a Beach
+const item: Beach = {
+  $type: 'Beach',
+  name: 'Example Beach'
+}
+
+// Use semantic patterns
+await $.Beach.create(item)
+const result = await $.Beach.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Beach](https://schema.org/Beach)
+- [Beach Properties](https://schema.org/Beach#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

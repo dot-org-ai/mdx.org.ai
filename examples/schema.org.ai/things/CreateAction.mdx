@@ -1,0 +1,55 @@
+---
+$id: https://schema.org.ai/CreateAction
+$context: https://schema.org
+$type: Class
+name: CreateAction
+description: The act of deliberately creating/producing/generating/building a result out of the agent.
+subClassOf: ["Action"]
+---
+
+# CreateAction
+
+The act of deliberately creating/producing/generating/building a result out of the agent.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **CreateAction**
+
+## Direct Subclasses
+
+- **[CookAction](CookAction.mdx)**: The act of producing/preparing food
+- **[DrawAction](DrawAction.mdx)**: The act of producing a visual/graphical representation of an object, typically with a pen/pencil and paper as instruments
+- **[FilmAction](FilmAction.mdx)**: The act of capturing sound and moving images on film, video, or digitally
+- **[PaintAction](PaintAction.mdx)**: The act of producing a painting, typically with paint and canvas as instruments
+- **[PhotographAction](PhotographAction.mdx)**: The act of capturing still images of objects using a camera
+- **[WriteAction](WriteAction.mdx)**: The act of authoring written creative content
+
+## Properties
+
+See [Schema.org CreateAction properties](https://schema.org/CreateAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CreateAction } from 'schema.org.ai'
+
+// Create a CreateAction
+const item: CreateAction = {
+  $type: 'CreateAction',
+  name: 'Example CreateAction'
+}
+
+// Use semantic patterns
+await $.CreateAction.create(item)
+const result = await $.CreateAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CreateAction](https://schema.org/CreateAction)
+- [CreateAction Properties](https://schema.org/CreateAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

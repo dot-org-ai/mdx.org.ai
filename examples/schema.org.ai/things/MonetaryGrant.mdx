@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MonetaryGrant
+$context: https://schema.org
+$type: Class
+name: MonetaryGrant
+description: A monetary grant.
+subClassOf: ["Grant"]
+---
+
+# MonetaryGrant
+
+A monetary grant.
+
+## Type Hierarchy
+
+**MonetaryGrant**
+
+
+
+## Properties
+
+See [Schema.org MonetaryGrant properties](https://schema.org/MonetaryGrant#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MonetaryGrant } from 'schema.org.ai'
+
+// Create a MonetaryGrant
+const item: MonetaryGrant = {
+  $type: 'MonetaryGrant',
+  name: 'Example MonetaryGrant'
+}
+
+// Use semantic patterns
+await $.MonetaryGrant.create(item)
+const result = await $.MonetaryGrant.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MonetaryGrant](https://schema.org/MonetaryGrant)
+- [MonetaryGrant Properties](https://schema.org/MonetaryGrant#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicAlbumReleaseType
+$context: https://schema.org
+$type: Class
+name: MusicAlbumReleaseType
+description: The kind of release which this album is: single, EP or album.
+subClassOf: ["Enumeration"]
+---
+
+# MusicAlbumReleaseType
+
+The kind of release which this album is: single, EP or album.
+
+## Type Hierarchy
+
+**MusicAlbumReleaseType**
+
+
+
+## Properties
+
+See [Schema.org MusicAlbumReleaseType properties](https://schema.org/MusicAlbumReleaseType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicAlbumReleaseType } from 'schema.org.ai'
+
+// Create a MusicAlbumReleaseType
+const item: MusicAlbumReleaseType = {
+  $type: 'MusicAlbumReleaseType',
+  name: 'Example MusicAlbumReleaseType'
+}
+
+// Use semantic patterns
+await $.MusicAlbumReleaseType.create(item)
+const result = await $.MusicAlbumReleaseType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicAlbumReleaseType](https://schema.org/MusicAlbumReleaseType)
+- [MusicAlbumReleaseType Properties](https://schema.org/MusicAlbumReleaseType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

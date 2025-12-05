@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PreOrderAction
+$context: https://schema.org
+$type: Class
+name: PreOrderAction
+description: An agent orders a (not yet released) object/product/service to be delivered/sent.
+subClassOf: ["TradeAction"]
+---
+
+# PreOrderAction
+
+An agent orders a (not yet released) object/product/service to be delivered/sent.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TradeAction](TradeAction.mdx) > **PreOrderAction**
+
+
+
+## Properties
+
+See [Schema.org PreOrderAction properties](https://schema.org/PreOrderAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PreOrderAction } from 'schema.org.ai'
+
+// Create a PreOrderAction
+const item: PreOrderAction = {
+  $type: 'PreOrderAction',
+  name: 'Example PreOrderAction'
+}
+
+// Use semantic patterns
+await $.PreOrderAction.create(item)
+const result = await $.PreOrderAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PreOrderAction](https://schema.org/PreOrderAction)
+- [PreOrderAction Properties](https://schema.org/PreOrderAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/NewsMediaOrganization
+$context: https://schema.org
+$type: Class
+name: NewsMediaOrganization
+description: A News/Media organization such as a newspaper or TV station.
+subClassOf: ["Organization"]
+---
+
+# NewsMediaOrganization
+
+A News/Media organization such as a newspaper or TV station.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **NewsMediaOrganization**
+
+
+
+## Properties
+
+See [Schema.org NewsMediaOrganization properties](https://schema.org/NewsMediaOrganization#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { NewsMediaOrganization } from 'schema.org.ai'
+
+// Create a NewsMediaOrganization
+const item: NewsMediaOrganization = {
+  $type: 'NewsMediaOrganization',
+  name: 'Example NewsMediaOrganization'
+}
+
+// Use semantic patterns
+await $.NewsMediaOrganization.create(item)
+const result = await $.NewsMediaOrganization.get('item-id')
+```
+
+## Resources
+
+- [Schema.org NewsMediaOrganization](https://schema.org/NewsMediaOrganization)
+- [NewsMediaOrganization Properties](https://schema.org/NewsMediaOrganization#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

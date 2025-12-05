@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SchoolDistrict
+$context: https://schema.org
+$type: Class
+name: SchoolDistrict
+description: A School District is an administrative area for the administration of schools.
+subClassOf: ["AdministrativeArea"]
+---
+
+# SchoolDistrict
+
+A School District is an administrative area for the administration of schools.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [AdministrativeArea](AdministrativeArea.mdx) > **SchoolDistrict**
+
+
+
+## Properties
+
+See [Schema.org SchoolDistrict properties](https://schema.org/SchoolDistrict#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SchoolDistrict } from 'schema.org.ai'
+
+// Create a SchoolDistrict
+const item: SchoolDistrict = {
+  $type: 'SchoolDistrict',
+  name: 'Example SchoolDistrict'
+}
+
+// Use semantic patterns
+await $.SchoolDistrict.create(item)
+const result = await $.SchoolDistrict.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SchoolDistrict](https://schema.org/SchoolDistrict)
+- [SchoolDistrict Properties](https://schema.org/SchoolDistrict#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

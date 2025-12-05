@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MapCategoryType
+$context: https://schema.org
+$type: Class
+name: MapCategoryType
+description: An enumeration of several kinds of Map.
+subClassOf: ["Enumeration"]
+---
+
+# MapCategoryType
+
+An enumeration of several kinds of Map.
+
+## Type Hierarchy
+
+**MapCategoryType**
+
+
+
+## Properties
+
+See [Schema.org MapCategoryType properties](https://schema.org/MapCategoryType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MapCategoryType } from 'schema.org.ai'
+
+// Create a MapCategoryType
+const item: MapCategoryType = {
+  $type: 'MapCategoryType',
+  name: 'Example MapCategoryType'
+}
+
+// Use semantic patterns
+await $.MapCategoryType.create(item)
+const result = await $.MapCategoryType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MapCategoryType](https://schema.org/MapCategoryType)
+- [MapCategoryType Properties](https://schema.org/MapCategoryType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

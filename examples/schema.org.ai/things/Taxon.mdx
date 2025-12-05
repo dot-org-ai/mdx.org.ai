@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Taxon
+$context: https://schema.org
+$type: Class
+name: Taxon
+description: A set of organisms asserted to represent a natural cohesive biological unit.
+subClassOf: ["Thing"]
+---
+
+# Taxon
+
+A set of organisms asserted to represent a natural cohesive biological unit.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > **Taxon**
+
+
+
+## Properties
+
+See [Schema.org Taxon properties](https://schema.org/Taxon#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Taxon } from 'schema.org.ai'
+
+// Create a Taxon
+const item: Taxon = {
+  $type: 'Taxon',
+  name: 'Example Taxon'
+}
+
+// Use semantic patterns
+await $.Taxon.create(item)
+const result = await $.Taxon.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Taxon](https://schema.org/Taxon)
+- [Taxon Properties](https://schema.org/Taxon#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Airport
+$context: https://schema.org
+$type: Class
+name: Airport
+description: An airport.
+subClassOf: ["CivicStructure"]
+---
+
+# Airport
+
+An airport.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **Airport**
+
+
+
+## Properties
+
+See [Schema.org Airport properties](https://schema.org/Airport#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Airport } from 'schema.org.ai'
+
+// Create a Airport
+const item: Airport = {
+  $type: 'Airport',
+  name: 'Example Airport'
+}
+
+// Use semantic patterns
+await $.Airport.create(item)
+const result = await $.Airport.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Airport](https://schema.org/Airport)
+- [Airport Properties](https://schema.org/Airport#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

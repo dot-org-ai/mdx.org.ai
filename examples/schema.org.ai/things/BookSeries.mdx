@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BookSeries
+$context: https://schema.org
+$type: Class
+name: BookSeries
+description: A series of books. Included books can be indicated with the hasPart property.
+subClassOf: ["CreativeWorkSeries"]
+---
+
+# BookSeries
+
+A series of books. Included books can be indicated with the hasPart property.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [CreativeWorkSeries](CreativeWorkSeries.mdx) > **BookSeries**
+
+
+
+## Properties
+
+See [Schema.org BookSeries properties](https://schema.org/BookSeries#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BookSeries } from 'schema.org.ai'
+
+// Create a BookSeries
+const item: BookSeries = {
+  $type: 'BookSeries',
+  name: 'Example BookSeries'
+}
+
+// Use semantic patterns
+await $.BookSeries.create(item)
+const result = await $.BookSeries.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BookSeries](https://schema.org/BookSeries)
+- [BookSeries Properties](https://schema.org/BookSeries#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

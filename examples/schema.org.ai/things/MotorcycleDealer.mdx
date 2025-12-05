@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MotorcycleDealer
+$context: https://schema.org
+$type: Class
+name: MotorcycleDealer
+description: A motorcycle dealer.
+subClassOf: ["AutomotiveBusiness"]
+---
+
+# MotorcycleDealer
+
+A motorcycle dealer.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [AutomotiveBusiness](AutomotiveBusiness.mdx) > **MotorcycleDealer**
+
+
+
+## Properties
+
+See [Schema.org MotorcycleDealer properties](https://schema.org/MotorcycleDealer#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MotorcycleDealer } from 'schema.org.ai'
+
+// Create a MotorcycleDealer
+const item: MotorcycleDealer = {
+  $type: 'MotorcycleDealer',
+  name: 'Example MotorcycleDealer'
+}
+
+// Use semantic patterns
+await $.MotorcycleDealer.create(item)
+const result = await $.MotorcycleDealer.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MotorcycleDealer](https://schema.org/MotorcycleDealer)
+- [MotorcycleDealer Properties](https://schema.org/MotorcycleDealer#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

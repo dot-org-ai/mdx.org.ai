@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PrependAction
+$context: https://schema.org
+$type: Class
+name: PrependAction
+description: The act of inserting at the beginning if an ordered collection.
+subClassOf: ["InsertAction"]
+---
+
+# PrependAction
+
+The act of inserting at the beginning if an ordered collection.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [UpdateAction](UpdateAction.mdx) > [AddAction](AddAction.mdx) > [InsertAction](InsertAction.mdx) > **PrependAction**
+
+
+
+## Properties
+
+See [Schema.org PrependAction properties](https://schema.org/PrependAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PrependAction } from 'schema.org.ai'
+
+// Create a PrependAction
+const item: PrependAction = {
+  $type: 'PrependAction',
+  name: 'Example PrependAction'
+}
+
+// Use semantic patterns
+await $.PrependAction.create(item)
+const result = await $.PrependAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PrependAction](https://schema.org/PrependAction)
+- [PrependAction Properties](https://schema.org/PrependAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

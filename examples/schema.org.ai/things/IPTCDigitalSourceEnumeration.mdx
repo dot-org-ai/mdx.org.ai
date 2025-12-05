@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/IPTCDigitalSourceEnumeration
+$context: https://schema.org
+$type: Class
+name: IPTCDigitalSourceEnumeration
+description: <a href="https://www.iptc.org/">IPTC</a> "Digital Source" codes for use with the [[digitalSourceType]] property, providing information about the source for a digital media object. In general these codes are not declared here to be mutually exclusive, although some combinations would be contradictory if applied simultaneously, or might be considered mutually incompatible by upstream maintainers of the definitions. See the IPTC <a href="https://www.iptc.org/std/photometadata/documentation/userguide/">documentation</a> for <a href="https://cv.iptc.org/newscodes/digitalsourcetype/">detailed definitions</a> of all terms.
+subClassOf: ["MediaEnumeration"]
+---
+
+# IPTCDigitalSourceEnumeration
+
+<a href="https://www.iptc.org/">IPTC</a> "Digital Source" codes for use with the [[digitalSourceType]] property, providing information about the source for a digital media object. In general these codes are not declared here to be mutually exclusive, although some combinations would be contradictory if applied simultaneously, or might be considered mutually incompatible by upstream maintainers of the definitions. See the IPTC <a href="https://www.iptc.org/std/photometadata/documentation/userguide/">documentation</a> for <a href="https://cv.iptc.org/newscodes/digitalsourcetype/">detailed definitions</a> of all terms.
+
+## Type Hierarchy
+
+**IPTCDigitalSourceEnumeration**
+
+
+
+## Properties
+
+See [Schema.org IPTCDigitalSourceEnumeration properties](https://schema.org/IPTCDigitalSourceEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { IPTCDigitalSourceEnumeration } from 'schema.org.ai'
+
+// Create a IPTCDigitalSourceEnumeration
+const item: IPTCDigitalSourceEnumeration = {
+  $type: 'IPTCDigitalSourceEnumeration',
+  name: 'Example IPTCDigitalSourceEnumeration'
+}
+
+// Use semantic patterns
+await $.IPTCDigitalSourceEnumeration.create(item)
+const result = await $.IPTCDigitalSourceEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org IPTCDigitalSourceEnumeration](https://schema.org/IPTCDigitalSourceEnumeration)
+- [IPTCDigitalSourceEnumeration Properties](https://schema.org/IPTCDigitalSourceEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

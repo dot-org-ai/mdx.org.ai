@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ActionAccessSpecification
+$context: https://schema.org
+$type: Class
+name: ActionAccessSpecification
+description: A set of requirements that must be fulfilled in order to perform an Action.
+subClassOf: ["Intangible"]
+---
+
+# ActionAccessSpecification
+
+A set of requirements that must be fulfilled in order to perform an Action.
+
+## Type Hierarchy
+
+**ActionAccessSpecification**
+
+
+
+## Properties
+
+See [Schema.org ActionAccessSpecification properties](https://schema.org/ActionAccessSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ActionAccessSpecification } from 'schema.org.ai'
+
+// Create a ActionAccessSpecification
+const item: ActionAccessSpecification = {
+  $type: 'ActionAccessSpecification',
+  name: 'Example ActionAccessSpecification'
+}
+
+// Use semantic patterns
+await $.ActionAccessSpecification.create(item)
+const result = await $.ActionAccessSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ActionAccessSpecification](https://schema.org/ActionAccessSpecification)
+- [ActionAccessSpecification Properties](https://schema.org/ActionAccessSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

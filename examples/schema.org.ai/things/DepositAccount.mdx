@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DepositAccount
+$context: https://schema.org
+$type: Class
+name: DepositAccount
+description: A type of Bank Account with a main purpose of depositing funds to gain interest or other benefits.
+subClassOf: ["InvestmentOrDeposit","BankAccount"]
+---
+
+# DepositAccount
+
+A type of Bank Account with a main purpose of depositing funds to gain interest or other benefits.
+
+## Type Hierarchy
+
+**DepositAccount**
+
+
+
+## Properties
+
+See [Schema.org DepositAccount properties](https://schema.org/DepositAccount#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DepositAccount } from 'schema.org.ai'
+
+// Create a DepositAccount
+const item: DepositAccount = {
+  $type: 'DepositAccount',
+  name: 'Example DepositAccount'
+}
+
+// Use semantic patterns
+await $.DepositAccount.create(item)
+const result = await $.DepositAccount.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DepositAccount](https://schema.org/DepositAccount)
+- [DepositAccount Properties](https://schema.org/DepositAccount#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,56 @@
+---
+$id: https://schema.org.ai/EntertainmentBusiness
+$context: https://schema.org
+$type: Class
+name: EntertainmentBusiness
+description: A business providing entertainment.
+subClassOf: ["LocalBusiness"]
+---
+
+# EntertainmentBusiness
+
+A business providing entertainment.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **EntertainmentBusiness**
+
+## Direct Subclasses
+
+- **[AdultEntertainment](AdultEntertainment.mdx)**: An adult entertainment establishment
+- **[AmusementPark](AmusementPark.mdx)**: An amusement park
+- **[ArtGallery](ArtGallery.mdx)**: An art gallery
+- **[Casino](Casino.mdx)**: A casino
+- **[ComedyClub](ComedyClub.mdx)**: A comedy club
+- **[MovieTheater](MovieTheater.mdx)**: A movie theater
+- **[NightClub](NightClub.mdx)**: A nightclub or discotheque
+
+## Properties
+
+See [Schema.org EntertainmentBusiness properties](https://schema.org/EntertainmentBusiness#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EntertainmentBusiness } from 'schema.org.ai'
+
+// Create a EntertainmentBusiness
+const item: EntertainmentBusiness = {
+  $type: 'EntertainmentBusiness',
+  name: 'Example EntertainmentBusiness'
+}
+
+// Use semantic patterns
+await $.EntertainmentBusiness.create(item)
+const result = await $.EntertainmentBusiness.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EntertainmentBusiness](https://schema.org/EntertainmentBusiness)
+- [EntertainmentBusiness Properties](https://schema.org/EntertainmentBusiness#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

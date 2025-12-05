@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Airline
+$context: https://schema.org
+$type: Class
+name: Airline
+description: An organization that provides flights for passengers.
+subClassOf: ["Organization"]
+---
+
+# Airline
+
+An organization that provides flights for passengers.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **Airline**
+
+
+
+## Properties
+
+See [Schema.org Airline properties](https://schema.org/Airline#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Airline } from 'schema.org.ai'
+
+// Create a Airline
+const item: Airline = {
+  $type: 'Airline',
+  name: 'Example Airline'
+}
+
+// Use semantic patterns
+await $.Airline.create(item)
+const result = await $.Airline.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Airline](https://schema.org/Airline)
+- [Airline Properties](https://schema.org/Airline#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

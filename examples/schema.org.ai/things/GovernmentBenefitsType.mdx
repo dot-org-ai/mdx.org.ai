@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GovernmentBenefitsType
+$context: https://schema.org
+$type: Class
+name: GovernmentBenefitsType
+description: GovernmentBenefitsType enumerates several kinds of government benefits to support the COVID-19 situation. Note that this structure may not capture all benefits offered.
+subClassOf: ["Enumeration"]
+---
+
+# GovernmentBenefitsType
+
+GovernmentBenefitsType enumerates several kinds of government benefits to support the COVID-19 situation. Note that this structure may not capture all benefits offered.
+
+## Type Hierarchy
+
+**GovernmentBenefitsType**
+
+
+
+## Properties
+
+See [Schema.org GovernmentBenefitsType properties](https://schema.org/GovernmentBenefitsType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GovernmentBenefitsType } from 'schema.org.ai'
+
+// Create a GovernmentBenefitsType
+const item: GovernmentBenefitsType = {
+  $type: 'GovernmentBenefitsType',
+  name: 'Example GovernmentBenefitsType'
+}
+
+// Use semantic patterns
+await $.GovernmentBenefitsType.create(item)
+const result = await $.GovernmentBenefitsType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GovernmentBenefitsType](https://schema.org/GovernmentBenefitsType)
+- [GovernmentBenefitsType Properties](https://schema.org/GovernmentBenefitsType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

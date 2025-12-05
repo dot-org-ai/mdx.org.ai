@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/ComicStory
+$context: https://schema.org
+$type: Class
+name: ComicStory
+description: The term "story" is any indivisible, re-printable unit of a comic, including the interior stories, covers, and backmatter. Most comics have at least two stories: a cover (ComicCoverArt) and an interior story.
+subClassOf: ["CreativeWork"]
+---
+
+# ComicStory
+
+The term "story" is any indivisible, re-printable unit of a comic, including the interior stories, covers, and backmatter. Most comics have at least two stories: a cover (ComicCoverArt) and an interior story.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **ComicStory**
+
+## Direct Subclasses
+
+- **[ComicCoverArt](ComicCoverArt.mdx)**: The artwork on the cover of a comic
+
+## Properties
+
+See [Schema.org ComicStory properties](https://schema.org/ComicStory#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ComicStory } from 'schema.org.ai'
+
+// Create a ComicStory
+const item: ComicStory = {
+  $type: 'ComicStory',
+  name: 'Example ComicStory'
+}
+
+// Use semantic patterns
+await $.ComicStory.create(item)
+const result = await $.ComicStory.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ComicStory](https://schema.org/ComicStory)
+- [ComicStory Properties](https://schema.org/ComicStory#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

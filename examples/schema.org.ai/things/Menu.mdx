@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Menu
+$context: https://schema.org
+$type: Class
+name: Menu
+description: A structured representation of food or drink items available from a FoodEstablishment.
+subClassOf: ["CreativeWork"]
+---
+
+# Menu
+
+A structured representation of food or drink items available from a FoodEstablishment.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Menu**
+
+
+
+## Properties
+
+See [Schema.org Menu properties](https://schema.org/Menu#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Menu } from 'schema.org.ai'
+
+// Create a Menu
+const item: Menu = {
+  $type: 'Menu',
+  name: 'Example Menu'
+}
+
+// Use semantic patterns
+await $.Menu.create(item)
+const result = await $.Menu.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Menu](https://schema.org/Menu)
+- [Menu Properties](https://schema.org/Menu#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

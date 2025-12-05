@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TravelAgency
+$context: https://schema.org
+$type: Class
+name: TravelAgency
+description: A travel agency.
+subClassOf: ["LocalBusiness"]
+---
+
+# TravelAgency
+
+A travel agency.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **TravelAgency**
+
+
+
+## Properties
+
+See [Schema.org TravelAgency properties](https://schema.org/TravelAgency#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TravelAgency } from 'schema.org.ai'
+
+// Create a TravelAgency
+const item: TravelAgency = {
+  $type: 'TravelAgency',
+  name: 'Example TravelAgency'
+}
+
+// Use semantic patterns
+await $.TravelAgency.create(item)
+const result = await $.TravelAgency.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TravelAgency](https://schema.org/TravelAgency)
+- [TravelAgency Properties](https://schema.org/TravelAgency#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

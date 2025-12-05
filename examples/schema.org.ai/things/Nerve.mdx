@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Nerve
+$context: https://schema.org
+$type: Class
+name: Nerve
+description: A common pathway for the electrochemical nerve impulses that are transmitted along each of the axons.
+subClassOf: ["AnatomicalStructure"]
+---
+
+# Nerve
+
+A common pathway for the electrochemical nerve impulses that are transmitted along each of the axons.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [AnatomicalStructure](AnatomicalStructure.mdx) > **Nerve**
+
+
+
+## Properties
+
+See [Schema.org Nerve properties](https://schema.org/Nerve#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Nerve } from 'schema.org.ai'
+
+// Create a Nerve
+const item: Nerve = {
+  $type: 'Nerve',
+  name: 'Example Nerve'
+}
+
+// Use semantic patterns
+await $.Nerve.create(item)
+const result = await $.Nerve.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Nerve](https://schema.org/Nerve)
+- [Nerve Properties](https://schema.org/Nerve#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

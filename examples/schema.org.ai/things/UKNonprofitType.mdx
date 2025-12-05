@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UKNonprofitType
+$context: https://schema.org
+$type: Class
+name: UKNonprofitType
+description: UKNonprofitType: Non-profit organization type originating from the United Kingdom.
+subClassOf: ["NonprofitType"]
+---
+
+# UKNonprofitType
+
+UKNonprofitType: Non-profit organization type originating from the United Kingdom.
+
+## Type Hierarchy
+
+**UKNonprofitType**
+
+
+
+## Properties
+
+See [Schema.org UKNonprofitType properties](https://schema.org/UKNonprofitType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UKNonprofitType } from 'schema.org.ai'
+
+// Create a UKNonprofitType
+const item: UKNonprofitType = {
+  $type: 'UKNonprofitType',
+  name: 'Example UKNonprofitType'
+}
+
+// Use semantic patterns
+await $.UKNonprofitType.create(item)
+const result = await $.UKNonprofitType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UKNonprofitType](https://schema.org/UKNonprofitType)
+- [UKNonprofitType Properties](https://schema.org/UKNonprofitType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DDxElement
+$context: https://schema.org
+$type: Class
+name: DDxElement
+description: An alternative, closely-related condition typically considered later in the differential diagnosis process along with the signs that are used to distinguish it.
+subClassOf: ["MedicalIntangible"]
+---
+
+# DDxElement
+
+An alternative, closely-related condition typically considered later in the differential diagnosis process along with the signs that are used to distinguish it.
+
+## Type Hierarchy
+
+**DDxElement**
+
+
+
+## Properties
+
+See [Schema.org DDxElement properties](https://schema.org/DDxElement#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DDxElement } from 'schema.org.ai'
+
+// Create a DDxElement
+const item: DDxElement = {
+  $type: 'DDxElement',
+  name: 'Example DDxElement'
+}
+
+// Use semantic patterns
+await $.DDxElement.create(item)
+const result = await $.DDxElement.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DDxElement](https://schema.org/DDxElement)
+- [DDxElement Properties](https://schema.org/DDxElement#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

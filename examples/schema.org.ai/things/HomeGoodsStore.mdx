@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HomeGoodsStore
+$context: https://schema.org
+$type: Class
+name: HomeGoodsStore
+description: A home goods store.
+subClassOf: ["Store"]
+---
+
+# HomeGoodsStore
+
+A home goods store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **HomeGoodsStore**
+
+
+
+## Properties
+
+See [Schema.org HomeGoodsStore properties](https://schema.org/HomeGoodsStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HomeGoodsStore } from 'schema.org.ai'
+
+// Create a HomeGoodsStore
+const item: HomeGoodsStore = {
+  $type: 'HomeGoodsStore',
+  name: 'Example HomeGoodsStore'
+}
+
+// Use semantic patterns
+await $.HomeGoodsStore.create(item)
+const result = await $.HomeGoodsStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HomeGoodsStore](https://schema.org/HomeGoodsStore)
+- [HomeGoodsStore Properties](https://schema.org/HomeGoodsStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

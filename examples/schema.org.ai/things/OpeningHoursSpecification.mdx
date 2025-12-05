@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/OpeningHoursSpecification
+$context: https://schema.org
+$type: Class
+name: OpeningHoursSpecification
+description: A structured value providing information about the opening hours of a place or a certain service inside a place.\
+subClassOf: ["StructuredValue"]
+---
+
+# OpeningHoursSpecification
+
+A structured value providing information about the opening hours of a place or a certain service inside a place.\
+\
+ The place is __open__ if the [[opens]] property is specified, and __closed__ otherwise.\
+\
+If the value for the [[closes]] property is less than the value for the [[opens]] property then the hour range is assumed to span over the next day.
+
+## Type Hierarchy
+
+**OpeningHoursSpecification**
+
+
+
+## Properties
+
+See [Schema.org OpeningHoursSpecification properties](https://schema.org/OpeningHoursSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OpeningHoursSpecification } from 'schema.org.ai'
+
+// Create a OpeningHoursSpecification
+const item: OpeningHoursSpecification = {
+  $type: 'OpeningHoursSpecification',
+  name: 'Example OpeningHoursSpecification'
+}
+
+// Use semantic patterns
+await $.OpeningHoursSpecification.create(item)
+const result = await $.OpeningHoursSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OpeningHoursSpecification](https://schema.org/OpeningHoursSpecification)
+- [OpeningHoursSpecification Properties](https://schema.org/OpeningHoursSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

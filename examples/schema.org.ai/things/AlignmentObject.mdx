@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AlignmentObject
+$context: https://schema.org
+$type: Class
+name: AlignmentObject
+description: An intangible item that describes an alignment between a learning resource and a node in an educational framework. Should not be used where the nature of the alignment can be described using a simple property, for example to express that a resource [[teaches]] or [[assesses]] a competency.
+subClassOf: ["Intangible"]
+---
+
+# AlignmentObject
+
+An intangible item that describes an alignment between a learning resource and a node in an educational framework. Should not be used where the nature of the alignment can be described using a simple property, for example to express that a resource [[teaches]] or [[assesses]] a competency.
+
+## Type Hierarchy
+
+**AlignmentObject**
+
+
+
+## Properties
+
+See [Schema.org AlignmentObject properties](https://schema.org/AlignmentObject#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AlignmentObject } from 'schema.org.ai'
+
+// Create a AlignmentObject
+const item: AlignmentObject = {
+  $type: 'AlignmentObject',
+  name: 'Example AlignmentObject'
+}
+
+// Use semantic patterns
+await $.AlignmentObject.create(item)
+const result = await $.AlignmentObject.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AlignmentObject](https://schema.org/AlignmentObject)
+- [AlignmentObject Properties](https://schema.org/AlignmentObject#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

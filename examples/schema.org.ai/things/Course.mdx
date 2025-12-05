@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Course
+$context: https://schema.org
+$type: Class
+name: Course
+description: A description of an educational course which may be offered as distinct instances which take place at different times or take place at different locations, or be offered through different media or modes of study. An educational course is a sequence of one or more educational events and/or creative works which aims to build knowledge, competence or ability of learners.
+subClassOf: ["LearningResource","CreativeWork"]
+---
+
+# Course
+
+A description of an educational course which may be offered as distinct instances which take place at different times or take place at different locations, or be offered through different media or modes of study. An educational course is a sequence of one or more educational events and/or creative works which aims to build knowledge, competence or ability of learners.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [LearningResource](LearningResource.mdx) > **Course**
+
+
+
+## Properties
+
+See [Schema.org Course properties](https://schema.org/Course#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Course } from 'schema.org.ai'
+
+// Create a Course
+const item: Course = {
+  $type: 'Course',
+  name: 'Example Course'
+}
+
+// Use semantic patterns
+await $.Course.create(item)
+const result = await $.Course.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Course](https://schema.org/Course)
+- [Course Properties](https://schema.org/Course#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

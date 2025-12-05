@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DrugLegalStatus
+$context: https://schema.org
+$type: Class
+name: DrugLegalStatus
+description: The legal availability status of a medical drug.
+subClassOf: ["MedicalIntangible"]
+---
+
+# DrugLegalStatus
+
+The legal availability status of a medical drug.
+
+## Type Hierarchy
+
+**DrugLegalStatus**
+
+
+
+## Properties
+
+See [Schema.org DrugLegalStatus properties](https://schema.org/DrugLegalStatus#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DrugLegalStatus } from 'schema.org.ai'
+
+// Create a DrugLegalStatus
+const item: DrugLegalStatus = {
+  $type: 'DrugLegalStatus',
+  name: 'Example DrugLegalStatus'
+}
+
+// Use semantic patterns
+await $.DrugLegalStatus.create(item)
+const result = await $.DrugLegalStatus.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DrugLegalStatus](https://schema.org/DrugLegalStatus)
+- [DrugLegalStatus Properties](https://schema.org/DrugLegalStatus#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

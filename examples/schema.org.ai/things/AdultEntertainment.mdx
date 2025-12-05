@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AdultEntertainment
+$context: https://schema.org
+$type: Class
+name: AdultEntertainment
+description: An adult entertainment establishment.
+subClassOf: ["EntertainmentBusiness"]
+---
+
+# AdultEntertainment
+
+An adult entertainment establishment.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [EntertainmentBusiness](EntertainmentBusiness.mdx) > **AdultEntertainment**
+
+
+
+## Properties
+
+See [Schema.org AdultEntertainment properties](https://schema.org/AdultEntertainment#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AdultEntertainment } from 'schema.org.ai'
+
+// Create a AdultEntertainment
+const item: AdultEntertainment = {
+  $type: 'AdultEntertainment',
+  name: 'Example AdultEntertainment'
+}
+
+// Use semantic patterns
+await $.AdultEntertainment.create(item)
+const result = await $.AdultEntertainment.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AdultEntertainment](https://schema.org/AdultEntertainment)
+- [AdultEntertainment Properties](https://schema.org/AdultEntertainment#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

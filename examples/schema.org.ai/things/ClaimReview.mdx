@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ClaimReview
+$context: https://schema.org
+$type: Class
+name: ClaimReview
+description: A fact-checking review of claims made (or reported) in some creative work (referenced via itemReviewed).
+subClassOf: ["Review"]
+---
+
+# ClaimReview
+
+A fact-checking review of claims made (or reported) in some creative work (referenced via itemReviewed).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Review](Review.mdx) > **ClaimReview**
+
+
+
+## Properties
+
+See [Schema.org ClaimReview properties](https://schema.org/ClaimReview#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ClaimReview } from 'schema.org.ai'
+
+// Create a ClaimReview
+const item: ClaimReview = {
+  $type: 'ClaimReview',
+  name: 'Example ClaimReview'
+}
+
+// Use semantic patterns
+await $.ClaimReview.create(item)
+const result = await $.ClaimReview.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ClaimReview](https://schema.org/ClaimReview)
+- [ClaimReview Properties](https://schema.org/ClaimReview#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/MedicalBusiness
+$context: https://schema.org
+$type: Class
+name: MedicalBusiness
+description: A particular physical or virtual business of an organization for medical purposes. Examples of MedicalBusiness include different businesses run by health professionals.
+subClassOf: ["LocalBusiness"]
+---
+
+# MedicalBusiness
+
+A particular physical or virtual business of an organization for medical purposes. Examples of MedicalBusiness include different businesses run by health professionals.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **MedicalBusiness**
+
+## Direct Subclasses
+
+- **[Dentist](Dentist.mdx)**: A dentist
+- **[MedicalClinic](MedicalClinic.mdx)**: A facility, often associated with a hospital or medical school, that is devoted to the specific diagnosis and/or healthcare
+- **[Optician](Optician.mdx)**: A store that sells reading glasses and similar devices for improving vision
+- **[Pharmacy](Pharmacy.mdx)**: A pharmacy or drugstore
+
+## Properties
+
+See [Schema.org MedicalBusiness properties](https://schema.org/MedicalBusiness#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalBusiness } from 'schema.org.ai'
+
+// Create a MedicalBusiness
+const item: MedicalBusiness = {
+  $type: 'MedicalBusiness',
+  name: 'Example MedicalBusiness'
+}
+
+// Use semantic patterns
+await $.MedicalBusiness.create(item)
+const result = await $.MedicalBusiness.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalBusiness](https://schema.org/MedicalBusiness)
+- [MedicalBusiness Properties](https://schema.org/MedicalBusiness#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

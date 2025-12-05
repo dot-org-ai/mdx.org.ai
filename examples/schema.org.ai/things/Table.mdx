@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Table
+$context: https://schema.org
+$type: Class
+name: Table
+description: A table on a Web page.
+subClassOf: ["WebPageElement"]
+---
+
+# Table
+
+A table on a Web page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPageElement](WebPageElement.mdx) > **Table**
+
+
+
+## Properties
+
+See [Schema.org Table properties](https://schema.org/Table#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Table } from 'schema.org.ai'
+
+// Create a Table
+const item: Table = {
+  $type: 'Table',
+  name: 'Example Table'
+}
+
+// Use semantic patterns
+await $.Table.create(item)
+const result = await $.Table.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Table](https://schema.org/Table)
+- [Table Properties](https://schema.org/Table#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

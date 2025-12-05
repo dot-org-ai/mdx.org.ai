@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AdvertiserContentArticle
+$context: https://schema.org
+$type: Class
+name: AdvertiserContentArticle
+description: An [[Article]] that an external entity has paid to place or to produce to its specifications. Includes [advertorials](https://en.wikipedia.org/wiki/Advertorial), sponsored content, native advertising and other paid content.
+subClassOf: ["Article"]
+---
+
+# AdvertiserContentArticle
+
+An [[Article]] that an external entity has paid to place or to produce to its specifications. Includes [advertorials](https://en.wikipedia.org/wiki/Advertorial), sponsored content, native advertising and other paid content.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > **AdvertiserContentArticle**
+
+
+
+## Properties
+
+See [Schema.org AdvertiserContentArticle properties](https://schema.org/AdvertiserContentArticle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AdvertiserContentArticle } from 'schema.org.ai'
+
+// Create a AdvertiserContentArticle
+const item: AdvertiserContentArticle = {
+  $type: 'AdvertiserContentArticle',
+  name: 'Example AdvertiserContentArticle'
+}
+
+// Use semantic patterns
+await $.AdvertiserContentArticle.create(item)
+const result = await $.AdvertiserContentArticle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AdvertiserContentArticle](https://schema.org/AdvertiserContentArticle)
+- [AdvertiserContentArticle Properties](https://schema.org/AdvertiserContentArticle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

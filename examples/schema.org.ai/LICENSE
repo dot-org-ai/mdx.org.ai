@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LICENSE
+$context: https://creativecommons.org/ns
+$type: CreativeWork
+name: Creative Commons Attribution-ShareAlike 4.0 International License
+license: CC-BY-SA-4.0
+copyrightHolder:
+  $type: Organization
+  name: .do Platform Team
+copyrightYear: 2025
+---
+
+Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)
+
+Copyright (c) 2025 .do Platform Team
+
+This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
+International License.
+
+To view a copy of this license, visit:
+http://creativecommons.org/licenses/by-sa/4.0/
+
+or send a letter to:
+Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+================================================================================
+
+THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS
+PUBLIC LICENSE ("CCPL" OR "LICENSE"). THE WORK IS PROTECTED BY COPYRIGHT AND/OR
+OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS
+LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+
+BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO BE
+BOUND BY THE TERMS OF THIS LICENSE.
+
+Full license text: https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+================================================================================
+
+## Attribution Required
+
+This ontology is derived from Schema.org, which is licensed under CC BY-SA 3.0.
+
+When using this work, you MUST provide attribution to:
+1. schema.org.ai (https://schema.org.ai)
+2. Schema.org (https://schema.org - original data source)
+
+See ATTRIBUTION.md for complete attribution requirements and data source details.

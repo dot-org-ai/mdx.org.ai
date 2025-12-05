@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/SizeGroupEnumeration
+$context: https://schema.org
+$type: Class
+name: SizeGroupEnumeration
+description: Enumerates common size groups for various product categories.
+subClassOf: ["Enumeration"]
+---
+
+# SizeGroupEnumeration
+
+Enumerates common size groups for various product categories.
+
+## Type Hierarchy
+
+**SizeGroupEnumeration**
+
+## Direct Subclasses
+
+- **[WearableSizeGroupEnumeration](WearableSizeGroupEnumeration.mdx)**: Enumerates common size groups (also known as "size types") for wearable products
+
+## Properties
+
+See [Schema.org SizeGroupEnumeration properties](https://schema.org/SizeGroupEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SizeGroupEnumeration } from 'schema.org.ai'
+
+// Create a SizeGroupEnumeration
+const item: SizeGroupEnumeration = {
+  $type: 'SizeGroupEnumeration',
+  name: 'Example SizeGroupEnumeration'
+}
+
+// Use semantic patterns
+await $.SizeGroupEnumeration.create(item)
+const result = await $.SizeGroupEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SizeGroupEnumeration](https://schema.org/SizeGroupEnumeration)
+- [SizeGroupEnumeration Properties](https://schema.org/SizeGroupEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

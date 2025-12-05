@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UserLikes
+$context: https://schema.org
+$type: Class
+name: UserLikes
+description: UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+subClassOf: ["UserInteraction"]
+---
+
+# UserLikes
+
+UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [UserInteraction](UserInteraction.mdx) > **UserLikes**
+
+
+
+## Properties
+
+See [Schema.org UserLikes properties](https://schema.org/UserLikes#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserLikes } from 'schema.org.ai'
+
+// Create a UserLikes
+const item: UserLikes = {
+  $type: 'UserLikes',
+  name: 'Example UserLikes'
+}
+
+// Use semantic patterns
+await $.UserLikes.create(item)
+const result = await $.UserLikes.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserLikes](https://schema.org/UserLikes)
+- [UserLikes Properties](https://schema.org/UserLikes#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OfferForPurchase
+$context: https://schema.org
+$type: Class
+name: OfferForPurchase
+description: An [[OfferForPurchase]] in Schema.org represents an [[Offer]] to sell something, i.e. an [[Offer]] whose [[businessFunction]] is [sell](http://purl.org/goodrelations/v1#Sell.). See [Good Relations](https://en.wikipedia.org/wiki/GoodRelations) for background on the underlying concepts.
+subClassOf: ["Offer"]
+---
+
+# OfferForPurchase
+
+An [[OfferForPurchase]] in Schema.org represents an [[Offer]] to sell something, i.e. an [[Offer]] whose [[businessFunction]] is [sell](http://purl.org/goodrelations/v1#Sell.). See [Good Relations](https://en.wikipedia.org/wiki/GoodRelations) for background on the underlying concepts.
+
+## Type Hierarchy
+
+**OfferForPurchase**
+
+
+
+## Properties
+
+See [Schema.org OfferForPurchase properties](https://schema.org/OfferForPurchase#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OfferForPurchase } from 'schema.org.ai'
+
+// Create a OfferForPurchase
+const item: OfferForPurchase = {
+  $type: 'OfferForPurchase',
+  name: 'Example OfferForPurchase'
+}
+
+// Use semantic patterns
+await $.OfferForPurchase.create(item)
+const result = await $.OfferForPurchase.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OfferForPurchase](https://schema.org/OfferForPurchase)
+- [OfferForPurchase Properties](https://schema.org/OfferForPurchase#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

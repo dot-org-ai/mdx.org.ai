@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicReleaseFormatType
+$context: https://schema.org
+$type: Class
+name: MusicReleaseFormatType
+description: Format of this release (the type of recording media used, i.e. compact disc, digital media, LP, etc.).
+subClassOf: ["Enumeration"]
+---
+
+# MusicReleaseFormatType
+
+Format of this release (the type of recording media used, i.e. compact disc, digital media, LP, etc.).
+
+## Type Hierarchy
+
+**MusicReleaseFormatType**
+
+
+
+## Properties
+
+See [Schema.org MusicReleaseFormatType properties](https://schema.org/MusicReleaseFormatType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicReleaseFormatType } from 'schema.org.ai'
+
+// Create a MusicReleaseFormatType
+const item: MusicReleaseFormatType = {
+  $type: 'MusicReleaseFormatType',
+  name: 'Example MusicReleaseFormatType'
+}
+
+// Use semantic patterns
+await $.MusicReleaseFormatType.create(item)
+const result = await $.MusicReleaseFormatType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicReleaseFormatType](https://schema.org/MusicReleaseFormatType)
+- [MusicReleaseFormatType Properties](https://schema.org/MusicReleaseFormatType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

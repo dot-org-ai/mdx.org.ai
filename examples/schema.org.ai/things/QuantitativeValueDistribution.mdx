@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/QuantitativeValueDistribution
+$context: https://schema.org
+$type: Class
+name: QuantitativeValueDistribution
+description: A statistical distribution of values.
+subClassOf: ["StructuredValue"]
+---
+
+# QuantitativeValueDistribution
+
+A statistical distribution of values.
+
+## Type Hierarchy
+
+**QuantitativeValueDistribution**
+
+## Direct Subclasses
+
+- **[MonetaryAmountDistribution](MonetaryAmountDistribution.mdx)**: A statistical distribution of monetary amounts
+
+## Properties
+
+See [Schema.org QuantitativeValueDistribution properties](https://schema.org/QuantitativeValueDistribution#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { QuantitativeValueDistribution } from 'schema.org.ai'
+
+// Create a QuantitativeValueDistribution
+const item: QuantitativeValueDistribution = {
+  $type: 'QuantitativeValueDistribution',
+  name: 'Example QuantitativeValueDistribution'
+}
+
+// Use semantic patterns
+await $.QuantitativeValueDistribution.create(item)
+const result = await $.QuantitativeValueDistribution.get('item-id')
+```
+
+## Resources
+
+- [Schema.org QuantitativeValueDistribution](https://schema.org/QuantitativeValueDistribution)
+- [QuantitativeValueDistribution Properties](https://schema.org/QuantitativeValueDistribution#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

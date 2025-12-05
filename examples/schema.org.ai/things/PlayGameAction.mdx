@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PlayGameAction
+$context: https://schema.org
+$type: Class
+name: PlayGameAction
+description: The act of playing a video game.
+subClassOf: ["ConsumeAction"]
+---
+
+# PlayGameAction
+
+The act of playing a video game.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > **PlayGameAction**
+
+
+
+## Properties
+
+See [Schema.org PlayGameAction properties](https://schema.org/PlayGameAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PlayGameAction } from 'schema.org.ai'
+
+// Create a PlayGameAction
+const item: PlayGameAction = {
+  $type: 'PlayGameAction',
+  name: 'Example PlayGameAction'
+}
+
+// Use semantic patterns
+await $.PlayGameAction.create(item)
+const result = await $.PlayGameAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PlayGameAction](https://schema.org/PlayGameAction)
+- [PlayGameAction Properties](https://schema.org/PlayGameAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

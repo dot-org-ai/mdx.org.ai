@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Property
+$context: https://schema.org
+$type: Class
+name: Property
+description: A property, used to indicate attributes and relationships of some Thing; equivalent to rdf:Property.
+subClassOf: ["Intangible"]
+---
+
+# Property
+
+A property, used to indicate attributes and relationships of some Thing; equivalent to rdf:Property.
+
+## Type Hierarchy
+
+**Property**
+
+
+
+## Properties
+
+See [Schema.org Property properties](https://schema.org/Property#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Property } from 'schema.org.ai'
+
+// Create a Property
+const item: Property = {
+  $type: 'Property',
+  name: 'Example Property'
+}
+
+// Use semantic patterns
+await $.Property.create(item)
+const result = await $.Property.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Property](https://schema.org/Property)
+- [Property Properties](https://schema.org/Property#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Drug
+$context: https://schema.org
+$type: Class
+name: Drug
+description: A chemical or biologic substance, used as a medical therapy, that has a physiological effect on an organism. Here the term drug is used interchangeably with the term medicine although clinical knowledge makes a clear difference between them.
+subClassOf: ["Substance","Product"]
+---
+
+# Drug
+
+A chemical or biologic substance, used as a medical therapy, that has a physiological effect on an organism. Here the term drug is used interchangeably with the term medicine although clinical knowledge makes a clear difference between them.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > **Drug**
+
+
+
+## Properties
+
+See [Schema.org Drug properties](https://schema.org/Drug#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Drug } from 'schema.org.ai'
+
+// Create a Drug
+const item: Drug = {
+  $type: 'Drug',
+  name: 'Example Drug'
+}
+
+// Use semantic patterns
+await $.Drug.create(item)
+const result = await $.Drug.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Drug](https://schema.org/Drug)
+- [Drug Properties](https://schema.org/Drug#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

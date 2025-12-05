@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ExerciseAction
+$context: https://schema.org
+$type: Class
+name: ExerciseAction
+description: The act of participating in exertive activity for the purposes of improving health and fitness.
+subClassOf: ["PlayAction"]
+---
+
+# ExerciseAction
+
+The act of participating in exertive activity for the purposes of improving health and fitness.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [PlayAction](PlayAction.mdx) > **ExerciseAction**
+
+
+
+## Properties
+
+See [Schema.org ExerciseAction properties](https://schema.org/ExerciseAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ExerciseAction } from 'schema.org.ai'
+
+// Create a ExerciseAction
+const item: ExerciseAction = {
+  $type: 'ExerciseAction',
+  name: 'Example ExerciseAction'
+}
+
+// Use semantic patterns
+await $.ExerciseAction.create(item)
+const result = await $.ExerciseAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ExerciseAction](https://schema.org/ExerciseAction)
+- [ExerciseAction Properties](https://schema.org/ExerciseAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

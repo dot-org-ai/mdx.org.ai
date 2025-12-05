@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/QuoteAction
+$context: https://schema.org
+$type: Class
+name: QuoteAction
+description: An agent quotes/estimates/appraises an object/product/service with a price at a location/store.
+subClassOf: ["TradeAction"]
+---
+
+# QuoteAction
+
+An agent quotes/estimates/appraises an object/product/service with a price at a location/store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TradeAction](TradeAction.mdx) > **QuoteAction**
+
+
+
+## Properties
+
+See [Schema.org QuoteAction properties](https://schema.org/QuoteAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { QuoteAction } from 'schema.org.ai'
+
+// Create a QuoteAction
+const item: QuoteAction = {
+  $type: 'QuoteAction',
+  name: 'Example QuoteAction'
+}
+
+// Use semantic patterns
+await $.QuoteAction.create(item)
+const result = await $.QuoteAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org QuoteAction](https://schema.org/QuoteAction)
+- [QuoteAction Properties](https://schema.org/QuoteAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

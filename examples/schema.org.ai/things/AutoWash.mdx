@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AutoWash
+$context: https://schema.org
+$type: Class
+name: AutoWash
+description: A car wash business.
+subClassOf: ["AutomotiveBusiness"]
+---
+
+# AutoWash
+
+A car wash business.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [AutomotiveBusiness](AutomotiveBusiness.mdx) > **AutoWash**
+
+
+
+## Properties
+
+See [Schema.org AutoWash properties](https://schema.org/AutoWash#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AutoWash } from 'schema.org.ai'
+
+// Create a AutoWash
+const item: AutoWash = {
+  $type: 'AutoWash',
+  name: 'Example AutoWash'
+}
+
+// Use semantic patterns
+await $.AutoWash.create(item)
+const result = await $.AutoWash.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AutoWash](https://schema.org/AutoWash)
+- [AutoWash Properties](https://schema.org/AutoWash#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

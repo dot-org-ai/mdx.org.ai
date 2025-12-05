@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ProfilePage
+$context: https://schema.org
+$type: Class
+name: ProfilePage
+description: Web page type: Profile page.
+subClassOf: ["WebPage"]
+---
+
+# ProfilePage
+
+Web page type: Profile page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **ProfilePage**
+
+
+
+## Properties
+
+See [Schema.org ProfilePage properties](https://schema.org/ProfilePage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ProfilePage } from 'schema.org.ai'
+
+// Create a ProfilePage
+const item: ProfilePage = {
+  $type: 'ProfilePage',
+  name: 'Example ProfilePage'
+}
+
+// Use semantic patterns
+await $.ProfilePage.create(item)
+const result = await $.ProfilePage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ProfilePage](https://schema.org/ProfilePage)
+- [ProfilePage Properties](https://schema.org/ProfilePage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

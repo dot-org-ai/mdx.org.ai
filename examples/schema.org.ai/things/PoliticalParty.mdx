@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PoliticalParty
+$context: https://schema.org
+$type: Class
+name: PoliticalParty
+description: Organization: Political Party.
+subClassOf: ["Organization"]
+---
+
+# PoliticalParty
+
+Organization: Political Party.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **PoliticalParty**
+
+
+
+## Properties
+
+See [Schema.org PoliticalParty properties](https://schema.org/PoliticalParty#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PoliticalParty } from 'schema.org.ai'
+
+// Create a PoliticalParty
+const item: PoliticalParty = {
+  $type: 'PoliticalParty',
+  name: 'Example PoliticalParty'
+}
+
+// Use semantic patterns
+await $.PoliticalParty.create(item)
+const result = await $.PoliticalParty.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PoliticalParty](https://schema.org/PoliticalParty)
+- [PoliticalParty Properties](https://schema.org/PoliticalParty#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Hackathon
+$context: https://schema.org
+$type: Class
+name: Hackathon
+description: A [hackathon](https://en.wikipedia.org/wiki/Hackathon) event.
+subClassOf: ["Event"]
+---
+
+# Hackathon
+
+A [hackathon](https://en.wikipedia.org/wiki/Hackathon) event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **Hackathon**
+
+
+
+## Properties
+
+See [Schema.org Hackathon properties](https://schema.org/Hackathon#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Hackathon } from 'schema.org.ai'
+
+// Create a Hackathon
+const item: Hackathon = {
+  $type: 'Hackathon',
+  name: 'Example Hackathon'
+}
+
+// Use semantic patterns
+await $.Hackathon.create(item)
+const result = await $.Hackathon.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Hackathon](https://schema.org/Hackathon)
+- [Hackathon Properties](https://schema.org/Hackathon#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

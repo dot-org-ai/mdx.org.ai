@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ParcelDelivery
+$context: https://schema.org
+$type: Class
+name: ParcelDelivery
+description: The delivery of a parcel either via the postal service or a commercial service.
+subClassOf: ["Intangible"]
+---
+
+# ParcelDelivery
+
+The delivery of a parcel either via the postal service or a commercial service.
+
+## Type Hierarchy
+
+**ParcelDelivery**
+
+
+
+## Properties
+
+See [Schema.org ParcelDelivery properties](https://schema.org/ParcelDelivery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ParcelDelivery } from 'schema.org.ai'
+
+// Create a ParcelDelivery
+const item: ParcelDelivery = {
+  $type: 'ParcelDelivery',
+  name: 'Example ParcelDelivery'
+}
+
+// Use semantic patterns
+await $.ParcelDelivery.create(item)
+const result = await $.ParcelDelivery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ParcelDelivery](https://schema.org/ParcelDelivery)
+- [ParcelDelivery Properties](https://schema.org/ParcelDelivery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/TaxiReservation
+$context: https://schema.org
+$type: Class
+name: TaxiReservation
+description: A reservation for a taxi.\
+subClassOf: ["Reservation"]
+---
+
+# TaxiReservation
+
+A reservation for a taxi.\
+\
+Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, use [[Offer]].
+
+## Type Hierarchy
+
+**TaxiReservation**
+
+
+
+## Properties
+
+See [Schema.org TaxiReservation properties](https://schema.org/TaxiReservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TaxiReservation } from 'schema.org.ai'
+
+// Create a TaxiReservation
+const item: TaxiReservation = {
+  $type: 'TaxiReservation',
+  name: 'Example TaxiReservation'
+}
+
+// Use semantic patterns
+await $.TaxiReservation.create(item)
+const result = await $.TaxiReservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TaxiReservation](https://schema.org/TaxiReservation)
+- [TaxiReservation Properties](https://schema.org/TaxiReservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

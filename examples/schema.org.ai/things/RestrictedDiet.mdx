@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RestrictedDiet
+$context: https://schema.org
+$type: Class
+name: RestrictedDiet
+description: A diet restricted to certain foods or preparations for cultural, religious, health or lifestyle reasons.
+subClassOf: ["Enumeration"]
+---
+
+# RestrictedDiet
+
+A diet restricted to certain foods or preparations for cultural, religious, health or lifestyle reasons.
+
+## Type Hierarchy
+
+**RestrictedDiet**
+
+
+
+## Properties
+
+See [Schema.org RestrictedDiet properties](https://schema.org/RestrictedDiet#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RestrictedDiet } from 'schema.org.ai'
+
+// Create a RestrictedDiet
+const item: RestrictedDiet = {
+  $type: 'RestrictedDiet',
+  name: 'Example RestrictedDiet'
+}
+
+// Use semantic patterns
+await $.RestrictedDiet.create(item)
+const result = await $.RestrictedDiet.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RestrictedDiet](https://schema.org/RestrictedDiet)
+- [RestrictedDiet Properties](https://schema.org/RestrictedDiet#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

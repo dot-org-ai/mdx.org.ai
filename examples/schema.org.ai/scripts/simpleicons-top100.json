@@ -1,0 +1,410 @@
+{
+  "summary": {
+    "total": 7155,
+    "withIcons": 407,
+    "coverage": "5.69%",
+    "generated": "2025-11-17T16:16:25.991Z"
+  },
+  "top100Services": [
+    {
+      "name": "Adafruit Io",
+      "zapierSlug": "adafruit-io",
+      "simpleIconsSlug": "adafruit",
+      "url": "https://adafruitio.com",
+      "color": "#000000",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Affinity",
+      "zapierSlug": "affinity",
+      "simpleIconsSlug": "affinity",
+      "url": "https://affinity.com",
+      "color": "#222324",
+      "matchType": "exact"
+    },
+    {
+      "name": "Airbrake",
+      "zapierSlug": "airbrake",
+      "simpleIconsSlug": "airbrake",
+      "url": "https://airbrake.com",
+      "color": "#FFA500",
+      "matchType": "exact"
+    },
+    {
+      "name": "Airtable",
+      "zapierSlug": "airtable",
+      "simpleIconsSlug": "airtable",
+      "url": "https://airtable.com",
+      "color": "#18BFFF",
+      "matchType": "exact"
+    },
+    {
+      "name": "Alchemy",
+      "zapierSlug": "alchemy",
+      "simpleIconsSlug": "alchemy",
+      "url": "https://alchemy.com",
+      "color": "#0C0C0E",
+      "matchType": "exact"
+    },
+    {
+      "name": "Arlo",
+      "zapierSlug": "arlo",
+      "simpleIconsSlug": "arlo",
+      "url": "https://arlo.com",
+      "color": "#49B48A",
+      "matchType": "exact"
+    },
+    {
+      "name": "Asana",
+      "zapierSlug": "asana",
+      "simpleIconsSlug": "asana",
+      "url": "https://asana.com",
+      "color": "#F06A6A",
+      "matchType": "exact"
+    },
+    {
+      "name": "Atlassian Mcp",
+      "zapierSlug": "atlassian-mcp",
+      "simpleIconsSlug": "atlassian",
+      "url": "https://atlassianmcp.com",
+      "color": "#0052CC",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Backendless Cloned Da66078",
+      "zapierSlug": "backendless-cloned-da66078",
+      "simpleIconsSlug": "backendless",
+      "url": "https://backendlessclonedda66078.com",
+      "color": "#1D77BD",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Backstage",
+      "zapierSlug": "backstage",
+      "simpleIconsSlug": "backstage",
+      "url": "https://backstage.com",
+      "color": "#9BF0E1",
+      "matchType": "exact"
+    },
+    {
+      "name": "Basecamp",
+      "zapierSlug": "basecamp",
+      "simpleIconsSlug": "basecamp",
+      "url": "https://basecamp.com",
+      "color": "#1D2D35",
+      "matchType": "exact"
+    },
+    {
+      "name": "Basecamp Classic",
+      "zapierSlug": "basecamp-classic",
+      "simpleIconsSlug": "basecamp",
+      "url": "https://basecamp.com",
+      "color": "#1D2D35",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Baserow",
+      "zapierSlug": "baserow",
+      "simpleIconsSlug": "baserow",
+      "url": "https://baserow.com",
+      "color": "#5190EF",
+      "matchType": "exact"
+    },
+    {
+      "name": "Bento Everboarding",
+      "zapierSlug": "bento-everboarding",
+      "simpleIconsSlug": "bento",
+      "url": "https://bentoeverboarding.com",
+      "color": "#768CFF",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Better Stack",
+      "zapierSlug": "better-stack",
+      "simpleIconsSlug": "betterstack",
+      "url": "https://betterstack.com",
+      "color": "#000000",
+      "matchType": "normalized"
+    },
+    {
+      "name": "Bevy Design",
+      "zapierSlug": "bevy-design",
+      "simpleIconsSlug": "bevy",
+      "url": "https://bevydesign.com",
+      "color": "#232326",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Bigcartel",
+      "zapierSlug": "bigcartel",
+      "simpleIconsSlug": "bigcartel",
+      "url": "https://bigcartel.com",
+      "color": "#222222",
+      "matchType": "exact"
+    },
+    {
+      "name": "Bigcommerce",
+      "zapierSlug": "bigcommerce",
+      "simpleIconsSlug": "bigcommerce",
+      "url": "https://bigcommerce.com",
+      "color": "#121118",
+      "matchType": "exact"
+    },
+    {
+      "name": "Bitbucket",
+      "zapierSlug": "bitbucket",
+      "simpleIconsSlug": "bitbucket",
+      "url": "https://bitbucket.org",
+      "color": "#0052CC",
+      "matchType": "exact"
+    },
+    {
+      "name": "Bitly",
+      "zapierSlug": "bitly",
+      "simpleIconsSlug": "bitly",
+      "url": "https://bitly.com",
+      "color": "#EE6123",
+      "matchType": "exact"
+    },
+    {
+      "name": "Black Magic",
+      "zapierSlug": "black-magic",
+      "simpleIconsSlug": "black",
+      "url": "https://blackmagic.com",
+      "color": "#000000",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Bluesky",
+      "zapierSlug": "bluesky",
+      "simpleIconsSlug": "bluesky",
+      "url": "https://bluesky.com",
+      "color": "#1185FE",
+      "matchType": "exact"
+    },
+    {
+      "name": "Boost Hub",
+      "zapierSlug": "boost-hub",
+      "simpleIconsSlug": "boost",
+      "url": "https://boosthub.com",
+      "color": "#F7901E",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Boost Note",
+      "zapierSlug": "boost-note",
+      "simpleIconsSlug": "boost",
+      "url": "https://boostnote.com",
+      "color": "#F7901E",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Boostapp",
+      "zapierSlug": "boostapp",
+      "simpleIconsSlug": "boost",
+      "url": "https://boostapp.com",
+      "color": "#F7901E",
+      "matchType": "normalized"
+    },
+    {
+      "name": "Box",
+      "zapierSlug": "box",
+      "simpleIconsSlug": "box",
+      "url": "https://box.com",
+      "color": "#0061D5",
+      "matchType": "exact"
+    },
+    {
+      "name": "Braintree",
+      "zapierSlug": "braintree",
+      "simpleIconsSlug": "braintree",
+      "url": "https://braintree.com",
+      "color": "#000000",
+      "matchType": "exact"
+    },
+    {
+      "name": "Braintrust",
+      "zapierSlug": "braintrust",
+      "simpleIconsSlug": "braintrust",
+      "url": "https://braintrust.com",
+      "color": "#000000",
+      "matchType": "exact"
+    },
+    {
+      "name": "Brandfolder",
+      "zapierSlug": "brandfolder",
+      "simpleIconsSlug": "brandfolder",
+      "url": "https://brandfolder.com",
+      "color": "#40D1F5",
+      "matchType": "exact"
+    },
+    {
+      "name": "Breaker",
+      "zapierSlug": "breaker",
+      "simpleIconsSlug": "breaker",
+      "url": "https://breaker.com",
+      "color": "#003DAD",
+      "matchType": "exact"
+    },
+    {
+      "name": "Brevo",
+      "zapierSlug": "brevo",
+      "simpleIconsSlug": "brevo",
+      "url": "https://brevo.com",
+      "color": "#0B996E",
+      "matchType": "exact"
+    },
+    {
+      "name": "Brex",
+      "zapierSlug": "brex",
+      "simpleIconsSlug": "brex",
+      "url": "https://brex.com",
+      "color": "#212121",
+      "matchType": "exact"
+    },
+    {
+      "name": "Brex Partner Referrals",
+      "zapierSlug": "brex-partner-referrals",
+      "simpleIconsSlug": "brex",
+      "url": "https://brexpartnerreferrals.com",
+      "color": "#212121",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Bricks",
+      "zapierSlug": "bricks",
+      "simpleIconsSlug": "bricks",
+      "url": "https://bricks.com",
+      "color": "#FFD54D",
+      "matchType": "exact"
+    },
+    {
+      "name": "Buddy Punch",
+      "zapierSlug": "buddy-punch",
+      "simpleIconsSlug": "buddy",
+      "url": "https://buddypunch.com",
+      "color": "#1A86FD",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Buffer",
+      "zapierSlug": "buffer",
+      "simpleIconsSlug": "buffer",
+      "url": "https://buffer.com",
+      "color": "#231F20",
+      "matchType": "exact"
+    },
+    {
+      "name": "Bunq",
+      "zapierSlug": "bunq",
+      "simpleIconsSlug": "bunq",
+      "url": "https://bunq.com",
+      "color": "#3394D7",
+      "matchType": "exact"
+    },
+    {
+      "name": "Buy Me A Coffee",
+      "zapierSlug": "buy-me-a-coffee",
+      "simpleIconsSlug": "buymeacoffee",
+      "url": "https://buymeacoffee.com",
+      "color": "#FFDD00",
+      "matchType": "normalized"
+    },
+    {
+      "name": "Buysellads",
+      "zapierSlug": "buysellads",
+      "simpleIconsSlug": "buysellads",
+      "url": "https://buysellads.com",
+      "color": "#EB4714",
+      "matchType": "exact"
+    },
+    {
+      "name": "C Me",
+      "zapierSlug": "c-me",
+      "simpleIconsSlug": "c",
+      "url": "https://cme.com",
+      "color": "#A8B9CC",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Calendly",
+      "zapierSlug": "calendly",
+      "simpleIconsSlug": "calendly",
+      "url": "https://calendly.com",
+      "color": "#006BFF",
+      "matchType": "exact"
+    },
+    {
+      "name": "Campaign Monitor",
+      "zapierSlug": "campaign-monitor",
+      "simpleIconsSlug": "campaignmonitor",
+      "url": "https://campaignmonitor.com",
+      "color": "#111324",
+      "matchType": "normalized"
+    },
+    {
+      "name": "Charles Universe",
+      "zapierSlug": "charles-universe",
+      "simpleIconsSlug": "charles",
+      "url": "https://charlesuniverse.com",
+      "color": "#F3F5F5",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Chatbot",
+      "zapierSlug": "chatbot",
+      "simpleIconsSlug": "chatbot",
+      "url": "https://chatbot.com",
+      "color": "#0066FF",
+      "matchType": "exact"
+    },
+    {
+      "name": "Circle",
+      "zapierSlug": "circle",
+      "simpleIconsSlug": "circle",
+      "url": "https://circle.com",
+      "color": "#8669AE",
+      "matchType": "exact"
+    },
+    {
+      "name": "Cisco Webex Meetings",
+      "zapierSlug": "cisco-webex-meetings",
+      "simpleIconsSlug": "cisco",
+      "url": "https://ciscowebexmeetings.com",
+      "color": "#1BA0D7",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Cisco Webex Teams",
+      "zapierSlug": "cisco-webex-teams",
+      "simpleIconsSlug": "cisco",
+      "url": "https://ciscowebexteams.com",
+      "color": "#1BA0D7",
+      "matchType": "fuzzy"
+    },
+    {
+      "name": "Civicrm",
+      "zapierSlug": "civicrm",
+      "simpleIconsSlug": "civicrm",
+      "url": "https://civicrm.com",
+      "color": "#81C459",
+      "matchType": "exact"
+    },
+    {
+      "name": "Clickup",
+      "zapierSlug": "clickup",
+      "simpleIconsSlug": "clickup",
+      "url": "https://clickup.com",
+      "color": "#7B68EE",
+      "matchType": "exact"
+    },
+    {
+      "name": "Clockify",
+      "zapierSlug": "clockify",
+      "simpleIconsSlug": "clockify",
+      "url": "https://clockify.com",
+      "color": "#03A9F4",
+      "matchType": "exact"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/LodgingReservation
+$context: https://schema.org
+$type: Class
+name: LodgingReservation
+description: A reservation for lodging at a hotel, motel, inn, etc.\
+subClassOf: ["Reservation"]
+---
+
+# LodgingReservation
+
+A reservation for lodging at a hotel, motel, inn, etc.\
+\
+Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.
+
+## Type Hierarchy
+
+**LodgingReservation**
+
+
+
+## Properties
+
+See [Schema.org LodgingReservation properties](https://schema.org/LodgingReservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LodgingReservation } from 'schema.org.ai'
+
+// Create a LodgingReservation
+const item: LodgingReservation = {
+  $type: 'LodgingReservation',
+  name: 'Example LodgingReservation'
+}
+
+// Use semantic patterns
+await $.LodgingReservation.create(item)
+const result = await $.LodgingReservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LodgingReservation](https://schema.org/LodgingReservation)
+- [LodgingReservation Properties](https://schema.org/LodgingReservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

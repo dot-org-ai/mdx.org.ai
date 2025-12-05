@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PodcastEpisode
+$context: https://schema.org
+$type: Class
+name: PodcastEpisode
+description: A single episode of a podcast series.
+subClassOf: ["Episode"]
+---
+
+# PodcastEpisode
+
+A single episode of a podcast series.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Episode](Episode.mdx) > **PodcastEpisode**
+
+
+
+## Properties
+
+See [Schema.org PodcastEpisode properties](https://schema.org/PodcastEpisode#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PodcastEpisode } from 'schema.org.ai'
+
+// Create a PodcastEpisode
+const item: PodcastEpisode = {
+  $type: 'PodcastEpisode',
+  name: 'Example PodcastEpisode'
+}
+
+// Use semantic patterns
+await $.PodcastEpisode.create(item)
+const result = await $.PodcastEpisode.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PodcastEpisode](https://schema.org/PodcastEpisode)
+- [PodcastEpisode Properties](https://schema.org/PodcastEpisode#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/NGO
+$context: https://schema.org
+$type: Class
+name: NGO
+description: Organization: Non-governmental Organization.
+subClassOf: ["Organization"]
+---
+
+# NGO
+
+Organization: Non-governmental Organization.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **NGO**
+
+
+
+## Properties
+
+See [Schema.org NGO properties](https://schema.org/NGO#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { NGO } from 'schema.org.ai'
+
+// Create a NGO
+const item: NGO = {
+  $type: 'NGO',
+  name: 'Example NGO'
+}
+
+// Use semantic patterns
+await $.NGO.create(item)
+const result = await $.NGO.get('item-id')
+```
+
+## Resources
+
+- [Schema.org NGO](https://schema.org/NGO)
+- [NGO Properties](https://schema.org/NGO#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

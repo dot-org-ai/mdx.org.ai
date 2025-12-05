@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Apartment
+$context: https://schema.org
+$type: Class
+name: Apartment
+description: An apartment (in American English) or flat (in British English) is a self-contained housing unit (a type of residential real estate) that occupies only part of a building (source: Wikipedia, the free encyclopedia, see <a href="http://en.wikipedia.org/wiki/Apartment">http://en.wikipedia.org/wiki/Apartment</a>).
+subClassOf: ["Accommodation"]
+---
+
+# Apartment
+
+An apartment (in American English) or flat (in British English) is a self-contained housing unit (a type of residential real estate) that occupies only part of a building (source: Wikipedia, the free encyclopedia, see <a href="http://en.wikipedia.org/wiki/Apartment">http://en.wikipedia.org/wiki/Apartment</a>).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Accommodation](Accommodation.mdx) > **Apartment**
+
+
+
+## Properties
+
+See [Schema.org Apartment properties](https://schema.org/Apartment#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Apartment } from 'schema.org.ai'
+
+// Create a Apartment
+const item: Apartment = {
+  $type: 'Apartment',
+  name: 'Example Apartment'
+}
+
+// Use semantic patterns
+await $.Apartment.create(item)
+const result = await $.Apartment.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Apartment](https://schema.org/Apartment)
+- [Apartment Properties](https://schema.org/Apartment#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,54 @@
+---
+$id: https://schema.org.ai/Review
+$context: https://schema.org
+$type: Class
+name: Review
+description: A review of an item - for example, of a restaurant, movie, or store.
+subClassOf: ["CreativeWork"]
+---
+
+# Review
+
+A review of an item - for example, of a restaurant, movie, or store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Review**
+
+## Direct Subclasses
+
+- **[ClaimReview](ClaimReview.mdx)**: A fact-checking review of claims made (or reported) in some creative work (referenced via itemReviewed)
+- **[EmployerReview](EmployerReview.mdx)**: An [[EmployerReview]] is a review of an [[Organization]] regarding its role as an employer, written by a current or former employee of that organization
+- **[MediaReview](MediaReview.mdx)**: A [[MediaReview]] is a more specialized form of Review dedicated to the evaluation of media content online, typically in the context of fact-checking and misinformation
+- **[Recommendation](Recommendation.mdx)**: [[Recommendation]] is a type of [[Review]] that suggests or proposes something as the best option or best course of action
+- **[UserReview](UserReview.mdx)**: A review created by an end-user (e
+
+## Properties
+
+See [Schema.org Review properties](https://schema.org/Review#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Review } from 'schema.org.ai'
+
+// Create a Review
+const item: Review = {
+  $type: 'Review',
+  name: 'Example Review'
+}
+
+// Use semantic patterns
+await $.Review.create(item)
+const result = await $.Review.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Review](https://schema.org/Review)
+- [Review Properties](https://schema.org/Review#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalDevice
+$context: https://schema.org
+$type: Class
+name: MedicalDevice
+description: Any object used in a medical capacity, such as to diagnose or treat a patient.
+subClassOf: ["MedicalEntity"]
+---
+
+# MedicalDevice
+
+Any object used in a medical capacity, such as to diagnose or treat a patient.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **MedicalDevice**
+
+
+
+## Properties
+
+See [Schema.org MedicalDevice properties](https://schema.org/MedicalDevice#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalDevice } from 'schema.org.ai'
+
+// Create a MedicalDevice
+const item: MedicalDevice = {
+  $type: 'MedicalDevice',
+  name: 'Example MedicalDevice'
+}
+
+// Use semantic patterns
+await $.MedicalDevice.create(item)
+const result = await $.MedicalDevice.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalDevice](https://schema.org/MedicalDevice)
+- [MedicalDevice Properties](https://schema.org/MedicalDevice#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

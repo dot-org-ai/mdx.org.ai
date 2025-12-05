@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/RentalCarReservation
+$context: https://schema.org
+$type: Class
+name: RentalCarReservation
+description: A reservation for a rental car.\
+subClassOf: ["Reservation"]
+---
+
+# RentalCarReservation
+
+A reservation for a rental car.\
+\
+Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.
+
+## Type Hierarchy
+
+**RentalCarReservation**
+
+
+
+## Properties
+
+See [Schema.org RentalCarReservation properties](https://schema.org/RentalCarReservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RentalCarReservation } from 'schema.org.ai'
+
+// Create a RentalCarReservation
+const item: RentalCarReservation = {
+  $type: 'RentalCarReservation',
+  name: 'Example RentalCarReservation'
+}
+
+// Use semantic patterns
+await $.RentalCarReservation.create(item)
+const result = await $.RentalCarReservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RentalCarReservation](https://schema.org/RentalCarReservation)
+- [RentalCarReservation Properties](https://schema.org/RentalCarReservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

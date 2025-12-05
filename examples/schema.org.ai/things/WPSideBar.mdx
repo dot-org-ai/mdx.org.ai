@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WPSideBar
+$context: https://schema.org
+$type: Class
+name: WPSideBar
+description: A sidebar section of the page.
+subClassOf: ["WebPageElement"]
+---
+
+# WPSideBar
+
+A sidebar section of the page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPageElement](WebPageElement.mdx) > **WPSideBar**
+
+
+
+## Properties
+
+See [Schema.org WPSideBar properties](https://schema.org/WPSideBar#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WPSideBar } from 'schema.org.ai'
+
+// Create a WPSideBar
+const item: WPSideBar = {
+  $type: 'WPSideBar',
+  name: 'Example WPSideBar'
+}
+
+// Use semantic patterns
+await $.WPSideBar.create(item)
+const result = await $.WPSideBar.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WPSideBar](https://schema.org/WPSideBar)
+- [WPSideBar Properties](https://schema.org/WPSideBar#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

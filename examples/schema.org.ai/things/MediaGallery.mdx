@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/MediaGallery
+$context: https://schema.org
+$type: Class
+name: MediaGallery
+description: Web page type: Media gallery page. A mixed-media page that can contain media such as images, videos, and other multimedia.
+subClassOf: ["CollectionPage"]
+---
+
+# MediaGallery
+
+Web page type: Media gallery page. A mixed-media page that can contain media such as images, videos, and other multimedia.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > [CollectionPage](CollectionPage.mdx) > **MediaGallery**
+
+## Direct Subclasses
+
+- **[ImageGallery](ImageGallery.mdx)**: Web page type: Image gallery page
+- **[VideoGallery](VideoGallery.mdx)**: Web page type: Video gallery page
+
+## Properties
+
+See [Schema.org MediaGallery properties](https://schema.org/MediaGallery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MediaGallery } from 'schema.org.ai'
+
+// Create a MediaGallery
+const item: MediaGallery = {
+  $type: 'MediaGallery',
+  name: 'Example MediaGallery'
+}
+
+// Use semantic patterns
+await $.MediaGallery.create(item)
+const result = await $.MediaGallery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MediaGallery](https://schema.org/MediaGallery)
+- [MediaGallery Properties](https://schema.org/MediaGallery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

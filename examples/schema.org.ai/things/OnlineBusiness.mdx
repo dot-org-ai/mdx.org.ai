@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/OnlineBusiness
+$context: https://schema.org
+$type: Class
+name: OnlineBusiness
+description: A particular online business, either standalone or the online part of a broader organization. Examples include an eCommerce site, an online travel booking site, an online learning site, an online logistics and shipping provider, an online (virtual) doctor, etc.
+subClassOf: ["Organization"]
+---
+
+# OnlineBusiness
+
+A particular online business, either standalone or the online part of a broader organization. Examples include an eCommerce site, an online travel booking site, an online learning site, an online logistics and shipping provider, an online (virtual) doctor, etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **OnlineBusiness**
+
+## Direct Subclasses
+
+- **[OnlineStore](OnlineStore.mdx)**: An eCommerce site
+
+## Properties
+
+See [Schema.org OnlineBusiness properties](https://schema.org/OnlineBusiness#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OnlineBusiness } from 'schema.org.ai'
+
+// Create a OnlineBusiness
+const item: OnlineBusiness = {
+  $type: 'OnlineBusiness',
+  name: 'Example OnlineBusiness'
+}
+
+// Use semantic patterns
+await $.OnlineBusiness.create(item)
+const result = await $.OnlineBusiness.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OnlineBusiness](https://schema.org/OnlineBusiness)
+- [OnlineBusiness Properties](https://schema.org/OnlineBusiness#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

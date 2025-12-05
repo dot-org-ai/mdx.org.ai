@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MolecularEntity
+$context: https://schema.org
+$type: Class
+name: MolecularEntity
+description: Any constitutionally or isotopically distinct atom, molecule, ion, ion pair, radical, radical ion, complex, conformer etc., identifiable as a separately distinguishable entity.
+subClassOf: ["BioChemEntity"]
+---
+
+# MolecularEntity
+
+Any constitutionally or isotopically distinct atom, molecule, ion, ion pair, radical, radical ion, complex, conformer etc., identifiable as a separately distinguishable entity.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [BioChemEntity](BioChemEntity.mdx) > **MolecularEntity**
+
+
+
+## Properties
+
+See [Schema.org MolecularEntity properties](https://schema.org/MolecularEntity#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MolecularEntity } from 'schema.org.ai'
+
+// Create a MolecularEntity
+const item: MolecularEntity = {
+  $type: 'MolecularEntity',
+  name: 'Example MolecularEntity'
+}
+
+// Use semantic patterns
+await $.MolecularEntity.create(item)
+const result = await $.MolecularEntity.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MolecularEntity](https://schema.org/MolecularEntity)
+- [MolecularEntity Properties](https://schema.org/MolecularEntity#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

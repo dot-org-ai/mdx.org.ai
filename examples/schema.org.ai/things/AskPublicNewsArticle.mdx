@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AskPublicNewsArticle
+$context: https://schema.org
+$type: Class
+name: AskPublicNewsArticle
+description: A [[NewsArticle]] expressing an open call by a [[NewsMediaOrganization]] asking the public for input, insights, clarifications, anecdotes, documentation, etc., on an issue, for reporting purposes.
+subClassOf: ["NewsArticle"]
+---
+
+# AskPublicNewsArticle
+
+A [[NewsArticle]] expressing an open call by a [[NewsMediaOrganization]] asking the public for input, insights, clarifications, anecdotes, documentation, etc., on an issue, for reporting purposes.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > [NewsArticle](NewsArticle.mdx) > **AskPublicNewsArticle**
+
+
+
+## Properties
+
+See [Schema.org AskPublicNewsArticle properties](https://schema.org/AskPublicNewsArticle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AskPublicNewsArticle } from 'schema.org.ai'
+
+// Create a AskPublicNewsArticle
+const item: AskPublicNewsArticle = {
+  $type: 'AskPublicNewsArticle',
+  name: 'Example AskPublicNewsArticle'
+}
+
+// Use semantic patterns
+await $.AskPublicNewsArticle.create(item)
+const result = await $.AskPublicNewsArticle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AskPublicNewsArticle](https://schema.org/AskPublicNewsArticle)
+- [AskPublicNewsArticle Properties](https://schema.org/AskPublicNewsArticle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

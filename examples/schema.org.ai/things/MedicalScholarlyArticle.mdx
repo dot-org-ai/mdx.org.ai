@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalScholarlyArticle
+$context: https://schema.org
+$type: Class
+name: MedicalScholarlyArticle
+description: A scholarly article in the medical domain.
+subClassOf: ["ScholarlyArticle"]
+---
+
+# MedicalScholarlyArticle
+
+A scholarly article in the medical domain.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > [ScholarlyArticle](ScholarlyArticle.mdx) > **MedicalScholarlyArticle**
+
+
+
+## Properties
+
+See [Schema.org MedicalScholarlyArticle properties](https://schema.org/MedicalScholarlyArticle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalScholarlyArticle } from 'schema.org.ai'
+
+// Create a MedicalScholarlyArticle
+const item: MedicalScholarlyArticle = {
+  $type: 'MedicalScholarlyArticle',
+  name: 'Example MedicalScholarlyArticle'
+}
+
+// Use semantic patterns
+await $.MedicalScholarlyArticle.create(item)
+const result = await $.MedicalScholarlyArticle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalScholarlyArticle](https://schema.org/MedicalScholarlyArticle)
+- [MedicalScholarlyArticle Properties](https://schema.org/MedicalScholarlyArticle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

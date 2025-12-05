@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Mountain
+$context: https://schema.org
+$type: Class
+name: Mountain
+description: A mountain, like Mount Whitney or Mount Everest.
+subClassOf: ["Landform"]
+---
+
+# Mountain
+
+A mountain, like Mount Whitney or Mount Everest.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > **Mountain**
+
+
+
+## Properties
+
+See [Schema.org Mountain properties](https://schema.org/Mountain#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Mountain } from 'schema.org.ai'
+
+// Create a Mountain
+const item: Mountain = {
+  $type: 'Mountain',
+  name: 'Example Mountain'
+}
+
+// Use semantic patterns
+await $.Mountain.create(item)
+const result = await $.Mountain.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Mountain](https://schema.org/Mountain)
+- [Mountain Properties](https://schema.org/Mountain#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

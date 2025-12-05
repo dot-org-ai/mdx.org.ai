@@ -1,0 +1,56 @@
+---
+$id: https://schema.org.ai/AnatomicalStructure
+$context: https://schema.org
+$type: Class
+name: AnatomicalStructure
+description: Any part of the human body, typically a component of an anatomical system. Organs, tissues, and cells are all anatomical structures.
+subClassOf: ["MedicalEntity"]
+---
+
+# AnatomicalStructure
+
+Any part of the human body, typically a component of an anatomical system. Organs, tissues, and cells are all anatomical structures.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **AnatomicalStructure**
+
+## Direct Subclasses
+
+- **[Bone](Bone.mdx)**: Rigid connective tissue that comprises up the skeletal structure of the human body
+- **[BrainStructure](BrainStructure.mdx)**: Any anatomical structure which pertains to the soft nervous tissue functioning as the coordinating center of sensation and intellectual and nervous activity
+- **[Joint](Joint.mdx)**: The anatomical location at which two or more bones make contact
+- **[Ligament](Ligament.mdx)**: A short band of tough, flexible, fibrous connective tissue that functions to connect multiple bones, cartilages, and structurally support joints
+- **[Muscle](Muscle.mdx)**: A muscle is an anatomical structure consisting of a contractile form of tissue that animals use to effect movement
+- **[Nerve](Nerve.mdx)**: A common pathway for the electrochemical nerve impulses that are transmitted along each of the axons
+- **[Vessel](Vessel.mdx)**: A component of the human body circulatory system comprised of an intricate network of hollow tubes that transport blood throughout the entire body
+
+## Properties
+
+See [Schema.org AnatomicalStructure properties](https://schema.org/AnatomicalStructure#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AnatomicalStructure } from 'schema.org.ai'
+
+// Create a AnatomicalStructure
+const item: AnatomicalStructure = {
+  $type: 'AnatomicalStructure',
+  name: 'Example AnatomicalStructure'
+}
+
+// Use semantic patterns
+await $.AnatomicalStructure.create(item)
+const result = await $.AnatomicalStructure.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AnatomicalStructure](https://schema.org/AnatomicalStructure)
+- [AnatomicalStructure Properties](https://schema.org/AnatomicalStructure#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LakeBodyOfWater
+$context: https://schema.org
+$type: Class
+name: LakeBodyOfWater
+description: A lake (for example, Lake Pontrachain).
+subClassOf: ["BodyOfWater"]
+---
+
+# LakeBodyOfWater
+
+A lake (for example, Lake Pontrachain).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > [BodyOfWater](BodyOfWater.mdx) > **LakeBodyOfWater**
+
+
+
+## Properties
+
+See [Schema.org LakeBodyOfWater properties](https://schema.org/LakeBodyOfWater#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LakeBodyOfWater } from 'schema.org.ai'
+
+// Create a LakeBodyOfWater
+const item: LakeBodyOfWater = {
+  $type: 'LakeBodyOfWater',
+  name: 'Example LakeBodyOfWater'
+}
+
+// Use semantic patterns
+await $.LakeBodyOfWater.create(item)
+const result = await $.LakeBodyOfWater.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LakeBodyOfWater](https://schema.org/LakeBodyOfWater)
+- [LakeBodyOfWater Properties](https://schema.org/LakeBodyOfWater#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

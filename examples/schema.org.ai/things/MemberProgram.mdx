@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MemberProgram
+$context: https://schema.org
+$type: Class
+name: MemberProgram
+description: A MemberProgram defines a loyalty (or membership) program that provides its members with certain benefits, for example better pricing, free shipping or returns, or the ability to earn loyalty points. Member programs may have multiple tiers, for example silver and gold members, each with different benefits.
+subClassOf: ["Intangible"]
+---
+
+# MemberProgram
+
+A MemberProgram defines a loyalty (or membership) program that provides its members with certain benefits, for example better pricing, free shipping or returns, or the ability to earn loyalty points. Member programs may have multiple tiers, for example silver and gold members, each with different benefits.
+
+## Type Hierarchy
+
+**MemberProgram**
+
+
+
+## Properties
+
+See [Schema.org MemberProgram properties](https://schema.org/MemberProgram#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MemberProgram } from 'schema.org.ai'
+
+// Create a MemberProgram
+const item: MemberProgram = {
+  $type: 'MemberProgram',
+  name: 'Example MemberProgram'
+}
+
+// Use semantic patterns
+await $.MemberProgram.create(item)
+const result = await $.MemberProgram.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MemberProgram](https://schema.org/MemberProgram)
+- [MemberProgram Properties](https://schema.org/MemberProgram#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Plumber
+$context: https://schema.org
+$type: Class
+name: Plumber
+description: A plumbing service.
+subClassOf: ["HomeAndConstructionBusiness"]
+---
+
+# Plumber
+
+A plumbing service.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HomeAndConstructionBusiness](HomeAndConstructionBusiness.mdx) > **Plumber**
+
+
+
+## Properties
+
+See [Schema.org Plumber properties](https://schema.org/Plumber#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Plumber } from 'schema.org.ai'
+
+// Create a Plumber
+const item: Plumber = {
+  $type: 'Plumber',
+  name: 'Example Plumber'
+}
+
+// Use semantic patterns
+await $.Plumber.create(item)
+const result = await $.Plumber.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Plumber](https://schema.org/Plumber)
+- [Plumber Properties](https://schema.org/Plumber#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

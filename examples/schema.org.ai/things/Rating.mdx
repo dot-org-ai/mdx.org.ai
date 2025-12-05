@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/Rating
+$context: https://schema.org
+$type: Class
+name: Rating
+description: A rating is an evaluation on a numeric scale, such as 1 to 5 stars.
+subClassOf: ["Intangible"]
+---
+
+# Rating
+
+A rating is an evaluation on a numeric scale, such as 1 to 5 stars.
+
+## Type Hierarchy
+
+**Rating**
+
+## Direct Subclasses
+
+- **[AggregateRating](AggregateRating.mdx)**: The average rating based on multiple ratings or reviews
+- **[EndorsementRating](EndorsementRating.mdx)**: An EndorsementRating is a rating that expresses some level of endorsement, for example inclusion in a "critic\
+
+## Properties
+
+See [Schema.org Rating properties](https://schema.org/Rating#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Rating } from 'schema.org.ai'
+
+// Create a Rating
+const item: Rating = {
+  $type: 'Rating',
+  name: 'Example Rating'
+}
+
+// Use semantic patterns
+await $.Rating.create(item)
+const result = await $.Rating.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Rating](https://schema.org/Rating)
+- [Rating Properties](https://schema.org/Rating#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TVSeries
+$context: https://schema.org
+$type: Class
+name: TVSeries
+description: CreativeWorkSeries dedicated to TV broadcast and associated online delivery.
+subClassOf: ["CreativeWork","CreativeWorkSeries"]
+---
+
+# TVSeries
+
+CreativeWorkSeries dedicated to TV broadcast and associated online delivery.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **TVSeries**
+
+
+
+## Properties
+
+See [Schema.org TVSeries properties](https://schema.org/TVSeries#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TVSeries } from 'schema.org.ai'
+
+// Create a TVSeries
+const item: TVSeries = {
+  $type: 'TVSeries',
+  name: 'Example TVSeries'
+}
+
+// Use semantic patterns
+await $.TVSeries.create(item)
+const result = await $.TVSeries.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TVSeries](https://schema.org/TVSeries)
+- [TVSeries Properties](https://schema.org/TVSeries#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

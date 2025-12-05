@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Electrician
+$context: https://schema.org
+$type: Class
+name: Electrician
+description: An electrician.
+subClassOf: ["HomeAndConstructionBusiness"]
+---
+
+# Electrician
+
+An electrician.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HomeAndConstructionBusiness](HomeAndConstructionBusiness.mdx) > **Electrician**
+
+
+
+## Properties
+
+See [Schema.org Electrician properties](https://schema.org/Electrician#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Electrician } from 'schema.org.ai'
+
+// Create a Electrician
+const item: Electrician = {
+  $type: 'Electrician',
+  name: 'Example Electrician'
+}
+
+// Use semantic patterns
+await $.Electrician.create(item)
+const result = await $.Electrician.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Electrician](https://schema.org/Electrician)
+- [Electrician Properties](https://schema.org/Electrician#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

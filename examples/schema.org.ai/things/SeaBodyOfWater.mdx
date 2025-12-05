@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SeaBodyOfWater
+$context: https://schema.org
+$type: Class
+name: SeaBodyOfWater
+description: A sea (for example, the Caspian sea).
+subClassOf: ["BodyOfWater"]
+---
+
+# SeaBodyOfWater
+
+A sea (for example, the Caspian sea).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [Landform](Landform.mdx) > [BodyOfWater](BodyOfWater.mdx) > **SeaBodyOfWater**
+
+
+
+## Properties
+
+See [Schema.org SeaBodyOfWater properties](https://schema.org/SeaBodyOfWater#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SeaBodyOfWater } from 'schema.org.ai'
+
+// Create a SeaBodyOfWater
+const item: SeaBodyOfWater = {
+  $type: 'SeaBodyOfWater',
+  name: 'Example SeaBodyOfWater'
+}
+
+// Use semantic patterns
+await $.SeaBodyOfWater.create(item)
+const result = await $.SeaBodyOfWater.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SeaBodyOfWater](https://schema.org/SeaBodyOfWater)
+- [SeaBodyOfWater Properties](https://schema.org/SeaBodyOfWater#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

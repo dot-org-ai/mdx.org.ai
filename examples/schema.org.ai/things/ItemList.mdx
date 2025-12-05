@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/ItemList
+$context: https://schema.org
+$type: Class
+name: ItemList
+description: A list of items of any sort&#x2014;for example, Top 10 Movies About Weathermen, or Top 100 Party Songs. Not to be confused with HTML lists, which are often used only for formatting.
+subClassOf: ["Intangible"]
+---
+
+# ItemList
+
+A list of items of any sort&#x2014;for example, Top 10 Movies About Weathermen, or Top 100 Party Songs. Not to be confused with HTML lists, which are often used only for formatting.
+
+## Type Hierarchy
+
+**ItemList**
+
+## Direct Subclasses
+
+- **[HowToSection](HowToSection.mdx)**: A sub-grouping of steps in the instructions for how to achieve a result (e
+- **[HowToStep](HowToStep.mdx)**: A step in the instructions for how to achieve a result
+- **[OfferCatalog](OfferCatalog.mdx)**: An OfferCatalog is an ItemList that contains related Offers and/or further OfferCatalogs that are offeredBy the same provider
+
+## Properties
+
+See [Schema.org ItemList properties](https://schema.org/ItemList#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ItemList } from 'schema.org.ai'
+
+// Create a ItemList
+const item: ItemList = {
+  $type: 'ItemList',
+  name: 'Example ItemList'
+}
+
+// Use semantic patterns
+await $.ItemList.create(item)
+const result = await $.ItemList.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ItemList](https://schema.org/ItemList)
+- [ItemList Properties](https://schema.org/ItemList#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

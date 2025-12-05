@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PresentationDigitalDocument
+$context: https://schema.org
+$type: Class
+name: PresentationDigitalDocument
+description: A file containing slides or used for a presentation.
+subClassOf: ["DigitalDocument"]
+---
+
+# PresentationDigitalDocument
+
+A file containing slides or used for a presentation.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [DigitalDocument](DigitalDocument.mdx) > **PresentationDigitalDocument**
+
+
+
+## Properties
+
+See [Schema.org PresentationDigitalDocument properties](https://schema.org/PresentationDigitalDocument#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PresentationDigitalDocument } from 'schema.org.ai'
+
+// Create a PresentationDigitalDocument
+const item: PresentationDigitalDocument = {
+  $type: 'PresentationDigitalDocument',
+  name: 'Example PresentationDigitalDocument'
+}
+
+// Use semantic patterns
+await $.PresentationDigitalDocument.create(item)
+const result = await $.PresentationDigitalDocument.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PresentationDigitalDocument](https://schema.org/PresentationDigitalDocument)
+- [PresentationDigitalDocument Properties](https://schema.org/PresentationDigitalDocument#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

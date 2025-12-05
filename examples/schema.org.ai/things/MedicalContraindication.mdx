@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalContraindication
+$context: https://schema.org
+$type: Class
+name: MedicalContraindication
+description: A condition or factor that serves as a reason to withhold a certain medical therapy. Contraindications can be absolute (there are no reasonable circumstances for undertaking a course of action) or relative (the patient is at higher risk of complications, but these risks may be outweighed by other considerations or mitigated by other measures).
+subClassOf: ["MedicalEntity"]
+---
+
+# MedicalContraindication
+
+A condition or factor that serves as a reason to withhold a certain medical therapy. Contraindications can be absolute (there are no reasonable circumstances for undertaking a course of action) or relative (the patient is at higher risk of complications, but these risks may be outweighed by other considerations or mitigated by other measures).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **MedicalContraindication**
+
+
+
+## Properties
+
+See [Schema.org MedicalContraindication properties](https://schema.org/MedicalContraindication#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalContraindication } from 'schema.org.ai'
+
+// Create a MedicalContraindication
+const item: MedicalContraindication = {
+  $type: 'MedicalContraindication',
+  name: 'Example MedicalContraindication'
+}
+
+// Use semantic patterns
+await $.MedicalContraindication.create(item)
+const result = await $.MedicalContraindication.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalContraindication](https://schema.org/MedicalContraindication)
+- [MedicalContraindication Properties](https://schema.org/MedicalContraindication#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

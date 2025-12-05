@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DriveWheelConfigurationValue
+$context: https://schema.org
+$type: Class
+name: DriveWheelConfigurationValue
+description: A value indicating which roadwheels will receive torque.
+subClassOf: ["QualitativeValue"]
+---
+
+# DriveWheelConfigurationValue
+
+A value indicating which roadwheels will receive torque.
+
+## Type Hierarchy
+
+**DriveWheelConfigurationValue**
+
+
+
+## Properties
+
+See [Schema.org DriveWheelConfigurationValue properties](https://schema.org/DriveWheelConfigurationValue#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DriveWheelConfigurationValue } from 'schema.org.ai'
+
+// Create a DriveWheelConfigurationValue
+const item: DriveWheelConfigurationValue = {
+  $type: 'DriveWheelConfigurationValue',
+  name: 'Example DriveWheelConfigurationValue'
+}
+
+// Use semantic patterns
+await $.DriveWheelConfigurationValue.create(item)
+const result = await $.DriveWheelConfigurationValue.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DriveWheelConfigurationValue](https://schema.org/DriveWheelConfigurationValue)
+- [DriveWheelConfigurationValue Properties](https://schema.org/DriveWheelConfigurationValue#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

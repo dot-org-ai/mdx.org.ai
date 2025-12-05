@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Distillery
+$context: https://schema.org
+$type: Class
+name: Distillery
+description: A distillery.
+subClassOf: ["FoodEstablishment"]
+---
+
+# Distillery
+
+A distillery.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FoodEstablishment](FoodEstablishment.mdx) > **Distillery**
+
+
+
+## Properties
+
+See [Schema.org Distillery properties](https://schema.org/Distillery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Distillery } from 'schema.org.ai'
+
+// Create a Distillery
+const item: Distillery = {
+  $type: 'Distillery',
+  name: 'Example Distillery'
+}
+
+// Use semantic patterns
+await $.Distillery.create(item)
+const result = await $.Distillery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Distillery](https://schema.org/Distillery)
+- [Distillery Properties](https://schema.org/Distillery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

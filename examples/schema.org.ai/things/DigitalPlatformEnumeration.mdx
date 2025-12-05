@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DigitalPlatformEnumeration
+$context: https://schema.org
+$type: Class
+name: DigitalPlatformEnumeration
+description: Enumerates some common technology platforms, for use with properties such as [[actionPlatform]]. It is not supposed to be comprehensive - when a suitable code is not enumerated here, textual or URL values can be used instead. These codes are at a fairly high level and do not deal with versioning and other nuance. Additional codes can be suggested [in github](https://github.com/schemaorg/schemaorg/issues/3057).
+subClassOf: ["Enumeration"]
+---
+
+# DigitalPlatformEnumeration
+
+Enumerates some common technology platforms, for use with properties such as [[actionPlatform]]. It is not supposed to be comprehensive - when a suitable code is not enumerated here, textual or URL values can be used instead. These codes are at a fairly high level and do not deal with versioning and other nuance. Additional codes can be suggested [in github](https://github.com/schemaorg/schemaorg/issues/3057).
+
+## Type Hierarchy
+
+**DigitalPlatformEnumeration**
+
+
+
+## Properties
+
+See [Schema.org DigitalPlatformEnumeration properties](https://schema.org/DigitalPlatformEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DigitalPlatformEnumeration } from 'schema.org.ai'
+
+// Create a DigitalPlatformEnumeration
+const item: DigitalPlatformEnumeration = {
+  $type: 'DigitalPlatformEnumeration',
+  name: 'Example DigitalPlatformEnumeration'
+}
+
+// Use semantic patterns
+await $.DigitalPlatformEnumeration.create(item)
+const result = await $.DigitalPlatformEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DigitalPlatformEnumeration](https://schema.org/DigitalPlatformEnumeration)
+- [DigitalPlatformEnumeration Properties](https://schema.org/DigitalPlatformEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

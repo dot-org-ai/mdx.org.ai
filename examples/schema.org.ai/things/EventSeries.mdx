@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EventSeries
+$context: https://schema.org
+$type: Class
+name: EventSeries
+description: A series of [[Event]]s. Included events can relate with the series using the [[superEvent]] property. An EventSeries is a collection of events that share some unifying characteristic. For example, "The Olympic Games" is a series, which is repeated regularly. The "2012 London Olympics" can be presented both as an [[Event]] in the series "Olympic Games", and as an [[EventSeries]] that included a number of sporting competitions as Events. The nature of the association between the events in an [[EventSeries]] can vary, but typical examples could include a thematic event series (e.g. topical meetups or classes), or a series of regular events that share a location, attendee group and/or organizers. EventSeries has been defined as a kind of Event to make it easy for publishers to use it in an Event context without worrying about which kinds of series are really event-like enough to call an Event. In general an EventSeries may seem more Event-like when the period of time is compact and when aspects such as location are fixed, but it may also sometimes prove useful to describe a longer-term series as an Event.
+subClassOf: ["Series","Event"]
+---
+
+# EventSeries
+
+A series of [[Event]]s. Included events can relate with the series using the [[superEvent]] property. An EventSeries is a collection of events that share some unifying characteristic. For example, "The Olympic Games" is a series, which is repeated regularly. The "2012 London Olympics" can be presented both as an [[Event]] in the series "Olympic Games", and as an [[EventSeries]] that included a number of sporting competitions as Events. The nature of the association between the events in an [[EventSeries]] can vary, but typical examples could include a thematic event series (e.g. topical meetups or classes), or a series of regular events that share a location, attendee group and/or organizers. EventSeries has been defined as a kind of Event to make it easy for publishers to use it in an Event context without worrying about which kinds of series are really event-like enough to call an Event. In general an EventSeries may seem more Event-like when the period of time is compact and when aspects such as location are fixed, but it may also sometimes prove useful to describe a longer-term series as an Event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **EventSeries**
+
+
+
+## Properties
+
+See [Schema.org EventSeries properties](https://schema.org/EventSeries#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EventSeries } from 'schema.org.ai'
+
+// Create a EventSeries
+const item: EventSeries = {
+  $type: 'EventSeries',
+  name: 'Example EventSeries'
+}
+
+// Use semantic patterns
+await $.EventSeries.create(item)
+const result = await $.EventSeries.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EventSeries](https://schema.org/EventSeries)
+- [EventSeries Properties](https://schema.org/EventSeries#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,66 @@
+---
+$id: https://schema.org.ai/Action
+$context: https://schema.org
+$type: Class
+name: Action
+description: An action performed by a direct agent and indirect participants upon a direct object. Optionally happens at a location with the help of an inanimate instrument. The execution of the action may produce a result. Specific action sub-type documentation specifies the exact expectation of each argument/role.\
+subClassOf: ["Thing"]
+---
+
+# Action
+
+An action performed by a direct agent and indirect participants upon a direct object. Optionally happens at a location with the help of an inanimate instrument. The execution of the action may produce a result. Specific action sub-type documentation specifies the exact expectation of each argument/role.\
+\
+See also [blog post](https://blog.schema.org/2014/04/16/announcing-schema-org-actions/) and [Actions overview document](https://schema.org/docs/actions.html).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > **Action**
+
+## Direct Subclasses
+
+- **[AchieveAction](AchieveAction.mdx)**: The act of accomplishing something via previous efforts
+- **[ConsumeAction](ConsumeAction.mdx)**: The act of ingesting information/resources/food
+- **[ControlAction](ControlAction.mdx)**: An agent controls a device or application
+- **[CreateAction](CreateAction.mdx)**: The act of deliberately creating/producing/generating/building a result out of the agent
+- **[FindAction](FindAction.mdx)**: The act of finding an object
+- **[InteractAction](InteractAction.mdx)**: The act of interacting with another person or organization
+- **[MoveAction](MoveAction.mdx)**: The act of an agent relocating to a place
+- **[OrganizeAction](OrganizeAction.mdx)**: The act of manipulating/administering/supervising/controlling one or more objects
+- **[PlayAction](PlayAction.mdx)**: The act of playing/exercising/training/performing for enjoyment, leisure, recreation, competition or exercise
+- **[SearchAction](SearchAction.mdx)**: The act of searching for an object
+- **[SeekToAction](SeekToAction.mdx)**: This is the [[Action]] of navigating to a specific [[startOffset]] timestamp within a [[VideoObject]], typically represented with a URL template structure
+- **[SolveMathAction](SolveMathAction.mdx)**: The action that takes in a math expression and directs users to a page potentially capable of solving/simplifying that expression
+- **[TradeAction](TradeAction.mdx)**: The act of participating in an exchange of goods and services for monetary compensation
+- **[TransferAction](TransferAction.mdx)**: The act of transferring/moving (abstract or concrete) animate or inanimate objects from one place to another
+- **[UpdateAction](UpdateAction.mdx)**: The act of managing by changing/editing the state of the object
+
+## Properties
+
+See [Schema.org Action properties](https://schema.org/Action#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Action } from 'schema.org.ai'
+
+// Create a Action
+const item: Action = {
+  $type: 'Action',
+  name: 'Example Action'
+}
+
+// Use semantic patterns
+await $.Action.create(item)
+const result = await $.Action.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Action](https://schema.org/Action)
+- [Action Properties](https://schema.org/Action#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

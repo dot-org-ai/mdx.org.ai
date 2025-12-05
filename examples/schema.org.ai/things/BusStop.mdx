@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BusStop
+$context: https://schema.org
+$type: Class
+name: BusStop
+description: A bus stop.
+subClassOf: ["CivicStructure"]
+---
+
+# BusStop
+
+A bus stop.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **BusStop**
+
+
+
+## Properties
+
+See [Schema.org BusStop properties](https://schema.org/BusStop#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BusStop } from 'schema.org.ai'
+
+// Create a BusStop
+const item: BusStop = {
+  $type: 'BusStop',
+  name: 'Example BusStop'
+}
+
+// Use semantic patterns
+await $.BusStop.create(item)
+const result = await $.BusStop.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BusStop](https://schema.org/BusStop)
+- [BusStop Properties](https://schema.org/BusStop#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

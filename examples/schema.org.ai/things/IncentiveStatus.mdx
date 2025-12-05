@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/IncentiveStatus
+$context: https://schema.org
+$type: Class
+name: IncentiveStatus
+description: Enumerates a status for an incentive, such as whether it is active.
+subClassOf: ["Enumeration"]
+---
+
+# IncentiveStatus
+
+Enumerates a status for an incentive, such as whether it is active.
+
+## Type Hierarchy
+
+**IncentiveStatus**
+
+
+
+## Properties
+
+See [Schema.org IncentiveStatus properties](https://schema.org/IncentiveStatus#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { IncentiveStatus } from 'schema.org.ai'
+
+// Create a IncentiveStatus
+const item: IncentiveStatus = {
+  $type: 'IncentiveStatus',
+  name: 'Example IncentiveStatus'
+}
+
+// Use semantic patterns
+await $.IncentiveStatus.create(item)
+const result = await $.IncentiveStatus.get('item-id')
+```
+
+## Resources
+
+- [Schema.org IncentiveStatus](https://schema.org/IncentiveStatus)
+- [IncentiveStatus Properties](https://schema.org/IncentiveStatus#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

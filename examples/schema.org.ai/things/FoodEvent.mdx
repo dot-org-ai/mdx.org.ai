@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FoodEvent
+$context: https://schema.org
+$type: Class
+name: FoodEvent
+description: Event type: Food event.
+subClassOf: ["Event"]
+---
+
+# FoodEvent
+
+Event type: Food event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **FoodEvent**
+
+
+
+## Properties
+
+See [Schema.org FoodEvent properties](https://schema.org/FoodEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FoodEvent } from 'schema.org.ai'
+
+// Create a FoodEvent
+const item: FoodEvent = {
+  $type: 'FoodEvent',
+  name: 'Example FoodEvent'
+}
+
+// Use semantic patterns
+await $.FoodEvent.create(item)
+const result = await $.FoodEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FoodEvent](https://schema.org/FoodEvent)
+- [FoodEvent Properties](https://schema.org/FoodEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

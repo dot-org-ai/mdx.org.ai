@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalEvidenceLevel
+$context: https://schema.org
+$type: Class
+name: MedicalEvidenceLevel
+description: Level of evidence for a medical guideline. Enumerated type.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# MedicalEvidenceLevel
+
+Level of evidence for a medical guideline. Enumerated type.
+
+## Type Hierarchy
+
+**MedicalEvidenceLevel**
+
+
+
+## Properties
+
+See [Schema.org MedicalEvidenceLevel properties](https://schema.org/MedicalEvidenceLevel#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalEvidenceLevel } from 'schema.org.ai'
+
+// Create a MedicalEvidenceLevel
+const item: MedicalEvidenceLevel = {
+  $type: 'MedicalEvidenceLevel',
+  name: 'Example MedicalEvidenceLevel'
+}
+
+// Use semantic patterns
+await $.MedicalEvidenceLevel.create(item)
+const result = await $.MedicalEvidenceLevel.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalEvidenceLevel](https://schema.org/MedicalEvidenceLevel)
+- [MedicalEvidenceLevel Properties](https://schema.org/MedicalEvidenceLevel#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

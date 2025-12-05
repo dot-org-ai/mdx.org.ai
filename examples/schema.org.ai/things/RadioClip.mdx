@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RadioClip
+$context: https://schema.org
+$type: Class
+name: RadioClip
+description: A short radio program or a segment/part of a radio program.
+subClassOf: ["Clip"]
+---
+
+# RadioClip
+
+A short radio program or a segment/part of a radio program.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Clip](Clip.mdx) > **RadioClip**
+
+
+
+## Properties
+
+See [Schema.org RadioClip properties](https://schema.org/RadioClip#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RadioClip } from 'schema.org.ai'
+
+// Create a RadioClip
+const item: RadioClip = {
+  $type: 'RadioClip',
+  name: 'Example RadioClip'
+}
+
+// Use semantic patterns
+await $.RadioClip.create(item)
+const result = await $.RadioClip.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RadioClip](https://schema.org/RadioClip)
+- [RadioClip Properties](https://schema.org/RadioClip#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

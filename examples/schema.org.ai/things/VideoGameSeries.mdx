@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/VideoGameSeries
+$context: https://schema.org
+$type: Class
+name: VideoGameSeries
+description: A video game series.
+subClassOf: ["CreativeWorkSeries"]
+---
+
+# VideoGameSeries
+
+A video game series.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [CreativeWorkSeries](CreativeWorkSeries.mdx) > **VideoGameSeries**
+
+
+
+## Properties
+
+See [Schema.org VideoGameSeries properties](https://schema.org/VideoGameSeries#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { VideoGameSeries } from 'schema.org.ai'
+
+// Create a VideoGameSeries
+const item: VideoGameSeries = {
+  $type: 'VideoGameSeries',
+  name: 'Example VideoGameSeries'
+}
+
+// Use semantic patterns
+await $.VideoGameSeries.create(item)
+const result = await $.VideoGameSeries.get('item-id')
+```
+
+## Resources
+
+- [Schema.org VideoGameSeries](https://schema.org/VideoGameSeries)
+- [VideoGameSeries Properties](https://schema.org/VideoGameSeries#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

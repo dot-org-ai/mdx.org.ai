@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PerformingArtsTheater
+$context: https://schema.org
+$type: Class
+name: PerformingArtsTheater
+description: A theater or other performing art center.
+subClassOf: ["CivicStructure"]
+---
+
+# PerformingArtsTheater
+
+A theater or other performing art center.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **PerformingArtsTheater**
+
+
+
+## Properties
+
+See [Schema.org PerformingArtsTheater properties](https://schema.org/PerformingArtsTheater#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PerformingArtsTheater } from 'schema.org.ai'
+
+// Create a PerformingArtsTheater
+const item: PerformingArtsTheater = {
+  $type: 'PerformingArtsTheater',
+  name: 'Example PerformingArtsTheater'
+}
+
+// Use semantic patterns
+await $.PerformingArtsTheater.create(item)
+const result = await $.PerformingArtsTheater.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PerformingArtsTheater](https://schema.org/PerformingArtsTheater)
+- [PerformingArtsTheater Properties](https://schema.org/PerformingArtsTheater#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

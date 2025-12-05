@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MenuItem
+$context: https://schema.org
+$type: Class
+name: MenuItem
+description: A food or drink item listed in a menu or menu section.
+subClassOf: ["Intangible"]
+---
+
+# MenuItem
+
+A food or drink item listed in a menu or menu section.
+
+## Type Hierarchy
+
+**MenuItem**
+
+
+
+## Properties
+
+See [Schema.org MenuItem properties](https://schema.org/MenuItem#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MenuItem } from 'schema.org.ai'
+
+// Create a MenuItem
+const item: MenuItem = {
+  $type: 'MenuItem',
+  name: 'Example MenuItem'
+}
+
+// Use semantic patterns
+await $.MenuItem.create(item)
+const result = await $.MenuItem.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MenuItem](https://schema.org/MenuItem)
+- [MenuItem Properties](https://schema.org/MenuItem#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

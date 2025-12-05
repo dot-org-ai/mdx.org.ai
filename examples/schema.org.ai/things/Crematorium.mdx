@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Crematorium
+$context: https://schema.org
+$type: Class
+name: Crematorium
+description: A crematorium.
+subClassOf: ["CivicStructure"]
+---
+
+# Crematorium
+
+A crematorium.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **Crematorium**
+
+
+
+## Properties
+
+See [Schema.org Crematorium properties](https://schema.org/Crematorium#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Crematorium } from 'schema.org.ai'
+
+// Create a Crematorium
+const item: Crematorium = {
+  $type: 'Crematorium',
+  name: 'Example Crematorium'
+}
+
+// Use semantic patterns
+await $.Crematorium.create(item)
+const result = await $.Crematorium.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Crematorium](https://schema.org/Crematorium)
+- [Crematorium Properties](https://schema.org/Crematorium#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GovernmentService
+$context: https://schema.org
+$type: Class
+name: GovernmentService
+description: A service provided by a government organization, e.g. food stamps, veterans benefits, etc.
+subClassOf: ["Service"]
+---
+
+# GovernmentService
+
+A service provided by a government organization, e.g. food stamps, veterans benefits, etc.
+
+## Type Hierarchy
+
+**GovernmentService**
+
+
+
+## Properties
+
+See [Schema.org GovernmentService properties](https://schema.org/GovernmentService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GovernmentService } from 'schema.org.ai'
+
+// Create a GovernmentService
+const item: GovernmentService = {
+  $type: 'GovernmentService',
+  name: 'Example GovernmentService'
+}
+
+// Use semantic patterns
+await $.GovernmentService.create(item)
+const result = await $.GovernmentService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GovernmentService](https://schema.org/GovernmentService)
+- [GovernmentService Properties](https://schema.org/GovernmentService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

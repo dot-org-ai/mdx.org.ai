@@ -1,0 +1,56 @@
+---
+$id: https://schema.org.ai/LodgingBusiness
+$context: https://schema.org
+$type: Class
+name: LodgingBusiness
+description: A lodging business, such as a motel, hotel, or inn.
+subClassOf: ["LocalBusiness"]
+---
+
+# LodgingBusiness
+
+A lodging business, such as a motel, hotel, or inn.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **LodgingBusiness**
+
+## Direct Subclasses
+
+- **[BedAndBreakfast](BedAndBreakfast.mdx)**: Bed and breakfast
+- **[Campground](Campground.mdx)**: A camping site, campsite, or [[Campground]] is a place used for overnight stay in the outdoors, typically containing individual [[CampingPitch]] locations
+- **[Hostel](Hostel.mdx)**: A hostel - cheap accommodation, often in shared dormitories
+- **[Hotel](Hotel.mdx)**: A hotel is an establishment that provides lodging paid on a short-term basis (source: Wikipedia, the free encyclopedia, see http://en
+- **[Motel](Motel.mdx)**: A motel
+- **[Resort](Resort.mdx)**: A resort is a place used for relaxation or recreation, attracting visitors for holidays or vacations
+- **[VacationRental](VacationRental.mdx)**: A kind of lodging business that focuses on renting single properties for limited time
+
+## Properties
+
+See [Schema.org LodgingBusiness properties](https://schema.org/LodgingBusiness#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LodgingBusiness } from 'schema.org.ai'
+
+// Create a LodgingBusiness
+const item: LodgingBusiness = {
+  $type: 'LodgingBusiness',
+  name: 'Example LodgingBusiness'
+}
+
+// Use semantic patterns
+await $.LodgingBusiness.create(item)
+const result = await $.LodgingBusiness.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LodgingBusiness](https://schema.org/LodgingBusiness)
+- [LodgingBusiness Properties](https://schema.org/LodgingBusiness#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

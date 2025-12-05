@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/CoverArt
+$context: https://schema.org
+$type: Class
+name: CoverArt
+description: The artwork on the outer surface of a CreativeWork.
+subClassOf: ["VisualArtwork"]
+---
+
+# CoverArt
+
+The artwork on the outer surface of a CreativeWork.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [VisualArtwork](VisualArtwork.mdx) > **CoverArt**
+
+## Direct Subclasses
+
+- **[ComicCoverArt](ComicCoverArt.mdx)**: The artwork on the cover of a comic
+
+## Properties
+
+See [Schema.org CoverArt properties](https://schema.org/CoverArt#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CoverArt } from 'schema.org.ai'
+
+// Create a CoverArt
+const item: CoverArt = {
+  $type: 'CoverArt',
+  name: 'Example CoverArt'
+}
+
+// Use semantic patterns
+await $.CoverArt.create(item)
+const result = await $.CoverArt.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CoverArt](https://schema.org/CoverArt)
+- [CoverArt Properties](https://schema.org/CoverArt#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/XPathType
+$context: https://schema.org
+$type: Class
+name: XPathType
+description: Text representing an XPath (typically but not necessarily version 1.0).
+subClassOf: ["Text"]
+---
+
+# XPathType
+
+Text representing an XPath (typically but not necessarily version 1.0).
+
+## Type Hierarchy
+
+**XPathType**
+
+
+
+## Properties
+
+See [Schema.org XPathType properties](https://schema.org/XPathType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { XPathType } from 'schema.org.ai'
+
+// Create a XPathType
+const item: XPathType = {
+  $type: 'XPathType',
+  name: 'Example XPathType'
+}
+
+// Use semantic patterns
+await $.XPathType.create(item)
+const result = await $.XPathType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org XPathType](https://schema.org/XPathType)
+- [XPathType Properties](https://schema.org/XPathType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

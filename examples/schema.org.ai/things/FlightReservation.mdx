@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/FlightReservation
+$context: https://schema.org
+$type: Class
+name: FlightReservation
+description: A reservation for air travel.\
+subClassOf: ["Reservation"]
+---
+
+# FlightReservation
+
+A reservation for air travel.\
+\
+Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, use [[Offer]].
+
+## Type Hierarchy
+
+**FlightReservation**
+
+
+
+## Properties
+
+See [Schema.org FlightReservation properties](https://schema.org/FlightReservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FlightReservation } from 'schema.org.ai'
+
+// Create a FlightReservation
+const item: FlightReservation = {
+  $type: 'FlightReservation',
+  name: 'Example FlightReservation'
+}
+
+// Use semantic patterns
+await $.FlightReservation.create(item)
+const result = await $.FlightReservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FlightReservation](https://schema.org/FlightReservation)
+- [FlightReservation Properties](https://schema.org/FlightReservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

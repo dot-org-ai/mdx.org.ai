@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BoatReservation
+$context: https://schema.org
+$type: Class
+name: BoatReservation
+description: A reservation for boat travel.
+subClassOf: ["Reservation"]
+---
+
+# BoatReservation
+
+A reservation for boat travel.
+
+## Type Hierarchy
+
+**BoatReservation**
+
+
+
+## Properties
+
+See [Schema.org BoatReservation properties](https://schema.org/BoatReservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BoatReservation } from 'schema.org.ai'
+
+// Create a BoatReservation
+const item: BoatReservation = {
+  $type: 'BoatReservation',
+  name: 'Example BoatReservation'
+}
+
+// Use semantic patterns
+await $.BoatReservation.create(item)
+const result = await $.BoatReservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BoatReservation](https://schema.org/BoatReservation)
+- [BoatReservation Properties](https://schema.org/BoatReservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

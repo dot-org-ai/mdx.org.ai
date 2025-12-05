@@ -1,0 +1,54 @@
+---
+$id: https://schema.org.ai/PlaceOfWorship
+$context: https://schema.org
+$type: Class
+name: PlaceOfWorship
+description: Place of worship, such as a church, synagogue, or mosque.
+subClassOf: ["CivicStructure"]
+---
+
+# PlaceOfWorship
+
+Place of worship, such as a church, synagogue, or mosque.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **PlaceOfWorship**
+
+## Direct Subclasses
+
+- **[BuddhistTemple](BuddhistTemple.mdx)**: A Buddhist temple
+- **[Church](Church.mdx)**: A church
+- **[HinduTemple](HinduTemple.mdx)**: A Hindu temple
+- **[Mosque](Mosque.mdx)**: A mosque
+- **[Synagogue](Synagogue.mdx)**: A synagogue
+
+## Properties
+
+See [Schema.org PlaceOfWorship properties](https://schema.org/PlaceOfWorship#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PlaceOfWorship } from 'schema.org.ai'
+
+// Create a PlaceOfWorship
+const item: PlaceOfWorship = {
+  $type: 'PlaceOfWorship',
+  name: 'Example PlaceOfWorship'
+}
+
+// Use semantic patterns
+await $.PlaceOfWorship.create(item)
+const result = await $.PlaceOfWorship.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PlaceOfWorship](https://schema.org/PlaceOfWorship)
+- [PlaceOfWorship Properties](https://schema.org/PlaceOfWorship#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

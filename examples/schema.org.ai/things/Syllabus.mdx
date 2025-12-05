@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Syllabus
+$context: https://schema.org
+$type: Class
+name: Syllabus
+description: A syllabus that describes the material covered in a course, often with several such sections per [[Course]] so that a distinct [[timeRequired]] can be provided for that section of the [[Course]].
+subClassOf: ["LearningResource"]
+---
+
+# Syllabus
+
+A syllabus that describes the material covered in a course, often with several such sections per [[Course]] so that a distinct [[timeRequired]] can be provided for that section of the [[Course]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [LearningResource](LearningResource.mdx) > **Syllabus**
+
+
+
+## Properties
+
+See [Schema.org Syllabus properties](https://schema.org/Syllabus#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Syllabus } from 'schema.org.ai'
+
+// Create a Syllabus
+const item: Syllabus = {
+  $type: 'Syllabus',
+  name: 'Example Syllabus'
+}
+
+// Use semantic patterns
+await $.Syllabus.create(item)
+const result = await $.Syllabus.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Syllabus](https://schema.org/Syllabus)
+- [Syllabus Properties](https://schema.org/Syllabus#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AutomatedTeller
+$context: https://schema.org
+$type: Class
+name: AutomatedTeller
+description: ATM/cash machine.
+subClassOf: ["FinancialService"]
+---
+
+# AutomatedTeller
+
+ATM/cash machine.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FinancialService](FinancialService.mdx) > **AutomatedTeller**
+
+
+
+## Properties
+
+See [Schema.org AutomatedTeller properties](https://schema.org/AutomatedTeller#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AutomatedTeller } from 'schema.org.ai'
+
+// Create a AutomatedTeller
+const item: AutomatedTeller = {
+  $type: 'AutomatedTeller',
+  name: 'Example AutomatedTeller'
+}
+
+// Use semantic patterns
+await $.AutomatedTeller.create(item)
+const result = await $.AutomatedTeller.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AutomatedTeller](https://schema.org/AutomatedTeller)
+- [AutomatedTeller Properties](https://schema.org/AutomatedTeller#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

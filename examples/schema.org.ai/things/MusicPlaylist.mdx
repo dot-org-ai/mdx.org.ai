@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/MusicPlaylist
+$context: https://schema.org
+$type: Class
+name: MusicPlaylist
+description: A collection of music tracks in playlist form.
+subClassOf: ["CreativeWork"]
+---
+
+# MusicPlaylist
+
+A collection of music tracks in playlist form.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **MusicPlaylist**
+
+## Direct Subclasses
+
+- **[MusicAlbum](MusicAlbum.mdx)**: A collection of music tracks
+- **[MusicRelease](MusicRelease.mdx)**: A MusicRelease is a specific release of a music album
+
+## Properties
+
+See [Schema.org MusicPlaylist properties](https://schema.org/MusicPlaylist#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicPlaylist } from 'schema.org.ai'
+
+// Create a MusicPlaylist
+const item: MusicPlaylist = {
+  $type: 'MusicPlaylist',
+  name: 'Example MusicPlaylist'
+}
+
+// Use semantic patterns
+await $.MusicPlaylist.create(item)
+const result = await $.MusicPlaylist.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicPlaylist](https://schema.org/MusicPlaylist)
+- [MusicPlaylist Properties](https://schema.org/MusicPlaylist#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

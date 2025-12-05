@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MobilePhoneStore
+$context: https://schema.org
+$type: Class
+name: MobilePhoneStore
+description: A store that sells mobile phones and related accessories.
+subClassOf: ["Store"]
+---
+
+# MobilePhoneStore
+
+A store that sells mobile phones and related accessories.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **MobilePhoneStore**
+
+
+
+## Properties
+
+See [Schema.org MobilePhoneStore properties](https://schema.org/MobilePhoneStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MobilePhoneStore } from 'schema.org.ai'
+
+// Create a MobilePhoneStore
+const item: MobilePhoneStore = {
+  $type: 'MobilePhoneStore',
+  name: 'Example MobilePhoneStore'
+}
+
+// Use semantic patterns
+await $.MobilePhoneStore.create(item)
+const result = await $.MobilePhoneStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MobilePhoneStore](https://schema.org/MobilePhoneStore)
+- [MobilePhoneStore Properties](https://schema.org/MobilePhoneStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

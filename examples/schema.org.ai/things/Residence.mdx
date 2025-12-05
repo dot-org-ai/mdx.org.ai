@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/Residence
+$context: https://schema.org
+$type: Class
+name: Residence
+description: The place where a person lives.
+subClassOf: ["Place"]
+---
+
+# Residence
+
+The place where a person lives.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > **Residence**
+
+## Direct Subclasses
+
+- **[ApartmentComplex](ApartmentComplex.mdx)**: Residence type: Apartment complex
+- **[GatedResidenceCommunity](GatedResidenceCommunity.mdx)**: Residence type: Gated community
+
+## Properties
+
+See [Schema.org Residence properties](https://schema.org/Residence#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Residence } from 'schema.org.ai'
+
+// Create a Residence
+const item: Residence = {
+  $type: 'Residence',
+  name: 'Example Residence'
+}
+
+// Use semantic patterns
+await $.Residence.create(item)
+const result = await $.Residence.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Residence](https://schema.org/Residence)
+- [Residence Properties](https://schema.org/Residence#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

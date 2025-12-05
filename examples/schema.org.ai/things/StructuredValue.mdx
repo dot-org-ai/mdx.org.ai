@@ -1,0 +1,74 @@
+---
+$id: https://schema.org.ai/StructuredValue
+$context: https://schema.org
+$type: Class
+name: StructuredValue
+description: Structured values are used when the value of a property has a more complex structure than simply being a textual value or a reference to another thing.
+subClassOf: ["Intangible"]
+---
+
+# StructuredValue
+
+Structured values are used when the value of a property has a more complex structure than simply being a textual value or a reference to another thing.
+
+## Type Hierarchy
+
+**StructuredValue**
+
+## Direct Subclasses
+
+- **[CDCPMDRecord](CDCPMDRecord.mdx)**: A CDCPMDRecord is a data structure representing a record in a CDC tabular data format used for hospital data reporting
+- **[ContactPoint](ContactPoint.mdx)**: A contact point&#x2014;for example, a Customer Complaints department
+- **[DefinedRegion](DefinedRegion.mdx)**: A DefinedRegion is a geographic area defined by potentially arbitrary (rather than political, administrative or natural geographical) criteria
+- **[EngineSpecification](EngineSpecification.mdx)**: Information about the engine of the vehicle
+- **[ExchangeRateSpecification](ExchangeRateSpecification.mdx)**: A structured value representing exchange rate
+- **[GeoCoordinates](GeoCoordinates.mdx)**: The geographic coordinates of a place or event
+- **[GeoShape](GeoShape.mdx)**: The geographic shape of a place
+- **[InteractionCounter](InteractionCounter.mdx)**: A summary of how users have interacted with this CreativeWork
+- **[MonetaryAmount](MonetaryAmount.mdx)**: A monetary value or range
+- **[NutritionInformation](NutritionInformation.mdx)**: Nutritional information about the recipe
+- **[OfferShippingDetails](OfferShippingDetails.mdx)**: OfferShippingDetails represents information about shipping destinations
+- **[OpeningHoursSpecification](OpeningHoursSpecification.mdx)**: A structured value providing information about the opening hours of a place or a certain service inside a place
+- **[OwnershipInfo](OwnershipInfo.mdx)**: A structured value providing information about when a certain organization or person owned a certain product
+- **[PostalCodeRangeSpecification](PostalCodeRangeSpecification.mdx)**: Indicates a range of postal codes, usually defined as the set of valid codes between [[postalCodeBegin]] and [[postalCodeEnd]], inclusively
+- **[PriceSpecification](PriceSpecification.mdx)**: A structured value representing a price or price range
+- **[QuantitativeValue](QuantitativeValue.mdx)**: A point value or interval for product characteristics and other purposes
+- **[QuantitativeValueDistribution](QuantitativeValueDistribution.mdx)**: A statistical distribution of values
+- **[RepaymentSpecification](RepaymentSpecification.mdx)**: A structured value representing repayment
+- **[ServicePeriod](ServicePeriod.mdx)**: ServicePeriod represents a duration with some constraints about cutoff time and business days
+- **[ShippingConditions](ShippingConditions.mdx)**: ShippingConditions represent a set of constraints and information about the conditions of shipping a product
+- **[ShippingDeliveryTime](ShippingDeliveryTime.mdx)**: ShippingDeliveryTime provides various pieces of information about delivery times for shipping
+- **[ShippingRateSettings](ShippingRateSettings.mdx)**: A ShippingRateSettings represents re-usable pieces of shipping information
+- **[ShippingService](ShippingService.mdx)**: ShippingService represents the criteria used to determine if and how an offer could be shipped to a customer
+- **[TypeAndQuantityNode](TypeAndQuantityNode.mdx)**: A structured value indicating the quantity, unit of measurement, and business function of goods included in a bundle offer
+- **[WarrantyPromise](WarrantyPromise.mdx)**: A structured value representing the duration and scope of services that will be provided to a customer free of charge in case of a defect or malfunction of a product
+
+## Properties
+
+See [Schema.org StructuredValue properties](https://schema.org/StructuredValue#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { StructuredValue } from 'schema.org.ai'
+
+// Create a StructuredValue
+const item: StructuredValue = {
+  $type: 'StructuredValue',
+  name: 'Example StructuredValue'
+}
+
+// Use semantic patterns
+await $.StructuredValue.create(item)
+const result = await $.StructuredValue.get('item-id')
+```
+
+## Resources
+
+- [Schema.org StructuredValue](https://schema.org/StructuredValue)
+- [StructuredValue Properties](https://schema.org/StructuredValue#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

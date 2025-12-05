@@ -1,0 +1,55 @@
+---
+$id: https://schema.org.ai/EducationalOrganization
+$context: https://schema.org
+$type: Class
+name: EducationalOrganization
+description: An educational organization.
+subClassOf: ["CivicStructure","Organization"]
+---
+
+# EducationalOrganization
+
+An educational organization.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **EducationalOrganization**
+
+## Direct Subclasses
+
+- **[CollegeOrUniversity](CollegeOrUniversity.mdx)**: A college, university, or other third-level educational institution
+- **[ElementarySchool](ElementarySchool.mdx)**: An elementary school
+- **[HighSchool](HighSchool.mdx)**: A high school
+- **[MiddleSchool](MiddleSchool.mdx)**: A middle school (typically for children aged around 11-14, although this varies somewhat)
+- **[Preschool](Preschool.mdx)**: A preschool
+- **[School](School.mdx)**: A school
+
+## Properties
+
+See [Schema.org EducationalOrganization properties](https://schema.org/EducationalOrganization#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EducationalOrganization } from 'schema.org.ai'
+
+// Create a EducationalOrganization
+const item: EducationalOrganization = {
+  $type: 'EducationalOrganization',
+  name: 'Example EducationalOrganization'
+}
+
+// Use semantic patterns
+await $.EducationalOrganization.create(item)
+const result = await $.EducationalOrganization.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EducationalOrganization](https://schema.org/EducationalOrganization)
+- [EducationalOrganization Properties](https://schema.org/EducationalOrganization#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

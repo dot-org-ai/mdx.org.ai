@@ -1,0 +1,57 @@
+---
+$id: https://schema.org.ai/Product
+$context: https://schema.org
+$type: Class
+name: Product
+description: Any offered product or service. For example: a pair of shoes; a concert ticket; the rental of a car; a haircut; or an episode of a TV show streamed online.
+subClassOf: ["Thing"]
+---
+
+# Product
+
+Any offered product or service. For example: a pair of shoes; a concert ticket; the rental of a car; a haircut; or an episode of a TV show streamed online.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > **Product**
+
+## Direct Subclasses
+
+- **[DietarySupplement](DietarySupplement.mdx)**: A product taken by mouth that contains a dietary ingredient intended to supplement the diet
+- **[Drug](Drug.mdx)**: A chemical or biologic substance, used as a medical therapy, that has a physiological effect on an organism
+- **[IndividualProduct](IndividualProduct.mdx)**: A single, identifiable product instance (e
+- **[ProductCollection](ProductCollection.mdx)**: A set of products (either [[ProductGroup]]s or specific variants) that are listed together e
+- **[ProductGroup](ProductGroup.mdx)**: A ProductGroup represents a group of [[Product]]s that vary only in certain well-described ways, such as by [[size]], [[color]], [[material]] etc
+- **[ProductModel](ProductModel.mdx)**: A datasheet or vendor specification of a product (in the sense of a prototypical description)
+- **[SomeProducts](SomeProducts.mdx)**: A placeholder for multiple similar products of the same kind
+- **[Vehicle](Vehicle.mdx)**: A vehicle is a device that is designed or used to transport people or cargo over land, water, air, or through space
+
+## Properties
+
+See [Schema.org Product properties](https://schema.org/Product#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Product } from 'schema.org.ai'
+
+// Create a Product
+const item: Product = {
+  $type: 'Product',
+  name: 'Example Product'
+}
+
+// Use semantic patterns
+await $.Product.create(item)
+const result = await $.Product.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Product](https://schema.org/Product)
+- [Product Properties](https://schema.org/Product#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

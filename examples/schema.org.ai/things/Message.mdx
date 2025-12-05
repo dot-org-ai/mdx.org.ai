@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Message
+$context: https://schema.org
+$type: Class
+name: Message
+description: A single message from a sender to one or more organizations or people.
+subClassOf: ["CreativeWork"]
+---
+
+# Message
+
+A single message from a sender to one or more organizations or people.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Message**
+
+## Direct Subclasses
+
+- **[EmailMessage](EmailMessage.mdx)**: An email message
+
+## Properties
+
+See [Schema.org Message properties](https://schema.org/Message#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Message } from 'schema.org.ai'
+
+// Create a Message
+const item: Message = {
+  $type: 'Message',
+  name: 'Example Message'
+}
+
+// Use semantic patterns
+await $.Message.create(item)
+const result = await $.Message.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Message](https://schema.org/Message)
+- [Message Properties](https://schema.org/Message#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

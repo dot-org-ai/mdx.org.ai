@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LandmarksOrHistoricalBuildings
+$context: https://schema.org
+$type: Class
+name: LandmarksOrHistoricalBuildings
+description: An historical landmark or building.
+subClassOf: ["Place"]
+---
+
+# LandmarksOrHistoricalBuildings
+
+An historical landmark or building.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > **LandmarksOrHistoricalBuildings**
+
+
+
+## Properties
+
+See [Schema.org LandmarksOrHistoricalBuildings properties](https://schema.org/LandmarksOrHistoricalBuildings#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LandmarksOrHistoricalBuildings } from 'schema.org.ai'
+
+// Create a LandmarksOrHistoricalBuildings
+const item: LandmarksOrHistoricalBuildings = {
+  $type: 'LandmarksOrHistoricalBuildings',
+  name: 'Example LandmarksOrHistoricalBuildings'
+}
+
+// Use semantic patterns
+await $.LandmarksOrHistoricalBuildings.create(item)
+const result = await $.LandmarksOrHistoricalBuildings.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LandmarksOrHistoricalBuildings](https://schema.org/LandmarksOrHistoricalBuildings)
+- [LandmarksOrHistoricalBuildings Properties](https://schema.org/LandmarksOrHistoricalBuildings#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

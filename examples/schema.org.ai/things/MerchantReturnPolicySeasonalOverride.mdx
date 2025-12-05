@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MerchantReturnPolicySeasonalOverride
+$context: https://schema.org
+$type: Class
+name: MerchantReturnPolicySeasonalOverride
+description: A seasonal override of a return policy, for example used for holidays.
+subClassOf: ["Intangible"]
+---
+
+# MerchantReturnPolicySeasonalOverride
+
+A seasonal override of a return policy, for example used for holidays.
+
+## Type Hierarchy
+
+**MerchantReturnPolicySeasonalOverride**
+
+
+
+## Properties
+
+See [Schema.org MerchantReturnPolicySeasonalOverride properties](https://schema.org/MerchantReturnPolicySeasonalOverride#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MerchantReturnPolicySeasonalOverride } from 'schema.org.ai'
+
+// Create a MerchantReturnPolicySeasonalOverride
+const item: MerchantReturnPolicySeasonalOverride = {
+  $type: 'MerchantReturnPolicySeasonalOverride',
+  name: 'Example MerchantReturnPolicySeasonalOverride'
+}
+
+// Use semantic patterns
+await $.MerchantReturnPolicySeasonalOverride.create(item)
+const result = await $.MerchantReturnPolicySeasonalOverride.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MerchantReturnPolicySeasonalOverride](https://schema.org/MerchantReturnPolicySeasonalOverride)
+- [MerchantReturnPolicySeasonalOverride Properties](https://schema.org/MerchantReturnPolicySeasonalOverride#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

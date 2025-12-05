@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HealthClub
+$context: https://schema.org
+$type: Class
+name: HealthClub
+description: A health club.
+subClassOf: ["HealthAndBeautyBusiness","SportsActivityLocation"]
+---
+
+# HealthClub
+
+A health club.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [SportsActivityLocation](SportsActivityLocation.mdx) > **HealthClub**
+
+
+
+## Properties
+
+See [Schema.org HealthClub properties](https://schema.org/HealthClub#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HealthClub } from 'schema.org.ai'
+
+// Create a HealthClub
+const item: HealthClub = {
+  $type: 'HealthClub',
+  name: 'Example HealthClub'
+}
+
+// Use semantic patterns
+await $.HealthClub.create(item)
+const result = await $.HealthClub.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HealthClub](https://schema.org/HealthClub)
+- [HealthClub Properties](https://schema.org/HealthClub#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

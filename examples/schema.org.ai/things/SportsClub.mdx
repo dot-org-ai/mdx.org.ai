@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SportsClub
+$context: https://schema.org
+$type: Class
+name: SportsClub
+description: A sports club.
+subClassOf: ["SportsActivityLocation"]
+---
+
+# SportsClub
+
+A sports club.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [SportsActivityLocation](SportsActivityLocation.mdx) > **SportsClub**
+
+
+
+## Properties
+
+See [Schema.org SportsClub properties](https://schema.org/SportsClub#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SportsClub } from 'schema.org.ai'
+
+// Create a SportsClub
+const item: SportsClub = {
+  $type: 'SportsClub',
+  name: 'Example SportsClub'
+}
+
+// Use semantic patterns
+await $.SportsClub.create(item)
+const result = await $.SportsClub.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SportsClub](https://schema.org/SportsClub)
+- [SportsClub Properties](https://schema.org/SportsClub#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

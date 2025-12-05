@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Demand
+$context: https://schema.org
+$type: Class
+name: Demand
+description: A demand entity represents the public, not necessarily binding, not necessarily exclusive, announcement by an organization or person to seek a certain type of goods or services. For describing demand using this type, the very same properties used for Offer apply.
+subClassOf: ["Intangible"]
+---
+
+# Demand
+
+A demand entity represents the public, not necessarily binding, not necessarily exclusive, announcement by an organization or person to seek a certain type of goods or services. For describing demand using this type, the very same properties used for Offer apply.
+
+## Type Hierarchy
+
+**Demand**
+
+
+
+## Properties
+
+See [Schema.org Demand properties](https://schema.org/Demand#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Demand } from 'schema.org.ai'
+
+// Create a Demand
+const item: Demand = {
+  $type: 'Demand',
+  name: 'Example Demand'
+}
+
+// Use semantic patterns
+await $.Demand.create(item)
+const result = await $.Demand.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Demand](https://schema.org/Demand)
+- [Demand Properties](https://schema.org/Demand#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

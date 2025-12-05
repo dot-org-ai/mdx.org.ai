@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BrainStructure
+$context: https://schema.org
+$type: Class
+name: BrainStructure
+description: Any anatomical structure which pertains to the soft nervous tissue functioning as the coordinating center of sensation and intellectual and nervous activity.
+subClassOf: ["AnatomicalStructure"]
+---
+
+# BrainStructure
+
+Any anatomical structure which pertains to the soft nervous tissue functioning as the coordinating center of sensation and intellectual and nervous activity.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [AnatomicalStructure](AnatomicalStructure.mdx) > **BrainStructure**
+
+
+
+## Properties
+
+See [Schema.org BrainStructure properties](https://schema.org/BrainStructure#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BrainStructure } from 'schema.org.ai'
+
+// Create a BrainStructure
+const item: BrainStructure = {
+  $type: 'BrainStructure',
+  name: 'Example BrainStructure'
+}
+
+// Use semantic patterns
+await $.BrainStructure.create(item)
+const result = await $.BrainStructure.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BrainStructure](https://schema.org/BrainStructure)
+- [BrainStructure Properties](https://schema.org/BrainStructure#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,54 @@
+---
+$id: https://schema.org.ai/NewsArticle
+$context: https://schema.org
+$type: Class
+name: NewsArticle
+description: A NewsArticle is an article whose content reports news, or provides background context and supporting materials for understanding the news. A more detailed overview of [schema.org News markup](/docs/news.html) is also available.
+subClassOf: ["Article"]
+---
+
+# NewsArticle
+
+A NewsArticle is an article whose content reports news, or provides background context and supporting materials for understanding the news. A more detailed overview of [schema.org News markup](/docs/news.html) is also available.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > **NewsArticle**
+
+## Direct Subclasses
+
+- **[AnalysisNewsArticle](AnalysisNewsArticle.mdx)**: An AnalysisNewsArticle is a [[NewsArticle]] that, while based on factual reporting, incorporates the expertise of the author/producer, offering interpretations and conclusions
+- **[AskPublicNewsArticle](AskPublicNewsArticle.mdx)**: A [[NewsArticle]] expressing an open call by a [[NewsMediaOrganization]] asking the public for input, insights, clarifications, anecdotes, documentation, etc
+- **[BackgroundNewsArticle](BackgroundNewsArticle.mdx)**: A [[NewsArticle]] providing historical context, definition and detail on a specific topic (aka "explainer" or "backgrounder")
+- **[OpinionNewsArticle](OpinionNewsArticle.mdx)**: An [[OpinionNewsArticle]] is a [[NewsArticle]] that primarily expresses opinions rather than journalistic reporting of news and events
+- **[ReportageNewsArticle](ReportageNewsArticle.mdx)**: The [[ReportageNewsArticle]] type is a subtype of [[NewsArticle]] representing news articles which are the result of journalistic news reporting conventions
+
+## Properties
+
+See [Schema.org NewsArticle properties](https://schema.org/NewsArticle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { NewsArticle } from 'schema.org.ai'
+
+// Create a NewsArticle
+const item: NewsArticle = {
+  $type: 'NewsArticle',
+  name: 'Example NewsArticle'
+}
+
+// Use semantic patterns
+await $.NewsArticle.create(item)
+const result = await $.NewsArticle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org NewsArticle](https://schema.org/NewsArticle)
+- [NewsArticle Properties](https://schema.org/NewsArticle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

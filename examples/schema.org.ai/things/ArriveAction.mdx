@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ArriveAction
+$context: https://schema.org
+$type: Class
+name: ArriveAction
+description: The act of arriving at a place. An agent arrives at a destination from a fromLocation, optionally with participants.
+subClassOf: ["MoveAction"]
+---
+
+# ArriveAction
+
+The act of arriving at a place. An agent arrives at a destination from a fromLocation, optionally with participants.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [MoveAction](MoveAction.mdx) > **ArriveAction**
+
+
+
+## Properties
+
+See [Schema.org ArriveAction properties](https://schema.org/ArriveAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ArriveAction } from 'schema.org.ai'
+
+// Create a ArriveAction
+const item: ArriveAction = {
+  $type: 'ArriveAction',
+  name: 'Example ArriveAction'
+}
+
+// Use semantic patterns
+await $.ArriveAction.create(item)
+const result = await $.ArriveAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ArriveAction](https://schema.org/ArriveAction)
+- [ArriveAction Properties](https://schema.org/ArriveAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

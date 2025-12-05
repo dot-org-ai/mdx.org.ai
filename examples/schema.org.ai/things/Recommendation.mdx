@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Recommendation
+$context: https://schema.org
+$type: Class
+name: Recommendation
+description: [[Recommendation]] is a type of [[Review]] that suggests or proposes something as the best option or best course of action. Recommendations may be for products or services, or other concrete things, as in the case of a ranked list or product guide. A [[Guide]] may list multiple recommendations for different categories. For example, in a [[Guide]] about which TVs to buy, the author may have several [[Recommendation]]s.
+subClassOf: ["Review"]
+---
+
+# Recommendation
+
+[[Recommendation]] is a type of [[Review]] that suggests or proposes something as the best option or best course of action. Recommendations may be for products or services, or other concrete things, as in the case of a ranked list or product guide. A [[Guide]] may list multiple recommendations for different categories. For example, in a [[Guide]] about which TVs to buy, the author may have several [[Recommendation]]s.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Review](Review.mdx) > **Recommendation**
+
+
+
+## Properties
+
+See [Schema.org Recommendation properties](https://schema.org/Recommendation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Recommendation } from 'schema.org.ai'
+
+// Create a Recommendation
+const item: Recommendation = {
+  $type: 'Recommendation',
+  name: 'Example Recommendation'
+}
+
+// Use semantic patterns
+await $.Recommendation.create(item)
+const result = await $.Recommendation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Recommendation](https://schema.org/Recommendation)
+- [Recommendation Properties](https://schema.org/Recommendation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

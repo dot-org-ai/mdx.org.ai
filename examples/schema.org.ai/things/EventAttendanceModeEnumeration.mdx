@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EventAttendanceModeEnumeration
+$context: https://schema.org
+$type: Class
+name: EventAttendanceModeEnumeration
+description: An EventAttendanceModeEnumeration value is one of potentially several modes of organising an event, relating to whether it is online or offline.
+subClassOf: ["Enumeration"]
+---
+
+# EventAttendanceModeEnumeration
+
+An EventAttendanceModeEnumeration value is one of potentially several modes of organising an event, relating to whether it is online or offline.
+
+## Type Hierarchy
+
+**EventAttendanceModeEnumeration**
+
+
+
+## Properties
+
+See [Schema.org EventAttendanceModeEnumeration properties](https://schema.org/EventAttendanceModeEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EventAttendanceModeEnumeration } from 'schema.org.ai'
+
+// Create a EventAttendanceModeEnumeration
+const item: EventAttendanceModeEnumeration = {
+  $type: 'EventAttendanceModeEnumeration',
+  name: 'Example EventAttendanceModeEnumeration'
+}
+
+// Use semantic patterns
+await $.EventAttendanceModeEnumeration.create(item)
+const result = await $.EventAttendanceModeEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EventAttendanceModeEnumeration](https://schema.org/EventAttendanceModeEnumeration)
+- [EventAttendanceModeEnumeration Properties](https://schema.org/EventAttendanceModeEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

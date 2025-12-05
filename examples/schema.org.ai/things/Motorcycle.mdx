@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Motorcycle
+$context: https://schema.org
+$type: Class
+name: Motorcycle
+description: A motorcycle or motorbike is a single-track, two-wheeled motor vehicle.
+subClassOf: ["Vehicle"]
+---
+
+# Motorcycle
+
+A motorcycle or motorbike is a single-track, two-wheeled motor vehicle.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > [Vehicle](Vehicle.mdx) > **Motorcycle**
+
+
+
+## Properties
+
+See [Schema.org Motorcycle properties](https://schema.org/Motorcycle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Motorcycle } from 'schema.org.ai'
+
+// Create a Motorcycle
+const item: Motorcycle = {
+  $type: 'Motorcycle',
+  name: 'Example Motorcycle'
+}
+
+// Use semantic patterns
+await $.Motorcycle.create(item)
+const result = await $.Motorcycle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Motorcycle](https://schema.org/Motorcycle)
+- [Motorcycle Properties](https://schema.org/Motorcycle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

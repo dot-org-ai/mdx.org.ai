@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CommentAction
+$context: https://schema.org
+$type: Class
+name: CommentAction
+description: The act of generating a comment about a subject.
+subClassOf: ["CommunicateAction"]
+---
+
+# CommentAction
+
+The act of generating a comment about a subject.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > **CommentAction**
+
+
+
+## Properties
+
+See [Schema.org CommentAction properties](https://schema.org/CommentAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CommentAction } from 'schema.org.ai'
+
+// Create a CommentAction
+const item: CommentAction = {
+  $type: 'CommentAction',
+  name: 'Example CommentAction'
+}
+
+// Use semantic patterns
+await $.CommentAction.create(item)
+const result = await $.CommentAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CommentAction](https://schema.org/CommentAction)
+- [CommentAction Properties](https://schema.org/CommentAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

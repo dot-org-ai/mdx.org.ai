@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DislikeAction
+$context: https://schema.org
+$type: Class
+name: DislikeAction
+description: The act of expressing a negative sentiment about the object. An agent dislikes an object (a proposition, topic or theme) with participants.
+subClassOf: ["ReactAction"]
+---
+
+# DislikeAction
+
+The act of expressing a negative sentiment about the object. An agent dislikes an object (a proposition, topic or theme) with participants.
+
+## Type Hierarchy
+
+**DislikeAction**
+
+
+
+## Properties
+
+See [Schema.org DislikeAction properties](https://schema.org/DislikeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DislikeAction } from 'schema.org.ai'
+
+// Create a DislikeAction
+const item: DislikeAction = {
+  $type: 'DislikeAction',
+  name: 'Example DislikeAction'
+}
+
+// Use semantic patterns
+await $.DislikeAction.create(item)
+const result = await $.DislikeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DislikeAction](https://schema.org/DislikeAction)
+- [DislikeAction Properties](https://schema.org/DislikeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

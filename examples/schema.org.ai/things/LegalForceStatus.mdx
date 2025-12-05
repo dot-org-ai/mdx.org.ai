@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LegalForceStatus
+$context: https://schema.org
+$type: Class
+name: LegalForceStatus
+description: A list of possible statuses for the legal force of a legislation.
+subClassOf: ["StatusEnumeration"]
+---
+
+# LegalForceStatus
+
+A list of possible statuses for the legal force of a legislation.
+
+## Type Hierarchy
+
+**LegalForceStatus**
+
+
+
+## Properties
+
+See [Schema.org LegalForceStatus properties](https://schema.org/LegalForceStatus#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LegalForceStatus } from 'schema.org.ai'
+
+// Create a LegalForceStatus
+const item: LegalForceStatus = {
+  $type: 'LegalForceStatus',
+  name: 'Example LegalForceStatus'
+}
+
+// Use semantic patterns
+await $.LegalForceStatus.create(item)
+const result = await $.LegalForceStatus.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LegalForceStatus](https://schema.org/LegalForceStatus)
+- [LegalForceStatus Properties](https://schema.org/LegalForceStatus#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

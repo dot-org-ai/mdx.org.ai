@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MarryAction
+$context: https://schema.org
+$type: Class
+name: MarryAction
+description: The act of marrying a person.
+subClassOf: ["InteractAction"]
+---
+
+# MarryAction
+
+The act of marrying a person.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > **MarryAction**
+
+
+
+## Properties
+
+See [Schema.org MarryAction properties](https://schema.org/MarryAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MarryAction } from 'schema.org.ai'
+
+// Create a MarryAction
+const item: MarryAction = {
+  $type: 'MarryAction',
+  name: 'Example MarryAction'
+}
+
+// Use semantic patterns
+await $.MarryAction.create(item)
+const result = await $.MarryAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MarryAction](https://schema.org/MarryAction)
+- [MarryAction Properties](https://schema.org/MarryAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

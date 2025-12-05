@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ExhibitionEvent
+$context: https://schema.org
+$type: Class
+name: ExhibitionEvent
+description: Event type: Exhibition event, e.g. at a museum, library, archive, tradeshow, ...
+subClassOf: ["Event"]
+---
+
+# ExhibitionEvent
+
+Event type: Exhibition event, e.g. at a museum, library, archive, tradeshow, ...
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **ExhibitionEvent**
+
+
+
+## Properties
+
+See [Schema.org ExhibitionEvent properties](https://schema.org/ExhibitionEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ExhibitionEvent } from 'schema.org.ai'
+
+// Create a ExhibitionEvent
+const item: ExhibitionEvent = {
+  $type: 'ExhibitionEvent',
+  name: 'Example ExhibitionEvent'
+}
+
+// Use semantic patterns
+await $.ExhibitionEvent.create(item)
+const result = await $.ExhibitionEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ExhibitionEvent](https://schema.org/ExhibitionEvent)
+- [ExhibitionEvent Properties](https://schema.org/ExhibitionEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

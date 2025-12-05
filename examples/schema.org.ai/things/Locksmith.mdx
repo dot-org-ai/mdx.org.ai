@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Locksmith
+$context: https://schema.org
+$type: Class
+name: Locksmith
+description: A locksmith.
+subClassOf: ["HomeAndConstructionBusiness"]
+---
+
+# Locksmith
+
+A locksmith.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HomeAndConstructionBusiness](HomeAndConstructionBusiness.mdx) > **Locksmith**
+
+
+
+## Properties
+
+See [Schema.org Locksmith properties](https://schema.org/Locksmith#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Locksmith } from 'schema.org.ai'
+
+// Create a Locksmith
+const item: Locksmith = {
+  $type: 'Locksmith',
+  name: 'Example Locksmith'
+}
+
+// Use semantic patterns
+await $.Locksmith.create(item)
+const result = await $.Locksmith.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Locksmith](https://schema.org/Locksmith)
+- [Locksmith Properties](https://schema.org/Locksmith#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

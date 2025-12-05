@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Synagogue
+$context: https://schema.org
+$type: Class
+name: Synagogue
+description: A synagogue.
+subClassOf: ["PlaceOfWorship"]
+---
+
+# Synagogue
+
+A synagogue.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [PlaceOfWorship](PlaceOfWorship.mdx) > **Synagogue**
+
+
+
+## Properties
+
+See [Schema.org Synagogue properties](https://schema.org/Synagogue#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Synagogue } from 'schema.org.ai'
+
+// Create a Synagogue
+const item: Synagogue = {
+  $type: 'Synagogue',
+  name: 'Example Synagogue'
+}
+
+// Use semantic patterns
+await $.Synagogue.create(item)
+const result = await $.Synagogue.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Synagogue](https://schema.org/Synagogue)
+- [Synagogue Properties](https://schema.org/Synagogue#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

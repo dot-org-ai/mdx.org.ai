@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AnatomicalSystem
+$context: https://schema.org
+$type: Class
+name: AnatomicalSystem
+description: An anatomical system is a group of anatomical structures that work together to perform a certain task. Anatomical systems, such as organ systems, are one organizing principle of anatomy, and can include circulatory, digestive, endocrine, integumentary, immune, lymphatic, muscular, nervous, reproductive, respiratory, skeletal, urinary, vestibular, and other systems.
+subClassOf: ["MedicalEntity"]
+---
+
+# AnatomicalSystem
+
+An anatomical system is a group of anatomical structures that work together to perform a certain task. Anatomical systems, such as organ systems, are one organizing principle of anatomy, and can include circulatory, digestive, endocrine, integumentary, immune, lymphatic, muscular, nervous, reproductive, respiratory, skeletal, urinary, vestibular, and other systems.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **AnatomicalSystem**
+
+
+
+## Properties
+
+See [Schema.org AnatomicalSystem properties](https://schema.org/AnatomicalSystem#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AnatomicalSystem } from 'schema.org.ai'
+
+// Create a AnatomicalSystem
+const item: AnatomicalSystem = {
+  $type: 'AnatomicalSystem',
+  name: 'Example AnatomicalSystem'
+}
+
+// Use semantic patterns
+await $.AnatomicalSystem.create(item)
+const result = await $.AnatomicalSystem.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AnatomicalSystem](https://schema.org/AnatomicalSystem)
+- [AnatomicalSystem Properties](https://schema.org/AnatomicalSystem#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

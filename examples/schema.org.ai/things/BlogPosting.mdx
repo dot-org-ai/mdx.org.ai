@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/BlogPosting
+$context: https://schema.org
+$type: Class
+name: BlogPosting
+description: A blog post.
+subClassOf: ["SocialMediaPosting"]
+---
+
+# BlogPosting
+
+A blog post.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > [SocialMediaPosting](SocialMediaPosting.mdx) > **BlogPosting**
+
+## Direct Subclasses
+
+- **[LiveBlogPosting](LiveBlogPosting.mdx)**: A [[LiveBlogPosting]] is a [[BlogPosting]] intended to provide a rolling textual coverage of an ongoing event through continuous updates
+
+## Properties
+
+See [Schema.org BlogPosting properties](https://schema.org/BlogPosting#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BlogPosting } from 'schema.org.ai'
+
+// Create a BlogPosting
+const item: BlogPosting = {
+  $type: 'BlogPosting',
+  name: 'Example BlogPosting'
+}
+
+// Use semantic patterns
+await $.BlogPosting.create(item)
+const result = await $.BlogPosting.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BlogPosting](https://schema.org/BlogPosting)
+- [BlogPosting Properties](https://schema.org/BlogPosting#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

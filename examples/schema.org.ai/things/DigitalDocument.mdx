@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/DigitalDocument
+$context: https://schema.org
+$type: Class
+name: DigitalDocument
+description: An electronic file or document.
+subClassOf: ["CreativeWork"]
+---
+
+# DigitalDocument
+
+An electronic file or document.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **DigitalDocument**
+
+## Direct Subclasses
+
+- **[NoteDigitalDocument](NoteDigitalDocument.mdx)**: A file containing a note, primarily for the author
+- **[PresentationDigitalDocument](PresentationDigitalDocument.mdx)**: A file containing slides or used for a presentation
+- **[SpreadsheetDigitalDocument](SpreadsheetDigitalDocument.mdx)**: A spreadsheet file
+- **[TextDigitalDocument](TextDigitalDocument.mdx)**: A file composed primarily of text
+
+## Properties
+
+See [Schema.org DigitalDocument properties](https://schema.org/DigitalDocument#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DigitalDocument } from 'schema.org.ai'
+
+// Create a DigitalDocument
+const item: DigitalDocument = {
+  $type: 'DigitalDocument',
+  name: 'Example DigitalDocument'
+}
+
+// Use semantic patterns
+await $.DigitalDocument.create(item)
+const result = await $.DigitalDocument.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DigitalDocument](https://schema.org/DigitalDocument)
+- [DigitalDocument Properties](https://schema.org/DigitalDocument#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

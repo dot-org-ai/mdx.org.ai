@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ResumeAction
+$context: https://schema.org
+$type: Class
+name: ResumeAction
+description: The act of resuming a device or application which was formerly paused (e.g. resume music playback or resume a timer).
+subClassOf: ["ControlAction"]
+---
+
+# ResumeAction
+
+The act of resuming a device or application which was formerly paused (e.g. resume music playback or resume a timer).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ControlAction](ControlAction.mdx) > **ResumeAction**
+
+
+
+## Properties
+
+See [Schema.org ResumeAction properties](https://schema.org/ResumeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ResumeAction } from 'schema.org.ai'
+
+// Create a ResumeAction
+const item: ResumeAction = {
+  $type: 'ResumeAction',
+  name: 'Example ResumeAction'
+}
+
+// Use semantic patterns
+await $.ResumeAction.create(item)
+const result = await $.ResumeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ResumeAction](https://schema.org/ResumeAction)
+- [ResumeAction Properties](https://schema.org/ResumeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

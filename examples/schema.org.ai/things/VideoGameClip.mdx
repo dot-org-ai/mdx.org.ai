@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/VideoGameClip
+$context: https://schema.org
+$type: Class
+name: VideoGameClip
+description: A short segment/part of a video game.
+subClassOf: ["Clip"]
+---
+
+# VideoGameClip
+
+A short segment/part of a video game.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Clip](Clip.mdx) > **VideoGameClip**
+
+
+
+## Properties
+
+See [Schema.org VideoGameClip properties](https://schema.org/VideoGameClip#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { VideoGameClip } from 'schema.org.ai'
+
+// Create a VideoGameClip
+const item: VideoGameClip = {
+  $type: 'VideoGameClip',
+  name: 'Example VideoGameClip'
+}
+
+// Use semantic patterns
+await $.VideoGameClip.create(item)
+const result = await $.VideoGameClip.get('item-id')
+```
+
+## Resources
+
+- [Schema.org VideoGameClip](https://schema.org/VideoGameClip)
+- [VideoGameClip Properties](https://schema.org/VideoGameClip#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

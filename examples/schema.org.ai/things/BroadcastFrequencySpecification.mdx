@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BroadcastFrequencySpecification
+$context: https://schema.org
+$type: Class
+name: BroadcastFrequencySpecification
+description: The frequency in MHz and the modulation used for a particular BroadcastService.
+subClassOf: ["Intangible"]
+---
+
+# BroadcastFrequencySpecification
+
+The frequency in MHz and the modulation used for a particular BroadcastService.
+
+## Type Hierarchy
+
+**BroadcastFrequencySpecification**
+
+
+
+## Properties
+
+See [Schema.org BroadcastFrequencySpecification properties](https://schema.org/BroadcastFrequencySpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BroadcastFrequencySpecification } from 'schema.org.ai'
+
+// Create a BroadcastFrequencySpecification
+const item: BroadcastFrequencySpecification = {
+  $type: 'BroadcastFrequencySpecification',
+  name: 'Example BroadcastFrequencySpecification'
+}
+
+// Use semantic patterns
+await $.BroadcastFrequencySpecification.create(item)
+const result = await $.BroadcastFrequencySpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BroadcastFrequencySpecification](https://schema.org/BroadcastFrequencySpecification)
+- [BroadcastFrequencySpecification Properties](https://schema.org/BroadcastFrequencySpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

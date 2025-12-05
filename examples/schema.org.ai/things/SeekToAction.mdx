@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SeekToAction
+$context: https://schema.org
+$type: Class
+name: SeekToAction
+description: This is the [[Action]] of navigating to a specific [[startOffset]] timestamp within a [[VideoObject]], typically represented with a URL template structure.
+subClassOf: ["Action"]
+---
+
+# SeekToAction
+
+This is the [[Action]] of navigating to a specific [[startOffset]] timestamp within a [[VideoObject]], typically represented with a URL template structure.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **SeekToAction**
+
+
+
+## Properties
+
+See [Schema.org SeekToAction properties](https://schema.org/SeekToAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SeekToAction } from 'schema.org.ai'
+
+// Create a SeekToAction
+const item: SeekToAction = {
+  $type: 'SeekToAction',
+  name: 'Example SeekToAction'
+}
+
+// Use semantic patterns
+await $.SeekToAction.create(item)
+const result = await $.SeekToAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SeekToAction](https://schema.org/SeekToAction)
+- [SeekToAction Properties](https://schema.org/SeekToAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

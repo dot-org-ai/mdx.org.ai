@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/BusReservation
+$context: https://schema.org
+$type: Class
+name: BusReservation
+description: A reservation for bus travel. \
+subClassOf: ["Reservation"]
+---
+
+# BusReservation
+
+A reservation for bus travel. \
+\
+Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, use [[Offer]].
+
+## Type Hierarchy
+
+**BusReservation**
+
+
+
+## Properties
+
+See [Schema.org BusReservation properties](https://schema.org/BusReservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BusReservation } from 'schema.org.ai'
+
+// Create a BusReservation
+const item: BusReservation = {
+  $type: 'BusReservation',
+  name: 'Example BusReservation'
+}
+
+// Use semantic patterns
+await $.BusReservation.create(item)
+const result = await $.BusReservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BusReservation](https://schema.org/BusReservation)
+- [BusReservation Properties](https://schema.org/BusReservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

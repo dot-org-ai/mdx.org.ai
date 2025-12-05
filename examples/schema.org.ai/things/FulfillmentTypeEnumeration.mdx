@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FulfillmentTypeEnumeration
+$context: https://schema.org
+$type: Class
+name: FulfillmentTypeEnumeration
+description: A type of product fulfillment.
+subClassOf: ["Enumeration"]
+---
+
+# FulfillmentTypeEnumeration
+
+A type of product fulfillment.
+
+## Type Hierarchy
+
+**FulfillmentTypeEnumeration**
+
+
+
+## Properties
+
+See [Schema.org FulfillmentTypeEnumeration properties](https://schema.org/FulfillmentTypeEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FulfillmentTypeEnumeration } from 'schema.org.ai'
+
+// Create a FulfillmentTypeEnumeration
+const item: FulfillmentTypeEnumeration = {
+  $type: 'FulfillmentTypeEnumeration',
+  name: 'Example FulfillmentTypeEnumeration'
+}
+
+// Use semantic patterns
+await $.FulfillmentTypeEnumeration.create(item)
+const result = await $.FulfillmentTypeEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FulfillmentTypeEnumeration](https://schema.org/FulfillmentTypeEnumeration)
+- [FulfillmentTypeEnumeration Properties](https://schema.org/FulfillmentTypeEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

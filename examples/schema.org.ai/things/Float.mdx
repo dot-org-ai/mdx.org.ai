@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Float
+$context: https://schema.org
+$type: Class
+name: Float
+description: Data type: Floating number.
+subClassOf: ["Number"]
+---
+
+# Float
+
+Data type: Floating number.
+
+## Type Hierarchy
+
+**Float**
+
+
+
+## Properties
+
+See [Schema.org Float properties](https://schema.org/Float#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Float } from 'schema.org.ai'
+
+// Create a Float
+const item: Float = {
+  $type: 'Float',
+  name: 'Example Float'
+}
+
+// Use semantic patterns
+await $.Float.create(item)
+const result = await $.Float.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Float](https://schema.org/Float)
+- [Float Properties](https://schema.org/Float#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EmailMessage
+$context: https://schema.org
+$type: Class
+name: EmailMessage
+description: An email message.
+subClassOf: ["Message"]
+---
+
+# EmailMessage
+
+An email message.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Message](Message.mdx) > **EmailMessage**
+
+
+
+## Properties
+
+See [Schema.org EmailMessage properties](https://schema.org/EmailMessage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EmailMessage } from 'schema.org.ai'
+
+// Create a EmailMessage
+const item: EmailMessage = {
+  $type: 'EmailMessage',
+  name: 'Example EmailMessage'
+}
+
+// Use semantic patterns
+await $.EmailMessage.create(item)
+const result = await $.EmailMessage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EmailMessage](https://schema.org/EmailMessage)
+- [EmailMessage Properties](https://schema.org/EmailMessage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

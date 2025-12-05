@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FundingScheme
+$context: https://schema.org
+$type: Class
+name: FundingScheme
+description: A FundingScheme combines organizational, project and policy aspects of grant-based funding that sets guidelines, principles and mechanisms to support other kinds of projects and activities. Funding is typically organized via [[Grant]] funding. Examples of funding schemes: Swiss Priority Programmes (SPPs); EU Framework 7 (FP7); Horizon 2020; the NIH-R01 Grant Program; Wellcome institutional strategic support fund. For large scale public sector funding, the management and administration of grant awards is often handled by other, dedicated, organizations - [[FundingAgency]]s such as ERC, REA, ...
+subClassOf: ["Organization"]
+---
+
+# FundingScheme
+
+A FundingScheme combines organizational, project and policy aspects of grant-based funding that sets guidelines, principles and mechanisms to support other kinds of projects and activities. Funding is typically organized via [[Grant]] funding. Examples of funding schemes: Swiss Priority Programmes (SPPs); EU Framework 7 (FP7); Horizon 2020; the NIH-R01 Grant Program; Wellcome institutional strategic support fund. For large scale public sector funding, the management and administration of grant awards is often handled by other, dedicated, organizations - [[FundingAgency]]s such as ERC, REA, ...
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **FundingScheme**
+
+
+
+## Properties
+
+See [Schema.org FundingScheme properties](https://schema.org/FundingScheme#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FundingScheme } from 'schema.org.ai'
+
+// Create a FundingScheme
+const item: FundingScheme = {
+  $type: 'FundingScheme',
+  name: 'Example FundingScheme'
+}
+
+// Use semantic patterns
+await $.FundingScheme.create(item)
+const result = await $.FundingScheme.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FundingScheme](https://schema.org/FundingScheme)
+- [FundingScheme Properties](https://schema.org/FundingScheme#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ShippingDeliveryTime
+$context: https://schema.org
+$type: Class
+name: ShippingDeliveryTime
+description: ShippingDeliveryTime provides various pieces of information about delivery times for shipping.
+subClassOf: ["StructuredValue"]
+---
+
+# ShippingDeliveryTime
+
+ShippingDeliveryTime provides various pieces of information about delivery times for shipping.
+
+## Type Hierarchy
+
+**ShippingDeliveryTime**
+
+
+
+## Properties
+
+See [Schema.org ShippingDeliveryTime properties](https://schema.org/ShippingDeliveryTime#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ShippingDeliveryTime } from 'schema.org.ai'
+
+// Create a ShippingDeliveryTime
+const item: ShippingDeliveryTime = {
+  $type: 'ShippingDeliveryTime',
+  name: 'Example ShippingDeliveryTime'
+}
+
+// Use semantic patterns
+await $.ShippingDeliveryTime.create(item)
+const result = await $.ShippingDeliveryTime.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ShippingDeliveryTime](https://schema.org/ShippingDeliveryTime)
+- [ShippingDeliveryTime Properties](https://schema.org/ShippingDeliveryTime#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

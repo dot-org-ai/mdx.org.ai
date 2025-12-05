@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Courthouse
+$context: https://schema.org
+$type: Class
+name: Courthouse
+description: A courthouse.
+subClassOf: ["GovernmentBuilding"]
+---
+
+# Courthouse
+
+A courthouse.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [GovernmentBuilding](GovernmentBuilding.mdx) > **Courthouse**
+
+
+
+## Properties
+
+See [Schema.org Courthouse properties](https://schema.org/Courthouse#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Courthouse } from 'schema.org.ai'
+
+// Create a Courthouse
+const item: Courthouse = {
+  $type: 'Courthouse',
+  name: 'Example Courthouse'
+}
+
+// Use semantic patterns
+await $.Courthouse.create(item)
+const result = await $.Courthouse.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Courthouse](https://schema.org/Courthouse)
+- [Courthouse Properties](https://schema.org/Courthouse#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

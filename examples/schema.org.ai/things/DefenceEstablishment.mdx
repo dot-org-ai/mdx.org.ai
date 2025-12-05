@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DefenceEstablishment
+$context: https://schema.org
+$type: Class
+name: DefenceEstablishment
+description: A defence establishment, such as an army or navy base.
+subClassOf: ["GovernmentBuilding"]
+---
+
+# DefenceEstablishment
+
+A defence establishment, such as an army or navy base.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [GovernmentBuilding](GovernmentBuilding.mdx) > **DefenceEstablishment**
+
+
+
+## Properties
+
+See [Schema.org DefenceEstablishment properties](https://schema.org/DefenceEstablishment#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DefenceEstablishment } from 'schema.org.ai'
+
+// Create a DefenceEstablishment
+const item: DefenceEstablishment = {
+  $type: 'DefenceEstablishment',
+  name: 'Example DefenceEstablishment'
+}
+
+// Use semantic patterns
+await $.DefenceEstablishment.create(item)
+const result = await $.DefenceEstablishment.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DefenceEstablishment](https://schema.org/DefenceEstablishment)
+- [DefenceEstablishment Properties](https://schema.org/DefenceEstablishment#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

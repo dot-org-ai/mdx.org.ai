@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Invoice
+$context: https://schema.org
+$type: Class
+name: Invoice
+description: A statement of the money due for goods or services; a bill.
+subClassOf: ["Intangible"]
+---
+
+# Invoice
+
+A statement of the money due for goods or services; a bill.
+
+## Type Hierarchy
+
+**Invoice**
+
+
+
+## Properties
+
+See [Schema.org Invoice properties](https://schema.org/Invoice#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Invoice } from 'schema.org.ai'
+
+// Create a Invoice
+const item: Invoice = {
+  $type: 'Invoice',
+  name: 'Example Invoice'
+}
+
+// Use semantic patterns
+await $.Invoice.create(item)
+const result = await $.Invoice.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Invoice](https://schema.org/Invoice)
+- [Invoice Properties](https://schema.org/Invoice#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

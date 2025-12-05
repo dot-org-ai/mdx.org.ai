@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BoardingPolicyType
+$context: https://schema.org
+$type: Class
+name: BoardingPolicyType
+description: A type of boarding policy used by an airline.
+subClassOf: ["Enumeration"]
+---
+
+# BoardingPolicyType
+
+A type of boarding policy used by an airline.
+
+## Type Hierarchy
+
+**BoardingPolicyType**
+
+
+
+## Properties
+
+See [Schema.org BoardingPolicyType properties](https://schema.org/BoardingPolicyType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BoardingPolicyType } from 'schema.org.ai'
+
+// Create a BoardingPolicyType
+const item: BoardingPolicyType = {
+  $type: 'BoardingPolicyType',
+  name: 'Example BoardingPolicyType'
+}
+
+// Use semantic patterns
+await $.BoardingPolicyType.create(item)
+const result = await $.BoardingPolicyType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BoardingPolicyType](https://schema.org/BoardingPolicyType)
+- [BoardingPolicyType Properties](https://schema.org/BoardingPolicyType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

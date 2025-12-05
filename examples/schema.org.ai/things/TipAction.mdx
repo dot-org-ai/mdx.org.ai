@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TipAction
+$context: https://schema.org
+$type: Class
+name: TipAction
+description: The act of giving money voluntarily to a beneficiary in recognition of services rendered.
+subClassOf: ["TradeAction"]
+---
+
+# TipAction
+
+The act of giving money voluntarily to a beneficiary in recognition of services rendered.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TradeAction](TradeAction.mdx) > **TipAction**
+
+
+
+## Properties
+
+See [Schema.org TipAction properties](https://schema.org/TipAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TipAction } from 'schema.org.ai'
+
+// Create a TipAction
+const item: TipAction = {
+  $type: 'TipAction',
+  name: 'Example TipAction'
+}
+
+// Use semantic patterns
+await $.TipAction.create(item)
+const result = await $.TipAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TipAction](https://schema.org/TipAction)
+- [TipAction Properties](https://schema.org/TipAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

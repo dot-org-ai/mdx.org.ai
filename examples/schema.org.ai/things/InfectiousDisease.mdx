@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/InfectiousDisease
+$context: https://schema.org
+$type: Class
+name: InfectiousDisease
+description: An infectious disease is a clinically evident human disease resulting from the presence of pathogenic microbial agents, like pathogenic viruses, pathogenic bacteria, fungi, protozoa, multicellular parasites, and prions. To be considered an infectious disease, such pathogens are known to be able to cause this disease.
+subClassOf: ["MedicalCondition"]
+---
+
+# InfectiousDisease
+
+An infectious disease is a clinically evident human disease resulting from the presence of pathogenic microbial agents, like pathogenic viruses, pathogenic bacteria, fungi, protozoa, multicellular parasites, and prions. To be considered an infectious disease, such pathogens are known to be able to cause this disease.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalCondition](MedicalCondition.mdx) > **InfectiousDisease**
+
+
+
+## Properties
+
+See [Schema.org InfectiousDisease properties](https://schema.org/InfectiousDisease#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InfectiousDisease } from 'schema.org.ai'
+
+// Create a InfectiousDisease
+const item: InfectiousDisease = {
+  $type: 'InfectiousDisease',
+  name: 'Example InfectiousDisease'
+}
+
+// Use semantic patterns
+await $.InfectiousDisease.create(item)
+const result = await $.InfectiousDisease.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InfectiousDisease](https://schema.org/InfectiousDisease)
+- [InfectiousDisease Properties](https://schema.org/InfectiousDisease#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Church
+$context: https://schema.org
+$type: Class
+name: Church
+description: A church.
+subClassOf: ["PlaceOfWorship"]
+---
+
+# Church
+
+A church.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [PlaceOfWorship](PlaceOfWorship.mdx) > **Church**
+
+## Direct Subclasses
+
+- **[CatholicChurch](CatholicChurch.mdx)**: A Catholic church
+
+## Properties
+
+See [Schema.org Church properties](https://schema.org/Church#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Church } from 'schema.org.ai'
+
+// Create a Church
+const item: Church = {
+  $type: 'Church',
+  name: 'Example Church'
+}
+
+// Use semantic patterns
+await $.Church.create(item)
+const result = await $.Church.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Church](https://schema.org/Church)
+- [Church Properties](https://schema.org/Church#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

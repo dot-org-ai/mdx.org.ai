@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LiveBlogPosting
+$context: https://schema.org
+$type: Class
+name: LiveBlogPosting
+description: A [[LiveBlogPosting]] is a [[BlogPosting]] intended to provide a rolling textual coverage of an ongoing event through continuous updates.
+subClassOf: ["BlogPosting"]
+---
+
+# LiveBlogPosting
+
+A [[LiveBlogPosting]] is a [[BlogPosting]] intended to provide a rolling textual coverage of an ongoing event through continuous updates.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > [SocialMediaPosting](SocialMediaPosting.mdx) > [BlogPosting](BlogPosting.mdx) > **LiveBlogPosting**
+
+
+
+## Properties
+
+See [Schema.org LiveBlogPosting properties](https://schema.org/LiveBlogPosting#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LiveBlogPosting } from 'schema.org.ai'
+
+// Create a LiveBlogPosting
+const item: LiveBlogPosting = {
+  $type: 'LiveBlogPosting',
+  name: 'Example LiveBlogPosting'
+}
+
+// Use semantic patterns
+await $.LiveBlogPosting.create(item)
+const result = await $.LiveBlogPosting.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LiveBlogPosting](https://schema.org/LiveBlogPosting)
+- [LiveBlogPosting Properties](https://schema.org/LiveBlogPosting#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

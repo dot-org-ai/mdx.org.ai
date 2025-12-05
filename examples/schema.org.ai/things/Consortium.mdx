@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Consortium
+$context: https://schema.org
+$type: Class
+name: Consortium
+description: A Consortium is a membership [[Organization]] whose members are typically Organizations.
+subClassOf: ["Organization"]
+---
+
+# Consortium
+
+A Consortium is a membership [[Organization]] whose members are typically Organizations.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **Consortium**
+
+
+
+## Properties
+
+See [Schema.org Consortium properties](https://schema.org/Consortium#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Consortium } from 'schema.org.ai'
+
+// Create a Consortium
+const item: Consortium = {
+  $type: 'Consortium',
+  name: 'Example Consortium'
+}
+
+// Use semantic patterns
+await $.Consortium.create(item)
+const result = await $.Consortium.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Consortium](https://schema.org/Consortium)
+- [Consortium Properties](https://schema.org/Consortium#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

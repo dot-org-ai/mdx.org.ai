@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/NutritionInformation
+$context: https://schema.org
+$type: Class
+name: NutritionInformation
+description: Nutritional information about the recipe.
+subClassOf: ["StructuredValue"]
+---
+
+# NutritionInformation
+
+Nutritional information about the recipe.
+
+## Type Hierarchy
+
+**NutritionInformation**
+
+
+
+## Properties
+
+See [Schema.org NutritionInformation properties](https://schema.org/NutritionInformation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { NutritionInformation } from 'schema.org.ai'
+
+// Create a NutritionInformation
+const item: NutritionInformation = {
+  $type: 'NutritionInformation',
+  name: 'Example NutritionInformation'
+}
+
+// Use semantic patterns
+await $.NutritionInformation.create(item)
+const result = await $.NutritionInformation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org NutritionInformation](https://schema.org/NutritionInformation)
+- [NutritionInformation Properties](https://schema.org/NutritionInformation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

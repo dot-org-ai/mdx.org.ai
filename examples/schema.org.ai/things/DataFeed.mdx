@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/DataFeed
+$context: https://schema.org
+$type: Class
+name: DataFeed
+description: A single feed providing structured information about one or more entities or topics.
+subClassOf: ["Dataset"]
+---
+
+# DataFeed
+
+A single feed providing structured information about one or more entities or topics.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Dataset](Dataset.mdx) > **DataFeed**
+
+## Direct Subclasses
+
+- **[CompleteDataFeed](CompleteDataFeed.mdx)**: A [[CompleteDataFeed]] is a [[DataFeed]] whose standard representation includes content for every item currently in the feed
+
+## Properties
+
+See [Schema.org DataFeed properties](https://schema.org/DataFeed#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DataFeed } from 'schema.org.ai'
+
+// Create a DataFeed
+const item: DataFeed = {
+  $type: 'DataFeed',
+  name: 'Example DataFeed'
+}
+
+// Use semantic patterns
+await $.DataFeed.create(item)
+const result = await $.DataFeed.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DataFeed](https://schema.org/DataFeed)
+- [DataFeed Properties](https://schema.org/DataFeed#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

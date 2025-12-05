@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ItemPage
+$context: https://schema.org
+$type: Class
+name: ItemPage
+description: A page devoted to a single item, such as a particular product or hotel.
+subClassOf: ["WebPage"]
+---
+
+# ItemPage
+
+A page devoted to a single item, such as a particular product or hotel.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > **ItemPage**
+
+
+
+## Properties
+
+See [Schema.org ItemPage properties](https://schema.org/ItemPage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ItemPage } from 'schema.org.ai'
+
+// Create a ItemPage
+const item: ItemPage = {
+  $type: 'ItemPage',
+  name: 'Example ItemPage'
+}
+
+// Use semantic patterns
+await $.ItemPage.create(item)
+const result = await $.ItemPage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ItemPage](https://schema.org/ItemPage)
+- [ItemPage Properties](https://schema.org/ItemPage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

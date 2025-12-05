@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DigitalDocumentPermission
+$context: https://schema.org
+$type: Class
+name: DigitalDocumentPermission
+description: A permission for a particular person or group to access a particular file.
+subClassOf: ["Intangible"]
+---
+
+# DigitalDocumentPermission
+
+A permission for a particular person or group to access a particular file.
+
+## Type Hierarchy
+
+**DigitalDocumentPermission**
+
+
+
+## Properties
+
+See [Schema.org DigitalDocumentPermission properties](https://schema.org/DigitalDocumentPermission#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DigitalDocumentPermission } from 'schema.org.ai'
+
+// Create a DigitalDocumentPermission
+const item: DigitalDocumentPermission = {
+  $type: 'DigitalDocumentPermission',
+  name: 'Example DigitalDocumentPermission'
+}
+
+// Use semantic patterns
+await $.DigitalDocumentPermission.create(item)
+const result = await $.DigitalDocumentPermission.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DigitalDocumentPermission](https://schema.org/DigitalDocumentPermission)
+- [DigitalDocumentPermission Properties](https://schema.org/DigitalDocumentPermission#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

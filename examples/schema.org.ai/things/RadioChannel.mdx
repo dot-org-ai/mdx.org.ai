@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/RadioChannel
+$context: https://schema.org
+$type: Class
+name: RadioChannel
+description: A unique instance of a radio BroadcastService on a CableOrSatelliteService lineup.
+subClassOf: ["BroadcastChannel"]
+---
+
+# RadioChannel
+
+A unique instance of a radio BroadcastService on a CableOrSatelliteService lineup.
+
+## Type Hierarchy
+
+**RadioChannel**
+
+## Direct Subclasses
+
+- **[AMRadioChannel](AMRadioChannel.mdx)**: A radio channel that uses AM
+- **[FMRadioChannel](FMRadioChannel.mdx)**: A radio channel that uses FM
+
+## Properties
+
+See [Schema.org RadioChannel properties](https://schema.org/RadioChannel#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RadioChannel } from 'schema.org.ai'
+
+// Create a RadioChannel
+const item: RadioChannel = {
+  $type: 'RadioChannel',
+  name: 'Example RadioChannel'
+}
+
+// Use semantic patterns
+await $.RadioChannel.create(item)
+const result = await $.RadioChannel.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RadioChannel](https://schema.org/RadioChannel)
+- [RadioChannel Properties](https://schema.org/RadioChannel#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

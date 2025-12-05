@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Map
+$context: https://schema.org
+$type: Class
+name: Map
+description: A map.
+subClassOf: ["CreativeWork"]
+---
+
+# Map
+
+A map.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Map**
+
+
+
+## Properties
+
+See [Schema.org Map properties](https://schema.org/Map#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Map } from 'schema.org.ai'
+
+// Create a Map
+const item: Map = {
+  $type: 'Map',
+  name: 'Example Map'
+}
+
+// Use semantic patterns
+await $.Map.create(item)
+const result = await $.Map.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Map](https://schema.org/Map)
+- [Map Properties](https://schema.org/Map#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

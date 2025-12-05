@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Winery
+$context: https://schema.org
+$type: Class
+name: Winery
+description: A winery.
+subClassOf: ["FoodEstablishment"]
+---
+
+# Winery
+
+A winery.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FoodEstablishment](FoodEstablishment.mdx) > **Winery**
+
+
+
+## Properties
+
+See [Schema.org Winery properties](https://schema.org/Winery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Winery } from 'schema.org.ai'
+
+// Create a Winery
+const item: Winery = {
+  $type: 'Winery',
+  name: 'Example Winery'
+}
+
+// Use semantic patterns
+await $.Winery.create(item)
+const result = await $.Winery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Winery](https://schema.org/Winery)
+- [Winery Properties](https://schema.org/Winery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

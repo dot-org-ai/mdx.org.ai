@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Audiobook
+$context: https://schema.org
+$type: Class
+name: Audiobook
+description: An audiobook.
+subClassOf: ["AudioObject","Book"]
+---
+
+# Audiobook
+
+An audiobook.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Book](Book.mdx) > **Audiobook**
+
+
+
+## Properties
+
+See [Schema.org Audiobook properties](https://schema.org/Audiobook#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Audiobook } from 'schema.org.ai'
+
+// Create a Audiobook
+const item: Audiobook = {
+  $type: 'Audiobook',
+  name: 'Example Audiobook'
+}
+
+// Use semantic patterns
+await $.Audiobook.create(item)
+const result = await $.Audiobook.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Audiobook](https://schema.org/Audiobook)
+- [Audiobook Properties](https://schema.org/Audiobook#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

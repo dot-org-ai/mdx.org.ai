@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PostalCodeRangeSpecification
+$context: https://schema.org
+$type: Class
+name: PostalCodeRangeSpecification
+description: Indicates a range of postal codes, usually defined as the set of valid codes between [[postalCodeBegin]] and [[postalCodeEnd]], inclusively.
+subClassOf: ["StructuredValue"]
+---
+
+# PostalCodeRangeSpecification
+
+Indicates a range of postal codes, usually defined as the set of valid codes between [[postalCodeBegin]] and [[postalCodeEnd]], inclusively.
+
+## Type Hierarchy
+
+**PostalCodeRangeSpecification**
+
+
+
+## Properties
+
+See [Schema.org PostalCodeRangeSpecification properties](https://schema.org/PostalCodeRangeSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PostalCodeRangeSpecification } from 'schema.org.ai'
+
+// Create a PostalCodeRangeSpecification
+const item: PostalCodeRangeSpecification = {
+  $type: 'PostalCodeRangeSpecification',
+  name: 'Example PostalCodeRangeSpecification'
+}
+
+// Use semantic patterns
+await $.PostalCodeRangeSpecification.create(item)
+const result = await $.PostalCodeRangeSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PostalCodeRangeSpecification](https://schema.org/PostalCodeRangeSpecification)
+- [PostalCodeRangeSpecification Properties](https://schema.org/PostalCodeRangeSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EmployeeRole
+$context: https://schema.org
+$type: Class
+name: EmployeeRole
+description: A subclass of OrganizationRole used to describe employee relationships.
+subClassOf: ["OrganizationRole"]
+---
+
+# EmployeeRole
+
+A subclass of OrganizationRole used to describe employee relationships.
+
+## Type Hierarchy
+
+**EmployeeRole**
+
+
+
+## Properties
+
+See [Schema.org EmployeeRole properties](https://schema.org/EmployeeRole#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EmployeeRole } from 'schema.org.ai'
+
+// Create a EmployeeRole
+const item: EmployeeRole = {
+  $type: 'EmployeeRole',
+  name: 'Example EmployeeRole'
+}
+
+// Use semantic patterns
+await $.EmployeeRole.create(item)
+const result = await $.EmployeeRole.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EmployeeRole](https://schema.org/EmployeeRole)
+- [EmployeeRole Properties](https://schema.org/EmployeeRole#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

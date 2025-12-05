@@ -1,0 +1,56 @@
+---
+$id: https://schema.org.ai/PlayAction
+$context: https://schema.org
+$type: Class
+name: PlayAction
+description: The act of playing/exercising/training/performing for enjoyment, leisure, recreation, competition or exercise.\
+subClassOf: ["Action"]
+---
+
+# PlayAction
+
+The act of playing/exercising/training/performing for enjoyment, leisure, recreation, competition or exercise.\
+\
+Related actions:\
+\
+* [[ListenAction]]: Unlike ListenAction (which is under ConsumeAction), PlayAction refers to performing for an audience or at an event, rather than consuming music.\
+* [[WatchAction]]: Unlike WatchAction (which is under ConsumeAction), PlayAction refers to showing/displaying for an audience or at an event, rather than consuming visual content.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **PlayAction**
+
+## Direct Subclasses
+
+- **[ExerciseAction](ExerciseAction.mdx)**: The act of participating in exertive activity for the purposes of improving health and fitness
+- **[PerformAction](PerformAction.mdx)**: The act of participating in performance arts
+
+## Properties
+
+See [Schema.org PlayAction properties](https://schema.org/PlayAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PlayAction } from 'schema.org.ai'
+
+// Create a PlayAction
+const item: PlayAction = {
+  $type: 'PlayAction',
+  name: 'Example PlayAction'
+}
+
+// Use semantic patterns
+await $.PlayAction.create(item)
+const result = await $.PlayAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PlayAction](https://schema.org/PlayAction)
+- [PlayAction Properties](https://schema.org/PlayAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

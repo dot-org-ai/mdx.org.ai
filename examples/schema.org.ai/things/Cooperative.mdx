@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Cooperative
+$context: https://schema.org
+$type: Class
+name: Cooperative
+description: An organization that is a joint project of multiple organizations or persons.
+subClassOf: ["Organization"]
+---
+
+# Cooperative
+
+An organization that is a joint project of multiple organizations or persons.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **Cooperative**
+
+
+
+## Properties
+
+See [Schema.org Cooperative properties](https://schema.org/Cooperative#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Cooperative } from 'schema.org.ai'
+
+// Create a Cooperative
+const item: Cooperative = {
+  $type: 'Cooperative',
+  name: 'Example Cooperative'
+}
+
+// Use semantic patterns
+await $.Cooperative.create(item)
+const result = await $.Cooperative.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Cooperative](https://schema.org/Cooperative)
+- [Cooperative Properties](https://schema.org/Cooperative#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

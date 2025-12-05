@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalRiskCalculator
+$context: https://schema.org
+$type: Class
+name: MedicalRiskCalculator
+description: A complex mathematical calculation requiring an online calculator, used to assess prognosis. Note: use the url property of Thing to record any URLs for online calculators.
+subClassOf: ["MedicalRiskEstimator"]
+---
+
+# MedicalRiskCalculator
+
+A complex mathematical calculation requiring an online calculator, used to assess prognosis. Note: use the url property of Thing to record any URLs for online calculators.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalRiskEstimator](MedicalRiskEstimator.mdx) > **MedicalRiskCalculator**
+
+
+
+## Properties
+
+See [Schema.org MedicalRiskCalculator properties](https://schema.org/MedicalRiskCalculator#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalRiskCalculator } from 'schema.org.ai'
+
+// Create a MedicalRiskCalculator
+const item: MedicalRiskCalculator = {
+  $type: 'MedicalRiskCalculator',
+  name: 'Example MedicalRiskCalculator'
+}
+
+// Use semantic patterns
+await $.MedicalRiskCalculator.create(item)
+const result = await $.MedicalRiskCalculator.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalRiskCalculator](https://schema.org/MedicalRiskCalculator)
+- [MedicalRiskCalculator Properties](https://schema.org/MedicalRiskCalculator#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PaintAction
+$context: https://schema.org
+$type: Class
+name: PaintAction
+description: The act of producing a painting, typically with paint and canvas as instruments.
+subClassOf: ["CreateAction"]
+---
+
+# PaintAction
+
+The act of producing a painting, typically with paint and canvas as instruments.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [CreateAction](CreateAction.mdx) > **PaintAction**
+
+
+
+## Properties
+
+See [Schema.org PaintAction properties](https://schema.org/PaintAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PaintAction } from 'schema.org.ai'
+
+// Create a PaintAction
+const item: PaintAction = {
+  $type: 'PaintAction',
+  name: 'Example PaintAction'
+}
+
+// Use semantic patterns
+await $.PaintAction.create(item)
+const result = await $.PaintAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PaintAction](https://schema.org/PaintAction)
+- [PaintAction Properties](https://schema.org/PaintAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/RejectAction
+$context: https://schema.org
+$type: Class
+name: RejectAction
+description: The act of rejecting to/adopting an object.\
+subClassOf: ["AllocateAction"]
+---
+
+# RejectAction
+
+The act of rejecting to/adopting an object.\
+\
+Related actions:\
+\
+* [[AcceptAction]]: The antonym of RejectAction.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [OrganizeAction](OrganizeAction.mdx) > [AllocateAction](AllocateAction.mdx) > **RejectAction**
+
+
+
+## Properties
+
+See [Schema.org RejectAction properties](https://schema.org/RejectAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RejectAction } from 'schema.org.ai'
+
+// Create a RejectAction
+const item: RejectAction = {
+  $type: 'RejectAction',
+  name: 'Example RejectAction'
+}
+
+// Use semantic patterns
+await $.RejectAction.create(item)
+const result = await $.RejectAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RejectAction](https://schema.org/RejectAction)
+- [RejectAction Properties](https://schema.org/RejectAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

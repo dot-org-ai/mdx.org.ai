@@ -1,0 +1,54 @@
+---
+$id: https://schema.org.ai/CheckInAction
+$context: https://schema.org
+$type: Class
+name: CheckInAction
+description: The act of an agent communicating (service provider, social media, etc) their arrival by registering/confirming for a previously reserved service (e.g. flight check-in) or at a place (e.g. hotel), possibly resulting in a result (boarding pass, etc).\
+subClassOf: ["CommunicateAction"]
+---
+
+# CheckInAction
+
+The act of an agent communicating (service provider, social media, etc) their arrival by registering/confirming for a previously reserved service (e.g. flight check-in) or at a place (e.g. hotel), possibly resulting in a result (boarding pass, etc).\
+\
+Related actions:\
+\
+* [[CheckOutAction]]: The antonym of CheckInAction.\
+* [[ArriveAction]]: Unlike ArriveAction, CheckInAction implies that the agent is informing/confirming the start of a previously reserved service.\
+* [[ConfirmAction]]: Unlike ConfirmAction, CheckInAction implies that the agent is informing/confirming the *start* of a previously reserved service rather than its validity/existence.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > **CheckInAction**
+
+
+
+## Properties
+
+See [Schema.org CheckInAction properties](https://schema.org/CheckInAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CheckInAction } from 'schema.org.ai'
+
+// Create a CheckInAction
+const item: CheckInAction = {
+  $type: 'CheckInAction',
+  name: 'Example CheckInAction'
+}
+
+// Use semantic patterns
+await $.CheckInAction.create(item)
+const result = await $.CheckInAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CheckInAction](https://schema.org/CheckInAction)
+- [CheckInAction Properties](https://schema.org/CheckInAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

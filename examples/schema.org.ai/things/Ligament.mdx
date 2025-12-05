@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Ligament
+$context: https://schema.org
+$type: Class
+name: Ligament
+description: A short band of tough, flexible, fibrous connective tissue that functions to connect multiple bones, cartilages, and structurally support joints.
+subClassOf: ["AnatomicalStructure"]
+---
+
+# Ligament
+
+A short band of tough, flexible, fibrous connective tissue that functions to connect multiple bones, cartilages, and structurally support joints.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [AnatomicalStructure](AnatomicalStructure.mdx) > **Ligament**
+
+
+
+## Properties
+
+See [Schema.org Ligament properties](https://schema.org/Ligament#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Ligament } from 'schema.org.ai'
+
+// Create a Ligament
+const item: Ligament = {
+  $type: 'Ligament',
+  name: 'Example Ligament'
+}
+
+// Use semantic patterns
+await $.Ligament.create(item)
+const result = await $.Ligament.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Ligament](https://schema.org/Ligament)
+- [Ligament Properties](https://schema.org/Ligament#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

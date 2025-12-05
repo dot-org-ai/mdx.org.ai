@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalDevicePurpose
+$context: https://schema.org
+$type: Class
+name: MedicalDevicePurpose
+description: Categories of medical devices, organized by the purpose or intended use of the device.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# MedicalDevicePurpose
+
+Categories of medical devices, organized by the purpose or intended use of the device.
+
+## Type Hierarchy
+
+**MedicalDevicePurpose**
+
+
+
+## Properties
+
+See [Schema.org MedicalDevicePurpose properties](https://schema.org/MedicalDevicePurpose#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalDevicePurpose } from 'schema.org.ai'
+
+// Create a MedicalDevicePurpose
+const item: MedicalDevicePurpose = {
+  $type: 'MedicalDevicePurpose',
+  name: 'Example MedicalDevicePurpose'
+}
+
+// Use semantic patterns
+await $.MedicalDevicePurpose.create(item)
+const result = await $.MedicalDevicePurpose.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalDevicePurpose](https://schema.org/MedicalDevicePurpose)
+- [MedicalDevicePurpose Properties](https://schema.org/MedicalDevicePurpose#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

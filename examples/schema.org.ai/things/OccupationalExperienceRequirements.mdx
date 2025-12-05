@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OccupationalExperienceRequirements
+$context: https://schema.org
+$type: Class
+name: OccupationalExperienceRequirements
+description: Indicates employment-related experience requirements, e.g. [[monthsOfExperience]].
+subClassOf: ["Intangible"]
+---
+
+# OccupationalExperienceRequirements
+
+Indicates employment-related experience requirements, e.g. [[monthsOfExperience]].
+
+## Type Hierarchy
+
+**OccupationalExperienceRequirements**
+
+
+
+## Properties
+
+See [Schema.org OccupationalExperienceRequirements properties](https://schema.org/OccupationalExperienceRequirements#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OccupationalExperienceRequirements } from 'schema.org.ai'
+
+// Create a OccupationalExperienceRequirements
+const item: OccupationalExperienceRequirements = {
+  $type: 'OccupationalExperienceRequirements',
+  name: 'Example OccupationalExperienceRequirements'
+}
+
+// Use semantic patterns
+await $.OccupationalExperienceRequirements.create(item)
+const result = await $.OccupationalExperienceRequirements.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OccupationalExperienceRequirements](https://schema.org/OccupationalExperienceRequirements)
+- [OccupationalExperienceRequirements Properties](https://schema.org/OccupationalExperienceRequirements#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

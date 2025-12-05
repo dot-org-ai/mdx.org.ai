@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Bakery
+$context: https://schema.org
+$type: Class
+name: Bakery
+description: A bakery.
+subClassOf: ["FoodEstablishment"]
+---
+
+# Bakery
+
+A bakery.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FoodEstablishment](FoodEstablishment.mdx) > **Bakery**
+
+
+
+## Properties
+
+See [Schema.org Bakery properties](https://schema.org/Bakery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Bakery } from 'schema.org.ai'
+
+// Create a Bakery
+const item: Bakery = {
+  $type: 'Bakery',
+  name: 'Example Bakery'
+}
+
+// Use semantic patterns
+await $.Bakery.create(item)
+const result = await $.Bakery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Bakery](https://schema.org/Bakery)
+- [Bakery Properties](https://schema.org/Bakery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

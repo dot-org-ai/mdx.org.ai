@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SiteNavigationElement
+$context: https://schema.org
+$type: Class
+name: SiteNavigationElement
+description: A navigation element of the page.
+subClassOf: ["WebPageElement"]
+---
+
+# SiteNavigationElement
+
+A navigation element of the page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPageElement](WebPageElement.mdx) > **SiteNavigationElement**
+
+
+
+## Properties
+
+See [Schema.org SiteNavigationElement properties](https://schema.org/SiteNavigationElement#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SiteNavigationElement } from 'schema.org.ai'
+
+// Create a SiteNavigationElement
+const item: SiteNavigationElement = {
+  $type: 'SiteNavigationElement',
+  name: 'Example SiteNavigationElement'
+}
+
+// Use semantic patterns
+await $.SiteNavigationElement.create(item)
+const result = await $.SiteNavigationElement.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SiteNavigationElement](https://schema.org/SiteNavigationElement)
+- [SiteNavigationElement Properties](https://schema.org/SiteNavigationElement#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

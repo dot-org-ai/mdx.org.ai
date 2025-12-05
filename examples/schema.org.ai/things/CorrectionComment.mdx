@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CorrectionComment
+$context: https://schema.org
+$type: Class
+name: CorrectionComment
+description: A [[comment]] that corrects [[CreativeWork]].
+subClassOf: ["Comment"]
+---
+
+# CorrectionComment
+
+A [[comment]] that corrects [[CreativeWork]].
+
+## Type Hierarchy
+
+**CorrectionComment**
+
+
+
+## Properties
+
+See [Schema.org CorrectionComment properties](https://schema.org/CorrectionComment#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CorrectionComment } from 'schema.org.ai'
+
+// Create a CorrectionComment
+const item: CorrectionComment = {
+  $type: 'CorrectionComment',
+  name: 'Example CorrectionComment'
+}
+
+// Use semantic patterns
+await $.CorrectionComment.create(item)
+const result = await $.CorrectionComment.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CorrectionComment](https://schema.org/CorrectionComment)
+- [CorrectionComment Properties](https://schema.org/CorrectionComment#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

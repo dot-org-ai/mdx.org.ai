@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/LifestyleModification
+$context: https://schema.org
+$type: Class
+name: LifestyleModification
+description: A process of care involving exercise, changes to diet, fitness routines, and other lifestyle changes aimed at improving a health condition.
+subClassOf: ["MedicalEntity"]
+---
+
+# LifestyleModification
+
+A process of care involving exercise, changes to diet, fitness routines, and other lifestyle changes aimed at improving a health condition.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > **LifestyleModification**
+
+## Direct Subclasses
+
+- **[Diet](Diet.mdx)**: A strategy of regulating the intake of food to achieve or maintain a specific health-related goal
+- **[PhysicalActivity](PhysicalActivity.mdx)**: Any bodily activity that enhances or maintains physical fitness and overall health and wellness
+
+## Properties
+
+See [Schema.org LifestyleModification properties](https://schema.org/LifestyleModification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LifestyleModification } from 'schema.org.ai'
+
+// Create a LifestyleModification
+const item: LifestyleModification = {
+  $type: 'LifestyleModification',
+  name: 'Example LifestyleModification'
+}
+
+// Use semantic patterns
+await $.LifestyleModification.create(item)
+const result = await $.LifestyleModification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LifestyleModification](https://schema.org/LifestyleModification)
+- [LifestyleModification Properties](https://schema.org/LifestyleModification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

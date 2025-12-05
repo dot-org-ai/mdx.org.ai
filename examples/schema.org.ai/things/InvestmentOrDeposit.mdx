@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/InvestmentOrDeposit
+$context: https://schema.org
+$type: Class
+name: InvestmentOrDeposit
+description: A type of financial product that typically requires the client to transfer funds to a financial service in return for potential beneficial financial return.
+subClassOf: ["FinancialProduct"]
+---
+
+# InvestmentOrDeposit
+
+A type of financial product that typically requires the client to transfer funds to a financial service in return for potential beneficial financial return.
+
+## Type Hierarchy
+
+**InvestmentOrDeposit**
+
+## Direct Subclasses
+
+- **[BrokerageAccount](BrokerageAccount.mdx)**: An account that allows an investor to deposit funds and place investment orders with a licensed broker or brokerage firm
+- **[DepositAccount](DepositAccount.mdx)**: A type of Bank Account with a main purpose of depositing funds to gain interest or other benefits
+- **[InvestmentFund](InvestmentFund.mdx)**: A company or fund that gathers capital from a number of investors to create a pool of money that is then re-invested into stocks, bonds and other assets
+
+## Properties
+
+See [Schema.org InvestmentOrDeposit properties](https://schema.org/InvestmentOrDeposit#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InvestmentOrDeposit } from 'schema.org.ai'
+
+// Create a InvestmentOrDeposit
+const item: InvestmentOrDeposit = {
+  $type: 'InvestmentOrDeposit',
+  name: 'Example InvestmentOrDeposit'
+}
+
+// Use semantic patterns
+await $.InvestmentOrDeposit.create(item)
+const result = await $.InvestmentOrDeposit.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InvestmentOrDeposit](https://schema.org/InvestmentOrDeposit)
+- [InvestmentOrDeposit Properties](https://schema.org/InvestmentOrDeposit#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/OrganizeAction
+$context: https://schema.org
+$type: Class
+name: OrganizeAction
+description: The act of manipulating/administering/supervising/controlling one or more objects.
+subClassOf: ["Action"]
+---
+
+# OrganizeAction
+
+The act of manipulating/administering/supervising/controlling one or more objects.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **OrganizeAction**
+
+## Direct Subclasses
+
+- **[AllocateAction](AllocateAction.mdx)**: The act of organizing tasks/objects/events by associating resources to it
+- **[ApplyAction](ApplyAction.mdx)**: The act of registering to an organization/service without the guarantee to receive it
+- **[BookmarkAction](BookmarkAction.mdx)**: An agent bookmarks/flags/labels/tags/marks an object
+- **[PlanAction](PlanAction.mdx)**: The act of planning the execution of an event/task/action/reservation/plan to a future date
+
+## Properties
+
+See [Schema.org OrganizeAction properties](https://schema.org/OrganizeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OrganizeAction } from 'schema.org.ai'
+
+// Create a OrganizeAction
+const item: OrganizeAction = {
+  $type: 'OrganizeAction',
+  name: 'Example OrganizeAction'
+}
+
+// Use semantic patterns
+await $.OrganizeAction.create(item)
+const result = await $.OrganizeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OrganizeAction](https://schema.org/OrganizeAction)
+- [OrganizeAction Properties](https://schema.org/OrganizeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

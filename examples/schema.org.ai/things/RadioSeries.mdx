@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RadioSeries
+$context: https://schema.org
+$type: Class
+name: RadioSeries
+description: CreativeWorkSeries dedicated to radio broadcast and associated online delivery.
+subClassOf: ["CreativeWorkSeries"]
+---
+
+# RadioSeries
+
+CreativeWorkSeries dedicated to radio broadcast and associated online delivery.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [CreativeWorkSeries](CreativeWorkSeries.mdx) > **RadioSeries**
+
+
+
+## Properties
+
+See [Schema.org RadioSeries properties](https://schema.org/RadioSeries#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RadioSeries } from 'schema.org.ai'
+
+// Create a RadioSeries
+const item: RadioSeries = {
+  $type: 'RadioSeries',
+  name: 'Example RadioSeries'
+}
+
+// Use semantic patterns
+await $.RadioSeries.create(item)
+const result = await $.RadioSeries.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RadioSeries](https://schema.org/RadioSeries)
+- [RadioSeries Properties](https://schema.org/RadioSeries#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

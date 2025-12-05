@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DataType
+$context: https://schema.org
+$type: Class
+name: DataType
+description: The basic data types such as Integers, Strings, etc.
+subClassOf: []
+---
+
+# DataType
+
+The basic data types such as Integers, Strings, etc.
+
+## Type Hierarchy
+
+**DataType**
+
+
+
+## Properties
+
+See [Schema.org DataType properties](https://schema.org/DataType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DataType } from 'schema.org.ai'
+
+// Create a DataType
+const item: DataType = {
+  $type: 'DataType',
+  name: 'Example DataType'
+}
+
+// Use semantic patterns
+await $.DataType.create(item)
+const result = await $.DataType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DataType](https://schema.org/DataType)
+- [DataType Properties](https://schema.org/DataType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

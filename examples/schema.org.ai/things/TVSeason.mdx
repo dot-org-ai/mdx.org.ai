@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TVSeason
+$context: https://schema.org
+$type: Class
+name: TVSeason
+description: Season dedicated to TV broadcast and associated online delivery.
+subClassOf: ["CreativeWorkSeason","CreativeWork"]
+---
+
+# TVSeason
+
+Season dedicated to TV broadcast and associated online delivery.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **TVSeason**
+
+
+
+## Properties
+
+See [Schema.org TVSeason properties](https://schema.org/TVSeason#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TVSeason } from 'schema.org.ai'
+
+// Create a TVSeason
+const item: TVSeason = {
+  $type: 'TVSeason',
+  name: 'Example TVSeason'
+}
+
+// Use semantic patterns
+await $.TVSeason.create(item)
+const result = await $.TVSeason.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TVSeason](https://schema.org/TVSeason)
+- [TVSeason Properties](https://schema.org/TVSeason#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

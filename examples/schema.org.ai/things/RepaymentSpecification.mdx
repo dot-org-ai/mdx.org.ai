@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RepaymentSpecification
+$context: https://schema.org
+$type: Class
+name: RepaymentSpecification
+description: A structured value representing repayment.
+subClassOf: ["StructuredValue"]
+---
+
+# RepaymentSpecification
+
+A structured value representing repayment.
+
+## Type Hierarchy
+
+**RepaymentSpecification**
+
+
+
+## Properties
+
+See [Schema.org RepaymentSpecification properties](https://schema.org/RepaymentSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RepaymentSpecification } from 'schema.org.ai'
+
+// Create a RepaymentSpecification
+const item: RepaymentSpecification = {
+  $type: 'RepaymentSpecification',
+  name: 'Example RepaymentSpecification'
+}
+
+// Use semantic patterns
+await $.RepaymentSpecification.create(item)
+const result = await $.RepaymentSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RepaymentSpecification](https://schema.org/RepaymentSpecification)
+- [RepaymentSpecification Properties](https://schema.org/RepaymentSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

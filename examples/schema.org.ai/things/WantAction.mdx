@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WantAction
+$context: https://schema.org
+$type: Class
+name: WantAction
+description: The act of expressing a desire about the object. An agent wants an object.
+subClassOf: ["ReactAction"]
+---
+
+# WantAction
+
+The act of expressing a desire about the object. An agent wants an object.
+
+## Type Hierarchy
+
+**WantAction**
+
+
+
+## Properties
+
+See [Schema.org WantAction properties](https://schema.org/WantAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WantAction } from 'schema.org.ai'
+
+// Create a WantAction
+const item: WantAction = {
+  $type: 'WantAction',
+  name: 'Example WantAction'
+}
+
+// Use semantic patterns
+await $.WantAction.create(item)
+const result = await $.WantAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WantAction](https://schema.org/WantAction)
+- [WantAction Properties](https://schema.org/WantAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

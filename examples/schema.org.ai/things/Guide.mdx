@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Guide
+$context: https://schema.org
+$type: Class
+name: Guide
+description: [[Guide]] is a page or article that recommends specific products or services, or aspects of a thing for a user to consider. A [[Guide]] may represent a Buying Guide and detail aspects of products or services for a user to consider. A [[Guide]] may represent a Product Guide and recommend specific products or services. A [[Guide]] may represent a Ranked List and recommend specific products or services with ranking.
+subClassOf: ["CreativeWork"]
+---
+
+# Guide
+
+[[Guide]] is a page or article that recommends specific products or services, or aspects of a thing for a user to consider. A [[Guide]] may represent a Buying Guide and detail aspects of products or services for a user to consider. A [[Guide]] may represent a Product Guide and recommend specific products or services. A [[Guide]] may represent a Ranked List and recommend specific products or services with ranking.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Guide**
+
+
+
+## Properties
+
+See [Schema.org Guide properties](https://schema.org/Guide#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Guide } from 'schema.org.ai'
+
+// Create a Guide
+const item: Guide = {
+  $type: 'Guide',
+  name: 'Example Guide'
+}
+
+// Use semantic patterns
+await $.Guide.create(item)
+const result = await $.Guide.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Guide](https://schema.org/Guide)
+- [Guide Properties](https://schema.org/Guide#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

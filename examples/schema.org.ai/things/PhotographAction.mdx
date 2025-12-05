@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PhotographAction
+$context: https://schema.org
+$type: Class
+name: PhotographAction
+description: The act of capturing still images of objects using a camera.
+subClassOf: ["CreateAction"]
+---
+
+# PhotographAction
+
+The act of capturing still images of objects using a camera.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [CreateAction](CreateAction.mdx) > **PhotographAction**
+
+
+
+## Properties
+
+See [Schema.org PhotographAction properties](https://schema.org/PhotographAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PhotographAction } from 'schema.org.ai'
+
+// Create a PhotographAction
+const item: PhotographAction = {
+  $type: 'PhotographAction',
+  name: 'Example PhotographAction'
+}
+
+// Use semantic patterns
+await $.PhotographAction.create(item)
+const result = await $.PhotographAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PhotographAction](https://schema.org/PhotographAction)
+- [PhotographAction Properties](https://schema.org/PhotographAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

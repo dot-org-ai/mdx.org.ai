@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ActionStatusType
+$context: https://schema.org
+$type: Class
+name: ActionStatusType
+description: The status of an Action.
+subClassOf: ["StatusEnumeration"]
+---
+
+# ActionStatusType
+
+The status of an Action.
+
+## Type Hierarchy
+
+**ActionStatusType**
+
+
+
+## Properties
+
+See [Schema.org ActionStatusType properties](https://schema.org/ActionStatusType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ActionStatusType } from 'schema.org.ai'
+
+// Create a ActionStatusType
+const item: ActionStatusType = {
+  $type: 'ActionStatusType',
+  name: 'Example ActionStatusType'
+}
+
+// Use semantic patterns
+await $.ActionStatusType.create(item)
+const result = await $.ActionStatusType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ActionStatusType](https://schema.org/ActionStatusType)
+- [ActionStatusType Properties](https://schema.org/ActionStatusType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

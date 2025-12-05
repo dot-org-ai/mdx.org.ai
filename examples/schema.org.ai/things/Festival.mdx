@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Festival
+$context: https://schema.org
+$type: Class
+name: Festival
+description: Event type: Festival.
+subClassOf: ["Event"]
+---
+
+# Festival
+
+Event type: Festival.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **Festival**
+
+
+
+## Properties
+
+See [Schema.org Festival properties](https://schema.org/Festival#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Festival } from 'schema.org.ai'
+
+// Create a Festival
+const item: Festival = {
+  $type: 'Festival',
+  name: 'Example Festival'
+}
+
+// Use semantic patterns
+await $.Festival.create(item)
+const result = await $.Festival.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Festival](https://schema.org/Festival)
+- [Festival Properties](https://schema.org/Festival#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

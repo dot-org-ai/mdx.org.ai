@@ -1,0 +1,60 @@
+---
+$id: https://schema.org.ai/CreativeWorkSeries
+$context: https://schema.org
+$type: Class
+name: CreativeWorkSeries
+description: A CreativeWorkSeries in schema.org is a group of related items, typically but not necessarily of the same kind. CreativeWorkSeries are usually organized into some order, often chronological. Unlike [[ItemList]] which is a general purpose data structure for lists of things, the emphasis with CreativeWorkSeries is on published materials (written e.g. books and periodicals, or media such as TV, radio and games).\
+subClassOf: ["CreativeWork","Series"]
+---
+
+# CreativeWorkSeries
+
+A CreativeWorkSeries in schema.org is a group of related items, typically but not necessarily of the same kind. CreativeWorkSeries are usually organized into some order, often chronological. Unlike [[ItemList]] which is a general purpose data structure for lists of things, the emphasis with CreativeWorkSeries is on published materials (written e.g. books and periodicals, or media such as TV, radio and games).\
+\
+Specific subtypes are available for describing [[TVSeries]], [[RadioSeries]], [[MovieSeries]], [[BookSeries]], [[Periodical]] and [[VideoGameSeries]]. In each case, the [[hasPart]] / [[isPartOf]] properties can be used to relate the CreativeWorkSeries to its parts. The general CreativeWorkSeries type serves largely just to organize these more specific and practical subtypes.\
+\
+It is common for properties applicable to an item from the series to be usefully applied to the containing group. Schema.org attempts to anticipate some of these cases, but publishers should be free to apply properties of the series parts to the series as a whole wherever they seem appropriate.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **CreativeWorkSeries**
+
+## Direct Subclasses
+
+- **[BookSeries](BookSeries.mdx)**: A series of books
+- **[MovieSeries](MovieSeries.mdx)**: A series of movies
+- **[Periodical](Periodical.mdx)**: A publication in any medium issued in successive parts bearing numerical or chronological designations and intended to continue indefinitely, such as a magazine, scholarly journal, or newspaper
+- **[PodcastSeries](PodcastSeries.mdx)**: A podcast is an episodic series of digital audio or video files which a user can download and listen to
+- **[RadioSeries](RadioSeries.mdx)**: CreativeWorkSeries dedicated to radio broadcast and associated online delivery
+- **[TVSeries](TVSeries.mdx)**: CreativeWorkSeries dedicated to TV broadcast and associated online delivery
+- **[VideoGameSeries](VideoGameSeries.mdx)**: A video game series
+
+## Properties
+
+See [Schema.org CreativeWorkSeries properties](https://schema.org/CreativeWorkSeries#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CreativeWorkSeries } from 'schema.org.ai'
+
+// Create a CreativeWorkSeries
+const item: CreativeWorkSeries = {
+  $type: 'CreativeWorkSeries',
+  name: 'Example CreativeWorkSeries'
+}
+
+// Use semantic patterns
+await $.CreativeWorkSeries.create(item)
+const result = await $.CreativeWorkSeries.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CreativeWorkSeries](https://schema.org/CreativeWorkSeries)
+- [CreativeWorkSeries Properties](https://schema.org/CreativeWorkSeries#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

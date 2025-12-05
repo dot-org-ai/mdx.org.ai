@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PhysicalExam
+$context: https://schema.org
+$type: Class
+name: PhysicalExam
+description: A type of physical examination of a patient performed by a physician.
+subClassOf: ["MedicalEnumeration","MedicalProcedure"]
+---
+
+# PhysicalExam
+
+A type of physical examination of a patient performed by a physician.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalProcedure](MedicalProcedure.mdx) > **PhysicalExam**
+
+
+
+## Properties
+
+See [Schema.org PhysicalExam properties](https://schema.org/PhysicalExam#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PhysicalExam } from 'schema.org.ai'
+
+// Create a PhysicalExam
+const item: PhysicalExam = {
+  $type: 'PhysicalExam',
+  name: 'Example PhysicalExam'
+}
+
+// Use semantic patterns
+await $.PhysicalExam.create(item)
+const result = await $.PhysicalExam.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PhysicalExam](https://schema.org/PhysicalExam)
+- [PhysicalExam Properties](https://schema.org/PhysicalExam#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

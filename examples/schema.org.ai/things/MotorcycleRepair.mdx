@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MotorcycleRepair
+$context: https://schema.org
+$type: Class
+name: MotorcycleRepair
+description: A motorcycle repair shop.
+subClassOf: ["AutomotiveBusiness"]
+---
+
+# MotorcycleRepair
+
+A motorcycle repair shop.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [AutomotiveBusiness](AutomotiveBusiness.mdx) > **MotorcycleRepair**
+
+
+
+## Properties
+
+See [Schema.org MotorcycleRepair properties](https://schema.org/MotorcycleRepair#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MotorcycleRepair } from 'schema.org.ai'
+
+// Create a MotorcycleRepair
+const item: MotorcycleRepair = {
+  $type: 'MotorcycleRepair',
+  name: 'Example MotorcycleRepair'
+}
+
+// Use semantic patterns
+await $.MotorcycleRepair.create(item)
+const result = await $.MotorcycleRepair.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MotorcycleRepair](https://schema.org/MotorcycleRepair)
+- [MotorcycleRepair Properties](https://schema.org/MotorcycleRepair#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

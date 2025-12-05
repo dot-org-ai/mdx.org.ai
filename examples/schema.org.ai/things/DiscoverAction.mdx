@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DiscoverAction
+$context: https://schema.org
+$type: Class
+name: DiscoverAction
+description: The act of discovering/finding an object.
+subClassOf: ["FindAction"]
+---
+
+# DiscoverAction
+
+The act of discovering/finding an object.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [FindAction](FindAction.mdx) > **DiscoverAction**
+
+
+
+## Properties
+
+See [Schema.org DiscoverAction properties](https://schema.org/DiscoverAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DiscoverAction } from 'schema.org.ai'
+
+// Create a DiscoverAction
+const item: DiscoverAction = {
+  $type: 'DiscoverAction',
+  name: 'Example DiscoverAction'
+}
+
+// Use semantic patterns
+await $.DiscoverAction.create(item)
+const result = await $.DiscoverAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DiscoverAction](https://schema.org/DiscoverAction)
+- [DiscoverAction Properties](https://schema.org/DiscoverAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

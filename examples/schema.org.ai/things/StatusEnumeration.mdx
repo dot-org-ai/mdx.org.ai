@@ -1,0 +1,56 @@
+---
+$id: https://schema.org.ai/StatusEnumeration
+$context: https://schema.org
+$type: Class
+name: StatusEnumeration
+description: Lists or enumerations dealing with status types.
+subClassOf: ["Enumeration"]
+---
+
+# StatusEnumeration
+
+Lists or enumerations dealing with status types.
+
+## Type Hierarchy
+
+**StatusEnumeration**
+
+## Direct Subclasses
+
+- **[ActionStatusType](ActionStatusType.mdx)**: The status of an Action
+- **[EventStatusType](EventStatusType.mdx)**: EventStatusType is an enumeration type whose instances represent several states that an Event may be in
+- **[GameServerStatus](GameServerStatus.mdx)**: Status of a game server
+- **[LegalForceStatus](LegalForceStatus.mdx)**: A list of possible statuses for the legal force of a legislation
+- **[OrderStatus](OrderStatus.mdx)**: Enumerated status values for Order
+- **[PaymentStatusType](PaymentStatusType.mdx)**: A specific payment status
+- **[ReservationStatusType](ReservationStatusType.mdx)**: Enumerated status values for Reservation
+
+## Properties
+
+See [Schema.org StatusEnumeration properties](https://schema.org/StatusEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { StatusEnumeration } from 'schema.org.ai'
+
+// Create a StatusEnumeration
+const item: StatusEnumeration = {
+  $type: 'StatusEnumeration',
+  name: 'Example StatusEnumeration'
+}
+
+// Use semantic patterns
+await $.StatusEnumeration.create(item)
+const result = await $.StatusEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org StatusEnumeration](https://schema.org/StatusEnumeration)
+- [StatusEnumeration Properties](https://schema.org/StatusEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

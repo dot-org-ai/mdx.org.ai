@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Barcode
+$context: https://schema.org
+$type: Class
+name: Barcode
+description: An image of a visual machine-readable code such as a barcode or QR code.
+subClassOf: ["ImageObject"]
+---
+
+# Barcode
+
+An image of a visual machine-readable code such as a barcode or QR code.
+
+## Type Hierarchy
+
+**Barcode**
+
+
+
+## Properties
+
+See [Schema.org Barcode properties](https://schema.org/Barcode#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Barcode } from 'schema.org.ai'
+
+// Create a Barcode
+const item: Barcode = {
+  $type: 'Barcode',
+  name: 'Example Barcode'
+}
+
+// Use semantic patterns
+await $.Barcode.create(item)
+const result = await $.Barcode.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Barcode](https://schema.org/Barcode)
+- [Barcode Properties](https://schema.org/Barcode#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

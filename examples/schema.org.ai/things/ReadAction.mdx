@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ReadAction
+$context: https://schema.org
+$type: Class
+name: ReadAction
+description: The act of consuming written content.
+subClassOf: ["ConsumeAction"]
+---
+
+# ReadAction
+
+The act of consuming written content.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [ConsumeAction](ConsumeAction.mdx) > **ReadAction**
+
+
+
+## Properties
+
+See [Schema.org ReadAction properties](https://schema.org/ReadAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReadAction } from 'schema.org.ai'
+
+// Create a ReadAction
+const item: ReadAction = {
+  $type: 'ReadAction',
+  name: 'Example ReadAction'
+}
+
+// Use semantic patterns
+await $.ReadAction.create(item)
+const result = await $.ReadAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReadAction](https://schema.org/ReadAction)
+- [ReadAction Properties](https://schema.org/ReadAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

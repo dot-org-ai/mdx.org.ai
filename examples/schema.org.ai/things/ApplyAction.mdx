@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/ApplyAction
+$context: https://schema.org
+$type: Class
+name: ApplyAction
+description: The act of registering to an organization/service without the guarantee to receive it.\
+subClassOf: ["OrganizeAction"]
+---
+
+# ApplyAction
+
+The act of registering to an organization/service without the guarantee to receive it.\
+\
+Related actions:\
+\
+* [[RegisterAction]]: Unlike RegisterAction, ApplyAction has no guarantees that the application will be accepted.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [OrganizeAction](OrganizeAction.mdx) > **ApplyAction**
+
+
+
+## Properties
+
+See [Schema.org ApplyAction properties](https://schema.org/ApplyAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ApplyAction } from 'schema.org.ai'
+
+// Create a ApplyAction
+const item: ApplyAction = {
+  $type: 'ApplyAction',
+  name: 'Example ApplyAction'
+}
+
+// Use semantic patterns
+await $.ApplyAction.create(item)
+const result = await $.ApplyAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ApplyAction](https://schema.org/ApplyAction)
+- [ApplyAction Properties](https://schema.org/ApplyAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

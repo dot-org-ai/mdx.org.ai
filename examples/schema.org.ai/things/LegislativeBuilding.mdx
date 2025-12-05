@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/LegislativeBuilding
+$context: https://schema.org
+$type: Class
+name: LegislativeBuilding
+description: A legislative building&#x2014;for example, the state capitol.
+subClassOf: ["GovernmentBuilding"]
+---
+
+# LegislativeBuilding
+
+A legislative building&#x2014;for example, the state capitol.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [GovernmentBuilding](GovernmentBuilding.mdx) > **LegislativeBuilding**
+
+
+
+## Properties
+
+See [Schema.org LegislativeBuilding properties](https://schema.org/LegislativeBuilding#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LegislativeBuilding } from 'schema.org.ai'
+
+// Create a LegislativeBuilding
+const item: LegislativeBuilding = {
+  $type: 'LegislativeBuilding',
+  name: 'Example LegislativeBuilding'
+}
+
+// Use semantic patterns
+await $.LegislativeBuilding.create(item)
+const result = await $.LegislativeBuilding.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LegislativeBuilding](https://schema.org/LegislativeBuilding)
+- [LegislativeBuilding Properties](https://schema.org/LegislativeBuilding#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

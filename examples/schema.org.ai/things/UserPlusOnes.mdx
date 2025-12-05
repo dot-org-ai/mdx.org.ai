@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UserPlusOnes
+$context: https://schema.org
+$type: Class
+name: UserPlusOnes
+description: UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+subClassOf: ["UserInteraction"]
+---
+
+# UserPlusOnes
+
+UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [UserInteraction](UserInteraction.mdx) > **UserPlusOnes**
+
+
+
+## Properties
+
+See [Schema.org UserPlusOnes properties](https://schema.org/UserPlusOnes#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserPlusOnes } from 'schema.org.ai'
+
+// Create a UserPlusOnes
+const item: UserPlusOnes = {
+  $type: 'UserPlusOnes',
+  name: 'Example UserPlusOnes'
+}
+
+// Use semantic patterns
+await $.UserPlusOnes.create(item)
+const result = await $.UserPlusOnes.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserPlusOnes](https://schema.org/UserPlusOnes)
+- [UserPlusOnes Properties](https://schema.org/UserPlusOnes#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

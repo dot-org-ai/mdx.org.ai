@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/ChooseAction
+$context: https://schema.org
+$type: Class
+name: ChooseAction
+description: The act of expressing a preference from a set of options or a large or unbounded set of choices/options.
+subClassOf: ["AssessAction"]
+---
+
+# ChooseAction
+
+The act of expressing a preference from a set of options or a large or unbounded set of choices/options.
+
+## Type Hierarchy
+
+**ChooseAction**
+
+## Direct Subclasses
+
+- **[VoteAction](VoteAction.mdx)**: The act of expressing a preference from a fixed/finite/structured set of choices/options
+
+## Properties
+
+See [Schema.org ChooseAction properties](https://schema.org/ChooseAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ChooseAction } from 'schema.org.ai'
+
+// Create a ChooseAction
+const item: ChooseAction = {
+  $type: 'ChooseAction',
+  name: 'Example ChooseAction'
+}
+
+// Use semantic patterns
+await $.ChooseAction.create(item)
+const result = await $.ChooseAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ChooseAction](https://schema.org/ChooseAction)
+- [ChooseAction Properties](https://schema.org/ChooseAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AppendAction
+$context: https://schema.org
+$type: Class
+name: AppendAction
+description: The act of inserting at the end if an ordered collection.
+subClassOf: ["InsertAction"]
+---
+
+# AppendAction
+
+The act of inserting at the end if an ordered collection.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [UpdateAction](UpdateAction.mdx) > [AddAction](AddAction.mdx) > [InsertAction](InsertAction.mdx) > **AppendAction**
+
+
+
+## Properties
+
+See [Schema.org AppendAction properties](https://schema.org/AppendAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AppendAction } from 'schema.org.ai'
+
+// Create a AppendAction
+const item: AppendAction = {
+  $type: 'AppendAction',
+  name: 'Example AppendAction'
+}
+
+// Use semantic patterns
+await $.AppendAction.create(item)
+const result = await $.AppendAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AppendAction](https://schema.org/AppendAction)
+- [AppendAction Properties](https://schema.org/AppendAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

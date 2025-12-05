@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DrugCostCategory
+$context: https://schema.org
+$type: Class
+name: DrugCostCategory
+description: Enumerated categories of medical drug costs.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# DrugCostCategory
+
+Enumerated categories of medical drug costs.
+
+## Type Hierarchy
+
+**DrugCostCategory**
+
+
+
+## Properties
+
+See [Schema.org DrugCostCategory properties](https://schema.org/DrugCostCategory#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DrugCostCategory } from 'schema.org.ai'
+
+// Create a DrugCostCategory
+const item: DrugCostCategory = {
+  $type: 'DrugCostCategory',
+  name: 'Example DrugCostCategory'
+}
+
+// Use semantic patterns
+await $.DrugCostCategory.create(item)
+const result = await $.DrugCostCategory.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DrugCostCategory](https://schema.org/DrugCostCategory)
+- [DrugCostCategory Properties](https://schema.org/DrugCostCategory#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

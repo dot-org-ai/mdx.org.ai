@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Taxi
+$context: https://schema.org
+$type: Class
+name: Taxi
+description: A taxi.
+subClassOf: ["Service"]
+---
+
+# Taxi
+
+A taxi.
+
+## Type Hierarchy
+
+**Taxi**
+
+
+
+## Properties
+
+See [Schema.org Taxi properties](https://schema.org/Taxi#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Taxi } from 'schema.org.ai'
+
+// Create a Taxi
+const item: Taxi = {
+  $type: 'Taxi',
+  name: 'Example Taxi'
+}
+
+// Use semantic patterns
+await $.Taxi.create(item)
+const result = await $.Taxi.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Taxi](https://schema.org/Taxi)
+- [Taxi Properties](https://schema.org/Taxi#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

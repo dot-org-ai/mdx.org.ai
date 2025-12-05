@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MiddleSchool
+$context: https://schema.org
+$type: Class
+name: MiddleSchool
+description: A middle school (typically for children aged around 11-14, although this varies somewhat).
+subClassOf: ["EducationalOrganization"]
+---
+
+# MiddleSchool
+
+A middle school (typically for children aged around 11-14, although this varies somewhat).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [EducationalOrganization](EducationalOrganization.mdx) > **MiddleSchool**
+
+
+
+## Properties
+
+See [Schema.org MiddleSchool properties](https://schema.org/MiddleSchool#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MiddleSchool } from 'schema.org.ai'
+
+// Create a MiddleSchool
+const item: MiddleSchool = {
+  $type: 'MiddleSchool',
+  name: 'Example MiddleSchool'
+}
+
+// Use semantic patterns
+await $.MiddleSchool.create(item)
+const result = await $.MiddleSchool.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MiddleSchool](https://schema.org/MiddleSchool)
+- [MiddleSchool Properties](https://schema.org/MiddleSchool#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SellAction
+$context: https://schema.org
+$type: Class
+name: SellAction
+description: The act of taking money from a buyer in exchange for goods or services rendered. An agent sells an object, product, or service to a buyer for a price. Reciprocal of BuyAction.
+subClassOf: ["TradeAction"]
+---
+
+# SellAction
+
+The act of taking money from a buyer in exchange for goods or services rendered. An agent sells an object, product, or service to a buyer for a price. Reciprocal of BuyAction.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TradeAction](TradeAction.mdx) > **SellAction**
+
+
+
+## Properties
+
+See [Schema.org SellAction properties](https://schema.org/SellAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SellAction } from 'schema.org.ai'
+
+// Create a SellAction
+const item: SellAction = {
+  $type: 'SellAction',
+  name: 'Example SellAction'
+}
+
+// Use semantic patterns
+await $.SellAction.create(item)
+const result = await $.SellAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SellAction](https://schema.org/SellAction)
+- [SellAction Properties](https://schema.org/SellAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

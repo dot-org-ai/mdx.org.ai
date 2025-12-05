@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EducationEvent
+$context: https://schema.org
+$type: Class
+name: EducationEvent
+description: Event type: Education event.
+subClassOf: ["Event"]
+---
+
+# EducationEvent
+
+Event type: Education event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **EducationEvent**
+
+
+
+## Properties
+
+See [Schema.org EducationEvent properties](https://schema.org/EducationEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EducationEvent } from 'schema.org.ai'
+
+// Create a EducationEvent
+const item: EducationEvent = {
+  $type: 'EducationEvent',
+  name: 'Example EducationEvent'
+}
+
+// Use semantic patterns
+await $.EducationEvent.create(item)
+const result = await $.EducationEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EducationEvent](https://schema.org/EducationEvent)
+- [EducationEvent Properties](https://schema.org/EducationEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

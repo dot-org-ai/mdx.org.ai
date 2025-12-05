@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OfferCatalog
+$context: https://schema.org
+$type: Class
+name: OfferCatalog
+description: An OfferCatalog is an ItemList that contains related Offers and/or further OfferCatalogs that are offeredBy the same provider.
+subClassOf: ["ItemList"]
+---
+
+# OfferCatalog
+
+An OfferCatalog is an ItemList that contains related Offers and/or further OfferCatalogs that are offeredBy the same provider.
+
+## Type Hierarchy
+
+**OfferCatalog**
+
+
+
+## Properties
+
+See [Schema.org OfferCatalog properties](https://schema.org/OfferCatalog#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OfferCatalog } from 'schema.org.ai'
+
+// Create a OfferCatalog
+const item: OfferCatalog = {
+  $type: 'OfferCatalog',
+  name: 'Example OfferCatalog'
+}
+
+// Use semantic patterns
+await $.OfferCatalog.create(item)
+const result = await $.OfferCatalog.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OfferCatalog](https://schema.org/OfferCatalog)
+- [OfferCatalog Properties](https://schema.org/OfferCatalog#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

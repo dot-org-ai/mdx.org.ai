@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/Audience
+$context: https://schema.org
+$type: Class
+name: Audience
+description: Intended audience for an item, i.e. the group for whom the item was created.
+subClassOf: ["Intangible"]
+---
+
+# Audience
+
+Intended audience for an item, i.e. the group for whom the item was created.
+
+## Type Hierarchy
+
+**Audience**
+
+## Direct Subclasses
+
+- **[EducationalAudience](EducationalAudience.mdx)**: An EducationalAudience
+- **[MedicalAudience](MedicalAudience.mdx)**: Target audiences for medical web pages
+- **[Researcher](Researcher.mdx)**: Researchers
+
+## Properties
+
+See [Schema.org Audience properties](https://schema.org/Audience#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Audience } from 'schema.org.ai'
+
+// Create a Audience
+const item: Audience = {
+  $type: 'Audience',
+  name: 'Example Audience'
+}
+
+// Use semantic patterns
+await $.Audience.create(item)
+const result = await $.Audience.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Audience](https://schema.org/Audience)
+- [Audience Properties](https://schema.org/Audience#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

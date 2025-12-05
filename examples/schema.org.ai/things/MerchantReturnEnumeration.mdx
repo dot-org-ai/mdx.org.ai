@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MerchantReturnEnumeration
+$context: https://schema.org
+$type: Class
+name: MerchantReturnEnumeration
+description: Enumerates several kinds of product return policies.
+subClassOf: ["Enumeration"]
+---
+
+# MerchantReturnEnumeration
+
+Enumerates several kinds of product return policies.
+
+## Type Hierarchy
+
+**MerchantReturnEnumeration**
+
+
+
+## Properties
+
+See [Schema.org MerchantReturnEnumeration properties](https://schema.org/MerchantReturnEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MerchantReturnEnumeration } from 'schema.org.ai'
+
+// Create a MerchantReturnEnumeration
+const item: MerchantReturnEnumeration = {
+  $type: 'MerchantReturnEnumeration',
+  name: 'Example MerchantReturnEnumeration'
+}
+
+// Use semantic patterns
+await $.MerchantReturnEnumeration.create(item)
+const result = await $.MerchantReturnEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MerchantReturnEnumeration](https://schema.org/MerchantReturnEnumeration)
+- [MerchantReturnEnumeration Properties](https://schema.org/MerchantReturnEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

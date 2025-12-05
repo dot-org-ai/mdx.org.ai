@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/IceCreamShop
+$context: https://schema.org
+$type: Class
+name: IceCreamShop
+description: An ice cream shop.
+subClassOf: ["FoodEstablishment"]
+---
+
+# IceCreamShop
+
+An ice cream shop.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FoodEstablishment](FoodEstablishment.mdx) > **IceCreamShop**
+
+
+
+## Properties
+
+See [Schema.org IceCreamShop properties](https://schema.org/IceCreamShop#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { IceCreamShop } from 'schema.org.ai'
+
+// Create a IceCreamShop
+const item: IceCreamShop = {
+  $type: 'IceCreamShop',
+  name: 'Example IceCreamShop'
+}
+
+// Use semantic patterns
+await $.IceCreamShop.create(item)
+const result = await $.IceCreamShop.get('item-id')
+```
+
+## Resources
+
+- [Schema.org IceCreamShop](https://schema.org/IceCreamShop)
+- [IceCreamShop Properties](https://schema.org/IceCreamShop#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

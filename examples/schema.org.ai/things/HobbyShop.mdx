@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HobbyShop
+$context: https://schema.org
+$type: Class
+name: HobbyShop
+description: A store that sells materials useful or necessary for various hobbies.
+subClassOf: ["Store"]
+---
+
+# HobbyShop
+
+A store that sells materials useful or necessary for various hobbies.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **HobbyShop**
+
+
+
+## Properties
+
+See [Schema.org HobbyShop properties](https://schema.org/HobbyShop#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HobbyShop } from 'schema.org.ai'
+
+// Create a HobbyShop
+const item: HobbyShop = {
+  $type: 'HobbyShop',
+  name: 'Example HobbyShop'
+}
+
+// Use semantic patterns
+await $.HobbyShop.create(item)
+const result = await $.HobbyShop.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HobbyShop](https://schema.org/HobbyShop)
+- [HobbyShop Properties](https://schema.org/HobbyShop#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

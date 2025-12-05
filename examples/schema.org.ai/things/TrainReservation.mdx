@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/TrainReservation
+$context: https://schema.org
+$type: Class
+name: TrainReservation
+description: A reservation for train travel.\
+subClassOf: ["Reservation"]
+---
+
+# TrainReservation
+
+A reservation for train travel.\
+\
+Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, use [[Offer]].
+
+## Type Hierarchy
+
+**TrainReservation**
+
+
+
+## Properties
+
+See [Schema.org TrainReservation properties](https://schema.org/TrainReservation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TrainReservation } from 'schema.org.ai'
+
+// Create a TrainReservation
+const item: TrainReservation = {
+  $type: 'TrainReservation',
+  name: 'Example TrainReservation'
+}
+
+// Use semantic patterns
+await $.TrainReservation.create(item)
+const result = await $.TrainReservation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TrainReservation](https://schema.org/TrainReservation)
+- [TrainReservation Properties](https://schema.org/TrainReservation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

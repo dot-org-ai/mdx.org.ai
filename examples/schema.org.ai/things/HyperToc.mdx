@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HyperToc
+$context: https://schema.org
+$type: Class
+name: HyperToc
+description: A HyperToc represents a hypertext table of contents for complex media objects, such as [[VideoObject]], [[AudioObject]]. Items in the table of contents are indicated using the [[tocEntry]] property, and typed [[HyperTocEntry]]. For cases where the same larger work is split into multiple files, [[associatedMedia]] can be used on individual [[HyperTocEntry]] items.
+subClassOf: ["CreativeWork"]
+---
+
+# HyperToc
+
+A HyperToc represents a hypertext table of contents for complex media objects, such as [[VideoObject]], [[AudioObject]]. Items in the table of contents are indicated using the [[tocEntry]] property, and typed [[HyperTocEntry]]. For cases where the same larger work is split into multiple files, [[associatedMedia]] can be used on individual [[HyperTocEntry]] items.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **HyperToc**
+
+
+
+## Properties
+
+See [Schema.org HyperToc properties](https://schema.org/HyperToc#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HyperToc } from 'schema.org.ai'
+
+// Create a HyperToc
+const item: HyperToc = {
+  $type: 'HyperToc',
+  name: 'Example HyperToc'
+}
+
+// Use semantic patterns
+await $.HyperToc.create(item)
+const result = await $.HyperToc.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HyperToc](https://schema.org/HyperToc)
+- [HyperToc Properties](https://schema.org/HyperToc#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

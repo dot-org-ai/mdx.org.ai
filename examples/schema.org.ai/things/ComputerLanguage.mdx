@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ComputerLanguage
+$context: https://schema.org
+$type: Class
+name: ComputerLanguage
+description: This type covers computer programming languages such as Scheme and Lisp, as well as other language-like computer representations. Natural languages are best represented with the [[Language]] type.
+subClassOf: ["Intangible"]
+---
+
+# ComputerLanguage
+
+This type covers computer programming languages such as Scheme and Lisp, as well as other language-like computer representations. Natural languages are best represented with the [[Language]] type.
+
+## Type Hierarchy
+
+**ComputerLanguage**
+
+
+
+## Properties
+
+See [Schema.org ComputerLanguage properties](https://schema.org/ComputerLanguage#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ComputerLanguage } from 'schema.org.ai'
+
+// Create a ComputerLanguage
+const item: ComputerLanguage = {
+  $type: 'ComputerLanguage',
+  name: 'Example ComputerLanguage'
+}
+
+// Use semantic patterns
+await $.ComputerLanguage.create(item)
+const result = await $.ComputerLanguage.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ComputerLanguage](https://schema.org/ComputerLanguage)
+- [ComputerLanguage Properties](https://schema.org/ComputerLanguage#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

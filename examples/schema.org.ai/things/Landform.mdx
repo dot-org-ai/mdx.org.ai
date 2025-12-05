@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/Landform
+$context: https://schema.org
+$type: Class
+name: Landform
+description: A landform or physical feature.  Landform elements include mountains, plains, lakes, rivers, seascape and oceanic waterbody interface features such as bays, peninsulas, seas and so forth, including sub-aqueous terrain features such as submersed mountain ranges, volcanoes, and the great ocean basins.
+subClassOf: ["Place"]
+---
+
+# Landform
+
+A landform or physical feature.  Landform elements include mountains, plains, lakes, rivers, seascape and oceanic waterbody interface features such as bays, peninsulas, seas and so forth, including sub-aqueous terrain features such as submersed mountain ranges, volcanoes, and the great ocean basins.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > **Landform**
+
+## Direct Subclasses
+
+- **[BodyOfWater](BodyOfWater.mdx)**: A body of water, such as a sea, ocean, or lake
+- **[Continent](Continent.mdx)**: One of the continents (for example, Europe or Africa)
+- **[Mountain](Mountain.mdx)**: A mountain, like Mount Whitney or Mount Everest
+- **[Volcano](Volcano.mdx)**: A volcano, like Fujisan
+
+## Properties
+
+See [Schema.org Landform properties](https://schema.org/Landform#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Landform } from 'schema.org.ai'
+
+// Create a Landform
+const item: Landform = {
+  $type: 'Landform',
+  name: 'Example Landform'
+}
+
+// Use semantic patterns
+await $.Landform.create(item)
+const result = await $.Landform.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Landform](https://schema.org/Landform)
+- [Landform Properties](https://schema.org/Landform#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

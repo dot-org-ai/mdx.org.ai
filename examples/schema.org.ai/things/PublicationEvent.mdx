@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/PublicationEvent
+$context: https://schema.org
+$type: Class
+name: PublicationEvent
+description: A PublicationEvent corresponds indifferently to the event of publication for a CreativeWork of any type, e.g. a broadcast event, an on-demand event, a book/journal publication via a variety of delivery media.
+subClassOf: ["Event"]
+---
+
+# PublicationEvent
+
+A PublicationEvent corresponds indifferently to the event of publication for a CreativeWork of any type, e.g. a broadcast event, an on-demand event, a book/journal publication via a variety of delivery media.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **PublicationEvent**
+
+## Direct Subclasses
+
+- **[BroadcastEvent](BroadcastEvent.mdx)**: An over the air or online broadcast event
+- **[OnDemandEvent](OnDemandEvent.mdx)**: A publication event, e
+
+## Properties
+
+See [Schema.org PublicationEvent properties](https://schema.org/PublicationEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PublicationEvent } from 'schema.org.ai'
+
+// Create a PublicationEvent
+const item: PublicationEvent = {
+  $type: 'PublicationEvent',
+  name: 'Example PublicationEvent'
+}
+
+// Use semantic patterns
+await $.PublicationEvent.create(item)
+const result = await $.PublicationEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PublicationEvent](https://schema.org/PublicationEvent)
+- [PublicationEvent Properties](https://schema.org/PublicationEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

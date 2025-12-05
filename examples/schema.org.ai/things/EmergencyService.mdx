@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/EmergencyService
+$context: https://schema.org
+$type: Class
+name: EmergencyService
+description: An emergency service, such as a fire station or ER.
+subClassOf: ["LocalBusiness"]
+---
+
+# EmergencyService
+
+An emergency service, such as a fire station or ER.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **EmergencyService**
+
+## Direct Subclasses
+
+- **[FireStation](FireStation.mdx)**: A fire station
+- **[Hospital](Hospital.mdx)**: A hospital
+- **[PoliceStation](PoliceStation.mdx)**: A police station
+
+## Properties
+
+See [Schema.org EmergencyService properties](https://schema.org/EmergencyService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EmergencyService } from 'schema.org.ai'
+
+// Create a EmergencyService
+const item: EmergencyService = {
+  $type: 'EmergencyService',
+  name: 'Example EmergencyService'
+}
+
+// Use semantic patterns
+await $.EmergencyService.create(item)
+const result = await $.EmergencyService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EmergencyService](https://schema.org/EmergencyService)
+- [EmergencyService Properties](https://schema.org/EmergencyService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

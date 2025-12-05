@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/SearchAction
+$context: https://schema.org
+$type: Class
+name: SearchAction
+description: The act of searching for an object.\
+subClassOf: ["Action"]
+---
+
+# SearchAction
+
+The act of searching for an object.\
+\
+Related actions:\
+\
+* [[FindAction]]: SearchAction generally leads to a FindAction, but not necessarily.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **SearchAction**
+
+
+
+## Properties
+
+See [Schema.org SearchAction properties](https://schema.org/SearchAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SearchAction } from 'schema.org.ai'
+
+// Create a SearchAction
+const item: SearchAction = {
+  $type: 'SearchAction',
+  name: 'Example SearchAction'
+}
+
+// Use semantic patterns
+await $.SearchAction.create(item)
+const result = await $.SearchAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SearchAction](https://schema.org/SearchAction)
+- [SearchAction Properties](https://schema.org/SearchAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

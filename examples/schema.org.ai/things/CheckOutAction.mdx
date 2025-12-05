@@ -1,0 +1,54 @@
+---
+$id: https://schema.org.ai/CheckOutAction
+$context: https://schema.org
+$type: Class
+name: CheckOutAction
+description: The act of an agent communicating (service provider, social media, etc) their departure of a previously reserved service (e.g. flight check-in) or place (e.g. hotel).\
+subClassOf: ["CommunicateAction"]
+---
+
+# CheckOutAction
+
+The act of an agent communicating (service provider, social media, etc) their departure of a previously reserved service (e.g. flight check-in) or place (e.g. hotel).\
+\
+Related actions:\
+\
+* [[CheckInAction]]: The antonym of CheckOutAction.\
+* [[DepartAction]]: Unlike DepartAction, CheckOutAction implies that the agent is informing/confirming the end of a previously reserved service.\
+* [[CancelAction]]: Unlike CancelAction, CheckOutAction implies that the agent is informing/confirming the end of a previously reserved service.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > **CheckOutAction**
+
+
+
+## Properties
+
+See [Schema.org CheckOutAction properties](https://schema.org/CheckOutAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CheckOutAction } from 'schema.org.ai'
+
+// Create a CheckOutAction
+const item: CheckOutAction = {
+  $type: 'CheckOutAction',
+  name: 'Example CheckOutAction'
+}
+
+// Use semantic patterns
+await $.CheckOutAction.create(item)
+const result = await $.CheckOutAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CheckOutAction](https://schema.org/CheckOutAction)
+- [CheckOutAction Properties](https://schema.org/CheckOutAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/AskAction
+$context: https://schema.org
+$type: Class
+name: AskAction
+description: The act of posing a question / favor to someone.\
+subClassOf: ["CommunicateAction"]
+---
+
+# AskAction
+
+The act of posing a question / favor to someone.\
+\
+Related actions:\
+\
+* [[ReplyAction]]: Appears generally as a response to AskAction.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > [CommunicateAction](CommunicateAction.mdx) > **AskAction**
+
+
+
+## Properties
+
+See [Schema.org AskAction properties](https://schema.org/AskAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AskAction } from 'schema.org.ai'
+
+// Create a AskAction
+const item: AskAction = {
+  $type: 'AskAction',
+  name: 'Example AskAction'
+}
+
+// Use semantic patterns
+await $.AskAction.create(item)
+const result = await $.AskAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AskAction](https://schema.org/AskAction)
+- [AskAction Properties](https://schema.org/AskAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

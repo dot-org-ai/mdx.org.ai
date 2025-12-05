@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WPFooter
+$context: https://schema.org
+$type: Class
+name: WPFooter
+description: The footer section of the page.
+subClassOf: ["WebPageElement"]
+---
+
+# WPFooter
+
+The footer section of the page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPageElement](WebPageElement.mdx) > **WPFooter**
+
+
+
+## Properties
+
+See [Schema.org WPFooter properties](https://schema.org/WPFooter#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WPFooter } from 'schema.org.ai'
+
+// Create a WPFooter
+const item: WPFooter = {
+  $type: 'WPFooter',
+  name: 'Example WPFooter'
+}
+
+// Use semantic patterns
+await $.WPFooter.create(item)
+const result = await $.WPFooter.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WPFooter](https://schema.org/WPFooter)
+- [WPFooter Properties](https://schema.org/WPFooter#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

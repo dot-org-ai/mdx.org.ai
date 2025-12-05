@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BoatTerminal
+$context: https://schema.org
+$type: Class
+name: BoatTerminal
+description: A terminal for boats, ships, and other water vessels.
+subClassOf: ["CivicStructure"]
+---
+
+# BoatTerminal
+
+A terminal for boats, ships, and other water vessels.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > **BoatTerminal**
+
+
+
+## Properties
+
+See [Schema.org BoatTerminal properties](https://schema.org/BoatTerminal#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BoatTerminal } from 'schema.org.ai'
+
+// Create a BoatTerminal
+const item: BoatTerminal = {
+  $type: 'BoatTerminal',
+  name: 'Example BoatTerminal'
+}
+
+// Use semantic patterns
+await $.BoatTerminal.create(item)
+const result = await $.BoatTerminal.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BoatTerminal](https://schema.org/BoatTerminal)
+- [BoatTerminal Properties](https://schema.org/BoatTerminal#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

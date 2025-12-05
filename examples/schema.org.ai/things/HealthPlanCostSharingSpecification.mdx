@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HealthPlanCostSharingSpecification
+$context: https://schema.org
+$type: Class
+name: HealthPlanCostSharingSpecification
+description: A description of costs to the patient under a given network or formulary.
+subClassOf: ["Intangible"]
+---
+
+# HealthPlanCostSharingSpecification
+
+A description of costs to the patient under a given network or formulary.
+
+## Type Hierarchy
+
+**HealthPlanCostSharingSpecification**
+
+
+
+## Properties
+
+See [Schema.org HealthPlanCostSharingSpecification properties](https://schema.org/HealthPlanCostSharingSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HealthPlanCostSharingSpecification } from 'schema.org.ai'
+
+// Create a HealthPlanCostSharingSpecification
+const item: HealthPlanCostSharingSpecification = {
+  $type: 'HealthPlanCostSharingSpecification',
+  name: 'Example HealthPlanCostSharingSpecification'
+}
+
+// Use semantic patterns
+await $.HealthPlanCostSharingSpecification.create(item)
+const result = await $.HealthPlanCostSharingSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HealthPlanCostSharingSpecification](https://schema.org/HealthPlanCostSharingSpecification)
+- [HealthPlanCostSharingSpecification Properties](https://schema.org/HealthPlanCostSharingSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

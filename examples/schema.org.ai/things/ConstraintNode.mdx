@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/ConstraintNode
+$context: https://schema.org
+$type: Class
+name: ConstraintNode
+description: The ConstraintNode type is provided to support usecases in which a node in a structured data graph is described with properties which appear to describe a single entity, but are being used in a situation where they serve a more abstract purpose. A [[ConstraintNode]] can be described using [[constraintProperty]] and [[numConstraints]]. These constraint properties can serve a variety of purposes, and their values may sometimes be understood to indicate sets of possible values rather than single, exact and specific values.
+subClassOf: ["Intangible"]
+---
+
+# ConstraintNode
+
+The ConstraintNode type is provided to support usecases in which a node in a structured data graph is described with properties which appear to describe a single entity, but are being used in a situation where they serve a more abstract purpose. A [[ConstraintNode]] can be described using [[constraintProperty]] and [[numConstraints]]. These constraint properties can serve a variety of purposes, and their values may sometimes be understood to indicate sets of possible values rather than single, exact and specific values.
+
+## Type Hierarchy
+
+**ConstraintNode**
+
+## Direct Subclasses
+
+- **[StatisticalVariable](StatisticalVariable.mdx)**: [[StatisticalVariable]] represents any type of statistical metric that can be measured at a place and time
+
+## Properties
+
+See [Schema.org ConstraintNode properties](https://schema.org/ConstraintNode#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ConstraintNode } from 'schema.org.ai'
+
+// Create a ConstraintNode
+const item: ConstraintNode = {
+  $type: 'ConstraintNode',
+  name: 'Example ConstraintNode'
+}
+
+// Use semantic patterns
+await $.ConstraintNode.create(item)
+const result = await $.ConstraintNode.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ConstraintNode](https://schema.org/ConstraintNode)
+- [ConstraintNode Properties](https://schema.org/ConstraintNode#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

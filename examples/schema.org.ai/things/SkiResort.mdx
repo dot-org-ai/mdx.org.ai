@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SkiResort
+$context: https://schema.org
+$type: Class
+name: SkiResort
+description: A ski resort.
+subClassOf: ["Resort","SportsActivityLocation"]
+---
+
+# SkiResort
+
+A ski resort.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [SportsActivityLocation](SportsActivityLocation.mdx) > **SkiResort**
+
+
+
+## Properties
+
+See [Schema.org SkiResort properties](https://schema.org/SkiResort#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SkiResort } from 'schema.org.ai'
+
+// Create a SkiResort
+const item: SkiResort = {
+  $type: 'SkiResort',
+  name: 'Example SkiResort'
+}
+
+// Use semantic patterns
+await $.SkiResort.create(item)
+const result = await $.SkiResort.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SkiResort](https://schema.org/SkiResort)
+- [SkiResort Properties](https://schema.org/SkiResort#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

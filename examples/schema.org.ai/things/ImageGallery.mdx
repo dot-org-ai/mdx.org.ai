@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ImageGallery
+$context: https://schema.org
+$type: Class
+name: ImageGallery
+description: Web page type: Image gallery page.
+subClassOf: ["MediaGallery"]
+---
+
+# ImageGallery
+
+Web page type: Image gallery page.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebPage](WebPage.mdx) > [CollectionPage](CollectionPage.mdx) > [MediaGallery](MediaGallery.mdx) > **ImageGallery**
+
+
+
+## Properties
+
+See [Schema.org ImageGallery properties](https://schema.org/ImageGallery#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ImageGallery } from 'schema.org.ai'
+
+// Create a ImageGallery
+const item: ImageGallery = {
+  $type: 'ImageGallery',
+  name: 'Example ImageGallery'
+}
+
+// Use semantic patterns
+await $.ImageGallery.create(item)
+const result = await $.ImageGallery.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ImageGallery](https://schema.org/ImageGallery)
+- [ImageGallery Properties](https://schema.org/ImageGallery#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

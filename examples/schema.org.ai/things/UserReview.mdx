@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UserReview
+$context: https://schema.org
+$type: Class
+name: UserReview
+description: A review created by an end-user (e.g. consumer, purchaser, attendee etc.), in contrast with [[CriticReview]].
+subClassOf: ["Review"]
+---
+
+# UserReview
+
+A review created by an end-user (e.g. consumer, purchaser, attendee etc.), in contrast with [[CriticReview]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Review](Review.mdx) > **UserReview**
+
+
+
+## Properties
+
+See [Schema.org UserReview properties](https://schema.org/UserReview#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserReview } from 'schema.org.ai'
+
+// Create a UserReview
+const item: UserReview = {
+  $type: 'UserReview',
+  name: 'Example UserReview'
+}
+
+// Use semantic patterns
+await $.UserReview.create(item)
+const result = await $.UserReview.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserReview](https://schema.org/UserReview)
+- [UserReview Properties](https://schema.org/UserReview#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Ticket
+$context: https://schema.org
+$type: Class
+name: Ticket
+description: Used to describe a ticket to an event, a flight, a bus ride, etc.
+subClassOf: ["Intangible"]
+---
+
+# Ticket
+
+Used to describe a ticket to an event, a flight, a bus ride, etc.
+
+## Type Hierarchy
+
+**Ticket**
+
+
+
+## Properties
+
+See [Schema.org Ticket properties](https://schema.org/Ticket#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Ticket } from 'schema.org.ai'
+
+// Create a Ticket
+const item: Ticket = {
+  $type: 'Ticket',
+  name: 'Example Ticket'
+}
+
+// Use semantic patterns
+await $.Ticket.create(item)
+const result = await $.Ticket.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Ticket](https://schema.org/Ticket)
+- [Ticket Properties](https://schema.org/Ticket#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

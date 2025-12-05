@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Integer
+$context: https://schema.org
+$type: Class
+name: Integer
+description: Data type: Integer.
+subClassOf: ["Number"]
+---
+
+# Integer
+
+Data type: Integer.
+
+## Type Hierarchy
+
+**Integer**
+
+
+
+## Properties
+
+See [Schema.org Integer properties](https://schema.org/Integer#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Integer } from 'schema.org.ai'
+
+// Create a Integer
+const item: Integer = {
+  $type: 'Integer',
+  name: 'Example Integer'
+}
+
+// Use semantic patterns
+await $.Integer.create(item)
+const result = await $.Integer.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Integer](https://schema.org/Integer)
+- [Integer Properties](https://schema.org/Integer#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

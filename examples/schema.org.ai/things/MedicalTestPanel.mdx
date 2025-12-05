@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalTestPanel
+$context: https://schema.org
+$type: Class
+name: MedicalTestPanel
+description: Any collection of tests commonly ordered together.
+subClassOf: ["MedicalTest"]
+---
+
+# MedicalTestPanel
+
+Any collection of tests commonly ordered together.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalTest](MedicalTest.mdx) > **MedicalTestPanel**
+
+
+
+## Properties
+
+See [Schema.org MedicalTestPanel properties](https://schema.org/MedicalTestPanel#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalTestPanel } from 'schema.org.ai'
+
+// Create a MedicalTestPanel
+const item: MedicalTestPanel = {
+  $type: 'MedicalTestPanel',
+  name: 'Example MedicalTestPanel'
+}
+
+// Use semantic patterns
+await $.MedicalTestPanel.create(item)
+const result = await $.MedicalTestPanel.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalTestPanel](https://schema.org/MedicalTestPanel)
+- [MedicalTestPanel Properties](https://schema.org/MedicalTestPanel#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

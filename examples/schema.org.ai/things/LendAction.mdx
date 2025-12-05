@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/LendAction
+$context: https://schema.org
+$type: Class
+name: LendAction
+description: The act of providing an object under an agreement that it will be returned at a later date. Reciprocal of BorrowAction.\
+subClassOf: ["TransferAction"]
+---
+
+# LendAction
+
+The act of providing an object under an agreement that it will be returned at a later date. Reciprocal of BorrowAction.\
+\
+Related actions:\
+\
+* [[BorrowAction]]: Reciprocal of LendAction.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TransferAction](TransferAction.mdx) > **LendAction**
+
+
+
+## Properties
+
+See [Schema.org LendAction properties](https://schema.org/LendAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LendAction } from 'schema.org.ai'
+
+// Create a LendAction
+const item: LendAction = {
+  $type: 'LendAction',
+  name: 'Example LendAction'
+}
+
+// Use semantic patterns
+await $.LendAction.create(item)
+const result = await $.LendAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LendAction](https://schema.org/LendAction)
+- [LendAction Properties](https://schema.org/LendAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

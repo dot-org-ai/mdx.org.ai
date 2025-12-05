@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AnalysisNewsArticle
+$context: https://schema.org
+$type: Class
+name: AnalysisNewsArticle
+description: An AnalysisNewsArticle is a [[NewsArticle]] that, while based on factual reporting, incorporates the expertise of the author/producer, offering interpretations and conclusions.
+subClassOf: ["NewsArticle"]
+---
+
+# AnalysisNewsArticle
+
+An AnalysisNewsArticle is a [[NewsArticle]] that, while based on factual reporting, incorporates the expertise of the author/producer, offering interpretations and conclusions.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [Article](Article.mdx) > [NewsArticle](NewsArticle.mdx) > **AnalysisNewsArticle**
+
+
+
+## Properties
+
+See [Schema.org AnalysisNewsArticle properties](https://schema.org/AnalysisNewsArticle#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AnalysisNewsArticle } from 'schema.org.ai'
+
+// Create a AnalysisNewsArticle
+const item: AnalysisNewsArticle = {
+  $type: 'AnalysisNewsArticle',
+  name: 'Example AnalysisNewsArticle'
+}
+
+// Use semantic patterns
+await $.AnalysisNewsArticle.create(item)
+const result = await $.AnalysisNewsArticle.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AnalysisNewsArticle](https://schema.org/AnalysisNewsArticle)
+- [AnalysisNewsArticle Properties](https://schema.org/AnalysisNewsArticle#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

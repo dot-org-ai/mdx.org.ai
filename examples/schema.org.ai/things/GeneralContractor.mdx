@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GeneralContractor
+$context: https://schema.org
+$type: Class
+name: GeneralContractor
+description: A general contractor.
+subClassOf: ["HomeAndConstructionBusiness"]
+---
+
+# GeneralContractor
+
+A general contractor.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HomeAndConstructionBusiness](HomeAndConstructionBusiness.mdx) > **GeneralContractor**
+
+
+
+## Properties
+
+See [Schema.org GeneralContractor properties](https://schema.org/GeneralContractor#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GeneralContractor } from 'schema.org.ai'
+
+// Create a GeneralContractor
+const item: GeneralContractor = {
+  $type: 'GeneralContractor',
+  name: 'Example GeneralContractor'
+}
+
+// Use semantic patterns
+await $.GeneralContractor.create(item)
+const result = await $.GeneralContractor.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GeneralContractor](https://schema.org/GeneralContractor)
+- [GeneralContractor Properties](https://schema.org/GeneralContractor#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

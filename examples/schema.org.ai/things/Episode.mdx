@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/Episode
+$context: https://schema.org
+$type: Class
+name: Episode
+description: A media episode (e.g. TV, radio, video game) which can be part of a series or season.
+subClassOf: ["CreativeWork"]
+---
+
+# Episode
+
+A media episode (e.g. TV, radio, video game) which can be part of a series or season.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Episode**
+
+## Direct Subclasses
+
+- **[PodcastEpisode](PodcastEpisode.mdx)**: A single episode of a podcast series
+- **[RadioEpisode](RadioEpisode.mdx)**: A radio episode which can be part of a series or season
+- **[TVEpisode](TVEpisode.mdx)**: A TV episode which can be part of a series or season
+
+## Properties
+
+See [Schema.org Episode properties](https://schema.org/Episode#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Episode } from 'schema.org.ai'
+
+// Create a Episode
+const item: Episode = {
+  $type: 'Episode',
+  name: 'Example Episode'
+}
+
+// Use semantic patterns
+await $.Episode.create(item)
+const result = await $.Episode.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Episode](https://schema.org/Episode)
+- [Episode Properties](https://schema.org/Episode#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

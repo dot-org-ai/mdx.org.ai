@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PawnShop
+$context: https://schema.org
+$type: Class
+name: PawnShop
+description: A shop that will buy, or lend money against the security of, personal possessions.
+subClassOf: ["Store"]
+---
+
+# PawnShop
+
+A shop that will buy, or lend money against the security of, personal possessions.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **PawnShop**
+
+
+
+## Properties
+
+See [Schema.org PawnShop properties](https://schema.org/PawnShop#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PawnShop } from 'schema.org.ai'
+
+// Create a PawnShop
+const item: PawnShop = {
+  $type: 'PawnShop',
+  name: 'Example PawnShop'
+}
+
+// Use semantic patterns
+await $.PawnShop.create(item)
+const result = await $.PawnShop.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PawnShop](https://schema.org/PawnShop)
+- [PawnShop Properties](https://schema.org/PawnShop#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

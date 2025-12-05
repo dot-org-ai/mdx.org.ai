@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MediaReviewItem
+$context: https://schema.org
+$type: Class
+name: MediaReviewItem
+description: Represents an item or group of closely related items treated as a unit for the sake of evaluation in a [[MediaReview]]. Authorship etc. apply to the items rather than to the curation/grouping or reviewing party.
+subClassOf: ["CreativeWork"]
+---
+
+# MediaReviewItem
+
+Represents an item or group of closely related items treated as a unit for the sake of evaluation in a [[MediaReview]]. Authorship etc. apply to the items rather than to the curation/grouping or reviewing party.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **MediaReviewItem**
+
+
+
+## Properties
+
+See [Schema.org MediaReviewItem properties](https://schema.org/MediaReviewItem#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MediaReviewItem } from 'schema.org.ai'
+
+// Create a MediaReviewItem
+const item: MediaReviewItem = {
+  $type: 'MediaReviewItem',
+  name: 'Example MediaReviewItem'
+}
+
+// Use semantic patterns
+await $.MediaReviewItem.create(item)
+const result = await $.MediaReviewItem.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MediaReviewItem](https://schema.org/MediaReviewItem)
+- [MediaReviewItem Properties](https://schema.org/MediaReviewItem#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

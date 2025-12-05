@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/PerformingGroup
+$context: https://schema.org
+$type: Class
+name: PerformingGroup
+description: A performance group, such as a band, an orchestra, or a circus.
+subClassOf: ["Organization"]
+---
+
+# PerformingGroup
+
+A performance group, such as a band, an orchestra, or a circus.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **PerformingGroup**
+
+## Direct Subclasses
+
+- **[DanceGroup](DanceGroup.mdx)**: A dance group&#x2014;for example, the Alvin Ailey Dance Theater or Riverdance
+- **[MusicGroup](MusicGroup.mdx)**: A musical group, such as a band, an orchestra, or a choir
+- **[TheaterGroup](TheaterGroup.mdx)**: A theater group or company, for example, the Royal Shakespeare Company or Druid Theatre
+
+## Properties
+
+See [Schema.org PerformingGroup properties](https://schema.org/PerformingGroup#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PerformingGroup } from 'schema.org.ai'
+
+// Create a PerformingGroup
+const item: PerformingGroup = {
+  $type: 'PerformingGroup',
+  name: 'Example PerformingGroup'
+}
+
+// Use semantic patterns
+await $.PerformingGroup.create(item)
+const result = await $.PerformingGroup.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PerformingGroup](https://schema.org/PerformingGroup)
+- [PerformingGroup Properties](https://schema.org/PerformingGroup#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

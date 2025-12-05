@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HealthTopicContent
+$context: https://schema.org
+$type: Class
+name: HealthTopicContent
+description: [[HealthTopicContent]] is [[WebContent]] that is about some aspect of a health topic, e.g. a condition, its symptoms or treatments. Such content may be comprised of several parts or sections and use different types of media. Multiple instances of [[WebContent]] (and hence [[HealthTopicContent]]) can be related using [[hasPart]] / [[isPartOf]] where there is some kind of content hierarchy, and their content described with [[about]] and [[mentions]] e.g. building upon the existing [[MedicalCondition]] vocabulary.
+subClassOf: ["WebContent"]
+---
+
+# HealthTopicContent
+
+[[HealthTopicContent]] is [[WebContent]] that is about some aspect of a health topic, e.g. a condition, its symptoms or treatments. Such content may be comprised of several parts or sections and use different types of media. Multiple instances of [[WebContent]] (and hence [[HealthTopicContent]]) can be related using [[hasPart]] / [[isPartOf]] where there is some kind of content hierarchy, and their content described with [[about]] and [[mentions]] e.g. building upon the existing [[MedicalCondition]] vocabulary.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [WebContent](WebContent.mdx) > **HealthTopicContent**
+
+
+
+## Properties
+
+See [Schema.org HealthTopicContent properties](https://schema.org/HealthTopicContent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HealthTopicContent } from 'schema.org.ai'
+
+// Create a HealthTopicContent
+const item: HealthTopicContent = {
+  $type: 'HealthTopicContent',
+  name: 'Example HealthTopicContent'
+}
+
+// Use semantic patterns
+await $.HealthTopicContent.create(item)
+const result = await $.HealthTopicContent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HealthTopicContent](https://schema.org/HealthTopicContent)
+- [HealthTopicContent Properties](https://schema.org/HealthTopicContent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

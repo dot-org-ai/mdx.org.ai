@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MoneyTransfer
+$context: https://schema.org
+$type: Class
+name: MoneyTransfer
+description: The act of transferring money from one place to another place. This may occur electronically or physically.
+subClassOf: ["TransferAction"]
+---
+
+# MoneyTransfer
+
+The act of transferring money from one place to another place. This may occur electronically or physically.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TransferAction](TransferAction.mdx) > **MoneyTransfer**
+
+
+
+## Properties
+
+See [Schema.org MoneyTransfer properties](https://schema.org/MoneyTransfer#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MoneyTransfer } from 'schema.org.ai'
+
+// Create a MoneyTransfer
+const item: MoneyTransfer = {
+  $type: 'MoneyTransfer',
+  name: 'Example MoneyTransfer'
+}
+
+// Use semantic patterns
+await $.MoneyTransfer.create(item)
+const result = await $.MoneyTransfer.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MoneyTransfer](https://schema.org/MoneyTransfer)
+- [MoneyTransfer Properties](https://schema.org/MoneyTransfer#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AssignAction
+$context: https://schema.org
+$type: Class
+name: AssignAction
+description: The act of allocating an action/event/task to some destination (someone or something).
+subClassOf: ["AllocateAction"]
+---
+
+# AssignAction
+
+The act of allocating an action/event/task to some destination (someone or something).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [OrganizeAction](OrganizeAction.mdx) > [AllocateAction](AllocateAction.mdx) > **AssignAction**
+
+
+
+## Properties
+
+See [Schema.org AssignAction properties](https://schema.org/AssignAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AssignAction } from 'schema.org.ai'
+
+// Create a AssignAction
+const item: AssignAction = {
+  $type: 'AssignAction',
+  name: 'Example AssignAction'
+}
+
+// Use semantic patterns
+await $.AssignAction.create(item)
+const result = await $.AssignAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AssignAction](https://schema.org/AssignAction)
+- [AssignAction Properties](https://schema.org/AssignAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

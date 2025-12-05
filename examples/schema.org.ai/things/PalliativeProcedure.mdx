@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PalliativeProcedure
+$context: https://schema.org
+$type: Class
+name: PalliativeProcedure
+description: A medical procedure intended primarily for palliative purposes, aimed at relieving the symptoms of an underlying health condition.
+subClassOf: ["MedicalTherapy","MedicalProcedure"]
+---
+
+# PalliativeProcedure
+
+A medical procedure intended primarily for palliative purposes, aimed at relieving the symptoms of an underlying health condition.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [MedicalEntity](MedicalEntity.mdx) > [MedicalProcedure](MedicalProcedure.mdx) > [TherapeuticProcedure](TherapeuticProcedure.mdx) > [MedicalTherapy](MedicalTherapy.mdx) > **PalliativeProcedure**
+
+
+
+## Properties
+
+See [Schema.org PalliativeProcedure properties](https://schema.org/PalliativeProcedure#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PalliativeProcedure } from 'schema.org.ai'
+
+// Create a PalliativeProcedure
+const item: PalliativeProcedure = {
+  $type: 'PalliativeProcedure',
+  name: 'Example PalliativeProcedure'
+}
+
+// Use semantic patterns
+await $.PalliativeProcedure.create(item)
+const result = await $.PalliativeProcedure.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PalliativeProcedure](https://schema.org/PalliativeProcedure)
+- [PalliativeProcedure Properties](https://schema.org/PalliativeProcedure#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

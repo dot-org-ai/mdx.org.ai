@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Dentist
+$context: https://schema.org
+$type: Class
+name: Dentist
+description: A dentist.
+subClassOf: ["MedicalBusiness","LocalBusiness","MedicalOrganization"]
+---
+
+# Dentist
+
+A dentist.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [MedicalBusiness](MedicalBusiness.mdx) > **Dentist**
+
+
+
+## Properties
+
+See [Schema.org Dentist properties](https://schema.org/Dentist#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Dentist } from 'schema.org.ai'
+
+// Create a Dentist
+const item: Dentist = {
+  $type: 'Dentist',
+  name: 'Example Dentist'
+}
+
+// Use semantic patterns
+await $.Dentist.create(item)
+const result = await $.Dentist.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Dentist](https://schema.org/Dentist)
+- [Dentist Properties](https://schema.org/Dentist#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

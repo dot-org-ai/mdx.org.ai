@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/NailSalon
+$context: https://schema.org
+$type: Class
+name: NailSalon
+description: A nail salon.
+subClassOf: ["HealthAndBeautyBusiness"]
+---
+
+# NailSalon
+
+A nail salon.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HealthAndBeautyBusiness](HealthAndBeautyBusiness.mdx) > **NailSalon**
+
+
+
+## Properties
+
+See [Schema.org NailSalon properties](https://schema.org/NailSalon#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { NailSalon } from 'schema.org.ai'
+
+// Create a NailSalon
+const item: NailSalon = {
+  $type: 'NailSalon',
+  name: 'Example NailSalon'
+}
+
+// Use semantic patterns
+await $.NailSalon.create(item)
+const result = await $.NailSalon.get('item-id')
+```
+
+## Resources
+
+- [Schema.org NailSalon](https://schema.org/NailSalon)
+- [NailSalon Properties](https://schema.org/NailSalon#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

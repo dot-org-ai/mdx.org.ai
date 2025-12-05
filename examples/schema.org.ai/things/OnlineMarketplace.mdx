@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OnlineMarketplace
+$context: https://schema.org
+$type: Class
+name: OnlineMarketplace
+description: An eCommerce marketplace.
+subClassOf: ["OnlineStore"]
+---
+
+# OnlineMarketplace
+
+An eCommerce marketplace.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > [OnlineBusiness](OnlineBusiness.mdx) > [OnlineStore](OnlineStore.mdx) > **OnlineMarketplace**
+
+
+
+## Properties
+
+See [Schema.org OnlineMarketplace properties](https://schema.org/OnlineMarketplace#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OnlineMarketplace } from 'schema.org.ai'
+
+// Create a OnlineMarketplace
+const item: OnlineMarketplace = {
+  $type: 'OnlineMarketplace',
+  name: 'Example OnlineMarketplace'
+}
+
+// Use semantic patterns
+await $.OnlineMarketplace.create(item)
+const result = await $.OnlineMarketplace.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OnlineMarketplace](https://schema.org/OnlineMarketplace)
+- [OnlineMarketplace Properties](https://schema.org/OnlineMarketplace#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/School
+$context: https://schema.org
+$type: Class
+name: School
+description: A school.
+subClassOf: ["EducationalOrganization"]
+---
+
+# School
+
+A school.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [EducationalOrganization](EducationalOrganization.mdx) > **School**
+
+
+
+## Properties
+
+See [Schema.org School properties](https://schema.org/School#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { School } from 'schema.org.ai'
+
+// Create a School
+const item: School = {
+  $type: 'School',
+  name: 'Example School'
+}
+
+// Use semantic patterns
+await $.School.create(item)
+const result = await $.School.get('item-id')
+```
+
+## Resources
+
+- [Schema.org School](https://schema.org/School)
+- [School Properties](https://schema.org/School#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DonateAction
+$context: https://schema.org
+$type: Class
+name: DonateAction
+description: The act of providing goods, services, or money without compensation, often for philanthropic reasons.
+subClassOf: ["TransferAction"]
+---
+
+# DonateAction
+
+The act of providing goods, services, or money without compensation, often for philanthropic reasons.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [TransferAction](TransferAction.mdx) > **DonateAction**
+
+
+
+## Properties
+
+See [Schema.org DonateAction properties](https://schema.org/DonateAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DonateAction } from 'schema.org.ai'
+
+// Create a DonateAction
+const item: DonateAction = {
+  $type: 'DonateAction',
+  name: 'Example DonateAction'
+}
+
+// Use semantic patterns
+await $.DonateAction.create(item)
+const result = await $.DonateAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DonateAction](https://schema.org/DonateAction)
+- [DonateAction Properties](https://schema.org/DonateAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

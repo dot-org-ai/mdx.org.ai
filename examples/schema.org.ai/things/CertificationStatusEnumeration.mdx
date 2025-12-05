@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CertificationStatusEnumeration
+$context: https://schema.org
+$type: Class
+name: CertificationStatusEnumeration
+description: Enumerates the different statuses of a Certification (Active and Inactive).
+subClassOf: ["Enumeration"]
+---
+
+# CertificationStatusEnumeration
+
+Enumerates the different statuses of a Certification (Active and Inactive).
+
+## Type Hierarchy
+
+**CertificationStatusEnumeration**
+
+
+
+## Properties
+
+See [Schema.org CertificationStatusEnumeration properties](https://schema.org/CertificationStatusEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CertificationStatusEnumeration } from 'schema.org.ai'
+
+// Create a CertificationStatusEnumeration
+const item: CertificationStatusEnumeration = {
+  $type: 'CertificationStatusEnumeration',
+  name: 'Example CertificationStatusEnumeration'
+}
+
+// Use semantic patterns
+await $.CertificationStatusEnumeration.create(item)
+const result = await $.CertificationStatusEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CertificationStatusEnumeration](https://schema.org/CertificationStatusEnumeration)
+- [CertificationStatusEnumeration Properties](https://schema.org/CertificationStatusEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,51 @@
+---
+$id: https://schema.org.ai/InsertAction
+$context: https://schema.org
+$type: Class
+name: InsertAction
+description: The act of adding at a specific location in an ordered collection.
+subClassOf: ["AddAction"]
+---
+
+# InsertAction
+
+The act of adding at a specific location in an ordered collection.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [UpdateAction](UpdateAction.mdx) > [AddAction](AddAction.mdx) > **InsertAction**
+
+## Direct Subclasses
+
+- **[AppendAction](AppendAction.mdx)**: The act of inserting at the end if an ordered collection
+- **[PrependAction](PrependAction.mdx)**: The act of inserting at the beginning if an ordered collection
+
+## Properties
+
+See [Schema.org InsertAction properties](https://schema.org/InsertAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { InsertAction } from 'schema.org.ai'
+
+// Create a InsertAction
+const item: InsertAction = {
+  $type: 'InsertAction',
+  name: 'Example InsertAction'
+}
+
+// Use semantic patterns
+await $.InsertAction.create(item)
+const result = await $.InsertAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org InsertAction](https://schema.org/InsertAction)
+- [InsertAction Properties](https://schema.org/InsertAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MedicalStudyStatus
+$context: https://schema.org
+$type: Class
+name: MedicalStudyStatus
+description: The status of a medical study. Enumerated type.
+subClassOf: ["MedicalEnumeration"]
+---
+
+# MedicalStudyStatus
+
+The status of a medical study. Enumerated type.
+
+## Type Hierarchy
+
+**MedicalStudyStatus**
+
+
+
+## Properties
+
+See [Schema.org MedicalStudyStatus properties](https://schema.org/MedicalStudyStatus#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalStudyStatus } from 'schema.org.ai'
+
+// Create a MedicalStudyStatus
+const item: MedicalStudyStatus = {
+  $type: 'MedicalStudyStatus',
+  name: 'Example MedicalStudyStatus'
+}
+
+// Use semantic patterns
+await $.MedicalStudyStatus.create(item)
+const result = await $.MedicalStudyStatus.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalStudyStatus](https://schema.org/MedicalStudyStatus)
+- [MedicalStudyStatus Properties](https://schema.org/MedicalStudyStatus#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

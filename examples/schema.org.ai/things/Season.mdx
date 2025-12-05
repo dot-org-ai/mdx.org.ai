@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Season
+$context: https://schema.org
+$type: Class
+name: Season
+description: A media season, e.g. TV, radio, video game etc.
+subClassOf: ["CreativeWork"]
+---
+
+# Season
+
+A media season, e.g. TV, radio, video game etc.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Season**
+
+
+
+## Properties
+
+See [Schema.org Season properties](https://schema.org/Season#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Season } from 'schema.org.ai'
+
+// Create a Season
+const item: Season = {
+  $type: 'Season',
+  name: 'Example Season'
+}
+
+// Use semantic patterns
+await $.Season.create(item)
+const result = await $.Season.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Season](https://schema.org/Season)
+- [Season Properties](https://schema.org/Season#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

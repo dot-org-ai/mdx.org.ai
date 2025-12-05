@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AgreeAction
+$context: https://schema.org
+$type: Class
+name: AgreeAction
+description: The act of expressing a consistency of opinion with the object. An agent agrees to/about an object (a proposition, topic or theme) with participants.
+subClassOf: ["ReactAction"]
+---
+
+# AgreeAction
+
+The act of expressing a consistency of opinion with the object. An agent agrees to/about an object (a proposition, topic or theme) with participants.
+
+## Type Hierarchy
+
+**AgreeAction**
+
+
+
+## Properties
+
+See [Schema.org AgreeAction properties](https://schema.org/AgreeAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AgreeAction } from 'schema.org.ai'
+
+// Create a AgreeAction
+const item: AgreeAction = {
+  $type: 'AgreeAction',
+  name: 'Example AgreeAction'
+}
+
+// Use semantic patterns
+await $.AgreeAction.create(item)
+const result = await $.AgreeAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AgreeAction](https://schema.org/AgreeAction)
+- [AgreeAction Properties](https://schema.org/AgreeAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

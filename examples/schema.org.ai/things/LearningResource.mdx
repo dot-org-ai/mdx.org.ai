@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/LearningResource
+$context: https://schema.org
+$type: Class
+name: LearningResource
+description: The LearningResource type can be used to indicate [[CreativeWork]]s (whether physical or digital) that have a particular and explicit orientation towards learning, education, skill acquisition, and other educational purposes. [[LearningResource]] is expected to be used as an addition to a primary type such as [[Book]], [[VideoObject]], [[Product]] etc. [[EducationEvent]] serves a similar purpose for event-like things (e.g. a [[Trip]]). A [[LearningResource]] may be created as a result of an [[EducationEvent]], for example by recording one.
+subClassOf: ["CreativeWork"]
+---
+
+# LearningResource
+
+The LearningResource type can be used to indicate [[CreativeWork]]s (whether physical or digital) that have a particular and explicit orientation towards learning, education, skill acquisition, and other educational purposes. [[LearningResource]] is expected to be used as an addition to a primary type such as [[Book]], [[VideoObject]], [[Product]] etc. [[EducationEvent]] serves a similar purpose for event-like things (e.g. a [[Trip]]). A [[LearningResource]] may be created as a result of an [[EducationEvent]], for example by recording one.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **LearningResource**
+
+## Direct Subclasses
+
+- **[Course](Course.mdx)**: A description of an educational course which may be offered as distinct instances which take place at different times or take place at different locations, or be offered through different media or modes of study
+- **[Quiz](Quiz.mdx)**: Quiz: A test of knowledge, skills and abilities
+- **[Syllabus](Syllabus.mdx)**: A syllabus that describes the material covered in a course, often with several such sections per [[Course]] so that a distinct [[timeRequired]] can be provided for that section of the [[Course]]
+
+## Properties
+
+See [Schema.org LearningResource properties](https://schema.org/LearningResource#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { LearningResource } from 'schema.org.ai'
+
+// Create a LearningResource
+const item: LearningResource = {
+  $type: 'LearningResource',
+  name: 'Example LearningResource'
+}
+
+// Use semantic patterns
+await $.LearningResource.create(item)
+const result = await $.LearningResource.get('item-id')
+```
+
+## Resources
+
+- [Schema.org LearningResource](https://schema.org/LearningResource)
+- [LearningResource Properties](https://schema.org/LearningResource#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

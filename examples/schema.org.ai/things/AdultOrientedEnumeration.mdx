@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AdultOrientedEnumeration
+$context: https://schema.org
+$type: Class
+name: AdultOrientedEnumeration
+description: Enumeration of considerations that make a product relevant or potentially restricted for adults only.
+subClassOf: ["Enumeration"]
+---
+
+# AdultOrientedEnumeration
+
+Enumeration of considerations that make a product relevant or potentially restricted for adults only.
+
+## Type Hierarchy
+
+**AdultOrientedEnumeration**
+
+
+
+## Properties
+
+See [Schema.org AdultOrientedEnumeration properties](https://schema.org/AdultOrientedEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AdultOrientedEnumeration } from 'schema.org.ai'
+
+// Create a AdultOrientedEnumeration
+const item: AdultOrientedEnumeration = {
+  $type: 'AdultOrientedEnumeration',
+  name: 'Example AdultOrientedEnumeration'
+}
+
+// Use semantic patterns
+await $.AdultOrientedEnumeration.create(item)
+const result = await $.AdultOrientedEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AdultOrientedEnumeration](https://schema.org/AdultOrientedEnumeration)
+- [AdultOrientedEnumeration Properties](https://schema.org/AdultOrientedEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

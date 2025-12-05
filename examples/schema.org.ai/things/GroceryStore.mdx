@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/GroceryStore
+$context: https://schema.org
+$type: Class
+name: GroceryStore
+description: A grocery store.
+subClassOf: ["Store"]
+---
+
+# GroceryStore
+
+A grocery store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **GroceryStore**
+
+
+
+## Properties
+
+See [Schema.org GroceryStore properties](https://schema.org/GroceryStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { GroceryStore } from 'schema.org.ai'
+
+// Create a GroceryStore
+const item: GroceryStore = {
+  $type: 'GroceryStore',
+  name: 'Example GroceryStore'
+}
+
+// Use semantic patterns
+await $.GroceryStore.create(item)
+const result = await $.GroceryStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org GroceryStore](https://schema.org/GroceryStore)
+- [GroceryStore Properties](https://schema.org/GroceryStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

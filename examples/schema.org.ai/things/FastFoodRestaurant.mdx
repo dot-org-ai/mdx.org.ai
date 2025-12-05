@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/FastFoodRestaurant
+$context: https://schema.org
+$type: Class
+name: FastFoodRestaurant
+description: A fast-food restaurant.
+subClassOf: ["FoodEstablishment"]
+---
+
+# FastFoodRestaurant
+
+A fast-food restaurant.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [FoodEstablishment](FoodEstablishment.mdx) > **FastFoodRestaurant**
+
+
+
+## Properties
+
+See [Schema.org FastFoodRestaurant properties](https://schema.org/FastFoodRestaurant#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { FastFoodRestaurant } from 'schema.org.ai'
+
+// Create a FastFoodRestaurant
+const item: FastFoodRestaurant = {
+  $type: 'FastFoodRestaurant',
+  name: 'Example FastFoodRestaurant'
+}
+
+// Use semantic patterns
+await $.FastFoodRestaurant.create(item)
+const result = await $.FastFoodRestaurant.get('item-id')
+```
+
+## Resources
+
+- [Schema.org FastFoodRestaurant](https://schema.org/FastFoodRestaurant)
+- [FastFoodRestaurant Properties](https://schema.org/FastFoodRestaurant#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

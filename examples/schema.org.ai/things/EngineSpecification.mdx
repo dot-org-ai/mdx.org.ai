@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EngineSpecification
+$context: https://schema.org
+$type: Class
+name: EngineSpecification
+description: Information about the engine of the vehicle. A vehicle can have multiple engines represented by multiple engine specification entities.
+subClassOf: ["StructuredValue"]
+---
+
+# EngineSpecification
+
+Information about the engine of the vehicle. A vehicle can have multiple engines represented by multiple engine specification entities.
+
+## Type Hierarchy
+
+**EngineSpecification**
+
+
+
+## Properties
+
+See [Schema.org EngineSpecification properties](https://schema.org/EngineSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EngineSpecification } from 'schema.org.ai'
+
+// Create a EngineSpecification
+const item: EngineSpecification = {
+  $type: 'EngineSpecification',
+  name: 'Example EngineSpecification'
+}
+
+// Use semantic patterns
+await $.EngineSpecification.create(item)
+const result = await $.EngineSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EngineSpecification](https://schema.org/EngineSpecification)
+- [EngineSpecification Properties](https://schema.org/EngineSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

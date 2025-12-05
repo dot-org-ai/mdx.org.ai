@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ComedyClub
+$context: https://schema.org
+$type: Class
+name: ComedyClub
+description: A comedy club.
+subClassOf: ["EntertainmentBusiness"]
+---
+
+# ComedyClub
+
+A comedy club.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [EntertainmentBusiness](EntertainmentBusiness.mdx) > **ComedyClub**
+
+
+
+## Properties
+
+See [Schema.org ComedyClub properties](https://schema.org/ComedyClub#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ComedyClub } from 'schema.org.ai'
+
+// Create a ComedyClub
+const item: ComedyClub = {
+  $type: 'ComedyClub',
+  name: 'Example ComedyClub'
+}
+
+// Use semantic patterns
+await $.ComedyClub.create(item)
+const result = await $.ComedyClub.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ComedyClub](https://schema.org/ComedyClub)
+- [ComedyClub Properties](https://schema.org/ComedyClub#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

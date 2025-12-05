@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/WearableSizeSystemEnumeration
+$context: https://schema.org
+$type: Class
+name: WearableSizeSystemEnumeration
+description: Enumerates common size systems specific for wearable products.
+subClassOf: ["SizeSystemEnumeration"]
+---
+
+# WearableSizeSystemEnumeration
+
+Enumerates common size systems specific for wearable products.
+
+## Type Hierarchy
+
+**WearableSizeSystemEnumeration**
+
+
+
+## Properties
+
+See [Schema.org WearableSizeSystemEnumeration properties](https://schema.org/WearableSizeSystemEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { WearableSizeSystemEnumeration } from 'schema.org.ai'
+
+// Create a WearableSizeSystemEnumeration
+const item: WearableSizeSystemEnumeration = {
+  $type: 'WearableSizeSystemEnumeration',
+  name: 'Example WearableSizeSystemEnumeration'
+}
+
+// Use semantic patterns
+await $.WearableSizeSystemEnumeration.create(item)
+const result = await $.WearableSizeSystemEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org WearableSizeSystemEnumeration](https://schema.org/WearableSizeSystemEnumeration)
+- [WearableSizeSystemEnumeration Properties](https://schema.org/WearableSizeSystemEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

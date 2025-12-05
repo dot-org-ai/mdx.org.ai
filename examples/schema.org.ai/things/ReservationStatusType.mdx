@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ReservationStatusType
+$context: https://schema.org
+$type: Class
+name: ReservationStatusType
+description: Enumerated status values for Reservation.
+subClassOf: ["StatusEnumeration"]
+---
+
+# ReservationStatusType
+
+Enumerated status values for Reservation.
+
+## Type Hierarchy
+
+**ReservationStatusType**
+
+
+
+## Properties
+
+See [Schema.org ReservationStatusType properties](https://schema.org/ReservationStatusType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReservationStatusType } from 'schema.org.ai'
+
+// Create a ReservationStatusType
+const item: ReservationStatusType = {
+  $type: 'ReservationStatusType',
+  name: 'Example ReservationStatusType'
+}
+
+// Use semantic patterns
+await $.ReservationStatusType.create(item)
+const result = await $.ReservationStatusType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReservationStatusType](https://schema.org/ReservationStatusType)
+- [ReservationStatusType Properties](https://schema.org/ReservationStatusType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

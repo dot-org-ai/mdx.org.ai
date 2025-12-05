@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ParentAudience
+$context: https://schema.org
+$type: Class
+name: ParentAudience
+description: A set of characteristics describing parents, who can be interested in viewing some content.
+subClassOf: ["PeopleAudience"]
+---
+
+# ParentAudience
+
+A set of characteristics describing parents, who can be interested in viewing some content.
+
+## Type Hierarchy
+
+**ParentAudience**
+
+
+
+## Properties
+
+See [Schema.org ParentAudience properties](https://schema.org/ParentAudience#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ParentAudience } from 'schema.org.ai'
+
+// Create a ParentAudience
+const item: ParentAudience = {
+  $type: 'ParentAudience',
+  name: 'Example ParentAudience'
+}
+
+// Use semantic patterns
+await $.ParentAudience.create(item)
+const result = await $.ParentAudience.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ParentAudience](https://schema.org/ParentAudience)
+- [ParentAudience Properties](https://schema.org/ParentAudience#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

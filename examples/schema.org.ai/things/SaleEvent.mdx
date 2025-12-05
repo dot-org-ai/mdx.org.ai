@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/SaleEvent
+$context: https://schema.org
+$type: Class
+name: SaleEvent
+description: Event type: Sales event.
+subClassOf: ["Event"]
+---
+
+# SaleEvent
+
+Event type: Sales event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **SaleEvent**
+
+
+
+## Properties
+
+See [Schema.org SaleEvent properties](https://schema.org/SaleEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { SaleEvent } from 'schema.org.ai'
+
+// Create a SaleEvent
+const item: SaleEvent = {
+  $type: 'SaleEvent',
+  name: 'Example SaleEvent'
+}
+
+// Use semantic patterns
+await $.SaleEvent.create(item)
+const result = await $.SaleEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org SaleEvent](https://schema.org/SaleEvent)
+- [SaleEvent Properties](https://schema.org/SaleEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

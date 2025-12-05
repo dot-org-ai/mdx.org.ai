@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/DefinedTerm
+$context: https://schema.org
+$type: Class
+name: DefinedTerm
+description: A word, name, acronym, phrase, etc. with a formal definition. Often used in the context of category or subject classification, glossaries or dictionaries, product or creative work types, etc. Use the name property for the term being defined, use termCode if the term has an alpha-numeric code allocated, use description to provide the definition of the term.
+subClassOf: ["Intangible"]
+---
+
+# DefinedTerm
+
+A word, name, acronym, phrase, etc. with a formal definition. Often used in the context of category or subject classification, glossaries or dictionaries, product or creative work types, etc. Use the name property for the term being defined, use termCode if the term has an alpha-numeric code allocated, use description to provide the definition of the term.
+
+## Type Hierarchy
+
+**DefinedTerm**
+
+## Direct Subclasses
+
+- **[CategoryCode](CategoryCode.mdx)**: A Category Code
+
+## Properties
+
+See [Schema.org DefinedTerm properties](https://schema.org/DefinedTerm#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DefinedTerm } from 'schema.org.ai'
+
+// Create a DefinedTerm
+const item: DefinedTerm = {
+  $type: 'DefinedTerm',
+  name: 'Example DefinedTerm'
+}
+
+// Use semantic patterns
+await $.DefinedTerm.create(item)
+const result = await $.DefinedTerm.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DefinedTerm](https://schema.org/DefinedTerm)
+- [DefinedTerm Properties](https://schema.org/DefinedTerm#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

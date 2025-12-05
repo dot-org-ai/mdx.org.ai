@@ -1,0 +1,323 @@
+---
+$id: https://schema.org.ai/Process
+$context: https://schema.org.ai
+$type: Class
+name: Process
+description: A business process representing a structured sequence of activities that accomplish a specific organizational objective.
+subClassOf:
+  - https://schema.org/Thing
+digital: 0.5
+---
+
+[Thing](Thing.mdx)
+
+# Process
+
+A business process representing a structured sequence of activities that accomplish a specific organizational objective. Processes can range from high-level strategic processes to detailed operational procedures and form the foundation of process.org.ai ontology.
+
+## Properties
+
+| Property | Type | Description | Inherited From |
+|----------|------|-------------|----------------|
+| `$type` | Text | Always "Process" | - |
+| `$id` | URL | Unique identifier for the process | Thing |
+| `name` | Text | The name of the process | Thing |
+| `description` | Text | Description of what the process accomplishes | Thing |
+| `identifier` | Text or PropertyValue | Process identifier (e.g., APQC code) | Thing |
+| `url` | URL | URL to process documentation | Thing |
+| `digital` | Number (0.0-1.0) | Digital maturity score | Thing |
+| `category` | Text | Process category (e.g., "Develop Vision and Strategy") | Process |
+| `processGroup` | Process | Parent process group | Process |
+| `subprocess` | Process[] | Child processes or activities | Process |
+| `task` | Task[] | Specific tasks within the process | Process |
+| `input` | Thing[] | Required inputs | Process |
+| `output` | Thing[] | Expected outputs | Process |
+| `owner` | Person or Organization | Process owner | Process |
+| `performer` | Occupation or Agent | Who performs the process | Process |
+| `tool` | Tool[] | Tools used in the process | Process |
+| `duration` | Duration | Typical process duration | Process |
+| `frequency` | Text | How often the process runs | Process |
+| `level` | Number | Process hierarchy level (1-5) | Process |
+| `apqcCode` | Text | APQC PCF code if applicable | Process |
+| `creator` | Person or Organization | The entity that defined the process | Thing |
+
+## Types
+
+The following types extend Process:
+
+- **OperatingProcess**: Core operating processes
+- **ManagementProcess**: Management and support processes
+- **StrategicProcess**: Strategic planning processes
+- **BusinessProcess**: End-to-end business processes
+- **WorkflowProcess**: Automated workflow processes
+
+## Examples
+
+### Example 1: Develop Vision and Strategy (APQC Process)
+
+```typescript
+import { $ } from 'sdk.do'
+
+const visionStrategy = {
+  $type: 'Process',
+  $id: 'https://process.org.ai/develop.Vision.and.Strategy',
+  name: 'Develop Vision and Strategy',
+  description: 'Define business concept and long-term vision, develop business strategy, and manage strategic initiatives',
+  digital: 0.6,
+  identifier: '1.0',
+  apqcCode: '10.0.0',
+  category: 'Operating Processes',
+  level: 1,
+  subprocess: [
+    {
+      $type: 'Process',
+      $id: 'https://process.org.ai/define.Business.Concept.and.Long-term.Vision',
+      name: 'Define business concept and long-term vision',
+      apqcCode: '10.1.0',
+      level: 2
+    },
+    {
+      $type: 'Process',
+      $id: 'https://process.org.ai/develop.Business.Strategy',
+      name: 'Develop business strategy',
+      apqcCode: '10.2.0',
+      level: 2
+    },
+    {
+      $type: 'Process',
+      $id: 'https://process.org.ai/manage.Strategic.Initiatives',
+      name: 'Manage strategic initiatives',
+      apqcCode: '10.3.0',
+      level: 2
+    }
+  ],
+  owner: {
+    $type: 'Occupation',
+    name: 'Chief Executive Officer'
+  },
+  performer: [
+    {
+      $type: 'Occupation',
+      name: 'Chief Strategy Officer'
+    },
+    {
+      $type: 'Occupation',
+      name: 'Strategic Planning Manager'
+    }
+  ],
+  frequency: 'annually',
+  duration: 'P3M',
+  tool: [
+    {
+      $type: 'Tool',
+      name: 'Strategic Planning Software'
+    }
+  ]
+}
+
+await $.Process.create(visionStrategy)
+```
+
+### Example 2: Automated PR Review Process
+
+```typescript
+import { $ } from 'sdk.do'
+
+const prReviewProcess = {
+  $type: 'Process',
+  $id: 'https://process.org.ai/review.Pull.Request',
+  name: 'Review Pull Request',
+  description: 'Automated process for reviewing code changes, running tests, and providing feedback',
+  digital: 1.0,
+  category: 'Development Processes',
+  level: 3,
+  input: [
+    {
+      $type: 'Thing',
+      name: 'Pull Request',
+      description: 'GitHub pull request with code changes'
+    }
+  ],
+  output: [
+    {
+      $type: 'Thing',
+      name: 'Code Review',
+      description: 'Review comments and approval/rejection'
+    },
+    {
+      $type: 'Thing',
+      name: 'Test Results',
+      description: 'Automated test execution results'
+    }
+  ],
+  task: [
+    {
+      $type: 'Task',
+      name: 'Fetch PR diff',
+      description: 'Retrieve code changes from GitHub'
+    },
+    {
+      $type: 'Task',
+      name: 'Run linting',
+      description: 'Execute code linting and formatting checks'
+    },
+    {
+      $type: 'Task',
+      name: 'Execute tests',
+      description: 'Run automated test suite'
+    },
+    {
+      $type: 'Task',
+      name: 'AI code review',
+      description: 'Generate AI-powered code review feedback'
+    },
+    {
+      $type: 'Task',
+      name: 'Post review comment',
+      description: 'Add review feedback to pull request'
+    }
+  ],
+  performer: {
+    $type: 'Agent',
+    $id: 'https://Cody.do',
+    name: 'Cody'
+  },
+  tool: [
+    {
+      $type: 'Tool',
+      name: 'GitHub API',
+      url: 'https://api.github.com'
+    },
+    {
+      $type: 'Tool',
+      name: 'ESLint'
+    },
+    {
+      $type: 'Tool',
+      name: 'Vitest'
+    }
+  ],
+  duration: 'PT5M',
+  frequency: 'on-demand'
+}
+
+await $.Process.create(prReviewProcess)
+```
+
+### Example 3: Customer Onboarding Process
+
+```typescript
+import { $ } from 'sdk.do'
+
+const onboardingProcess = {
+  $type: 'Process',
+  $id: 'https://process.org.ai/onboard.Customer',
+  name: 'Onboard Customer',
+  description: 'Welcome new customers, set up their accounts, and ensure successful activation',
+  digital: 0.9,
+  category: 'Customer Management',
+  level: 2,
+  input: [
+    {
+      $type: 'Thing',
+      name: 'New Customer Registration',
+      description: 'Customer signup information'
+    }
+  ],
+  output: [
+    {
+      $type: 'Thing',
+      name: 'Activated Customer',
+      description: 'Customer with configured workspace and completed onboarding'
+    }
+  ],
+  task: [
+    {
+      $type: 'Task',
+      name: 'Create workspace',
+      description: 'Provision customer workspace and resources'
+    },
+    {
+      $type: 'Task',
+      name: 'Send welcome email',
+      description: 'Send personalized welcome message'
+    },
+    {
+      $type: 'Task',
+      name: 'Schedule kickoff call',
+      description: 'Book onboarding call with customer success'
+    },
+    {
+      $type: 'Task',
+      name: 'Set up starter projects',
+      description: 'Create example projects'
+    },
+    {
+      $type: 'Task',
+      name: 'Track activation',
+      description: 'Monitor customer engagement'
+    }
+  ],
+  performer: [
+    {
+      $type: 'Occupation',
+      name: 'Customer Success Manager'
+    },
+    {
+      $type: 'Agent',
+      name: 'Onboarding Agent'
+    }
+  ],
+  owner: {
+    $type: 'Occupation',
+    name: 'VP of Customer Success'
+  },
+  duration: 'P7D',
+  frequency: 'per-customer'
+}
+
+await $.Process.create(onboardingProcess)
+```
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Process, Task, Agent } from 'schema.org.ai'
+
+// Create a process
+const process: Process = {
+  $type: 'Process',
+  $id: 'https://myorg.do/processes/my-process',
+  name: 'My Business Process',
+  description: 'A process that creates value',
+  digital: 0.7
+}
+
+await $.Process.create(process)
+
+// Query processes by category
+const strategicProcesses = await $.Process.find({
+  category: 'Strategic Planning'
+})
+
+// Find highly digital processes
+const digitalProcesses = await $.Process.find({
+  digital: { $gte: 0.8 }
+})
+
+// Get process hierarchy
+const processWithChildren = await $.Process.get('process-id', {
+  populate: ['subprocess', 'task']
+})
+```
+
+## Resources
+
+- [Schema.org Thing](https://schema.org/Thing)
+- [APQC Process Classification Framework](https://process.org.ai)
+- [Business Process Management](https://docs.platform.do/processes)
+
+## License
+
+This is an extension to Schema.org vocabulary created by the .do Platform Team. The base Schema.org vocabulary is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

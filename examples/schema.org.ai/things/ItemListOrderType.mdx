@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ItemListOrderType
+$context: https://schema.org
+$type: Class
+name: ItemListOrderType
+description: Enumerated for values for itemListOrder for indicating how an ordered ItemList is organized.
+subClassOf: ["Enumeration"]
+---
+
+# ItemListOrderType
+
+Enumerated for values for itemListOrder for indicating how an ordered ItemList is organized.
+
+## Type Hierarchy
+
+**ItemListOrderType**
+
+
+
+## Properties
+
+See [Schema.org ItemListOrderType properties](https://schema.org/ItemListOrderType#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ItemListOrderType } from 'schema.org.ai'
+
+// Create a ItemListOrderType
+const item: ItemListOrderType = {
+  $type: 'ItemListOrderType',
+  name: 'Example ItemListOrderType'
+}
+
+// Use semantic patterns
+await $.ItemListOrderType.create(item)
+const result = await $.ItemListOrderType.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ItemListOrderType](https://schema.org/ItemListOrderType)
+- [ItemListOrderType Properties](https://schema.org/ItemListOrderType#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

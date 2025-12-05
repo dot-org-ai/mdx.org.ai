@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MerchantReturnPolicy
+$context: https://schema.org
+$type: Class
+name: MerchantReturnPolicy
+description: A MerchantReturnPolicy provides information about product return policies associated with an [[Organization]], [[Product]], or [[Offer]].
+subClassOf: ["Intangible"]
+---
+
+# MerchantReturnPolicy
+
+A MerchantReturnPolicy provides information about product return policies associated with an [[Organization]], [[Product]], or [[Offer]].
+
+## Type Hierarchy
+
+**MerchantReturnPolicy**
+
+
+
+## Properties
+
+See [Schema.org MerchantReturnPolicy properties](https://schema.org/MerchantReturnPolicy#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MerchantReturnPolicy } from 'schema.org.ai'
+
+// Create a MerchantReturnPolicy
+const item: MerchantReturnPolicy = {
+  $type: 'MerchantReturnPolicy',
+  name: 'Example MerchantReturnPolicy'
+}
+
+// Use semantic patterns
+await $.MerchantReturnPolicy.create(item)
+const result = await $.MerchantReturnPolicy.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MerchantReturnPolicy](https://schema.org/MerchantReturnPolicy)
+- [MerchantReturnPolicy Properties](https://schema.org/MerchantReturnPolicy#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

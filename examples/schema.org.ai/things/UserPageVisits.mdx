@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/UserPageVisits
+$context: https://schema.org
+$type: Class
+name: UserPageVisits
+description: UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+subClassOf: ["UserInteraction"]
+---
+
+# UserPageVisits
+
+UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use [[Action]]-based vocabulary, alongside types such as [[Comment]].
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [UserInteraction](UserInteraction.mdx) > **UserPageVisits**
+
+
+
+## Properties
+
+See [Schema.org UserPageVisits properties](https://schema.org/UserPageVisits#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UserPageVisits } from 'schema.org.ai'
+
+// Create a UserPageVisits
+const item: UserPageVisits = {
+  $type: 'UserPageVisits',
+  name: 'Example UserPageVisits'
+}
+
+// Use semantic patterns
+await $.UserPageVisits.create(item)
+const result = await $.UserPageVisits.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UserPageVisits](https://schema.org/UserPageVisits)
+- [UserPageVisits Properties](https://schema.org/UserPageVisits#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/ListItem
+$context: https://schema.org
+$type: Class
+name: ListItem
+description: An list item, e.g. a step in a checklist or how-to description.
+subClassOf: ["Intangible"]
+---
+
+# ListItem
+
+An list item, e.g. a step in a checklist or how-to description.
+
+## Type Hierarchy
+
+**ListItem**
+
+## Direct Subclasses
+
+- **[HowToDirection](HowToDirection.mdx)**: A direction indicating a single action to do in the instructions for how to achieve a result
+- **[HowToItem](HowToItem.mdx)**: An item used as either a tool or supply when performing the instructions for how to achieve a result
+- **[HowToSection](HowToSection.mdx)**: A sub-grouping of steps in the instructions for how to achieve a result (e
+- **[HowToStep](HowToStep.mdx)**: A step in the instructions for how to achieve a result
+
+## Properties
+
+See [Schema.org ListItem properties](https://schema.org/ListItem#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ListItem } from 'schema.org.ai'
+
+// Create a ListItem
+const item: ListItem = {
+  $type: 'ListItem',
+  name: 'Example ListItem'
+}
+
+// Use semantic patterns
+await $.ListItem.create(item)
+const result = await $.ListItem.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ListItem](https://schema.org/ListItem)
+- [ListItem Properties](https://schema.org/ListItem#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

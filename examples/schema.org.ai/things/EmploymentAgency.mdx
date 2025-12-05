@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/EmploymentAgency
+$context: https://schema.org
+$type: Class
+name: EmploymentAgency
+description: An employment agency.
+subClassOf: ["LocalBusiness"]
+---
+
+# EmploymentAgency
+
+An employment agency.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **EmploymentAgency**
+
+
+
+## Properties
+
+See [Schema.org EmploymentAgency properties](https://schema.org/EmploymentAgency#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { EmploymentAgency } from 'schema.org.ai'
+
+// Create a EmploymentAgency
+const item: EmploymentAgency = {
+  $type: 'EmploymentAgency',
+  name: 'Example EmploymentAgency'
+}
+
+// Use semantic patterns
+await $.EmploymentAgency.create(item)
+const result = await $.EmploymentAgency.get('item-id')
+```
+
+## Resources
+
+- [Schema.org EmploymentAgency](https://schema.org/EmploymentAgency)
+- [EmploymentAgency Properties](https://schema.org/EmploymentAgency#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

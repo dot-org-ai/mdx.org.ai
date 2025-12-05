@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/CollegeOrUniversity
+$context: https://schema.org
+$type: Class
+name: CollegeOrUniversity
+description: A college, university, or other third-level educational institution.
+subClassOf: ["EducationalOrganization"]
+---
+
+# CollegeOrUniversity
+
+A college, university, or other third-level educational institution.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [CivicStructure](CivicStructure.mdx) > [EducationalOrganization](EducationalOrganization.mdx) > **CollegeOrUniversity**
+
+
+
+## Properties
+
+See [Schema.org CollegeOrUniversity properties](https://schema.org/CollegeOrUniversity#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { CollegeOrUniversity } from 'schema.org.ai'
+
+// Create a CollegeOrUniversity
+const item: CollegeOrUniversity = {
+  $type: 'CollegeOrUniversity',
+  name: 'Example CollegeOrUniversity'
+}
+
+// Use semantic patterns
+await $.CollegeOrUniversity.create(item)
+const result = await $.CollegeOrUniversity.get('item-id')
+```
+
+## Resources
+
+- [Schema.org CollegeOrUniversity](https://schema.org/CollegeOrUniversity)
+- [CollegeOrUniversity Properties](https://schema.org/CollegeOrUniversity#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BroadcastEvent
+$context: https://schema.org
+$type: Class
+name: BroadcastEvent
+description: An over the air or online broadcast event.
+subClassOf: ["PublicationEvent"]
+---
+
+# BroadcastEvent
+
+An over the air or online broadcast event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > [PublicationEvent](PublicationEvent.mdx) > **BroadcastEvent**
+
+
+
+## Properties
+
+See [Schema.org BroadcastEvent properties](https://schema.org/BroadcastEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BroadcastEvent } from 'schema.org.ai'
+
+// Create a BroadcastEvent
+const item: BroadcastEvent = {
+  $type: 'BroadcastEvent',
+  name: 'Example BroadcastEvent'
+}
+
+// Use semantic patterns
+await $.BroadcastEvent.create(item)
+const result = await $.BroadcastEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BroadcastEvent](https://schema.org/BroadcastEvent)
+- [BroadcastEvent Properties](https://schema.org/BroadcastEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DeliveryChargeSpecification
+$context: https://schema.org
+$type: Class
+name: DeliveryChargeSpecification
+description: The price for the delivery of an offer using a particular delivery method.
+subClassOf: ["PriceSpecification"]
+---
+
+# DeliveryChargeSpecification
+
+The price for the delivery of an offer using a particular delivery method.
+
+## Type Hierarchy
+
+**DeliveryChargeSpecification**
+
+
+
+## Properties
+
+See [Schema.org DeliveryChargeSpecification properties](https://schema.org/DeliveryChargeSpecification#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DeliveryChargeSpecification } from 'schema.org.ai'
+
+// Create a DeliveryChargeSpecification
+const item: DeliveryChargeSpecification = {
+  $type: 'DeliveryChargeSpecification',
+  name: 'Example DeliveryChargeSpecification'
+}
+
+// Use semantic patterns
+await $.DeliveryChargeSpecification.create(item)
+const result = await $.DeliveryChargeSpecification.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DeliveryChargeSpecification](https://schema.org/DeliveryChargeSpecification)
+- [DeliveryChargeSpecification Properties](https://schema.org/DeliveryChargeSpecification#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

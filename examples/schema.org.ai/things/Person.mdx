@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Person
+$context: https://schema.org
+$type: Class
+name: Person
+description: A person (alive, dead, undead, or fictional).
+subClassOf: ["Thing"]
+---
+
+# Person
+
+A person (alive, dead, undead, or fictional).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > **Person**
+
+## Direct Subclasses
+
+- **[Patient](Patient.mdx)**: A patient is any person recipient of health care services
+
+## Properties
+
+See [Schema.org Person properties](https://schema.org/Person#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Person } from 'schema.org.ai'
+
+// Create a Person
+const item: Person = {
+  $type: 'Person',
+  name: 'Example Person'
+}
+
+// Use semantic patterns
+await $.Person.create(item)
+const result = await $.Person.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Person](https://schema.org/Person)
+- [Person Properties](https://schema.org/Person#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

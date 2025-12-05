@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Duration
+$context: https://schema.org
+$type: Class
+name: Duration
+description: Quantity: Duration (use [ISO 8601 duration format](http://en.wikipedia.org/wiki/ISO_8601)).
+subClassOf: ["Quantity"]
+---
+
+# Duration
+
+Quantity: Duration (use [ISO 8601 duration format](http://en.wikipedia.org/wiki/ISO_8601)).
+
+## Type Hierarchy
+
+**Duration**
+
+
+
+## Properties
+
+See [Schema.org Duration properties](https://schema.org/Duration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Duration } from 'schema.org.ai'
+
+// Create a Duration
+const item: Duration = {
+  $type: 'Duration',
+  name: 'Example Duration'
+}
+
+// Use semantic patterns
+await $.Duration.create(item)
+const result = await $.Duration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Duration](https://schema.org/Duration)
+- [Duration Properties](https://schema.org/Duration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

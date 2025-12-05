@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PaymentService
+$context: https://schema.org
+$type: Class
+name: PaymentService
+description: A Service to transfer funds from a person or organization to a beneficiary person or organization.
+subClassOf: ["FinancialProduct","PaymentMethod"]
+---
+
+# PaymentService
+
+A Service to transfer funds from a person or organization to a beneficiary person or organization.
+
+## Type Hierarchy
+
+**PaymentService**
+
+
+
+## Properties
+
+See [Schema.org PaymentService properties](https://schema.org/PaymentService#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PaymentService } from 'schema.org.ai'
+
+// Create a PaymentService
+const item: PaymentService = {
+  $type: 'PaymentService',
+  name: 'Example PaymentService'
+}
+
+// Use semantic patterns
+await $.PaymentService.create(item)
+const result = await $.PaymentService.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PaymentService](https://schema.org/PaymentService)
+- [PaymentService Properties](https://schema.org/PaymentService#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/StadiumOrArena
+$context: https://schema.org
+$type: Class
+name: StadiumOrArena
+description: A stadium.
+subClassOf: ["CivicStructure","SportsActivityLocation"]
+---
+
+# StadiumOrArena
+
+A stadium.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [SportsActivityLocation](SportsActivityLocation.mdx) > **StadiumOrArena**
+
+
+
+## Properties
+
+See [Schema.org StadiumOrArena properties](https://schema.org/StadiumOrArena#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { StadiumOrArena } from 'schema.org.ai'
+
+// Create a StadiumOrArena
+const item: StadiumOrArena = {
+  $type: 'StadiumOrArena',
+  name: 'Example StadiumOrArena'
+}
+
+// Use semantic patterns
+await $.StadiumOrArena.create(item)
+const result = await $.StadiumOrArena.get('item-id')
+```
+
+## Resources
+
+- [Schema.org StadiumOrArena](https://schema.org/StadiumOrArena)
+- [StadiumOrArena Properties](https://schema.org/StadiumOrArena#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

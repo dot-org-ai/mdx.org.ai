@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Notary
+$context: https://schema.org
+$type: Class
+name: Notary
+description: A notary.
+subClassOf: ["LegalService"]
+---
+
+# Notary
+
+A notary.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [LegalService](LegalService.mdx) > **Notary**
+
+
+
+## Properties
+
+See [Schema.org Notary properties](https://schema.org/Notary#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Notary } from 'schema.org.ai'
+
+// Create a Notary
+const item: Notary = {
+  $type: 'Notary',
+  name: 'Example Notary'
+}
+
+// Use semantic patterns
+await $.Notary.create(item)
+const result = await $.Notary.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Notary](https://schema.org/Notary)
+- [Notary Properties](https://schema.org/Notary#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

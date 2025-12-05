@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Florist
+$context: https://schema.org
+$type: Class
+name: Florist
+description: A florist.
+subClassOf: ["Store"]
+---
+
+# Florist
+
+A florist.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **Florist**
+
+
+
+## Properties
+
+See [Schema.org Florist properties](https://schema.org/Florist#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Florist } from 'schema.org.ai'
+
+// Create a Florist
+const item: Florist = {
+  $type: 'Florist',
+  name: 'Example Florist'
+}
+
+// Use semantic patterns
+await $.Florist.create(item)
+const result = await $.Florist.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Florist](https://schema.org/Florist)
+- [Florist Properties](https://schema.org/Florist#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

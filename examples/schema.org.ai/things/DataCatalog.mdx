@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/DataCatalog
+$context: https://schema.org
+$type: Class
+name: DataCatalog
+description: A collection of datasets.
+subClassOf: ["CreativeWork"]
+---
+
+# DataCatalog
+
+A collection of datasets.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **DataCatalog**
+
+
+
+## Properties
+
+See [Schema.org DataCatalog properties](https://schema.org/DataCatalog#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DataCatalog } from 'schema.org.ai'
+
+// Create a DataCatalog
+const item: DataCatalog = {
+  $type: 'DataCatalog',
+  name: 'Example DataCatalog'
+}
+
+// Use semantic patterns
+await $.DataCatalog.create(item)
+const result = await $.DataCatalog.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DataCatalog](https://schema.org/DataCatalog)
+- [DataCatalog Properties](https://schema.org/DataCatalog#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

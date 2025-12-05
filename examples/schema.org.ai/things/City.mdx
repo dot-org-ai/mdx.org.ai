@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/City
+$context: https://schema.org
+$type: Class
+name: City
+description: A city or town.
+subClassOf: ["AdministrativeArea"]
+---
+
+# City
+
+A city or town.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [AdministrativeArea](AdministrativeArea.mdx) > **City**
+
+
+
+## Properties
+
+See [Schema.org City properties](https://schema.org/City#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { City } from 'schema.org.ai'
+
+// Create a City
+const item: City = {
+  $type: 'City',
+  name: 'Example City'
+}
+
+// Use semantic patterns
+await $.City.create(item)
+const result = await $.City.get('item-id')
+```
+
+## Resources
+
+- [Schema.org City](https://schema.org/City)
+- [City Properties](https://schema.org/City#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

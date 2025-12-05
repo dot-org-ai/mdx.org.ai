@@ -1,0 +1,58 @@
+---
+$id: https://schema.org.ai/Place
+$context: https://schema.org
+$type: Class
+name: Place
+description: Entities that have a somewhat fixed, physical extension.
+subClassOf: ["Thing"]
+---
+
+# Place
+
+Entities that have a somewhat fixed, physical extension.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > **Place**
+
+## Direct Subclasses
+
+- **[Accommodation](Accommodation.mdx)**: An accommodation is a place that can accommodate human beings, e
+- **[AdministrativeArea](AdministrativeArea.mdx)**: A geographical region, typically under the jurisdiction of a particular government
+- **[CivicStructure](CivicStructure.mdx)**: A public structure, such as a town hall or concert hall
+- **[Landform](Landform.mdx)**: A landform or physical feature
+- **[LandmarksOrHistoricalBuildings](LandmarksOrHistoricalBuildings.mdx)**: An historical landmark or building
+- **[LocalBusiness](LocalBusiness.mdx)**: A particular physical business or branch of an organization
+- **[Residence](Residence.mdx)**: The place where a person lives
+- **[TouristAttraction](TouristAttraction.mdx)**: A tourist attraction
+- **[TouristDestination](TouristDestination.mdx)**: A tourist destination
+
+## Properties
+
+See [Schema.org Place properties](https://schema.org/Place#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Place } from 'schema.org.ai'
+
+// Create a Place
+const item: Place = {
+  $type: 'Place',
+  name: 'Example Place'
+}
+
+// Use semantic patterns
+await $.Place.create(item)
+const result = await $.Place.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Place](https://schema.org/Place)
+- [Place Properties](https://schema.org/Place#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

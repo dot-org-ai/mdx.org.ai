@@ -1,0 +1,59 @@
+---
+$id: https://schema.org.ai/DeliveryMethod
+$context: https://schema.org
+$type: Class
+name: DeliveryMethod
+description: A delivery method is a standardized procedure for transferring the product or service to the destination of fulfillment chosen by the customer. Delivery methods are characterized by the means of transportation used, and by the organization or group that is the contracting party for the sending organization or person.\
+subClassOf: ["Enumeration"]
+---
+
+# DeliveryMethod
+
+A delivery method is a standardized procedure for transferring the product or service to the destination of fulfillment chosen by the customer. Delivery methods are characterized by the means of transportation used, and by the organization or group that is the contracting party for the sending organization or person.\
+\
+Commonly used values:\
+\
+* http://purl.org/goodrelations/v1#DeliveryModeDirectDownload\
+* http://purl.org/goodrelations/v1#DeliveryModeFreight\
+* http://purl.org/goodrelations/v1#DeliveryModeMail\
+* http://purl.org/goodrelations/v1#DeliveryModeOwnFleet\
+* http://purl.org/goodrelations/v1#DeliveryModePickUp\
+* http://purl.org/goodrelations/v1#DHL\
+* http://purl.org/goodrelations/v1#FederalExpress\
+* http://purl.org/goodrelations/v1#UPS
+
+## Type Hierarchy
+
+**DeliveryMethod**
+
+
+
+## Properties
+
+See [Schema.org DeliveryMethod properties](https://schema.org/DeliveryMethod#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { DeliveryMethod } from 'schema.org.ai'
+
+// Create a DeliveryMethod
+const item: DeliveryMethod = {
+  $type: 'DeliveryMethod',
+  name: 'Example DeliveryMethod'
+}
+
+// Use semantic patterns
+await $.DeliveryMethod.create(item)
+const result = await $.DeliveryMethod.get('item-id')
+```
+
+## Resources
+
+- [Schema.org DeliveryMethod](https://schema.org/DeliveryMethod)
+- [DeliveryMethod Properties](https://schema.org/DeliveryMethod#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

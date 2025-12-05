@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OrderStatus
+$context: https://schema.org
+$type: Class
+name: OrderStatus
+description: Enumerated status values for Order.
+subClassOf: ["StatusEnumeration"]
+---
+
+# OrderStatus
+
+Enumerated status values for Order.
+
+## Type Hierarchy
+
+**OrderStatus**
+
+
+
+## Properties
+
+See [Schema.org OrderStatus properties](https://schema.org/OrderStatus#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OrderStatus } from 'schema.org.ai'
+
+// Create a OrderStatus
+const item: OrderStatus = {
+  $type: 'OrderStatus',
+  name: 'Example OrderStatus'
+}
+
+// Use semantic patterns
+await $.OrderStatus.create(item)
+const result = await $.OrderStatus.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OrderStatus](https://schema.org/OrderStatus)
+- [OrderStatus Properties](https://schema.org/OrderStatus#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

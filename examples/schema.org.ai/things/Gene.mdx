@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Gene
+$context: https://schema.org
+$type: Class
+name: Gene
+description: A discrete unit of inheritance which affects one or more biological traits (Source: [https://en.wikipedia.org/wiki/Gene](https://en.wikipedia.org/wiki/Gene)). Examples include FOXP2 (Forkhead box protein P2), SCARNA21 (small Cajal body-specific RNA 21), A- (agouti genotype).
+subClassOf: ["BioChemEntity"]
+---
+
+# Gene
+
+A discrete unit of inheritance which affects one or more biological traits (Source: [https://en.wikipedia.org/wiki/Gene](https://en.wikipedia.org/wiki/Gene)). Examples include FOXP2 (Forkhead box protein P2), SCARNA21 (small Cajal body-specific RNA 21), A- (agouti genotype).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [BioChemEntity](BioChemEntity.mdx) > **Gene**
+
+
+
+## Properties
+
+See [Schema.org Gene properties](https://schema.org/Gene#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Gene } from 'schema.org.ai'
+
+// Create a Gene
+const item: Gene = {
+  $type: 'Gene',
+  name: 'Example Gene'
+}
+
+// Use semantic patterns
+await $.Gene.create(item)
+const result = await $.Gene.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Gene](https://schema.org/Gene)
+- [Gene Properties](https://schema.org/Gene#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

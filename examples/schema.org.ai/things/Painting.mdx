@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Painting
+$context: https://schema.org
+$type: Class
+name: Painting
+description: A painting.
+subClassOf: ["CreativeWork"]
+---
+
+# Painting
+
+A painting.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Painting**
+
+
+
+## Properties
+
+See [Schema.org Painting properties](https://schema.org/Painting#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Painting } from 'schema.org.ai'
+
+// Create a Painting
+const item: Painting = {
+  $type: 'Painting',
+  name: 'Example Painting'
+}
+
+// Use semantic patterns
+await $.Painting.create(item)
+const result = await $.Painting.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Painting](https://schema.org/Painting)
+- [Painting Properties](https://schema.org/Painting#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

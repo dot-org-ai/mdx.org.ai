@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/MedicalClinic
+$context: https://schema.org
+$type: Class
+name: MedicalClinic
+description: A facility, often associated with a hospital or medical school, that is devoted to the specific diagnosis and/or healthcare. Previously limited to outpatients but with evolution it may be open to inpatients as well.
+subClassOf: ["MedicalOrganization","MedicalBusiness"]
+---
+
+# MedicalClinic
+
+A facility, often associated with a hospital or medical school, that is devoted to the specific diagnosis and/or healthcare. Previously limited to outpatients but with evolution it may be open to inpatients as well.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [MedicalBusiness](MedicalBusiness.mdx) > **MedicalClinic**
+
+## Direct Subclasses
+
+- **[CovidTestingFacility](CovidTestingFacility.mdx)**: A CovidTestingFacility is a [[MedicalClinic]] where testing for the COVID-19 Coronavirus disease is available
+
+## Properties
+
+See [Schema.org MedicalClinic properties](https://schema.org/MedicalClinic#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MedicalClinic } from 'schema.org.ai'
+
+// Create a MedicalClinic
+const item: MedicalClinic = {
+  $type: 'MedicalClinic',
+  name: 'Example MedicalClinic'
+}
+
+// Use semantic patterns
+await $.MedicalClinic.create(item)
+const result = await $.MedicalClinic.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MedicalClinic](https://schema.org/MedicalClinic)
+- [MedicalClinic Properties](https://schema.org/MedicalClinic#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

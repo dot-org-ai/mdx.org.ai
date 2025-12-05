@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PerformAction
+$context: https://schema.org
+$type: Class
+name: PerformAction
+description: The act of participating in performance arts.
+subClassOf: ["PlayAction"]
+---
+
+# PerformAction
+
+The act of participating in performance arts.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [PlayAction](PlayAction.mdx) > **PerformAction**
+
+
+
+## Properties
+
+See [Schema.org PerformAction properties](https://schema.org/PerformAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PerformAction } from 'schema.org.ai'
+
+// Create a PerformAction
+const item: PerformAction = {
+  $type: 'PerformAction',
+  name: 'Example PerformAction'
+}
+
+// Use semantic patterns
+await $.PerformAction.create(item)
+const result = await $.PerformAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PerformAction](https://schema.org/PerformAction)
+- [PerformAction Properties](https://schema.org/PerformAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

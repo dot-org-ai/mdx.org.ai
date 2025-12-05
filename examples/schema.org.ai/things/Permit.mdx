@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/Permit
+$context: https://schema.org
+$type: Class
+name: Permit
+description: A permit issued by an organization, e.g. a parking pass.
+subClassOf: ["Intangible"]
+---
+
+# Permit
+
+A permit issued by an organization, e.g. a parking pass.
+
+## Type Hierarchy
+
+**Permit**
+
+## Direct Subclasses
+
+- **[GovernmentPermit](GovernmentPermit.mdx)**: A permit issued by a government agency
+
+## Properties
+
+See [Schema.org Permit properties](https://schema.org/Permit#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Permit } from 'schema.org.ai'
+
+// Create a Permit
+const item: Permit = {
+  $type: 'Permit',
+  name: 'Example Permit'
+}
+
+// Use semantic patterns
+await $.Permit.create(item)
+const result = await $.Permit.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Permit](https://schema.org/Permit)
+- [Permit Properties](https://schema.org/Permit#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

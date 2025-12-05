@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PostOffice
+$context: https://schema.org
+$type: Class
+name: PostOffice
+description: A post office.
+subClassOf: ["GovernmentOffice"]
+---
+
+# PostOffice
+
+A post office.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [GovernmentOffice](GovernmentOffice.mdx) > **PostOffice**
+
+
+
+## Properties
+
+See [Schema.org PostOffice properties](https://schema.org/PostOffice#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PostOffice } from 'schema.org.ai'
+
+// Create a PostOffice
+const item: PostOffice = {
+  $type: 'PostOffice',
+  name: 'Example PostOffice'
+}
+
+// Use semantic patterns
+await $.PostOffice.create(item)
+const result = await $.PostOffice.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PostOffice](https://schema.org/PostOffice)
+- [PostOffice Properties](https://schema.org/PostOffice#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

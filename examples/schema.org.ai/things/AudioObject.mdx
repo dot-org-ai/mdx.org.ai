@@ -1,0 +1,50 @@
+---
+$id: https://schema.org.ai/AudioObject
+$context: https://schema.org
+$type: Class
+name: AudioObject
+description: An audio file.
+subClassOf: ["MediaObject"]
+---
+
+# AudioObject
+
+An audio file.
+
+## Type Hierarchy
+
+**AudioObject**
+
+## Direct Subclasses
+
+- **[Audiobook](Audiobook.mdx)**: An audiobook
+
+## Properties
+
+See [Schema.org AudioObject properties](https://schema.org/AudioObject#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AudioObject } from 'schema.org.ai'
+
+// Create a AudioObject
+const item: AudioObject = {
+  $type: 'AudioObject',
+  name: 'Example AudioObject'
+}
+
+// Use semantic patterns
+await $.AudioObject.create(item)
+const result = await $.AudioObject.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AudioObject](https://schema.org/AudioObject)
+- [AudioObject Properties](https://schema.org/AudioObject#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

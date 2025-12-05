@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HealthPlanNetwork
+$context: https://schema.org
+$type: Class
+name: HealthPlanNetwork
+description: A US-style health insurance plan network.
+subClassOf: ["Intangible"]
+---
+
+# HealthPlanNetwork
+
+A US-style health insurance plan network.
+
+## Type Hierarchy
+
+**HealthPlanNetwork**
+
+
+
+## Properties
+
+See [Schema.org HealthPlanNetwork properties](https://schema.org/HealthPlanNetwork#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HealthPlanNetwork } from 'schema.org.ai'
+
+// Create a HealthPlanNetwork
+const item: HealthPlanNetwork = {
+  $type: 'HealthPlanNetwork',
+  name: 'Example HealthPlanNetwork'
+}
+
+// Use semantic patterns
+await $.HealthPlanNetwork.create(item)
+const result = await $.HealthPlanNetwork.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HealthPlanNetwork](https://schema.org/HealthPlanNetwork)
+- [HealthPlanNetwork Properties](https://schema.org/HealthPlanNetwork#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

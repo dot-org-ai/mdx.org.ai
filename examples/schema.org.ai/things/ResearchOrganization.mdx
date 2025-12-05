@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ResearchOrganization
+$context: https://schema.org
+$type: Class
+name: ResearchOrganization
+description: A Research Organization (e.g. scientific institute, research company).
+subClassOf: ["Organization"]
+---
+
+# ResearchOrganization
+
+A Research Organization (e.g. scientific institute, research company).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Organization](Organization.mdx) > **ResearchOrganization**
+
+
+
+## Properties
+
+See [Schema.org ResearchOrganization properties](https://schema.org/ResearchOrganization#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ResearchOrganization } from 'schema.org.ai'
+
+// Create a ResearchOrganization
+const item: ResearchOrganization = {
+  $type: 'ResearchOrganization',
+  name: 'Example ResearchOrganization'
+}
+
+// Use semantic patterns
+await $.ResearchOrganization.create(item)
+const result = await $.ResearchOrganization.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ResearchOrganization](https://schema.org/ResearchOrganization)
+- [ResearchOrganization Properties](https://schema.org/ResearchOrganization#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

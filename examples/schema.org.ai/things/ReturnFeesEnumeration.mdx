@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ReturnFeesEnumeration
+$context: https://schema.org
+$type: Class
+name: ReturnFeesEnumeration
+description: Enumerates several kinds of policies for product return fees.
+subClassOf: ["Enumeration"]
+---
+
+# ReturnFeesEnumeration
+
+Enumerates several kinds of policies for product return fees.
+
+## Type Hierarchy
+
+**ReturnFeesEnumeration**
+
+
+
+## Properties
+
+See [Schema.org ReturnFeesEnumeration properties](https://schema.org/ReturnFeesEnumeration#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ReturnFeesEnumeration } from 'schema.org.ai'
+
+// Create a ReturnFeesEnumeration
+const item: ReturnFeesEnumeration = {
+  $type: 'ReturnFeesEnumeration',
+  name: 'Example ReturnFeesEnumeration'
+}
+
+// Use semantic patterns
+await $.ReturnFeesEnumeration.create(item)
+const result = await $.ReturnFeesEnumeration.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ReturnFeesEnumeration](https://schema.org/ReturnFeesEnumeration)
+- [ReturnFeesEnumeration Properties](https://schema.org/ReturnFeesEnumeration#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

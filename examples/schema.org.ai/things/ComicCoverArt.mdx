@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ComicCoverArt
+$context: https://schema.org
+$type: Class
+name: ComicCoverArt
+description: The artwork on the cover of a comic.
+subClassOf: ["ComicStory","CoverArt"]
+---
+
+# ComicCoverArt
+
+The artwork on the cover of a comic.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [VisualArtwork](VisualArtwork.mdx) > [CoverArt](CoverArt.mdx) > **ComicCoverArt**
+
+
+
+## Properties
+
+See [Schema.org ComicCoverArt properties](https://schema.org/ComicCoverArt#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ComicCoverArt } from 'schema.org.ai'
+
+// Create a ComicCoverArt
+const item: ComicCoverArt = {
+  $type: 'ComicCoverArt',
+  name: 'Example ComicCoverArt'
+}
+
+// Use semantic patterns
+await $.ComicCoverArt.create(item)
+const result = await $.ComicCoverArt.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ComicCoverArt](https://schema.org/ComicCoverArt)
+- [ComicCoverArt Properties](https://schema.org/ComicCoverArt#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

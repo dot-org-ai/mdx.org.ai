@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/IndividualProduct
+$context: https://schema.org
+$type: Class
+name: IndividualProduct
+description: A single, identifiable product instance (e.g. a laptop with a particular serial number).
+subClassOf: ["Product"]
+---
+
+# IndividualProduct
+
+A single, identifiable product instance (e.g. a laptop with a particular serial number).
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Product](Product.mdx) > **IndividualProduct**
+
+
+
+## Properties
+
+See [Schema.org IndividualProduct properties](https://schema.org/IndividualProduct#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { IndividualProduct } from 'schema.org.ai'
+
+// Create a IndividualProduct
+const item: IndividualProduct = {
+  $type: 'IndividualProduct',
+  name: 'Example IndividualProduct'
+}
+
+// Use semantic patterns
+await $.IndividualProduct.create(item)
+const result = await $.IndividualProduct.get('item-id')
+```
+
+## Resources
+
+- [Schema.org IndividualProduct](https://schema.org/IndividualProduct)
+- [IndividualProduct Properties](https://schema.org/IndividualProduct#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

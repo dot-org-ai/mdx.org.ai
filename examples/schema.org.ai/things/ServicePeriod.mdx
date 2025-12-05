@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ServicePeriod
+$context: https://schema.org
+$type: Class
+name: ServicePeriod
+description: ServicePeriod represents a duration with some constraints about cutoff time and business days. This is used e.g. in shipping for handling times or transit time.
+subClassOf: ["StructuredValue"]
+---
+
+# ServicePeriod
+
+ServicePeriod represents a duration with some constraints about cutoff time and business days. This is used e.g. in shipping for handling times or transit time.
+
+## Type Hierarchy
+
+**ServicePeriod**
+
+
+
+## Properties
+
+See [Schema.org ServicePeriod properties](https://schema.org/ServicePeriod#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ServicePeriod } from 'schema.org.ai'
+
+// Create a ServicePeriod
+const item: ServicePeriod = {
+  $type: 'ServicePeriod',
+  name: 'Example ServicePeriod'
+}
+
+// Use semantic patterns
+await $.ServicePeriod.create(item)
+const result = await $.ServicePeriod.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ServicePeriod](https://schema.org/ServicePeriod)
+- [ServicePeriod Properties](https://schema.org/ServicePeriod#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/Thesis
+$context: https://schema.org
+$type: Class
+name: Thesis
+description: A thesis or dissertation document submitted in support of candidature for an academic degree or professional qualification.
+subClassOf: ["CreativeWork"]
+---
+
+# Thesis
+
+A thesis or dissertation document submitted in support of candidature for an academic degree or professional qualification.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **Thesis**
+
+
+
+## Properties
+
+See [Schema.org Thesis properties](https://schema.org/Thesis#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { Thesis } from 'schema.org.ai'
+
+// Create a Thesis
+const item: Thesis = {
+  $type: 'Thesis',
+  name: 'Example Thesis'
+}
+
+// Use semantic patterns
+await $.Thesis.create(item)
+const result = await $.Thesis.get('item-id')
+```
+
+## Resources
+
+- [Schema.org Thesis](https://schema.org/Thesis)
+- [Thesis Properties](https://schema.org/Thesis#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

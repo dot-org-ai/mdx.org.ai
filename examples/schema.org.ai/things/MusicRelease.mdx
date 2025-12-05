@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MusicRelease
+$context: https://schema.org
+$type: Class
+name: MusicRelease
+description: A MusicRelease is a specific release of a music album.
+subClassOf: ["MusicPlaylist"]
+---
+
+# MusicRelease
+
+A MusicRelease is a specific release of a music album.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > [MusicPlaylist](MusicPlaylist.mdx) > **MusicRelease**
+
+
+
+## Properties
+
+See [Schema.org MusicRelease properties](https://schema.org/MusicRelease#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MusicRelease } from 'schema.org.ai'
+
+// Create a MusicRelease
+const item: MusicRelease = {
+  $type: 'MusicRelease',
+  name: 'Example MusicRelease'
+}
+
+// Use semantic patterns
+await $.MusicRelease.create(item)
+const result = await $.MusicRelease.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MusicRelease](https://schema.org/MusicRelease)
+- [MusicRelease Properties](https://schema.org/MusicRelease#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

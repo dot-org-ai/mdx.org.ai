@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/PlanAction
+$context: https://schema.org
+$type: Class
+name: PlanAction
+description: The act of planning the execution of an event/task/action/reservation/plan to a future date.
+subClassOf: ["OrganizeAction"]
+---
+
+# PlanAction
+
+The act of planning the execution of an event/task/action/reservation/plan to a future date.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [OrganizeAction](OrganizeAction.mdx) > **PlanAction**
+
+## Direct Subclasses
+
+- **[CancelAction](CancelAction.mdx)**: The act of asserting that a future event/action is no longer going to happen
+- **[ReserveAction](ReserveAction.mdx)**: Reserving a concrete object
+- **[ScheduleAction](ScheduleAction.mdx)**: Scheduling future actions, events, or tasks
+
+## Properties
+
+See [Schema.org PlanAction properties](https://schema.org/PlanAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PlanAction } from 'schema.org.ai'
+
+// Create a PlanAction
+const item: PlanAction = {
+  $type: 'PlanAction',
+  name: 'Example PlanAction'
+}
+
+// Use semantic patterns
+await $.PlanAction.create(item)
+const result = await $.PlanAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PlanAction](https://schema.org/PlanAction)
+- [PlanAction Properties](https://schema.org/PlanAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

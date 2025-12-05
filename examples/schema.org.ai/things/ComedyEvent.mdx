@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/ComedyEvent
+$context: https://schema.org
+$type: Class
+name: ComedyEvent
+description: Event type: Comedy event.
+subClassOf: ["Event"]
+---
+
+# ComedyEvent
+
+Event type: Comedy event.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Event](Event.mdx) > **ComedyEvent**
+
+
+
+## Properties
+
+See [Schema.org ComedyEvent properties](https://schema.org/ComedyEvent#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { ComedyEvent } from 'schema.org.ai'
+
+// Create a ComedyEvent
+const item: ComedyEvent = {
+  $type: 'ComedyEvent',
+  name: 'Example ComedyEvent'
+}
+
+// Use semantic patterns
+await $.ComedyEvent.create(item)
+const result = await $.ComedyEvent.get('item-id')
+```
+
+## Resources
+
+- [Schema.org ComedyEvent](https://schema.org/ComedyEvent)
+- [ComedyEvent Properties](https://schema.org/ComedyEvent#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

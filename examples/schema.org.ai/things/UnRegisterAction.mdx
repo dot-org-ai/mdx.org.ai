@@ -1,0 +1,53 @@
+---
+$id: https://schema.org.ai/UnRegisterAction
+$context: https://schema.org
+$type: Class
+name: UnRegisterAction
+description: The act of un-registering from a service.\
+subClassOf: ["InteractAction"]
+---
+
+# UnRegisterAction
+
+The act of un-registering from a service.\
+\
+Related actions:\
+\
+* [[RegisterAction]]: antonym of UnRegisterAction.\
+* [[LeaveAction]]: Unlike LeaveAction, UnRegisterAction implies that you are unregistering from a service you were previously registered, rather than leaving a team/group of people.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > [InteractAction](InteractAction.mdx) > **UnRegisterAction**
+
+
+
+## Properties
+
+See [Schema.org UnRegisterAction properties](https://schema.org/UnRegisterAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UnRegisterAction } from 'schema.org.ai'
+
+// Create a UnRegisterAction
+const item: UnRegisterAction = {
+  $type: 'UnRegisterAction',
+  name: 'Example UnRegisterAction'
+}
+
+// Use semantic patterns
+await $.UnRegisterAction.create(item)
+const result = await $.UnRegisterAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UnRegisterAction](https://schema.org/UnRegisterAction)
+- [UnRegisterAction Properties](https://schema.org/UnRegisterAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

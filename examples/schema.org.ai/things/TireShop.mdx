@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TireShop
+$context: https://schema.org
+$type: Class
+name: TireShop
+description: A tire shop.
+subClassOf: ["Store"]
+---
+
+# TireShop
+
+A tire shop.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **TireShop**
+
+
+
+## Properties
+
+See [Schema.org TireShop properties](https://schema.org/TireShop#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TireShop } from 'schema.org.ai'
+
+// Create a TireShop
+const item: TireShop = {
+  $type: 'TireShop',
+  name: 'Example TireShop'
+}
+
+// Use semantic patterns
+await $.TireShop.create(item)
+const result = await $.TireShop.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TireShop](https://schema.org/TireShop)
+- [TireShop Properties](https://schema.org/TireShop#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/MathSolver
+$context: https://schema.org
+$type: Class
+name: MathSolver
+description: A math solver which is capable of solving a subset of mathematical problems.
+subClassOf: ["CreativeWork"]
+---
+
+# MathSolver
+
+A math solver which is capable of solving a subset of mathematical problems.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [CreativeWork](CreativeWork.mdx) > **MathSolver**
+
+
+
+## Properties
+
+See [Schema.org MathSolver properties](https://schema.org/MathSolver#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { MathSolver } from 'schema.org.ai'
+
+// Create a MathSolver
+const item: MathSolver = {
+  $type: 'MathSolver',
+  name: 'Example MathSolver'
+}
+
+// Use semantic patterns
+await $.MathSolver.create(item)
+const result = await $.MathSolver.get('item-id')
+```
+
+## Resources
+
+- [Schema.org MathSolver](https://schema.org/MathSolver)
+- [MathSolver Properties](https://schema.org/MathSolver#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

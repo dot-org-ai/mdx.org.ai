@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/HowToSupply
+$context: https://schema.org
+$type: Class
+name: HowToSupply
+description: A supply consumed when performing the instructions for how to achieve a result.
+subClassOf: ["HowToItem"]
+---
+
+# HowToSupply
+
+A supply consumed when performing the instructions for how to achieve a result.
+
+## Type Hierarchy
+
+**HowToSupply**
+
+
+
+## Properties
+
+See [Schema.org HowToSupply properties](https://schema.org/HowToSupply#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { HowToSupply } from 'schema.org.ai'
+
+// Create a HowToSupply
+const item: HowToSupply = {
+  $type: 'HowToSupply',
+  name: 'Example HowToSupply'
+}
+
+// Use semantic patterns
+await $.HowToSupply.create(item)
+const result = await $.HowToSupply.get('item-id')
+```
+
+## Resources
+
+- [Schema.org HowToSupply](https://schema.org/HowToSupply)
+- [HowToSupply Properties](https://schema.org/HowToSupply#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

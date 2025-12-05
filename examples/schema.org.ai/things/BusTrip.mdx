@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/BusTrip
+$context: https://schema.org
+$type: Class
+name: BusTrip
+description: A trip on a commercial bus line.
+subClassOf: ["Trip"]
+---
+
+# BusTrip
+
+A trip on a commercial bus line.
+
+## Type Hierarchy
+
+**BusTrip**
+
+
+
+## Properties
+
+See [Schema.org BusTrip properties](https://schema.org/BusTrip#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { BusTrip } from 'schema.org.ai'
+
+// Create a BusTrip
+const item: BusTrip = {
+  $type: 'BusTrip',
+  name: 'Example BusTrip'
+}
+
+// Use semantic patterns
+await $.BusTrip.create(item)
+const result = await $.BusTrip.get('item-id')
+```
+
+## Resources
+
+- [Schema.org BusTrip](https://schema.org/BusTrip)
+- [BusTrip Properties](https://schema.org/BusTrip#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

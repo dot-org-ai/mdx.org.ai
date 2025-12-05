@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/TextObject
+$context: https://schema.org
+$type: Class
+name: TextObject
+description: A text file. The text can be unformatted or contain markup, html, etc.
+subClassOf: ["MediaObject"]
+---
+
+# TextObject
+
+A text file. The text can be unformatted or contain markup, html, etc.
+
+## Type Hierarchy
+
+**TextObject**
+
+
+
+## Properties
+
+See [Schema.org TextObject properties](https://schema.org/TextObject#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { TextObject } from 'schema.org.ai'
+
+// Create a TextObject
+const item: TextObject = {
+  $type: 'TextObject',
+  name: 'Example TextObject'
+}
+
+// Use semantic patterns
+await $.TextObject.create(item)
+const result = await $.TextObject.get('item-id')
+```
+
+## Resources
+
+- [Schema.org TextObject](https://schema.org/TextObject)
+- [TextObject Properties](https://schema.org/TextObject#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

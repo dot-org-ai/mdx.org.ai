@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RoofingContractor
+$context: https://schema.org
+$type: Class
+name: RoofingContractor
+description: A roofing contractor.
+subClassOf: ["HomeAndConstructionBusiness"]
+---
+
+# RoofingContractor
+
+A roofing contractor.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [HomeAndConstructionBusiness](HomeAndConstructionBusiness.mdx) > **RoofingContractor**
+
+
+
+## Properties
+
+See [Schema.org RoofingContractor properties](https://schema.org/RoofingContractor#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RoofingContractor } from 'schema.org.ai'
+
+// Create a RoofingContractor
+const item: RoofingContractor = {
+  $type: 'RoofingContractor',
+  name: 'Example RoofingContractor'
+}
+
+// Use semantic patterns
+await $.RoofingContractor.create(item)
+const result = await $.RoofingContractor.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RoofingContractor](https://schema.org/RoofingContractor)
+- [RoofingContractor Properties](https://schema.org/RoofingContractor#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

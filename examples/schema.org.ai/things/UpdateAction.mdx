@@ -1,0 +1,52 @@
+---
+$id: https://schema.org.ai/UpdateAction
+$context: https://schema.org
+$type: Class
+name: UpdateAction
+description: The act of managing by changing/editing the state of the object.
+subClassOf: ["Action"]
+---
+
+# UpdateAction
+
+The act of managing by changing/editing the state of the object.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Action](Action.mdx) > **UpdateAction**
+
+## Direct Subclasses
+
+- **[AddAction](AddAction.mdx)**: The act of editing by adding an object to a collection
+- **[DeleteAction](DeleteAction.mdx)**: The act of editing a recipient by removing one of its objects
+- **[ReplaceAction](ReplaceAction.mdx)**: The act of editing a recipient by replacing an old object with a new object
+
+## Properties
+
+See [Schema.org UpdateAction properties](https://schema.org/UpdateAction#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { UpdateAction } from 'schema.org.ai'
+
+// Create a UpdateAction
+const item: UpdateAction = {
+  $type: 'UpdateAction',
+  name: 'Example UpdateAction'
+}
+
+// Use semantic patterns
+await $.UpdateAction.create(item)
+const result = await $.UpdateAction.get('item-id')
+```
+
+## Resources
+
+- [Schema.org UpdateAction](https://schema.org/UpdateAction)
+- [UpdateAction Properties](https://schema.org/UpdateAction#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

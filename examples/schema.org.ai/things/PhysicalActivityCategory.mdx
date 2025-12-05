@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/PhysicalActivityCategory
+$context: https://schema.org
+$type: Class
+name: PhysicalActivityCategory
+description: Categories of physical activity, organized by physiologic classification.
+subClassOf: ["Enumeration"]
+---
+
+# PhysicalActivityCategory
+
+Categories of physical activity, organized by physiologic classification.
+
+## Type Hierarchy
+
+**PhysicalActivityCategory**
+
+
+
+## Properties
+
+See [Schema.org PhysicalActivityCategory properties](https://schema.org/PhysicalActivityCategory#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { PhysicalActivityCategory } from 'schema.org.ai'
+
+// Create a PhysicalActivityCategory
+const item: PhysicalActivityCategory = {
+  $type: 'PhysicalActivityCategory',
+  name: 'Example PhysicalActivityCategory'
+}
+
+// Use semantic patterns
+await $.PhysicalActivityCategory.create(item)
+const result = await $.PhysicalActivityCategory.get('item-id')
+```
+
+## Resources
+
+- [Schema.org PhysicalActivityCategory](https://schema.org/PhysicalActivityCategory)
+- [PhysicalActivityCategory Properties](https://schema.org/PhysicalActivityCategory#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OutletStore
+$context: https://schema.org
+$type: Class
+name: OutletStore
+description: An outlet store.
+subClassOf: ["Store"]
+---
+
+# OutletStore
+
+An outlet store.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [Store](Store.mdx) > **OutletStore**
+
+
+
+## Properties
+
+See [Schema.org OutletStore properties](https://schema.org/OutletStore#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OutletStore } from 'schema.org.ai'
+
+// Create a OutletStore
+const item: OutletStore = {
+  $type: 'OutletStore',
+  name: 'Example OutletStore'
+}
+
+// Use semantic patterns
+await $.OutletStore.create(item)
+const result = await $.OutletStore.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OutletStore](https://schema.org/OutletStore)
+- [OutletStore Properties](https://schema.org/OutletStore#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/OfferItemCondition
+$context: https://schema.org
+$type: Class
+name: OfferItemCondition
+description: A list of possible conditions for the item.
+subClassOf: ["Enumeration"]
+---
+
+# OfferItemCondition
+
+A list of possible conditions for the item.
+
+## Type Hierarchy
+
+**OfferItemCondition**
+
+
+
+## Properties
+
+See [Schema.org OfferItemCondition properties](https://schema.org/OfferItemCondition#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { OfferItemCondition } from 'schema.org.ai'
+
+// Create a OfferItemCondition
+const item: OfferItemCondition = {
+  $type: 'OfferItemCondition',
+  name: 'Example OfferItemCondition'
+}
+
+// Use semantic patterns
+await $.OfferItemCondition.create(item)
+const result = await $.OfferItemCondition.get('item-id')
+```
+
+## Resources
+
+- [Schema.org OfferItemCondition](https://schema.org/OfferItemCondition)
+- [OfferItemCondition Properties](https://schema.org/OfferItemCondition#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

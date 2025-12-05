@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/RadioStation
+$context: https://schema.org
+$type: Class
+name: RadioStation
+description: A radio station.
+subClassOf: ["LocalBusiness"]
+---
+
+# RadioStation
+
+A radio station.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > **RadioStation**
+
+
+
+## Properties
+
+See [Schema.org RadioStation properties](https://schema.org/RadioStation#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { RadioStation } from 'schema.org.ai'
+
+// Create a RadioStation
+const item: RadioStation = {
+  $type: 'RadioStation',
+  name: 'Example RadioStation'
+}
+
+// Use semantic patterns
+await $.RadioStation.create(item)
+const result = await $.RadioStation.get('item-id')
+```
+
+## Resources
+
+- [Schema.org RadioStation](https://schema.org/RadioStation)
+- [RadioStation Properties](https://schema.org/RadioStation#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

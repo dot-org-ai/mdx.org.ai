@@ -1,0 +1,48 @@
+---
+$id: https://schema.org.ai/AutoRepair
+$context: https://schema.org
+$type: Class
+name: AutoRepair
+description: Car repair business.
+subClassOf: ["AutomotiveBusiness"]
+---
+
+# AutoRepair
+
+Car repair business.
+
+## Type Hierarchy
+
+[Thing](Thing.mdx) > [Place](Place.mdx) > [LocalBusiness](LocalBusiness.mdx) > [AutomotiveBusiness](AutomotiveBusiness.mdx) > **AutoRepair**
+
+
+
+## Properties
+
+See [Schema.org AutoRepair properties](https://schema.org/AutoRepair#properties)
+
+## Usage in Business-as-Code
+
+```typescript
+import { $ } from 'sdk.do'
+import type { AutoRepair } from 'schema.org.ai'
+
+// Create a AutoRepair
+const item: AutoRepair = {
+  $type: 'AutoRepair',
+  name: 'Example AutoRepair'
+}
+
+// Use semantic patterns
+await $.AutoRepair.create(item)
+const result = await $.AutoRepair.get('item-id')
+```
+
+## Resources
+
+- [Schema.org AutoRepair](https://schema.org/AutoRepair)
+- [AutoRepair Properties](https://schema.org/AutoRepair#properties)
+
+## License
+
+This documentation is based on Schema.org vocabulary, which is licensed under Creative Commons Attribution-ShareAlike License (version 3.0).

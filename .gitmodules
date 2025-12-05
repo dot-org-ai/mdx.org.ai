@@ -7,3 +7,6 @@
 [submodule "examples/agi.as"]
 	path = examples/agi.as
 	url = https://github.com/dot-do/agi.as
+[submodule "examples/schema.org.ai"]
+	path = examples/schema.org.ai
+	url = https://github.com/dot-org-ai/schema.org.ai.git
