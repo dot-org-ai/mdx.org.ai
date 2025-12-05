@@ -108,6 +108,9 @@ importers:
 
   apps/storybook:
     dependencies:
+      '@mdxui/semantic':
+        specifier: workspace:^
+        version: link:../../packages/@mdxui/semantic
       '@mdxui/shadcn':
         specifier: workspace:^
         version: link:../../packages/@mdxui/shadcn
@@ -163,6 +166,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.22(postcss@8.5.6)
+      chromatic:
+        specifier: ^11.20.0
+        version: 11.29.0
       postcss:
         specifier: ^8.4.49
         version: 8.5.6
@@ -1741,6 +1747,9 @@ importers:
 
   primitives/packages/digital-tools:
     dependencies:
+      ai-database:
+        specifier: workspace:*
+        version: link:../ai-database
       ai-functions:
         specifier: workspace:*
         version: link:../ai-functions
