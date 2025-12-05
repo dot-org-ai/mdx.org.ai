@@ -430,10 +430,10 @@ pnpm wrangler deploy
   <title>@mdxui/js Demo</title>
 
   <!-- Inline theme script to prevent FOUC -->
-  <script src="https://js.mdxui.org/theme?theme=auto"></script>
+  <script src="https://mdxui.org/theme.js?theme=auto"></script>
 
   <!-- CSS from @mdxui/css worker -->
-  <link rel="stylesheet" href="https://css.mdxui.org/main.css">
+  <link rel="stylesheet" href="https://mdxui.org/main.css">
 </head>
 <body>
   <header>
