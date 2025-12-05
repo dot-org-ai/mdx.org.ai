@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Input, Label } from '@mdxui/shadcn'
 
 const meta: Meta<typeof Input> = {
-  title: 'shadcn/Input',
+  title: 'Components/Forms/Input',
   component: Input,
   parameters: {
     layout: 'centered',

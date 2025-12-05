@@ -12,7 +12,7 @@ import {
 } from '@mdxui/shadcn'
 
 const meta: Meta<typeof Card> = {
-  title: 'shadcn/Card',
+  title: 'Components/Card',
   component: Card,
   parameters: {
     layout: 'centered',

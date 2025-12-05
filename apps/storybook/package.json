@@ -7,17 +7,29 @@
     "dev": "storybook dev -p 6006",
     "build": "storybook build",
     "build-storybook": "storybook build",
-    "chromatic": "chromatic --exit-zero-on-changes"
+    "chromatic": "chromatic --exit-zero-on-changes",
+    "deploy": "pnpm build && wrangler deploy",
+    "deploy:preview": "pnpm build && wrangler deploy --env preview"
   },
   "dependencies": {
-    "@mdxui/semantic": "workspace:^",
+    "@mdxui/chat": "workspace:^",
+    "@mdxui/css": "workspace:^",
+    "@mdxui/editor": "workspace:^",
+    "@mdxui/examples": "workspace:^",
+    "@mdxui/html": "workspace:^",
     "@mdxui/shadcn": "workspace:^",
+    "@mdxui/shadcnblocks": "workspace:^",
+    "@mdxui/storybook": "workspace:^",
+    "@mdxui/tremor": "workspace:^",
+    "@mdxui/mantine": "workspace:^",
+    "@mdxui/tailark": "workspace:^",
     "@mdxui/widgets": "workspace:^",
     "lucide-react": "^0.555.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "wrangler": "^4",
     "chromatic": "^11.20.0",
     "@chromatic-com/storybook": "^3.2.6",
     "@storybook/addon-essentials": "^8.6.12",

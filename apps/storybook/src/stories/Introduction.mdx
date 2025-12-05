@@ -2,41 +2,298 @@ import { Meta } from '@storybook/blocks'
 
 <Meta title="Introduction" />
 
-# MDXUI Component Library
+# MDXUI Architecture
 
-Welcome to the MDXUI component library documentation. This Storybook contains components from the following packages:
+MDXUI is a hierarchical component system for building MDX-powered digital experiences. From high-level business abstractions down to atomic UI primitives, every layer composes cleanly.
 
-## @mdxui/shadcn
+---
 
-Shadcn/ui components with tweakcn theme presets for MDX applications. Built on top of Radix UI primitives with Tailwind CSS styling.
+## The Hierarchy
 
-### Components
-
-- **Button** - Interactive button component with multiple variants and sizes
-- **Card** - Container component for displaying content in a box
-- **Badge** - Small status indicators and labels
-- **Input** - Form input fields
-- And many more...
-
-## @mdxui/widgets
-
-Advanced widgets for MDX applications:
-
-- **Chatbox** - AI-powered chat interface
-- **Editor** - Monaco-based code editor
-- **Searchbox** - Command palette style search
-
-## Getting Started
-
-```bash
-# Install packages
-pnpm add @mdxui/shadcn @mdxui/widgets
-
-# Import components
-import { Button, Card, Badge } from '@mdxui/shadcn'
-import { Chatbox, Editor, Searchbox } from '@mdxui/widgets'
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        ABSTRACTS                                │
+│   Agent · Business · Product · Service · Directory · Marketplace│
+│                    (contain Site and/or App)                    │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+          ┌───────────────────┴───────────────────┐
+          ▼                                       ▼
+┌─────────────────────┐               ┌─────────────────────┐
+│        SITE         │               │         APP         │
+│   (content-driven)  │               │  (interaction-driven)│
+├─────────────────────┤               ├─────────────────────┤
+│   Layout            │               │   Layout            │
+│   └── Pages         │               │   └── Views         │
+│       └── Sections  │               │       └── Panels    │
+│           └── Blocks│               │           └── Widgets│
+└─────────────────────┘               └─────────────────────┘
+          │                                       │
+          └───────────────────┬───────────────────┘
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                       COMPONENTS                                │
+│        Button · Card · Input · Badge · Avatar · Dialog          │
+│           (atomic primitives shared by Site and App)            │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Theming
+---
 
-Components support light and dark themes via CSS variables. Use the theme toggle in the toolbar above to preview components in different themes.
+## Abstracts
+
+**High-level business concepts** that own digital experiences. Each Abstract can contain a Site (for content/marketing), an App (for functionality), or both.
+
+| Package | Abstract | Description |
+|---------|----------|-------------|
+| `@mdxui/agent` | **Agent** | AI agent with personality, capabilities, and interface |
+| `@mdxui/business` | **Business** | Company or organization entity |
+| `@mdxui/product` | **Product** | SaaS product or digital offering |
+| `@mdxui/service` | **Service** | Service-based business model |
+| `@mdxui/directory` | **Directory** | Collection of listings (people, places, things) |
+| `@mdxui/marketplace` | **Marketplace** | Collection of products/services for exchange |
+
+### Example: Agent Abstract
+
+```tsx
+import { Agent } from '@mdxui/agent'
+
+<Agent
+  name="Claude"
+  description="AI assistant for software engineering"
+  capabilities={['code', 'research', 'planning']}
+  site={{
+    pages: ['/', '/docs', '/pricing'],
+    theme: 'dark',
+  }}
+  app={{
+    views: ['chat', 'workspace', 'settings'],
+    layout: 'sidebar',
+  }}
+/>
+```
+
+---
+
+## Containers
+
+### Site (Content-Driven)
+
+**Sites** are for content, marketing, and documentation. Users consume information by scrolling through pages.
+
+| Package | Purpose |
+|---------|---------|
+| `@mdxui/site` | Site container with routing, SEO, theming |
+
+**Site → Page → Section → Block → Component**
+
+```tsx
+import { Site, Page, Section } from '@mdxui/site'
+import { Hero, Features, Pricing } from '@mdxui/html'
+
+<Site domain="example.com" theme="light">
+  <Page path="/" title="Home">
+    <Section id="hero">
+      <Hero title="Welcome" subtitle="Get started today" />
+    </Section>
+    <Section id="features">
+      <Features items={features} />
+    </Section>
+  </Page>
+  <Page path="/pricing" title="Pricing">
+    <Section id="plans">
+      <Pricing plans={plans} />
+    </Section>
+  </Page>
+</Site>
+```
+
+### App (Interaction-Driven)
+
+**Apps** are for functionality and interaction. Users navigate between views and interact with widgets.
+
+| Package | Purpose |
+|---------|---------|
+| `@mdxui/app` | App container with routing, state, auth |
+
+**App → View → Panel → Widget → Component**
+
+```tsx
+import { App, View, Panel } from '@mdxui/app'
+import { Chat } from '@mdxui/chat'
+import { Editor } from '@mdxui/editor'
+
+<App name="Studio" layout="sidebar">
+  <View path="/workspace" title="Workspace">
+    <Panel position="main">
+      <Editor language="mdx" />
+    </Panel>
+    <Panel position="aside">
+      <Chat variant="sidebar" />
+    </Panel>
+  </View>
+  <View path="/settings" title="Settings">
+    <Panel position="main">
+      <SettingsForm />
+    </Panel>
+  </View>
+</App>
+```
+
+---
+
+## Site Components
+
+### Pages
+Full routes within a Site. Each page has a URL, title, and contains Sections.
+
+### Sections
+Vertical divisions of a Page. Sections stack and scroll. Each Section contains Blocks.
+
+### Blocks
+Semantic content units within a Section:
+
+| Block | Purpose |
+|-------|---------|
+| **Hero** | Page header with headline, subtitle, CTAs |
+| **Features** | Feature grid or list |
+| **Bento** | Asymmetric grid layout |
+| **Testimonials** | Social proof and quotes |
+| **Pricing** | Plan comparison |
+| **CTA** | Call-to-action banner |
+| **FAQ** | Frequently asked questions |
+| **Team** | Team member showcase |
+| **Stats** | Metric highlights |
+| **Waitlist** | Email capture form |
+
+---
+
+## App Components
+
+### Views
+Screens within an App. Each View has a route and contains Panels.
+
+### Panels
+Spatial divisions of a View. Common patterns:
+- **Main** - Primary content area
+- **Sidebar** - Navigation or secondary content
+- **Aside** - Contextual information
+- **Header** - Top bar with actions
+- **Footer** - Bottom bar with status
+
+### Widgets
+Interactive components within Panels:
+
+| Widget | Purpose |
+|--------|---------|
+| **Chat** | Conversational AI interface |
+| **Editor** | Code/text editing |
+| **Table** | Data grid with actions |
+| **Form** | Input collection |
+| **Chart** | Data visualization |
+| **Calendar** | Date/time selection |
+| **FileTree** | File/folder navigation |
+| **Terminal** | Command line interface |
+
+---
+
+## Layouts
+
+Both Sites and Apps use Layouts to structure their content. Layouts provide consistent chrome (headers, footers, navigation) across pages/views.
+
+### Site Layouts
+
+| Layout | Source | Style |
+|--------|--------|-------|
+| **Marketing** | @mdxui/tailark | Full-featured marketing site |
+| **Docs** | @mdxui/fumadocs | Documentation site |
+| **Blog** | @mdxui/tailark | Content-focused blog |
+| **Landing** | @mdxui/shadcnblocks | Single-page landing |
+
+### App Layouts
+
+| Layout | Source | Style |
+|--------|--------|-------|
+| **Dashboard** | @mdxui/tremor | Analytics dashboard |
+| **Admin** | @mdxui/mantine | Admin panel |
+| **Workspace** | @mdxui/app | IDE-like workspace |
+| **Minimal** | @mdxui/app | Clean, focused |
+
+---
+
+## Components (Primitives)
+
+Atomic building blocks used by both Sites and Apps. From `@mdxui/shadcn`:
+
+### Inputs
+Button · Input · Textarea · Select · Checkbox · Switch · Slider · RadioGroup
+
+### Display
+Card · Badge · Avatar · Alert · Progress · Skeleton · Tooltip
+
+### Navigation
+Tabs · Accordion · Breadcrumb · Pagination · NavigationMenu
+
+### Overlay
+Dialog · Sheet · Popover · DropdownMenu · ContextMenu
+
+### Data
+Table · DataTable · Chart · Calendar
+
+---
+
+## Package Map
+
+| Level | Package | Purpose |
+|-------|---------|---------|
+| **Abstract** | `@mdxui/agent` | AI agent abstraction |
+| **Abstract** | `@mdxui/business` | Business entity |
+| **Abstract** | `@mdxui/product` | Product abstraction |
+| **Abstract** | `@mdxui/service` | Service abstraction |
+| **Abstract** | `@mdxui/directory` | Directory of listings |
+| **Abstract** | `@mdxui/marketplace` | Marketplace of offerings |
+| **Container** | `@mdxui/site` | Site container |
+| **Container** | `@mdxui/app` | App container |
+| **Block** | `@mdxui/html` | Semantic HTML blocks |
+| **Widget** | `@mdxui/chat` | Chat widget |
+| **Widget** | `@mdxui/editor` | Editor widget |
+| **Layout** | `@mdxui/tremor` | Dashboard layouts |
+| **Layout** | `@mdxui/mantine` | Admin layouts |
+| **Layout** | `@mdxui/tailark` | Marketing layouts |
+| **Layout** | `@mdxui/shadcnblocks` | Block layouts |
+| **Primitive** | `@mdxui/shadcn` | UI primitives |
+
+---
+
+## Installation
+
+```bash
+# Abstracts
+pnpm add @mdxui/agent @mdxui/business @mdxui/product
+
+# Containers
+pnpm add @mdxui/site @mdxui/app
+
+# Blocks & Widgets
+pnpm add @mdxui/html @mdxui/chat @mdxui/editor
+
+# Layouts
+pnpm add @mdxui/tremor @mdxui/tailark @mdxui/shadcnblocks
+
+# Primitives
+pnpm add @mdxui/shadcn
+```
+
+---
+
+## Explore
+
+Use the sidebar to browse the component hierarchy:
+
+- **Abstracts** - High-level business concepts
+- **Sites** - Content-driven experiences
+- **Apps** - Interaction-driven experiences
+- **Blocks** - Semantic content units (Hero, Features, etc.)
+- **Widgets** - Interactive tools (Chat, Editor, etc.)
+- **Layouts** - Page/View templates
+- **Components** - Atomic UI primitives

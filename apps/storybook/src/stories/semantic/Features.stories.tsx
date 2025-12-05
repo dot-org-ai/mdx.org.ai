@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Features } from '@mdxui/semantic'
+import { Features } from '@mdxui/html'
 
 const meta: Meta<typeof Features> = {
-  title: 'Semantic/Sections/Features',
+  title: 'Blocks/Features',
   component: Features,
   parameters: {
     layout: 'padded',
