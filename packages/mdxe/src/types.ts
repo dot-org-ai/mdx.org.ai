@@ -175,6 +175,19 @@ export interface CloudflareDeployOptions extends DeployOptions {
    * Tenant/customer identifier for namespace isolation
    */
   tenantId?: string
+
+  /**
+   * Use managed workers.do API for deployment
+   * Authenticates via oauth.do and POSTs to /workers endpoint
+   * @default false
+   */
+  useManagedApi?: boolean
+
+  /**
+   * Managed API base URL (workers.do)
+   * @default 'https://workers.do'
+   */
+  managedApiUrl?: string
 }
 
 /**

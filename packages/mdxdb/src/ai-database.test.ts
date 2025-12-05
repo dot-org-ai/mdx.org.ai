@@ -19,7 +19,7 @@ import {
 describe('ai-database integration', () => {
   describe('DB factory', () => {
     it('should create a typed database from schema', () => {
-      const db = DB({
+      const { db } = DB({
         User: {
           name: 'string',
           email: 'string',
@@ -32,7 +32,7 @@ describe('ai-database integration', () => {
     })
 
     it('should support bi-directional relationships', () => {
-      const db = DB({
+      const { db } = DB({
         Post: {
           title: 'string',
           content: 'markdown',
@@ -51,7 +51,7 @@ describe('ai-database integration', () => {
     })
 
     it('should support multiple entity types', () => {
-      const db = DB({
+      const { db } = DB({
         User: {
           name: 'string',
           email: 'string',

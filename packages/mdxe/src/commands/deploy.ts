@@ -17,6 +17,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSy
 import { join, resolve, relative } from 'node:path'
 import type { CloudflareDeployOptions, DeployResult, SourceTypeInfo } from '../types.js'
 import { CloudflareApi, type WorkerMetadata, type WorkerBinding } from '../cloudflare/api.js'
+import { ensureLoggedIn } from 'oauth.do'
 
 /**
  * Detect the data source type by analyzing the project configuration
@@ -829,6 +830,156 @@ async function deployOpenNextViaApi(
 }
 
 /**
+ * Deploy via managed workers.do API
+ * Uses oauth.do for authentication and POSTs to /workers endpoint
+ */
+async function deployViaManagedApi(
+  projectDir: string,
+  options: CloudflareDeployOptions
+): Promise<DeployResult> {
+  const logs: string[] = []
+  logs.push('Using managed workers.do API for deployment')
+
+  const managedApiUrl = options.managedApiUrl || process.env.WORKERS_API_URL || 'https://workers.do'
+
+  try {
+    // Get authentication token
+    let token: string
+    if (options.dryRun) {
+      token = 'dry-run-token'
+      logs.push('Skipping authentication (dry run)')
+    } else {
+      logs.push('Authenticating via oauth.do...')
+      const auth = await ensureLoggedIn()
+      token = auth.token
+      logs.push(auth.isNewLogin ? 'Logged in successfully' : 'Using existing session')
+    }
+
+    // Detect source type
+    const sourceType = detectSourceType(projectDir)
+    logs.push(`Detected adapter: ${sourceType.adapter || 'unknown'}`)
+
+    // Determine deployment mode
+    const mode = options.mode || (sourceType.isStatic ? 'static' : 'opennext')
+    logs.push(`Deployment mode: ${mode}`)
+
+    // Build the project first
+    logs.push('Building project...')
+    const buildResult = await runCommand('npm', ['run', 'build'], projectDir, {
+      dryRun: options.dryRun,
+    })
+
+    if (!buildResult.success) {
+      return {
+        success: false,
+        error: `Build failed: ${buildResult.error}`,
+        logs,
+      }
+    }
+    logs.push('Build completed successfully')
+
+    // Read the built worker code
+    let workerCode: string
+    const workerDir = join(projectDir, '.worker')
+    const workerPath = join(workerDir, 'index.js')
+    const openNextWorkerPath = join(projectDir, '.open-next', 'worker.js')
+
+    if (mode === 'opennext' && existsSync(openNextWorkerPath)) {
+      workerCode = readFileSync(openNextWorkerPath, 'utf-8')
+    } else if (existsSync(workerPath)) {
+      workerCode = readFileSync(workerPath, 'utf-8')
+    } else {
+      // Generate a basic worker if none exists
+      if (!options.dryRun) {
+        mkdirSync(workerDir, { recursive: true })
+        writeFileSync(workerPath, generateStaticWorkerScript())
+      }
+      workerCode = generateStaticWorkerScript()
+    }
+
+    // Collect static assets if available
+    const assetsDir = mode === 'opennext'
+      ? join(projectDir, '.open-next', 'assets')
+      : join(projectDir, '.next', 'static')
+
+    const assets = existsSync(assetsDir)
+      ? readFilesRecursively(assetsDir)
+      : []
+
+    logs.push(`Found ${assets.length} static asset(s)`)
+
+    // Prepare the deployment payload
+    const payload = {
+      name: options.projectName || 'mdxe-worker',
+      code: workerCode,
+      mode,
+      compatibilityDate: options.compatibilityDate || new Date().toISOString().split('T')[0],
+      compatibilityFlags: options.compatibilityFlags,
+      env: options.env,
+      kvNamespaces: options.kvNamespaces,
+      d1Databases: options.d1Databases,
+      r2Buckets: options.r2Buckets,
+      dispatchNamespace: options.dispatchNamespace,
+      tenantId: options.tenantId,
+      assets: assets.map(a => ({ path: a.path, content: a.content })),
+    }
+
+    if (options.dryRun) {
+      logs.push(`[dry-run] Would POST to ${managedApiUrl}/workers`)
+      logs.push(`[dry-run] Worker name: ${payload.name}`)
+      logs.push(`[dry-run] Mode: ${payload.mode}`)
+      logs.push(`[dry-run] Assets: ${assets.length} files`)
+      return {
+        success: true,
+        logs,
+      }
+    }
+
+    // POST to /workers endpoint
+    logs.push(`Deploying to ${managedApiUrl}/workers...`)
+
+    const response = await fetch(`${managedApiUrl}/workers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`HTTP ${response.status}: ${error}`)
+    }
+
+    const result = await response.json() as {
+      success: boolean
+      url?: string
+      deploymentId?: string
+      error?: string
+    }
+
+    if (result.success) {
+      logs.push(`Deployment successful${result.url ? `: ${result.url}` : ''}`)
+      return {
+        success: true,
+        url: result.url,
+        deploymentId: result.deploymentId,
+        logs,
+      }
+    } else {
+      throw new Error(result.error || 'Unknown error')
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      logs,
+    }
+  }
+}
+
+/**
  * Main deploy function
  */
 export async function deploy(
@@ -846,6 +997,15 @@ export async function deploy(
   // Determine deployment mode
   const mode = options.mode || (sourceType.isStatic ? 'static' : 'opennext')
   logs.push(`Deployment mode: ${mode}`)
+
+  // Use managed workers.do API if requested (oauth.do auth)
+  if (options.useManagedApi) {
+    const result = await deployViaManagedApi(resolvedDir, options)
+    return {
+      ...result,
+      logs: [...logs, ...(result.logs || [])],
+    }
+  }
 
   // Use API-based deployment if requested (for custom auth / multi-tenant)
   if (options.useApi) {

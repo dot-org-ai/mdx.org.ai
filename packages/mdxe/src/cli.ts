@@ -38,6 +38,9 @@ export interface CliOptions {
   // Server options
   port: number
   host: string
+  // Deploy options
+  managed: boolean
+  managedApiUrl?: string
 }
 
 export const VERSION = '0.0.0'
@@ -102,6 +105,8 @@ Deploy Options:
   --platform, -p <name>  Deployment platform: cloudflare (default: cloudflare)
   --mode, -m <mode>      Deployment mode: static | opennext (auto-detected)
   --name, -n <name>      Project name for deployment
+  --managed              Use managed workers.do API (oauth.do auth)
+  --managed-url <url>    Managed API URL (default: https://workers.do)
   --dry-run              Show what would be deployed without deploying
   --force                Force regeneration of config files
   --verbose, -v          Show detailed output
@@ -128,6 +133,9 @@ Examples:
 
   # Set environment variables
   mdxe deploy --env API_URL=https://api.example.com --env DEBUG=true
+
+  # Deploy via managed workers.do API (uses oauth.do for auth)
+  mdxe deploy --managed
 
 Deployment Modes:
 
@@ -173,6 +181,7 @@ export function parseArgs(args: string[]): CliOptions {
     aiMode: 'local',
     port: 3000,
     host: 'localhost',
+    managed: false,
   }
 
   // Parse command
@@ -321,6 +330,14 @@ export function parseArgs(args: string[]): CliOptions {
         options.host = next || 'localhost'
         i++
         break
+      // Deploy options
+      case '--managed':
+        options.managed = true
+        break
+      case '--managed-url':
+        options.managedApiUrl = next
+        i++
+        break
     }
   }
 
@@ -358,6 +375,8 @@ export async function runDeploy(options: CliOptions): Promise<void> {
     dryRun: options.dryRun,
     force: options.force,
     env: options.env,
+    useManagedApi: options.managed,
+    managedApiUrl: options.managedApiUrl,
   }
 
   const result = await deploy(options.projectDir, deployOptions)
