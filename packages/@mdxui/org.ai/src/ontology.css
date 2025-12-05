@@ -1,0 +1,655 @@
+/* ============================================
+   RESET & CUSTOM PROPERTIES
+   ============================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg-primary: #0a0a0b;
+    --bg-secondary: #111113;
+    --bg-elevated: #18181b;
+    --bg-hover: rgba(255, 255, 255, 0.04);
+
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-default: rgba(255, 255, 255, 0.12);
+
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --text-tertiary: #71717a;
+    --text-quaternary: #52525b;
+
+    --accent-cyan: #22d3ee;
+    --accent-purple: #a78bfa;
+    --accent-green: #4ade80;
+
+    --sidebar-width: 280px;
+    --toc-width: 280px;
+}
+
+/* ============================================
+   BASE LAYOUT
+   ============================================ */
+html {
+    scroll-behavior: smooth;
+}
+
+[data-layout="ontology"] {
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr var(--toc-width);
+}
+
+/* Subtle noise overlay */
+[data-layout="ontology"]::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    background-repeat: repeat;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ============================================
+   MOBILE HEADER
+   ============================================ */
+[data-layout="ontology"] > header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    padding: 0 16px;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-subtle);
+    z-index: 200;
+    align-items: center;
+    justify-content: space-between;
+}
+
+[data-layout="ontology"] > header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    background-repeat: repeat;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: -1;
+}
+
+[data-layout="ontology"] > header > a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+[data-layout="ontology"] > header > a img {
+    width: 24px;
+    height: 24px;
+}
+
+[data-layout="ontology"] > header > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+}
+
+[data-layout="ontology"] > header > button:hover {
+    background: var(--bg-hover);
+}
+
+[data-layout="ontology"] > header > button svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   LEFT SIDEBAR
+   ============================================ */
+[data-layout="ontology"] > nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    overflow-y: auto;
+    padding: 0 16px 20px 32px;
+    border-right: 1px solid var(--border-subtle);
+    background: var(--bg-primary);
+    z-index: 100;
+}
+
+[data-layout="ontology"] > nav::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    background-repeat: repeat;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: -1;
+}
+
+[data-layout="ontology"] > nav::-webkit-scrollbar {
+    width: 0;
+}
+
+/* Sidebar logo/header link */
+[data-layout="ontology"] > nav > a {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 10px 16px;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    background: var(--bg-primary);
+    z-index: 10;
+}
+
+[data-layout="ontology"] > nav > a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    background-repeat: repeat;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: -1;
+}
+
+[data-layout="ontology"] > nav > a img {
+    width: 28px;
+    height: 28px;
+}
+
+/* Sidebar sections */
+[data-layout="ontology"] > nav > section {
+    margin-bottom: 28px;
+}
+
+[data-layout="ontology"] > nav > section:not(:first-of-type) {
+    margin-top: 32px;
+}
+
+[data-layout="ontology"] > nav > section > h2 {
+    display: block;
+    padding: 0 10px;
+    margin-bottom: 10px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #3f3f46;
+}
+
+[data-layout="ontology"] > nav > section > menu {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    list-style: none;
+}
+
+[data-layout="ontology"] > nav > section > menu > li > a {
+    display: block;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+
+[data-layout="ontology"] > nav > section > menu > li > a:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+[data-layout="ontology"] > nav > section > menu > li > a[aria-current="page"] {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+[data-layout="ontology"] > main {
+    grid-column: 2;
+    padding: 48px 56px 120px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+[data-layout="ontology"] > main h1 {
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+[data-layout="ontology"] > main > p:first-of-type {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-tertiary);
+    margin-bottom: 48px;
+}
+
+/* Section headers */
+[data-layout="ontology"] > main h2 {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-tertiary);
+    margin-top: 64px;
+    margin-bottom: 20px;
+    padding-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+[data-layout="ontology"] > main h2::before {
+    content: '';
+    width: 12px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+}
+
+[data-layout="ontology"] > main h2::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-subtle), transparent);
+}
+
+[data-layout="ontology"] > main > p:first-of-type + section h2 {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+[data-layout="ontology"] > main > section:first-of-type h2 {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+[data-layout="ontology"] > main table {
+    position: relative;
+    width: 100%;
+    margin-bottom: 8px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+[data-layout="ontology"] > main thead tr {
+    background: var(--bg-elevated);
+}
+
+[data-layout="ontology"] > main th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-quaternary);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+[data-layout="ontology"] > main tbody tr {
+    transition: background 0.15s ease;
+}
+
+[data-layout="ontology"] > main tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+[data-layout="ontology"] > main td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: top;
+}
+
+[data-layout="ontology"] > main tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Column styles */
+[data-layout="ontology"] > main td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-cyan);
+    white-space: nowrap;
+}
+
+[data-layout="ontology"] > main td:nth-child(2) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent-purple);
+}
+
+[data-layout="ontology"] > main td:nth-child(3),
+[data-layout="ontology"] > main td:nth-child(4) {
+    color: var(--text-tertiary);
+}
+
+/* Actions section - Result column */
+[data-layout="ontology"] > main section[aria-labelledby="actions"] td:nth-child(3) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent-green);
+}
+
+/* Events section - 2 columns only */
+[data-layout="ontology"] > main section[aria-labelledby="events"] td:nth-child(2) {
+    font-family: inherit;
+    color: var(--text-tertiary);
+}
+
+/* ============================================
+   RIGHT TOC
+   ============================================ */
+[data-layout="ontology"] > aside {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: var(--toc-width);
+    height: 100vh;
+    padding: 0 32px 0 16px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+[data-layout="ontology"] > aside > h2 {
+    flex-shrink: 0;
+    display: block;
+    padding: 72px 0 16px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-quaternary);
+    background: var(--bg-primary);
+}
+
+[data-layout="ontology"] > aside > menu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-bottom: 16px;
+    list-style: none;
+}
+
+[data-layout="ontology"] > aside > menu > li > a {
+    display: block;
+    padding: 6px 0 6px 15px;
+    font-size: 13px;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    border-left: 1px solid var(--border-subtle);
+    transition: all 0.15s ease;
+}
+
+[data-layout="ontology"] > aside > menu > li > a:hover {
+    color: var(--text-secondary);
+}
+
+[data-layout="ontology"] > aside > menu > li > a[aria-current="true"] {
+    color: var(--text-primary);
+    border-left-color: var(--accent-cyan);
+}
+
+/* ============================================
+   PROMO/AD CARD
+   ============================================ */
+[data-layout="ontology"] > aside > article {
+    flex-shrink: 0;
+    margin: 0 0 20px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+}
+
+[data-layout="ontology"] > aside > article > small {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    margin-bottom: 16px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    color: var(--bg-primary);
+    border-radius: 4px;
+}
+
+[data-layout="ontology"] > aside > article > strong {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+[data-layout="ontology"] > aside > article > p {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-tertiary);
+}
+
+[data-layout="ontology"] > aside > article > a {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    color: var(--bg-primary);
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+[data-layout="ontology"] > aside > article > a:hover {
+    opacity: 0.9;
+}
+
+/* ============================================
+   THINGS DIRECTORY VIEW
+   ============================================ */
+[data-layout="ontology"] > main > section > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+[data-layout="ontology"] > main > section > div > article {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    transition: all 0.15s ease;
+}
+
+[data-layout="ontology"] > main > section > div > article:hover {
+    border-color: var(--border-default);
+    background: var(--bg-elevated);
+}
+
+[data-layout="ontology"] > main > section > div > article > a {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    text-decoration: none;
+    height: 100%;
+}
+
+[data-layout="ontology"] > main > section > div > article > a > span {
+    font-size: 28px;
+    margin-bottom: 12px;
+}
+
+[data-layout="ontology"] > main > section > div > article > a > header > h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+[data-layout="ontology"] > main > section > div > article > a > header > p {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+}
+
+[data-layout="ontology"] > main > section > div > article > a > footer {
+    display: flex;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 16px;
+}
+
+[data-layout="ontology"] > main > section > div > article > a > footer > data {
+    font-size: 12px;
+    color: var(--text-quaternary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1280px) {
+    [data-layout="ontology"] {
+        grid-template-columns: var(--sidebar-width) 1fr;
+    }
+    [data-layout="ontology"] > aside {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    [data-layout="ontology"] {
+        display: block;
+    }
+
+    [data-layout="ontology"] > header {
+        display: flex;
+    }
+
+    [data-layout="ontology"] > nav {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 200;
+    }
+
+    [data-layout="ontology"] > nav.open {
+        transform: translateX(0);
+    }
+
+    [data-layout="ontology"] > main {
+        padding: 88px 20px 40px;
+    }
+
+    [data-layout="ontology"] > main h1 {
+        font-size: 28px;
+    }
+
+    [data-layout="ontology"] > aside {
+        display: block;
+        position: static;
+        width: 100%;
+        height: auto;
+        padding: 0 20px 40px;
+        border: none;
+    }
+
+    [data-layout="ontology"] > aside > h2,
+    [data-layout="ontology"] > aside > menu {
+        display: none;
+    }
+
+    [data-layout="ontology"] > aside::before {
+        content: '';
+        display: block;
+        height: 1px;
+        margin-bottom: 32px;
+        background: var(--border-subtle);
+    }
+
+    [data-layout="ontology"] > aside > article {
+        display: block;
+        margin: 0;
+        padding: 20px;
+    }
+
+    [data-layout="ontology"] > aside > article > small {
+        margin-bottom: 20px;
+    }
+
+    [data-layout="ontology"] > aside > article > strong {
+        font-size: 20px;
+    }
+
+    [data-layout="ontology"] > aside > article > p {
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    [data-layout="ontology"] > aside > article > a {
+        margin-top: 20px;
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+}
