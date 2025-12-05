@@ -1,0 +1,10 @@
+{
+  "extends": "@mdxld/config/typescript/library.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "jsx": "react-jsx",
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}

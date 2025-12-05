@@ -4,3 +4,6 @@
 [submodule "packages/@mdxui/editor/app"]
 	path = packages/@mdxui/editor/app
 	url = https://github.com/dot-do/editor
+[submodule "examples/agi.as"]
+	path = examples/agi.as
+	url = https://github.com/dot-do/agi.as

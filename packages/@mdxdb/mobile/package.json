@@ -1,0 +1,74 @@
+{
+  "name": "@mdxdb/mobile",
+  "version": "0.0.0",
+  "description": "MDXDB for Expo/React Native - mobile document database with editor",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./editor": {
+      "types": "./dist/editor.d.ts",
+      "import": "./dist/editor.js",
+      "require": "./dist/editor.cjs"
+    },
+    "./sync": {
+      "types": "./dist/sync.d.ts",
+      "import": "./dist/sync.js",
+      "require": "./dist/sync.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxdb",
+    "mobile",
+    "expo",
+    "react-native",
+    "editor",
+    "database",
+    "mdx"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "expo": ">=50.0.0",
+    "expo-file-system": ">=17.0.0",
+    "expo-sqlite": ">=14.0.0",
+    "mdxld": "workspace:*",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-native": ">=0.73.0"
+  },
+  "peerDependenciesMeta": {
+    "expo-sqlite": {
+      "optional": true
+    },
+    "expo-file-system": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@mdxe/expo": "workspace:*"
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "@types/react": "^18.3.0",
+    "mdxld": "workspace:*",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
