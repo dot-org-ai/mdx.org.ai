@@ -27,6 +27,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Free up disk space
+        run: |
+          # Remove large unused packages to free disk space for ClickHouse build
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force || true
+          df -h
+
       - name: Cache chdb build
         if: inputs.skip_cache != 'true'
         uses: actions/cache@v4
@@ -62,10 +72,11 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           if [ ! -d /tmp/chdb ]; then
-            git clone -b $CHDB_BRANCH $CHDB_REPO /tmp/chdb
+            git clone -b $CHDB_BRANCH --depth 1 $CHDB_REPO /tmp/chdb
             cd /tmp/chdb
-            git fetch --tags
-            git submodule update --init --recursive
+            git fetch --tags --depth 1
+            # Use shallow submodule clone to save disk space
+            git submodule update --init --recursive --depth 1
           fi
 
       - name: Build chdb core
@@ -172,10 +183,11 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           if [ ! -d /tmp/chdb ]; then
-            git clone -b $CHDB_BRANCH $CHDB_REPO /tmp/chdb
+            git clone -b $CHDB_BRANCH --depth 1 $CHDB_REPO /tmp/chdb
             cd /tmp/chdb
-            git fetch --tags
-            git submodule update --init --recursive
+            git fetch --tags --depth 1
+            # Use shallow submodule clone to save disk space
+            git submodule update --init --recursive --depth 1
           fi
 
       - name: Build chdb core
@@ -230,10 +242,11 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           if [ ! -d /tmp/chdb ]; then
-            git clone -b $CHDB_BRANCH $CHDB_REPO /tmp/chdb
+            git clone -b $CHDB_BRANCH --depth 1 $CHDB_REPO /tmp/chdb
             cd /tmp/chdb
-            git fetch --tags
-            git submodule update --init --recursive
+            git fetch --tags --depth 1
+            # Use shallow submodule clone to save disk space
+            git submodule update --init --recursive --depth 1
           fi
 
       - name: Build chdb core
