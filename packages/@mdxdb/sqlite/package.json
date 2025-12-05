@@ -1,7 +1,7 @@
 {
   "name": "@mdxdb/sqlite",
   "version": "0.0.0",
-  "description": "SQLite/libSQL adapter for mdxdb - stores MDX documents with vector search support",
+  "description": "Cloudflare Durable Objects SQLite adapter for mdxdb - namespace-isolated storage with Workers RPC",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -11,6 +11,21 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./durable-object": {
+      "types": "./dist/durable-object.d.ts",
+      "import": "./dist/durable-object.js",
+      "require": "./dist/durable-object.cjs"
+    },
+    "./miniflare": {
+      "types": "./dist/miniflare.d.ts",
+      "import": "./dist/miniflare.js",
+      "require": "./dist/miniflare.cjs"
+    },
+    "./sync": {
+      "types": "./dist/sync.d.ts",
+      "import": "./dist/sync.js",
+      "require": "./dist/sync.cjs"
     }
   },
   "files": [
@@ -29,26 +44,30 @@
   "keywords": [
     "mdxdb",
     "sqlite",
-    "libsql",
-    "turso",
+    "cloudflare",
+    "durable-objects",
+    "workers",
     "database",
     "adapter",
     "mdx",
     "vector",
-    "embeddings"
+    "embeddings",
+    "rpc"
   ],
   "license": "MIT",
-  "dependencies": {
-    "@libsql/client": "^0.14.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
-    "mdxdb": "workspace:*",
-    "mdxld": "workspace:*"
+    "miniflare": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "miniflare": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
     "@mdxld/config": "workspace:^",
-    "mdxdb": "workspace:*",
-    "mdxld": "workspace:*",
+    "miniflare": "^3.20241106.1",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

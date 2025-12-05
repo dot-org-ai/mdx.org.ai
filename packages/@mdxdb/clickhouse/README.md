@@ -14,11 +14,11 @@ yarn add @mdxdb/clickhouse
 
 ## Features
 
-- **Dual Mode** - chDB (embedded) for local dev, HTTP for production
+- **HTTP Client** - Works with both local and remote ClickHouse via HTTP
 - **Graph Database** - Things (nodes) + Relationships (edges) model
 - **Event Sourcing** - Immutable event log, actions, artifacts
 - **Analytics Optimized** - MergeTree storage for fast aggregations
-- **Works Everywhere** - Local CLI or Cloudflare Workers
+- **Works Everywhere** - Local CLI, Node.js, Bun, or Cloudflare Workers
 - **Type-Safe** - Full TypeScript support
 
 ## Quick Start
@@ -26,15 +26,11 @@ yarn add @mdxdb/clickhouse
 ```typescript
 import { createClickHouseDatabase } from '@mdxdb/clickhouse'
 
-// Local development with chDB (embedded ClickHouse)
-const localDb = await createClickHouseDatabase({
-  mode: 'chdb',
-  url: './data/clickhouse'
-})
+// Connect to local ClickHouse (default localhost:8123)
+const localDb = await createClickHouseDatabase()
 
-// Production with HTTP client
+// Connect to remote ClickHouse
 const remoteDb = await createClickHouseDatabase({
-  mode: 'http',
   url: 'https://your-clickhouse.example.com:8443',
   username: 'default',
   password: 'secret'
@@ -74,8 +70,7 @@ async function createClickHouseDatabase<TData>(
 ): Promise<ClickHouseDatabase<TData>>
 
 interface ClickHouseConfig {
-  mode?: 'chdb' | 'http'     // Operating mode (default: 'http')
-  url?: string               // chdb: data path, http: server URL
+  url?: string               // ClickHouse HTTP URL (default: http://localhost:8123)
   username?: string          // HTTP authentication
   password?: string          // HTTP authentication
   database?: string          // Database name (default: 'mdxdb')
@@ -83,26 +78,30 @@ interface ClickHouseConfig {
 }
 ```
 
-### Modes
+### Local Development
 
-#### chDB Mode (Local Development)
+Start a local ClickHouse instance:
 
-Uses embedded ClickHouse via [chDB](https://github.com/chdb-io/chdb) for local development and CLI tools. Data is persisted to disk.
+```bash
+# Using Docker
+docker run -d -p 8123:8123 clickhouse/clickhouse-server
 
-```typescript
-const db = await createClickHouseDatabase({
-  mode: 'chdb',
-  url: './data/clickhouse'  // Local file storage path
-})
+# Or download the binary directly
+# See: https://clickhouse.com/docs/en/install
 ```
 
-#### HTTP Mode (Production/Workers)
+Then connect:
 
-Uses HTTP client for remote ClickHouse servers. Works in Cloudflare Workers and other edge runtimes.
+```typescript
+const db = await createClickHouseDatabase()  // Uses localhost:8123 by default
+```
+
+### Remote/Production
+
+Connect to ClickHouse Cloud or self-hosted:
 
 ```typescript
 const db = await createClickHouseDatabase({
-  mode: 'http',
   url: 'https://your-clickhouse.example.com:8443',
   username: 'default',
   password: 'your-password',
@@ -542,7 +541,6 @@ const db = await createClickHouseDatabase({
 import { createClickHouseDatabase } from '@mdxdb/clickhouse'
 
 const db = await createClickHouseDatabase({
-  mode: 'http',
   url: process.env.CLICKHOUSE_URL,
   username: process.env.CLICKHOUSE_USER,
   password: process.env.CLICKHOUSE_PASSWORD
@@ -585,7 +583,7 @@ const recentViews = await db.queryEvents({
 ```typescript
 import { createClickHouseDatabase } from '@mdxdb/clickhouse'
 
-const db = await createClickHouseDatabase({ mode: 'chdb', url: './data' })
+const db = await createClickHouseDatabase()
 
 // Submit job
 async function submitJob(userId: string, type: string, payload: unknown) {
@@ -622,7 +620,11 @@ async function processJobs() {
 import { createClickHouseDatabase } from '@mdxdb/clickhouse'
 import { createHash } from 'crypto'
 
-const db = await createClickHouseDatabase({ mode: 'http', url: '...' })
+const db = await createClickHouseDatabase({
+  url: process.env.CLICKHOUSE_URL,
+  username: process.env.CLICKHOUSE_USER,
+  password: process.env.CLICKHOUSE_PASSWORD
+})
 
 async function getCachedCompilation(source: string, content: string) {
   const sourceHash = createHash('sha256').update(content).digest('hex')
@@ -724,7 +726,6 @@ interface Artifact<T = unknown> {
 | [mdxdb](https://www.npmjs.com/package/mdxdb) | Database abstraction layer |
 | [@mdxdb/sqlite](https://www.npmjs.com/package/@mdxdb/sqlite) | SQLite backend |
 | [@mdxdb/api](https://www.npmjs.com/package/@mdxdb/api) | REST API server |
-| [chdb](https://www.npmjs.com/package/chdb) | Embedded ClickHouse |
 
 ## License
 

@@ -2,7 +2,7 @@
  * Git Sync Types
  *
  * Type definitions for bi-directional git synchronization.
- * Supports both local (chdb) and remote (clickhouse/client) providers.
+ * Supports both local and remote ClickHouse providers via HTTP.
  */
 
 import type { ActionObject } from '../schema/actions'
@@ -311,7 +311,7 @@ export interface ConflictResolution {
 /**
  * Sync provider interface
  *
- * Abstracts database operations for both chdb (local) and clickhouse (remote).
+ * Abstracts database operations for ClickHouse (local or remote via HTTP).
  */
 export interface SyncProvider {
   /** Provider name */

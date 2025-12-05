@@ -1,8 +1,8 @@
 /**
  * ClickHouse Sync Provider
  *
- * Implements SyncProvider for both local chdb and remote ClickHouse.
- * Uses the existing ClickHouseDatabase interface.
+ * Implements SyncProvider for ClickHouse via HTTP.
+ * Works with both local and remote ClickHouse instances.
  */
 
 import type {
@@ -46,7 +46,7 @@ export interface ClickHouseProviderConfig {
 /**
  * ClickHouse sync provider
  *
- * Works with both chdb (local) and clickhouse-client (remote).
+ * Works with both local and remote ClickHouse via HTTP.
  */
 export class ClickHouseProvider implements SyncProvider {
   readonly name = 'clickhouse'
@@ -410,51 +410,3 @@ export function createClickHouseProvider(
   return new ClickHouseProvider(config)
 }
 
-/**
- * Create a chdb (local) provider
- *
- * Uses the chdb module for local ClickHouse operations.
- */
-export async function createChdbProvider(
-  dbPath: string,
-  options: { database?: string } = {}
-): Promise<SyncProvider> {
-  // Dynamic import to avoid requiring chdb at module load
-  const { query } = await import('chdb')
-
-  const database = options.database ?? 'mdxdb'
-
-  // Create database and tables
-  query(`CREATE DATABASE IF NOT EXISTS ${database}`)
-  query(SYNC_STATE_SCHEMA.replace('SyncState', `${database}.SyncState`))
-
-  // Create executor
-  const executor: ClickHouseExecutor = {
-    async query<T>(sql: string): Promise<T[]> {
-      const result = query(sql, 'JSON')
-      return JSON.parse(result).data as T[]
-    },
-    async command(sql: string): Promise<void> {
-      query(sql)
-    },
-    async insert<T>(table: string, rows: T[]): Promise<void> {
-      for (const row of rows) {
-        const columns = Object.keys(row as object)
-        const values = columns.map((col) => {
-          const val = (row as Record<string, unknown>)[col]
-          if (val === null || val === undefined) return 'NULL'
-          if (typeof val === 'string') return `'${escape(val)}'`
-          if (typeof val === 'object') return `'${escape(JSON.stringify(val))}'`
-          return String(val)
-        })
-        const sql = `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${values.join(', ')})`
-        query(sql)
-      }
-    },
-  }
-
-  return new ClickHouseProvider({
-    executor,
-    database,
-  })
-}

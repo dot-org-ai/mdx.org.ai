@@ -5,7 +5,7 @@
  * Designed to work in Node.js, Bun, and potentially other environments.
  */
 
-import { execFile, execSync } from 'child_process'
+import { exec, execFile, execSync } from 'child_process'
 import { promisify } from 'util'
 import { existsSync } from 'fs'
 import { join } from 'path'
@@ -20,6 +20,7 @@ import type {
 } from './types'
 
 const execFileAsync = promisify(execFile)
+const execAsync = promisify(exec)
 
 /**
  * Default git executor using child_process

@@ -1,667 +1,282 @@
 # @mdxdb/sqlite
 
-libSQL/SQLite adapter for mdxdb with graph database features and vector search support. Works with local SQLite files, in-memory databases, and remote Turso databases.
+Cloudflare Durable Objects SQLite adapter for mdxdb.
+
+Each namespace gets its own Durable Object with isolated SQLite storage. Uses Workers RPC for direct method calls on stubs.
+
+## Features
+
+- **Namespace isolation**: Each namespace (e.g., `example.com`) gets its own Durable Object with SQLite storage
+- **Workers RPC**: Call methods directly on Durable Object stubs - no fetch/JSON overhead
+- **Full graph support**: Things (nodes), Relationships (edges), with bidirectional traversal
+- **Vector search ready**: Chunked content with embeddings support (client-side embedding)
+- **Events & Actions**: Immutable event log and durable action tracking
+- **Artifacts**: Cached compiled content with TTL support
+- **Node.js support**: Use miniflare for local development and testing
 
 ## Installation
 
 ```bash
-npm install @mdxdb/sqlite
-# or
 pnpm add @mdxdb/sqlite
-# or
-yarn add @mdxdb/sqlite
 ```
 
-## Features
+## Usage
 
-- **Graph Database** - Things (nodes) + Relationships (edges) model
-- **Vector Search** - Semantic search with embeddings
-- **Multiple Storage** - Local files, in-memory, or remote Turso
-- **Event Sourcing** - Track events, actions, and artifacts
-- **Content Chunking** - Automatic content chunking for embeddings
-- **Type-Safe** - Full TypeScript support
+### Cloudflare Workers
 
-## Quick Start
+```ts
+import { createMDXClient, MDXDatabase, type Env } from '@mdxdb/sqlite'
 
-```typescript
-import { createSqliteDatabase } from '@mdxdb/sqlite'
+// Export the Durable Object class for wrangler.toml
+export { MDXDatabase }
 
-// Local file database
-const db = await createSqliteDatabase({ url: './data.db' })
+export default {
+  async fetch(request: Request, env: Env) {
+    // Create client for a namespace
+    const client = createMDXClient({
+      namespace: 'example.com',
+      binding: env.MDXDB,
+    })
 
-// In-memory database (great for testing)
-const memDb = await createSqliteDatabase({ url: ':memory:' })
+    // CRUD operations
+    const post = await client.create({
+      ns: 'example.com',
+      type: 'Post',
+      data: { title: 'Hello World', content: '...' },
+    })
 
-// Remote Turso database
-const tursoDb = await createSqliteDatabase({
-  url: 'libsql://your-db.turso.io',
-  authToken: process.env.TURSO_AUTH_TOKEN,
-})
+    const posts = await client.list({ type: 'Post' })
 
-// Create a thing (node)
-const user = await db.create({
-  ns: 'example.com',
-  type: 'User',
-  data: { name: 'Alice', email: 'alice@example.com' }
-})
+    // Relationships
+    await client.relate({
+      type: 'authored',
+      from: 'https://example.com/User/alice',
+      to: post.url,
+    })
 
-// Create a relationship (edge)
-await db.relate({
-  type: 'follows',
-  from: user.url,
-  to: 'https://example.com/User/bob'
-})
-
-// Search things
-const results = await db.search({ query: 'Alice' })
-
-// Get related things
-const following = await db.related(user.url, 'follows')
-```
-
-## API Reference
-
-### `createSqliteDatabase(config)`
-
-Create a SQLite database instance.
-
-```typescript
-async function createSqliteDatabase<TData>(
-  config: SqliteDatabaseConfig
-): Promise<SqliteDatabase<TData>>
-
-interface SqliteDatabaseConfig {
-  url: string                    // Database URL or file path
-  authToken?: string             // Turso auth token (for remote)
-  embedFn?: (text: string) => Promise<number[]>  // Embedding function
-  chunkSize?: number             // Content chunk size (default: 1000)
-  chunkOverlap?: number          // Chunk overlap (default: 200)
-  embeddingDimension?: number    // Embedding dimension (default: 1536)
+    return Response.json(posts)
+  }
 }
 ```
 
-**Example:**
+### wrangler.toml
 
-```typescript
-import { createSqliteDatabase } from '@mdxdb/sqlite'
+```toml
+name = "my-worker"
+compatibility_date = "2024-12-01"
 
-// With vector search
-const db = await createSqliteDatabase({
-  url: './data.db',
-  embedFn: async (text) => {
-    // Your embedding function (OpenAI, Cloudflare, etc.)
-    return await embed(text)
-  },
-  embeddingDimension: 1536
+[[durable_objects.bindings]]
+name = "MDXDB"
+class_name = "MDXDatabase"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["MDXDatabase"]
+```
+
+### Node.js with Miniflare
+
+```ts
+import { createMiniflareClient } from '@mdxdb/sqlite'
+
+// Create client with miniflare backend
+const client = await createMiniflareClient({
+  namespace: 'example.com',
+  persistPath: './.data', // Optional: persist to disk
 })
 
-// Remote Turso with auth
-const tursoDb = await createSqliteDatabase({
-  url: 'libsql://your-db.turso.io',
-  authToken: 'eyJ...',
+await client.create({
+  ns: 'example.com',
+  type: 'Post',
+  data: { title: 'Hello' },
 })
 ```
+
+### In-Memory Testing
+
+```ts
+import { createInMemoryBinding, MDXClient } from '@mdxdb/sqlite'
+
+const binding = createInMemoryBinding()
+const id = binding.idFromName('test.local')
+const stub = binding.get(id)
+const client = new MDXClient(stub, 'test.local')
+
+// Use in tests
+const thing = await client.create({
+  ns: 'test.local',
+  type: 'Post',
+  data: { title: 'Test' },
+})
+```
+
+## API
 
 ### Thing Operations
 
-#### `list(options?)`
-
-List things with filtering and pagination.
-
-```typescript
-interface QueryOptions {
-  ns?: string           // Namespace filter
-  type?: string         // Type filter
-  where?: Record<string, unknown>  // Field filters
-  orderBy?: string      // Sort field
-  order?: 'asc' | 'desc'
-  limit?: number
-  offset?: number
-}
-```
-
-**Example:**
-
-```typescript
-// List all users
-const users = await db.list({ type: 'User' })
-
-// Filter by namespace
-const myAppUsers = await db.list({
-  ns: 'myapp.com',
-  type: 'User'
-})
-
-// Filter by field
-const activeUsers = await db.list({
-  type: 'User',
-  where: { status: 'active' }
-})
-```
-
-#### `search(options)`
-
-Search things with optional semantic search.
-
-```typescript
-interface ThingSearchOptions {
-  query: string        // Search query
-  ns?: string          // Namespace filter
-  type?: string        // Type filter
-  limit?: number
-  offset?: number
-  minScore?: number    // Minimum similarity score
-}
-```
-
-**Example:**
-
-```typescript
-// Text search
-const results = await db.search({ query: 'machine learning' })
-
-// Filter by type
-const posts = await db.search({
-  query: 'typescript',
-  type: 'BlogPost'
-})
-```
-
-#### `get(url)` / `getById(ns, type, id)`
-
-Get a thing by URL or ID components.
-
-```typescript
-// By URL
-const user = await db.get('https://example.com/User/alice')
-
-// By ID components
-const user = await db.getById('example.com', 'User', 'alice')
-```
-
-#### `create(options)`
-
-Create a new thing.
-
-```typescript
-interface CreateOptions<TData> {
-  ns: string            // Namespace
-  type: string          // Type
-  id?: string           // ID (auto-generated if not provided)
-  url?: string          // Full URL (computed if not provided)
-  data: TData           // Thing data
-  '@context'?: unknown  // JSON-LD context
-}
-```
-
-**Example:**
-
-```typescript
-const user = await db.create({
+```ts
+// Create
+const thing = await client.create({
   ns: 'example.com',
-  type: 'User',
-  data: {
-    name: 'Alice',
-    email: 'alice@example.com'
-  }
+  type: 'Post',
+  data: { title: 'Hello' },
 })
 
-console.log(user.url)  // 'https://example.com/User/lq8x3_abc1234'
-```
+// Read
+const thing = await client.get('https://example.com/Post/123')
+const thing = await client.getById('Post', '123')
 
-#### `update(url, options)`
+// List
+const posts = await client.list({ type: 'Post', limit: 10 })
 
-Update an existing thing.
+// Update
+await client.update(url, { data: { title: 'Updated' } })
 
-```typescript
-const updated = await db.update(user.url, {
-  data: { name: 'Alice Smith' }
-})
-```
+// Upsert
+await client.upsert({ ns, type, id, data })
 
-#### `upsert(options)`
+// Delete
+await client.delete(url)
 
-Create or update a thing.
-
-```typescript
-const user = await db.upsert({
-  ns: 'example.com',
-  type: 'User',
-  id: 'alice',
-  data: { name: 'Alice', status: 'active' }
-})
-```
-
-#### `set(url, data)`
-
-Set data directly by URL.
-
-```typescript
-await db.set('https://example.com/User/alice', {
-  name: 'Alice Smith',
-  email: 'alice@example.com'
-})
-```
-
-#### `delete(url)`
-
-Delete a thing and its relationships.
-
-```typescript
-const deleted = await db.delete('https://example.com/User/alice')
-console.log(deleted)  // true
+// Search
+const results = await client.search({ query: 'hello', type: 'Post' })
 ```
 
 ### Relationship Operations
 
-#### `relate(options)`
-
-Create a relationship between things.
-
-```typescript
-interface RelateOptions<T> {
-  type: string        // Relationship type
-  from: string        // Source thing URL
-  to: string          // Target thing URL
-  data?: T            // Relationship data
-}
-```
-
-**Example:**
-
-```typescript
-// Simple relationship
-await db.relate({
+```ts
+// Create relationship
+await client.relate({
   type: 'follows',
-  from: 'https://example.com/User/alice',
-  to: 'https://example.com/User/bob'
+  from: userUrl,
+  to: otherUserUrl,
 })
 
-// With relationship data
-await db.relate({
-  type: 'likes',
-  from: 'https://example.com/User/alice',
-  to: 'https://example.com/Post/hello',
-  data: { likedAt: new Date().toISOString() }
+// Remove relationship
+await client.unrelate(from, 'follows', to)
+
+// Get related things
+const following = await client.related(userUrl, 'follows', 'from')
+const followers = await client.related(userUrl, 'follows', 'to')
+
+// Get relationship objects
+const rels = await client.relationships(url, 'follows')
+```
+
+### Event Operations
+
+```ts
+// Track event
+const event = await client.track({
+  type: 'user.signup',
+  source: 'auth',
+  data: { userId: '123' },
+  correlationId: 'req-456',
+})
+
+// Query events
+const events = await client.queryEvents({
+  type: 'user.signup',
+  source: 'auth',
+  after: new Date('2024-01-01'),
+  limit: 100,
 })
 ```
 
-#### `unrelate(from, type, to)`
+### Action Operations
 
-Remove a relationship.
+```ts
+// Send action (pending)
+const action = await client.send({
+  actor: 'user:123',
+  object: 'post:456',
+  action: 'publish',
+})
 
-```typescript
-await db.unrelate(
-  'https://example.com/User/alice',
-  'follows',
-  'https://example.com/User/bob'
-)
+// Do action (immediately active)
+const action = await client.do({
+  actor: 'user:123',
+  object: 'post:456',
+  action: 'publish',
+})
+
+// Update action status
+await client.startAction(id)
+await client.completeAction(id, result)
+await client.failAction(id, 'error message')
+await client.cancelAction(id)
+
+// Query actions
+const pending = await client.queryActions({ status: 'pending' })
 ```
 
-#### `related(url, type?, direction?)`
+### Artifact Operations
 
-Get related things.
+```ts
+// Store artifact
+const artifact = await client.storeArtifact({
+  key: 'post:123:ast',
+  type: 'ast',
+  source: 'post:123',
+  sourceHash: 'abc123',
+  content: { type: 'root', children: [] },
+  ttl: 3600000, // 1 hour
+})
 
-```typescript
-// Get things this user follows
-const following = await db.related(user.url, 'follows', 'from')
+// Get artifact
+const artifact = await client.getArtifact('post:123:ast')
 
-// Get things that follow this user
-const followers = await db.related(user.url, 'follows', 'to')
+// Delete
+await client.deleteArtifact(key)
 
-// Get all related things (both directions)
-const all = await db.related(user.url, 'follows', 'both')
-```
-
-#### `relationships(url, type?, direction?)`
-
-Get relationship objects (not the things).
-
-```typescript
-const rels = await db.relationships(user.url, 'follows')
-// [{ id, type, from, to, createdAt, data }]
-```
-
-#### `references(url, type?)`
-
-Get things that reference this thing (incoming relationships).
-
-```typescript
-const refs = await db.references(postUrl)
+// Clean expired
+const count = await client.cleanExpiredArtifacts()
 ```
 
 ### Vector Search
 
-#### `vectorSearch(options)`
+Vector search requires a client-side embedding function:
 
-Perform semantic vector search.
-
-```typescript
-interface VectorSearchOptions {
-  query: string         // Search query (will be embedded)
-  limit?: number        // Maximum results
-  minScore?: number     // Minimum similarity score
-  type?: string         // Filter by type
-  ns?: string           // Filter by namespace
-  thingUrls?: string[]  // Limit to specific things
-}
-
-interface VectorSearchResult {
-  content: string       // Matched chunk content
-  score: number         // Similarity score (0-1)
-  thingUrl: string      // Source thing URL
-  chunkIndex: number    // Chunk index
-  metadata?: unknown    // Chunk metadata
-}
-```
-
-**Example:**
-
-```typescript
-// Configure with embedding function
-const db = await createSqliteDatabase({
-  url: './data.db',
+```ts
+const client = createMDXClient({
+  namespace: 'example.com',
+  binding: env.MDXDB,
   embedFn: async (text) => {
-    const response = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: text
-    })
-    return response.data[0].embedding
-  }
+    // Call your embedding API (OpenAI, Cloudflare AI, etc.)
+    return await embed(text)
+  },
 })
 
-// Semantic search
-const results = await db.vectorSearch({
-  query: 'how do I get started with the API?',
-  limit: 5,
-  minScore: 0.7
-})
-
-for (const result of results) {
-  console.log(`Score: ${result.score}`)
-  console.log(`Content: ${result.content}`)
-  console.log(`From: ${result.thingUrl}`)
-}
+// Search will automatically embed the query
+const results = await client.search({ query: 'machine learning' })
 ```
 
-### Event Sourcing
+## Architecture
 
-#### `track(options)` - Events
-
-Track immutable events for analytics.
-
-```typescript
-interface CreateEventOptions<T> {
-  type: string          // Event type
-  source: string        // Event source
-  data: T               // Event data
-  correlationId?: string
-  causationId?: string
-}
-
-const event = await db.track({
-  type: 'User.signup',
-  source: 'web',
-  data: { userId: 'alice', plan: 'pro' }
-})
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Cloudflare Workers                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌─────────────┐    RPC    ┌─────────────────────────────┐  │
+│  │  MDXClient  │ ───────▶ │  MDXDatabase (Durable Object) │  │
+│  └─────────────┘           │  ┌─────────────────────────┐ │  │
+│                            │  │   SQLite Storage        │ │  │
+│                            │  │  ┌────────────────────┐ │ │  │
+│                            │  │  │ things             │ │ │  │
+│                            │  │  │ relationships      │ │ │  │
+│                            │  │  │ search (chunks)    │ │ │  │
+│                            │  │  │ events             │ │ │  │
+│                            │  │  │ actions            │ │ │  │
+│                            │  │  │ artifacts          │ │ │  │
+│                            │  │  └────────────────────┘ │ │  │
+│                            │  └─────────────────────────┘ │  │
+│                            └─────────────────────────────┘  │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-#### `send(options)` - Actions
-
-Send an action (fire-and-forget, pending state).
-
-```typescript
-const action = await db.send({
-  actor: 'user:alice',
-  object: 'document:report.pdf',
-  action: 'review'
-})
-```
-
-#### `do(options)` - Actions
-
-Do an action (create and immediately start).
-
-```typescript
-const action = await db.do({
-  actor: 'system',
-  object: 'file.pdf',
-  action: 'process'
-})
-// action.status === 'active'
-```
-
-#### `try(options, fn)` - Actions
-
-Try an action with automatic error handling.
-
-```typescript
-const action = await db.try(
-  { actor: 'system', object: 'report.pdf', action: 'generate' },
-  async () => {
-    // Your processing logic
-    return { pages: 10, size: 1024 }
-  }
-)
-// action.status === 'completed' or 'failed'
-```
-
-#### Action State Management
-
-```typescript
-// Start a pending action
-await db.startAction(actionId)
-
-// Complete with result
-await db.completeAction(actionId, { output: 'success' })
-
-// Fail with error
-await db.failAction(actionId, 'Processing failed')
-
-// Cancel
-await db.cancelAction(actionId)
-
-// Query actions
-const pending = await db.queryActions({
-  status: 'pending',
-  actor: 'user:alice'
-})
-```
-
-### Artifact Storage
-
-Cache compiled content or other artifacts.
-
-```typescript
-// Store artifact
-const artifact = await db.storeArtifact({
-  key: 'compiled:doc.mdx',
-  type: 'compiled',
-  source: 'doc.mdx',
-  sourceHash: 'abc123',
-  content: { code: '...' },
-  ttl: 3600000  // 1 hour
-})
-
-// Get artifact
-const cached = await db.getArtifact('compiled:doc.mdx')
-
-// Get by source
-const bySource = await db.getArtifactBySource('doc.mdx', 'compiled')
-
-// Clean expired
-const cleaned = await db.cleanExpiredArtifacts()
-```
-
-## Schema
-
-The database creates these tables:
-
-- **things** - Graph nodes with URL, namespace, type, data
-- **relationships** - Graph edges between things
-- **search** - Chunked content with vector embeddings
-- **events** - Immutable event log
-- **actions** - Pending/active work tracking
-- **artifacts** - Cached compiled content
-
-## Examples
-
-### Social Network
-
-```typescript
-import { createSqliteDatabase } from '@mdxdb/sqlite'
-
-const db = await createSqliteDatabase({ url: './social.db' })
-
-// Create users
-const alice = await db.create({
-  ns: 'social.app',
-  type: 'User',
-  data: { name: 'Alice', bio: 'Software engineer' }
-})
-
-const bob = await db.create({
-  ns: 'social.app',
-  type: 'User',
-  data: { name: 'Bob', bio: 'Designer' }
-})
-
-// Create follow relationship
-await db.relate({
-  type: 'follows',
-  from: alice.url,
-  to: bob.url
-})
-
-// Create a post
-const post = await db.create({
-  ns: 'social.app',
-  type: 'Post',
-  data: { content: 'Hello world!', authorId: alice.id }
-})
-
-// Like the post
-await db.relate({
-  type: 'likes',
-  from: alice.url,
-  to: post.url,
-  data: { likedAt: new Date().toISOString() }
-})
-
-// Get who Alice follows
-const following = await db.related(alice.url, 'follows')
-
-// Get Alice's posts
-const posts = await db.list({
-  type: 'Post',
-  where: { authorId: alice.id }
-})
-```
-
-### Knowledge Base with Semantic Search
-
-```typescript
-import { createSqliteDatabase } from '@mdxdb/sqlite'
-import { embed } from './embeddings'
-
-const db = await createSqliteDatabase({
-  url: './knowledge.db',
-  embedFn: embed,
-  chunkSize: 500,
-  chunkOverlap: 100
-})
-
-// Add documents
-await db.create({
-  ns: 'docs.myapp.com',
-  type: 'Document',
-  data: {
-    title: 'Getting Started',
-    content: 'This guide shows you how to...',
-    category: 'tutorials'
-  }
-})
-
-// Semantic search
-const results = await db.vectorSearch({
-  query: 'how do I configure authentication?',
-  type: 'Document',
-  limit: 5
-})
-```
-
-## Types
-
-### `Thing`
-
-```typescript
-interface Thing<TData = Record<string, unknown>> {
-  ns: string           // Namespace (domain)
-  type: string         // Type name
-  id: string           // Unique ID
-  url: string          // Full URL
-  data: TData          // Thing data
-  createdAt: Date
-  updatedAt: Date
-  '@context'?: unknown // JSON-LD context
-}
-```
-
-### `Relationship`
-
-```typescript
-interface Relationship<T = Record<string, unknown>> {
-  id: string
-  type: string         // Relationship type
-  from: string         // Source URL
-  to: string           // Target URL
-  createdAt: Date
-  data?: T             // Relationship data
-}
-```
-
-### `Event`
-
-```typescript
-interface Event<T = Record<string, unknown>> {
-  id: string
-  type: string
-  timestamp: Date
-  source: string
-  data: T
-  correlationId?: string
-  causationId?: string
-}
-```
-
-### `Action`
-
-```typescript
-interface Action<T = Record<string, unknown>> {
-  id: string
-  actor: string
-  object: string
-  action: string
-  status: 'pending' | 'active' | 'completed' | 'failed' | 'cancelled'
-  createdAt: Date
-  updatedAt: Date
-  startedAt?: Date
-  completedAt?: Date
-  result?: unknown
-  error?: string
-  metadata?: T
-}
-```
-
-## Related Packages
-
-| Package | Description |
-|---------|-------------|
-| [mdxdb](https://www.npmjs.com/package/mdxdb) | Database abstraction layer |
-| [@mdxdb/fs](https://www.npmjs.com/package/@mdxdb/fs) | Filesystem backend |
-| [@mdxdb/clickhouse](https://www.npmjs.com/package/@mdxdb/clickhouse) | ClickHouse backend |
-| [@mdxdb/api](https://www.npmjs.com/package/@mdxdb/api) | REST API server |
-| [@libsql/client](https://www.npmjs.com/package/@libsql/client) | libSQL client |
+Each namespace (`example.com`, `app.dev`, etc.) maps to a unique Durable Object instance with its own SQLite database.
 
 ## License
 

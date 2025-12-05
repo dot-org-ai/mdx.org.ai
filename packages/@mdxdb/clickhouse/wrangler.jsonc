@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mdxdb-clickhouse",
+  "main": "src/worker.ts",
+  "compatibility_date": "2024-12-01",
+
+  // Default vars (secrets set via `wrangler secret put`)
+  "vars": {
+    "CLICKHOUSE_DATABASE": "mdxdb",
+    "CACHE_TTL": "60"
+  },
+
+  // Local dev - connects to local ClickHouse server
+  // Start with: pnpm clickhouse:server
+  "dev": {
+    "port": 8787
+  },
+
+  // Scheduled triggers for processing pending actions
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+
+  // Preview environment
+  "env": {
+    "preview": {
+      "name": "mdxdb-clickhouse-preview",
+      "vars": {
+        "CACHE_TTL": "0"
+      }
+    },
+    "production": {
+      "name": "mdxdb-clickhouse",
+      "vars": {
+        "CACHE_TTL": "60"
+      }
+    }
+  }
+}

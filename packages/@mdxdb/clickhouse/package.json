@@ -12,6 +12,11 @@
       "import": "./dist/src/index.js",
       "require": "./dist/src/index.cjs"
     },
+    "./worker": {
+      "types": "./dist/src/worker.d.ts",
+      "import": "./dist/src/worker.js",
+      "require": "./dist/src/worker.cjs"
+    },
     "./schema": {
       "types": "./dist/schema/index.d.ts",
       "import": "./dist/schema/index.js",
@@ -34,6 +39,9 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "worker": "wrangler dev",
+    "worker:deploy": "wrangler deploy",
+    "worker:deploy:preview": "wrangler deploy --env preview",
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:watch": "vitest",
@@ -44,7 +52,6 @@
   "keywords": [
     "mdxdb",
     "clickhouse",
-    "chdb",
     "analytics",
     "database",
     "adapter",
@@ -57,19 +64,12 @@
   "dependencies": {
     "mdxdb": "workspace:^"
   },
-  "peerDependencies": {
-    "chdb": ">=1.0.0"
-  },
-  "peerDependenciesMeta": {
-    "chdb": {
-      "optional": true
-    }
-  },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
     "@mdxld/config": "workspace:^",
-    "chdb": "^1.2.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "wrangler": "^3.93.0"
   }
 }

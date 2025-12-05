@@ -1,9 +1,10 @@
 /**
  * @mdxdb/clickhouse - ClickHouse adapter for mdxdb
  *
- * Supports two modes:
- * 1. chDB mode (local/CLI) - Embedded ClickHouse with persistent file storage
- * 2. Web client mode (Workers) - HTTP-based client for remote ClickHouse
+ * Uses HTTP client for both local and remote ClickHouse:
+ * - Local: Connect to ClickHouse binary running on localhost
+ * - Remote: Connect to ClickHouse Cloud or self-hosted instance
+ * - Works in Node.js, Bun, and Cloudflare Workers
  *
  * Optimized for analytics and event sourcing with:
  * - Things: Graph nodes with MergeTree storage
@@ -44,7 +45,7 @@ export const name = '@mdxdb/clickhouse'
 
 /**
  * Abstract interface for ClickHouse operations
- * Implemented by both chDB (local) and HTTP (remote) clients
+ * Used by HTTP client for both local and remote ClickHouse
  */
 export interface ClickHouseExecutor {
   /** Execute a query and return results */
@@ -58,69 +59,7 @@ export interface ClickHouseExecutor {
 }
 
 // =============================================================================
-// chDB Client (Local/CLI mode)
-// =============================================================================
-
-/**
- * chDB session type (imported dynamically to avoid bundling in Workers)
- */
-interface ChDBSession {
-  query(sql: string, format?: string): string
-  cleanup(): void
-}
-
-/**
- * Create a chDB-based executor for local development
- * Uses embedded ClickHouse with persistent file storage
- */
-export async function createChDBExecutor(dataPath: string): Promise<ClickHouseExecutor> {
-  // Dynamic import to avoid bundling chdb in Workers
-  const { Session } = await import('chdb')
-  const session: ChDBSession = new Session(dataPath)
-
-  return {
-    async query<T = unknown>(sql: string): Promise<T[]> {
-      const result = session.query(sql, 'JSONEachRow')
-      if (!result || result.trim() === '') return []
-      // Parse newline-delimited JSON
-      return result
-        .trim()
-        .split('\n')
-        .filter(line => line.trim())
-        .map(line => JSON.parse(line) as T)
-    },
-
-    async command(sql: string): Promise<void> {
-      session.query(sql)
-    },
-
-    async insert<T>(table: string, values: T[]): Promise<void> {
-      if (values.length === 0) return
-      // Build INSERT statement with VALUES
-      const columns = Object.keys(values[0] as object)
-      const rows = values.map(v => {
-        const vals = columns.map(col => {
-          const val = (v as Record<string, unknown>)[col]
-          if (val === null || val === undefined) return 'NULL'
-          if (typeof val === 'string') return `'${escapeString(val)}'`
-          if (typeof val === 'number') return String(val)
-          if (typeof val === 'boolean') return val ? '1' : '0'
-          return `'${escapeString(JSON.stringify(val))}'`
-        })
-        return `(${vals.join(', ')})`
-      })
-      const sql = `INSERT INTO ${table} (${columns.join(', ')}) VALUES ${rows.join(', ')}`
-      session.query(sql)
-    },
-
-    async close(): Promise<void> {
-      // Don't cleanup - preserve data. Call cleanup() explicitly if needed.
-    },
-  }
-}
-
-// =============================================================================
-// HTTP/Web Client (Workers mode)
+// HTTP Client (for both local and remote ClickHouse)
 // =============================================================================
 
 /**
@@ -210,22 +149,12 @@ export function createHttpExecutor(config: ClickHouseHttpConfig): ClickHouseExec
  * Configuration for ClickHouse database
  */
 export interface ClickHouseConfig {
-  /**
-   * Mode of operation:
-   * - 'chdb': Use embedded chDB with local file storage (for dev/CLI)
-   * - 'http': Use HTTP client for remote ClickHouse (for Workers/production)
-   */
-  mode?: 'chdb' | 'http'
-
-  /**
-   * For chdb mode: Path to store database files
-   * For http mode: ClickHouse HTTP URL
-   */
+  /** ClickHouse HTTP URL (default: http://localhost:8123) */
   url?: string
 
-  /** ClickHouse username (http mode only) */
+  /** ClickHouse username */
   username?: string
-  /** ClickHouse password (http mode only) */
+  /** ClickHouse password */
   password?: string
   /** Database name (default: mdxdb) */
   database?: string
@@ -311,15 +240,11 @@ function escapeString(str: string): string {
  *
  * @example
  * ```ts
- * // Local development with chDB (persistent file storage)
- * const localDb = await createClickHouseDatabase({
- *   mode: 'chdb',
- *   url: './data/clickhouse',
- * })
+ * // Connect to local ClickHouse (default localhost:8123)
+ * const localDb = await createClickHouseDatabase()
  *
- * // Cloudflare Workers with HTTP client
+ * // Connect to remote ClickHouse
  * const remoteDb = await createClickHouseDatabase({
- *   mode: 'http',
  *   url: 'https://your-clickhouse.example.com:8443',
  *   username: 'default',
  *   password: 'secret',
@@ -1625,15 +1550,11 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
  *
  * @example
  * ```ts
- * // Local development with chDB (persistent file storage)
- * const localDb = await createClickHouseDatabase({
- *   mode: 'chdb',
- *   url: './data/clickhouse',
- * })
+ * // Connect to local ClickHouse (default)
+ * const db = await createClickHouseDatabase()
  *
- * // Cloudflare Workers with HTTP client
+ * // Connect to remote ClickHouse
  * const remoteDb = await createClickHouseDatabase({
- *   mode: 'http',
  *   url: 'https://your-clickhouse.example.com:8443',
  *   username: 'default',
  *   password: 'secret',
@@ -1666,24 +1587,12 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
 export async function createClickHouseDatabase<TData extends Record<string, unknown> = Record<string, unknown>>(
   config: ClickHouseConfig = {}
 ): Promise<ClickHouseDatabase<TData>> {
-  let executor: ClickHouseExecutor
-
-  if (config.executor) {
-    // Use provided executor (for testing)
-    executor = config.executor
-  } else if (config.mode === 'chdb') {
-    // Use chDB for local development
-    const dataPath = config.url ?? './data/clickhouse'
-    executor = await createChDBExecutor(dataPath)
-  } else {
-    // Default to HTTP mode
-    executor = createHttpExecutor({
-      url: config.url ?? 'http://localhost:8123',
-      username: config.username,
-      password: config.password,
-      database: config.database,
-    })
-  }
+  const executor = config.executor ?? createHttpExecutor({
+    url: config.url ?? 'http://localhost:8123',
+    username: config.username,
+    password: config.password,
+    database: config.database,
+  })
 
   const db = new ClickHouseDatabase<TData>(executor, config.database ?? 'mdxdb')
   await db.init()

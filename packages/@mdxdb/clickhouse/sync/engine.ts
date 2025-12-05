@@ -2,7 +2,7 @@
  * Sync Engine
  *
  * Bi-directional synchronization between git repositories and the database.
- * Supports both local (chdb) and remote (clickhouse/client) providers.
+ * Supports both local and remote ClickHouse providers via HTTP.
  */
 
 import { tmpdir } from 'os'

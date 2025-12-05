@@ -3,6 +3,7 @@ import { defineConfig } from 'tsup'
 export default defineConfig({
   entry: [
     'src/index.ts',
+    'src/worker.ts',
     'schema/index.ts',
     'schema/migrate.ts',
     'sync/index.ts',
@@ -11,5 +12,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ['chdb'], // Optional peer dependency
+  external: [], // No external dependencies
 })

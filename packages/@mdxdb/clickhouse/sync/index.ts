@@ -2,6 +2,7 @@
  * MDXDB Git Sync
  *
  * Bi-directional synchronization between git repositories and ClickHouse.
+ * Works with both local ClickHouse binary and remote ClickHouse servers.
  *
  * ## Quick Start
  *
@@ -17,12 +18,17 @@
  * console.log(`Synced ${result.stats.filesSynced} files`)
  * ```
  *
- * ## Usage with chdb (local)
+ * ## Usage with Local ClickHouse
  *
  * ```typescript
- * import { createSyncEngine, createChdbProvider } from '@mdxdb/clickhouse/sync'
+ * import { createSyncEngine, createClickHouseProvider } from '@mdxdb/clickhouse/sync'
  *
- * const provider = await createChdbProvider('./.mdx/db')
+ * // Connect to local ClickHouse binary on localhost:8123
+ * const provider = createClickHouseProvider({
+ *   executor: createHttpExecutor({ url: 'http://localhost:8123' }),
+ *   database: 'mdxdb',
+ * })
+ *
  * const engine = createSyncEngine({ provider })
  *
  * const result = await engine.sync({
@@ -31,20 +37,17 @@
  * })
  * ```
  *
- * ## Usage with ClickHouse (remote)
+ * ## Usage with Remote ClickHouse
  *
  * ```typescript
- * import { createClient } from '@clickhouse/client'
  * import { createSyncEngine, createClickHouseProvider } from '@mdxdb/clickhouse/sync'
  *
- * const client = createClient({ url: process.env.CLICKHOUSE_URL })
- *
  * const provider = createClickHouseProvider({
- *   executor: {
- *     query: (sql) => client.query({ query: sql }).then(r => r.json()),
- *     command: (sql) => client.command({ query: sql }),
- *     insert: (table, rows) => client.insert({ table, values: rows }),
- *   },
+ *   executor: createHttpExecutor({
+ *     url: process.env.CLICKHOUSE_URL,
+ *     username: process.env.CLICKHOUSE_USER,
+ *     password: process.env.CLICKHOUSE_PASSWORD,
+ *   }),
  *   database: 'mdxdb',
  * })
  *
@@ -114,7 +117,6 @@ export type { SyncEngineConfig } from './engine'
 export {
   ClickHouseProvider,
   createClickHouseProvider,
-  createChdbProvider,
   SYNC_STATE_SCHEMA,
 } from './provider'
 export type { ClickHouseExecutor, ClickHouseProviderConfig } from './provider'
@@ -124,16 +126,98 @@ export type { ClickHouseExecutor, ClickHouseProviderConfig } from './provider'
 // =============================================================================
 
 import { createSyncEngine } from './engine'
-import { createChdbProvider } from './provider'
+import { createClickHouseProvider } from './provider'
 import type { SyncOptions, SyncResult } from './types'
 
 /**
- * Sync a git repository with the local database
+ * Create a default HTTP executor for local ClickHouse
+ */
+function createDefaultExecutor() {
+  const url = process.env.CLICKHOUSE_URL ?? 'http://localhost:8123'
+  const database = process.env.CLICKHOUSE_DATABASE ?? 'mdxdb'
+
+  return {
+    async query<T>(sql: string): Promise<T[]> {
+      const params = new URLSearchParams({ database, default_format: 'JSON' })
+      const response = await fetch(`${url}?${params}`, {
+        method: 'POST',
+        body: sql,
+        headers: {
+          'Content-Type': 'text/plain',
+          ...(process.env.CLICKHOUSE_USER && {
+            'X-ClickHouse-User': process.env.CLICKHOUSE_USER,
+          }),
+          ...(process.env.CLICKHOUSE_PASSWORD && {
+            'X-ClickHouse-Key': process.env.CLICKHOUSE_PASSWORD,
+          }),
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`ClickHouse query failed: ${await response.text()}`)
+      }
+      const result = await response.json() as { data: T[] }
+      return result.data
+    },
+    async command(sql: string): Promise<void> {
+      const params = new URLSearchParams({ database })
+      const response = await fetch(`${url}?${params}`, {
+        method: 'POST',
+        body: sql,
+        headers: {
+          'Content-Type': 'text/plain',
+          ...(process.env.CLICKHOUSE_USER && {
+            'X-ClickHouse-User': process.env.CLICKHOUSE_USER,
+          }),
+          ...(process.env.CLICKHOUSE_PASSWORD && {
+            'X-ClickHouse-Key': process.env.CLICKHOUSE_PASSWORD,
+          }),
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`ClickHouse command failed: ${await response.text()}`)
+      }
+    },
+    async insert<T>(table: string, rows: T[]): Promise<void> {
+      if (rows.length === 0) return
+      const columns = Object.keys(rows[0] as object)
+      const params = new URLSearchParams({
+        database,
+        query: `INSERT INTO ${table} (${columns.join(', ')}) FORMAT JSONEachRow`,
+      })
+      const body = rows.map((row) => JSON.stringify(row)).join('\n')
+      const response = await fetch(`${url}?${params}`, {
+        method: 'POST',
+        body,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(process.env.CLICKHOUSE_USER && {
+            'X-ClickHouse-User': process.env.CLICKHOUSE_USER,
+          }),
+          ...(process.env.CLICKHOUSE_PASSWORD && {
+            'X-ClickHouse-Key': process.env.CLICKHOUSE_PASSWORD,
+          }),
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`ClickHouse insert failed: ${await response.text()}`)
+      }
+    },
+  }
+}
+
+/**
+ * Sync a git repository with ClickHouse database
  *
  * This is a convenience function that:
- * 1. Creates a chdb provider at ./.mdx/db
+ * 1. Creates an HTTP provider connecting to localhost:8123
  * 2. Creates a sync engine
  * 3. Runs the sync
+ *
+ * Configure via environment variables:
+ * - CLICKHOUSE_URL: ClickHouse HTTP URL (default: http://localhost:8123)
+ * - CLICKHOUSE_DATABASE: Database name (default: mdxdb)
+ * - CLICKHOUSE_USER: Username for authentication
+ * - CLICKHOUSE_PASSWORD: Password for authentication
  *
  * @example
  * ```typescript
@@ -148,8 +232,11 @@ import type { SyncOptions, SyncResult } from './types'
  * ```
  */
 export async function sync(options: SyncOptions): Promise<SyncResult> {
-  const dbPath = process.env.MDXDB_PATH ?? './.mdx/db'
-  const provider = await createChdbProvider(dbPath)
+  const database = process.env.CLICKHOUSE_DATABASE ?? 'mdxdb'
+  const provider = createClickHouseProvider({
+    executor: createDefaultExecutor(),
+    database,
+  })
   const engine = createSyncEngine({ provider })
   return engine.sync(options)
 }
@@ -167,8 +254,11 @@ export async function sync(options: SyncOptions): Promise<SyncResult> {
  * ```
  */
 export async function checkConflicts(options: SyncOptions): Promise<import('./types').SyncConflict[]> {
-  const dbPath = process.env.MDXDB_PATH ?? './.mdx/db'
-  const provider = await createChdbProvider(dbPath)
+  const database = process.env.CLICKHOUSE_DATABASE ?? 'mdxdb'
+  const provider = createClickHouseProvider({
+    executor: createDefaultExecutor(),
+    database,
+  })
   const engine = createSyncEngine({ provider })
   return engine.checkConflicts(options)
 }
