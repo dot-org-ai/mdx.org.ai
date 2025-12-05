@@ -383,3 +383,12 @@ export function setupDBNotifications(
     webContents.send(`${prefix}:change`, event)
   })
 }
+
+// Re-export studio integration for convenience
+export {
+  registerStudioHandlers,
+  setupStudioNotifications,
+  getPreloadScript as getStudioPreloadScript,
+} from '@mdxdb/studio/electron'
+export type { ElectronStudioConfig, StudioPreloadAPI } from '@mdxdb/studio/electron'
+export { createStudio, type Studio, type StudioConfig, type FileEntry } from '@mdxdb/studio'

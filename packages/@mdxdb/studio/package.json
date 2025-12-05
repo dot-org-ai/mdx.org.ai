@@ -1,31 +1,29 @@
 {
-  "name": "@mdxdb/desktop",
+  "name": "@mdxdb/studio",
   "version": "0.0.0",
-  "description": "MDXDB for Electron - desktop document database with editor",
+  "description": "MDXDB Studio - Full-featured MDX editor with database integration",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "mdxdb-studio": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./main": {
-      "types": "./dist/main.d.ts",
-      "import": "./dist/main.js",
-      "require": "./dist/main.cjs"
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
     },
-    "./renderer": {
-      "types": "./dist/renderer.d.ts",
-      "import": "./dist/renderer.js",
-      "require": "./dist/renderer.cjs"
-    },
-    "./preload": {
-      "types": "./dist/preload.d.ts",
-      "import": "./dist/preload.js",
-      "require": "./dist/preload.cjs"
+    "./electron": {
+      "types": "./dist/electron.d.ts",
+      "import": "./dist/electron.js",
+      "require": "./dist/electron.cjs"
     }
   },
   "files": [
@@ -34,6 +32,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "start": "node dist/cli.js",
     "test": "vitest run",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
@@ -41,24 +40,26 @@
   },
   "keywords": [
     "mdxdb",
-    "desktop",
-    "electron",
+    "studio",
     "editor",
-    "database",
-    "mdx"
+    "mdx",
+    "database"
   ],
   "license": "MIT",
-  "peerDependencies": {
-    "electron": ">=28.0.0",
+  "dependencies": {
     "mdxld": "workspace:*"
   },
-  "dependencies": {
-    "@mdxdb/studio": "workspace:*",
-    "@mdxe/electron": "workspace:*"
+  "peerDependencies": {
+    "@mdxui/editor": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@mdxui/editor": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
-    "mdxld": "workspace:*",
+    "@types/node": "^22.0.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
