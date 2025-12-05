@@ -1,0 +1,63 @@
+{
+  "name": "@mdxdb/chdb",
+  "version": "0.0.1",
+  "description": "chDB with vector similarity search and ULID support - embedded ClickHouse for Node.js",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "prebuilds"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:native": "node scripts/build-native.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "node-addon-api": "^8.3.0",
+    "prebuild-install": "^7.1.2"
+  },
+  "devDependencies": {
+    "chdb": "^1.6.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "prebuildify": "^6.0.1"
+  },
+  "peerDependencies": {
+    "chdb": "^1.6.0"
+  },
+  "peerDependenciesMeta": {
+    "chdb": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "clickhouse",
+    "chdb",
+    "embedded",
+    "olap",
+    "sql",
+    "vector-search",
+    "vector-similarity",
+    "ulid"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxdb/chdb"
+  },
+  "license": "MIT"
+}
