@@ -1,0 +1,172 @@
+name: Build mdxe Release
+
+on:
+  push:
+    tags:
+      - 'mdxe-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0.1.0)'
+        required: true
+        default: '0.0.1'
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14  # Apple Silicon
+            platform: darwin-arm64
+            target: bun-darwin-arm64
+          - os: macos-13  # Intel
+            platform: darwin-x64
+            target: bun-darwin-x64
+          - os: ubuntu-latest
+            platform: linux-x64
+            target: bun-linux-x64
+          - os: ubuntu-latest
+            platform: linux-arm64
+            target: bun-linux-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: packages/mdxe
+
+      - name: Build executable
+        run: |
+          mkdir -p dist-exe
+          bun build src/cli.ts --compile --target=${{ matrix.target }} --outfile=dist-exe/mdxe-${{ matrix.platform }}
+        working-directory: packages/mdxe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdxe-${{ matrix.platform }}
+          path: packages/mdxe/dist-exe/mdxe-${{ matrix.platform }}
+          retention-days: 7
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          find artifacts -type f -name 'mdxe-*' -exec cp {} release/ \;
+          chmod +x release/mdxe-*
+          ls -la release/
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            # Extract version from tag (mdxe-v0.1.0 -> 0.1.0)
+            echo "version=${GITHUB_REF_NAME#mdxe-v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mdxe-v${{ steps.version.outputs.version }}
+          name: mdxe v${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+          files: release/*
+          body: |
+            ## mdxe v${{ steps.version.outputs.version }}
+
+            Execute, Test, & Deploy MDX-based Agents, Apps, APIs, and Sites
+
+            ### What's Included
+
+            This single binary includes:
+            - **mdxe CLI** - Execute, test, and deploy MDX applications
+            - **mdxdb CLI** - Database management with ClickHouse
+            - **@mdxdb/clickhouse** - ClickHouse adapter (auto-downloads binary)
+            - All dependencies bundled
+
+            ### Installation
+
+            ```bash
+            # Quick install
+            curl https://mdxe.js.org/ | sh
+
+            # Or download directly for your platform:
+            # macOS Apple Silicon
+            curl -fsSL https://github.com/${{ github.repository }}/releases/download/mdxe-v${{ steps.version.outputs.version }}/mdxe-darwin-arm64 -o mdxe
+
+            # macOS Intel
+            curl -fsSL https://github.com/${{ github.repository }}/releases/download/mdxe-v${{ steps.version.outputs.version }}/mdxe-darwin-x64 -o mdxe
+
+            # Linux x64
+            curl -fsSL https://github.com/${{ github.repository }}/releases/download/mdxe-v${{ steps.version.outputs.version }}/mdxe-linux-x64 -o mdxe
+
+            # Linux ARM64
+            curl -fsSL https://github.com/${{ github.repository }}/releases/download/mdxe-v${{ steps.version.outputs.version }}/mdxe-linux-arm64 -o mdxe
+
+            # Make executable
+            chmod +x mdxe
+            sudo mv mdxe /usr/local/bin/
+            ```
+
+            ### Usage
+
+            ```bash
+            # Start dev server
+            mdxe
+
+            # Start database environment (ClickHouse + sync + UI)
+            mdxe db
+
+            # Run MDX tests
+            mdxe test
+
+            # Deploy to Cloudflare/Vercel/GitHub
+            mdxe deploy
+
+            # Show help
+            mdxe --help
+            ```
+
+            ### Commands
+
+            | Command | Description |
+            |---------|-------------|
+            | `mdxe` | Start development server |
+            | `mdxe build` | Build for production |
+            | `mdxe test` | Run MDX tests with vitest |
+            | `mdxe deploy` | Deploy to cloud platforms |
+            | `mdxe db` | Start local dev environment |
+            | `mdxe db:server` | Start only ClickHouse server |
+            | `mdxe db:client` | Open ClickHouse client |
+            | `mdxe db:publish` | Publish MDX files to database |
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

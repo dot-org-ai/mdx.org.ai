@@ -4,6 +4,8 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     types: 'src/types.ts',
+    typegen: 'src/typegen.ts',
+    cli: 'src/cli.ts',
     functions: 'src/functions.ts',
     database: 'src/database.ts',
     workflows: 'src/workflows.ts',

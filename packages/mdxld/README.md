@@ -20,6 +20,7 @@ yarn add mdxld
 - **JSON-LD Properties** - First-class support for `$id`, `$type`, `$context`
 - **Type-Safe** - Full TypeScript support with generics
 - **Two Modes** - Expanded (default) or flat frontmatter handling
+- **Type Generation** - CLI and API to generate TypeScript types from MDX files
 
 ## Quick Start
 
@@ -51,6 +52,53 @@ console.log(doc)
 
 // Stringify back to MDX
 const mdx = stringify(doc)
+```
+
+## CLI
+
+mdxld includes a CLI for generating TypeScript types from your MDX files.
+
+### Type Generation
+
+```bash
+# Generate types from all MDX/MD files in project
+mdxld typegen
+
+# Custom glob pattern
+mdxld typegen "content/**/*.mdx"
+
+# Custom output path (default: .mdx/types.d.ts)
+mdxld typegen -o src/types/mdx.d.ts
+```
+
+This scans your MDX files, extracts frontmatter, infers TypeScript types, and generates a `.d.ts` file:
+
+```typescript
+// .mdx/types.d.ts (auto-generated)
+import type { MDXLDDocument } from 'mdxld'
+
+export interface BlogPost {
+  $type?: string
+  title: string
+  author: string
+  tags?: string[]
+}
+
+export type BlogPostDocument = MDXLDDocument & { data: BlogPost }
+```
+
+### Programmatic API
+
+```typescript
+import { generateTypes, inferSchemaFromDocument } from 'mdxld/typegen'
+import { parse } from 'mdxld'
+
+// Parse documents
+const docs = files.map(content => parse(content))
+
+// Generate TypeScript types
+const types = generateTypes(docs)
+// Returns TypeScript declaration file content
 ```
 
 ## API Reference
@@ -332,9 +380,12 @@ For additional functionality, use these companion packages:
 | Package | Description |
 |---------|-------------|
 | [@mdxld/ast](https://www.npmjs.com/package/@mdxld/ast) | AST manipulation and analysis |
+| [@mdxld/jsx](https://www.npmjs.com/package/@mdxld/jsx) | MDX compilation with React/Preact/Hono JSX support |
 | [@mdxld/compile](https://www.npmjs.com/package/@mdxld/compile) | JSX compilation with esbuild |
 | [@mdxld/evaluate](https://www.npmjs.com/package/@mdxld/evaluate) | MDX execution and rendering |
 | [@mdxld/validate](https://www.npmjs.com/package/@mdxld/validate) | Schema validation |
+| [@mdxld/extract](https://www.npmjs.com/package/@mdxld/extract) | Bi-directional MDX ↔ Markdown extraction |
+| [@mdxld/jsonld](https://www.npmjs.com/package/@mdxld/jsonld) | JSON-LD conversion utilities |
 
 ### AI Primitives (Optional Peer Dependencies)
 

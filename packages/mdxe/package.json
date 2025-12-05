@@ -36,19 +36,22 @@
   ],
   "scripts": {
     "build": "tsup",
+    "build:exe": "bun scripts/build-exe.ts",
+    "build:exe:current": "bun scripts/build-exe.ts --current",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo"
+    "clean": "rm -rf dist dist-exe .turbo"
   },
   "keywords": [
     "mdx",
     "mdxe",
     "execute",
     "deploy",
+    "do",
     "cloudflare",
     "workers",
     "fumadocs",
@@ -59,13 +62,17 @@
     "mdxld": "workspace:*"
   },
   "dependencies": {
+    "@mdxdb/clickhouse": "workspace:*",
+    "@mdxe/deploy": "workspace:*",
     "@mdxe/hono": "workspace:*",
+    "@mdxe/payload": "workspace:*",
     "ai-functions": "file:../../primitives/packages/ai-functions",
     "ai-sandbox": "file:../../primitives/packages/ai-sandbox",
     "ai-workflows": "file:../../primitives/packages/ai-workflows",
     "esbuild": "^0.27.0",
     "glob": "^10.4.5",
     "hono": "^4.6.0",
+    "mdxdb": "workspace:*",
     "oauth.do": "^0.1.4"
   },
   "devDependencies": {

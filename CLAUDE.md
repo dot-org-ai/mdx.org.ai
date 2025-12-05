@@ -42,6 +42,9 @@ pnpm mdxai
 # Run mdxe test command
 pnpm mdxe:test
 
+# Generate TypeScript types from MDX files
+pnpm --filter mdxld exec -- mdxld typegen
+
 # Deploy to Cloudflare
 pnpm --filter mdxe exec -- mdxe deploy
 ```
@@ -121,6 +124,7 @@ Defines runtimes, servers, and communication protocols:
 ```
 @mdxld/
 ├── ast        → AST manipulation and traversal
+├── jsx        → MDX compilation with React/Preact/Hono JSX support
 ├── compile    → MDX → JavaScript compilation
 ├── evaluate   → Runtime evaluation
 ├── validate   → Schema validation (JSON Schema, Zod)
@@ -128,6 +132,10 @@ Defines runtimes, servers, and communication protocols:
 ├── extract    → Bi-directional MDX ↔ Markdown translation
 └── config     → Shared TypeScript/ESLint configs
 ```
+
+The core `mdxld` package also includes:
+- **CLI**: `mdxld typegen` - Generate TypeScript types from MDX files
+- **Type Generation**: `mdxld/typegen` - Programmatic API for type inference and generation
 
 #### Bi-directional Extraction (@mdxld/extract)
 

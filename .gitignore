@@ -159,3 +159,7 @@ Thumbs.db
 
 # Storybook build output
 storybook-static
+
+# ClickHouse runtime files
+preprocessed_configs/
+.mdx/db/

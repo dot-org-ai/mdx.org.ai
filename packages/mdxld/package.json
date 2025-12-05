@@ -6,6 +6,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "mdxld": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -16,6 +19,11 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/types.js",
       "require": "./dist/types.cjs"
+    },
+    "./typegen": {
+      "types": "./dist/typegen.d.ts",
+      "import": "./dist/typegen.js",
+      "require": "./dist/typegen.cjs"
     },
     "./functions": {
       "types": "./dist/functions.d.ts",

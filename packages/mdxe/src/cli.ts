@@ -11,13 +11,11 @@ import { spawn } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { glob } from 'glob'
 import { transform } from 'esbuild'
-import { deploy, detectSourceType } from './commands/deploy.js'
-import type { CloudflareDeployOptions } from './types.js'
 
 export interface CliOptions {
-  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'help' | 'version'
+  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'admin' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
   projectDir: string
-  platform: 'cloudflare' | 'vercel' | 'netlify'
+  platform: 'do' | 'cloudflare' | 'vercel' | 'github'
   mode?: 'static' | 'opennext'
   projectName?: string
   dryRun: boolean
@@ -33,11 +31,14 @@ export interface CliOptions {
   // Execution context options
   context: 'local' | 'remote' | 'all'
   target: 'node' | 'bun' | 'workers' | 'all'
-  db: 'memory' | 'fs' | 'sqlite' | 'sqlite-do' | 'chdb' | 'clickhouse' | 'all'
+  db: 'memory' | 'fs' | 'sqlite' | 'sqlite-do' | 'clickhouse' | 'all'
   aiMode: 'local' | 'remote'
   // Server options
   port: number
   host: string
+  // Database options (from mdxdb)
+  clickhouseUrl: string
+  httpPort: number
   // Deploy options (always uses managed apis.do API)
 }
 
@@ -54,7 +55,12 @@ Commands:
   build               Build for production
   start               Start production server
   test                Run MDX tests with vitest
-  deploy              Deploy to Cloudflare Workers
+  admin               Start Payload admin UI with mdxdb backend
+  deploy              Deploy to cloud platforms
+  db                  Start local dev environment (ClickHouse + sync + UI)
+  db:server           Start only the ClickHouse server
+  db:client           Open ClickHouse client shell
+  db:publish          Publish MDX files to database
   help                Show this help message
   version             Show version
 
@@ -63,6 +69,13 @@ Server Options:
   --port <port>          Server port (default: 3000)
   --host <host>          Server host (default: localhost)
   --verbose, -v          Show detailed output
+
+Database Options (db commands):
+  --path, -p <path>      Path to MDX files (default: ./content)
+  --name, -n <name>      Database name/namespace
+  --http-port <port>     ClickHouse HTTP port (default: 8123)
+  --clickhouse <url>     ClickHouse URL for publish (default: http://localhost:8123)
+  --dry-run              Show what would be published without publishing
 
 Test Options:
   --dir, -d <path>       Directory containing tests (default: current directory)
@@ -73,7 +86,7 @@ Test Options:
   --verbose, -v          Show detailed output
   --context, -c <ctx>    Execution context: local | remote | all (default: local)
   --target <runtime>     Target runtime: node | bun | workers | all (default: node)
-  --db <backend>         Database backend: memory | fs | sqlite | sqlite-do | chdb | clickhouse | all
+  --db <backend>         Database backend: memory | fs | sqlite | sqlite-do | clickhouse | all
   --ai <mode>            AI mode: local | remote (default: local)
 
 Test Matrix Examples:
@@ -83,8 +96,8 @@ Test Matrix Examples:
   # Run tests with SQLite on Node
   mdxe test --target node --db sqlite
 
-  # Run tests with ClickHouse (chDB) on Node
-  mdxe test --target node --db chdb
+  # Run tests with ClickHouse on Node (auto-downloads)
+  mdxe test --target node --db clickhouse
 
   # Run tests on Bun runtime
   mdxe test --target bun --db sqlite
@@ -92,15 +105,25 @@ Test Matrix Examples:
   # Run tests with SQLite Durable Objects on Workers
   mdxe test --target workers --db sqlite-do
 
-  # Run tests with remote ClickHouse on Workers
-  mdxe test --target workers --db clickhouse
-
   # Run ALL combinations (full matrix)
   mdxe test --target all --db all
 
+Database Examples:
+  # Start local dev environment (auto-downloads ClickHouse)
+  mdxe db
+
+  # Start only ClickHouse server
+  mdxe db:server
+
+  # Open ClickHouse client
+  mdxe db:client
+
+  # Publish MDX files to local ClickHouse
+  mdxe db:publish --name my-project
+
 Deploy Options:
   --dir, -d <path>       Project directory (default: current directory)
-  --platform, -p <name>  Deployment platform: cloudflare (default: cloudflare)
+  --platform, -p <name>  Deployment platform: do | cloudflare | vercel | github (default: do)
   --mode, -m <mode>      Deployment mode: static | opennext (auto-detected)
   --name, -n <name>      Project name for deployment
   --dry-run              Show what would be deployed without deploying
@@ -108,9 +131,18 @@ Deploy Options:
   --verbose, -v          Show detailed output
   --env, -e <KEY=VALUE>  Set environment variable (can be repeated)
 
-Examples:
-  # Deploy current directory to Cloudflare
+Deploy Examples:
+  # Deploy to .do platform (default)
   mdxe deploy
+
+  # Deploy to Cloudflare directly
+  mdxe deploy --platform cloudflare
+
+  # Deploy to Vercel
+  mdxe deploy --platform vercel
+
+  # Deploy to GitHub Pages
+  mdxe deploy --platform github
 
   # Deploy with specific project name
   mdxe deploy --name my-docs
@@ -118,11 +150,8 @@ Examples:
   # Deploy a specific directory
   mdxe deploy --dir ./my-project
 
-  # Force static mode (use Workers Static Assets)
+  # Force static mode
   mdxe deploy --mode static
-
-  # Force OpenNext mode (for SSR/dynamic content)
-  mdxe deploy --mode opennext
 
   # Dry run to see what would happen
   mdxe deploy --dry-run
@@ -130,36 +159,44 @@ Examples:
   # Set environment variables
   mdxe deploy --env API_URL=https://api.example.com --env DEBUG=true
 
-Deployment Modes:
+Platforms:
 
-  Static (Workers Static Assets):
-    Used when your docs use a static data source like @mdxdb/fs.
-    Exports Next.js as static HTML and serves via Cloudflare Workers.
+  .do (default):
+    Managed serverless platform powered by Cloudflare Workers.
+    Uses oauth.do for authentication.
+    Supports static sites and SSR via OpenNext.
+    Handles KV, D1, R2, and Durable Objects automatically.
 
-  OpenNext (Server-Side Rendering):
-    Used when your docs use a dynamic data source like @mdxdb/api,
-    @mdxdb/postgres, @mdxdb/mongo, etc.
-    Uses OpenNext.js to run Next.js on Cloudflare Workers.
+  Cloudflare:
+    Deploy directly to Cloudflare Workers or Pages.
+    Use this when you have a wrangler.toml configuration.
+    Supports Workers for Platforms (multi-tenant).
 
-Auto-Detection:
-  mdxe automatically detects your data source by analyzing:
-  - source.config.ts
-  - lib/source.ts
-  - package.json dependencies
+  Vercel:
+    Deploy to Vercel's serverless platform.
+    Supports preview and production deployments.
+    Auto-detects framework (Next.js, Vite, etc.).
 
-  Static sources: @mdxdb/fs
-  Dynamic sources: @mdxdb/api, @mdxdb/postgres, @mdxdb/mongo, etc.
+  GitHub:
+    Deploy to GitHub Pages.
+    Supports direct git push or GitHub Actions workflow.
+    Ideal for static documentation sites.
 
-Environment:
-  CLOUDFLARE_ACCOUNT_ID    Cloudflare account ID
-  CLOUDFLARE_API_TOKEN     Cloudflare API token
+Environment Variables:
+  DO_TOKEN                 .do platform API token (via oauth.do)
+  DO_API_URL               .do platform API URL (default: https://apis.do)
+  CLOUDFLARE_ACCOUNT_ID    Cloudflare account ID (for direct CF deploys)
+  CLOUDFLARE_API_TOKEN     Cloudflare API token (for direct CF deploys)
+  VERCEL_TOKEN             Vercel API token
+  VERCEL_TEAM_ID           Vercel team ID (optional)
+  GITHUB_TOKEN             GitHub personal access token
 `
 
 export function parseArgs(args: string[]): CliOptions {
   const options: CliOptions = {
     command: 'dev', // Default to dev
     projectDir: process.cwd(),
-    platform: 'cloudflare',
+    platform: 'do', // Default to .do platform
     dryRun: false,
     force: false,
     verbose: false,
@@ -174,6 +211,8 @@ export function parseArgs(args: string[]): CliOptions {
     aiMode: 'local',
     port: 3000,
     host: 'localhost',
+    clickhouseUrl: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+    httpPort: parseInt(process.env.CLICKHOUSE_HTTP_PORT || '8123', 10),
   }
 
   // Parse command
@@ -189,6 +228,16 @@ export function parseArgs(args: string[]): CliOptions {
       options.command = 'test'
     } else if (cmd === 'deploy') {
       options.command = 'deploy'
+    } else if (cmd === 'admin') {
+      options.command = 'admin'
+    } else if (cmd === 'db') {
+      options.command = 'db'
+    } else if (cmd === 'db:server') {
+      options.command = 'db:server'
+    } else if (cmd === 'db:client') {
+      options.command = 'db:client'
+    } else if (cmd === 'db:publish') {
+      options.command = 'db:publish'
     } else if (cmd === 'version' || cmd === '-v' || cmd === '--version') {
       options.command = 'version'
     } else if (cmd === 'help' || cmd === '-h' || cmd === '--help') {
@@ -210,10 +259,10 @@ export function parseArgs(args: string[]): CliOptions {
         break
       case '--platform':
       case '-p':
-        if (next === 'cloudflare' || next === 'vercel' || next === 'netlify') {
+        if (next === 'do' || next === 'cloudflare' || next === 'vercel' || next === 'github') {
           options.platform = next
         } else {
-          console.error(`Invalid platform: ${next}. Supported: cloudflare, vercel, netlify`)
+          console.error(`Invalid platform: ${next}. Supported: do, cloudflare, vercel, github`)
           process.exit(1)
         }
         i++
@@ -296,12 +345,20 @@ export function parseArgs(args: string[]): CliOptions {
         i++
         break
       case '--db':
-        if (['memory', 'fs', 'sqlite', 'sqlite-do', 'chdb', 'clickhouse', 'all'].includes(next)) {
+        if (['memory', 'fs', 'sqlite', 'sqlite-do', 'clickhouse', 'all'].includes(next)) {
           options.db = next as CliOptions['db']
         } else {
-          console.error(`Invalid db backend: ${next}. Use memory, fs, sqlite, sqlite-do, chdb, clickhouse, or all.`)
+          console.error(`Invalid db backend: ${next}. Use memory, fs, sqlite, sqlite-do, clickhouse, or all.`)
           process.exit(1)
         }
+        i++
+        break
+      case '--http-port':
+        options.httpPort = parseInt(next || '8123', 10)
+        i++
+        break
+      case '--clickhouse':
+        options.clickhouseUrl = next || 'http://localhost:8123'
         i++
         break
       case '--ai':
@@ -330,39 +387,49 @@ export function parseArgs(args: string[]): CliOptions {
 
 export async function runDeploy(options: CliOptions): Promise<void> {
   console.log('🚀 mdxe deploy\n')
-
-  if (options.platform !== 'cloudflare') {
-    console.error(`Platform '${options.platform}' is not yet supported. Currently only 'cloudflare' is available.`)
-    process.exit(1)
-  }
-
-  // Show detection info
   console.log(`📁 Project: ${options.projectDir}`)
-
-  const sourceType = detectSourceType(options.projectDir)
-  console.log(`🔍 Detected adapter: ${sourceType.adapter || 'unknown'}`)
-  console.log(`📊 Source type: ${sourceType.isStatic ? 'static' : 'dynamic'}`)
-
-  const mode = options.mode || (sourceType.isStatic ? 'static' : 'opennext')
-  console.log(`⚙️  Deployment mode: ${mode}`)
 
   if (options.dryRun) {
     console.log('🔬 Dry run mode - no changes will be made\n')
   }
 
-  console.log('')
+  // Use unified deploy package
+  const { deploy, detectPlatform } = await import('@mdxe/deploy')
 
-  const deployOptions: CloudflareDeployOptions = {
-    platform: 'cloudflare',
-    projectName: options.projectName,
-    mode: options.mode,
-    dryRun: options.dryRun,
-    force: options.force,
-    env: options.env,
-    // Always use managed apis.do API (oauth.do auth)
+  // Auto-detect platform if not specified
+  let platform = options.platform
+  const detection = detectPlatform(options.projectDir)
+
+  if (!platform) {
+    platform = detection.platform
+    console.log(`🔍 Auto-detected: ${platform} (${detection.reason})`)
   }
 
-  const result = await deploy(options.projectDir, deployOptions)
+  if (detection.framework) {
+    console.log(`📦 Framework: ${detection.framework}`)
+  }
+  console.log(`📊 Static: ${detection.isStatic ? 'yes' : 'no (SSR)'}`)
+  console.log(`🎯 Platform: ${platform}`)
+  console.log('')
+
+  // Build unified options
+  type DeployOpts = Parameters<typeof deploy>[0]
+  const deployOptions: DeployOpts = {
+    projectDir: options.projectDir,
+    platform,
+    name: options.projectName,
+    env: options.env,
+    dryRun: options.dryRun,
+    force: options.force,
+    verbose: options.verbose,
+  }
+
+  // Add platform-specific options
+  if (platform === 'cloudflare' && options.mode) {
+    (deployOptions as DeployOpts & { mode?: string }).mode = options.mode
+  }
+
+  const result = await deploy(deployOptions)
 
   // Show logs if verbose
   if (options.verbose && result.logs) {
@@ -372,10 +439,21 @@ export async function runDeploy(options: CliOptions): Promise<void> {
     }
   }
 
+  // Show timing if available
+  if (result.timing?.totalDuration) {
+    console.log(`\n⏱️  Duration: ${(result.timing.totalDuration / 1000).toFixed(1)}s`)
+  }
+
   if (result.success) {
     console.log('\n✅ Deployment successful!')
     if (result.url) {
       console.log(`🌐 URL: ${result.url}`)
+    }
+    if (result.productionUrl && result.productionUrl !== result.url) {
+      console.log(`🌐 Production: ${result.productionUrl}`)
+    }
+    if (result.deploymentId) {
+      console.log(`📋 ID: ${result.deploymentId}`)
     }
   } else {
     console.error('\n❌ Deployment failed!')
@@ -623,8 +701,6 @@ function getDbConfig(db: CliOptions['db'], target: CliOptions['target']): { prov
       return { provider: 'sqlite', config: { url: ':memory:' } }
     case 'sqlite-do':
       return { provider: 'sqlite-do', config: {} }
-    case 'chdb':
-      return { provider: 'chdb', config: { path: './.db/clickhouse' } }
     case 'clickhouse':
       return { provider: 'clickhouse', config: { url: process.env.CLICKHOUSE_URL || 'http://localhost:8123' } }
     default:
@@ -638,7 +714,7 @@ function getDbConfig(db: CliOptions['db'], target: CliOptions['target']): { prov
 function generateTestMatrix(target: CliOptions['target'], db: CliOptions['db']): Array<{ target: string; db: string }> {
   const targets = target === 'all' ? ['node', 'bun', 'workers'] : [target]
   const dbs = db === 'all'
-    ? ['memory', 'fs', 'sqlite', 'sqlite-do', 'chdb', 'clickhouse']
+    ? ['memory', 'fs', 'sqlite', 'sqlite-do', 'clickhouse']
     : [db]
 
   const matrix: Array<{ target: string; db: string }> = []
@@ -646,7 +722,7 @@ function generateTestMatrix(target: CliOptions['target'], db: CliOptions['db']):
   for (const t of targets) {
     for (const d of dbs) {
       // Skip invalid combinations
-      if (t === 'workers' && (d === 'fs' || d === 'chdb')) continue // fs and chdb not available on workers
+      if (t === 'workers' && d === 'fs') continue // fs not available on workers
       if (t === 'node' && d === 'sqlite-do') continue // Durable Objects only on workers
       if (t === 'bun' && d === 'sqlite-do') continue // Durable Objects only on workers
 
@@ -915,6 +991,86 @@ export async function runStart(options: CliOptions): Promise<void> {
   })
 }
 
+/**
+ * Run database commands via mdxdb CLI
+ */
+async function runDbCommand(options: CliOptions): Promise<void> {
+  // Import mdxdb CLI functions
+  const { parseArgs: mdxdbParseArgs, main: mdxdbMain } = await import('mdxdb/cli')
+
+  // Map mdxe options to mdxdb options
+  const mdxdbArgs: string[] = []
+
+  // Map command
+  if (options.command === 'db') {
+    mdxdbArgs.push('dev')
+  } else if (options.command === 'db:server') {
+    mdxdbArgs.push('server')
+  } else if (options.command === 'db:client') {
+    mdxdbArgs.push('client')
+  } else if (options.command === 'db:publish') {
+    mdxdbArgs.push('publish')
+  }
+
+  // Map options
+  if (options.projectDir !== process.cwd()) {
+    mdxdbArgs.push('--path', options.projectDir)
+  }
+  if (options.projectName) {
+    mdxdbArgs.push('--name', options.projectName)
+  }
+  if (options.httpPort !== 8123) {
+    mdxdbArgs.push('--http-port', String(options.httpPort))
+  }
+  if (options.clickhouseUrl !== 'http://localhost:8123') {
+    mdxdbArgs.push('--clickhouse', options.clickhouseUrl)
+  }
+  if (options.dryRun) {
+    mdxdbArgs.push('--dry-run')
+  }
+  if (options.verbose) {
+    mdxdbArgs.push('--verbose')
+  }
+
+  // Parse with mdxdb's parser and run
+  const mdxdbOptions = mdxdbParseArgs(mdxdbArgs)
+
+  // Call the appropriate mdxdb function based on command
+  const mdxdb = await import('mdxdb/cli')
+
+  switch (mdxdbOptions.command) {
+    case 'publish':
+      await mdxdb.runPublish(mdxdbOptions)
+      break
+    default:
+      // For dev/server/client, call the main function which handles these
+      await mdxdbMain()
+      break
+  }
+}
+
+/**
+ * Run Payload admin with mdxdb backend
+ *
+ * Scans the current directory for MDX files, discovers types from $type frontmatter,
+ * and starts a Payload instance with native mdxdb collections enabled.
+ */
+export async function runAdmin(options: CliOptions): Promise<void> {
+  console.log('🎛️  mdxe admin\n')
+  console.log(`📁 Project: ${options.projectDir}`)
+  console.log(`🌐 Server: http://${options.host}:${options.port}`)
+  console.log('')
+
+  // Dynamic import of @mdxe/payload
+  const { adminCommand } = await import('@mdxe/payload')
+
+  await adminCommand({
+    contentDir: options.projectDir,
+    port: options.port,
+    verbose: options.verbose,
+  })
+}
+
 export async function main(): Promise<void> {
   const args = process.argv.slice(2)
   const options = parseArgs(args)
@@ -934,6 +1090,15 @@ export async function main(): Promise<void> {
       break
     case 'deploy':
       await runDeploy(options)
+      break
+    case 'admin':
+      await runAdmin(options)
+      break
+    case 'db':
+    case 'db:server':
+    case 'db:client':
+    case 'db:publish':
+      await runDbCommand(options)
       break
     case 'version':
       console.log(`mdxe version ${VERSION}`)

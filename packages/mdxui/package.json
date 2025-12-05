@@ -6,6 +6,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "mdxui": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -16,6 +19,11 @@
       "types": "./dist/products.d.ts",
       "import": "./dist/products.js",
       "require": "./dist/products.cjs"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js",
+      "require": "./dist/cli.cjs"
     }
   },
   "files": [
@@ -35,19 +43,25 @@
     "mdx",
     "mdxui",
     "ui",
-    "components"
+    "components",
+    "storybook"
   ],
   "license": "MIT",
   "devDependencies": {
+    "@mdxui/storybook": "workspace:^",
     "digital-products": "workspace:^",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   },
   "peerDependencies": {
-    "digital-products": "*"
+    "@mdxui/storybook": "workspace:*",
+    "digital-products": "workspace:*"
   },
   "peerDependenciesMeta": {
+    "@mdxui/storybook": {
+      "optional": true
+    },
     "digital-products": {
       "optional": true
     }

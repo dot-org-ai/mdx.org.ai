@@ -1,0 +1,153 @@
+name: Build mdxdb Release
+
+on:
+  push:
+    tags:
+      - 'mdxdb-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0.1.0)'
+        required: true
+        default: '0.0.1'
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14  # Apple Silicon
+            platform: darwin-arm64
+            target: bun-darwin-arm64
+          - os: macos-13  # Intel
+            platform: darwin-x64
+            target: bun-darwin-x64
+          - os: ubuntu-latest
+            platform: linux-x64
+            target: bun-linux-x64
+          - os: ubuntu-latest
+            platform: linux-arm64
+            target: bun-linux-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: packages/mdxdb
+
+      - name: Build executable
+        run: |
+          mkdir -p dist-exe
+          bun build src/cli.ts --compile --target=${{ matrix.target }} --outfile=dist-exe/mdxdb-${{ matrix.platform }}
+        working-directory: packages/mdxdb
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdxdb-${{ matrix.platform }}
+          path: packages/mdxdb/dist-exe/mdxdb-${{ matrix.platform }}
+          retention-days: 7
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          find artifacts -type f -name 'mdxdb-*' -exec cp {} release/ \;
+          chmod +x release/mdxdb-*
+          ls -la release/
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            # Extract version from tag (mdxdb-v0.1.0 -> 0.1.0)
+            echo "version=${GITHUB_REF_NAME#mdxdb-v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mdxdb-v${{ steps.version.outputs.version }}
+          name: mdxdb v${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+          files: release/*
+          body: |
+            ## mdxdb v${{ steps.version.outputs.version }}
+
+            MDX Database CLI - Create, Manage, & Publish MDX Databases
+
+            ### Installation
+
+            ```bash
+            # Quick install
+            curl https://mdxdb.js.org/ | sh
+
+            # Or download directly for your platform:
+            # macOS Apple Silicon
+            curl -fsSL https://github.com/${{ github.repository }}/releases/download/mdxdb-v${{ steps.version.outputs.version }}/mdxdb-darwin-arm64 -o mdxdb
+
+            # macOS Intel
+            curl -fsSL https://github.com/${{ github.repository }}/releases/download/mdxdb-v${{ steps.version.outputs.version }}/mdxdb-darwin-x64 -o mdxdb
+
+            # Linux x64
+            curl -fsSL https://github.com/${{ github.repository }}/releases/download/mdxdb-v${{ steps.version.outputs.version }}/mdxdb-linux-x64 -o mdxdb
+
+            # Linux ARM64
+            curl -fsSL https://github.com/${{ github.repository }}/releases/download/mdxdb-v${{ steps.version.outputs.version }}/mdxdb-linux-arm64 -o mdxdb
+
+            # Make executable
+            chmod +x mdxdb
+            sudo mv mdxdb /usr/local/bin/
+            ```
+
+            ### Usage
+
+            ```bash
+            # Start local dev environment (auto-downloads ClickHouse)
+            mdxdb
+
+            # Show help
+            mdxdb --help
+
+            # Publish MDX files
+            mdxdb publish --name my-project
+            ```
+
+            ### What's Included
+
+            - **Single binary** - No dependencies required
+            - **Auto-downloads ClickHouse** - On first run
+            - **Web UI** - Browse your database at http://localhost:4000
+            - **File watcher** - Auto-sync MDX changes
+            - **Type definitions** - [TypeName].mdx convention
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
