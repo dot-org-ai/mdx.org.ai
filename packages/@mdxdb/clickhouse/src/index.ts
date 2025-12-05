@@ -235,131 +235,29 @@ export interface ClickHouseConfig {
 }
 
 // =============================================================================
-// Schema
+// Schema (imported from modular schema files)
 // =============================================================================
 
-const SCHEMA = `
-  -- Things table (graph nodes)
-  -- Uses ReplacingMergeTree for upsert semantics with version tracking
-  CREATE TABLE IF NOT EXISTS Things (
-    url String,
-    ns LowCardinality(String),
-    type LowCardinality(String),
-    id String,
-    context String DEFAULT '',
-    data String DEFAULT '{}',
-    content String DEFAULT '',
-    createdAt DateTime64(3) DEFAULT now64(3),
-    updatedAt DateTime64(3) DEFAULT now64(3),
-    deletedAt Nullable(DateTime64(3)),
-    version UInt32 DEFAULT 1,
+import {
+  FULL_SCHEMA,
+  getAllSchemaStatements,
+  TABLES,
+  TABLE_SCHEMAS,
+  SCHEMA_VERSION,
+  type TableName,
+  // Row types
+  type ThingRow,
+  type RelationshipRow,
+  type EventRow,
+  type ActionRow,
+  type ArtifactRow,
+  type SearchRow,
+} from '../schema/index.js'
 
-    -- Bloom filter index for faster JSON queries on data
-    INDEX idx_data_bloom data TYPE bloom_filter GRANULARITY 1
-  ) ENGINE = ReplacingMergeTree(version)
-  ORDER BY (ns, type, id)
-  PRIMARY KEY (ns, type, id);
-
-  -- Relationships table (graph edges)
-  -- Stores bi-directional relationships between things
-  CREATE TABLE IF NOT EXISTS Relationships (
-    id String,
-    type LowCardinality(String),
-    fromUrl String,
-    toUrl String,
-    data String DEFAULT '{}',
-    createdAt DateTime64(3) DEFAULT now64(3),
-
-    -- Index for reverse lookups (find things that point TO a url)
-    INDEX idx_toUrl toUrl TYPE bloom_filter GRANULARITY 1
-  ) ENGINE = ReplacingMergeTree(createdAt)
-  ORDER BY (fromUrl, type, toUrl)
-  PRIMARY KEY (fromUrl, type, toUrl);
-
-  -- Events table (immutable event log - append-only)
-  -- Partitioned by month for efficient time-based queries and retention
-  CREATE TABLE IF NOT EXISTS Events (
-    id String,
-    type LowCardinality(String),
-    url Nullable(String),
-    timestamp DateTime64(3) DEFAULT now64(3),
-    source String,
-    data String DEFAULT '{}',
-    correlationId Nullable(String),
-    causationId Nullable(String),
-
-    -- Index for correlation chain lookups
-    INDEX idx_correlation correlationId TYPE bloom_filter GRANULARITY 1,
-    INDEX idx_causation causationId TYPE bloom_filter GRANULARITY 1
-  ) ENGINE = MergeTree()
-  ORDER BY (type, timestamp, id)
-  PARTITION BY toYYYYMM(timestamp);
-
-  -- Actions table (pending/active work with progress tracking)
-  -- Following Activity Streams pattern: actor performs action on object
-  CREATE TABLE IF NOT EXISTS Actions (
-    id String,
-    type LowCardinality(String),
-    actor String,
-    object String,
-    status LowCardinality(String) DEFAULT 'pending',
-    progress UInt32 DEFAULT 0,
-    total UInt32 DEFAULT 0,
-    data String DEFAULT '{}',
-    result String DEFAULT '',
-    error String DEFAULT '',
-    createdAt DateTime64(3) DEFAULT now64(3),
-    updatedAt DateTime64(3) DEFAULT now64(3),
-    startedAt Nullable(DateTime64(3)),
-    completedAt Nullable(DateTime64(3)),
-
-    -- Index for finding actions by status
-    INDEX idx_status status TYPE set(10) GRANULARITY 1
-  ) ENGINE = ReplacingMergeTree(updatedAt)
-  ORDER BY (status, type, createdAt, id)
-  PRIMARY KEY (status, type, createdAt);
-
-  -- Artifacts table (cached compiled content, embeddings, etc.)
-  -- Used for: AST, ESM bundles, HTML, embeddings, computed content
-  CREATE TABLE IF NOT EXISTS Artifacts (
-    url String,
-    type LowCardinality(String),
-    sourceHash String,
-    content String,
-    size UInt64 DEFAULT 0,
-    metadata String DEFAULT '{}',
-    createdAt DateTime64(3) DEFAULT now64(3),
-    expiresAt Nullable(DateTime64(3)),
-
-    -- Index for finding expired artifacts
-    INDEX idx_expires expiresAt TYPE minmax GRANULARITY 1
-  ) ENGINE = ReplacingMergeTree(createdAt)
-  ORDER BY (url, type)
-  PRIMARY KEY (url, type);
-
-  -- Search table (hybrid full-text + vector search with chunking)
-  -- Stores searchable content chunks with embeddings for semantic search
-  CREATE TABLE IF NOT EXISTS Search (
-    url String,
-    chunk UInt16 DEFAULT 0,
-    ns LowCardinality(String),
-    type LowCardinality(String),
-    title String DEFAULT '',
-    content String DEFAULT '',
-    embedding Array(Float32),
-    model LowCardinality(String) DEFAULT 'default',
-    dimensions UInt16 DEFAULT 0,
-    sourceHash String,
-    metadata String DEFAULT '{}',
-    createdAt DateTime64(3) DEFAULT now64(3),
-
-    -- Full-text index on content and title
-    INDEX idx_content content TYPE tokenbf_v1(32768, 3, 0) GRANULARITY 1,
-    INDEX idx_title title TYPE tokenbf_v1(32768, 3, 0) GRANULARITY 1
-  ) ENGINE = ReplacingMergeTree(createdAt)
-  ORDER BY (ns, type, url, chunk)
-  PRIMARY KEY (ns, type, url, chunk);
-`
+// Re-export schema modules
+export * from '../schema/index.js'
+export { migrate, rollback, cleanupBackups, needsMigration } from '../schema/migrate.js'
+export type { MigrateOptions, MigrateResult } from '../schema/migrate.js'
 
 // =============================================================================
 // Utilities
@@ -447,10 +345,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     await this.executor.command(`CREATE DATABASE IF NOT EXISTS ${this.database}`)
 
     // Execute schema statements one by one
-    const statements = SCHEMA
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0)
+    const statements = getAllSchemaStatements()
 
     for (const statement of statements) {
       await this.executor.command(statement)
@@ -462,7 +357,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   // ===========================================================================
 
   async list(options: QueryOptions = {}): Promise<Thing<TData>[]> {
-    const conditions: string[] = ['deletedAt IS NULL']
+    const conditions: string[] = ["event != 'deleted'"]
 
     if (options.ns) {
       conditions.push(`ns = '${escapeString(options.ns)}'`)
@@ -475,19 +370,19 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     if (options.where) {
       for (const [key, value] of Object.entries(options.where)) {
         const jsonValue = typeof value === 'string' ? value : JSON.stringify(value)
-        conditions.push(`JSONExtractString(data, '${key}') = '${escapeString(jsonValue)}'`)
+        conditions.push(`data.${key} = '${escapeString(jsonValue)}'`)
       }
     }
 
     const whereClause = `WHERE ${conditions.join(' AND ')}`
 
-    let orderClause = 'ORDER BY updatedAt DESC'
+    let orderClause = 'ORDER BY ts DESC'
     if (options.orderBy) {
       const dir = options.order === 'desc' ? 'DESC' : 'ASC'
-      if (['url', 'ns', 'type', 'id', 'createdAt', 'updatedAt'].includes(options.orderBy)) {
+      if (['url', 'ns', 'type', 'id', 'ts', 'version'].includes(options.orderBy)) {
         orderClause = `ORDER BY ${options.orderBy} ${dir}`
       } else {
-        orderClause = `ORDER BY JSONExtractString(data, '${options.orderBy}') ${dir}`
+        orderClause = `ORDER BY data.${options.orderBy} ${dir}`
       }
     }
 
@@ -507,8 +402,8 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   async search(options: ThingSearchOptions): Promise<Thing<TData>[]> {
     const query = escapeString(options.query.toLowerCase())
     const conditions: string[] = [
-      'deletedAt IS NULL',
-      `(positionCaseInsensitive(id, '${query}') > 0 OR positionCaseInsensitive(data, '${query}') > 0 OR positionCaseInsensitive(content, '${query}') > 0)`,
+      "event != 'deleted'",
+      `(positionCaseInsensitive(id, '${query}') > 0 OR positionCaseInsensitive(toString(data), '${query}') > 0 OR positionCaseInsensitive(content, '${query}') > 0)`,
     ]
 
     if (options.ns) {
@@ -524,14 +419,14 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     const offsetClause = options.offset ? `OFFSET ${options.offset}` : ''
 
     const rows = await this.executor.query<ThingRow>(
-      `SELECT * FROM Things FINAL ${whereClause} ORDER BY updatedAt DESC ${limitClause} ${offsetClause}`
+      `SELECT * FROM Things FINAL ${whereClause} ORDER BY ts DESC ${limitClause} ${offsetClause}`
     )
     return rows.map(row => this.rowToThing(row))
   }
 
   async get(url: string): Promise<Thing<TData> | null> {
     const rows = await this.executor.query<ThingRow>(
-      `SELECT * FROM Things FINAL WHERE url = '${escapeString(url)}' AND deletedAt IS NULL LIMIT 1`
+      `SELECT * FROM Things FINAL WHERE url = '${escapeString(url)}' AND event != 'deleted' LIMIT 1`
     )
     if (rows.length === 0) return null
     return this.rowToThing(rows[0]!)
@@ -553,13 +448,19 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       ns,
       type,
       id,
-      context: '',
-      data: JSON.stringify(data),
-      content: '',
-      createdAt: existing?.createdAt?.toISOString() ?? now,
-      updatedAt: now,
-      deletedAt: null,
+      branch: 'main',
+      variant: '',
       version,
+      repo: '',
+      patch: '',
+      commit: '',
+      data,
+      content: '',
+      code: '',
+      meta: {},
+      visibility: 'tenant',
+      event: existing ? 'updated' : 'created',
+      ts: now,
     }])
 
     return {
@@ -589,13 +490,19 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       ns: options.ns,
       type: options.type,
       id,
-      context: options['@context'] ? JSON.stringify(options['@context']) : '',
-      data: JSON.stringify(options.data),
-      content: '',
-      createdAt: now,
-      updatedAt: now,
-      deletedAt: null,
+      branch: 'main',
+      variant: '',
       version: 1,
+      repo: '',
+      patch: '',
+      commit: '',
+      data: options.data,
+      content: '',
+      code: '',
+      meta: options['@context'] ? { '@context': options['@context'] } : {},
+      visibility: 'tenant',
+      event: 'created',
+      ts: now,
     }])
 
     return {
@@ -639,19 +546,25 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     const { ns, type, id } = parseThingUrl(url)
     const now = new Date().toISOString()
 
-    // Soft delete by setting deleted_at
+    // Soft delete by setting event = 'deleted'
     await this.executor.insert('Things', [{
       url,
       ns,
       type,
       id,
-      context: '',
-      data: JSON.stringify(existing.data),
-      content: '',
-      createdAt: existing.createdAt.toISOString(),
-      updatedAt: now,
-      deletedAt: now,
+      branch: 'main',
+      variant: '',
       version: (existing as any).version + 1,
+      repo: '',
+      patch: '',
+      commit: '',
+      data: existing.data,
+      content: '',
+      code: '',
+      meta: {},
+      visibility: 'tenant',
+      event: 'deleted',
+      ts: now,
     }])
 
     return true
@@ -674,20 +587,24 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   async relate<T extends Record<string, unknown> = Record<string, unknown>>(
     options: RelateOptions<T>
   ): Promise<Relationship<T>> {
-    const id = generateRelationshipId(options.from, options.type, options.to)
     const now = new Date().toISOString()
+    const { ns } = parseThingUrl(options.from)
 
     await this.executor.insert('Relationships', [{
-      id,
-      type: options.type,
-      fromUrl: options.from,
-      toUrl: options.to,
-      data: options.data ? JSON.stringify(options.data) : '',
-      createdAt: now,
+      ns,
+      from: options.from,
+      to: options.to,
+      predicate: options.type,
+      reverse: '',
+      data: options.data ?? {},
+      meta: {},
+      visibility: '',
+      event: 'created',
+      ts: now,
     }])
 
     return {
-      id,
+      id: generateRelationshipId(options.from, options.type, options.to),
       type: options.type,
       from: options.from,
       to: options.to,
@@ -698,7 +615,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
 
   async unrelate(from: string, type: string, to: string): Promise<boolean> {
     await this.executor.command(
-      `ALTER TABLE Relationships DELETE WHERE fromUrl = '${escapeString(from)}' AND type = '${escapeString(type)}' AND toUrl = '${escapeString(to)}'`
+      `ALTER TABLE Relationships DELETE WHERE \`from\` = '${escapeString(from)}' AND predicate = '${escapeString(type)}' AND \`to\` = '${escapeString(to)}'`
     )
     return true
   }
@@ -711,19 +628,19 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     const urls: string[] = []
 
     if (direction === 'from' || direction === 'both') {
-      const typeClause = relationshipType ? `AND type = '${escapeString(relationshipType)}'` : ''
-      const rows = await this.executor.query<{ toUrl: string }>(
-        `SELECT toUrl FROM Relationships FINAL WHERE fromUrl = '${escapeString(url)}' ${typeClause}`
+      const predicateClause = relationshipType ? `AND predicate = '${escapeString(relationshipType)}'` : ''
+      const rows = await this.executor.query<{ to: string }>(
+        `SELECT \`to\` FROM Relationships WHERE \`from\` = '${escapeString(url)}' ${predicateClause}`
       )
-      urls.push(...rows.map(r => r.to_url))
+      urls.push(...rows.map(r => r.to))
     }
 
     if (direction === 'to' || direction === 'both') {
-      const typeClause = relationshipType ? `AND type = '${escapeString(relationshipType)}'` : ''
-      const rows = await this.executor.query<{ fromUrl: string }>(
-        `SELECT fromUrl FROM Relationships FINAL WHERE toUrl = '${escapeString(url)}' ${typeClause}`
+      const predicateClause = relationshipType ? `AND predicate = '${escapeString(relationshipType)}'` : ''
+      const rows = await this.executor.query<{ from: string }>(
+        `SELECT \`from\` FROM Relationships WHERE \`to\` = '${escapeString(url)}' ${predicateClause}`
       )
-      urls.push(...rows.map(r => r.from_url))
+      urls.push(...rows.map(r => r.from))
     }
 
     const uniqueUrls = [...new Set(urls)]
@@ -731,7 +648,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
 
     const urlList = uniqueUrls.map(u => `'${escapeString(u)}'`).join(', ')
     const rows = await this.executor.query<ThingRow>(
-      `SELECT * FROM Things FINAL WHERE url IN (${urlList}) AND deletedAt IS NULL`
+      `SELECT * FROM Things FINAL WHERE url IN (${urlList}) AND event != 'deleted'`
     )
     return rows.map(row => this.rowToThing(row))
   }
@@ -744,17 +661,17 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     const results: Relationship[] = []
 
     if (direction === 'from' || direction === 'both') {
-      const typeClause = type ? `AND type = '${escapeString(type)}'` : ''
+      const predicateClause = type ? `AND predicate = '${escapeString(type)}'` : ''
       const rows = await this.executor.query<RelationshipRow>(
-        `SELECT * FROM Relationships FINAL WHERE fromUrl = '${escapeString(url)}' ${typeClause}`
+        `SELECT * FROM Relationships WHERE \`from\` = '${escapeString(url)}' ${predicateClause}`
       )
       results.push(...rows.map(row => this.rowToRelationship(row)))
     }
 
     if (direction === 'to' || direction === 'both') {
-      const typeClause = type ? `AND type = '${escapeString(type)}'` : ''
+      const predicateClause = type ? `AND predicate = '${escapeString(type)}'` : ''
       const rows = await this.executor.query<RelationshipRow>(
-        `SELECT * FROM Relationships FINAL WHERE toUrl = '${escapeString(url)}' ${typeClause}`
+        `SELECT * FROM Relationships WHERE \`to\` = '${escapeString(url)}' ${predicateClause}`
       )
       results.push(...rows.map(row => this.rowToRelationship(row)))
     }
@@ -767,27 +684,41 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   }
 
   // ===========================================================================
-  // Event Operations
+  // Event Operations (Actor-Event-Object-Result pattern)
   // ===========================================================================
 
   async track<T extends Record<string, unknown>>(
     options: CreateEventOptions<T>
   ): Promise<Event<T>> {
-    const id = generateId()
     const now = new Date().toISOString()
+    // Extract ns from source URL or use 'default'
+    let ns = 'default'
+    try {
+      const { ns: sourceNs } = parseThingUrl(options.source)
+      ns = sourceNs
+    } catch {
+      // Use default ns if source is not a valid URL
+    }
 
     await this.executor.insert('Events', [{
-      id,
-      type: options.type,
-      timestamp: now,
-      source: options.source,
-      data: JSON.stringify(options.data),
-      correlationId: options.correlationId ?? null,
-      causationId: options.causationId ?? null,
+      // ulid is auto-generated by ClickHouse
+      ns,
+      actor: options.source,
+      actorData: {},
+      event: options.type,
+      object: '',
+      objectData: options.data ?? {},
+      result: '',
+      resultData: {},
+      meta: {
+        correlationId: options.correlationId,
+        causationId: options.causationId,
+      },
+      ts: now,
     }])
 
     return {
-      id,
+      id: '', // Will be generated by ClickHouse
       type: options.type,
       timestamp: new Date(now),
       source: options.source,
@@ -799,7 +730,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
 
   async getEvent(id: string): Promise<Event | null> {
     const rows = await this.executor.query<EventRow>(
-      `SELECT * FROM Events WHERE id = '${escapeString(id)}' LIMIT 1`
+      `SELECT * FROM Events WHERE ulid = '${escapeString(id)}' LIMIT 1`
     )
     if (rows.length === 0) return null
     return this.rowToEvent(rows[0]!)
@@ -809,23 +740,23 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     const conditions: string[] = []
 
     if (options.type) {
-      conditions.push(`type = '${escapeString(options.type)}'`)
+      conditions.push(`event = '${escapeString(options.type)}'`)
     }
 
     if (options.source) {
-      conditions.push(`source = '${escapeString(options.source)}'`)
+      conditions.push(`actor = '${escapeString(options.source)}'`)
     }
 
     if (options.correlationId) {
-      conditions.push(`correlationId = '${escapeString(options.correlationId)}'`)
+      conditions.push(`meta.correlationId = '${escapeString(options.correlationId)}'`)
     }
 
     if (options.after) {
-      conditions.push(`timestamp > '${options.after.toISOString()}'`)
+      conditions.push(`ts > '${options.after.toISOString()}'`)
     }
 
     if (options.before) {
-      conditions.push(`timestamp < '${options.before.toISOString()}'`)
+      conditions.push(`ts < '${options.before.toISOString()}'`)
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
@@ -833,40 +764,71 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     const offsetClause = options.offset ? `OFFSET ${options.offset}` : ''
 
     const rows = await this.executor.query<EventRow>(
-      `SELECT * FROM Events ${whereClause} ORDER BY timestamp DESC ${limitClause} ${offsetClause}`
+      `SELECT * FROM Events ${whereClause} ORDER BY ts DESC ${limitClause} ${offsetClause}`
     )
     return rows.map(row => this.rowToEvent(row))
   }
 
   // ===========================================================================
-  // Action Operations ($.do, $.try, $.send patterns)
+  // Action Operations (Linguistic verb conjugations: act → action → activity)
   // ===========================================================================
 
   async send<T extends Record<string, unknown>>(
     options: CreateActionOptions<T>
   ): Promise<Action<T>> {
-    const id = generateId()
     const now = new Date().toISOString()
+    // Extract ns from actor URL or use 'default'
+    let ns = 'default'
+    try {
+      const { ns: actorNs } = parseThingUrl(options.actor)
+      ns = actorNs
+    } catch {
+      // Use default ns if actor is not a valid URL
+    }
+
+    // Derive linguistic forms from the action verb
+    const act = options.action
+    const action = `${act}s`      // e.g., publish → publishes
+    const activity = `${act}ing`  // e.g., publish → publishing
 
     await this.executor.insert('Actions', [{
-      id,
-      type: options.action,
+      ns,
+      // id is auto-generated by ClickHouse with generateULID()
+      act,
+      action,
+      activity,
+      event: '',
       actor: options.actor,
+      actorData: {},
       object: options.object,
+      objectData: {},
       status: options.status ?? 'pending',
       progress: 0,
       total: 0,
-      data: options.metadata ? JSON.stringify(options.metadata) : '{}',
-      result: '',
+      result: {},
       error: '',
-      createdAt: now,
-      updatedAt: now,
+      data: options.metadata ?? {},
+      meta: {},
+      priority: 5,
+      attempts: 0,
+      maxAttempts: 3,
+      timeout: 0,
+      ttl: 0,
+      batch: '',
+      batchIndex: 0,
+      batchTotal: 0,
+      parent: '',
+      children: [],
+      dependencies: [],
+      scheduledAt: null,
       startedAt: null,
       completedAt: null,
+      createdAt: now,
+      updatedAt: now,
     }])
 
     return {
-      id,
+      id: '', // Will be generated by ClickHouse
       actor: options.actor,
       object: options.object,
       action: options.action,
@@ -880,28 +842,59 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   async do<T extends Record<string, unknown>>(
     options: CreateActionOptions<T>
   ): Promise<Action<T>> {
-    const id = generateId()
     const now = new Date().toISOString()
+    // Extract ns from actor URL or use 'default'
+    let ns = 'default'
+    try {
+      const { ns: actorNs } = parseThingUrl(options.actor)
+      ns = actorNs
+    } catch {
+      // Use default ns if actor is not a valid URL
+    }
+
+    // Derive linguistic forms from the action verb
+    const act = options.action
+    const action = `${act}s`      // e.g., publish → publishes
+    const activity = `${act}ing`  // e.g., publish → publishing
 
     await this.executor.insert('Actions', [{
-      id,
-      type: options.action,
+      ns,
+      // id is auto-generated by ClickHouse with generateULID()
+      act,
+      action,
+      activity,
+      event: '',
       actor: options.actor,
+      actorData: {},
       object: options.object,
+      objectData: {},
       status: 'active',
       progress: 0,
       total: 0,
-      data: options.metadata ? JSON.stringify(options.metadata) : '{}',
-      result: '',
+      result: {},
       error: '',
-      createdAt: now,
-      updatedAt: now,
+      data: options.metadata ?? {},
+      meta: {},
+      priority: 5,
+      attempts: 0,
+      maxAttempts: 3,
+      timeout: 0,
+      ttl: 0,
+      batch: '',
+      batchIndex: 0,
+      batchTotal: 0,
+      parent: '',
+      children: [],
+      dependencies: [],
+      scheduledAt: null,
       startedAt: now,
       completedAt: null,
+      createdAt: now,
+      updatedAt: now,
     }])
 
     return {
-      id,
+      id: '', // Will be generated by ClickHouse
       actor: options.actor,
       object: options.object,
       action: options.action,
@@ -952,7 +945,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     }
 
     if (options.action) {
-      conditions.push(`action = '${escapeString(options.action)}'`)
+      conditions.push(`act = '${escapeString(options.action)}'`)
     }
 
     if (options.status) {
@@ -1003,7 +996,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       status: 'completed',
       completedAt: now,
       updatedAt: now,
-      result: result !== undefined ? JSON.stringify(result) : '',
+      result: result !== undefined ? result : {},
     }])
 
     const action = await this.getAction(id)
@@ -1057,17 +1050,43 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     const content = JSON.stringify(options.content)
     const expiresAt = options.ttl
       ? new Date(Date.now() + options.ttl).toISOString()
-      : null
+      : '2999-12-31 23:59:59'
+
+    // Parse source URL for ns
+    let ns = 'default'
+    try {
+      const { ns: sourceNs } = parseThingUrl(options.source)
+      ns = sourceNs
+    } catch {
+      // Use default ns if source is not a valid URL
+    }
+
+    const id = generateId()
 
     await this.executor.insert('Artifacts', [{
-      url: options.source,
+      ns,
+      id,
       type: options.type,
-      sourceHash: options.sourceHash,
+      thing: '',
+      source: options.source,
+      name: '',
+      description: '',
+      path: '',
+      storage: '',
       content,
+      code: '',
+      data: {},
+      meta: options.metadata ?? {},
+      contentType: '',
+      encoding: 'utf-8',
       size: content.length,
-      metadata: options.metadata ? JSON.stringify(options.metadata) : '{}',
-      createdAt: now,
-      expiresAt: expiresAt,
+      hash: options.sourceHash,
+      build: '',
+      status: 'success',
+      log: '',
+      expires: expiresAt,
+      event: 'created',
+      ts: now,
     }])
 
     return {
@@ -1076,7 +1095,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       source: options.source,
       sourceHash: options.sourceHash,
       createdAt: new Date(now),
-      expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+      expiresAt: expiresAt !== '2999-12-31 23:59:59' ? new Date(expiresAt) : undefined,
       content: options.content,
       size: content.length,
       metadata: options.metadata,
@@ -1084,25 +1103,37 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   }
 
   async getArtifact<T = unknown>(key: string): Promise<Artifact<T> | null> {
-    // Parse key format: "url:type"
+    // Parse key format: "ns:type:id" or "url:type"
+    const parts = key.split(':')
+    if (parts.length < 2) return null
+
+    if (parts.length === 3) {
+      // Format: ns:type:id
+      const [ns, type, id] = parts
+      const rows = await this.executor.query<ArtifactRow>(
+        `SELECT * FROM Artifacts WHERE ns = '${escapeString(ns!)}' AND type = '${escapeString(type!)}' AND id = '${escapeString(id!)}' ORDER BY ts DESC LIMIT 1`
+      )
+      if (rows.length === 0) return null
+      return this.rowToArtifact(rows[0]!)
+    }
+
+    // Format: url:type (legacy)
     const lastColon = key.lastIndexOf(':')
-    if (lastColon === -1) return null
     const url = key.substring(0, lastColon)
     const type = key.substring(lastColon + 1)
-
     return this.getArtifactBySource(url, type as ArtifactType) as Promise<Artifact<T> | null>
   }
 
   async getArtifactBySource(source: string, type: ArtifactType): Promise<Artifact | null> {
     const rows = await this.executor.query<ArtifactRow>(
-      `SELECT * FROM Artifacts FINAL WHERE url = '${escapeString(source)}' AND type = '${escapeString(type)}' LIMIT 1`
+      `SELECT * FROM Artifacts WHERE source = '${escapeString(source)}' AND type = '${escapeString(type)}' ORDER BY ts DESC LIMIT 1`
     )
     if (rows.length === 0) return null
 
     const row = rows[0]!
 
     // Check if expired
-    if (row.expires_at && new Date(row.expires_at) < new Date()) {
+    if (row.expires && new Date(row.expires) < new Date()) {
       await this.deleteArtifactBySource(source, type)
       return null
     }
@@ -1111,18 +1142,27 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   }
 
   async deleteArtifact(key: string): Promise<boolean> {
-    // Parse key format: "url:type"
+    // Parse key format: "ns:type:id" or "url:type"
+    const parts = key.split(':')
+    if (parts.length < 2) return false
+
+    if (parts.length === 3) {
+      const [ns, type, id] = parts
+      await this.executor.command(
+        `ALTER TABLE Artifacts DELETE WHERE ns = '${escapeString(ns!)}' AND type = '${escapeString(type!)}' AND id = '${escapeString(id!)}'`
+      )
+      return true
+    }
+
     const lastColon = key.lastIndexOf(':')
-    if (lastColon === -1) return false
     const url = key.substring(0, lastColon)
     const type = key.substring(lastColon + 1)
-
     return this.deleteArtifactBySource(url, type as ArtifactType)
   }
 
-  async deleteArtifactBySource(url: string, type: ArtifactType): Promise<boolean> {
+  async deleteArtifactBySource(source: string, type: ArtifactType): Promise<boolean> {
     await this.executor.command(
-      `ALTER TABLE Artifacts DELETE WHERE url = '${escapeString(url)}' AND type = '${escapeString(type)}'`
+      `ALTER TABLE Artifacts DELETE WHERE source = '${escapeString(source)}' AND type = '${escapeString(type)}'`
     )
     return true
   }
@@ -1132,59 +1172,122 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
 
     // Count expired artifacts first
     const countRows = await this.executor.query<{ count: string }>(
-      `SELECT count() as count FROM Artifacts FINAL WHERE expiresAt IS NOT NULL AND expiresAt < '${now}'`
+      `SELECT count() as count FROM Artifacts WHERE expires < '${now}'`
     )
     const count = parseInt(countRows[0]?.count ?? '0', 10)
 
     // Delete expired
     await this.executor.command(
-      `ALTER TABLE Artifacts DELETE WHERE expiresAt IS NOT NULL AND expiresAt < '${now}'`
+      `ALTER TABLE Artifacts DELETE WHERE expires < '${now}'`
     )
 
     return count
   }
 
   // ===========================================================================
-  // Embedding Operations (Vector Search)
+  // Search Operations (Hybrid Full-Text + Vector Search with HNSW)
   // ===========================================================================
 
   /**
-   * Store an embedding for a URL
+   * Index content for search (with optional embedding for semantic search)
    */
-  async storeEmbedding(
-    url: string,
-    model: string,
-    embedding: number[],
-    sourceHash: string
-  ): Promise<void> {
+  async indexForSearch(options: {
+    url: string
+    id?: string
+    ns: string
+    type: string
+    title?: string
+    description?: string
+    content: string
+    keywords?: string[]
+    embedding?: number[]
+    model?: string
+    metadata?: Record<string, unknown>
+    language?: string
+    locale?: string
+  }): Promise<void> {
     const now = new Date().toISOString()
 
     await this.executor.insert('Search', [{
-      url,
-      model,
-      embedding,
-      dimensions: embedding.length,
-      sourceHash: sourceHash,
-      createdAt: now,
+      url: options.url,
+      ns: options.ns,
+      type: options.type,
+      id: options.id ?? '',
+      title: options.title ?? '',
+      description: options.description ?? '',
+      content: options.content,
+      keywords: options.keywords ?? [],
+      embedding: options.embedding ?? [],
+      model: options.model ?? '',
+      data: {},
+      meta: options.metadata ?? {},
+      language: options.language ?? 'en',
+      locale: options.locale ?? 'en-US',
+      event: 'created',
+      ts: now,
     }])
   }
 
   /**
-   * Get embedding for a URL and model
+   * Full-text search
    */
-  async getEmbedding(url: string, model: string): Promise<number[] | null> {
-    const rows = await this.executor.query<EmbeddingRow>(
-      `SELECT * FROM Search FINAL WHERE url = '${escapeString(url)}' AND model = '${escapeString(model)}' LIMIT 1`
-    )
-    if (rows.length === 0) return null
-    return rows[0]!.embedding
+  async fullTextSearch(
+    query: string,
+    options: {
+      ns?: string
+      type?: string
+      limit?: number
+    } = {}
+  ): Promise<Array<{ url: string; title: string; content: string; score: number }>> {
+    const { limit = 10 } = options
+    const escapedQuery = escapeString(query.toLowerCase())
+
+    const conditions: string[] = []
+
+    if (options.ns) {
+      conditions.push(`ns = '${escapeString(options.ns)}'`)
+    }
+    if (options.type) {
+      conditions.push(`type = '${escapeString(options.type)}'`)
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
+    const sql = `
+      SELECT
+        url,
+        title,
+        description,
+        content,
+        (multiSearchAllPositionsCaseInsensitive(content, ['${escapedQuery}'])[1] > 0) as hasMatch,
+        length(content) as contentLen
+      FROM Search
+      ${whereClause}
+      ORDER BY hasMatch DESC, contentLen ASC
+      LIMIT ${limit}
+    `
+
+    const rows = await this.executor.query<{
+      url: string
+      title: string
+      description: string
+      content: string
+      hasMatch: number
+      contentLen: number
+    }>(sql)
+
+    return rows.map(row => ({
+      url: row.url,
+      title: row.title,
+      content: row.content,
+      score: row.hasMatch ? 1 : 0,
+    }))
   }
 
   /**
-   * Search for similar items using vector similarity
-   * Uses L2 distance (Euclidean distance)
+   * Vector similarity search using cosine distance with HNSW index
    */
-  async searchByEmbedding(
+  async vectorSearch(
     queryEmbedding: number[],
     options: {
       model?: string
@@ -1193,49 +1296,132 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       ns?: string
       type?: string
     } = {}
-  ): Promise<Array<{ url: string; score: number; thing?: Thing<TData> }>> {
-    const { model = 'default', limit = 10, minScore = 0 } = options
+  ): Promise<Array<{ url: string; title: string; content: string; score: number }>> {
+    const { limit = 10, minScore = 0 } = options
 
     // Build embedding array literal
     const embeddingLiteral = `[${queryEmbedding.join(', ')}]`
 
     // Build conditions
-    const conditions: string[] = [`model = '${escapeString(model)}'`]
+    const conditions: string[] = [
+      'length(embedding) > 0',
+    ]
 
-    let sql = `
+    if (options.model) {
+      conditions.push(`model = '${escapeString(options.model)}'`)
+    }
+    if (options.ns) {
+      conditions.push(`ns = '${escapeString(options.ns)}'`)
+    }
+    if (options.type) {
+      conditions.push(`type = '${escapeString(options.type)}'`)
+    }
+
+    // Use cosineDistance for semantic similarity (works with HNSW index)
+    const sql = `
       SELECT
         url,
-        L2Distance(embedding, ${embeddingLiteral}) as distance
-      FROM Search FINAL
+        title,
+        content,
+        cosineDistance(embedding, ${embeddingLiteral}) as distance
+      FROM Search
       WHERE ${conditions.join(' AND ')}
       ORDER BY distance ASC
       LIMIT ${limit}
     `
 
-    const rows = await this.executor.query<{ url: string; distance: number }>(sql)
+    const rows = await this.executor.query<{
+      url: string
+      title: string
+      content: string
+      distance: number
+    }>(sql)
 
-    // Convert distance to score (1 / (1 + distance)) and filter by minScore
-    const results = rows
+    // Convert cosine distance to score (1 - distance) and filter by minScore
+    // Cosine distance ranges from 0 (identical) to 2 (opposite), so score = 1 - distance/2
+    return rows
       .map(row => ({
         url: row.url,
-        score: 1 / (1 + row.distance),
+        title: row.title,
+        content: row.content,
+        score: 1 - row.distance / 2,
       }))
       .filter(r => r.score >= minScore)
+  }
+
+  /**
+   * Hybrid search combining full-text and vector similarity
+   */
+  async hybridSearch(
+    query: string,
+    queryEmbedding: number[] | null,
+    options: {
+      model?: string
+      limit?: number
+      ns?: string
+      type?: string
+      textWeight?: number
+      vectorWeight?: number
+    } = {}
+  ): Promise<Array<{ url: string; title: string; content: string; score: number; thing?: Thing<TData> }>> {
+    const { limit = 10, textWeight = 0.3, vectorWeight = 0.7 } = options
+
+    // Get text search results
+    const textResults = await this.fullTextSearch(query, { ...options, limit: limit * 2 })
+
+    // Get vector search results if embedding provided
+    let vectorResults: Array<{ url: string; title: string; content: string; score: number }> = []
+    if (queryEmbedding && queryEmbedding.length > 0) {
+      vectorResults = await this.vectorSearch(queryEmbedding, { ...options, limit: limit * 2 })
+    }
+
+    // Combine and score results
+    const scoreMap = new Map<string, { url: string; title: string; content: string; textScore: number; vectorScore: number }>()
+
+    for (const r of textResults) {
+      scoreMap.set(r.url, {
+        url: r.url,
+        title: r.title,
+        content: r.content,
+        textScore: r.score,
+        vectorScore: 0,
+      })
+    }
+
+    for (const r of vectorResults) {
+      const existing = scoreMap.get(r.url)
+      if (existing) {
+        existing.vectorScore = r.score
+      } else {
+        scoreMap.set(r.url, {
+          url: r.url,
+          title: r.title,
+          content: r.content,
+          textScore: 0,
+          vectorScore: r.score,
+        })
+      }
+    }
+
+    // Calculate combined scores and sort
+    const combined = Array.from(scoreMap.values())
+      .map(r => ({
+        url: r.url,
+        title: r.title,
+        content: r.content,
+        score: r.textScore * textWeight + r.vectorScore * vectorWeight,
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
 
     // Optionally fetch the things
-    if (results.length > 0) {
-      const urlList = results.map(r => `'${escapeString(r.url)}'`).join(', ')
+    if (combined.length > 0) {
+      const uniqueUrls = [...new Set(combined.map(r => r.url))]
+      const urlList = uniqueUrls.map(u => `'${escapeString(u)}'`).join(', ')
       const thingConditions: string[] = [
         `url IN (${urlList})`,
-        'deletedAt IS NULL',
+        "event != 'deleted'",
       ]
-
-      if (options.ns) {
-        thingConditions.push(`ns = '${escapeString(options.ns)}'`)
-      }
-      if (options.type) {
-        thingConditions.push(`type = '${escapeString(options.type)}'`)
-      }
 
       const things = await this.executor.query<ThingRow>(
         `SELECT * FROM Things FINAL WHERE ${thingConditions.join(' AND ')}`
@@ -1243,21 +1429,21 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
 
       const thingMap = new Map(things.map(t => [t.url, this.rowToThing(t)]))
 
-      return results.map(r => ({
+      return combined.map(r => ({
         ...r,
         thing: thingMap.get(r.url),
       }))
     }
 
-    return results
+    return combined
   }
 
   /**
-   * Delete embedding for a URL and model
+   * Remove search index entries for a URL
    */
-  async deleteEmbedding(url: string, model: string): Promise<boolean> {
+  async removeFromSearch(url: string): Promise<boolean> {
     await this.executor.command(
-      `ALTER TABLE Search DELETE WHERE url = '${escapeString(url)}' AND model = '${escapeString(model)}'`
+      `ALTER TABLE Search DELETE WHERE url = '${escapeString(url)}'`
     )
     return true
   }
@@ -1272,33 +1458,33 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       type: row.type,
       id: row.id,
       url: row.url,
-      data: JSON.parse(row.data || '{}') as TData,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
-      '@context': row.context ? JSON.parse(row.context) : undefined,
+      data: (row.data || {}) as TData,
+      createdAt: new Date(row.ts),
+      updatedAt: new Date(row.ts),
+      '@context': row.meta?.['@context'] as string | undefined,
     }
   }
 
   private rowToRelationship(row: RelationshipRow): Relationship {
     return {
-      id: row.id,
-      type: row.type,
-      from: row.fromUrl,
-      to: row.toUrl,
-      createdAt: new Date(row.createdAt),
-      data: row.data ? JSON.parse(row.data) : undefined,
+      id: generateRelationshipId(row.from, row.predicate, row.to),
+      type: row.predicate,
+      from: row.from,
+      to: row.to,
+      createdAt: new Date(row.ts),
+      data: row.data || undefined,
     }
   }
 
   private rowToEvent<T extends Record<string, unknown>>(row: EventRow): Event<T> {
     return {
-      id: row.id,
-      type: row.type,
-      timestamp: new Date(row.timestamp),
-      source: row.source,
-      data: JSON.parse(row.data || '{}') as T,
-      correlationId: row.correlationId ?? undefined,
-      causationId: row.causationId ?? undefined,
+      id: row.ulid,
+      type: row.event,
+      timestamp: new Date(row.ts),
+      source: row.actor,
+      data: (row.objectData || {}) as T,
+      correlationId: row.meta?.correlationId as string | undefined,
+      causationId: row.meta?.causationId as string | undefined,
     }
   }
 
@@ -1307,48 +1493,111 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       id: row.id,
       actor: row.actor,
       object: row.object,
-      action: row.type, // map type column to action field
+      action: row.act, // map act column to action field
       status: row.status as ActionStatus,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
       startedAt: row.startedAt ? new Date(row.startedAt) : undefined,
       completedAt: row.completedAt ? new Date(row.completedAt) : undefined,
-      result: row.result ? JSON.parse(row.result) : undefined,
+      result: row.result || undefined,
       error: row.error || undefined,
-      metadata: row.data ? JSON.parse(row.data) as T : undefined,
+      metadata: (row.data || undefined) as T | undefined,
     }
   }
 
   private actionToRow(action: Action): ActionRow {
+    // Derive linguistic forms from the action verb
+    const act = action.action
+    const actionForm = `${act}s`      // e.g., publish → publishes
+    const activity = `${act}ing`      // e.g., publish → publishing
+
     return {
+      // Identity
+      ns: 'default',
       id: action.id,
-      type: action.action, // map action field to type column
+
+      // Linguistic verb conjugations
+      act,
+      action: actionForm,
+      activity,
+      event: '',
+
+      // Actor
       actor: action.actor,
+      actorData: {},
+
+      // Target object
       object: action.object,
+      objectData: {},
+
+      // Staged objects (new)
+      objects: null,
+      objectsCount: 0,
+
+      // Git integration (new)
+      repo: '',
+      branch: 'main',
+      commit: '',
+      commitMessage: '',
+      commitAuthor: '',
+      commitEmail: '',
+      commitTs: null,
+      diff: '',
+
+      // Workflow state
       status: action.status,
-      progress: 0, // Default to 0, could be extended
+      progress: 0,
       total: 0,
-      data: action.metadata ? JSON.stringify(action.metadata) : '{}',
-      result: action.result ? JSON.stringify(action.result) : '',
+      result: (action.result ?? {}) as Record<string, unknown>,
       error: action.error ?? '',
-      createdAt: action.createdAt.toISOString(),
-      updatedAt: action.updatedAt.toISOString(),
+
+      // Action data
+      data: (action.metadata ?? {}) as Record<string, unknown>,
+      meta: {},
+
+      // Execution control
+      priority: 5,
+      attempts: 0,
+      maxAttempts: 3,
+      timeout: 0,
+      ttl: 0,
+
+      // Batch processing
+      batch: '',
+      batchIndex: 0,
+      batchTotal: 0,
+
+      // Hierarchy
+      parent: '',
+      children: [],
+      dependencies: [],
+
+      // Timestamps
+      scheduledAt: null,
       startedAt: action.startedAt?.toISOString() ?? null,
       completedAt: action.completedAt?.toISOString() ?? null,
+      createdAt: action.createdAt.toISOString(),
+      updatedAt: action.updatedAt.toISOString(),
     }
   }
 
   private rowToArtifact<T>(row: ArtifactRow): Artifact<T> {
+    let content: T
+    try {
+      content = JSON.parse(row.content) as T
+    } catch {
+      content = row.content as unknown as T
+    }
     return {
-      key: `${row.url}:${row.type}`, // compose key from url and type
+      key: `${row.ns}:${row.type}:${row.id}`,
       type: row.type as ArtifactType,
-      source: row.url, // url is the source
-      sourceHash: row.sourceHash,
-      createdAt: new Date(row.createdAt),
-      expiresAt: row.expiresAt ? new Date(row.expiresAt) : undefined,
-      content: JSON.parse(row.content) as T,
+      source: row.source,
+      sourceHash: row.hash,
+      createdAt: new Date(row.ts),
+      expiresAt: row.expires ? new Date(row.expires) : undefined,
+      content,
       size: row.size,
-      metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
+      metadata: row.meta || undefined,
     }
   }
 
@@ -1365,87 +1614,6 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   getExecutor(): ClickHouseExecutor {
     return this.executor
   }
-}
-
-// =============================================================================
-// Row Types
-// =============================================================================
-
-interface ThingRow {
-  url: string
-  ns: string
-  type: string
-  id: string
-  context: string
-  data: string
-  content: string
-  createdAt: string
-  updatedAt: string
-  deletedAt: string | null
-  version: number
-}
-
-interface RelationshipRow {
-  id: string
-  type: string
-  fromUrl: string
-  toUrl: string
-  data: string
-  createdAt: string
-}
-
-interface EventRow {
-  id: string
-  type: string
-  url: string | null
-  timestamp: string
-  source: string
-  data: string
-  correlationId: string | null
-  causationId: string | null
-}
-
-interface ActionRow {
-  id: string
-  type: string
-  actor: string
-  object: string
-  status: string
-  progress: number
-  total: number
-  data: string
-  result: string
-  error: string
-  createdAt: string
-  updatedAt: string
-  startedAt: string | null
-  completedAt: string | null
-}
-
-interface ArtifactRow {
-  url: string
-  type: string
-  sourceHash: string
-  content: string
-  size: number
-  metadata: string
-  createdAt: string
-  expiresAt: string | null
-}
-
-interface SearchRow {
-  url: string
-  chunk: number
-  ns: string
-  type: string
-  title: string
-  content: string
-  embedding: number[]
-  model: string
-  dimensions: number
-  sourceHash: string
-  metadata: string
-  createdAt: string
 }
 
 // =============================================================================
