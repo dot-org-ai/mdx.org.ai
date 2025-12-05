@@ -1,0 +1,81 @@
+{
+  "name": "@mdxe/payload",
+  "version": "0.0.0",
+  "description": "Generate and run Payload CMS apps on Cloudflare Workers using mdxdb",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "mdxe-payload": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./worker": {
+      "types": "./dist/worker.d.ts",
+      "import": "./dist/worker.js",
+      "require": "./dist/worker.cjs"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js",
+      "require": "./dist/config.cjs"
+    },
+    "./generate": {
+      "types": "./dist/generate.d.ts",
+      "import": "./dist/generate.js",
+      "require": "./dist/generate.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxe",
+    "payload",
+    "payload-cms",
+    "cloudflare-workers",
+    "mdxdb",
+    "headless-cms",
+    "mdx",
+    "content-management"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@mdxdb/payload": "workspace:^",
+    "@mdxdb/sqlite": "workspace:^",
+    "mdxld": "workspace:^"
+  },
+  "peerDependencies": {
+    "miniflare": ">=3.0.0",
+    "payload": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "miniflare": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "@mdxld/config": "workspace:^",
+    "miniflare": "^3.20241106.1",
+    "payload": "^3.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

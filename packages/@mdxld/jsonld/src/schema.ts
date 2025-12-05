@@ -11,6 +11,13 @@ import { extractLocalName, extractRefs } from './utils.js'
 import type { JsonLDDocument, JsonLDNode, MDXLDNode, ConversionOptions } from './types.js'
 
 /**
+ * Source of a vocabulary item
+ * - 'base': From base vocabulary (e.g., schema.org), can be regenerated
+ * - 'extension': Custom extension, should be preserved
+ */
+export type VocabularySource = 'base' | 'extension'
+
+/**
  * A Thing in the vocabulary (type/class definition)
  */
 export interface Thing {
@@ -19,6 +26,8 @@ export interface Thing {
   name: string
   description: string
   subClassOf?: string[]
+  /** Source of this type definition */
+  $source?: VocabularySource
 }
 
 /**
@@ -40,6 +49,8 @@ export interface RelationshipDef {
   inverseOf?: string
   /** Deprecated in favor of */
   supersededBy?: string
+  /** Source of this property definition */
+  $source?: VocabularySource
 }
 
 /**
@@ -51,6 +62,34 @@ export interface Vocabulary {
   things: Map<string, Thing>
   /** All property/relationship definitions indexed by name */
   relationships: Map<string, RelationshipDef>
+}
+
+/**
+ * Extended vocabulary that combines a base vocabulary with extensions
+ * Used for creating supersets like schema.org.ai extending schema.org
+ */
+export interface ExtendedVocabulary extends Vocabulary {
+  /** Base vocabulary context (e.g., 'https://schema.org') */
+  baseContext: string
+  /** Extension vocabulary context (e.g., 'https://schema.org.ai') */
+  extensionContext: string
+}
+
+/**
+ * Options for extending a vocabulary
+ */
+export interface ExtendVocabularyOptions {
+  /** Context URL for the base vocabulary */
+  baseContext?: string
+  /** Context URL for the extension vocabulary */
+  extensionContext?: string
+  /**
+   * How to handle conflicts when both base and extension define the same type/property
+   * - 'extension-wins': Extension definition replaces base (default)
+   * - 'base-wins': Base definition is preserved
+   * - 'merge': Merge descriptions, combine arrays
+   */
+  conflictStrategy?: 'extension-wins' | 'base-wins' | 'merge'
 }
 
 /**
@@ -217,6 +256,233 @@ export function allRelationshipsFor(vocab: Vocabulary, typeName: string): Relati
   }
 
   return result
+}
+
+/**
+ * Get all types that inherit from a given type (descendants)
+ * Reverse of typeHierarchy - finds all children instead of parents
+ */
+export function typeDescendants(vocab: Vocabulary, typeName: string): string[] {
+  const result: string[] = []
+
+  for (const [name, thing] of vocab.things) {
+    if (thing.subClassOf?.includes(typeName)) {
+      result.push(name)
+      // Recursively get descendants of this type
+      result.push(...typeDescendants(vocab, name))
+    }
+  }
+
+  return [...new Set(result)] // Remove duplicates
+}
+
+/**
+ * Get all types that have a property (direct domain + types that inherit from those)
+ */
+export function typesForProperty(vocab: Vocabulary, propertyName: string): string[] {
+  const rel = vocab.relationships.get(propertyName)
+  if (!rel) return []
+
+  const result = new Set<string>()
+
+  // Add direct domain types
+  for (const type of rel.from) {
+    result.add(type)
+    // Add all descendants of this type
+    for (const descendant of typeDescendants(vocab, type)) {
+      result.add(descendant)
+    }
+  }
+
+  return [...result]
+}
+
+/**
+ * Get all properties for a type (direct + inherited from ancestors)
+ * Returns properties grouped by where they come from
+ */
+export function propertiesForType(vocab: Vocabulary, typeName: string): {
+  direct: RelationshipDef[]
+  inherited: { type: string; properties: RelationshipDef[] }[]
+} {
+  const direct = relationshipsFrom(vocab, typeName)
+  const hierarchy = typeHierarchy(vocab, typeName)
+
+  const inherited: { type: string; properties: RelationshipDef[] }[] = []
+  const seenProps = new Set(direct.map(p => p.name))
+
+  for (const ancestor of hierarchy) {
+    const ancestorProps = relationshipsFrom(vocab, ancestor)
+      .filter(p => !seenProps.has(p.name))
+
+    if (ancestorProps.length > 0) {
+      inherited.push({ type: ancestor, properties: ancestorProps })
+      ancestorProps.forEach(p => seenProps.add(p.name))
+    }
+  }
+
+  return { direct, inherited }
+}
+
+/**
+ * Extend a base vocabulary with custom types and properties
+ *
+ * Creates a superset vocabulary where:
+ * - All base types/properties are included with $source: 'base'
+ * - All extension types/properties are added with $source: 'extension'
+ * - Extension types can subClassOf base types and inherit their properties
+ * - Extension properties can target base types (domainIncludes)
+ *
+ * @example
+ * ```ts
+ * // Load base schema.org vocabulary
+ * const schemaOrg = await fetch('https://schema.org/version/latest/schemaorg-current-https.jsonld')
+ * const base = toVocabulary(await schemaOrg.json())
+ *
+ * // Load custom extensions
+ * const extensions = toVocabulary(extensionsJsonLd)
+ *
+ * // Create superset
+ * const vocab = extendVocabulary(base, extensions, {
+ *   baseContext: 'https://schema.org',
+ *   extensionContext: 'https://schema.org.ai',
+ * })
+ *
+ * // Extension types inherit from base
+ * const agent = vocab.things.get('Agent')
+ * // { $source: 'extension', subClassOf: ['Thing'], ... }
+ *
+ * // Extension properties on base types
+ * const digital = vocab.relationships.get('digital')
+ * // { $source: 'extension', from: ['Thing'], ... }
+ * ```
+ */
+export function extendVocabulary(
+  base: Vocabulary,
+  extensions: Vocabulary,
+  options: ExtendVocabularyOptions = {}
+): ExtendedVocabulary {
+  const {
+    baseContext = base.$context,
+    extensionContext = extensions.$context,
+    conflictStrategy = 'extension-wins',
+  } = options
+
+  const things = new Map<string, Thing>()
+  const relationships = new Map<string, RelationshipDef>()
+
+  // Add all base types with $source: 'base'
+  for (const [name, thing] of base.things) {
+    things.set(name, { ...thing, $source: 'base' })
+  }
+
+  // Add all extension types with $source: 'extension'
+  for (const [name, thing] of extensions.things) {
+    const existing = things.get(name)
+
+    if (existing) {
+      // Handle conflict
+      switch (conflictStrategy) {
+        case 'base-wins':
+          // Keep base, don't add extension
+          break
+        case 'merge':
+          // Merge descriptions, keep extension's structure
+          things.set(name, {
+            ...thing,
+            $source: 'extension',
+            description: thing.description || existing.description,
+          })
+          break
+        case 'extension-wins':
+        default:
+          // Replace with extension
+          things.set(name, { ...thing, $source: 'extension' })
+          break
+      }
+    } else {
+      // New type from extension
+      things.set(name, { ...thing, $source: 'extension' })
+    }
+  }
+
+  // Add all base relationships with $source: 'base'
+  for (const [name, rel] of base.relationships) {
+    relationships.set(name, { ...rel, $source: 'base' })
+  }
+
+  // Add all extension relationships with $source: 'extension'
+  for (const [name, rel] of extensions.relationships) {
+    const existing = relationships.get(name)
+
+    if (existing) {
+      // Handle conflict
+      switch (conflictStrategy) {
+        case 'base-wins':
+          // Keep base, but merge domain/range if extension adds new types
+          relationships.set(name, {
+            ...existing,
+            from: [...new Set([...existing.from, ...rel.from])],
+            to: [...new Set([...existing.to, ...rel.to])],
+          })
+          break
+        case 'merge':
+          // Merge everything
+          relationships.set(name, {
+            ...rel,
+            $source: 'extension',
+            description: rel.description || existing.description,
+            from: [...new Set([...existing.from, ...rel.from])],
+            to: [...new Set([...existing.to, ...rel.to])],
+          })
+          break
+        case 'extension-wins':
+        default:
+          // Replace with extension but preserve expanded domain/range
+          relationships.set(name, {
+            ...rel,
+            $source: 'extension',
+            from: [...new Set([...existing.from, ...rel.from])],
+            to: [...new Set([...existing.to, ...rel.to])],
+          })
+          break
+      }
+    } else {
+      // New relationship from extension
+      relationships.set(name, { ...rel, $source: 'extension' })
+    }
+  }
+
+  return {
+    $context: extensionContext,
+    baseContext,
+    extensionContext,
+    things,
+    relationships,
+  }
+}
+
+/**
+ * Filter vocabulary items by source
+ *
+ * @example
+ * ```ts
+ * const extended = extendVocabulary(base, extensions)
+ *
+ * // Get only extension types (for preserving during regeneration)
+ * const extensionTypes = filterBySource(extended, 'extension')
+ *
+ * // Get only base types (for regeneration)
+ * const baseTypes = filterBySource(extended, 'base')
+ * ```
+ */
+export function filterBySource(
+  vocab: Vocabulary,
+  source: VocabularySource
+): { things: Thing[]; relationships: RelationshipDef[] } {
+  const things = [...vocab.things.values()].filter(t => t.$source === source)
+  const relationships = [...vocab.relationships.values()].filter(r => r.$source === source)
+  return { things, relationships }
 }
 
 /**

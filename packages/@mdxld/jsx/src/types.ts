@@ -165,8 +165,19 @@ export const JSX_PRESETS = {
     importSource: 'preact',
     development: false,
   },
+  /**
+   * Hono JSX for server-side rendering
+   */
   hono: {
     importSource: 'hono/jsx',
+    development: false,
+  },
+  /**
+   * Hono JSX DOM for client-side rendering (2.8KB vs React's 47.8KB)
+   * Use this for interactive client components
+   */
+  'hono-dom': {
+    importSource: 'hono/jsx/dom',
     development: false,
   },
   /**
