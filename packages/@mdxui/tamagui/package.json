@@ -67,6 +67,7 @@
     "@tamagui/config": "^1.116.11",
     "@tamagui/core": "^1.116.11",
     "@types/react": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "react": "^18.3.1",
     "tamagui": "^1.116.11",
     "tsup": "^8.3.5",
