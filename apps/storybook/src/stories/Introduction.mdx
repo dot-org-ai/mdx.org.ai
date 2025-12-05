@@ -1,0 +1,42 @@
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Introduction" />
+
+# MDXUI Component Library
+
+Welcome to the MDXUI component library documentation. This Storybook contains components from the following packages:
+
+## @mdxui/shadcn
+
+Shadcn/ui components with tweakcn theme presets for MDX applications. Built on top of Radix UI primitives with Tailwind CSS styling.
+
+### Components
+
+- **Button** - Interactive button component with multiple variants and sizes
+- **Card** - Container component for displaying content in a box
+- **Badge** - Small status indicators and labels
+- **Input** - Form input fields
+- And many more...
+
+## @mdxui/widgets
+
+Advanced widgets for MDX applications:
+
+- **Chatbox** - AI-powered chat interface
+- **Editor** - Monaco-based code editor
+- **Searchbox** - Command palette style search
+
+## Getting Started
+
+```bash
+# Install packages
+pnpm add @mdxui/shadcn @mdxui/widgets
+
+# Import components
+import { Button, Card, Badge } from '@mdxui/shadcn'
+import { Chatbox, Editor, Searchbox } from '@mdxui/widgets'
+```
+
+## Theming
+
+Components support light and dark themes via CSS variables. Use the theme toggle in the toolbar above to preview components in different themes.
