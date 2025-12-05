@@ -67,6 +67,11 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-19 100
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-19 100
           sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-19 100
+          # Install Rust with required nightly toolchain for ClickHouse
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          rustup install nightly-2025-07-07
+          rustup default nightly-2025-07-07
 
       - name: Clone chdb (with vector support)
         if: steps.cache.outputs.cache-hit != 'true'
@@ -82,6 +87,7 @@ jobs:
       - name: Build chdb core
         run: |
           cd /tmp/chdb
+          source "$HOME/.cargo/env"
           export CC=clang-19
           export CXX=clang++-19
           # Configure ccache for clang
@@ -171,13 +177,19 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cmake ninja llvm@19 findutils grep python-setuptools
-          # Verify GNU find is available
+          brew install cmake ninja llvm@19 findutils grep python-setuptools ccache
+          # Verify GNU find and ccache are available
           gfind --version || find --version
+          which ccache && ccache --version
           # Install setuptools for Python
           python3 -m pip install --break-system-packages setuptools || pip3 install setuptools || true
           # Symlink llvm@19 for chdb build script
           brew link llvm@19 --force || true
+          # Install Rust with required nightly toolchain for ClickHouse
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          rustup install nightly-2025-07-07
+          rustup default nightly-2025-07-07
 
       - name: Clone chdb (with vector support)
         if: steps.cache.outputs.cache-hit != 'true'
@@ -193,6 +205,7 @@ jobs:
       - name: Build chdb core
         run: |
           cd /tmp/chdb
+          source "$HOME/.cargo/env"
           export CC=/opt/homebrew/opt/llvm@19/bin/clang
           export CXX=/opt/homebrew/opt/llvm@19/bin/clang++
           make buildlib
@@ -231,12 +244,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cmake ninja llvm@19 findutils grep python-setuptools
-          # Verify GNU find is available
+          brew install cmake ninja llvm@19 findutils grep python-setuptools ccache
+          # Verify GNU find and ccache are available
           gfind --version || find --version
+          which ccache && ccache --version
           # Install setuptools for Python
           python3 -m pip install --break-system-packages setuptools || pip3 install setuptools || true
           brew link llvm@19 --force || true
+          # Install Rust with required nightly toolchain for ClickHouse
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          rustup install nightly-2025-07-07
+          rustup default nightly-2025-07-07
 
       - name: Clone chdb (with vector support)
         if: steps.cache.outputs.cache-hit != 'true'
@@ -252,6 +271,7 @@ jobs:
       - name: Build chdb core
         run: |
           cd /tmp/chdb
+          source "$HOME/.cargo/env"
           export CC=/usr/local/opt/llvm@19/bin/clang
           export CXX=/usr/local/opt/llvm@19/bin/clang++
           make buildlib
