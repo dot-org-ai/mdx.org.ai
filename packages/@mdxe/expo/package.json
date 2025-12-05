@@ -1,0 +1,72 @@
+{
+  "name": "@mdxe/expo",
+  "version": "0.0.0",
+  "description": "Expo/React Native runtime for MDXLD documents",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./router": {
+      "types": "./dist/router.d.ts",
+      "import": "./dist/router.js",
+      "require": "./dist/router.cjs"
+    },
+    "./components": {
+      "types": "./dist/components.d.ts",
+      "import": "./dist/components.js",
+      "require": "./dist/components.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxe",
+    "mdxld",
+    "expo",
+    "react-native",
+    "mobile",
+    "runtime"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "peerDependencies": {
+    "expo": ">=50.0.0",
+    "expo-router": ">=3.0.0",
+    "react": "^18.0.0",
+    "react-native": ">=0.73.0"
+  },
+  "peerDependenciesMeta": {
+    "expo-router": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "@types/react": "^18.3.0",
+    "expo": "^52.0.0",
+    "react": "^18.3.1",
+    "react-native": "^0.76.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

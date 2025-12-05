@@ -1,6 +1,6 @@
 [submodule "primitives"]
 	path = primitives
 	url = https://github.com/dot-org-ai/primitives.org.ai
-[submodule "packages/buildercss"]
-	path = packages/buildercss
-	url = https://github.com/dot-do/buildercss
+[submodule "packages/@mdxui/editor/app"]
+	path = packages/@mdxui/editor/app
+	url = https://github.com/dot-do/editor

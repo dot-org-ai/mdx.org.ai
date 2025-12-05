@@ -1,0 +1,80 @@
+{
+  "name": "@mdxui/gluestack",
+  "version": "0.0.0",
+  "description": "Gluestack UI components for rendering MDX content - accessible, NativeWind-based",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./themes": {
+      "types": "./dist/themes.d.ts",
+      "import": "./dist/themes.js",
+      "require": "./dist/themes.cjs"
+    },
+    "./primitives": {
+      "types": "./dist/primitives.d.ts",
+      "import": "./dist/primitives.js",
+      "require": "./dist/primitives.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxui",
+    "gluestack",
+    "nativewind",
+    "react-native",
+    "universal",
+    "accessible",
+    "components",
+    "ui",
+    "mdx",
+    "mdxld",
+    "tailwind"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "peerDependencies": {
+    "@gluestack-ui/themed": ">=1.1.0",
+    "nativewind": ">=4.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-native": ">=0.73.0",
+    "tailwindcss": ">=3.4.0"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    },
+    "nativewind": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "@gluestack-ui/themed": "^1.1.71",
+    "@types/react": "^18.3.0",
+    "react": "^18.3.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
