@@ -20,7 +20,9 @@
     "mdxe": "node packages/mdxe/dist/cli.js",
     "mdxe:dev": "node packages/mdxe/dist/cli.js dev --dir examples",
     "mdxe:test": "node packages/mdxe/dist/cli.js test",
-    "notebook": "node packages/mdxe/dist/cli.js notebook examples/notebook.mdx --open"
+    "notebook": "node packages/mdxe/dist/cli.js notebook examples/notebook.mdx --open",
+    "studio": "node packages/mdxdb/dist/cli.js studio --path examples",
+    "storybook": "pnpm --filter storybook dev"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:*",

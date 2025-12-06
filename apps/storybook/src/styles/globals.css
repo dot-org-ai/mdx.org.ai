@@ -83,3 +83,123 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Storybook docs dark mode support */
+.dark .sbdocs-wrapper,
+.dark .sbdocs-content,
+.dark .sbdocs {
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .sbdocs h1,
+.dark .sbdocs h2,
+.dark .sbdocs h3,
+.dark .sbdocs h4,
+.dark .sbdocs h5,
+.dark .sbdocs h6 {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .sbdocs p,
+.dark .sbdocs li,
+.dark .sbdocs td,
+.dark .sbdocs th,
+.dark .sbdocs span {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .sbdocs a {
+  color: hsl(220 80% 60%) !important;
+}
+
+.dark .sbdocs code {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .sbdocs pre,
+.dark .docblock-source {
+  background: hsl(240 6% 10%) !important;
+}
+
+.dark .sbdocs pre code {
+  background: transparent !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .sbdocs table {
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .sbdocs th {
+  background: hsl(var(--muted)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .sbdocs td {
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .sbdocs hr {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Dark mode for Storybook's syntax highlighting */
+.dark .docblock-source,
+.dark .docs-story pre,
+.dark [class*="css-"] pre {
+  background: hsl(240 6% 10%) !important;
+}
+
+.dark .token.comment,
+.dark .token.prolog,
+.dark .token.doctype,
+.dark .token.cdata {
+  color: hsl(220 10% 50%) !important;
+}
+
+.dark .token.punctuation {
+  color: hsl(220 10% 70%) !important;
+}
+
+.dark .token.property,
+.dark .token.tag,
+.dark .token.boolean,
+.dark .token.number,
+.dark .token.constant,
+.dark .token.symbol {
+  color: hsl(30 80% 65%) !important;
+}
+
+.dark .token.selector,
+.dark .token.attr-name,
+.dark .token.string,
+.dark .token.char,
+.dark .token.builtin {
+  color: hsl(100 60% 60%) !important;
+}
+
+.dark .token.operator,
+.dark .token.entity,
+.dark .token.url,
+.dark .token.variable {
+  color: hsl(200 70% 65%) !important;
+}
+
+.dark .token.atrule,
+.dark .token.attr-value,
+.dark .token.function,
+.dark .token.class-name {
+  color: hsl(50 80% 65%) !important;
+}
+
+.dark .token.keyword {
+  color: hsl(280 70% 70%) !important;
+}
+
+.dark .token.regex,
+.dark .token.important {
+  color: hsl(30 90% 60%) !important;
+}
+

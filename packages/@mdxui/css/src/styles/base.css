@@ -163,11 +163,11 @@ th, td {
 
 th {
   font-weight: var(--font-semibold);
-  background: var(--muted);
+  background: hsl(var(--muted, 240 4.8% 95.9%));
 }
 
 tbody tr:hover {
-  background: var(--muted);
+  background: hsl(var(--muted, 240 4.8% 95.9%));
 }
 
 /* Forms */

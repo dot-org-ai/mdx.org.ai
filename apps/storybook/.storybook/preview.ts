@@ -4,6 +4,14 @@ import '../src/styles/globals.css'
 import '../src/styles/layouts.css'
 import '@mdxui/css'
 
+// Detect system preference
+const getSystemTheme = () => {
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  }
+  return 'light'
+}
+
 const preview: Preview = {
   parameters: {
     controls: {
@@ -13,11 +21,10 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-      default: 'light',
-      values: [
-        { name: 'light', value: '#ffffff' },
-        { name: 'dark', value: '#0a0a0a' },
-      ],
+      disable: true,
+    },
+    docs: {
+      theme: undefined,
     },
   },
   decorators: [
@@ -26,7 +33,8 @@ const preview: Preview = {
         light: '',
         dark: 'dark',
       },
-      defaultTheme: 'light',
+      defaultTheme: getSystemTheme(),
+      parentSelector: 'body',
     }),
   ],
 }

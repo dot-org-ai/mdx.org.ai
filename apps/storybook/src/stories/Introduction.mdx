@@ -6,6 +6,34 @@ import { Meta } from '@storybook/blocks'
 
 MDXUI is a component system where **entities become components**. Define your data in MDX, use it as JSX.
 
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                          ABSTRACTS                              │
+│  Agent · Business · Product · Service · Directory · Marketplace │
+│                   (contain Site and/or App)                     │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+          ┌───────────────────┴───────────────────┐
+          ▼                                       ▼
+┌─────────────────────┐               ┌────────────────────────┐
+│        SITE         │               │          APP           │
+│   (content-driven)  │               │  (interaction-driven)  │
+├─────────────────────┤               ├────────────────────────┤
+│   Layout            │               │   Layout               │
+│   └── Pages         │               │   └── Views            │
+│       └── Sections  │               │       └── Panels       │
+│           └── Blocks│               │           └── Widgets  │
+└─────────────────────┘               └────────────────────────┘
+          │                                       │
+          └───────────────────┬───────────────────┘
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        COMPONENTS                               │
+│       Button · Card · Input · Badge · Avatar · Dialog           │
+│          (atomic primitives shared by Site and App)             │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 ---
 
 ## The Pattern
