@@ -164,17 +164,65 @@ function generateNotebookHtml(doc: NotebookDocument): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>${doc.title} - MDX Notebook</title>
   <style>
+    :root {
+      --bg-primary: #f5f5f5;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f9fafb;
+      --bg-code: #fafafa;
+      --bg-output: #f0fdf4;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border-color: #e5e7eb;
+      --border-focus: #3b82f6;
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --accent-green: #10b981;
+      --accent-green-hover: #059669;
+      --error-bg: #fef2f2;
+      --error-text: #dc2626;
+      --code-badge-bg: #dbeafe;
+      --code-badge-text: #1d4ed8;
+      --md-badge-bg: #fef3c7;
+      --md-badge-text: #92400e;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #0f0f0f;
+        --bg-secondary: #1a1a1a;
+        --bg-tertiary: #262626;
+        --bg-code: #1e1e1e;
+        --bg-output: #1a2e1a;
+        --text-primary: #f3f4f6;
+        --text-secondary: #9ca3af;
+        --text-muted: #6b7280;
+        --border-color: #374151;
+        --border-focus: #60a5fa;
+        --accent-blue: #60a5fa;
+        --accent-blue-hover: #3b82f6;
+        --accent-green: #34d399;
+        --accent-green-hover: #10b981;
+        --error-bg: #2d1f1f;
+        --error-text: #f87171;
+        --code-badge-bg: #1e3a5f;
+        --code-badge-text: #93c5fd;
+        --md-badge-bg: #422006;
+        --md-badge-text: #fcd34d;
+      }
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: #f5f5f5;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       min-height: 100vh;
     }
     .header {
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
       padding: 1rem;
       display: flex;
       align-items: center;
@@ -191,45 +239,46 @@ function generateNotebookHtml(doc: NotebookDocument): string {
     }
     .btn {
       padding: 0.5rem 1rem;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--border-color);
       border-radius: 0.375rem;
-      background: white;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
       cursor: pointer;
       font-size: 0.875rem;
     }
-    .btn:hover { background: #f9fafb; }
+    .btn:hover { background: var(--bg-tertiary); }
     .btn-primary {
-      background: #3b82f6;
+      background: var(--accent-blue);
       color: white;
-      border-color: #3b82f6;
+      border-color: var(--accent-blue);
     }
-    .btn-primary:hover { background: #2563eb; }
+    .btn-primary:hover { background: var(--accent-blue-hover); }
     .btn-success {
-      background: #10b981;
+      background: var(--accent-green);
       color: white;
-      border-color: #10b981;
+      border-color: var(--accent-green);
     }
-    .btn-success:hover { background: #059669; }
+    .btn-success:hover { background: var(--accent-green-hover); }
     .notebook {
       max-width: 900px;
       margin: 0 auto;
       padding: 1rem;
     }
     .cell {
-      background: white;
-      border: 1px solid #e5e7eb;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
       border-radius: 0.5rem;
       margin-bottom: 0.75rem;
       overflow: hidden;
     }
-    .cell.active { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+    .cell.active { border-color: var(--border-focus); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
     .cell-header {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem;
-      background: #f9fafb;
-      border-bottom: 1px solid #e5e7eb;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-color);
       font-size: 0.75rem;
     }
     .cell-type {
@@ -237,41 +286,55 @@ function generateNotebookHtml(doc: NotebookDocument): string {
       border-radius: 0.25rem;
       font-weight: 500;
     }
-    .cell-type.code { background: #dbeafe; color: #1d4ed8; }
-    .cell-type.markdown { background: #fef3c7; color: #92400e; }
+    .cell-type.code { background: var(--code-badge-bg); color: var(--code-badge-text); }
+    .cell-type.markdown { background: var(--md-badge-bg); color: var(--md-badge-text); }
     .cell-actions { margin-left: auto; display: flex; gap: 0.25rem; }
     .cell-actions button {
       padding: 0.25rem 0.5rem;
       border: none;
       background: transparent;
+      color: var(--text-secondary);
       cursor: pointer;
       border-radius: 0.25rem;
       font-size: 0.75rem;
     }
-    .cell-actions button:hover { background: #e5e7eb; }
+    .cell-actions button:hover { background: var(--border-color); }
     .cell-content {
-      padding: 0.75rem;
+      padding: 0;
     }
     .cell-editor {
       width: 100%;
-      min-height: 100px;
+      min-height: 80px;
       padding: 0.75rem;
       border: none;
-      font-family: ui-monospace, monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
       font-size: 0.875rem;
+      line-height: 1.5;
       resize: vertical;
-      background: #fafafa;
+      background: var(--bg-code);
+      color: var(--text-primary);
     }
-    .cell-editor:focus { outline: none; background: white; }
+    .cell-editor:focus { outline: none; background: var(--bg-secondary); }
     .cell-output {
-      border-top: 1px solid #e5e7eb;
-      padding: 0.75rem;
-      background: #f9fafb;
-      font-family: ui-monospace, monospace;
+      border-top: 1px solid var(--border-color);
+      padding: 0.75rem 1rem;
+      background: var(--bg-output);
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
       font-size: 0.875rem;
+      line-height: 1.5;
       white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 400px;
+      overflow-y: auto;
     }
-    .cell-output.error { color: #dc2626; background: #fef2f2; }
+    .cell-output.error { color: var(--error-text); background: var(--error-bg); }
+    .cell-output-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
     .markdown-preview {
       padding: 0.75rem;
       line-height: 1.6;
@@ -282,7 +345,7 @@ function generateNotebookHtml(doc: NotebookDocument): string {
     }
     .markdown-preview p { margin-bottom: 0.5rem; }
     .markdown-preview code {
-      background: #f3f4f6;
+      background: var(--bg-tertiary);
       padding: 0.125rem 0.25rem;
       border-radius: 0.25rem;
       font-family: ui-monospace, monospace;
@@ -297,13 +360,27 @@ function generateNotebookHtml(doc: NotebookDocument): string {
     }
     .cell:hover + .add-cell, .add-cell:hover { opacity: 1; }
     .execution-count {
-      color: #6b7280;
+      color: var(--text-muted);
       font-family: ui-monospace, monospace;
     }
-    .status { margin-left: 0.5rem; color: #6b7280; }
+    .status { margin-left: 0.5rem; color: var(--text-secondary); }
     .status.running { color: #f59e0b; }
-    .status.success { color: #10b981; }
-    .status.error { color: #ef4444; }
+    .status.success { color: var(--accent-green); }
+    .status.error { color: var(--error-text); }
+    .output-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    .output-table th, .output-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.5rem;
+      text-align: left;
+    }
+    .output-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -379,19 +456,31 @@ function generateNotebookHtml(doc: NotebookDocument): string {
 
     function formatOutput(output) {
       if (output.type === 'error') {
-        return output.data.message || output.data;
+        return '<div class="cell-output-label">Error</div>' + escapeHtml(output.data.message || String(output.data));
       }
-      if (output.type === 'table' && output.data.rows) {
-        const cols = output.data.columns;
-        const header = '| ' + cols.join(' | ') + ' |';
-        const sep = '|' + cols.map(() => '---').join('|') + '|';
-        const rows = output.data.rows.map(r => '| ' + cols.map(c => r[c] ?? '').join(' | ') + ' |');
-        return [header, sep, ...rows].join('\\n');
+      if (output.type === 'table' && output.data && output.data.rows) {
+        const cols = output.data.columns || [];
+        const rows = output.data.rows || [];
+        if (cols.length === 0 || rows.length === 0) return '<em>Empty result</em>';
+        let html = '<div class="cell-output-label">Result (' + rows.length + ' rows)</div>';
+        html += '<table class="output-table"><thead><tr>';
+        cols.forEach(c => html += '<th>' + escapeHtml(String(c)) + '</th>');
+        html += '</tr></thead><tbody>';
+        rows.forEach(r => {
+          html += '<tr>';
+          cols.forEach(c => html += '<td>' + escapeHtml(String(r[c] ?? '')) + '</td>');
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        return html;
       }
-      if (typeof output.data === 'object') {
-        return JSON.stringify(output.data, null, 2);
+      if (output.type === 'text') {
+        return '<div class="cell-output-label">Output</div>' + escapeHtml(String(output.data));
       }
-      return String(output.data);
+      if (typeof output.data === 'object' && output.data !== null) {
+        return '<div class="cell-output-label">Result</div>' + escapeHtml(JSON.stringify(output.data, null, 2));
+      }
+      return '<div class="cell-output-label">Output</div>' + escapeHtml(String(output.data));
     }
 
     function setActive(id) {
@@ -680,17 +769,6 @@ async function executeCode(
   }
 
   try {
-    // Create sandboxed function
-    const fn = new Function(
-      'context',
-      'sql',
-      `
-      with (context) {
-        ${code}
-      }
-      `
-    )
-
     // Simple sql tagged template (returns the query for now)
     const sql = (strings: TemplateStringsArray, ...values: unknown[]) => {
       let query = strings[0]
@@ -700,7 +778,51 @@ async function executeCode(
       return { query, execute: async () => ({ columns: [], rows: [] }) }
     }
 
-    const result = await fn(context, sql)
+    // API helper for fetch requests
+    const api = {
+      get: async (url: string) => {
+        const res = await fetch(url)
+        return res.json()
+      },
+      post: async (url: string, body?: unknown) => {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body ? JSON.stringify(body) : undefined,
+        })
+        return res.json()
+      },
+    }
+
+    // Create async function that wraps the code
+    // This allows top-level await to work
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
+    const fn = new AsyncFunction(
+      'context',
+      'sql',
+      'api',
+      'console',
+      `
+      with (context) {
+        ${code}
+      }
+      `
+    )
+
+    // Custom console to capture logs
+    const capturedConsole = {
+      log: (...args: unknown[]) => {
+        logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' '))
+      },
+      error: (...args: unknown[]) => {
+        logs.push('[ERROR] ' + args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '))
+      },
+      warn: (...args: unknown[]) => {
+        logs.push('[WARN] ' + args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '))
+      },
+    }
+
+    const result = await fn(context, sql, api, capturedConsole)
 
     // Add console logs as outputs
     for (const log of logs) {
