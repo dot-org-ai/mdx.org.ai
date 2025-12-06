@@ -19,11 +19,6 @@
       "types": "./dist/server.d.ts",
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
-    },
-    "./electron": {
-      "types": "./dist/electron.d.ts",
-      "import": "./dist/electron.js",
-      "require": "./dist/electron.cjs"
     }
   },
   "files": [

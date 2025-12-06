@@ -26,6 +26,11 @@
       "types": "./dist/preload.d.ts",
       "import": "./dist/preload.js",
       "require": "./dist/preload.cjs"
+    },
+    "./studio-ipc": {
+      "types": "./dist/studio-ipc.d.ts",
+      "import": "./dist/studio-ipc.js",
+      "require": "./dist/studio-ipc.cjs"
     }
   },
   "files": [

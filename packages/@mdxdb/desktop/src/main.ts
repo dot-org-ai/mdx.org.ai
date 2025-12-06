@@ -389,6 +389,6 @@ export {
   registerStudioHandlers,
   setupStudioNotifications,
   getPreloadScript as getStudioPreloadScript,
-} from '@mdxdb/studio/electron'
-export type { ElectronStudioConfig, StudioPreloadAPI } from '@mdxdb/studio/electron'
+} from './studio-ipc'
+export type { ElectronStudioConfig, StudioPreloadAPI } from './studio-ipc'
 export { createStudio, type Studio, type StudioConfig, type FileEntry } from '@mdxdb/studio'

@@ -1,12 +1,12 @@
 /**
- * @mdxdb/studio/electron - Electron integration for the studio
+ * @mdxdb/desktop - Studio IPC handlers for Electron
  *
  * Provides utilities to embed the studio in an Electron application.
  *
  * @packageDocumentation
  */
 
-import { createStudio, type StudioConfig, type Studio, type FileEntry, type FileChangeEvent } from './index'
+import { createStudio, type StudioConfig, type Studio, type FileEntry, type FileChangeEvent } from '@mdxdb/studio'
 
 /**
  * Electron studio configuration
