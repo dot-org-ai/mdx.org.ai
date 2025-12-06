@@ -3,7 +3,7 @@ title: mdxld
 description: Parse, Stringify, Validate, and Compile MDXLD Documents
 root: true
 defaultOpen: true
-pages: [index, getting-started, parsing, validation, ast, compilation]
+pages: [index, getting-started, parsing, validation, ast, compilation, formats]
 ---
 
 # mdxld
@@ -241,9 +241,25 @@ function processDocument(doc: MDXLDDocument) {
 }
 ```
 
+## Format Conversion Packages
+
+The `@mdxld/*` ecosystem includes packages for bi-directional conversion between objects and various formats:
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/markdown`](/docs/mdxld/formats/markdown) | Object ↔ Markdown conversion |
+| [`@mdxld/json`](/docs/mdxld/formats/json) | JSON, JSON-LD, JSON Schema, OpenAPI, MCP, GraphQL |
+| [`@mdxld/html`](/docs/mdxld/formats/html) | Semantic HTML with microdata |
+| [`@mdxld/yaml`](/docs/mdxld/formats/yaml) | YAML for configs, K8s, CI/CD |
+| [`@mdxld/typescript`](/docs/mdxld/formats/typescript) | TypeScript types, Zod schemas, JSON5 |
+| [`@mdxld/diff`](/docs/mdxld/formats/diff) | Git-style diffing and 3-way merge |
+
+See [Format Conversion](/docs/mdxld/formats) for the complete guide.
+
 ## Next Steps
 
 - [Parsing Documents](/docs/mdxld/parsing) - Deep dive into parsing
 - [Validation](/docs/mdxld/validation) - Schema validation with ArkType
 - [AST Manipulation](/docs/mdxld/ast) - Working with the syntax tree
 - [Compilation](/docs/mdxld/compilation) - Compiling MDX to code
+- [Format Conversion](/docs/mdxld/formats) - Convert to/from Markdown, JSON, HTML, etc.

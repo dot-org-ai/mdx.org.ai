@@ -1,20 +1,112 @@
 ---
 title: UI Components
-description: Component specifications and rendering packages for MDX applications
+description: Component templates, composition, and rendering packages for MDX applications
 root: true
 defaultOpen: true
 ---
 
-The **UI Components** layer provides component specifications and rendering packages for building interfaces from MDX documents.
+The **UI Components** layer provides component templates and rendering packages for building interfaces from MDX documents.
+
+## Templates (Components)
+
+Templates are JSX components that know how to **render to multiple formats** and **extract data back**:
+
+```tsx
+import { Entity, Property, Action } from '@mdxld/jsx/primitives'
+
+function Customer({ name, email, tier, actions }) {
+  return (
+    <Entity name={name} type="Customer">
+      <Property name="email">{email}</Property>
+      <Property name="tier" default="free">{tier}</Property>
+      <Action name="upgrade" returns="Customer">
+        Upgrade to a higher tier
+      </Action>
+    </Entity>
+  )
+}
+
+// Render to any format
+Customer.toMarkdown(data)   // → Markdown
+Customer.toJSON(data)       // → JSON
+Customer.toJSONLD(data)     // → JSON-LD
+Customer.toHTML(data)       // → HTML
+
+// Extract from any format
+Customer.fromMarkdown(md)   // → Object
+Customer.fromJSON(json)     // → Object
+```
+
+## Composition
+
+Templates compose together like React components:
+
+```tsx
+function StoryBrand({ name, hero, problem, guide }) {
+  return (
+    <Document name={name}>
+      <Hero {...hero} />
+      <Problem {...problem} />
+      <Guide {...guide} />
+    </Document>
+  )
+}
+
+function Hero({ persona, occupation, company }) {
+  return (
+    <Section name="hero">
+      <Property name="persona">{persona}</Property>
+      <Property name="occupation">{occupation}</Property>
+      <Property name="company">{company}</Property>
+    </Section>
+  )
+}
+```
+
+Composition enables:
+- **Reusability** - Use `Hero` in multiple templates
+- **Nesting** - Deep component trees
+- **Overrides** - Customize rendering per-component
+
+## Encapsulation
+
+Each component **encapsulates its own rendering logic**:
+
+```tsx
+// Entity knows how to render itself to each format
+<Entity name="Customer" plural="Customers">
+  <Property name="email" type="string" required />
+</Entity>
+
+// → Markdown
+# Customer (Customers)
+| Property | Type | Required |
+|----------|------|----------|
+| email | string | ✓ |
+
+// → JSON
+{ "name": "Customer", "plural": "Customers", "properties": [...] }
+
+// → JSON-LD
+{ "@type": "Class", "name": "Customer", ... }
+
+// → HTML
+<article><h1>Customer</h1><table>...</table></article>
+```
+
+Components encapsulate:
+- **Schema** - The shape of data they accept
+- **Layout** - How they render to each format
+- **Extraction** - How they parse content back to data
 
 ## mdxui Package
 
-Render MDX to various output formats:
+The presentation layer adds **styling** on top of semantic output:
 
-- **@mdxui/html** - HTML strings (SSR)
-- **@mdxui/json** - JSON / JSON-LD
-- **@mdxui/markdown** - Markdown strings
-- **@mdxui/shadcn** - shadcn/ui components
+- **@mdxui/shadcn** - shadcn/ui styled components
+- **@mdxui/tailwind** - Tailwind CSS styling
+- **@mdxui/email** - Email-optimized HTML
+- **@mdxui/slack** - Slack Block Kit
 - **@mdxui/fumadocs** - Documentation sites
 
 ```bash

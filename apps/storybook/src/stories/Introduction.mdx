@@ -4,296 +4,379 @@ import { Meta } from '@storybook/blocks'
 
 # MDXUI Architecture
 
-MDXUI is a hierarchical component system for building MDX-powered digital experiences. From high-level business abstractions down to atomic UI primitives, every layer composes cleanly.
+MDXUI is a component system where **entities become components**. Define your data in MDX, use it as JSX.
 
 ---
 
-## The Hierarchy
+## The Pattern
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        ABSTRACTS                                │
-│   Agent · Business · Product · Service · Directory · Marketplace│
-│                    (contain Site and/or App)                    │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-          ┌───────────────────┴───────────────────┐
-          ▼                                       ▼
-┌─────────────────────┐               ┌─────────────────────┐
-│        SITE         │               │         APP         │
-│   (content-driven)  │               │  (interaction-driven)│
-├─────────────────────┤               ├─────────────────────┤
-│   Layout            │               │   Layout            │
-│   └── Pages         │               │   └── Views         │
-│       └── Sections  │               │       └── Panels    │
-│           └── Blocks│               │           └── Widgets│
-└─────────────────────┘               └─────────────────────┘
-          │                                       │
-          └───────────────────┬───────────────────┘
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       COMPONENTS                                │
-│        Button · Card · Input · Badge · Avatar · Dialog          │
-│           (atomic primitives shared by Site and App)            │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Abstracts
-
-**High-level business concepts** that own digital experiences. Each Abstract can contain a Site (for content/marketing), an App (for functionality), or both.
-
-| Package | Abstract | Description |
-|---------|----------|-------------|
-| `@mdxui/agent` | **Agent** | AI agent with personality, capabilities, and interface |
-| `@mdxui/business` | **Business** | Company or organization entity |
-| `@mdxui/product` | **Product** | SaaS product or digital offering |
-| `@mdxui/service` | **Service** | Service-based business model |
-| `@mdxui/directory` | **Directory** | Collection of listings (people, places, things) |
-| `@mdxui/marketplace` | **Marketplace** | Collection of products/services for exchange |
-
-### Example: Agent Abstract
+**Sites** are content-driven (marketing, docs). **Apps** are interaction-driven (dashboards, tools).
 
 ```tsx
-import { Agent } from '@mdxui/agent'
-
-<Agent
-  name="Claude"
-  description="AI assistant for software engineering"
-  capabilities={['code', 'research', 'planning']}
-  site={{
-    pages: ['/', '/docs', '/pricing'],
-    theme: 'dark',
-  }}
-  app={{
-    views: ['chat', 'workspace', 'settings'],
-    layout: 'sidebar',
-  }}
-/>
-```
-
----
-
-## Containers
-
-### Site (Content-Driven)
-
-**Sites** are for content, marketing, and documentation. Users consume information by scrolling through pages.
-
-| Package | Purpose |
-|---------|---------|
-| `@mdxui/site` | Site container with routing, SEO, theming |
-
-**Site → Page → Section → Block → Component**
-
-```tsx
-import { Site, Page, Section } from '@mdxui/site'
-import { Hero, Features, Pricing } from '@mdxui/html'
-
-<Site domain="example.com" theme="light">
-  <Page path="/" title="Home">
-    <Section id="hero">
-      <Hero title="Welcome" subtitle="Get started today" />
-    </Section>
-    <Section id="features">
-      <Features items={features} />
-    </Section>
-  </Page>
-  <Page path="/pricing" title="Pricing">
-    <Section id="plans">
-      <Pricing plans={plans} />
-    </Section>
-  </Page>
+// Site - sections stack vertically
+<Site product={widget}>
+  <Hero />
+  <Pain />
+  <Benefits />
+  <Features />
+  <Steps />
+  <Pricing />
+  <Quotes />
+  <FAQ />
+  <CTA />
 </Site>
-```
 
-### App (Interaction-Driven)
-
-**Apps** are for functionality and interaction. Users navigate between views and interact with widgets.
-
-| Package | Purpose |
-|---------|---------|
-| `@mdxui/app` | App container with routing, state, auth |
-
-**App → View → Panel → Widget → Component**
-
-```tsx
-import { App, View, Panel } from '@mdxui/app'
-import { Chat } from '@mdxui/chat'
-import { Editor } from '@mdxui/editor'
-
-<App name="Studio" layout="sidebar">
-  <View path="/workspace" title="Workspace">
-    <Panel position="main">
-      <Editor language="mdx" />
-    </Panel>
-    <Panel position="aside">
-      <Chat variant="sidebar" />
-    </Panel>
-  </View>
-  <View path="/settings" title="Settings">
-    <Panel position="main">
-      <SettingsForm />
-    </Panel>
-  </View>
+// App - entities become CRUD views
+<App business={acme}>
+  <Dashboard />
+  <Customers list="cards" />
+  <Orders />
+  <Products list="grid" />
+  <Users />
+  <Settings />
 </App>
 ```
 
 ---
 
-## Site Components
+## Site
 
-### Pages
-Full routes within a Site. Each page has a URL, title, and contains Sections.
+Sites render content. Props define what kind of site:
 
-### Sections
-Vertical divisions of a Page. Sections stack and scroll. Each Section contains Blocks.
-
-### Blocks
-Semantic content units within a Section:
-
-| Block | Purpose |
-|-------|---------|
-| **Hero** | Page header with headline, subtitle, CTAs |
-| **Features** | Feature grid or list |
-| **Bento** | Asymmetric grid layout |
-| **Testimonials** | Social proof and quotes |
-| **Pricing** | Plan comparison |
-| **CTA** | Call-to-action banner |
-| **FAQ** | Frequently asked questions |
-| **Team** | Team member showcase |
-| **Stats** | Metric highlights |
-| **Waitlist** | Email capture form |
-
----
-
-## App Components
-
-### Views
-Screens within an App. Each View has a route and contains Panels.
-
-### Panels
-Spatial divisions of a View. Common patterns:
-- **Main** - Primary content area
-- **Sidebar** - Navigation or secondary content
-- **Aside** - Contextual information
-- **Header** - Top bar with actions
-- **Footer** - Bottom bar with status
-
-### Widgets
-Interactive components within Panels:
-
-| Widget | Purpose |
-|--------|---------|
-| **Chat** | Conversational AI interface |
-| **Editor** | Code/text editing |
-| **Table** | Data grid with actions |
-| **Form** | Input collection |
-| **Chart** | Data visualization |
-| **Calendar** | Date/time selection |
-| **FileTree** | File/folder navigation |
-| **Terminal** | Command line interface |
-
----
-
-## Layouts
-
-Both Sites and Apps use Layouts to structure their content. Layouts provide consistent chrome (headers, footers, navigation) across pages/views.
+```tsx
+<Site product={widget} />      // Product marketing
+<Site business={acme} />       // Company site
+<Site agent={CodeReview} />    // AI agent site
+<Site service={consulting} />  // Service site
+<Site listings={tools} />      // Directory
+<Site marketplace={sellers} /> // Marketplace
+<Site portfolio={projects} />  // Portfolio
+<Site waitlist={config} />     // Pre-launch
+```
 
 ### Site Layouts
 
-| Layout | Source | Style |
-|--------|--------|-------|
-| **Marketing** | @mdxui/tailark | Full-featured marketing site |
-| **Docs** | @mdxui/fumadocs | Documentation site |
-| **Blog** | @mdxui/tailark | Content-focused blog |
-| **Landing** | @mdxui/shadcnblocks | Single-page landing |
+| Layout | Structure | Use Case |
+|--------|-----------|----------|
+| `marketing` | Header → Sections → Footer | Landing pages |
+| `docs` | Header → Sidebar + Content + TOC → Footer | Documentation |
+| `blog` | Header → Content + Sidebar → Footer | Articles |
+| `minimal` | Content only | Embeds, focused |
+| `centered` | Centered content | Auth, forms |
 
-### App Layouts
+```tsx
+<Site product={widget} layout="marketing">
+  ...
+</Site>
+```
 
-| Layout | Source | Style |
-|--------|--------|-------|
-| **Dashboard** | @mdxui/tremor | Analytics dashboard |
-| **Admin** | @mdxui/mantine | Admin panel |
-| **Workspace** | @mdxui/app | IDE-like workspace |
-| **Minimal** | @mdxui/app | Clean, focused |
+### Site Sections
+
+Sections are the building blocks of pages:
+
+| Section | Purpose |
+|---------|---------|
+| `<Hero />` | Headline, subheadline, CTA |
+| `<Pain />` | Agitate the problem |
+| `<Benefits />` | Outcome-focused value |
+| `<Features />` | Capability showcase |
+| `<Steps />` | How it works (1-2-3) |
+| `<Pricing />` | Plans and pricing |
+| `<Quotes />` | Testimonials, social proof |
+| `<FAQ />` | Objection handling |
+| `<Stats />` | Numbers, metrics |
+| `<Team />` | People behind it |
+| `<Logos />` | Trust signals |
+| `<Comparison />` | vs Competitors |
+| `<CTA />` | Final call to action |
+| `<Contact />` | Form, calendly |
+| `<Newsletter />` | Email capture |
+| `<Gallery />` | Screenshots, videos |
+
+### Section Props
+
+```tsx
+<Hero />                          // Uses context for copy
+<Hero headline="Ship Faster" />   // Override
+<Features layout="bento" />       // Bento grid
+<Features layout="list" />        // List
+<Quotes layout="carousel" />      // Carousel
+<Quotes layout="grid" columns={3} />
+<Steps />                         // From context
+<Pricing billing="annual" />      // Default annual
+```
+
+### Full Site Example
+
+```tsx
+<Site
+  product={widget}
+  context={{ storyBrand, leanCanvas, brandVoice }}
+>
+  <Hero />
+  <Logos />
+  <Pain />
+  <Benefits />
+  <Features layout="bento" />
+  <Steps />
+  <Quotes layout="carousel" />
+  <Pricing />
+  <FAQ />
+  <CTA />
+
+  {/* Subsites */}
+  <Site docs={api} path="/docs" />
+  <Site blog={posts} path="/blog" />
+  <Site changelog={releases} path="/changelog" />
+</Site>
+```
 
 ---
 
-## Components (Primitives)
+## App
 
-Atomic building blocks used by both Sites and Apps. From `@mdxui/shadcn`:
+Apps manage data and interactions. Props define what kind of app:
 
-### Inputs
-Button · Input · Textarea · Select · Checkbox · Switch · Slider · RadioGroup
+```tsx
+<App product={widget} />           // Dashboard
+<App business={acme} />            // Admin
+<App agent={StrategicPlanning} />  // Chat interface
+<App agent={CustomerSupport} />    // Support chat
+```
 
-### Display
-Card · Badge · Avatar · Alert · Progress · Skeleton · Tooltip
+### App Layouts
 
-### Navigation
-Tabs · Accordion · Breadcrumb · Pagination · NavigationMenu
+| Layout | Structure | Use Case |
+|--------|-----------|----------|
+| `dashboard` | TopNav → Grid | Metrics, analytics |
+| `sidebar` | Sidebar → Content | Admin, settings |
+| `workspace` | ActivityBar → Sidebar → Editor → Aside | IDE |
+| `split` | List → Detail | Chat, email, CRM |
+| `minimal` | Header → Content | Focused apps |
 
-### Overlay
-Dialog · Sheet · Popover · DropdownMenu · ContextMenu
+```tsx
+<App business={acme} layout="sidebar">
+  ...
+</App>
+```
 
-### Data
-Table · DataTable · Chart · Calendar
+### Entity Components
+
+**Entities become components.** Define in MDX, use as JSX:
+
+```yaml
+---
+$type: Entity
+name: Customer
+plural: Customers
+fields:
+  name: string
+  email: string
+  tier: free | pro | enterprise
+---
+```
+
+Then use directly:
+
+```tsx
+<App business={acme}>
+  <Customers />                    // → /customers (table)
+  <Customers list="cards" />       // → /customers (cards)
+  <Customers list="kanban" />      // → /customers (kanban)
+</App>
+```
+
+Each entity auto-generates CRUD routes:
+- `/customers` → List view
+- `/customers/:id` → Detail view
+- `/customers/:id/edit` → Edit view
+- `/customers/new` → Create view
+
+### Entity Props
+
+| Prop | Default | Options |
+|------|---------|---------|
+| `list` | `table` | `table`, `cards`, `grid`, `kanban`, `timeline`, `calendar` |
+| `detail` | `full` | `full`, `split`, `modal` |
+| `create` | `form` | `form`, `modal`, `wizard` |
+
+```tsx
+<Customers />                           // Defaults
+<Customers list="cards" />              // Card grid
+<Tasks list="kanban" />                 // Kanban board
+<Events list="calendar" />              // Calendar
+<Posts list="kanban" detail="modal" />  // Kanban + modal
+```
+
+### Agent Apps
+
+Agents are defined by role:
+
+```tsx
+<App agent={StrategicPlanning}>
+  <Chat />
+  <History />
+  <Settings />
+</App>
+
+<App agent={CustomerSupport}>
+  <Chat />
+  <Tickets />
+  <Knowledge />
+</App>
+
+<App agent={CodeReview}>
+  <Chat />
+  <Diff />
+  <History />
+</App>
+```
+
+### Full App Examples
+
+**SaaS Admin:**
+```tsx
+<App business={acme} layout="sidebar">
+  <Dashboard />
+  <Customers list="cards" />
+  <Orders />
+  <Products list="grid" />
+  <Invoices />
+  <Users />
+  <Settings />
+</App>
+```
+
+**Project Management:**
+```tsx
+<App product={projectTool} layout="sidebar">
+  <Dashboard />
+  <Projects list="cards" />
+  <Tasks list="kanban" />
+  <Team list="grid" />
+  <Calendar />
+  <Settings />
+</App>
+```
+
+**CRM:**
+```tsx
+<App product={crm} layout="sidebar">
+  <Dashboard />
+  <Contacts list="table" />
+  <Companies list="cards" />
+  <Deals list="kanban" />
+  <Activities list="timeline" />
+  <Reports />
+</App>
+```
+
+**Support Desk:**
+```tsx
+<App business={acme} layout="split">
+  <Tickets list="table" detail="split" />
+  <Customers />
+  <Knowledge />
+  <Agent role={CustomerSupport} path="/ai" />
+</App>
+```
+
+---
+
+## Process Views
+
+### Steps (Multi-step flows)
+
+Works in both Site and App:
+
+**Site Steps** (Marketing):
+```tsx
+<Steps>
+  <Step title="Sign Up" description="Create your account" />
+  <Step title="Connect" description="Link your repo" />
+  <Step title="Deploy" description="Ship to production" />
+</Steps>
+```
+
+**App Steps** (Workflows):
+```tsx
+<App>
+  <Steps path="/onboarding">
+    <Step title="Account" fields={['email', 'password']} />
+    <Step title="Profile" fields={['name', 'avatar']} />
+    <Step title="Team" fields={['company', 'role']} />
+    <Step title="Done" component={<Welcome />} />
+  </Steps>
+</App>
+```
+
+---
+
+## Context for AI Generation
+
+The `context` prop provides strategic data for AI content generation:
+
+```tsx
+<Site
+  product={widget}
+  context={{
+    storyBrand: {
+      hero: { persona: 'Busy developer', desire: 'Ship faster' },
+      problem: { external: 'Slow deploys', internal: 'Frustrated' },
+      guide: { empathy: '...', authority: '...' },
+      plan: ['Sign up', 'Connect', 'Deploy'],
+      callToAction: { direct: 'Start Free', transitional: 'Watch Demo' },
+    },
+    brandVoice: { tone: 'confident', style: 'concise' },
+    targetPersona: { role: 'Senior Engineer', painPoints: [...] },
+    competitors: [{ name: 'Vercel', pricing: '$20/mo' }],
+  }}
+>
+  <Hero />       {/* AI writes using StoryBrand */}
+  <Features />   {/* AI uses brandVoice */}
+  <FAQ />        {/* AI addresses objections */}
+</Site>
+```
+
+In MDX frontmatter, anything not in schema becomes context:
+
+```yaml
+---
+$type: Site
+title: Widget Pro
+product: widget
+
+# Becomes context automatically
+storyBrand:
+  hero:
+    persona: Busy developer
+brandVoice:
+  tone: confident
+---
+```
 
 ---
 
 ## Package Map
 
-| Level | Package | Purpose |
-|-------|---------|---------|
-| **Abstract** | `@mdxui/agent` | AI agent abstraction |
-| **Abstract** | `@mdxui/business` | Business entity |
-| **Abstract** | `@mdxui/product` | Product abstraction |
-| **Abstract** | `@mdxui/service` | Service abstraction |
-| **Abstract** | `@mdxui/directory` | Directory of listings |
-| **Abstract** | `@mdxui/marketplace` | Marketplace of offerings |
-| **Container** | `@mdxui/site` | Site container |
-| **Container** | `@mdxui/app` | App container |
-| **Block** | `@mdxui/html` | Semantic HTML blocks |
-| **Widget** | `@mdxui/chat` | Chat widget |
-| **Widget** | `@mdxui/editor` | Editor widget |
-| **Layout** | `@mdxui/tremor` | Dashboard layouts |
-| **Layout** | `@mdxui/mantine` | Admin layouts |
-| **Layout** | `@mdxui/tailark` | Marketing layouts |
-| **Layout** | `@mdxui/shadcnblocks` | Block layouts |
-| **Primitive** | `@mdxui/shadcn` | UI primitives |
-
----
-
-## Installation
-
-```bash
-# Abstracts
-pnpm add @mdxui/agent @mdxui/business @mdxui/product
-
-# Containers
-pnpm add @mdxui/site @mdxui/app
-
-# Blocks & Widgets
-pnpm add @mdxui/html @mdxui/chat @mdxui/editor
-
-# Layouts
-pnpm add @mdxui/tremor @mdxui/tailark @mdxui/shadcnblocks
-
-# Primitives
-pnpm add @mdxui/shadcn
-```
+| Package | Purpose |
+|---------|---------|
+| `@mdxui/site` | Site container |
+| `@mdxui/app` | App container |
+| `@mdxui/html` | Site sections (Hero, Features, etc.) |
+| `@mdxui/widgets` | App widgets (Chat, Editor, etc.) |
+| `@mdxui/shadcn` | UI primitives |
+| `primitives` | Entity types (Business, Product, Agent) |
 
 ---
 
 ## Explore
 
-Use the sidebar to browse the component hierarchy:
+Browse the sidebar:
 
-- **Abstracts** - High-level business concepts
-- **Sites** - Content-driven experiences
-- **Apps** - Interaction-driven experiences
-- **Blocks** - Semantic content units (Hero, Features, etc.)
-- **Widgets** - Interactive tools (Chat, Editor, etc.)
-- **Layouts** - Page/View templates
-- **Components** - Atomic UI primitives
+- **Sites** → Layouts, Sections, Examples
+- **Apps** → Layouts, Entities, Views, Examples
+- **Agents** → Roles, Chat interfaces
+- **Blocks** → Hero, Features, Pricing, etc.
+- **Widgets** → Chat, Editor, Table, etc.
+- **Components** → Button, Card, Dialog, etc.

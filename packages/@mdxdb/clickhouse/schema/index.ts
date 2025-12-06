@@ -101,10 +101,19 @@ export function parseSchemaStatements(schema: string): string[] {
 }
 
 /**
- * Get all schema statements
+ * Get all schema statements (one per table)
  */
 export function getAllSchemaStatements(): string[] {
-  return parseSchemaStatements(FULL_SCHEMA)
+  // Return each table schema as a separate statement
+  // (don't rely on semicolons since schemas don't end with them)
+  return [
+    EVENTS_SCHEMA,
+    ACTIONS_SCHEMA,
+    THINGS_SCHEMA,
+    RELATIONSHIPS_SCHEMA,
+    SEARCH_SCHEMA,
+    ARTIFACTS_SCHEMA,
+  ].map(s => s.trim())
 }
 
 /**

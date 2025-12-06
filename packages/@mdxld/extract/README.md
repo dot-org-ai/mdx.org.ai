@@ -348,15 +348,75 @@ if (changes.hasChanges) {
 }
 ```
 
-## Integration with mdx.org.ai Ecosystem
+## Architecture
+
+`@mdxld/extract` is the **template-based** extraction layer. For **convention-based** extraction, see the format packages:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Bi-directional Conversion                 │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Convention-based (auto layout):                            │
+│  ┌─────────────────┐       ┌─────────────────┐             │
+│  │ @mdxld/markdown │  ↔    │    toMarkdown   │             │
+│  │ @mdxld/json     │  ↔    │    fromMarkdown │             │
+│  │ @mdxld/html     │       │    etc.         │             │
+│  └─────────────────┘       └─────────────────┘             │
+│                                                             │
+│  Template-based (explicit layout):                          │
+│  ┌─────────────────┐       ┌─────────────────┐             │
+│  │ @mdxld/extract  │  ↔    │    extract()    │  ← this pkg │
+│  │                 │       │    render()     │             │
+│  └─────────────────┘       └─────────────────┘             │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Approach | Package | Use Case |
+|----------|---------|----------|
+| **Convention** | `@mdxld/markdown` | Auto layout based on object shape |
+| **Template** | `@mdxld/extract` | Explicit MDX template with slots |
+
+### When to Use Each
+
+**Use `@mdxld/markdown`** (convention-based):
+- Automatic rendering from object structure
+- Standard layouts (entities, tables, sections)
+- No custom template needed
+
+```typescript
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
+
+const md = toMarkdown(customer)      // Auto layout
+const obj = fromMarkdown(md)         // Extract back
+```
+
+**Use `@mdxld/extract`** (template-based):
+- Custom MDX templates with specific layouts
+- Complex component extraction
+- Precise control over rendering
+
+```typescript
+import { extract, render } from '@mdxld/extract'
+
+const md = render(template, props)   // Explicit template
+const obj = extract({ template, rendered: md })
+```
+
+## Integration with @mdxld Ecosystem
 
 ```
 @mdxld/extract integrates with:
 
-mdxld (parse/stringify)
-├── Parse MDXLD content
-├── Stringify back to MDXLD
-└── @mdxld/extract ← Extract from rendered
+@mdxld/markdown
+├── Convention-based toMarkdown/fromMarkdown
+└── @mdxld/extract adds template-based extraction
+
+@mdxld/jsx
+├── Universal JSX runtime
+├── Semantic primitives (Entity, Property, etc.)
+└── @mdxld/extract for template extraction
 
 mdxdb (storage)
 ├── Store source MDX

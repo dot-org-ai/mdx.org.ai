@@ -31,6 +31,11 @@
       "types": "./dist/sync/index.d.ts",
       "import": "./dist/sync/index.js",
       "require": "./dist/sync/index.cjs"
+    },
+    "./server": {
+      "types": "./dist/src/server.d.ts",
+      "import": "./dist/src/server.js",
+      "require": "./dist/src/server.cjs"
     }
   },
   "files": [

@@ -1,0 +1,339 @@
+---
+title: "@mdxld/html"
+description: Bi-directional conversion between Objects and semantic HTML with microdata
+---
+
+# @mdxld/html
+
+Convert objects to semantic HTML with Schema.org microdata. Produces clean, accessible HTML5 with proper semantic elements and structured data markup.
+
+## Installation
+
+```bash
+pnpm add @mdxld/html
+```
+
+## Quick Start
+
+```typescript
+import { toHTML, fromHTML, toJSONLDScript } from '@mdxld/html'
+
+const customer = {
+  name: 'Acme Corp',
+  description: 'A leading software company',
+  email: 'hello@acme.com'
+}
+
+const html = toHTML(customer, { itemtype: 'Organization' })
+```
+
+**Output:**
+
+```html
+<article itemscope itemtype="https://schema.org/Organization">
+  <h1 itemprop="name">Acme Corp</h1>
+  <p itemprop="description">A leading software company</p>
+  <dl>
+    <dt>email</dt>
+    <dd itemprop="email">hello@acme.com</dd>
+  </dl>
+</article>
+```
+
+## API Reference
+
+### toHTML(object, options?)
+
+Convert an object to semantic HTML.
+
+```typescript
+function toHTML<T extends Record<string, unknown>>(
+  object: T,
+  options?: ToHTMLOptions
+): string
+
+interface ToHTMLOptions {
+  /** Include microdata attributes (default: true) */
+  microdata?: boolean
+  /** Use HTML5 semantic elements (default: true) */
+  semantic?: boolean
+  /** Schema.org @type for root element */
+  itemtype?: string
+  /** Wrap in full HTML document */
+  document?: boolean
+  /** Pretty print with indentation */
+  pretty?: boolean
+  /** Indentation string (default: '  ') */
+  indent?: string
+}
+```
+
+**Example with options:**
+
+```typescript
+// Minimal output without microdata
+const html = toHTML(data, { microdata: false, pretty: false })
+
+// Full HTML document
+const page = toHTML(data, { document: true, itemtype: 'Article' })
+```
+
+### fromHTML(html, options?)
+
+Extract structured data from HTML.
+
+```typescript
+function fromHTML<T = Record<string, unknown>>(
+  html: string,
+  options?: FromHTMLOptions
+): T
+
+interface FromHTMLOptions {
+  /** Extract microdata */
+  microdata?: boolean
+  /** Strict mode - throw on parse errors */
+  strict?: boolean
+}
+```
+
+**Example:**
+
+```typescript
+const html = `
+<article>
+  <h1>My Product</h1>
+  <p>A great product</p>
+  <ul>
+    <li>Feature 1</li>
+    <li>Feature 2</li>
+  </ul>
+</article>
+`
+
+const data = fromHTML(html)
+// {
+//   name: 'My Product',
+//   description: 'A great product',
+//   items: ['Feature 1', 'Feature 2']
+// }
+```
+
+### toJSONLDScript(object, options?)
+
+Generate a JSON-LD `<script>` tag for SEO.
+
+```typescript
+function toJSONLDScript<T extends Record<string, unknown>>(
+  object: T,
+  options?: { type?: string }
+): string
+```
+
+**Example:**
+
+```typescript
+const script = toJSONLDScript(article, { type: 'Article' })
+// <script type="application/ld+json">
+// {
+//   "@context": "https://schema.org",
+//   "@type": "Article",
+//   ...
+// }
+// </script>
+```
+
+## Semantic HTML Conventions
+
+Objects are rendered using semantic HTML5 elements:
+
+| Object Shape | HTML Element |
+|--------------|--------------|
+| Root | `<article>` |
+| `name` | `<h1>` |
+| `description` | `<p>` |
+| `properties[]` | `<table>` |
+| `sections[]` | `<section>` with `<h2>` |
+| `items[]` | `<ul>` with `<li>` |
+| Other key-value pairs | `<dl>`, `<dt>`, `<dd>` |
+
+### Heading Hierarchy
+
+Nested structures create proper heading hierarchy:
+
+```typescript
+const doc = {
+  name: 'Main Title',           // → <h1>
+  sections: [
+    { name: 'Section 1' },      // → <h2>
+    { name: 'Section 2' },      // → <h2>
+  ]
+}
+```
+
+## Microdata (Schema.org)
+
+When `microdata: true` (default), Schema.org attributes are added:
+
+```html
+<article itemscope itemtype="https://schema.org/Product">
+  <h1 itemprop="name">Widget</h1>
+  <p itemprop="description">A useful widget</p>
+  <dl>
+    <dt>price</dt>
+    <dd itemprop="price">$9.99</dd>
+  </dl>
+</article>
+```
+
+### Automatic Type Inference
+
+The `itemtype` is automatically inferred from object shape:
+
+| Object Shape | Inferred itemtype |
+|--------------|-------------------|
+| `email` + `name` | Person or Organization |
+| `address` | Place or PostalAddress |
+| `startDate` + `endDate` | Event |
+| `ingredients` + `instructions` | Recipe |
+| `headline` + `author` | Article |
+
+## Property Tables
+
+Objects with `properties[]` render as tables:
+
+```typescript
+const entity = {
+  name: 'User',
+  properties: [
+    { name: 'id', type: 'string', required: true, description: 'Unique ID' },
+    { name: 'email', type: 'string', required: true, description: 'Email' },
+  ]
+}
+
+toHTML(entity)
+```
+
+**Output:**
+
+```html
+<article>
+  <h1>User</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>id</code></td>
+        <td><code>string</code></td>
+        <td>✓</td>
+        <td>Unique ID</td>
+      </tr>
+      <tr>
+        <td><code>email</code></td>
+        <td><code>string</code></td>
+        <td>✓</td>
+        <td>Email</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+```
+
+## Use Cases
+
+### Server-Side Rendering
+
+```typescript
+import { toHTML } from '@mdxld/html'
+
+app.get('/product/:id', async (req, res) => {
+  const product = await db.Product.get(req.params.id)
+  const html = toHTML(product, {
+    document: true,
+    itemtype: 'Product'
+  })
+  res.send(html)
+})
+```
+
+### Email Templates
+
+```typescript
+import { toHTML } from '@mdxld/html'
+
+const email = {
+  name: 'Order Confirmation',
+  description: 'Your order has been confirmed',
+  items: ['Widget x2', 'Gadget x1']
+}
+
+const html = toHTML(email, { semantic: false, microdata: false })
+// Send via email service
+```
+
+### Static Site Generation
+
+```typescript
+import { toHTML, toJSONLDScript } from '@mdxld/html'
+
+for (const page of pages) {
+  const body = toHTML(page)
+  const seo = toJSONLDScript(page, { type: 'WebPage' })
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <title>${page.name}</title>
+  ${seo}
+</head>
+<body>
+  ${body}
+</body>
+</html>`
+
+  await Bun.write(`dist/${page.slug}.html`, html)
+}
+```
+
+### Content Extraction
+
+```typescript
+import { fromHTML } from '@mdxld/html'
+
+// Scrape and structure
+const response = await fetch('https://example.com/product')
+const html = await response.text()
+const product = fromHTML(html)
+```
+
+## Relationship to @mdxui/html
+
+| Package | Purpose |
+|---------|---------|
+| `@mdxld/html` | Semantic conversion (data structure → HTML) |
+| `@mdxui/html` | Presentation (adds styling, themes, CSS) |
+
+```typescript
+// Semantic only
+import { toHTML } from '@mdxld/html'
+const html = toHTML(data)  // Clean semantic HTML
+
+// With styling
+import { toHTML } from '@mdxui/html'
+const html = toHTML(data, { theme: 'modern' })  // Styled HTML
+```
+
+## Related Packages
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/markdown`](/docs/mdxld/formats/markdown) | Object ↔ Markdown |
+| [`@mdxld/json`](/docs/mdxld/formats/json) | JSON-LD and JSON Schema |
+| [`@mdxui/html`](/docs/mdxui/renderers/html) | Styled HTML output |
+| [`@mdxld/jsx`](/docs/mdxld/jsx) | JSX runtime for HTML |

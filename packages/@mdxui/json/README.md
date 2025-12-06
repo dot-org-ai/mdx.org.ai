@@ -1,6 +1,24 @@
 # @mdxui/json
 
-JSON serialization and transformation for MDXLD documents. Convert between MDXLD and JSON-LD formats, generate schemas, and validate data.
+Styled JSON output for MDXLD documents. Convert between MDXLD and JSON-LD formats, generate schemas, and validate data.
+
+## Architecture
+
+```
+@mdxld/json (semantic layer)
+     ↓
+@mdxui/json (presentation layer) ← this package
+```
+
+| Layer | Package | Purpose |
+|-------|---------|---------|
+| **Semantic** | `@mdxld/json` | Pure conversion - `toJSON()` / `toJSONLD()` / `toJSONSchema()` |
+| **Presentation** | `@mdxui/json` | MDXLD documents → styled JSON output |
+
+Use `@mdxld/json` for raw object conversion. Use `@mdxui/json` when you need:
+- MDXLD document → JSON conversion
+- Content + frontmatter serialization
+- Pretty-printed output with formatting
 
 ## Installation
 
@@ -412,11 +430,28 @@ interface ToolSchema {
 
 ## Related Packages
 
+### Semantic Layer (@mdxld)
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/json`](../../../@mdxld/json) | Pure conversion - `toJSON()` / `toJSONLD()` / `toJSONSchema()` |
+| [`@mdxld/html`](../../../@mdxld/html) | Semantic HTML - `toHTML()` / `fromHTML()` |
+| [`@mdxld/markdown`](../../../@mdxld/markdown) | Markdown - `toMarkdown()` / `fromMarkdown()` |
+| [`@mdxld/jsx`](../../../@mdxld/jsx) | Universal JSX runtime |
+| [`@mdxld/jsonld`](../../../@mdxld/jsonld) | JSON-LD utilities |
+
+### Presentation Layer (@mdxui)
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxui/html`](../html) | Styled HTML output |
+| [`@mdxui/markdown`](../markdown) | Styled markdown output |
+
+### Core
+
 | Package | Description |
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
-| [@mdxld/jsonld](https://www.npmjs.com/package/@mdxld/jsonld) | JSON-LD utilities |
-| [@mdxui/html](https://www.npmjs.com/package/@mdxui/html) | HTML rendering |
 | [@mdxe/mcp](https://www.npmjs.com/package/@mdxe/mcp) | MCP server |
 
 ## License

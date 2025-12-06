@@ -54,121 +54,7 @@ import type {
   Env,
 } from './types.js'
 
-// =============================================================================
-// Schema
-// =============================================================================
-
-const SCHEMA = `
-  -- Things table (graph nodes)
-  CREATE TABLE IF NOT EXISTS things (
-    url TEXT PRIMARY KEY,
-    ns TEXT NOT NULL,
-    type TEXT NOT NULL,
-    id TEXT NOT NULL,
-    context TEXT,
-    data TEXT NOT NULL DEFAULT '{}',
-    content TEXT NOT NULL DEFAULT '',
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-    deleted_at TEXT,
-    version INTEGER NOT NULL DEFAULT 1
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_things_ns ON things(ns);
-  CREATE INDEX IF NOT EXISTS idx_things_type ON things(type);
-  CREATE INDEX IF NOT EXISTS idx_things_ns_type ON things(ns, type);
-  CREATE INDEX IF NOT EXISTS idx_things_deleted_at ON things(deleted_at);
-  CREATE UNIQUE INDEX IF NOT EXISTS idx_things_ns_type_id ON things(ns, type, id);
-
-  -- Relationships table (graph edges)
-  CREATE TABLE IF NOT EXISTS relationships (
-    id TEXT PRIMARY KEY,
-    type TEXT NOT NULL,
-    from_url TEXT NOT NULL,
-    to_url TEXT NOT NULL,
-    data TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (from_url) REFERENCES things(url) ON DELETE CASCADE
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_rel_type ON relationships(type);
-  CREATE INDEX IF NOT EXISTS idx_rel_from ON relationships(from_url);
-  CREATE INDEX IF NOT EXISTS idx_rel_to ON relationships(to_url);
-  CREATE INDEX IF NOT EXISTS idx_rel_from_type ON relationships(from_url, type);
-  CREATE INDEX IF NOT EXISTS idx_rel_to_type ON relationships(to_url, type);
-  CREATE UNIQUE INDEX IF NOT EXISTS idx_rel_unique ON relationships(from_url, type, to_url);
-
-  -- Search table (chunked content with embeddings)
-  CREATE TABLE IF NOT EXISTS search (
-    id TEXT PRIMARY KEY,
-    thing_url TEXT NOT NULL,
-    chunk_index INTEGER NOT NULL,
-    content TEXT NOT NULL,
-    embedding TEXT,
-    metadata TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (thing_url) REFERENCES things(url) ON DELETE CASCADE
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_search_thing ON search(thing_url);
-  CREATE INDEX IF NOT EXISTS idx_search_thing_chunk ON search(thing_url, chunk_index);
-
-  -- Events table (immutable event log)
-  CREATE TABLE IF NOT EXISTS events (
-    id TEXT PRIMARY KEY,
-    type TEXT NOT NULL,
-    timestamp TEXT NOT NULL DEFAULT (datetime('now')),
-    source TEXT NOT NULL,
-    data TEXT NOT NULL DEFAULT '{}',
-    correlation_id TEXT,
-    causation_id TEXT
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_events_type ON events(type);
-  CREATE INDEX IF NOT EXISTS idx_events_source ON events(source);
-  CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
-  CREATE INDEX IF NOT EXISTS idx_events_correlation ON events(correlation_id);
-
-  -- Actions table (pending/active work)
-  CREATE TABLE IF NOT EXISTS actions (
-    id TEXT PRIMARY KEY,
-    actor TEXT NOT NULL,
-    object TEXT NOT NULL,
-    action TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending',
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-    started_at TEXT,
-    completed_at TEXT,
-    result TEXT,
-    error TEXT,
-    metadata TEXT
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_actions_actor ON actions(actor);
-  CREATE INDEX IF NOT EXISTS idx_actions_object ON actions(object);
-  CREATE INDEX IF NOT EXISTS idx_actions_action ON actions(action);
-  CREATE INDEX IF NOT EXISTS idx_actions_status ON actions(status);
-  CREATE INDEX IF NOT EXISTS idx_actions_actor_status ON actions(actor, status);
-
-  -- Artifacts table (cached compiled content)
-  CREATE TABLE IF NOT EXISTS artifacts (
-    key TEXT PRIMARY KEY,
-    type TEXT NOT NULL,
-    source TEXT NOT NULL,
-    source_hash TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    expires_at TEXT,
-    content TEXT NOT NULL,
-    size INTEGER,
-    metadata TEXT
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_artifacts_type ON artifacts(type);
-  CREATE INDEX IF NOT EXISTS idx_artifacts_source ON artifacts(source);
-  CREATE INDEX IF NOT EXISTS idx_artifacts_source_type ON artifacts(source, type);
-  CREATE INDEX IF NOT EXISTS idx_artifacts_expires ON artifacts(expires_at);
-`
+import { getAllSchemaStatements } from '../schema/index.js'
 
 // =============================================================================
 // Utilities
@@ -287,8 +173,8 @@ export class MDXDatabase {
 
     // Run schema in a transaction
     this.ctx.storage.transactionSync(() => {
-      // Split and execute each statement
-      const statements = SCHEMA.split(';').map(s => s.trim()).filter(Boolean)
+      // Execute each schema statement from the schema module
+      const statements = getAllSchemaStatements()
       for (const stmt of statements) {
         this.sql.exec(stmt)
       }
@@ -537,7 +423,8 @@ export class MDXDatabase {
 
     const urls: string[] = []
 
-    if (direction === 'from' || direction === 'both') {
+    // direction='to': Return things this URL points TO (outbound, where from_url = url)
+    if (direction === 'to' || direction === 'both') {
       let sql = 'SELECT to_url FROM relationships WHERE from_url = ?'
       const bindings: unknown[] = [url]
       if (type) {
@@ -548,7 +435,8 @@ export class MDXDatabase {
       urls.push(...cursor.toArray().map(r => r.to_url))
     }
 
-    if (direction === 'to' || direction === 'both') {
+    // direction='from': Return things that point TO this URL (inbound, where to_url = url)
+    if (direction === 'from' || direction === 'both') {
       let sql = 'SELECT from_url FROM relationships WHERE to_url = ?'
       const bindings: unknown[] = [url]
       if (type) {

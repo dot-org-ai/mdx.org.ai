@@ -1,6 +1,6 @@
 ---
 title: Unstructured Content
-description: Markdown content, parsing, and bi-directional extraction
+description: Markdown content, templates, layouts, and bi-directional extraction
 root: true
 defaultOpen: true
 ---
@@ -21,22 +21,98 @@ This is **markdown** content with an embedded component:
 And more prose continues here...
 ```
 
-## Bi-directional Extraction
+## Templates (Layouts)
 
-The `@mdxld/extract` package enables round-trip editing between rendered content and structured data:
+Templates define how structured data **renders to markdown** and **extracts back** to objects.
+
+### Convention-Based Layouts
+
+Objects automatically render to markdown following conventions:
 
 ```typescript
-import { extract } from '@mdxld/extract'
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
 
-// Template defines structure
-const template = `# {data.title}\n\n{data.content}`
+// Object → Markdown (auto layout)
+const markdown = toMarkdown({
+  name: 'Customer',
+  plural: 'Customers',
+  description: 'A person who purchases products.',
+  properties: [
+    { name: 'id', type: 'string', required: true },
+    { name: 'email', type: 'string', required: true },
+  ]
+})
+```
 
-// User edits rendered markdown
-const edited = `# Updated Title\n\nNew content here`
+**Output:**
+```markdown
+# Customer (Customers)
 
-// Extract changes back to data
-const result = extract({ template, rendered: edited })
-// { data: { title: 'Updated Title', content: 'New content here' } }
+A person who purchases products.
+
+## Properties
+
+| Property | Type | Required |
+|----------|------|----------|
+| id | string | ✓ |
+| email | string | ✓ |
+```
+
+### Layout Conventions
+
+| Shape Pattern | Markdown Output |
+|---------------|-----------------|
+| `name` (top-level) | `# {name}` |
+| `description` | Paragraph after title |
+| Nested object | `## {Key}` section |
+| `string[]` | Bullet list |
+| `object[]` (flat) | Table |
+| `object[]` (complex) | `### {name}` subsections |
+
+### Custom Layouts
+
+For full control, use explicit templates:
+
+```typescript
+const template = `
+# {name}
+
+> {tagline}
+
+## The Hero
+
+{hero.persona}
+
+**Works as:** {hero.occupation}
+`
+
+// Render with template
+const markdown = render(template, storyBrand)
+
+// Extract from edited markdown
+const data = extract(editedMarkdown, template)
+```
+
+## Bi-directional Extraction
+
+The `@mdxld/markdown` package enables round-trip editing:
+
+```typescript
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
+
+// 1. Render to markdown
+const markdown = toMarkdown(storyBrand)
+
+// 2. User or AI edits the markdown
+const edited = markdown.replace('VP of Engineering', 'CTO')
+
+// 3. Extract changes back to object
+const updated = fromMarkdown<StoryBrand>(edited)
+
+// 4. Diff to see what changed
+import { diff } from '@mdxld/markdown'
+const changes = diff(storyBrand, updated)
+// { modified: { 'hero.occupation': { from: 'VP of Engineering', to: 'CTO' } } }
 ```
 
 ## Use Cases
@@ -45,3 +121,6 @@ const result = extract({ template, rendered: edited })
 - **AI Editing** - Let AI improve content, extract the changes
 - **Round-trip Sync** - Keep source MDX and rendered output in sync
 - **Content Migration** - Transform between formats while preserving structure
+- **Documentation** - Generate docs from schemas, accept edits back
+
+See [Structured Data](/structured-data) for schema definitions and [UI Components](/ui-components) for JSX rendering.

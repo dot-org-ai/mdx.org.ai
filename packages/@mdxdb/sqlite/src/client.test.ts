@@ -130,7 +130,8 @@ describe('MDXClient', () => {
       await client.relate({ type: 'authored', from: user.url, to: post1.url })
       await client.relate({ type: 'authored', from: user.url, to: post2.url })
 
-      const related = await client.related(user.url, 'authored')
+      // direction='to' gets things that user points TO (outbound - the posts user authored)
+      const related = await client.related(user.url, 'authored', 'to')
       expect(related).toHaveLength(2)
     })
   })

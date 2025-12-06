@@ -45,8 +45,7 @@ CREATE TABLE IF NOT EXISTS Things (
   event LowCardinality(String) DEFAULT 'created',
   ts DateTime64(3) DEFAULT now64(3),
 
-  -- Indexes
-  INDEX idx_data data TYPE bloom_filter GRANULARITY 1,
+  -- Indexes (bloom_filter not supported on JSON type)
   INDEX idx_repo repo TYPE bloom_filter GRANULARITY 1,
   INDEX idx_commit commit TYPE bloom_filter GRANULARITY 1
 ) ENGINE = ReplacingMergeTree(version)

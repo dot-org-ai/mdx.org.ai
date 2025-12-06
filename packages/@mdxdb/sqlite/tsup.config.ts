@@ -8,6 +8,7 @@ export default defineConfig({
     miniflare: 'src/miniflare.ts',
     sync: 'src/sync.ts',
     types: 'src/types.ts',
+    schema: 'schema/index.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,

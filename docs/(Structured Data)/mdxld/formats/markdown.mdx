@@ -1,0 +1,354 @@
+---
+title: "@mdxld/markdown"
+description: Bi-directional conversion between Objects and Markdown
+---
+
+# @mdxld/markdown
+
+Bi-directional conversion between JavaScript objects and Markdown. Uses convention-based layouts that automatically determine how objects render based on their shape.
+
+## Installation
+
+```bash
+pnpm add @mdxld/markdown
+```
+
+## Quick Start
+
+```typescript
+import { toMarkdown, fromMarkdown, diff, applyExtract } from '@mdxld/markdown'
+
+// Object to Markdown
+const customer = {
+  name: 'Customer',
+  description: 'A customer entity',
+  properties: [
+    { name: 'id', type: 'string', required: true, description: 'Unique identifier' },
+    { name: 'email', type: 'string', required: true, description: 'Email address' },
+  ]
+}
+
+const markdown = toMarkdown(customer)
+```
+
+**Output:**
+
+```markdown
+# Customer
+
+A customer entity
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| id | string | ✓ | Unique identifier |
+| email | string | ✓ | Email address |
+```
+
+## API Reference
+
+### toMarkdown(object, options?)
+
+Convert an object to Markdown using convention-based layout.
+
+```typescript
+function toMarkdown<T extends object>(
+  object: T,
+  options?: ToMarkdownOptions
+): string
+
+interface ToMarkdownOptions {
+  /** Starting heading depth (default: 1) */
+  headingDepth?: number
+  /** Include table of contents */
+  toc?: boolean
+  /** Use frontmatter for metadata */
+  frontmatter?: boolean
+  /** Table style: 'github' | 'simple' */
+  tableStyle?: 'github' | 'simple'
+  /** List style: 'dash' | 'asterisk' | 'plus' */
+  listStyle?: 'dash' | 'asterisk' | 'plus'
+}
+```
+
+**Example with options:**
+
+```typescript
+const markdown = toMarkdown(entity, {
+  headingDepth: 2,      // Start at ## instead of #
+  tableStyle: 'github', // GFM tables
+  listStyle: 'dash',    // Use - for lists
+})
+```
+
+### fromMarkdown(markdown, options?)
+
+Parse Markdown back to an object using convention-based extraction.
+
+```typescript
+function fromMarkdown<T = Record<string, unknown>>(
+  markdown: string,
+  options?: FromMarkdownOptions
+): T
+
+interface FromMarkdownOptions {
+  /** Expected type for validation */
+  type?: string
+  /** Strict mode - throw on parse errors */
+  strict?: boolean
+}
+```
+
+**Example:**
+
+```typescript
+const markdown = `# Customer
+
+A customer entity
+
+| Property | Type | Required |
+|----------|------|----------|
+| id | string | ✓ |
+| email | string | ✓ |
+`
+
+const customer = fromMarkdown<Customer>(markdown)
+// {
+//   name: 'Customer',
+//   description: 'A customer entity',
+//   properties: [
+//     { name: 'id', type: 'string', required: true },
+//     { name: 'email', type: 'string', required: true },
+//   ]
+// }
+```
+
+### diff(original, extracted)
+
+Compute the difference between two objects.
+
+```typescript
+function diff<T extends object>(original: T, extracted: T): DiffResult
+
+interface DiffResult {
+  added: Record<string, unknown>
+  modified: Record<string, { from: unknown; to: unknown }>
+  removed: string[]
+  hasChanges: boolean
+}
+```
+
+**Example:**
+
+```typescript
+const original = { name: 'John', age: 30 }
+const updated = { name: 'John', age: 31, city: 'NYC' }
+
+const changes = diff(original, updated)
+// {
+//   added: { city: 'NYC' },
+//   modified: { age: { from: 30, to: 31 } },
+//   removed: [],
+//   hasChanges: true
+// }
+```
+
+### applyExtract(original, extracted, options?)
+
+Apply extracted data to original document with merge strategies.
+
+```typescript
+function applyExtract<T extends object>(
+  original: T,
+  extracted: Partial<T>,
+  options?: ApplyOptions
+): T
+
+interface ApplyOptions {
+  /** Only apply specific paths */
+  paths?: string[]
+  /** Array merge strategy: 'replace' | 'append' | 'prepend' */
+  arrayMerge?: 'replace' | 'append' | 'prepend'
+}
+```
+
+**Example:**
+
+```typescript
+const original = { name: 'John', tags: ['a', 'b'] }
+const extracted = { name: 'Jane', tags: ['c'] }
+
+// Replace arrays (default)
+applyExtract(original, extracted)
+// { name: 'Jane', tags: ['c'] }
+
+// Append to arrays
+applyExtract(original, extracted, { arrayMerge: 'append' })
+// { name: 'Jane', tags: ['a', 'b', 'c'] }
+
+// Only apply specific paths
+applyExtract(original, extracted, { paths: ['name'] })
+// { name: 'Jane', tags: ['a', 'b'] }
+```
+
+## Layout Conventions
+
+Objects are rendered based on their shape:
+
+| Property | Markdown Output |
+|----------|-----------------|
+| `name` | `# {name}` heading |
+| `description` | Paragraph after heading |
+| `properties[]` | Table with columns |
+| `sections[]` | H2 subsections |
+| `items[]` | Bulleted list |
+
+### Entity Example
+
+```typescript
+const entity = {
+  name: 'User',
+  description: 'A user account',
+  properties: [
+    { name: 'id', type: 'string', required: true },
+    { name: 'email', type: 'string', required: true },
+    { name: 'role', type: 'string', enum: ['admin', 'user'] },
+  ]
+}
+
+toMarkdown(entity)
+```
+
+**Output:**
+
+```markdown
+# User
+
+A user account
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| id | string | ✓ |  |
+| email | string | ✓ |  |
+| role | string |  |  |
+```
+
+### Section Example
+
+```typescript
+const doc = {
+  name: 'Getting Started',
+  sections: [
+    { name: 'Installation', content: 'Run `npm install`' },
+    { name: 'Usage', content: 'Import and use' },
+  ]
+}
+
+toMarkdown(doc)
+```
+
+**Output:**
+
+```markdown
+# Getting Started
+
+## Installation
+
+Run `npm install`
+
+## Usage
+
+Import and use
+```
+
+### List Example
+
+```typescript
+const list = {
+  name: 'Features',
+  items: ['Fast', 'Reliable', 'Scalable']
+}
+
+toMarkdown(list)
+```
+
+**Output:**
+
+```markdown
+# Features
+
+- Fast
+- Reliable
+- Scalable
+```
+
+## Use Cases
+
+### Documentation Generation
+
+```typescript
+import { toMarkdown } from '@mdxld/markdown'
+
+const apiEndpoint = {
+  name: 'Create User',
+  description: 'Creates a new user account',
+  properties: [
+    { name: 'email', type: 'string', required: true, description: 'User email' },
+    { name: 'password', type: 'string', required: true, description: 'User password' },
+  ]
+}
+
+const docs = toMarkdown(apiEndpoint)
+await Bun.write('docs/create-user.md', docs)
+```
+
+### CMS Content Editing
+
+```typescript
+import { toMarkdown, fromMarkdown, diff, applyExtract } from '@mdxld/markdown'
+
+// Load structured content
+const post = await db.BlogPost.get('hello-world')
+
+// Render for editing
+const markdown = toMarkdown(post)
+
+// User edits in WYSIWYG editor...
+const edited = await editor.edit(markdown)
+
+// Extract changes
+const extracted = fromMarkdown(edited)
+const changes = diff(post, extracted)
+
+if (changes.hasChanges) {
+  // Review changes before saving
+  console.log('Modified:', Object.keys(changes.modified))
+
+  // Apply and save
+  const updated = applyExtract(post, extracted)
+  await db.BlogPost.update('hello-world', updated)
+}
+```
+
+### AI Content Improvement
+
+```typescript
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
+
+// Render to markdown for AI
+const markdown = toMarkdown(content)
+
+// AI improves the content
+const improved = await ai.improve(markdown, 'Make it more engaging')
+
+// Extract changes back
+const updated = fromMarkdown(improved)
+```
+
+## Related Packages
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/extract`](/docs/mdxld/extract) | Template-based extraction |
+| [`@mdxld/diff`](/docs/mdxld/formats/diff) | Advanced diffing and patching |
+| [`@mdxui/markdown`](/docs/mdxui/renderers/markdown) | Styled markdown output |
+| [`mdxdb`](/docs/mdxdb) | Document storage |

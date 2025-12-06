@@ -1,6 +1,25 @@
 # @mdxui/html
 
-Render MDXLD documents to HTML strings. Server-side HTML generation from MDX content.
+Styled HTML rendering for MDXLD documents. Server-side HTML generation with customizable presentation.
+
+## Architecture
+
+```
+@mdxld/html (semantic layer)
+     ↓
+@mdxui/html (presentation layer) ← this package
+```
+
+| Layer | Package | Purpose |
+|-------|---------|---------|
+| **Semantic** | `@mdxld/html` | Pure structure - `toHTML()` / `fromHTML()` |
+| **Presentation** | `@mdxui/html` | Styling, theming, component mapping |
+
+Use `@mdxld/html` for raw semantic HTML. Use `@mdxui/html` when you need:
+- Custom CSS styling
+- Component mapping (MDX → HTML elements)
+- Full document generation with `<head>`, meta tags
+- SSR with React hydration
 
 ## Installation
 
@@ -273,11 +292,29 @@ interface HTMLOutput {
 
 ## Related Packages
 
+### Semantic Layer (@mdxld)
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/html`](../../../@mdxld/html) | Semantic HTML - `toHTML()` / `fromHTML()` |
+| [`@mdxld/json`](../../../@mdxld/json) | JSON/JSON-LD - `toJSON()` / `toJSONLD()` |
+| [`@mdxld/markdown`](../../../@mdxld/markdown) | Markdown - `toMarkdown()` / `fromMarkdown()` |
+| [`@mdxld/jsx`](../../../@mdxld/jsx) | Universal JSX runtime |
+
+### Presentation Layer (@mdxui)
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxui/json`](../json) | Styled JSON output |
+| [`@mdxui/markdown`](../markdown) | Styled markdown output |
+| [`@mdxui/shadcn`](../shadcn) | shadcn/ui components |
+| [`@mdxui/email`](../email) | Email-optimized HTML |
+
+### Core
+
 | Package | Description |
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
-| [@mdxui/json](https://www.npmjs.com/package/@mdxui/json) | JSON output |
-| [@mdxui/markdown](https://www.npmjs.com/package/@mdxui/markdown) | Markdown output |
 | [@mdxe/hono](https://www.npmjs.com/package/@mdxe/hono) | Hono middleware |
 
 ## License

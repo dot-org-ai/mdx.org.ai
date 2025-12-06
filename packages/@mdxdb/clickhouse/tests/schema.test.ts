@@ -59,7 +59,12 @@ describe('Schema Version', () => {
   it('has TABLE_SCHEMAS for all tables', () => {
     for (const table of TABLES) {
       expect(TABLE_SCHEMAS).toHaveProperty(table)
-      expect(TABLE_SCHEMAS[table]).toContain('CREATE TABLE')
+      // access_control has roles/grants, not CREATE TABLE
+      if (table === 'access_control') {
+        expect(TABLE_SCHEMAS[table]).toContain('CREATE ROLE')
+      } else {
+        expect(TABLE_SCHEMAS[table]).toContain('CREATE TABLE')
+      }
     }
   })
 })

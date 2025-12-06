@@ -130,7 +130,17 @@ export function createHttpExecutor(config: ClickHouseHttpConfig): ClickHouseExec
     async insert<T>(table: string, values: T[]): Promise<void> {
       if (values.length === 0) return
       // Use JSONEachRow format for insert
-      const rows = values.map(v => JSON.stringify(v)).join('\n')
+      // Convert ISO timestamps to ClickHouse format (YYYY-MM-DD HH:MM:SS.sss)
+      const rows = values.map(v => {
+        const converted = { ...v } as Record<string, unknown>
+        for (const [key, value] of Object.entries(converted)) {
+          if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
+            // Convert ISO string to ClickHouse DateTime format
+            converted[key] = value.replace('T', ' ').replace('Z', '')
+          }
+        }
+        return JSON.stringify(converted)
+      }).join('\n')
       const sql = `INSERT INTO ${table} FORMAT JSONEachRow\n${rows}`
       await executeQuery(sql)
     },
@@ -228,6 +238,21 @@ function parseThingUrl(url: string): { ns: string; type: string; id: string } {
 
 function escapeString(str: string): string {
   return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+}
+
+/**
+ * Parse ClickHouse DateTime as UTC
+ * ClickHouse returns timestamps without timezone like '2024-01-01 12:00:00.000'
+ * We need to treat these as UTC, not local time
+ */
+function parseClickHouseDateTime(dateStr: string): Date {
+  if (!dateStr) return new Date()
+  // If already has timezone info (Z or +/-HH:MM offset at end), just parse it
+  if (dateStr.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(dateStr)) {
+    return new Date(dateStr)
+  }
+  // ClickHouse format: '2024-01-01 12:00:00.000' -> needs 'T' and 'Z'
+  return new Date(dateStr.replace(' ', 'T') + 'Z')
 }
 
 // =============================================================================
@@ -539,9 +564,23 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   }
 
   async unrelate(from: string, type: string, to: string): Promise<boolean> {
-    await this.executor.command(
-      `ALTER TABLE Relationships DELETE WHERE \`from\` = '${escapeString(from)}' AND predicate = '${escapeString(type)}' AND \`to\` = '${escapeString(to)}'`
-    )
+    const now = new Date().toISOString()
+    const { ns } = parseThingUrl(from)
+
+    // Use soft-delete by inserting a row with event='deleted'
+    // This is synchronous unlike ALTER TABLE DELETE
+    await this.executor.insert('Relationships', [{
+      ns,
+      from,
+      to,
+      predicate: type,
+      reverse: '',
+      data: {},
+      meta: {},
+      visibility: '',
+      event: 'deleted',
+      ts: now,
+    }])
     return true
   }
 
@@ -552,18 +591,30 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   ): Promise<Thing<TData>[]> {
     const urls: string[] = []
 
-    if (direction === 'from' || direction === 'both') {
+    // direction='to': Return things this URL points TO (outbound, where from=url)
+    // direction='from': Return things that point TO this URL (inbound, where to=url)
+    if (direction === 'to' || direction === 'both') {
       const predicateClause = relationshipType ? `AND predicate = '${escapeString(relationshipType)}'` : ''
+      // Get latest row for each unique (from, predicate, to) and filter out deleted
       const rows = await this.executor.query<{ to: string }>(
-        `SELECT \`to\` FROM Relationships WHERE \`from\` = '${escapeString(url)}' ${predicateClause}`
+        `SELECT \`to\` FROM (
+          SELECT \`to\`, event, ROW_NUMBER() OVER (PARTITION BY \`from\`, predicate, \`to\` ORDER BY ts DESC) as rn
+          FROM Relationships
+          WHERE \`from\` = '${escapeString(url)}' ${predicateClause}
+        ) WHERE rn = 1 AND event != 'deleted'`
       )
       urls.push(...rows.map(r => r.to))
     }
 
-    if (direction === 'to' || direction === 'both') {
+    if (direction === 'from' || direction === 'both') {
       const predicateClause = relationshipType ? `AND predicate = '${escapeString(relationshipType)}'` : ''
+      // Get latest row for each unique (from, predicate, to) and filter out deleted
       const rows = await this.executor.query<{ from: string }>(
-        `SELECT \`from\` FROM Relationships WHERE \`to\` = '${escapeString(url)}' ${predicateClause}`
+        `SELECT \`from\` FROM (
+          SELECT \`from\`, event, ROW_NUMBER() OVER (PARTITION BY \`from\`, predicate, \`to\` ORDER BY ts DESC) as rn
+          FROM Relationships
+          WHERE \`to\` = '${escapeString(url)}' ${predicateClause}
+        ) WHERE rn = 1 AND event != 'deleted'`
       )
       urls.push(...rows.map(r => r.from))
     }
@@ -585,18 +636,30 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   ): Promise<Relationship[]> {
     const results: Relationship[] = []
 
-    if (direction === 'from' || direction === 'both') {
+    // direction='to': Return relationships where this URL is the FROM (outbound)
+    // direction='from': Return relationships where this URL is the TO (inbound)
+    if (direction === 'to' || direction === 'both') {
       const predicateClause = type ? `AND predicate = '${escapeString(type)}'` : ''
+      // Get latest row for each unique (from, predicate, to) and filter out deleted
       const rows = await this.executor.query<RelationshipRow>(
-        `SELECT * FROM Relationships WHERE \`from\` = '${escapeString(url)}' ${predicateClause}`
+        `SELECT * FROM (
+          SELECT *, ROW_NUMBER() OVER (PARTITION BY \`from\`, predicate, \`to\` ORDER BY ts DESC) as rn
+          FROM Relationships
+          WHERE \`from\` = '${escapeString(url)}' ${predicateClause}
+        ) WHERE rn = 1 AND event != 'deleted'`
       )
       results.push(...rows.map(row => this.rowToRelationship(row)))
     }
 
-    if (direction === 'to' || direction === 'both') {
+    if (direction === 'from' || direction === 'both') {
       const predicateClause = type ? `AND predicate = '${escapeString(type)}'` : ''
+      // Get latest row for each unique (from, predicate, to) and filter out deleted
       const rows = await this.executor.query<RelationshipRow>(
-        `SELECT * FROM Relationships WHERE \`to\` = '${escapeString(url)}' ${predicateClause}`
+        `SELECT * FROM (
+          SELECT *, ROW_NUMBER() OVER (PARTITION BY \`from\`, predicate, \`to\` ORDER BY ts DESC) as rn
+          FROM Relationships
+          WHERE \`to\` = '${escapeString(url)}' ${predicateClause}
+        ) WHERE rn = 1 AND event != 'deleted'`
       )
       results.push(...rows.map(row => this.rowToRelationship(row)))
     }
@@ -605,7 +668,8 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   }
 
   async references(url: string, relationshipType?: string): Promise<Thing<TData>[]> {
-    return this.related(url, relationshipType, 'to')
+    // References are inbound - things that point TO this url
+    return this.related(url, relationshipType, 'from')
   }
 
   // ===========================================================================
@@ -616,6 +680,8 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     options: CreateEventOptions<T>
   ): Promise<Event<T>> {
     const now = new Date().toISOString()
+    // Generate ID client-side for immediate return
+    const ulid = generateId()
     // Extract ns from source URL or use 'default'
     let ns = 'default'
     try {
@@ -626,7 +692,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     }
 
     await this.executor.insert('Events', [{
-      // ulid is auto-generated by ClickHouse
+      ulid,
       ns,
       actor: options.source,
       actorData: {},
@@ -643,7 +709,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     }])
 
     return {
-      id: '', // Will be generated by ClickHouse
+      id: ulid,
       type: options.type,
       timestamp: new Date(now),
       source: options.source,
@@ -702,6 +768,8 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     options: CreateActionOptions<T>
   ): Promise<Action<T>> {
     const now = new Date().toISOString()
+    // Generate ID client-side for immediate return
+    const id = generateId()
     // Extract ns from actor URL or use 'default'
     let ns = 'default'
     try {
@@ -718,7 +786,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
 
     await this.executor.insert('Actions', [{
       ns,
-      // id is auto-generated by ClickHouse with generateULID()
+      id,
       act,
       action,
       activity,
@@ -753,7 +821,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     }])
 
     return {
-      id: '', // Will be generated by ClickHouse
+      id,
       actor: options.actor,
       object: options.object,
       action: options.action,
@@ -768,6 +836,8 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     options: CreateActionOptions<T>
   ): Promise<Action<T>> {
     const now = new Date().toISOString()
+    // Generate ID client-side for immediate return
+    const id = generateId()
     // Extract ns from actor URL or use 'default'
     let ns = 'default'
     try {
@@ -784,7 +854,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
 
     await this.executor.insert('Actions', [{
       ns,
-      // id is auto-generated by ClickHouse with generateULID()
+      id,
       act,
       action,
       activity,
@@ -819,7 +889,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     }])
 
     return {
-      id: '', // Will be generated by ClickHouse
+      id,
       actor: options.actor,
       object: options.object,
       action: options.action,
@@ -851,8 +921,10 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   }
 
   async getAction(id: string): Promise<Action | null> {
+    // Use ORDER BY updatedAt DESC because status is in ORDER BY key,
+    // so status changes create separate rows with same id
     const rows = await this.executor.query<ActionRow>(
-      `SELECT * FROM Actions FINAL WHERE id = '${escapeString(id)}' LIMIT 1`
+      `SELECT * FROM Actions FINAL WHERE id = '${escapeString(id)}' ORDER BY updatedAt DESC LIMIT 1`
     )
     if (rows.length === 0) return null
     return this.rowToAction(rows[0]!)
@@ -973,9 +1045,10 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   async storeArtifact<T>(options: StoreArtifactOptions<T>): Promise<Artifact<T>> {
     const now = new Date().toISOString()
     const content = JSON.stringify(options.content)
+    // Use ISO format for expires to ensure proper DateTime64 parsing
     const expiresAt = options.ttl
       ? new Date(Date.now() + options.ttl).toISOString()
-      : '2999-12-31 23:59:59'
+      : '2999-12-31T23:59:59.000Z'
 
     // Parse source URL for ns
     let ns = 'default'
@@ -986,7 +1059,8 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       // Use default ns if source is not a valid URL
     }
 
-    const id = generateId()
+    // Use provided key as ID, or generate one
+    const id = options.key ?? generateId()
 
     await this.executor.insert('Artifacts', [{
       ns,
@@ -1020,7 +1094,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       source: options.source,
       sourceHash: options.sourceHash,
       createdAt: new Date(now),
-      expiresAt: expiresAt !== '2999-12-31 23:59:59' ? new Date(expiresAt) : undefined,
+      expiresAt: expiresAt !== '2999-12-31T23:59:59.000Z' ? new Date(expiresAt) : undefined,
       content: options.content,
       size: content.length,
       metadata: options.metadata,
@@ -1028,18 +1102,32 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   }
 
   async getArtifact<T = unknown>(key: string): Promise<Artifact<T> | null> {
-    // Parse key format: "ns:type:id" or "url:type"
+    // Parse key format: "ns:type:id", "url:type", or simple key
     const parts = key.split(':')
-    if (parts.length < 2) return null
+
+    // Simple key format (no colons) - lookup by id directly
+    if (parts.length === 1) {
+      // Get latest row and check if it's deleted
+      const rows = await this.executor.query<ArtifactRow>(
+        `SELECT * FROM Artifacts WHERE id = '${escapeString(key)}' ORDER BY ts DESC LIMIT 1`
+      )
+      if (rows.length === 0) return null
+      const row = rows[0]!
+      if (row.event === 'deleted') return null
+      return this.rowToArtifact(row)
+    }
 
     if (parts.length === 3) {
       // Format: ns:type:id
       const [ns, type, id] = parts
+      // Get latest row and check if it's deleted
       const rows = await this.executor.query<ArtifactRow>(
         `SELECT * FROM Artifacts WHERE ns = '${escapeString(ns!)}' AND type = '${escapeString(type!)}' AND id = '${escapeString(id!)}' ORDER BY ts DESC LIMIT 1`
       )
       if (rows.length === 0) return null
-      return this.rowToArtifact(rows[0]!)
+      const row = rows[0]!
+      if (row.event === 'deleted') return null
+      return this.rowToArtifact(row)
     }
 
     // Format: url:type (legacy)
@@ -1051,14 +1139,17 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
 
   async getArtifactBySource(source: string, type: ArtifactType): Promise<Artifact | null> {
     const rows = await this.executor.query<ArtifactRow>(
-      `SELECT * FROM Artifacts WHERE source = '${escapeString(source)}' AND type = '${escapeString(type)}' ORDER BY ts DESC LIMIT 1`
+      `SELECT * FROM Artifacts WHERE source = '${escapeString(source)}' AND \`type\` = '${escapeString(type)}' ORDER BY ts DESC LIMIT 1`
     )
     if (rows.length === 0) return null
 
     const row = rows[0]!
 
+    // Check if deleted
+    if (row.event === 'deleted') return null
+
     // Check if expired
-    if (row.expires && new Date(row.expires) < new Date()) {
+    if (row.expires && parseClickHouseDateTime(row.expires) < new Date()) {
       await this.deleteArtifactBySource(source, type)
       return null
     }
@@ -1067,15 +1158,83 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
   }
 
   async deleteArtifact(key: string): Promise<boolean> {
-    // Parse key format: "ns:type:id" or "url:type"
+    const now = new Date().toISOString()
+
+    // Parse key format: "ns:type:id", "url:type", or simple key
     const parts = key.split(':')
-    if (parts.length < 2) return false
+
+    // Simple key format (no colons) - soft-delete by id
+    if (parts.length === 1) {
+      // Get the existing artifact to get ns and type
+      const existing = await this.getArtifact(key)
+      if (!existing) return false
+
+      // Parse ns from source
+      let ns = 'default'
+      try {
+        const parsed = parseThingUrl(existing.source)
+        ns = parsed.ns
+      } catch {
+        // Use default ns
+      }
+
+      // Insert soft-delete marker
+      await this.executor.insert('Artifacts', [{
+        ns,
+        id: key,
+        type: existing.type,
+        thing: '',
+        source: existing.source,
+        name: '',
+        description: '',
+        path: '',
+        storage: '',
+        content: '',
+        code: '',
+        data: {},
+        meta: {},
+        contentType: '',
+        encoding: 'utf-8',
+        size: 0,
+        hash: '',
+        build: '',
+        status: 'deleted',
+        log: '',
+        expires: '2999-12-31 23:59:59',
+        event: 'deleted',
+        ts: now,
+      }])
+      return true
+    }
 
     if (parts.length === 3) {
       const [ns, type, id] = parts
-      await this.executor.command(
-        `ALTER TABLE Artifacts DELETE WHERE ns = '${escapeString(ns!)}' AND type = '${escapeString(type!)}' AND id = '${escapeString(id!)}'`
-      )
+      // Insert soft-delete marker
+      await this.executor.insert('Artifacts', [{
+        ns,
+        id,
+        type,
+        thing: '',
+        source: '',
+        name: '',
+        description: '',
+        path: '',
+        storage: '',
+        content: '',
+        code: '',
+        data: {},
+        meta: {},
+        contentType: '',
+        encoding: 'utf-8',
+        size: 0,
+        hash: '',
+        build: '',
+        status: 'deleted',
+        log: '',
+        expires: '2999-12-31 23:59:59',
+        event: 'deleted',
+        ts: now,
+      }])
       return true
     }
 
@@ -1384,8 +1543,8 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       id: row.id,
       url: row.url,
       data: (row.data || {}) as TData,
-      createdAt: new Date(row.ts),
-      updatedAt: new Date(row.ts),
+      createdAt: parseClickHouseDateTime(row.ts),
+      updatedAt: parseClickHouseDateTime(row.ts),
       '@context': row.meta?.['@context'] as string | undefined,
     }
   }
@@ -1396,7 +1555,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       type: row.predicate,
       from: row.from,
       to: row.to,
-      createdAt: new Date(row.ts),
+      createdAt: parseClickHouseDateTime(row.ts),
       data: row.data || undefined,
     }
   }
@@ -1405,7 +1564,7 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
     return {
       id: row.ulid,
       type: row.event,
-      timestamp: new Date(row.ts),
+      timestamp: parseClickHouseDateTime(row.ts),
       source: row.actor,
       data: (row.objectData || {}) as T,
       correlationId: row.meta?.correlationId as string | undefined,
@@ -1420,10 +1579,10 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       object: row.object,
       action: row.act, // map act column to action field
       status: row.status as ActionStatus,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
-      startedAt: row.startedAt ? new Date(row.startedAt) : undefined,
-      completedAt: row.completedAt ? new Date(row.completedAt) : undefined,
+      createdAt: parseClickHouseDateTime(row.createdAt),
+      updatedAt: parseClickHouseDateTime(row.updatedAt),
+      startedAt: row.startedAt ? parseClickHouseDateTime(row.startedAt) : undefined,
+      completedAt: row.completedAt ? parseClickHouseDateTime(row.completedAt) : undefined,
       result: row.result || undefined,
       error: row.error || undefined,
       metadata: (row.data || undefined) as T | undefined,
@@ -1514,12 +1673,12 @@ export class ClickHouseDatabase<TData extends Record<string, unknown> = Record<s
       content = row.content as unknown as T
     }
     return {
-      key: `${row.ns}:${row.type}:${row.id}`,
+      key: row.id, // Use just the id as the key, matching what was passed to storeArtifact
       type: row.type as ArtifactType,
       source: row.source,
       sourceHash: row.hash,
-      createdAt: new Date(row.ts),
-      expiresAt: row.expires ? new Date(row.expires) : undefined,
+      createdAt: parseClickHouseDateTime(row.ts),
+      expiresAt: row.expires ? parseClickHouseDateTime(row.expires) : undefined,
       content,
       size: row.size,
       metadata: row.meta || undefined,

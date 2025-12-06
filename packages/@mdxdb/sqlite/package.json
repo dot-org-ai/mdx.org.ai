@@ -26,6 +26,11 @@
       "types": "./dist/sync.d.ts",
       "import": "./dist/sync.js",
       "require": "./dist/sync.cjs"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js",
+      "require": "./dist/schema.cjs"
     }
   },
   "files": [
@@ -67,6 +72,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
     "@mdxld/config": "workspace:^",
+    "ai-database": "workspace:*",
     "miniflare": "^3.20241106.1",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

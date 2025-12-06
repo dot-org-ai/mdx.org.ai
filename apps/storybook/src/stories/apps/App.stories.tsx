@@ -1,134 +1,177 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Badge, Button } from '@mdxui/shadcn'
-import { AppWindow, Layers, PanelLeft, Settings, Play } from 'lucide-react'
+import { AppWindow, Package, Building2, Bot, Code, BarChart3, Shield, MessageSquare, Play, Settings } from 'lucide-react'
+
+// Props display
+const PropsDisplay = ({ props }: { props: Record<string, string | boolean> }) => (
+  <div className="font-mono text-xs bg-slate-900 text-slate-300 p-3 rounded-lg">
+    <span className="text-purple-400">{'<App'}</span>
+    {Object.entries(props).map(([key, value]) => (
+      <div key={key} className="ml-4">
+        <span className="text-cyan-400">{key}</span>
+        <span className="text-slate-500">=</span>
+        {typeof value === 'boolean' ? (
+          <span className="text-orange-400">{String(value)}</span>
+        ) : (
+          <span className="text-green-400">{`{${value}}`}</span>
+        )}
+      </div>
+    ))}
+    <span className="text-purple-400">{'/>'}</span>
+  </div>
+)
 
 // View preview
-const ViewPreview = ({ path, title, panels }: { path: string, title: string, panels: string[] }) => (
-  <div className="border rounded-lg p-3">
-    <div className="flex items-center justify-between mb-2">
-      <code className="text-xs bg-muted px-2 py-1 rounded">{path}</code>
-      <span className="text-xs text-muted-foreground">{panels.length} panels</span>
-    </div>
-    <div className="font-medium text-sm">{title}</div>
-    <div className="flex flex-wrap gap-1 mt-2">
-      {panels.map(panel => (
-        <Badge key={panel} variant="outline" className="text-xs">{panel}</Badge>
+const ViewPreview = ({ path, widgets }: { path: string, widgets: string[] }) => (
+  <div className="flex items-center gap-2 text-xs">
+    <code className="bg-muted px-1.5 py-0.5 rounded">{path}</code>
+    <span className="text-muted-foreground">→</span>
+    <div className="flex gap-1 flex-wrap">
+      {widgets.map(w => (
+        <Badge key={w} variant="outline" className="text-[10px]">{w}</Badge>
       ))}
     </div>
   </div>
 )
 
-// Conceptual App component
+// App component showing props-based rendering
 const App = ({
-  name,
+  appProps,
+  displayName,
   description,
+  icon: Icon,
+  color,
   layout,
-  auth,
   views,
+  auth,
 }: {
-  name: string
+  appProps: Record<string, string | boolean>
+  displayName: string
   description: string
-  layout: 'sidebar' | 'dashboard' | 'workspace' | 'minimal'
+  icon: React.ElementType
+  color: string
+  layout: 'dashboard' | 'sidebar' | 'workspace' | 'minimal' | 'split'
+  views: Array<{ path: string, widgets: string[] }>
   auth: 'required' | 'optional' | 'none'
-  views: Array<{ path: string, title: string, panels: string[] }>
 }) => (
-  <Card className="w-[550px]">
+  <Card className="w-[600px]">
     <CardHeader>
       <div className="flex items-center gap-4">
-        <div className="h-14 w-14 rounded-lg bg-primary flex items-center justify-center">
-          <AppWindow className="h-7 w-7 text-primary-foreground" />
+        <div className={`h-14 w-14 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center`}>
+          <Icon className="h-7 w-7 text-white" />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <CardTitle>{name}</CardTitle>
-            <Badge variant={auth === 'required' ? 'default' : 'secondary'}>{auth} auth</Badge>
+            <CardTitle>App</CardTitle>
+            <Badge>{displayName}</Badge>
+            <Badge variant="outline">{layout}</Badge>
           </div>
           <CardDescription>{description}</CardDescription>
         </div>
       </div>
     </CardHeader>
     <CardContent className="space-y-4">
-      {/* Layout info */}
-      <div className="flex items-center gap-4 text-sm">
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <PanelLeft className="h-4 w-4" />
-          <span>{layout} layout</span>
-        </div>
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <Layers className="h-4 w-4" />
-          <span>{views.length} views</span>
-        </div>
-      </div>
-
-      {/* App structure visualization */}
-      <div className="bg-muted/50 rounded-lg p-4">
-        <div className="text-xs font-medium text-muted-foreground mb-3">APP STRUCTURE</div>
-        <div className="font-mono text-sm space-y-1">
-          <div className="text-primary">App</div>
-          <div className="ml-4">├── Layout <span className="text-muted-foreground">({layout})</span></div>
-          <div className="ml-4">├── Auth <span className="text-muted-foreground">({auth})</span></div>
-          <div className="ml-4">└── Views</div>
-          {views.map((view, i) => (
-            <div key={view.path} className="ml-8">
-              {i === views.length - 1 ? '└──' : '├──'} {view.path} <span className="text-muted-foreground">→ {view.panels.length} panels</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Layout diagram */}
+      {/* Props that define this app */}
       <div>
-        <h4 className="text-sm font-medium mb-2">Layout Preview</h4>
-        <div className="border rounded-lg overflow-hidden">
-          {layout === 'sidebar' && (
-            <div className="flex h-32">
-              <div className="w-1/4 bg-muted border-r flex items-center justify-center text-xs text-muted-foreground">Sidebar</div>
-              <div className="flex-1 flex flex-col">
-                <div className="h-8 border-b bg-muted/50 flex items-center justify-center text-xs text-muted-foreground">Header</div>
-                <div className="flex-1 flex items-center justify-center text-xs text-muted-foreground">Main Panel</div>
+        <div className="text-xs font-medium text-muted-foreground mb-2">PROPS DEFINE THE SHAPE</div>
+        <PropsDisplay props={appProps} />
+      </div>
+
+      {/* Layout preview */}
+      <div className="border rounded-lg overflow-hidden h-40">
+        {layout === 'dashboard' && (
+          <div className="flex flex-col h-full">
+            <div className="h-10 border-b bg-muted flex items-center px-3 text-xs">
+              <span className="font-medium">Dashboard</span>
+              <span className="ml-auto text-muted-foreground">Header</span>
+            </div>
+            <div className="flex-1 grid grid-cols-3 gap-1 p-2">
+              <div className="bg-muted/50 rounded flex items-center justify-center text-xs text-muted-foreground">Stats</div>
+              <div className="bg-muted/50 rounded col-span-2 flex items-center justify-center text-xs text-muted-foreground">Charts</div>
+              <div className="bg-muted/50 rounded col-span-2 flex items-center justify-center text-xs text-muted-foreground">Table</div>
+              <div className="bg-muted/50 rounded flex items-center justify-center text-xs text-muted-foreground">Activity</div>
+            </div>
+          </div>
+        )}
+        {layout === 'sidebar' && (
+          <div className="flex h-full">
+            <div className="w-40 bg-muted border-r p-2 text-xs text-muted-foreground">
+              <div className="font-medium mb-2">Navigation</div>
+              <div className="space-y-1">
+                <div className="p-1 bg-background rounded">Dashboard</div>
+                <div className="p-1">Content</div>
+                <div className="p-1">Users</div>
+                <div className="p-1">Settings</div>
               </div>
             </div>
-          )}
-          {layout === 'dashboard' && (
-            <div className="flex flex-col h-32">
-              <div className="h-10 border-b bg-muted flex items-center justify-center text-xs text-muted-foreground">Top Navigation</div>
-              <div className="flex-1 grid grid-cols-3 gap-1 p-1">
-                <div className="bg-muted/50 rounded flex items-center justify-center text-xs text-muted-foreground">Panel 1</div>
-                <div className="bg-muted/50 rounded flex items-center justify-center text-xs text-muted-foreground">Panel 2</div>
-                <div className="bg-muted/50 rounded flex items-center justify-center text-xs text-muted-foreground">Panel 3</div>
+            <div className="flex-1 p-2 flex items-center justify-center text-xs text-muted-foreground">
+              Main Content
+            </div>
+          </div>
+        )}
+        {layout === 'workspace' && (
+          <div className="flex h-full">
+            <div className="w-10 bg-muted border-r flex flex-col items-center py-2 gap-2">
+              <div className="w-6 h-6 bg-background rounded" />
+              <div className="w-6 h-6 bg-muted-foreground/20 rounded" />
+              <div className="w-6 h-6 bg-muted-foreground/20 rounded" />
+            </div>
+            <div className="w-32 border-r p-2 text-xs text-muted-foreground">
+              File Tree
+            </div>
+            <div className="flex-1 p-2 text-xs text-muted-foreground flex items-center justify-center">
+              Editor
+            </div>
+            <div className="w-48 border-l p-2 text-xs text-muted-foreground">
+              Aside Panel
+            </div>
+          </div>
+        )}
+        {layout === 'split' && (
+          <div className="flex h-full">
+            <div className="w-48 border-r p-2 text-xs text-muted-foreground">
+              <div className="font-medium mb-2">Conversations</div>
+              <div className="space-y-1">
+                <div className="p-1 bg-background rounded">Current</div>
+                <div className="p-1">Previous</div>
               </div>
             </div>
-          )}
-          {layout === 'workspace' && (
-            <div className="flex h-32">
-              <div className="w-12 bg-muted border-r flex items-center justify-center text-xs text-muted-foreground rotate-[-90deg]">Nav</div>
-              <div className="w-1/4 bg-muted/50 border-r flex items-center justify-center text-xs text-muted-foreground">Tree</div>
-              <div className="flex-1 flex items-center justify-center text-xs text-muted-foreground">Editor</div>
-              <div className="w-1/4 bg-muted/50 border-l flex items-center justify-center text-xs text-muted-foreground">Aside</div>
+            <div className="flex-1 flex flex-col">
+              <div className="flex-1 p-2 text-xs text-muted-foreground flex items-center justify-center">
+                Messages
+              </div>
+              <div className="h-12 border-t p-2 text-xs text-muted-foreground">
+                Input
+              </div>
             </div>
-          )}
-          {layout === 'minimal' && (
-            <div className="flex flex-col h-32">
-              <div className="h-10 border-b flex items-center justify-center text-xs text-muted-foreground">Header</div>
-              <div className="flex-1 flex items-center justify-center text-xs text-muted-foreground">Content</div>
+          </div>
+        )}
+        {layout === 'minimal' && (
+          <div className="flex flex-col h-full">
+            <div className="h-10 border-b flex items-center justify-center text-xs text-muted-foreground">
+              Header
             </div>
-          )}
-        </div>
+            <div className="flex-1 flex items-center justify-center text-xs text-muted-foreground">
+              Content
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Views */}
       <div>
-        <h4 className="text-sm font-medium mb-2">Views</h4>
+        <div className="text-xs font-medium text-muted-foreground mb-2">VIEWS</div>
         <div className="space-y-2">
-          {views.slice(0, 3).map(view => (
+          {views.map(view => (
             <ViewPreview key={view.path} {...view} />
           ))}
-          {views.length > 3 && (
-            <div className="text-xs text-muted-foreground text-center py-2">
-              +{views.length - 3} more views
-            </div>
-          )}
         </div>
+      </div>
+
+      {/* Auth badge */}
+      <div className="flex items-center gap-2 text-xs">
+        <span className="text-muted-foreground">Auth:</span>
+        <Badge variant={auth === 'required' ? 'default' : 'secondary'}>{auth}</Badge>
       </div>
 
       <div className="flex gap-2 pt-2">
@@ -138,7 +181,7 @@ const App = ({
         </Button>
         <Button size="sm">
           <Play className="h-4 w-4 mr-1" />
-          Launch App
+          Launch
         </Button>
       </div>
     </CardContent>
@@ -146,13 +189,13 @@ const App = ({
 )
 
 const meta: Meta<typeof App> = {
-  title: 'Containers/App',
+  title: 'Apps/App',
   component: App,
   parameters: {
     layout: 'centered',
     docs: {
       description: {
-        component: 'An App is an interaction-driven container. Apps contain Views, which contain Panels, which contain Widgets. Apps are for dashboards, tools, and interactive experiences.',
+        component: 'App is a props-driven container. The props you pass determine what kind of app gets rendered. Pass `product` for a dashboard, `business` for admin, `agent` for chat, etc.',
       },
     },
   },
@@ -162,59 +205,139 @@ const meta: Meta<typeof App> = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
+export const Dashboard: Story = {
   args: {
-    name: 'Dashboard',
-    description: 'Analytics and monitoring dashboard',
+    appProps: {
+      product: 'widget',
+    },
+    displayName: 'Dashboard',
+    description: 'Product analytics and metrics',
+    icon: BarChart3,
+    color: 'from-indigo-500 to-purple-600',
     layout: 'dashboard',
     auth: 'required',
     views: [
-      { path: '/dashboard', title: 'Overview', panels: ['Stats', 'Charts', 'Activity'] },
-      { path: '/analytics', title: 'Analytics', panels: ['Metrics', 'Trends', 'Reports'] },
-      { path: '/settings', title: 'Settings', panels: ['Profile', 'Preferences', 'Billing'] },
+      { path: '/', widgets: ['Stats', 'RevenueChart', 'UsersChart', 'Activity'] },
+      { path: '/analytics', widgets: ['Metrics', 'Funnel', 'Cohorts'] },
+      { path: '/users', widgets: ['UserTable', 'Segments'] },
+      { path: '/settings', widgets: ['ProductSettings', 'Billing'] },
     ],
   },
 }
 
-export const SidebarApp: Story = {
+export const AdminApp: Story = {
   args: {
-    name: 'Admin Panel',
-    description: 'Content management system',
+    appProps: {
+      business: 'acme',
+    },
+    displayName: 'Admin',
+    description: 'Content and user management',
+    icon: Shield,
+    color: 'from-amber-500 to-orange-600',
     layout: 'sidebar',
     auth: 'required',
     views: [
-      { path: '/content', title: 'Content', panels: ['List', 'Editor'] },
-      { path: '/media', title: 'Media', panels: ['Gallery', 'Upload'] },
-      { path: '/users', title: 'Users', panels: ['Table', 'Details'] },
-      { path: '/settings', title: 'Settings', panels: ['General', 'Security'] },
+      { path: '/', widgets: ['DashboardStats', 'RecentActivity'] },
+      { path: '/content', widgets: ['ContentTable', 'Editor'] },
+      { path: '/users', widgets: ['UserTable', 'RoleManager'] },
+      { path: '/settings', widgets: ['GeneralSettings', 'Integrations'] },
     ],
   },
 }
 
-export const WorkspaceApp: Story = {
+export const Chat: Story = {
   args: {
-    name: 'Code Studio',
-    description: 'IDE-like development environment',
+    appProps: {
+      agent: 'claude',
+    },
+    displayName: 'Chat',
+    description: 'Conversational AI interface',
+    icon: MessageSquare,
+    color: 'from-emerald-500 to-teal-600',
+    layout: 'split',
+    auth: 'optional',
+    views: [
+      { path: '/', widgets: ['ConversationList', 'MessageList', 'ChatInput'] },
+      { path: '/settings', widgets: ['AgentConfig', 'ModelSelect', 'SystemPrompt'] },
+    ],
+  },
+}
+
+export const Workspace: Story = {
+  args: {
+    appProps: {
+      product: 'widget',
+      workspace: true,
+    },
+    displayName: 'Workspace',
+    description: 'IDE-like creation environment',
+    icon: Code,
+    color: 'from-cyan-500 to-blue-600',
     layout: 'workspace',
     auth: 'optional',
     views: [
-      { path: '/editor', title: 'Editor', panels: ['FileTree', 'Editor', 'Terminal', 'Chat'] },
-      { path: '/preview', title: 'Preview', panels: ['FileTree', 'Browser', 'Console'] },
-      { path: '/diff', title: 'Diff', panels: ['FileTree', 'DiffView', 'History'] },
+      { path: '/', widgets: ['FileTree', 'Editor', 'Terminal', 'AIChat'] },
+      { path: '/preview', widgets: ['FileTree', 'Preview', 'DevTools'] },
+      { path: '/settings', widgets: ['EditorSettings', 'Extensions'] },
     ],
   },
 }
 
-export const MinimalApp: Story = {
+export const BusinessDashboard: Story = {
   args: {
-    name: 'Focus',
-    description: 'Distraction-free writing app',
-    layout: 'minimal',
-    auth: 'none',
+    appProps: {
+      business: 'acme',
+      products: '[widget, analytics]',
+    },
+    displayName: 'Business Dashboard',
+    description: 'Executive overview of all products',
+    icon: Building2,
+    color: 'from-slate-600 to-slate-800',
+    layout: 'dashboard',
+    auth: 'required',
     views: [
-      { path: '/', title: 'Write', panels: ['Editor'] },
-      { path: '/preview', title: 'Preview', panels: ['Rendered'] },
-      { path: '/export', title: 'Export', panels: ['Options', 'Preview'] },
+      { path: '/', widgets: ['KPIs', 'RevenueByProduct', 'Growth'] },
+      { path: '/products', widgets: ['ProductTable', 'ProductMetrics'] },
+      { path: '/team', widgets: ['TeamTable', 'Performance'] },
+    ],
+  },
+}
+
+export const AgentBuilder: Story = {
+  args: {
+    appProps: {
+      agent: 'custom',
+      workspace: true,
+    },
+    displayName: 'Agent Builder',
+    description: 'Build and configure AI agents',
+    icon: Bot,
+    color: 'from-violet-500 to-purple-600',
+    layout: 'workspace',
+    auth: 'required',
+    views: [
+      { path: '/', widgets: ['AgentConfig', 'ToolEditor', 'TestChat'] },
+      { path: '/tools', widgets: ['ToolList', 'ToolEditor'] },
+      { path: '/prompts', widgets: ['PromptEditor', 'Variables'] },
+      { path: '/test', widgets: ['TestChat', 'Logs'] },
+    ],
+  },
+}
+
+export const ProductApp: Story = {
+  args: {
+    appProps: {
+      product: 'widget',
+    },
+    displayName: 'Product App',
+    description: 'The actual product application',
+    icon: Package,
+    color: 'from-blue-500 to-cyan-500',
+    layout: 'minimal',
+    auth: 'required',
+    views: [
+      { path: '/', widgets: ['MainWidget'] },
+      { path: '/settings', widgets: ['UserSettings', 'Preferences'] },
     ],
   },
 }

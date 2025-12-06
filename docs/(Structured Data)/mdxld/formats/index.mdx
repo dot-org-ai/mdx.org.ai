@@ -1,0 +1,199 @@
+---
+title: Format Conversion
+description: Bi-directional conversion between objects and various formats
+root: true
+pages: [markdown, json, html, yaml, typescript, diff]
+---
+
+# Format Conversion
+
+The `@mdxld/*` format packages provide bi-directional conversion between JavaScript objects and various output formats. Each package follows the same pattern: `toX()` to convert objects to a format, and `fromX()` to parse that format back to objects.
+
+## Package Overview
+
+| Package | Description | Primary Use |
+|---------|-------------|-------------|
+| [`@mdxld/markdown`](/docs/mdxld/formats/markdown) | Object ↔ Markdown | Documentation, CMS |
+| [`@mdxld/json`](/docs/mdxld/formats/json) | Object ↔ JSON/JSON-LD/Schema | APIs, SEO, Validation |
+| [`@mdxld/html`](/docs/mdxld/formats/html) | Object ↔ Semantic HTML | SSR, Email |
+| [`@mdxld/yaml`](/docs/mdxld/formats/yaml) | Object ↔ YAML | Config, K8s, CI/CD |
+| [`@mdxld/typescript`](/docs/mdxld/formats/typescript) | Object → TypeScript/Zod | Type generation |
+| [`@mdxld/diff`](/docs/mdxld/formats/diff) | Text/Object diffing | Version control |
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    JavaScript Object                     │
+└────────────────────────────┬────────────────────────────┘
+                             │
+          ┌──────────────────┼──────────────────┐
+          │                  │                  │
+          ▼                  ▼                  ▼
+   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+   │  Markdown   │    │    JSON     │    │    HTML     │
+   │ toMarkdown  │    │   toJSON    │    │   toHTML    │
+   │fromMarkdown │    │  fromJSON   │    │  fromHTML   │
+   └─────────────┘    └─────────────┘    └─────────────┘
+          │                  │                  │
+          ▼                  ▼                  ▼
+   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+   │   String    │    │ JSON-LD     │    │ Semantic    │
+   │  (GFM)      │    │ OpenAPI     │    │ Microdata   │
+   │             │    │ JSON Schema │    │             │
+   └─────────────┘    └─────────────┘    └─────────────┘
+```
+
+## Two Layers: Semantic vs Presentation
+
+The `@mdxld/*` packages provide **semantic conversion** (data-focused). For styled output, see the `@mdxui/*` packages:
+
+| Semantic (@mdxld) | Presentation (@mdxui) |
+|-------------------|----------------------|
+| `@mdxld/markdown` | `@mdxui/markdown` |
+| `@mdxld/json` | `@mdxui/json` |
+| `@mdxld/html` | `@mdxui/html` |
+
+```typescript
+// Semantic: Clean data structure
+import { toMarkdown } from '@mdxld/markdown'
+const md = toMarkdown(customer)
+
+// Presentation: Styled output with themes
+import { toMarkdown } from '@mdxui/markdown'
+const md = toMarkdown(customer, { theme: 'github' })
+```
+
+## Quick Start
+
+### Install All Packages
+
+```bash
+pnpm add @mdxld/markdown @mdxld/json @mdxld/html @mdxld/yaml @mdxld/typescript @mdxld/diff
+```
+
+### Basic Usage
+
+```typescript
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
+import { toJSON, toJSONLD, toJSONSchema } from '@mdxld/json'
+import { toHTML } from '@mdxld/html'
+import { toYAML } from '@mdxld/yaml'
+import { toTypeScript, toZod } from '@mdxld/typescript'
+import { diffLines, createPatch } from '@mdxld/diff'
+
+// Define your object
+const customer = {
+  name: 'Acme Corp',
+  email: 'hello@acme.com',
+  tier: 'enterprise',
+  properties: [
+    { name: 'id', type: 'string', required: true },
+    { name: 'email', type: 'string', required: true },
+  ]
+}
+
+// Convert to any format
+const markdown = toMarkdown(customer)
+const json = toJSON(customer)
+const jsonld = toJSONLD(customer, { type: 'Organization' })
+const html = toHTML(customer)
+const yaml = toYAML(customer)
+const types = toTypeScript(customer)
+const schema = toZod(customer)
+
+// Parse back from formats
+const parsed = fromMarkdown(markdown)
+```
+
+## Convention-Based Layout
+
+All packages use **convention-based** conversion - the object's shape determines how it renders:
+
+| Object Shape | Markdown | HTML | JSON-LD |
+|--------------|----------|------|---------|
+| Has `name` | `# {name}` heading | `<h1 itemprop="name">` | `"name": "..."` |
+| Has `description` | Paragraph | `<p itemprop="description">` | `"description": "..."` |
+| Has `properties[]` | Table | `<table>` | `"property": [...]` |
+| Has `items[]` | Bulleted list | `<ul>` | Array |
+| Has `sections[]` | H2 headings | `<section>` | Nested objects |
+
+## When to Use Each Package
+
+### @mdxld/markdown
+- Documentation generation
+- CMS content editing
+- AI-assisted content workflows
+- Round-trip sync between data and content
+
+### @mdxld/json
+- API responses and requests
+- SEO structured data (JSON-LD)
+- Schema validation (JSON Schema)
+- OpenAPI specification generation
+- MCP tool definitions
+
+### @mdxld/html
+- Server-side rendering
+- Email templates
+- Static site generation
+- Semantic web content
+
+### @mdxld/yaml
+- Kubernetes manifests
+- GitHub Actions workflows
+- Docker Compose files
+- Configuration files
+
+### @mdxld/typescript
+- Type definition generation
+- Zod schema generation
+- Config file generation (JSON5)
+- JSDoc for plain JavaScript
+
+### @mdxld/diff
+- Version history
+- Collaborative editing
+- Content comparison
+- 3-way merge conflicts
+
+## Integration with mdxdb
+
+The format packages integrate seamlessly with `mdxdb` for storage:
+
+```typescript
+import { DB } from 'mdxdb'
+import { toMarkdown, fromMarkdown, diff } from '@mdxld/markdown'
+
+const db = DB({
+  BlogPost: {
+    title: 'string',
+    content: 'markdown',
+    author: 'Author.posts',
+  }
+})
+
+// Get document
+const post = await db.BlogPost.get('hello-world')
+
+// Render to markdown for editing
+const markdown = toMarkdown(post)
+
+// User edits the markdown...
+const edited = await editor.edit(markdown)
+
+// Extract changes back
+const updated = fromMarkdown(edited)
+const changes = diff(post, updated)
+
+// Save if changed
+if (changes.hasChanges) {
+  await db.BlogPost.update('hello-world', updated)
+}
+```
+
+## Related
+
+- [Template-based Extraction](/docs/mdxld/extract) - For explicit MDX templates
+- [JSX Primitives](/docs/mdxld/jsx) - Universal JSX runtime
+- [mdxdb Storage](/docs/mdxdb) - Document storage

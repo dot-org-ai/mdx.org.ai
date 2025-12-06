@@ -1,6 +1,6 @@
 # @mdxld/jsx
 
-MDX compilation and build tooling with support for multiple JSX runtimes (React, Preact, Hono/JSX).
+Universal JSX runtime with pluggable output renderers. Write components once, render to any format.
 
 ## Installation
 
@@ -8,197 +8,360 @@ MDX compilation and build tooling with support for multiple JSX runtimes (React,
 pnpm add @mdxld/jsx
 ```
 
-## Features
+## Overview
 
-- Compile MDX files to JavaScript
-- Support for React, Preact, and Hono/JSX via automatic JSX runtime
-- Build plugins for esbuild, tsup, Vite, and Rollup
-- TypeScript type generation from MDX frontmatter
-- YAML-LD frontmatter extraction with `$type`, `$id`, `$context` support
+`@mdxld/jsx` provides a unified JSX system that can render to multiple output formats:
 
-## Basic Usage
+| Entry Point | Output | Use Case |
+|-------------|--------|----------|
+| `@mdxld/jsx/html` | HTML string | SSR, static sites, email |
+| `@mdxld/jsx/dom` | DOM nodes | Client-side hydration |
+| `@mdxld/jsx/react` | React elements | React applications |
+| `@mdxld/jsx/preact` | Preact VNodes | Preact applications |
+| `@mdxld/jsx/markdown` | Markdown string | Docs, AI editing, content |
+| `@mdxld/jsx/json` | JSON object | APIs, data exchange |
+| `@mdxld/jsx/jsonld` | JSON-LD | SEO, linked data, Schema.org |
 
-```ts
-import { compileMDX } from '@mdxld/jsx'
+## Quick Start
 
-const mdxContent = `---
-$type: BlogPost
-title: Hello World
----
+```tsx
+import { Entity, Property } from '@mdxld/jsx/primitives'
 
-# Hello World
+function Customer({ name, email, tier }) {
+  return (
+    <Entity name={name} type="Customer">
+      <Property name="email">{email}</Property>
+      <Property name="tier" default="free">{tier}</Property>
+    </Entity>
+  )
+}
 
-This is my first post.
-`
+// Render to any format
+import { renderToMarkdown } from '@mdxld/jsx/markdown'
+import { renderToJSON } from '@mdxld/jsx/json'
+import { renderToHTML } from '@mdxld/jsx/html'
 
-const result = await compileMDX(mdxContent)
-console.log(result.code)        // Compiled JavaScript
-console.log(result.frontmatter) // { $type: 'BlogPost', title: 'Hello World' }
+renderToMarkdown(<Customer name="Acme" email="hi@acme.com" tier="pro" />)
+// # Acme
+// **Email:** hi@acme.com
+// **Tier:** pro
+
+renderToJSON(<Customer name="Acme" email="hi@acme.com" tier="pro" />)
+// { name: "Acme", type: "Customer", email: "hi@acme.com", tier: "pro" }
+
+renderToHTML(<Customer name="Acme" email="hi@acme.com" tier="pro" />)
+// <article><h1>Acme</h1>...</article>
 ```
 
-## JSX Runtimes
+## Runtime Configuration
 
-### React (default)
+Configure the JSX runtime in `tsconfig.json`:
 
-```ts
-const result = await compileMDX(content)
-// or explicitly:
-const result = await compileMDX(content, { jsx: 'react' })
+```json
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@mdxld/jsx/html"
+  }
+}
+```
+
+Or import directly:
+
+```tsx
+import { jsx, Fragment } from '@mdxld/jsx/html'
+import { jsx, Fragment } from '@mdxld/jsx/markdown'
+import { jsx, Fragment } from '@mdxld/jsx/json'
+```
+
+## Output Runtimes
+
+### HTML (SSR)
+
+Wraps `hono/jsx` for HTML string output:
+
+```tsx
+import { renderToString } from '@mdxld/jsx/html'
+
+const html = renderToString(<Customer {...data} />)
+// <article class="customer"><h1>Acme</h1>...</article>
+```
+
+### DOM (Client)
+
+Wraps `hono/jsx/dom` for client-side rendering:
+
+```tsx
+import { render } from '@mdxld/jsx/dom'
+
+render(<Customer {...data} />, document.getElementById('root'))
+```
+
+### React
+
+Standard React JSX runtime:
+
+```tsx
+import { jsx } from '@mdxld/jsx/react'
+// Uses react/jsx-runtime
 ```
 
 ### Preact
 
-```ts
-const result = await compileMDX(content, { jsx: 'preact' })
+Preact JSX runtime:
+
+```tsx
+import { jsx } from '@mdxld/jsx/preact'
+// Uses preact
 ```
 
-### Hono/JSX
+### Markdown
 
-```ts
-// Server-side rendering
-const result = await compileMDX(content, { jsx: 'hono' })
+Renders JSX to Markdown strings:
 
-// Client-side rendering (smaller bundle: 2.8KB vs React's 47.8KB)
-const result = await compileMDX(content, { jsx: 'hono-dom' })
+```tsx
+import { renderToMarkdown, extractFromMarkdown } from '@mdxld/jsx/markdown'
+
+// Render
+const md = renderToMarkdown(<Customer {...data} />)
+
+// Extract (bi-directional)
+const obj = extractFromMarkdown(editedMarkdown, Customer)
 ```
 
-### Custom Runtime
+### JSON
 
-```ts
-const result = await compileMDX(content, {
-  jsx: {
-    importSource: 'my-jsx-lib',
-    development: false,
-  }
-})
+Renders JSX to JSON objects:
+
+```tsx
+import { renderToJSON, extractFromJSON } from '@mdxld/jsx/json'
+
+const json = renderToJSON(<Customer {...data} />)
+const obj = extractFromJSON(jsonData, Customer)
 ```
 
-## Build Plugins
+### JSON-LD
 
-### esbuild
+Renders JSX to JSON-LD with Schema.org context:
 
-```ts
-import { mdxPlugin } from '@mdxld/jsx/esbuild'
+```tsx
+import { renderToJSONLD } from '@mdxld/jsx/jsonld'
 
-await esbuild.build({
-  entryPoints: ['src/index.tsx'],
-  plugins: [mdxPlugin()],
-})
+const jsonld = renderToJSONLD(<Customer {...data} />)
+// { "@context": "https://schema.org", "@type": "Person", ... }
 ```
 
-### tsup
+## Semantic Primitives
 
-```ts
-import { defineConfig } from 'tsup'
-import { mdxTsupPlugin } from '@mdxld/jsx/plugin'
+Core building blocks that know how to render to each format:
 
-export default defineConfig({
-  entry: ['src/index.ts'],
-  esbuildPlugins: [mdxTsupPlugin()],
-})
+```tsx
+import {
+  // Structural
+  Document,    // Root container
+  Entity,      // Named thing with properties
+  Section,     // Grouped content
+  Property,    // Key-value pair
+  List,        // Array of items
+  Table,       // Tabular data
+
+  // Data Types
+  Text,        // Plain text
+  Code,        // Code block with language
+  Link,        // URL reference
+
+  // Actions/API
+  Action,      // Function/method definition
+  Argument,    // Parameter
+  Returns,     // Return type
+  Event,       // Event definition
+
+  // Metadata
+  Type,        // Type reference
+  Extends,     // Inheritance
+} from '@mdxld/jsx/primitives'
 ```
 
-### Vite
+### Entity Example
 
-```ts
-import { defineConfig } from 'vite'
-import { mdxVitePlugin } from '@mdxld/jsx/plugin'
-
-export default defineConfig({
-  plugins: [mdxVitePlugin()],
-})
+```tsx
+<Entity name="Customer" plural="Customers" extends="Entity">
+  <Property name="id" type="string" required>
+    Unique identifier
+  </Property>
+  <Property name="email" type="string" required>
+    Primary email address
+  </Property>
+  <Action name="upgrade" returns="Customer">
+    <Argument name="tier" type="Tier" required />
+  </Action>
+</Entity>
 ```
 
-### Rollup
+**→ Markdown:**
+```markdown
+# Customer (Customers)
 
-```ts
-import { mdxRollupPlugin } from '@mdxld/jsx/plugin'
+**Extends:** Entity
 
-export default {
-  input: 'src/index.js',
-  plugins: [mdxRollupPlugin()],
+## Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| id | string | ✓ | Unique identifier |
+| email | string | ✓ | Primary email address |
+
+## Actions
+
+### upgrade
+
+**Returns:** `Customer`
+
+| Argument | Type | Required |
+|----------|------|----------|
+| tier | Tier | ✓ |
+```
+
+**→ JSON:**
+```json
+{
+  "name": "Customer",
+  "plural": "Customers",
+  "extends": "Entity",
+  "properties": [
+    { "name": "id", "type": "string", "required": true, "description": "Unique identifier" }
+  ],
+  "actions": [
+    { "name": "upgrade", "returns": "Customer", "arguments": [{ "name": "tier", "type": "Tier", "required": true }] }
+  ]
 }
 ```
 
-## Runtime-Specific Plugins
-
-For convenience, pre-configured plugins are available for each runtime:
-
-```ts
-import {
-  mdxReactPlugin,   // React
-  mdxPreactPlugin,  // Preact
-  mdxHonoPlugin,    // Hono/JSX
-} from '@mdxld/jsx/plugin'
+**→ JSON-LD:**
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Class",
+  "name": "Customer",
+  "subClassOf": { "@id": "Entity" }
+}
 ```
 
-## Options
+## Composition
 
-### CompileMDXOptions
+Templates compose like React components:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `jsx` | `JSXRuntime \| JSXPreset` | `'react'` | JSX runtime configuration |
-| `outputFormat` | `'esm' \| 'cjs' \| 'function-body'` | `'esm'` | Output format |
-| `exportFrontmatter` | `boolean` | `true` | Include frontmatter export |
-| `filepath` | `string` | - | Source file path for error messages |
-| `remarkPlugins` | `unknown[]` | `[]` | Remark plugins to apply |
-| `rehypePlugins` | `unknown[]` | `[]` | Rehype plugins to apply |
-| `generateTypes` | `boolean` | `false` | Generate TypeScript declarations |
+```tsx
+function StoryBrand({ name, hero, problem, guide }) {
+  return (
+    <Document name={name}>
+      <Hero {...hero} />
+      <Problem {...problem} />
+      <Guide {...guide} />
+    </Document>
+  )
+}
+
+function Hero({ persona, occupation, company }) {
+  return (
+    <Section name="hero" title="Hero">
+      <Property name="persona">{persona}</Property>
+      <Property name="occupation">{occupation}</Property>
+      <Property name="company">{company}</Property>
+    </Section>
+  )
+}
+```
+
+## Bi-directional Extraction
+
+Components define both rendering AND extraction:
+
+```tsx
+import { renderToMarkdown, extractFromMarkdown } from '@mdxld/jsx/markdown'
+
+// 1. Render to markdown
+const markdown = renderToMarkdown(<Customer {...data} />)
+
+// 2. User/AI edits the markdown
+const edited = markdown.replace('pro', 'enterprise')
+
+// 3. Extract back to object
+const updated = extractFromMarkdown(edited, Customer)
+```
+
+The component structure serves as the extraction schema.
+
+## MDX Compilation
+
+Compile MDX files with JSX runtime support:
+
+```ts
+import { compileMDX } from '@mdxld/jsx'
+
+const result = await compileMDX(mdxContent, {
+  jsx: 'html',  // or 'react', 'preact', 'markdown', 'json'
+})
+```
+
+### Build Plugins
+
+```ts
+// esbuild
+import { mdxPlugin } from '@mdxld/jsx/esbuild'
+
+// Vite
+import { mdxVitePlugin } from '@mdxld/jsx/plugin'
+
+// Rollup
+import { mdxRollupPlugin } from '@mdxld/jsx/plugin'
+
+// tsup
+import { mdxTsupPlugin } from '@mdxld/jsx/plugin'
+```
 
 ### JSX Presets
 
-Available presets: `react`, `react-dev`, `preact`, `hono`, `hono-dom`, `classic`
-
 ```ts
-import { JSX_PRESETS } from '@mdxld/jsx'
+import { compileMDX, JSX_PRESETS } from '@mdxld/jsx'
 
-// Use a preset
-const result = await compileMDX(content, { jsx: 'hono' })
+// Use preset name
+await compileMDX(content, { jsx: 'html' })
+await compileMDX(content, { jsx: 'react' })
+await compileMDX(content, { jsx: 'preact' })
+await compileMDX(content, { jsx: 'markdown' })
 
-// Or access preset config directly
-console.log(JSX_PRESETS.hono)
-// { importSource: 'hono/jsx', development: false }
-```
-
-## Batch Compilation
-
-Compile multiple MDX files in parallel:
-
-```ts
-import { compileMDXBatch } from '@mdxld/jsx'
-
-const files = [
-  { path: 'posts/hello.mdx', content: '...' },
-  { path: 'posts/world.mdx', content: '...' },
-]
-
-const results = await compileMDXBatch(files)
-// Map<string, CompileMDXResult>
-```
-
-## TypeScript Support
-
-Generate TypeScript declarations from MDX frontmatter:
-
-```ts
-const result = await compileMDX(content, { generateTypes: true })
-console.log(result.types) // TypeScript declaration file content
+// Or custom config
+await compileMDX(content, {
+  jsx: { importSource: '@mdxld/jsx/html' }
+})
 ```
 
 ## Exports
 
-The package provides multiple entry points:
-
-- `@mdxld/jsx` - Core compiler and types
-- `@mdxld/jsx/plugin` - Rollup/Vite/tsup plugins
-- `@mdxld/jsx/esbuild` - esbuild plugin
+| Entry Point | Description |
+|-------------|-------------|
+| `@mdxld/jsx` | Core compiler, types, presets |
+| `@mdxld/jsx/html` | HTML string renderer (hono/jsx) |
+| `@mdxld/jsx/dom` | DOM renderer (hono/jsx/dom) |
+| `@mdxld/jsx/react` | React JSX runtime |
+| `@mdxld/jsx/preact` | Preact JSX runtime |
+| `@mdxld/jsx/markdown` | Markdown renderer + extractor |
+| `@mdxld/jsx/json` | JSON renderer + extractor |
+| `@mdxld/jsx/jsonld` | JSON-LD renderer |
+| `@mdxld/jsx/primitives` | Semantic primitive components |
+| `@mdxld/jsx/plugin` | Vite/Rollup/tsup plugins |
+| `@mdxld/jsx/esbuild` | esbuild plugin |
 
 ## Related Packages
 
-- [`mdxld`](../mdxld) - Core MDX + Linked Data parser
-- [`@mdxld/compile`](../compile) - Full MDX compilation pipeline
-- [`@mdxld/evaluate`](../evaluate) - Runtime MDX evaluation
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/markdown`](../markdown) | Standalone toMarkdown/fromMarkdown |
+| [`@mdxld/json`](../json) | Standalone toJSON/fromJSON/toJSONLD |
+| [`@mdxld/html`](../html) | Standalone toHTML/fromHTML |
+| [`mdxld`](../../mdxld) | Core MDX + Linked Data parser |
+| [`@mdxld/extract`](../extract) | Template-based extraction |
 
 ## License
 

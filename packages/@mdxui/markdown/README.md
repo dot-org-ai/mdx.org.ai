@@ -1,6 +1,25 @@
 # @mdxui/markdown
 
-Render MDXLD documents to clean markdown. String-to-string rendering without going through HTML.
+Styled markdown output for MDXLD documents. String-to-string rendering with customizable formatting.
+
+## Architecture
+
+```
+@mdxld/markdown (semantic layer)
+     ↓
+@mdxui/markdown (presentation layer) ← this package
+```
+
+| Layer | Package | Purpose |
+|-------|---------|---------|
+| **Semantic** | `@mdxld/markdown` | Pure conversion - `toMarkdown()` / `fromMarkdown()` |
+| **Presentation** | `@mdxui/markdown` | MDXLD documents → styled markdown output |
+
+Use `@mdxld/markdown` for raw object ↔ markdown conversion. Use `@mdxui/markdown` when you need:
+- MDXLD document → markdown conversion
+- JSX stripping/placeholder handling
+- Formatting customization (bullets, headings, code fences)
+- MDX expression handling
 
 ## Installation
 
@@ -445,10 +464,27 @@ interface MDXLDAstNode {
 
 ## Related Packages
 
+### Semantic Layer (@mdxld)
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/markdown`](../../../@mdxld/markdown) | Pure conversion - `toMarkdown()` / `fromMarkdown()` |
+| [`@mdxld/html`](../../../@mdxld/html) | Semantic HTML - `toHTML()` / `fromHTML()` |
+| [`@mdxld/json`](../../../@mdxld/json) | JSON/JSON-LD - `toJSON()` / `toJSONLD()` |
+| [`@mdxld/jsx`](../../../@mdxld/jsx) | Universal JSX runtime |
+
+### Presentation Layer (@mdxui)
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxui/html`](../html) | Styled HTML output |
+| [`@mdxui/json`](../json) | Styled JSON output |
+
+### Core
+
 | Package | Description |
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
-| [@mdxui/html](https://www.npmjs.com/package/@mdxui/html) | HTML rendering |
 | [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) | Terminal rendering |
 
 ## License

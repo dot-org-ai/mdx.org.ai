@@ -1,0 +1,426 @@
+---
+title: "@mdxld/json"
+description: Bi-directional conversion to JSON, JSON-LD, JSON Schema, OpenAPI, MCP, and GraphQL
+---
+
+# @mdxld/json
+
+Convert objects to multiple JSON-based formats: plain JSON, JSON-LD (linked data), JSON Schema (validation), OpenAPI (API docs), MCP (AI tools), and GraphQL SDL.
+
+## Installation
+
+```bash
+pnpm add @mdxld/json
+```
+
+## Quick Start
+
+```typescript
+import {
+  toJSON, fromJSON,
+  toJSONLD, fromJSONLD,
+  toJSONSchema,
+  toOpenAPI,
+  toMCP,
+  toGraphQL
+} from '@mdxld/json'
+
+const customer = {
+  name: 'Customer',
+  properties: [
+    { name: 'id', type: 'string', required: true },
+    { name: 'email', type: 'string', required: true },
+  ]
+}
+
+// Plain JSON
+const json = toJSON(customer)
+
+// JSON-LD with Schema.org
+const jsonld = toJSONLD(customer, { type: 'Organization' })
+
+// JSON Schema for validation
+const schema = toJSONSchema(customer)
+
+// OpenAPI specification
+const openapi = toOpenAPI([endpoint])
+
+// MCP tool definitions
+const tools = toMCP([functionDef])
+
+// GraphQL SDL
+const graphql = toGraphQL([typeDef])
+```
+
+## API Reference
+
+### toJSON / fromJSON
+
+Basic JSON serialization with options.
+
+```typescript
+function toJSON<T>(object: T, options?: ToJSONOptions): string
+function fromJSON<T>(json: string, options?: FromJSONOptions): T
+
+interface ToJSONOptions {
+  pretty?: boolean  // Pretty print (default: true)
+  indent?: number   // Indent spaces (default: 2)
+}
+```
+
+### toJSONLD / fromJSONLD
+
+Convert to/from JSON-LD with Schema.org context.
+
+```typescript
+function toJSONLD<T>(object: T, options?: ToJSONLDOptions): JSONLDDocument
+function fromJSONLD<T>(jsonld: JSONLDDocument): T
+
+interface ToJSONLDOptions {
+  context?: string | object  // Default: "https://schema.org"
+  type?: string              // @type value
+  id?: string                // @id value
+  baseUrl?: string           // Base URL for IDs
+}
+```
+
+**Example:**
+
+```typescript
+const customer = {
+  name: 'Acme Corp',
+  email: 'hello@acme.com',
+  address: {
+    street: '123 Main St',
+    city: 'San Francisco'
+  }
+}
+
+const jsonld = toJSONLD(customer, { type: 'Organization' })
+```
+
+**Output:**
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Acme Corp",
+  "email": "hello@acme.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "123 Main St",
+    "addressLocality": "San Francisco"
+  }
+}
+```
+
+### toJSONSchema
+
+Generate JSON Schema for validation.
+
+```typescript
+function toJSONSchema(type: TypeDef, options?: ToJSONSchemaOptions): JSONSchema
+
+interface ToJSONSchemaOptions {
+  $id?: string                    // Schema $id
+  title?: string                  // Schema title
+  draft?: '2020-12' | '07'        // JSON Schema version
+}
+```
+
+**Example:**
+
+```typescript
+const CustomerType = {
+  name: 'Customer',
+  properties: [
+    { name: 'id', type: 'string', required: true },
+    { name: 'email', type: 'string', required: true, format: 'email' },
+    { name: 'tier', type: 'string', enum: ['free', 'pro', 'enterprise'] },
+  ]
+}
+
+const schema = toJSONSchema(CustomerType)
+```
+
+**Output:**
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "Customer",
+  "title": "Customer",
+  "type": "object",
+  "required": ["id", "email"],
+  "properties": {
+    "id": { "type": "string" },
+    "email": { "type": "string", "format": "email" },
+    "tier": {
+      "type": "string",
+      "enum": ["free", "pro", "enterprise"]
+    }
+  }
+}
+```
+
+### toOpenAPI
+
+Generate OpenAPI specification from API endpoints.
+
+```typescript
+function toOpenAPI(endpoints: APIEndpoint[], options?: ToOpenAPIOptions): object
+
+interface APIEndpoint {
+  method: string
+  path: string
+  summary?: string
+  description?: string
+  requestBody?: { properties: PropertyDef[]; required?: boolean }
+  responses?: Array<{ status: number; description: string; schema?: string }>
+}
+
+interface ToOpenAPIOptions {
+  title?: string
+  version?: string
+  servers?: Array<{ url: string; description?: string }>
+}
+```
+
+**Example:**
+
+```typescript
+const endpoints = [
+  {
+    method: 'POST',
+    path: '/customers',
+    summary: 'Create customer',
+    requestBody: {
+      properties: [
+        { name: 'email', type: 'string', required: true },
+        { name: 'name', type: 'string', required: true }
+      ]
+    },
+    responses: [
+      { status: 201, description: 'Created', schema: 'Customer' },
+      { status: 400, description: 'Validation error' }
+    ]
+  }
+]
+
+const spec = toOpenAPI(endpoints, {
+  title: 'Customer API',
+  version: '1.0.0'
+})
+```
+
+### toMCP
+
+Generate MCP (Model Context Protocol) tool definitions for AI.
+
+```typescript
+function toMCP(functions: FunctionDef[], options?: ToMCPOptions): { tools: MCPTool[] }
+
+interface FunctionDef {
+  name: string
+  description?: string
+  arguments?: Array<{
+    name: string
+    type: string
+    required?: boolean
+    description?: string
+  }>
+  returns?: { type: string; description?: string }
+}
+```
+
+**Example:**
+
+```typescript
+const functions = [
+  {
+    name: 'read_file',
+    description: 'Read contents of a file',
+    arguments: [
+      { name: 'path', type: 'string', required: true, description: 'File path' },
+      { name: 'encoding', type: 'string', description: 'File encoding' }
+    ],
+    returns: { type: 'string', description: 'File contents' }
+  }
+]
+
+const tools = toMCP(functions)
+```
+
+**Output:**
+
+```json
+{
+  "tools": [
+    {
+      "name": "read_file",
+      "description": "Read contents of a file",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "description": "File path" },
+          "encoding": { "type": "string", "description": "File encoding" }
+        },
+        "required": ["path"]
+      }
+    }
+  ]
+}
+```
+
+### toGraphQL
+
+Generate GraphQL SDL from type definitions.
+
+```typescript
+function toGraphQL(types: GraphQLTypeDef[], options?: ToGraphQLOptions): string
+
+interface GraphQLTypeDef {
+  name: string
+  kind: 'type' | 'input' | 'interface' | 'enum'
+  description?: string
+  implements?: string[]
+  fields?: GraphQLFieldDef[]
+  values?: string[]  // for enums
+}
+
+interface GraphQLFieldDef {
+  name: string
+  type: string
+  description?: string
+  arguments?: Array<{ name: string; type: string }>
+}
+```
+
+**Example:**
+
+```typescript
+const types = [
+  {
+    name: 'Customer',
+    kind: 'type',
+    implements: ['Node'],
+    fields: [
+      { name: 'id', type: 'ID!', description: 'Unique identifier' },
+      { name: 'email', type: 'String!', description: 'Email address' },
+      { name: 'orders', type: '[Order!]!', arguments: [
+        { name: 'first', type: 'Int' },
+        { name: 'after', type: 'String' }
+      ]}
+    ]
+  }
+]
+
+const sdl = toGraphQL(types)
+```
+
+**Output:**
+
+```graphql
+"""
+Customer
+"""
+type Customer implements Node {
+  "Unique identifier"
+  id: ID!
+
+  "Email address"
+  email: String!
+
+  orders(first: Int, after: String): [Order!]!
+}
+```
+
+## Schema.org Type Inference
+
+`toJSONLD` automatically infers Schema.org types from object shapes:
+
+| Object Shape | Inferred @type |
+|--------------|----------------|
+| Has `email` + `name` | Person or Organization |
+| Has `address` | Place or PostalAddress |
+| Has `startDate` | Event |
+| Has `ingredients` + `instructions` | Recipe |
+| Has `headline` + `author` | Article |
+| Has `properties` + `actions` | Class |
+
+## Property Mapping
+
+Common properties are automatically mapped to Schema.org:
+
+| Object Key | Schema.org Property |
+|------------|---------------------|
+| `phone` | `telephone` |
+| `address.street` | `streetAddress` |
+| `address.city` | `addressLocality` |
+| `address.state` | `addressRegion` |
+| `address.zip` | `postalCode` |
+
+## Use Cases
+
+### SEO Structured Data
+
+```typescript
+const article = {
+  headline: 'My Blog Post',
+  author: { name: 'Jane Doe' },
+  datePublished: '2024-01-15'
+}
+
+const jsonld = toJSONLD(article, { type: 'Article' })
+
+// Add to page
+const script = `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>`
+```
+
+### API Documentation
+
+```typescript
+// Generate OpenAPI from route definitions
+const spec = toOpenAPI(routes, { title: 'My API', version: '1.0.0' })
+
+// Serve at /openapi.json
+app.get('/openapi.json', () => spec)
+```
+
+### Runtime Validation
+
+```typescript
+import { toJSONSchema } from '@mdxld/json'
+import Ajv from 'ajv'
+
+const schema = toJSONSchema(CustomerType)
+const ajv = new Ajv()
+const validate = ajv.compile(schema)
+
+if (validate(data)) {
+  // Valid customer
+} else {
+  console.error(validate.errors)
+}
+```
+
+### AI Tool Definitions
+
+```typescript
+import { toMCP } from '@mdxld/json'
+import { Server } from '@modelcontextprotocol/sdk/server'
+
+const tools = toMCP(myFunctions)
+
+const server = new Server({ name: 'my-tools', version: '1.0.0' })
+server.setRequestHandler('tools/list', () => tools)
+```
+
+## Related Packages
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/jsonld`](/docs/mdxld/jsonld) | Full JSON-LD processing (expand, compact, frame) |
+| [`@mdxld/typescript`](/docs/mdxld/formats/typescript) | TypeScript types and Zod schemas |
+| [`@mdxui/json`](/docs/mdxui/renderers/json) | Styled JSON output |

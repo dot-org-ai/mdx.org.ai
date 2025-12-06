@@ -163,3 +163,4 @@ storybook-static
 # ClickHouse runtime files
 preprocessed_configs/
 .mdx/db/
+packages/@mdxdb/clickhouse/.mdx/

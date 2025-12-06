@@ -71,8 +71,9 @@ beforeAll(async () => {
     database: TEST_DB,
   })
 
-  // Create all schema tables
+  // Create all schema tables (skip access_control - it has multi-statement SQL)
   for (const table of TABLES) {
+    if (table === 'access_control') continue
     const schema = TABLE_SCHEMAS[table]
     const cleanedSchema = cleanSchema(schema)
     await executor.command(cleanedSchema)

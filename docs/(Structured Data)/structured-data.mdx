@@ -1,6 +1,6 @@
 ---
 title: Structured Data
-description: YAML-LD frontmatter, schemas, and database storage for MDX documents
+description: YAML-LD frontmatter, schemas, templates, and database storage for MDX documents
 root: true
 defaultOpen: true
 ---
@@ -34,6 +34,48 @@ const db = DB({
   },
 })
 ```
+
+### Templates (Shapes)
+
+Templates define the **shape** of your data - the TypeScript type or JSON Schema that structures your content:
+
+```typescript
+type StoryBrand = {
+  name: string
+  hero: {
+    persona: string
+    occupation: string
+  }
+  problem: {
+    external: string
+    internal: string
+  }
+}
+
+type Noun = {
+  name: string
+  plural: string
+  properties: Array<{ name: string; type: string; required: boolean }>
+  actions: Array<{ name: string; returns: string }>
+}
+```
+
+Templates enable **bi-directional conversion** between objects and content formats:
+
+```typescript
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
+import { toJSONLD, toJSONSchema } from '@mdxld/json'
+
+// Object → Formats
+const markdown = toMarkdown(storyBrand)
+const jsonld = toJSONLD(storyBrand)
+const schema = toJSONSchema(StoryBrandType)
+
+// Markdown → Object
+const data = fromMarkdown<StoryBrand>(editedMarkdown)
+```
+
+See [Unstructured Content](/unstructured-content) for markdown layouts and [UI Components](/ui-components) for JSX rendering.
 
 ## Packages
 

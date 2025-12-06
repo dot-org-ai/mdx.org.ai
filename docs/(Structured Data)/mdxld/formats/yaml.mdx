@@ -1,0 +1,318 @@
+---
+title: "@mdxld/yaml"
+description: Bi-directional conversion between Objects and YAML
+---
+
+# @mdxld/yaml
+
+Convert objects to YAML and back. Perfect for configuration files, Kubernetes manifests, CI/CD pipelines, and Docker Compose files.
+
+## Installation
+
+```bash
+pnpm add @mdxld/yaml
+```
+
+## Quick Start
+
+```typescript
+import { toYAML, fromYAML } from '@mdxld/yaml'
+
+const config = {
+  name: 'my-app',
+  version: '1.0.0',
+  database: {
+    host: 'localhost',
+    port: 5432
+  },
+  features: ['auth', 'api']
+}
+
+const yaml = toYAML(config)
+```
+
+**Output:**
+
+```yaml
+name: my-app
+version: 1.0.0
+database:
+  host: localhost
+  port: 5432
+features:
+  - auth
+  - api
+```
+
+## API Reference
+
+### toYAML(object, options?)
+
+Convert an object to YAML string.
+
+```typescript
+function toYAML<T>(object: T, options?: ToYAMLOptions): string
+
+interface ToYAMLOptions {
+  /** Indentation spaces (default: 2) */
+  indent?: number
+  /** Flow style nesting level (-1 = block style) */
+  flowLevel?: number
+  /** Sort object keys alphabetically */
+  sortKeys?: boolean
+  /** Max line width (default: 80) */
+  lineWidth?: number
+  /** Disable anchor/alias refs */
+  noRefs?: boolean
+  /** String quoting style */
+  quotingType?: '"' | "'"
+  /** Quote all strings */
+  forceQuotes?: boolean
+}
+```
+
+**Example with options:**
+
+```typescript
+const yaml = toYAML(config, {
+  indent: 4,
+  sortKeys: true,
+  lineWidth: 120
+})
+```
+
+### fromYAML(yaml, options?)
+
+Parse YAML string to object.
+
+```typescript
+function fromYAML<T = Record<string, unknown>>(
+  yaml: string,
+  options?: FromYAMLOptions
+): T
+
+interface FromYAMLOptions {
+  /** YAML schema: 'core' | 'json' | 'failsafe' */
+  schema?: 'core' | 'json' | 'failsafe'
+  /** Strict parsing mode */
+  strict?: boolean
+}
+```
+
+**Example:**
+
+```typescript
+const yaml = `
+name: my-app
+replicas: 3
+env:
+  NODE_ENV: production
+  DEBUG: false
+`
+
+const config = fromYAML<AppConfig>(yaml)
+// { name: 'my-app', replicas: 3, env: { NODE_ENV: 'production', DEBUG: false } }
+```
+
+### Multi-Document Support
+
+YAML supports multiple documents in a single file, separated by `---`.
+
+```typescript
+import { toYAMLDocuments, fromYAMLDocuments } from '@mdxld/yaml'
+
+// Create multi-document YAML
+const docs = [
+  { kind: 'Deployment', metadata: { name: 'app' } },
+  { kind: 'Service', metadata: { name: 'app-svc' } }
+]
+
+const yaml = toYAMLDocuments(docs)
+```
+
+**Output:**
+
+```yaml
+---
+kind: Deployment
+metadata:
+  name: app
+---
+kind: Service
+metadata:
+  name: app-svc
+```
+
+**Parsing:**
+
+```typescript
+const resources = fromYAMLDocuments<K8sResource>(yaml)
+// [{ kind: 'Deployment', ... }, { kind: 'Service', ... }]
+```
+
+### Streaming Support
+
+For large files, use streaming to avoid loading everything into memory:
+
+```typescript
+import { createYAMLStream } from '@mdxld/yaml'
+
+const stream = createYAMLStream<K8sResource>()
+
+for await (const doc of stream.parse(fileStream)) {
+  console.log(doc.kind, doc.metadata.name)
+}
+```
+
+## Use Cases
+
+### Kubernetes Manifests
+
+```typescript
+import { toYAML } from '@mdxld/yaml'
+
+const deployment = {
+  apiVersion: 'apps/v1',
+  kind: 'Deployment',
+  metadata: {
+    name: 'my-app',
+    labels: { app: 'my-app' }
+  },
+  spec: {
+    replicas: 3,
+    selector: {
+      matchLabels: { app: 'my-app' }
+    },
+    template: {
+      metadata: {
+        labels: { app: 'my-app' }
+      },
+      spec: {
+        containers: [{
+          name: 'app',
+          image: 'my-app:latest',
+          ports: [{ containerPort: 3000 }]
+        }]
+      }
+    }
+  }
+}
+
+const manifest = toYAML(deployment)
+await Bun.write('k8s/deployment.yaml', manifest)
+```
+
+### GitHub Actions Workflow
+
+```typescript
+import { toYAML } from '@mdxld/yaml'
+
+const workflow = {
+  name: 'CI',
+  on: {
+    push: { branches: ['main'] },
+    pull_request: { branches: ['main'] }
+  },
+  jobs: {
+    build: {
+      'runs-on': 'ubuntu-latest',
+      steps: [
+        { uses: 'actions/checkout@v4' },
+        { uses: 'actions/setup-node@v4', with: { 'node-version': '20' } },
+        { run: 'npm ci' },
+        { run: 'npm test' }
+      ]
+    }
+  }
+}
+
+const yaml = toYAML(workflow)
+await Bun.write('.github/workflows/ci.yml', yaml)
+```
+
+### Docker Compose
+
+```typescript
+import { toYAML } from '@mdxld/yaml'
+
+const compose = {
+  version: '3.8',
+  services: {
+    web: {
+      build: '.',
+      ports: ['3000:3000'],
+      environment: {
+        DATABASE_URL: 'postgres://db:5432/app'
+      },
+      depends_on: ['db']
+    },
+    db: {
+      image: 'postgres:15',
+      volumes: ['db-data:/var/lib/postgresql/data'],
+      environment: {
+        POSTGRES_DB: 'app',
+        POSTGRES_PASSWORD: 'secret'
+      }
+    }
+  },
+  volumes: {
+    'db-data': {}
+  }
+}
+
+const yaml = toYAML(compose)
+await Bun.write('docker-compose.yml', yaml)
+```
+
+### Configuration Management
+
+```typescript
+import { toYAML, fromYAML } from '@mdxld/yaml'
+
+// Read config
+const configYaml = await Bun.file('config.yaml').text()
+const config = fromYAML<AppConfig>(configYaml)
+
+// Modify
+config.database.pool.max = 20
+config.features.push('new-feature')
+
+// Write back
+await Bun.write('config.yaml', toYAML(config))
+```
+
+## YAML-LD Integration
+
+Convert between YAML-LD (MDXLD frontmatter style) and JSON-LD:
+
+```typescript
+import { fromYAML, yamlldToJsonld, jsonldToYamlld } from '@mdxld/yaml'
+import { toJSONLD } from '@mdxld/json'
+
+// YAML-LD uses $ prefix (valid YAML)
+const yamlld = `
+$type: BlogPost
+$id: https://example.com/posts/hello
+title: Hello World
+author:
+  $type: Person
+  name: Jane Doe
+`
+
+// Parse and convert to JSON-LD
+const doc = fromYAML(yamlld)
+const jsonld = yamlldToJsonld(doc)
+// { "@type": "BlogPost", "@id": "...", ... }
+
+// Convert back to YAML-LD
+const yamlldDoc = jsonldToYamlld(jsonld)
+// { "$type": "BlogPost", "$id": "...", ... }
+```
+
+## Related Packages
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/json`](/docs/mdxld/formats/json) | JSON and JSON-LD |
+| [`@mdxld/typescript`](/docs/mdxld/formats/typescript) | TypeScript and JSON5 |
+| [`mdxld`](/docs/mdxld) | Core MDXLD parser (YAML frontmatter) |

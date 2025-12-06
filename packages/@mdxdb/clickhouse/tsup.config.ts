@@ -4,6 +4,7 @@ export default defineConfig({
   entry: [
     'src/index.ts',
     'src/worker.ts',
+    'src/server.ts',
     'schema/index.ts',
     'schema/migrate.ts',
     'sync/index.ts',

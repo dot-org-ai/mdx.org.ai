@@ -166,13 +166,14 @@ function generateNotebookHtml(doc: NotebookDocument): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <title>${doc.title} - MDX Notebook</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.css">
   <style>
     :root {
       --bg-primary: #f5f5f5;
       --bg-secondary: #ffffff;
       --bg-tertiary: #f9fafb;
       --bg-code: #fafafa;
-      --bg-output: #f0fdf4;
+      --bg-output: #f8fafc;
       --text-primary: #111827;
       --text-secondary: #6b7280;
       --text-muted: #9ca3af;
@@ -180,8 +181,7 @@ function generateNotebookHtml(doc: NotebookDocument): string {
       --border-focus: #3b82f6;
       --accent-blue: #3b82f6;
       --accent-blue-hover: #2563eb;
-      --accent-green: #10b981;
-      --accent-green-hover: #059669;
+      --accent-success: #64748b;
       --error-bg: #fef2f2;
       --error-text: #dc2626;
       --code-badge-bg: #dbeafe;
@@ -195,7 +195,7 @@ function generateNotebookHtml(doc: NotebookDocument): string {
         --bg-secondary: #1a1a1a;
         --bg-tertiary: #262626;
         --bg-code: #1e1e1e;
-        --bg-output: #1a2e1a;
+        --bg-output: #1f1f1f;
         --text-primary: #f3f4f6;
         --text-secondary: #9ca3af;
         --text-muted: #6b7280;
@@ -203,8 +203,7 @@ function generateNotebookHtml(doc: NotebookDocument): string {
         --border-focus: #60a5fa;
         --accent-blue: #60a5fa;
         --accent-blue-hover: #3b82f6;
-        --accent-green: #34d399;
-        --accent-green-hover: #10b981;
+        --accent-success: #94a3b8;
         --error-bg: #2d1f1f;
         --error-text: #f87171;
         --code-badge-bg: #1e3a5f;
@@ -254,11 +253,11 @@ function generateNotebookHtml(doc: NotebookDocument): string {
     }
     .btn-primary:hover { background: var(--accent-blue-hover); }
     .btn-success {
-      background: var(--accent-green);
+      background: var(--accent-blue);
       color: white;
-      border-color: var(--accent-green);
+      border-color: var(--accent-blue);
     }
-    .btn-success:hover { background: var(--accent-green-hover); }
+    .btn-success:hover { background: var(--accent-blue-hover); }
     .notebook {
       max-width: 900px;
       margin: 0 auto;
@@ -304,24 +303,30 @@ function generateNotebookHtml(doc: NotebookDocument): string {
     }
     .cell-editor {
       width: 100%;
-      min-height: 80px;
+      min-height: 1.5em;
       padding: 0.75rem;
       border: none;
       font-family: ui-monospace, 'SF Mono', Menlo, monospace;
       font-size: 0.875rem;
       line-height: 1.5;
-      resize: vertical;
+      resize: none;
+      overflow: hidden;
       background: var(--bg-code);
       color: var(--text-primary);
+      field-sizing: content;
     }
     .cell-editor:focus { outline: none; background: var(--bg-secondary); }
+    .monaco-container {
+      width: 100%;
+      min-height: 60px;
+    }
     .cell-output {
       border-top: 1px solid var(--border-color);
-      padding: 0.75rem 1rem;
+      padding: 4px 20px;
       background: var(--bg-output);
       font-family: ui-monospace, 'SF Mono', Menlo, monospace;
       font-size: 0.875rem;
-      line-height: 1.5;
+      line-height: 1.2;
       white-space: pre-wrap;
       word-break: break-word;
       max-height: 400px;
@@ -329,11 +334,7 @@ function generateNotebookHtml(doc: NotebookDocument): string {
     }
     .cell-output.error { color: var(--error-text); background: var(--error-bg); }
     .cell-output-label {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      margin-bottom: 0.25rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      display: none;
     }
     .markdown-preview {
       padding: 0.75rem;
@@ -350,6 +351,26 @@ function generateNotebookHtml(doc: NotebookDocument): string {
       border-radius: 0.25rem;
       font-family: ui-monospace, monospace;
     }
+    .markdown-preview {
+      cursor: text;
+      min-height: 2rem;
+    }
+    .markdown-preview:hover {
+      background: var(--bg-tertiary);
+    }
+    .markdown-preview .placeholder {
+      color: var(--text-muted);
+    }
+    .markdown-editor {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      min-height: 100px;
+    }
+    .cell.editing {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+    }
     .add-cell {
       display: flex;
       justify-content: center;
@@ -365,7 +386,7 @@ function generateNotebookHtml(doc: NotebookDocument): string {
     }
     .status { margin-left: 0.5rem; color: var(--text-secondary); }
     .status.running { color: #f59e0b; }
-    .status.success { color: var(--accent-green); }
+    .status.success { color: var(--accent-success); }
     .status.error { color: var(--error-text); }
     .output-table {
       width: 100%;
@@ -400,44 +421,8 @@ function generateNotebookHtml(doc: NotebookDocument): string {
   <script>
     let notebook = ${JSON.stringify(doc)};
     let activeCell = null;
+    let editingCell = null;
     let executionCount = 0;
-
-    function render() {
-      const container = document.getElementById('notebook');
-      container.innerHTML = notebook.cells.map((cell, index) => \`
-        <div class="cell \${activeCell === cell.id ? 'active' : ''}"
-             onclick="setActive('\${cell.id}')"
-             data-id="\${cell.id}">
-          <div class="cell-header">
-            <span class="cell-type \${cell.type}">\${cell.type === 'code' ? cell.language : 'markdown'}</span>
-            \${cell.executionCount ? \`<span class="execution-count">[\${cell.executionCount}]</span>\` : ''}
-            <div class="cell-actions">
-              \${cell.type === 'code' ? \`<button onclick="event.stopPropagation(); runCell('\${cell.id}')">▶ Run</button>\` : ''}
-              <button onclick="event.stopPropagation(); moveCell('\${cell.id}', -1)">↑</button>
-              <button onclick="event.stopPropagation(); moveCell('\${cell.id}', 1)">↓</button>
-              <button onclick="event.stopPropagation(); deleteCell('\${cell.id}')">×</button>
-            </div>
-          </div>
-          <div class="cell-content">
-            \${cell.type === 'code'
-              ? \`<textarea class="cell-editor"
-                   onchange="updateCell('\${cell.id}', this.value)"
-                   onkeydown="handleKeyDown(event, '\${cell.id}')">\${escapeHtml(cell.source)}</textarea>\`
-              : \`<div class="markdown-preview" ondblclick="editMarkdown('\${cell.id}')">\${renderMarkdown(cell.source)}</div>\`
-            }
-          </div>
-          \${cell.outputs && cell.outputs.length > 0 ? \`
-            <div class="cell-output \${cell.outputs.some(o => o.type === 'error') ? 'error' : ''}">
-              \${cell.outputs.map(o => formatOutput(o)).join('\\n')}
-            </div>
-          \` : ''}
-        </div>
-        <div class="add-cell">
-          <button class="btn" onclick="addCellAfter('\${cell.id}', 'code')">+ Code</button>
-          <button class="btn" onclick="addCellAfter('\${cell.id}', 'markdown')">+ Markdown</button>
-        </div>
-      \`).join('');
-    }
 
     function escapeHtml(text) {
       return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -606,17 +591,170 @@ function generateNotebookHtml(doc: NotebookDocument): string {
         : '';
     }
 
-    function editMarkdown(id) {
-      const cell = notebook.cells.find(c => c.id === id);
-      if (!cell) return;
-      const newSource = prompt('Edit markdown:', cell.source);
-      if (newSource !== null) {
-        cell.source = newSource;
+    function startEditMarkdown(id) {
+      editingCell = id;
+      render();
+    }
+
+    function finishEditMarkdown(id) {
+      // Only finish if we're still editing this cell
+      if (editingCell === id) {
+        editingCell = null;
         render();
       }
     }
 
-    render();
+    function toggleEditMarkdown(id) {
+      if (editingCell === id) {
+        editingCell = null;
+      } else {
+        editingCell = id;
+      }
+      render();
+    }
+
+    function handleMarkdownKeyDown(event, cellId) {
+      // Escape to exit edit mode
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        editingCell = null;
+        render();
+      }
+      // Cmd/Ctrl+Enter to exit edit mode
+      if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        editingCell = null;
+        render();
+      }
+    }
+
+    // Monaco editors storage
+    const editors = {};
+    let monacoReady = false;
+
+    function initMonacoEditors() {
+      if (!monacoReady) return;
+
+      document.querySelectorAll('.monaco-container').forEach(container => {
+        const cellId = container.dataset.cellId;
+        if (editors[cellId]) return; // Already initialized
+
+        const cell = notebook.cells.find(c => c.id === cellId);
+        if (!cell) return;
+
+        const lineCount = (cell.source.match(/\\n/g) || []).length + 1;
+        const height = Math.max(60, Math.min(500, lineCount * 19 + 44));
+        container.style.height = height + 'px';
+
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const editor = monaco.editor.create(container, {
+          value: cell.source,
+          language: cell.language === 'typescript' ? 'typescript' : 'javascript',
+          theme: isDark ? 'vs-dark' : 'vs',
+          minimap: { enabled: false },
+          lineNumbers: 'off',
+          glyphMargin: false,
+          folding: false,
+          lineDecorationsWidth: 20,
+          lineNumbersMinChars: 0,
+          renderLineHighlight: 'none',
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+          fontSize: 13,
+          fontFamily: "ui-monospace, 'SF Mono', Menlo, monospace",
+          padding: { top: 20, bottom: 20 },
+          overviewRulerLanes: 0,
+          hideCursorInOverviewRuler: true,
+          overviewRulerBorder: false,
+          scrollbar: { vertical: 'hidden', horizontal: 'auto' },
+        });
+
+        editors[cellId] = editor;
+
+        // Update cell source on change
+        editor.onDidChangeModelContent(() => {
+          const cell = notebook.cells.find(c => c.id === cellId);
+          if (cell) {
+            cell.source = editor.getValue();
+            // Auto-resize
+            const lineCount = editor.getModel().getLineCount();
+            const height = Math.max(60, Math.min(500, lineCount * 19 + 44));
+            container.style.height = height + 'px';
+            editor.layout();
+          }
+        });
+
+        // Cmd/Ctrl+Enter to run
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+          runCell(cellId);
+        });
+      });
+    }
+
+    function render() {
+      // Dispose old editors
+      Object.values(editors).forEach(e => e.dispose());
+      Object.keys(editors).forEach(k => delete editors[k]);
+
+      const container = document.getElementById('notebook');
+      container.innerHTML = notebook.cells.map((cell, index) => \`
+        <div class="cell \${activeCell === cell.id ? 'active' : ''} \${editingCell === cell.id ? 'editing' : ''}"
+             onclick="setActive('\${cell.id}')"
+             data-id="\${cell.id}">
+          <div class="cell-header">
+            <span class="cell-type \${cell.type}">\${cell.type === 'code' ? cell.language : 'markdown'}</span>
+            \${cell.executionCount ? \`<span class="execution-count">[\${cell.executionCount}]</span>\` : ''}
+            <div class="cell-actions">
+              \${cell.type === 'code' ? \`<button onclick="event.stopPropagation(); runCell('\${cell.id}')">▶ Run</button>\` : ''}
+              \${cell.type === 'markdown' ? \`<button onclick="event.stopPropagation(); toggleEditMarkdown('\${cell.id}')">\${editingCell === cell.id ? '👁 Preview' : '✏️ Edit'}</button>\` : ''}
+              <button onclick="event.stopPropagation(); moveCell('\${cell.id}', -1)">↑</button>
+              <button onclick="event.stopPropagation(); moveCell('\${cell.id}', 1)">↓</button>
+              <button onclick="event.stopPropagation(); deleteCell('\${cell.id}')">×</button>
+            </div>
+          </div>
+          <div class="cell-content">
+            \${cell.type === 'code'
+              ? \`<div class="monaco-container" id="monaco-\${cell.id}" data-cell-id="\${cell.id}"></div>\`
+              : (editingCell === cell.id
+                  ? \`<textarea class="cell-editor markdown-editor"
+                       oninput="updateCell('\${cell.id}', this.value)"
+                       onblur="finishEditMarkdown('\${cell.id}')"
+                       onkeydown="handleMarkdownKeyDown(event, '\${cell.id}')">\${escapeHtml(cell.source)}</textarea>\`
+                  : \`<div class="markdown-preview" onclick="startEditMarkdown('\${cell.id}')">\${cell.source.trim() ? renderMarkdown(cell.source) : '<em class="placeholder">Click to edit markdown...</em>'}</div>\`)
+            }
+          </div>
+          \${cell.outputs && cell.outputs.length > 0 ? \`
+            <div class="cell-output \${cell.outputs.some(o => o.type === 'error') ? 'error' : ''}">
+              \${cell.outputs.map(o => formatOutput(o)).join('')}
+            </div>
+          \` : ''}
+        </div>
+        <div class="add-cell">
+          <button class="btn" onclick="addCellAfter('\${cell.id}', 'code')">+ Code</button>
+          <button class="btn" onclick="addCellAfter('\${cell.id}', 'markdown')">+ Markdown</button>
+        </div>
+      \`).join('');
+
+      // Initialize Monaco editors after DOM is ready
+      setTimeout(initMonacoEditors, 0);
+
+      // Focus markdown editor if editing
+      if (editingCell) {
+        const editor = document.querySelector('.cell.editing .cell-editor');
+        if (editor) {
+          editor.focus();
+          editor.selectionStart = editor.selectionEnd = editor.value.length;
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+  <script>
+    require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+    require(['vs/editor/editor.main'], function () {
+      monacoReady = true;
+      render();
+    });
   </script>
 </body>
 </html>`
@@ -794,6 +932,69 @@ async function executeCode(
       },
     }
 
+    // Transform code to return last expression (Jupyter-like behavior)
+    // We need to find the last expression and wrap it with return
+    // Handle both newline-separated and semicolon-separated statements
+    const trimmedCode = code.trim()
+
+    // Split into statements (approximate - handles most common cases)
+    // This is a simple heuristic that works for typical notebook code
+    const lines = trimmedCode.split('\n')
+    let lastLineIndex = lines.length - 1
+
+    // Find the last non-empty, non-comment line
+    while (lastLineIndex >= 0) {
+      const line = lines[lastLineIndex].trim()
+      if (line && !line.startsWith('//') && !line.startsWith('/*')) {
+        break
+      }
+      lastLineIndex--
+    }
+
+    let transformedCode = code
+    if (lastLineIndex >= 0) {
+      const lastLine = lines[lastLineIndex].trim()
+
+      // Check if it's a block-ending statement
+      const endsWithBrace = lastLine.endsWith('{') || lastLine.endsWith('}')
+
+      if (!endsWithBrace) {
+        // Check if there are semicolons - we want to return the last part
+        const semicolonIndex = lastLine.lastIndexOf(';')
+        let lastStatement = semicolonIndex >= 0
+          ? lastLine.slice(semicolonIndex + 1).trim()
+          : lastLine
+
+        // If last part is empty (trailing semicolon), use the statement before it
+        if (!lastStatement && semicolonIndex >= 0) {
+          // Find the previous semicolon
+          const prevSemicolon = lastLine.lastIndexOf(';', semicolonIndex - 1)
+          lastStatement = prevSemicolon >= 0
+            ? lastLine.slice(prevSemicolon + 1, semicolonIndex).trim()
+            : lastLine.slice(0, semicolonIndex).trim()
+        }
+
+        // Check if last statement is likely an expression
+        const isStatement = /^(const|let|var|if|for|while|switch|try|function|class|import|export|return|throw|break|continue)\b/.test(lastStatement)
+
+        if (!isStatement && lastStatement) {
+          if (semicolonIndex >= 0 && lastLine.slice(semicolonIndex + 1).trim()) {
+            // Has semicolon with content after it - just return that last part
+            const beforeSemi = lastLine.slice(0, semicolonIndex + 1)
+            const afterSemi = lastLine.slice(semicolonIndex + 1).trim()
+            lines[lastLineIndex] = beforeSemi + ' return ' + afterSemi
+          } else if (semicolonIndex >= 0) {
+            // Trailing semicolon - wrap the whole statement (minus semicolon) with return
+            lines[lastLineIndex] = 'return (' + lastLine.slice(0, -1) + ')'
+          } else {
+            // No semicolon - just add return at the start
+            lines[lastLineIndex] = 'return ' + lastLine
+          }
+          transformedCode = lines.join('\n')
+        }
+      }
+    }
+
     // Create async function that wraps the code
     // This allows top-level await to work
     const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
@@ -804,7 +1005,7 @@ async function executeCode(
       'console',
       `
       with (context) {
-        ${code}
+        ${transformedCode}
       }
       `
     )

@@ -1,0 +1,402 @@
+---
+title: "@mdxld/typescript"
+description: Generate TypeScript types, Zod schemas, and JSON5 from objects
+---
+
+# @mdxld/typescript
+
+Generate TypeScript interfaces, Zod validation schemas, JSON5 configuration, and JSDoc type definitions from object schemas. All outputs are valid TypeScript/JavaScript.
+
+## Installation
+
+```bash
+pnpm add @mdxld/typescript
+```
+
+## Quick Start
+
+```typescript
+import { toTypeScript, toZod, toJSON5, toJSDoc } from '@mdxld/typescript'
+
+const schema = {
+  name: 'Customer',
+  properties: [
+    { name: 'id', type: 'string', required: true, description: 'Unique identifier' },
+    { name: 'email', type: 'string', required: true, description: 'Email address' },
+    { name: 'tier', type: 'string', enum: ['free', 'pro', 'enterprise'], default: 'free' },
+  ]
+}
+
+// Generate TypeScript interface
+const types = toTypeScript(schema)
+
+// Generate Zod schema
+const zodSchema = toZod(schema)
+
+// Generate JSON5 config
+const config = toJSON5({ port: 3000, debug: true })
+```
+
+## API Reference
+
+### toTypeScript(schema, options?)
+
+Generate TypeScript interface definitions.
+
+```typescript
+function toTypeScript(schema: Schema, options?: ToTypeScriptOptions): string
+
+interface ToTypeScriptOptions {
+  /** Root type name */
+  name?: string
+  /** Add export keyword (default: true) */
+  export?: boolean
+  /** Make all properties readonly */
+  readonly?: boolean
+  /** Optional handling: 'all' | 'none' | 'infer' */
+  optional?: 'all' | 'none' | 'infer'
+  /** Include JSDoc comments (default: true) */
+  comments?: boolean
+  /** Indentation spaces (default: 2) */
+  indent?: number
+}
+```
+
+**Example:**
+
+```typescript
+const schema = {
+  name: 'Customer',
+  properties: [
+    { name: 'id', type: 'string', required: true, description: 'Unique ID' },
+    { name: 'email', type: 'string', required: true, description: 'Email' },
+    { name: 'tier', type: 'string', enum: ['free', 'pro', 'enterprise'] },
+    { name: 'metadata', type: 'object' }
+  ]
+}
+
+const ts = toTypeScript(schema)
+```
+
+**Output:**
+
+```typescript
+/**
+ * Customer
+ */
+export interface Customer {
+  /** Unique ID */
+  id: string
+  /** Email */
+  email: string
+  tier?: 'free' | 'pro' | 'enterprise'
+  metadata?: Record<string, unknown>
+}
+```
+
+### toZod(schema, options?)
+
+Generate Zod validation schema.
+
+```typescript
+function toZod(schema: Schema, options?: ToZodOptions): string
+
+interface ToZodOptions {
+  /** Schema variable name */
+  name?: string
+  /** Add export keyword (default: true) */
+  export?: boolean
+  /** Use strict() mode */
+  strict?: boolean
+  /** Add coercion for primitives */
+  coerce?: boolean
+}
+```
+
+**Example:**
+
+```typescript
+const zodSchema = toZod(schema)
+```
+
+**Output:**
+
+```typescript
+import { z } from 'zod'
+
+export const CustomerSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  tier: z.enum(['free', 'pro', 'enterprise']).default('free'),
+  metadata: z.record(z.unknown()).optional(),
+})
+
+export type Customer = z.infer<typeof CustomerSchema>
+```
+
+### toJSON5(object, options?)
+
+Convert object to JSON5 (valid JavaScript/TypeScript).
+
+```typescript
+function toJSON5(object: unknown, options?: ToJSON5Options): string
+
+interface ToJSON5Options {
+  /** Indentation (default: 2) */
+  indent?: number
+  /** Quote style: 'single' | 'double' | 'none' */
+  quote?: 'single' | 'double' | 'none'
+  /** Add trailing commas (default: true) */
+  trailingComma?: boolean
+  /** Space after colons (default: true) */
+  space?: boolean
+}
+```
+
+**Example:**
+
+```typescript
+const config = {
+  name: 'my-app',
+  port: 3000,
+  features: ['auth', 'api'],
+  debug: true
+}
+
+const json5 = toJSON5(config)
+```
+
+**Output:**
+
+```json5
+{
+  name: 'my-app',
+  port: 3000,
+  features: [
+    'auth',
+    'api',
+  ],
+  debug: true,
+}
+```
+
+### toJSDoc(schema, options?)
+
+Generate JSDoc type definitions for plain JavaScript.
+
+```typescript
+function toJSDoc(schema: Schema, options?: ToJSDocOptions): string
+```
+
+**Example:**
+
+```typescript
+const jsdoc = toJSDoc(schema)
+```
+
+**Output:**
+
+```javascript
+/**
+ * @typedef {Object} Customer
+ * @property {string} id - Unique ID
+ * @property {string} email - Email
+ * @property {'free' | 'pro' | 'enterprise'} [tier='free']
+ * @property {Object.<string, *>} [metadata]
+ */
+```
+
+### fromTypeScript(source)
+
+Parse TypeScript interface back to schema object.
+
+```typescript
+function fromTypeScript(source: string): Schema
+```
+
+**Example:**
+
+```typescript
+const schema = fromTypeScript(`
+  interface Customer {
+    id: string
+    email: string
+    tier?: 'free' | 'pro'
+  }
+`)
+
+// { name: 'Customer', properties: [...] }
+```
+
+## Type Mappings
+
+### Primitive Types
+
+| Schema Type | TypeScript | Zod |
+|-------------|------------|-----|
+| `string` | `string` | `z.string()` |
+| `number` | `number` | `z.number()` |
+| `integer` | `number` | `z.number().int()` |
+| `boolean` | `boolean` | `z.boolean()` |
+| `null` | `null` | `z.null()` |
+| `any` | `unknown` | `z.unknown()` |
+
+### Complex Types
+
+| Schema Type | TypeScript | Zod |
+|-------------|------------|-----|
+| `array` | `T[]` | `z.array(T)` |
+| `object` | `Record<string, T>` | `z.record(T)` |
+| `enum` | `'a' \| 'b'` | `z.enum(['a', 'b'])` |
+| `union` | `A \| B` | `z.union([A, B])` |
+| `optional` | `T?` | `T.optional()` |
+
+### Format Hints
+
+| Format | TypeScript | Zod |
+|--------|------------|-----|
+| `email` | `string` | `z.string().email()` |
+| `url` | `string` | `z.string().url()` |
+| `uuid` | `string` | `z.string().uuid()` |
+| `date` | `Date` | `z.coerce.date()` |
+
+## JSON5 Features
+
+JSON5 extends JSON with JavaScript-friendly features:
+
+```json5
+{
+  // Comments are allowed
+  unquoted: 'keys work',
+  'single-quotes': 'for strings',
+  trailing: 'commas',  // ← trailing comma OK
+
+  // Numbers
+  hex: 0xDEADBEEF,
+  leadingDecimal: .5,
+  infinity: Infinity,
+
+  // Strings
+  multiline: 'line 1 \
+line 2',
+}
+```
+
+Since JSON5 is valid JavaScript, you can use it directly:
+
+```typescript
+// config.ts
+export default {
+  name: 'my-app',
+  // JSON5 content
+} as const
+```
+
+## Use Cases
+
+### Generate Types from MDXLD
+
+```typescript
+import { parse } from 'mdxld'
+import { toTypeScript } from '@mdxld/typescript'
+
+const doc = parse(`---
+$type: BlogPost
+title: Hello
+author: Jane
+tags:
+  - tech
+  - tutorial
+---
+`)
+
+const types = toTypeScript({
+  name: doc.data.$type,
+  properties: Object.entries(doc.data).map(([name, value]) => ({
+    name,
+    type: typeof value === 'object'
+      ? (Array.isArray(value) ? 'array' : 'object')
+      : typeof value,
+    required: true
+  }))
+})
+```
+
+### Config File Generation
+
+```typescript
+import { toTypeScript, toZod, toJSON5 } from '@mdxld/typescript'
+
+const configSchema = {
+  name: 'AppConfig',
+  properties: [
+    { name: 'port', type: 'number', default: 3000 },
+    { name: 'host', type: 'string', default: 'localhost' },
+    { name: 'database', type: 'DatabaseConfig' }
+  ]
+}
+
+// Generate types
+await Bun.write('src/config.types.ts', toTypeScript(configSchema))
+
+// Generate validation
+await Bun.write('src/config.schema.ts', toZod(configSchema))
+
+// Generate default config
+await Bun.write('config.json5', toJSON5(defaultConfig))
+```
+
+### API Type Generation
+
+```typescript
+import { toTypeScript, toZod } from '@mdxld/typescript'
+
+const endpoints = [
+  {
+    name: 'CreateCustomer',
+    body: { name: 'string', email: 'string' },
+  }
+]
+
+for (const endpoint of endpoints) {
+  const requestType = toTypeScript({
+    name: `${endpoint.name}Request`,
+    properties: Object.entries(endpoint.body).map(([name, type]) => ({
+      name, type, required: true
+    }))
+  })
+
+  const zodSchema = toZod({
+    name: `${endpoint.name}RequestSchema`,
+    properties: Object.entries(endpoint.body).map(([name, type]) => ({
+      name, type, required: true
+    }))
+  })
+}
+```
+
+### Runtime Validation
+
+```typescript
+import { toZod } from '@mdxld/typescript'
+
+// Generate at build time
+const schemaCode = toZod(mySchema)
+await Bun.write('src/schemas/customer.ts', schemaCode)
+
+// Use at runtime
+import { CustomerSchema } from './schemas/customer'
+
+function createCustomer(data: unknown) {
+  const validated = CustomerSchema.parse(data)
+  // validated is now typed as Customer
+}
+```
+
+## Related Packages
+
+| Package | Description |
+|---------|-------------|
+| [`@mdxld/json`](/docs/mdxld/formats/json) | JSON Schema generation |
+| [`@mdxld/yaml`](/docs/mdxld/formats/yaml) | YAML output |
+| [`mdxld`](/docs/mdxld) | Core MDXLD with typegen CLI |

@@ -50,8 +50,8 @@ CREATE TABLE IF NOT EXISTS Search (
   event LowCardinality(String) DEFAULT 'created',
   ts DateTime64(3) DEFAULT now64(3),
 
-  -- Vector similarity index (HNSW with cosine distance)
-  INDEX idx_embedding embedding TYPE vector_similarity('hnsw', 'cosineDistance') GRANULARITY 1,
+  -- Note: Vector similarity index requires specific ClickHouse version config
+  -- INDEX idx_embedding embedding TYPE vector_similarity('hnsw', 'cosineDistance', 'f32', 1536) GRANULARITY 1,
   -- Full-text indexes
   INDEX idx_title title TYPE tokenbf_v1(32768, 3, 0) GRANULARITY 1,
   INDEX idx_description description TYPE tokenbf_v1(32768, 3, 0) GRANULARITY 1,

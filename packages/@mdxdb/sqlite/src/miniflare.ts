@@ -33,7 +33,8 @@ import type {
 // Miniflare types (we'll import dynamically)
 interface MiniflareOptions {
   modules: boolean
-  script: string
+  script?: string
+  scriptPath?: string
   durableObjects: Record<string, string>
   durableObjectsPersist?: string
 }
@@ -61,27 +62,38 @@ export async function createMiniflareBinding(
     return miniflareBinding
   }
 
-  // Dynamic import miniflare
+  // Dynamic import miniflare and path
   const { Miniflare: MF } = await import('miniflare')
+  const { fileURLToPath } = await import('node:url')
+  const { dirname, join } = await import('node:path')
+  const { existsSync } = await import('node:fs')
 
-  // Read the durable object module
-  // In production, this would be bundled; for dev we read from source
-  const doScript = `
-    // Miniflare worker script that exports the MDXDatabase Durable Object
-    export { MDXDatabase } from './durable-object.js'
+  // Get the path to the durable-object.js file
+  // When running from source (vitest), __dirname is src/
+  // When running from dist, __dirname is dist/
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = dirname(__filename)
 
-    export default {
-      async fetch(request, env) {
-        return new Response('MDXDatabase Worker', { status: 200 })
-      }
+  // Check if we're running from source (src/) or dist
+  let doPath = join(__dirname, 'durable-object.js')
+  if (!existsSync(doPath)) {
+    // Try dist directory (when running tests from src/)
+    const distPath = join(__dirname, '..', 'dist', 'durable-object.js')
+    if (existsSync(distPath)) {
+      doPath = distPath
+    } else {
+      throw new Error(
+        `Cannot find durable-object.js. Tried:\n  - ${doPath}\n  - ${distPath}\n` +
+        `Run 'pnpm build' first if testing with miniflare.`
+      )
     }
-  `
+  }
 
-  // Create miniflare instance
+  // Create miniflare instance with the actual module file
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   miniflareInstance = new MF({
     modules: true,
-    script: doScript,
+    scriptPath: doPath,
     durableObjects: {
       MDXDB: 'MDXDatabase',
     },
@@ -140,6 +152,44 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         }
         if (options.ns) {
           result = result.filter((t: Record<string, unknown>) => t.ns === options.ns)
+        }
+
+        // Handle where clause
+        if (options.where) {
+          for (const [key, value] of Object.entries(options.where)) {
+            result = result.filter((t: Record<string, unknown>) => {
+              const data = t.data as Record<string, unknown>
+              return data[key] === value
+            })
+          }
+        }
+
+        // Handle ordering
+        if (options.orderBy) {
+          const orderBy = options.orderBy as string
+          result.sort((a: Record<string, unknown>, b: Record<string, unknown>) => {
+            let aVal: unknown
+            let bVal: unknown
+            if (['url', 'ns', 'type', 'id', 'created_at', 'updated_at'].includes(orderBy)) {
+              aVal = a[orderBy]
+              bVal = b[orderBy]
+            } else {
+              // JSON field
+              aVal = (a.data as Record<string, unknown>)[orderBy]
+              bVal = (b.data as Record<string, unknown>)[orderBy]
+            }
+            if (aVal < bVal) return -1
+            if (aVal > bVal) return 1
+            return 0
+          })
+          if (options.order === 'desc') {
+            result.reverse()
+          }
+        }
+
+        // Handle offset and limit
+        if (options.offset) {
+          result = result.slice(options.offset)
         }
         if (options.limit) {
           result = result.slice(0, options.limit)
@@ -308,10 +358,12 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         for (const rel of relationships.values()) {
           if (type && rel.type !== type) continue
 
-          if ((direction === 'from' || direction === 'both') && rel.from_url === url) {
+          // direction='to': Return things this URL points TO (outbound, where from_url = url)
+          if ((direction === 'to' || direction === 'both') && rel.from_url === url) {
             urls.push(rel.to_url as string)
           }
-          if ((direction === 'to' || direction === 'both') && rel.to_url === url) {
+          // direction='from': Return things that point TO this URL (inbound, where to_url = url)
+          if ((direction === 'from' || direction === 'both') && rel.to_url === url) {
             urls.push(rel.from_url as string)
           }
         }
