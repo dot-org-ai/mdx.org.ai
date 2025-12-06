@@ -17,7 +17,7 @@ export type { ApiClientConfig } from './client.js'
 // DBClient adapter
 export { createDBClient, MemoryDBClient } from './db-client.js'
 
-// Export all types
+// Export original Database interface types (local definitions)
 export type {
   // Original Database interface
   ListOptions,
@@ -32,7 +32,10 @@ export type {
   Database,
   DatabaseConfig,
   CreateDatabase,
-  // ai-database compatible types
+} from './types.js'
+
+// Re-export ai-database compatible types (from ai-database, breaking circular dep)
+export type {
   EntityId,
   Thing,
   Relationship,
@@ -42,7 +45,8 @@ export type {
   UpdateOptions,
   RelateOptions,
   DBClient,
-  // Event, Action, Artifact types (ai-workflows integration)
+  DBClientExtended,
+  // Event, Action, Artifact types (simple event sourcing style)
   Event,
   Action,
   ActionStatus,
@@ -53,11 +57,10 @@ export type {
   StoreArtifactOptions,
   EventQueryOptions,
   ActionQueryOptions,
-  DBClientExtended,
-} from './types.js'
+} from 'ai-database'
 
-// URL utilities
-export { resolveUrl, resolveShortUrl, parseUrl } from './types.js'
+// URL utilities (from ai-database)
+export { resolveUrl, resolveShortUrl, parseUrl } from 'ai-database'
 
 // Re-export mdxld types for convenience
 export type { MDXLDDocument, MDXLDData, LDProperties } from 'mdxld'

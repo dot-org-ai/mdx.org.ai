@@ -35,7 +35,7 @@ import type {
   ActionQueryOptions,
   ArtifactType,
   ActionStatus,
-} from 'mdxdb'
+} from 'ai-database'
 
 export const name = '@mdxdb/clickhouse'
 

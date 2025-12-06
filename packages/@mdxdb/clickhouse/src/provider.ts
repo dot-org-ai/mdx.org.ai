@@ -5,7 +5,7 @@
  * Wraps ClickHouseDatabase to conform to the schema-first interface.
  */
 
-import type { DBProvider, DBListOptions as ListOptions, DBSearchOptions as SearchOptions } from 'mdxdb'
+import type { DBProvider, ListOptions, SearchOptions } from 'ai-database'
 import {
   ClickHouseDatabase,
   createClickHouseDatabase,
