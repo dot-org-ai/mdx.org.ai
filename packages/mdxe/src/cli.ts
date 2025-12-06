@@ -13,7 +13,7 @@ import { glob } from 'glob'
 import { transform } from 'esbuild'
 
 export interface CliOptions {
-  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'admin' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
+  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'admin' | 'notebook' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
   projectDir: string
   platform: 'do' | 'cloudflare' | 'vercel' | 'github'
   mode?: 'static' | 'opennext'
@@ -39,6 +39,8 @@ export interface CliOptions {
   // Database options (from mdxdb)
   clickhouseUrl: string
   httpPort: number
+  // Notebook options
+  open: boolean
   // Deploy options (always uses managed apis.do API)
 }
 
@@ -56,6 +58,7 @@ Commands:
   start               Start production server
   test                Run MDX tests with vitest
   admin               Start Payload admin UI with mdxdb backend
+  notebook            Launch interactive notebook for MDX files
   deploy              Deploy to cloud platforms
   db                  Start local dev environment (ClickHouse + sync + UI)
   db:server           Start only the ClickHouse server
@@ -69,6 +72,22 @@ Server Options:
   --port <port>          Server port (default: 3000)
   --host <host>          Server host (default: localhost)
   --verbose, -v          Show detailed output
+
+Notebook Options:
+  --dir, -d <path>       File or directory to open (default: current directory)
+  --port <port>          Server port (default: 3000)
+  --open, -o             Open browser automatically
+  --verbose, -v          Show detailed output
+
+Notebook Examples:
+  # Open notebook for current directory
+  mdxe notebook
+
+  # Open specific MDX file
+  mdxe notebook ./docs/intro.mdx
+
+  # Open with browser auto-launch
+  mdxe notebook --open
 
 Database Options (db commands):
   --path, -p <path>      Path to MDX files (default: ./content)
@@ -213,6 +232,7 @@ export function parseArgs(args: string[]): CliOptions {
     host: 'localhost',
     clickhouseUrl: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
     httpPort: parseInt(process.env.CLICKHOUSE_HTTP_PORT || '8123', 10),
+    open: false,
   }
 
   // Parse command
@@ -230,6 +250,8 @@ export function parseArgs(args: string[]): CliOptions {
       options.command = 'deploy'
     } else if (cmd === 'admin') {
       options.command = 'admin'
+    } else if (cmd === 'notebook') {
+      options.command = 'notebook'
     } else if (cmd === 'db') {
       options.command = 'db'
     } else if (cmd === 'db:server') {
@@ -378,6 +400,10 @@ export function parseArgs(args: string[]): CliOptions {
       case '--host':
         options.host = next || 'localhost'
         i++
+        break
+      case '--open':
+      case '-o':
+        options.open = true
         break
     }
   }
@@ -1093,6 +1119,16 @@ export async function main(): Promise<void> {
       break
     case 'admin':
       await runAdmin(options)
+      break
+    case 'notebook':
+      const { runNotebook } = await import('./commands/notebook')
+      await runNotebook({
+        path: options.projectDir,
+        port: options.port,
+        host: options.host,
+        open: options.open,
+        verbose: options.verbose,
+      })
       break
     case 'db':
     case 'db:server':

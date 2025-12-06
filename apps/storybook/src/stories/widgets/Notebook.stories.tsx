@@ -435,6 +435,63 @@ salesData`,
   },
 }
 
+export const Interactive: Story = {
+  args: {
+    executionMode: 'browser',
+    cells: [
+      {
+        type: 'markdown',
+        source: `# Welcome to MDX Notebook
+
+Try editing the code cells below and press **Ctrl+Enter** to run them.`,
+      },
+      {
+        type: 'code',
+        language: 'javascript',
+        source: `// Try modifying this code!
+const message = "Hello from MDX Notebook!"
+console.log(message)
+
+// Return a value to display it
+message.toUpperCase()`,
+      },
+      {
+        type: 'code',
+        language: 'typescript',
+        source: `// Work with data
+const users = [
+  { name: "Alice", role: "Developer" },
+  { name: "Bob", role: "Designer" },
+  { name: "Charlie", role: "Manager" }
+]
+
+// Transform and display
+users.map(u => \`\${u.name} is a \${u.role}\`)`,
+      },
+      {
+        type: 'markdown',
+        source: `## SQL Queries
+
+Use the \`sql\` tagged template literal to query data from URLs:`,
+      },
+      {
+        type: 'code',
+        language: 'typescript',
+        source: `import { sql } from '@mdxui/notebook'
+
+// Query remote JSON as a SQL table
+const result = await sql\`
+  SELECT id, title, completed
+  FROM url('https://jsonplaceholder.typicode.com/todos')
+  LIMIT 5
+\`
+
+result`,
+      },
+    ],
+  },
+}
+
 export const Empty: Story = {
   args: {
     executionMode: 'browser',
