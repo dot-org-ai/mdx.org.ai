@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react'
 
-/** Supported programming languages */
+/** Supported languages in MDX notebooks */
 export type Language =
   | 'javascript'
   | 'typescript'
-  | 'python'
-  | 'sql'
+  | 'mdx'
   | 'markdown'
   | 'json'
+  | 'jsx'
+  | 'tsx'
 
 /** Execution mode: browser-side or remote RPC */
 export type ExecutionMode = 'browser' | 'rpc'

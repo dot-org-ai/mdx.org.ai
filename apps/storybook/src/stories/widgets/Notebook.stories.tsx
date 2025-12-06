@@ -281,61 +281,63 @@ users.map(u => u.name)`,
   },
 }
 
-export const Python: Story = {
+export const MDXWithJSX: Story = {
   args: {
-    executionMode: 'rpc',
+    executionMode: 'browser',
     cells: [
       {
         type: 'markdown',
-        source: `# Python Notebook
+        source: `# MDX with JSX Components
 
-Python execution requires RPC mode with a remote executor.`,
+Interactive components rendered inline with your content.`,
       },
       {
         type: 'code',
-        language: 'python',
-        source: `import pandas as pd
-import numpy as np
+        language: 'tsx',
+        source: `const Button = ({ children, onClick }) => (
+  <button
+    onClick={onClick}
+    style={{
+      padding: '0.5rem 1rem',
+      backgroundColor: '#3b82f6',
+      color: 'white',
+      border: 'none',
+      borderRadius: '0.375rem',
+      cursor: 'pointer'
+    }}
+  >
+    {children}
+  </button>
+)
 
-df = pd.DataFrame({
-    'A': np.random.randn(5),
-    'B': np.random.randn(5)
-})
-
-df.describe()`,
-        output: `       A         B
-count  5.000000  5.000000
-mean   0.123456  0.234567
-std    1.012345  0.987654
-min   -1.234567 -0.876543
-25%   -0.567890 -0.345678
-50%    0.123456  0.123456
-75%    0.678901  0.567890
-max    1.234567  1.234567`,
+<Button onClick={() => alert('Clicked!')}>
+  Click Me
+</Button>`,
+        output: '<Button>Click Me</Button>',
       },
     ],
   },
 }
 
-export const SQL: Story = {
+export const ServerSideExecution: Story = {
   args: {
     executionMode: 'rpc',
     cells: [
       {
+        type: 'markdown',
+        source: `# Server-Side Execution
+
+Execute TypeScript on the server via rpc.do for API access and secrets.`,
+      },
+      {
         type: 'code',
-        language: 'sql',
-        source: `SELECT
-  name,
-  age,
-  city
-FROM users
-WHERE age > 25
-ORDER BY age DESC
-LIMIT 10`,
-        output: `| name    | age | city    |
-|---------|-----|---------|
-| Charlie | 35  | Chicago |
-| Alice   | 30  | NYC     |`,
+        language: 'typescript',
+        source: `// This runs on the server via rpc.do
+const response = await fetch('https://api.example.com/data')
+const data = await response.json()
+
+data`,
+        output: `{ "status": "ok", "data": [...] }`,
       },
     ],
   },

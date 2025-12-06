@@ -7,8 +7,8 @@ import type {
 } from '../types'
 
 /**
- * Remote executor using rpc.do for server-side code execution
- * Supports multiple languages including Python, JavaScript, SQL, etc.
+ * Remote executor using rpc.do for server-side TypeScript/MDX execution
+ * Use this for executing code that needs server-side resources or APIs
  */
 export class RPCExecutor implements Executor {
   private options: Required<RPCExecutionOptions>
