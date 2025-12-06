@@ -17,6 +17,11 @@ export {
   executeViaRPC,
   createExecutor,
   createExecutionContext,
+  // SQL tagged template literal
+  sql,
+  SQLQuery,
+  SQLResult,
+  createSQLExecutor,
 } from './execution'
 
 // Outputs

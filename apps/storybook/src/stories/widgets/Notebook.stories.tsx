@@ -343,6 +343,63 @@ data`,
   },
 }
 
+export const SQLQuery: Story = {
+  args: {
+    executionMode: 'browser',
+    cells: [
+      {
+        type: 'markdown',
+        source: `# SQL with Tagged Template Literals
+
+Query any URL as a table using the \`sql\` tagged template literal.`,
+      },
+      {
+        type: 'code',
+        language: 'typescript',
+        source: `import { sql } from '@mdxui/notebook'
+
+// Query JSON API as a SQL table
+const todos = await sql\`
+  SELECT id, title, completed
+  FROM url('https://jsonplaceholder.typicode.com/todos')
+  WHERE completed = true
+  LIMIT 5
+\`
+
+todos`,
+        output: `| id | title                                    | completed |
+|----|------------------------------------------|-----------|
+| 4  | et porro tempora                         | true      |
+| 8  | quo adipisci enim quam ut ab             | true      |
+| 11 | vero rerum temporibus dolor              | true      |
+| 14 | voluptatem eligendi optio                | true      |
+| 16 | repellendus sunt dolores architecto      | true      |`,
+      },
+      {
+        type: 'code',
+        language: 'typescript',
+        source: `// Join multiple URL sources
+const result = await sql\`
+  SELECT
+    p.title as post,
+    u.name as author
+  FROM url('https://jsonplaceholder.typicode.com/posts') p
+  JOIN url('https://jsonplaceholder.typicode.com/users') u
+    ON p.userId = u.id
+  LIMIT 3
+\`
+
+result`,
+        output: `| post                                             | author           |
+|--------------------------------------------------|------------------|
+| sunt aut facere repellat provident occaecati     | Leanne Graham    |
+| qui est esse                                     | Leanne Graham    |
+| ea molestias quasi exercitationem repellat       | Leanne Graham    |`,
+      },
+    ],
+  },
+}
+
 export const DataVisualization: Story = {
   args: {
     executionMode: 'browser',

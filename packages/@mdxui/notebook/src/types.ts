@@ -9,6 +9,7 @@ export type Language =
   | 'json'
   | 'jsx'
   | 'tsx'
+  | 'sql'
 
 /** Execution mode: browser-side or remote RPC */
 export type ExecutionMode = 'browser' | 'rpc'

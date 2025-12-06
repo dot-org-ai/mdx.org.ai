@@ -1,5 +1,6 @@
 export { BrowserExecutor, createBrowserExecutor } from './browser'
 export { RPCExecutor, createRPCExecutor, executeViaRPC } from './rpc'
+export { sql, SQLQuery, SQLResult, createSQLExecutor } from './sql'
 
 export type { Executor, ExecutionContext, BrowserExecutionOptions, RPCExecutionOptions } from '../types'
 
