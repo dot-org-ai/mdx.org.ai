@@ -1,0 +1,17 @@
+#!/bin/bash
+# Launch the example notebook in development mode
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Build mdxe if needed
+if [ ! -f "packages/mdxe/dist/cli.js" ]; then
+  echo "Building mdxe..."
+  pnpm --filter mdxe build
+fi
+
+# Launch the notebook
+echo "Starting notebook server..."
+node packages/mdxe/dist/cli.js notebook examples/notebook.mdx --open "$@"

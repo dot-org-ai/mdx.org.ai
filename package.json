@@ -19,7 +19,8 @@
     "mdxai": "node packages/mdxai/dist/cli.js",
     "mdxe": "node packages/mdxe/dist/cli.js",
     "mdxe:dev": "node packages/mdxe/dist/cli.js dev --dir examples",
-    "mdxe:test": "node packages/mdxe/dist/cli.js test"
+    "mdxe:test": "node packages/mdxe/dist/cli.js test",
+    "notebook": "node packages/mdxe/dist/cli.js notebook examples/notebook.mdx --open"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:*",

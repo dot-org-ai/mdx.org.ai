@@ -5,6 +5,7 @@ import type {
   Language,
   BrowserExecutionOptions,
 } from '../types'
+import { sql } from './sql'
 
 /**
  * Browser-side JavaScript/TypeScript executor using sandboxed eval
@@ -90,11 +91,22 @@ export class BrowserExecutor implements Executor {
       info: (...args: unknown[]) => logs.push({ type: 'info', args }),
     }
 
-    // Build the sandbox context
+    // Build the sandbox context with MDX ecosystem globals
     const sandboxContext = {
+      // User-defined variables and functions
       ...context.variables,
       ...context.functions,
+
+      // MDX ecosystem globals (from mdxdb, mdxai)
+      sql,  // SQL tagged template literal
+      db: context.imports?.db || createDbProxy(),  // Database access
+      ai: context.imports?.ai || createAiProxy(),  // AI functions
+      api: context.imports?.api || createApiProxy(),  // API calls
+
+      // Console capture
       console: captureConsole,
+
+      // Standard globals
       fetch: globalThis.fetch?.bind(globalThis),
       setTimeout: globalThis.setTimeout?.bind(globalThis),
       clearTimeout: globalThis.clearTimeout?.bind(globalThis),
@@ -216,4 +228,72 @@ export function createBrowserExecutor(
   options?: BrowserExecutionOptions
 ): BrowserExecutor {
   return new BrowserExecutor(options)
+}
+
+/**
+ * Create a proxy for database operations
+ * Provides db.get(), db.list(), db.put(), etc.
+ */
+function createDbProxy(): Record<string, unknown> {
+  return new Proxy({} as Record<string, unknown>, {
+    get(_, prop) {
+      // Return a function that makes RPC calls to the database
+      return async (...args: unknown[]) => {
+        console.log(`db.${String(prop)}(${args.map(a => JSON.stringify(a)).join(', ')})`)
+        // In production, this would call mdxdb via RPC
+        return { _placeholder: `db.${String(prop)}`, args }
+      }
+    }
+  })
+}
+
+/**
+ * Create a proxy for AI operations
+ * Provides ai.generate(), ai.chat(), ai.embed(), etc.
+ */
+function createAiProxy(): Record<string, unknown> {
+  return new Proxy({} as Record<string, unknown>, {
+    get(_, prop) {
+      return async (...args: unknown[]) => {
+        console.log(`ai.${String(prop)}(${args.map(a => JSON.stringify(a)).join(', ')})`)
+        // In production, this would call mdxai via RPC
+        return { _placeholder: `ai.${String(prop)}`, args }
+      }
+    }
+  })
+}
+
+/**
+ * Create a proxy for API operations
+ * Provides api.get(), api.post(), etc.
+ */
+function createApiProxy(): Record<string, unknown> {
+  return {
+    async get(url: string, options?: RequestInit) {
+      const response = await fetch(url, { ...options, method: 'GET' })
+      return response.json()
+    },
+    async post(url: string, body?: unknown, options?: RequestInit) {
+      const response = await fetch(url, {
+        ...options,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...options?.headers },
+        body: body ? JSON.stringify(body) : undefined,
+      })
+      return response.json()
+    },
+    async put(url: string, body?: unknown, options?: RequestInit) {
+      const response = await fetch(url, {
+        ...options,
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...options?.headers },
+        body: body ? JSON.stringify(body) : undefined,
+      })
+      return response.json()
+    },
+    async delete(url: string, options?: RequestInit) {
+      const response = await fetch(url, { ...options, method: 'DELETE' })
+      return response.json()
+    },
+  }
 }

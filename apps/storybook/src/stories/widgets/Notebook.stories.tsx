@@ -356,9 +356,7 @@ Query any URL as a table using the \`sql\` tagged template literal.`,
       {
         type: 'code',
         language: 'typescript',
-        source: `import { sql } from '@mdxui/notebook'
-
-// Query JSON API as a SQL table
+        source: `// sql is available globally - no import needed!
 const todos = await sql\`
   SELECT id, title, completed
   FROM url('https://jsonplaceholder.typicode.com/todos')
@@ -477,9 +475,7 @@ Use the \`sql\` tagged template literal to query data from URLs:`,
       {
         type: 'code',
         language: 'typescript',
-        source: `import { sql } from '@mdxui/notebook'
-
-// Query remote JSON as a SQL table
+        source: `// sql, db, ai, api are all available globally!
 const result = await sql\`
   SELECT id, title, completed
   FROM url('https://jsonplaceholder.typicode.com/todos')
