@@ -7,6 +7,7 @@
 import { resolve, basename, extname } from 'node:path'
 import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
+import { exec } from 'node:child_process'
 
 export interface NotebookOptions {
   path: string
@@ -653,7 +654,6 @@ export async function runNotebook(options: NotebookOptions): Promise<void> {
 
     // Open browser if requested
     if (options.open) {
-      const { exec } = require('child_process')
       const cmd = process.platform === 'darwin' ? 'open' :
                   process.platform === 'win32' ? 'start' : 'xdg-open'
       exec(`${cmd} ${url}`)

@@ -268,6 +268,12 @@ export function parseArgs(args: string[]): CliOptions {
     args = args.slice(1)
   }
 
+  // Handle positional argument after command (e.g., mdxe notebook ./path/to/file.mdx)
+  if (args.length > 0 && !args[0].startsWith('-')) {
+    options.projectDir = resolve(args[0])
+    args = args.slice(1)
+  }
+
   // Parse options
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]
