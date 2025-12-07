@@ -1,0 +1,9 @@
+/**
+ * @mdxui/codehike styles
+ * Import codehike's default styles and add any custom overrides
+ */
+
+/* Re-export codehike styles */
+@import 'codehike/dist/index.css';
+
+/* Custom overrides can be added here */

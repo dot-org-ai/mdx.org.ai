@@ -1,0 +1,59 @@
+{
+  "name": "@mdxui/codehike",
+  "version": "0.0.0",
+  "description": "Code Hike components for annotated code walkthroughs in MDX",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./src/styles.css"
+  },
+  "files": [
+    "dist",
+    "src/styles.css"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxui",
+    "codehike",
+    "code",
+    "annotations",
+    "walkthrough",
+    "tutorial",
+    "react",
+    "mdx"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "codehike": "^1.0.4"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
