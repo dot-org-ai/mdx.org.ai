@@ -80,6 +80,8 @@ export {
   parseSchema,
   MemoryProvider,
   createMemoryProvider,
+  // Natural Language Query support
+  setNLQueryGenerator,
   type DatabaseSchema,
   type EntitySchema,
   type FieldDefinition,
@@ -93,6 +95,12 @@ export {
   type ListOptions as DBListOptions,
   type SearchOptions as DBSearchOptions,
   type InferEntity,
+  // Natural Language Query types
+  type NLQueryResult,
+  type NLQueryFn,
+  type NLQueryGenerator,
+  type NLQueryContext,
+  type NLQueryPlan,
 } from 'ai-database'
 
 // =============================================================================
@@ -305,6 +313,23 @@ export {
   PersistentFunctionRegistry,
   type PersistentRegistryConfig,
 } from './persistence.js'
+
+// =============================================================================
+// Dev Mode
+// =============================================================================
+
+export {
+  isDevMode,
+  initDevMode,
+  getDevModeState,
+  resetDevModeState,
+  saveFunctionDefinition,
+  saveSchema,
+  generateTypesFile,
+  writeTypesFile,
+  type DevModeConfig,
+  type DevModeState,
+} from './devmode.js'
 
 // =============================================================================
 // MCP Server for Claude integration
@@ -1046,7 +1071,7 @@ export function createAgentContext(
   options: { db?: AnyDatabase; ai?: AIProxy } = {}
 ): AgentContext {
   const database = options.db || $.db
-  const aiInstance = options.ai || ai
+  const aiInstance = (options.ai || ai) as AIProxy
 
   const agent = Agent(config)
 
@@ -1143,7 +1168,7 @@ export function createServiceContext(
   options: { db?: AnyDatabase; ai?: AIProxy } = {}
 ): ServiceContext {
   const database = options.db || $.db
-  const aiInstance = options.ai || ai
+  const aiInstance = (options.ai || ai) as AIProxy
 
   const service = Service(definition)
 
@@ -1374,4 +1399,526 @@ export function delay(duration: number | string): Promise<void> {
   }
 
   return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+// =============================================================================
+// Natural Language Query Generator
+// =============================================================================
+
+import { z } from 'zod'
+import { setNLQueryGenerator, type NLQueryContext, type NLQueryPlan, type NLQueryGenerator } from 'ai-database'
+
+/**
+ * Zod schema for NLQueryPlan
+ */
+const NLQueryPlanSchema = z.object({
+  types: z.array(z.string()).describe('The types/entities to query'),
+  filters: z.record(z.unknown()).optional().describe('Filters to apply to the query'),
+  search: z.string().optional().describe('Search terms to use'),
+  timeRange: z.object({
+    since: z.date().optional(),
+    until: z.date().optional(),
+  }).optional().describe('Time range for the query'),
+  include: z.array(z.string()).optional().describe('Relationships to include'),
+  interpretation: z.string().describe('How to interpret the results - explain what the query will return'),
+  confidence: z.number().min(0).max(1).describe('Confidence score from 0 to 1'),
+})
+
+/**
+ * Create a default NL query generator using ai-functions.generateObject
+ *
+ * @example
+ * ```ts
+ * import { createDefaultNLQueryGenerator, setNLQueryGenerator } from 'mdxai'
+ *
+ * // Set up the generator
+ * const generator = createDefaultNLQueryGenerator()
+ * setNLQueryGenerator(generator)
+ *
+ * // Now you can use natural language queries
+ * const db = DB({ Users: { name: 'string', email: 'string' } })
+ * const result = await db`how many users do we have?`
+ * const topUsers = await db.Users`top 10 by activity`
+ * ```
+ */
+export function createDefaultNLQueryGenerator(options: {
+  model?: string
+} = {}): NLQueryGenerator {
+  return async (prompt: string, context: NLQueryContext): Promise<NLQueryPlan> => {
+    const systemPrompt = `You are a database query planner. Given a natural language question and a schema, generate a query plan.
+
+Available types in the database:
+${JSON.stringify(context.types, null, 2)}
+
+${context.targetType ? `The user is specifically querying the "${context.targetType}" type.` : ''}
+
+Generate a query plan that answers the user's question. Be specific about:
+- Which types to query
+- What filters to apply
+- What relationships to include
+- How to interpret the results`
+
+    const result = await generateObject({
+      model: options.model as Parameters<typeof generateObject>[0]['model'],
+      schema: NLQueryPlanSchema,
+      system: systemPrompt,
+      prompt,
+    })
+
+    return result.object as unknown as NLQueryPlan
+  }
+}
+
+/**
+ * Set up the default NL query generator
+ *
+ * Call this once at application startup to enable natural language queries.
+ *
+ * @example
+ * ```ts
+ * import { setupNLQuery, DB } from 'mdxai'
+ *
+ * // Enable NL queries with default settings
+ * setupNLQuery()
+ *
+ * // Or specify a model
+ * setupNLQuery({ model: 'gpt-4' })
+ *
+ * // Use natural language queries
+ * const db = DB({ Users: { name: 'string', revenue: 'number' } })
+ * const answer = await db`how many users have revenue over $5000?`
+ * ```
+ */
+export function setupNLQuery(options: { model?: string } = {}): void {
+  const generator = createDefaultNLQueryGenerator(options)
+  setNLQueryGenerator(generator)
+}
+
+// =============================================================================
+// Persistent AI with Function Storage
+// =============================================================================
+
+import { define, defineFunction, type FunctionRegistry, type DefinedFunction } from 'ai-functions'
+import { PersistentFunctionRegistry, type PersistentRegistryConfig } from './persistence.js'
+
+/** Built-in methods that should not be auto-defined */
+const BUILTIN_METHODS = new Set([
+  'do', 'is', 'code', 'decide', 'diagram', 'generate', 'image', 'video', 'write', 'list', 'lists',
+  'functions', 'define', 'defineFunction', 'then', 'catch', 'finally',
+])
+
+/**
+ * Configuration for persistent AI
+ */
+export interface PersistentAIConfig {
+  /** Database to store function definitions */
+  database: AnyDatabase
+  /** Namespace for function storage (default: 'ai-functions') */
+  namespace?: string
+  /** Cache TTL in milliseconds (default: 60000 - 1 minute) */
+  cacheTtl?: number
+  /** Whether to preload functions on startup */
+  preload?: boolean
+}
+
+/**
+ * Persistent AI proxy with function storage
+ *
+ * Like the regular AI proxy, but auto-defined functions are persisted to mdxdb.
+ * Functions are automatically restored on restart.
+ */
+export interface PersistentAIProxy extends AIProxy {
+  /** The persistent function registry */
+  functions: PersistentFunctionRegistry
+  /** Preload all functions from database */
+  preload(): Promise<void>
+  /** Close the registry (closes database connection) */
+  close(): Promise<void>
+}
+
+/**
+ * Create a smart AI client with persistent function storage
+ *
+ * Auto-defined functions are stored in mdxdb and restored on application restart.
+ *
+ * @example
+ * ```ts
+ * import { createPersistentAI, createFsDatabase } from 'mdxai'
+ *
+ * const db = createFsDatabase({ root: './data' })
+ * const ai = await createPersistentAI({ database: db })
+ *
+ * // First call - auto-defines and persists the function
+ * const trip = await ai.planTrip({
+ *   destination: 'Tokyo',
+ *   dates: { start: '2024-03-01', end: '2024-03-10' },
+ * })
+ *
+ * // After restart - function definition is restored from database
+ * const trip2 = await ai.planTrip({
+ *   destination: 'Paris',
+ *   dates: { start: '2024-06-01', end: '2024-06-07' },
+ * })
+ *
+ * // List all persisted functions
+ * const names = await ai.functions.listAsync()
+ * ```
+ */
+export async function createPersistentAI(config: PersistentAIConfig): Promise<PersistentAIProxy> {
+  const registry = new PersistentFunctionRegistry({
+    database: config.database as Database,
+    namespace: config.namespace ?? 'ai-functions',
+    cacheTtl: config.cacheTtl,
+  })
+
+  // Preload functions if requested
+  if (config.preload !== false) {
+    await registry.preload()
+  }
+
+  // Create a define wrapper that uses the persistent registry
+  const persistentDefine = Object.assign(
+    async (name: string, args: Record<string, unknown> = {}): Promise<DefinedFunction> => {
+      // Check if already defined (in cache or database)
+      let existing = registry.get(name)
+      if (!existing) {
+        existing = await registry.getAsync(name)
+      }
+      if (existing) {
+        return existing
+      }
+
+      // Auto-define using the original define function
+      const fn = await define(name, args)
+
+      // Persist to database
+      await registry.setAsync(name, fn)
+
+      return fn
+    },
+    {
+      code: (definition: Parameters<typeof define.code>[0]) => {
+        const fn = define.code(definition)
+        registry.set(definition.name, fn as DefinedFunction)
+        return fn
+      },
+      generative: (definition: Parameters<typeof define.generative>[0]) => {
+        const fn = define.generative(definition)
+        registry.set(definition.name, fn as DefinedFunction)
+        return fn
+      },
+      agentic: (definition: Parameters<typeof define.agentic>[0]) => {
+        const fn = define.agentic(definition)
+        registry.set(definition.name, fn as DefinedFunction)
+        return fn
+      },
+      human: (definition: Parameters<typeof define.human>[0]) => {
+        const fn = define.human(definition)
+        registry.set(definition.name, fn as DefinedFunction)
+        return fn
+      },
+    }
+  )
+
+  const base = {
+    functions: registry,
+    define: persistentDefine,
+    defineFunction,
+    preload: () => registry.preload(),
+    close: () => registry.close(),
+  }
+
+  return new Proxy(base as PersistentAIProxy, {
+    get(target, prop: string) {
+      // Return built-in properties
+      if (prop in target) {
+        return (target as Record<string, unknown>)[prop]
+      }
+
+      // Skip internal properties
+      if (typeof prop === 'symbol' || prop.startsWith('_') || BUILTIN_METHODS.has(prop)) {
+        return undefined
+      }
+
+      // Return a function that auto-defines, persists, and calls
+      return async (args: Record<string, unknown> = {}) => {
+        // Check if function is already defined (in cache)
+        let fn = registry.get(prop)
+
+        // Check database if not in cache
+        if (!fn) {
+          fn = await registry.getAsync(prop)
+        }
+
+        if (!fn) {
+          // Auto-define the function
+          fn = await define(prop, args)
+          // Persist to database
+          await registry.setAsync(prop, fn)
+        }
+
+        // Call the function
+        return fn.call(args)
+      }
+    },
+  })
+}
+
+/**
+ * Helper to create a persistent AI instance with filesystem database
+ *
+ * @example
+ * ```ts
+ * import { createPersistentAIWithFs } from 'mdxai'
+ *
+ * const ai = await createPersistentAIWithFs('./ai-functions')
+ *
+ * const summary = await ai.summarize({ text: 'Long article...' })
+ * ```
+ */
+export async function createPersistentAIWithFs(
+  path: string,
+  options: Omit<PersistentAIConfig, 'database'> = {}
+): Promise<PersistentAIProxy> {
+  const { createFsDatabase } = await import('@mdxdb/fs')
+  const db = createFsDatabase({ root: path })
+  return createPersistentAI({ database: db as unknown as AnyDatabase, ...options })
+}
+
+// =============================================================================
+// Dev Mode AI
+// =============================================================================
+
+import {
+  isDevMode,
+  getDevModeState,
+  saveFunctionDefinition,
+  saveSchema,
+  writeTypesFile,
+  type DevModeConfig,
+  type DevModeState,
+} from './devmode.js'
+
+/**
+ * Dev AI configuration
+ */
+export interface DevAIConfig extends Omit<PersistentAIConfig, 'database'> {
+  /** Project root directory */
+  root?: string
+  /** Path to .ai folder (default: .ai) */
+  aiFolderPath?: string
+  /** Path to mdx.d.ts (default: mdx.d.ts) */
+  typesPath?: string
+  /** Auto-generate types on function define (default: true in dev mode) */
+  autoGenerateTypes?: boolean
+}
+
+/**
+ * Dev AI proxy with type generation
+ */
+export interface DevAIProxy extends PersistentAIProxy {
+  /** Dev mode state */
+  devMode: DevModeState
+  /** Regenerate types file */
+  regenerateTypes(): void
+  /** Register a database schema for type generation */
+  registerSchema(name: string, schema: DatabaseSchema): void
+}
+
+/**
+ * Create an AI client for development mode
+ *
+ * Stores function definitions in .ai/ folder as MDX files and generates
+ * TypeScript types in mdx.d.ts.
+ *
+ * @example
+ * ```ts
+ * import { createDevAI } from 'mdxai'
+ *
+ * const ai = await createDevAI()
+ *
+ * // First call - auto-defines, persists to .ai/functions/, and generates types
+ * const summary = await ai.summarize({ text: 'Long article...' })
+ *
+ * // Types are available in mdx.d.ts:
+ * // - SummarizeArgs: { text: string }
+ * // - SummarizeResult: string
+ * // - SummarizeFunction: (args: SummarizeArgs) => Promise<SummarizeResult>
+ *
+ * // Register a database schema
+ * ai.registerSchema('app', {
+ *   User: { name: 'string', email: 'string' },
+ *   Post: { title: 'string', author: 'User.posts' },
+ * })
+ * ```
+ */
+export async function createDevAI(config: DevAIConfig = {}): Promise<DevAIProxy> {
+  const root = config.root ?? process.cwd()
+
+  // Initialize dev mode state
+  const devModeState = getDevModeState({
+    root,
+    aiFolderPath: config.aiFolderPath,
+    typesPath: config.typesPath,
+  })
+
+  // Create filesystem database in .ai folder
+  const { createFsDatabase } = await import('@mdxdb/fs')
+  const db = createFsDatabase({ root: devModeState.aiFolder })
+
+  // Create the persistent AI
+  const registry = new PersistentFunctionRegistry({
+    database: db as unknown as Database,
+    namespace: 'functions',
+    cacheTtl: config.cacheTtl,
+  })
+
+  // Preload existing functions
+  if (config.preload !== false) {
+    await registry.preload()
+  }
+
+  const shouldAutoGenerateTypes = config.autoGenerateTypes ?? isDevMode()
+
+  // Create define wrapper that saves to .ai and generates types
+  const devDefine = Object.assign(
+    async (name: string, args: Record<string, unknown> = {}): Promise<DefinedFunction> => {
+      // Check if already defined
+      let existing = registry.get(name)
+      if (!existing) {
+        existing = await registry.getAsync(name)
+      }
+      if (existing) {
+        return existing
+      }
+
+      // Auto-define
+      const fn = await define(name, args)
+
+      // Persist to database
+      await registry.setAsync(name, fn)
+
+      // Save to .ai/functions/ as MDX
+      saveFunctionDefinition(devModeState, fn.definition)
+
+      // Regenerate types
+      if (shouldAutoGenerateTypes) {
+        writeTypesFile(devModeState)
+      }
+
+      return fn
+    },
+    {
+      code: (definition: Parameters<typeof define.code>[0]) => {
+        const fn = define.code(definition)
+        registry.set(definition.name, fn as DefinedFunction)
+        saveFunctionDefinition(devModeState, fn.definition)
+        if (shouldAutoGenerateTypes) writeTypesFile(devModeState)
+        return fn
+      },
+      generative: (definition: Parameters<typeof define.generative>[0]) => {
+        const fn = define.generative(definition)
+        registry.set(definition.name, fn as DefinedFunction)
+        saveFunctionDefinition(devModeState, fn.definition)
+        if (shouldAutoGenerateTypes) writeTypesFile(devModeState)
+        return fn
+      },
+      agentic: (definition: Parameters<typeof define.agentic>[0]) => {
+        const fn = define.agentic(definition)
+        registry.set(definition.name, fn as DefinedFunction)
+        saveFunctionDefinition(devModeState, fn.definition)
+        if (shouldAutoGenerateTypes) writeTypesFile(devModeState)
+        return fn
+      },
+      human: (definition: Parameters<typeof define.human>[0]) => {
+        const fn = define.human(definition)
+        registry.set(definition.name, fn as DefinedFunction)
+        saveFunctionDefinition(devModeState, fn.definition)
+        if (shouldAutoGenerateTypes) writeTypesFile(devModeState)
+        return fn
+      },
+    }
+  )
+
+  const base = {
+    functions: registry,
+    define: devDefine,
+    defineFunction,
+    preload: () => registry.preload(),
+    close: () => registry.close(),
+    devMode: devModeState,
+    regenerateTypes: () => writeTypesFile(devModeState),
+    registerSchema: (name: string, schema: DatabaseSchema) => {
+      saveSchema(devModeState, name, schema)
+      if (shouldAutoGenerateTypes) {
+        writeTypesFile(devModeState)
+      }
+    },
+  }
+
+  return new Proxy(base as DevAIProxy, {
+    get(target, prop: string) {
+      // Return built-in properties
+      if (prop in target) {
+        return (target as Record<string, unknown>)[prop]
+      }
+
+      // Skip internal properties
+      if (typeof prop === 'symbol' || prop.startsWith('_') || BUILTIN_METHODS.has(prop)) {
+        return undefined
+      }
+
+      // Return a function that auto-defines, persists, and calls
+      return async (args: Record<string, unknown> = {}) => {
+        // Check if function is already defined
+        let fn = registry.get(prop)
+        if (!fn) {
+          fn = await registry.getAsync(prop)
+        }
+
+        if (!fn) {
+          // Auto-define the function
+          fn = await define(prop, args)
+
+          // Persist to database
+          await registry.setAsync(prop, fn)
+
+          // Save to .ai/functions/ as MDX
+          saveFunctionDefinition(devModeState, fn.definition)
+
+          // Regenerate types
+          if (shouldAutoGenerateTypes) {
+            writeTypesFile(devModeState)
+          }
+        }
+
+        // Call the function
+        return fn.call(args)
+      }
+    },
+  })
+}
+
+/**
+ * Create the default AI instance based on environment
+ *
+ * - In development mode: Uses createDevAI with .ai folder and type generation
+ * - In production mode: Uses the default in-memory AI
+ *
+ * @example
+ * ```ts
+ * import { createAI } from 'mdxai'
+ *
+ * // Automatically picks dev or production mode
+ * const ai = await createAI()
+ *
+ * const result = await ai.summarize({ text: 'Article...' })
+ * ```
+ */
+export async function createAI(config?: DevAIConfig): Promise<AIProxy | DevAIProxy> {
+  if (isDevMode()) {
+    return createDevAI(config)
+  }
+  // In production, return the default AI proxy
+  return ai as unknown as AIProxy
 }

@@ -11,8 +11,9 @@
 export const name = 'mdxdb'
 
 // API Client for connecting to remote mdxdb servers
-export { ApiClient, createApiClient } from './client.js'
-export type { ApiClientConfig } from './client.js'
+// Re-exported from @mdxdb/api for backward compatibility
+export { ApiClient, createApiClient, createClient } from '@mdxdb/api'
+export type { ApiClientConfig, ClientConfig } from '@mdxdb/api'
 
 // DBClient adapter
 export { createDBClient, MemoryDBClient } from './db-client.js'
@@ -32,6 +33,16 @@ export type {
   Database,
   DatabaseConfig,
   CreateDatabase,
+  // View types (bi-directional relationship rendering/extraction)
+  ViewEntityItem,
+  ViewComponent,
+  ViewDocument,
+  ViewContext,
+  ViewRenderResult,
+  ViewRelationshipMutation,
+  ViewSyncResult,
+  ViewManager,
+  DatabaseWithViews,
 } from './types.js'
 
 // Re-export ai-database compatible types (from ai-database, breaking circular dep)

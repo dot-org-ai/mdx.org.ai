@@ -218,8 +218,8 @@ async function createLocalAIProvider(config: SDKProviderConfig): Promise<AIProvi
           body: JSON.stringify({ prompt, ...options }),
         })
         if (!response.ok) throw new Error(`AI generate failed: ${response.statusText}`)
-        const data = await response.json()
-        return data.text || data.result || ''
+        const data = await response.json() as Record<string, unknown>
+        return (data.text || data.result || '') as string
       },
       embed: async (text) => {
         const response = await fetch(`${rpcUrl}/ai/embed`, {
@@ -231,8 +231,8 @@ async function createLocalAIProvider(config: SDKProviderConfig): Promise<AIProvi
           body: JSON.stringify({ text }),
         })
         if (!response.ok) throw new Error(`AI embed failed: ${response.statusText}`)
-        const data = await response.json()
-        return data.embedding || data.result || []
+        const data = await response.json() as Record<string, unknown>
+        return (data.embedding || data.result || []) as number[]
       },
       chat: async (messages) => {
         const response = await fetch(`${rpcUrl}/ai/chat`, {
@@ -244,8 +244,8 @@ async function createLocalAIProvider(config: SDKProviderConfig): Promise<AIProvi
           body: JSON.stringify({ messages }),
         })
         if (!response.ok) throw new Error(`AI chat failed: ${response.statusText}`)
-        const data = await response.json()
-        return data.text || data.result || ''
+        const data = await response.json() as Record<string, unknown>
+        return (data.text || data.result || '') as string
       },
     }
   }
@@ -297,8 +297,8 @@ function createRPCClient(rpcUrl: string, token: string) {
         body: JSON.stringify({ method, args }),
       })
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}))
-        throw new Error(error.error || `RPC error: ${response.statusText}`)
+        const error = await response.json().catch(() => ({})) as Record<string, unknown>
+        throw new Error((error.error as string) || `RPC error: ${response.statusText}`)
       }
       return response.json()
     },
@@ -322,9 +322,9 @@ function createProxiedDBClient(rpc: ReturnType<typeof createRPCClient>, ns?: str
  */
 function createProxiedAIProvider(rpc: ReturnType<typeof createRPCClient>): AIProvider {
   return {
-    generate: (prompt, options) => rpc.call('ai.generate', prompt, options),
-    embed: (text) => rpc.call('ai.embed', text),
-    chat: (messages) => rpc.call('ai.chat', messages),
+    generate: (prompt, options) => rpc.call('ai.generate', prompt, options) as Promise<string>,
+    embed: (text) => rpc.call('ai.embed', text) as Promise<number[]>,
+    chat: (messages) => rpc.call('ai.chat', messages) as Promise<string>,
   }
 }
 
@@ -340,7 +340,7 @@ function createProxiedWorkflowProvider(rpc: ReturnType<typeof createRPCClient>):
   return {
     on: createProxy('on'),
     every: createProxy('every'),
-    send: (event, data) => rpc.call('send', event, data),
+    send: (event, data) => rpc.call('send', event, data) as Promise<void>,
   }
 }
 

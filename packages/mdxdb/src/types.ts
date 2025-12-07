@@ -626,3 +626,206 @@ export interface DBClientExtended<TData extends Record<string, unknown> = Record
   deleteArtifact(key: string): Promise<boolean>
   cleanExpiredArtifacts(): Promise<number>
 }
+
+// =============================================================================
+// View Types - For bi-directional relationship rendering/extraction
+// =============================================================================
+
+/**
+ * Entity item with standard fields
+ */
+export interface ViewEntityItem {
+  /** Entity ID (URL or slug) */
+  $id: string
+  /** Entity type */
+  $type?: string
+  /** Entity data fields */
+  [key: string]: unknown
+}
+
+/**
+ * View component definition
+ *
+ * Represents a component like <Tags /> or <Posts /> that can:
+ * 1. Render related entities to markdown
+ * 2. Extract changes from edited markdown back to structured data
+ */
+export interface ViewComponent {
+  /** Component name (e.g., 'Tags', 'Posts') */
+  name: string
+  /** Entity type this component renders (auto-inferred from name if not provided) */
+  entityType?: string
+  /** Relationship predicate (auto-inferred from schema if not provided) */
+  relationship?: string
+  /** Default columns to render (auto-detected from entity if not provided) */
+  columns?: string[]
+  /** Render format */
+  format?: 'table' | 'list' | 'cards'
+}
+
+/**
+ * A View document is a template that renders related entities
+ *
+ * e.g., [Posts].mdx renders all posts for a given context (like a Tag or Author)
+ *
+ * @example
+ * ```mdx
+ * ---
+ * $type: View
+ * entityType: Tag
+ * ---
+ *
+ * # {name}
+ *
+ * {description}
+ *
+ * ## Posts with this tag
+ *
+ * <Posts />
+ * ```
+ */
+export interface ViewDocument {
+  /** View template ID (e.g., '[Posts]' or 'views/TagPosts') */
+  id: string
+  /** Entity type this view is for (e.g., 'Tag') */
+  entityType: string
+  /** The template content with components like <Posts />, <Tags /> */
+  template: string
+  /** Components discovered in the template */
+  components: ViewComponent[]
+}
+
+/**
+ * Context for rendering a view
+ */
+export interface ViewContext {
+  /** The entity URL this view is being rendered for */
+  entityUrl: string
+  /** Optional filters to apply to related entities */
+  filters?: Record<string, unknown>
+}
+
+/**
+ * Result of rendering a view
+ */
+export interface ViewRenderResult {
+  /** The rendered markdown */
+  markdown: string
+  /** Entities that were rendered (for each component) */
+  entities: Record<string, ViewEntityItem[]>
+}
+
+/**
+ * Relationship mutation from view extraction
+ */
+export interface ViewRelationshipMutation {
+  /** Mutation type */
+  type: 'add' | 'remove' | 'update'
+  /** Relationship predicate (e.g., 'hasTags', 'hasAuthor') */
+  predicate: string
+  /** Source entity URL */
+  from: string
+  /** Target entity URL */
+  to: string
+  /** Entity data (for add/update) */
+  data?: Record<string, unknown>
+  /** Previous entity data (for update) */
+  previousData?: Record<string, unknown>
+}
+
+/**
+ * Result of syncing changes from an edited view
+ */
+export interface ViewSyncResult {
+  /** Relationship mutations to apply */
+  mutations: ViewRelationshipMutation[]
+  /** Entities that were created (new relationships to non-existent entities) */
+  created: ViewEntityItem[]
+  /** Entities that were updated */
+  updated: ViewEntityItem[]
+}
+
+/**
+ * View manager interface for rendering and syncing views
+ *
+ * Implementations should:
+ * 1. Auto-discover views from [Type].mdx files
+ * 2. Infer relationships from schema
+ * 3. Handle bi-directional sync when views are edited
+ */
+export interface ViewManager {
+  /**
+   * Discover available views
+   */
+  discoverViews(): Promise<ViewDocument[]>
+
+  /**
+   * Get a view by ID
+   */
+  getView(viewId: string): Promise<ViewDocument | null>
+
+  /**
+   * Render a view for a specific entity context
+   *
+   * @example
+   * ```ts
+   * // Render all posts for a specific tag
+   * const result = await views.render('[Posts]', {
+   *   entityUrl: 'https://example.com/Tag/javascript'
+   * })
+   * ```
+   */
+  render(viewId: string, context: ViewContext): Promise<ViewRenderResult>
+
+  /**
+   * Extract and sync changes from edited view markdown
+   *
+   * This is the key bi-directional operation:
+   * 1. Parse the edited markdown using the view template
+   * 2. Extract entity data from rendered components
+   * 3. Diff against current relationships
+   * 4. Return mutations to apply
+   *
+   * @example
+   * ```ts
+   * // User edited the rendered view, adding a new tag
+   * const result = await views.sync('[Posts]', {
+   *   entityUrl: 'https://example.com/Tag/javascript'
+   * }, editedMarkdown)
+   *
+   * // Apply mutations
+   * for (const mutation of result.mutations) {
+   *   if (mutation.type === 'add') {
+   *     await db.relate({ from: mutation.from, to: mutation.to, type: mutation.predicate })
+   *   }
+   * }
+   * ```
+   */
+  sync(viewId: string, context: ViewContext, editedMarkdown: string): Promise<ViewSyncResult>
+
+  /**
+   * Infer the relationship predicate for an entity component
+   *
+   * Uses schema information to determine relationships:
+   * - Post.tags -> 'hasTags' (Post -> Tag)
+   * - Tag -> Post -> 'taggedIn' (reverse of hasTags)
+   *
+   * @example
+   * ```ts
+   * const predicate = await views.inferRelationship('Tag', 'Posts')
+   * // Returns: { predicate: 'taggedIn', direction: 'reverse' }
+   * ```
+   */
+  inferRelationship(
+    contextType: string,
+    componentName: string
+  ): Promise<{ predicate: string; direction: 'forward' | 'reverse' } | null>
+}
+
+/**
+ * Extended Database interface with view support
+ */
+export interface DatabaseWithViews<TData extends MDXLDData = MDXLDData> extends Database<TData> {
+  /** View manager for rendering and syncing views */
+  views: ViewManager
+}

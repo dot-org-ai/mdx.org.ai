@@ -56,6 +56,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@mdxdb/api": "workspace:*",
     "@mdxld/extract": "workspace:*",
     "ai-database": "workspace:*",
     "oauth.do": "^0.1.4"
@@ -64,8 +65,6 @@
     "mdxld": "workspace:*"
   },
   "devDependencies": {
-    "@mdxdb/clickhouse": "workspace:*",
-    "@mdxdb/studio": "workspace:*",
     "@mdxui/editor": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
@@ -74,5 +73,11 @@
   },
   "optionalDependencies": {
     "@mdxdb/studio": "workspace:*"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/mdxdb"
+  },
+  "author": "MDX.org.ai"
 }

@@ -79,6 +79,4 @@ export type {
 export type {
   RPC,
   RPCPromise,
-  RPCServer,
-  RPCClient,
 } from 'ai-functions'

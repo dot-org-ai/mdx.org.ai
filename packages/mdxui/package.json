@@ -65,5 +65,11 @@
     "digital-products": {
       "optional": true
     }
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/mdxui"
+  },
+  "author": "MDX.org.ai"
 }
