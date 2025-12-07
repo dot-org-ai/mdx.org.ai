@@ -1,7 +1,7 @@
 {
   "name": "@mdxdb/api",
   "version": "0.0.0",
-  "description": "HTTP API server for mdxdb using Hono - works with any runtime",
+  "description": "HTTP API client for mdxdb - fetch-based REST client",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -11,11 +11,6 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    },
-    "./server": {
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
     }
   },
   "files": [
@@ -34,27 +29,26 @@
   "keywords": [
     "mdxdb",
     "api",
+    "client",
     "http",
     "rest",
-    "hono",
-    "adapter"
+    "fetch"
   ],
   "license": "MIT",
-  "dependencies": {
-    "hono": "^4.6.0"
-  },
   "peerDependencies": {
-    "mdxdb": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
-    "@mdxdb/fs": "workspace:*",
-    "@mdxdb/sqlite": "workspace:*",
-    "mdxdb": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxdb/api"
+  },
+  "author": "MDX.org.ai"
 }

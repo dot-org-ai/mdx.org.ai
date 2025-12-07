@@ -29,9 +29,12 @@
     "dev": "tsup --watch",
     "start": "node dist/cli.js",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:install": "playwright install chromium",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo"
+    "clean": "rm -rf dist .turbo playwright-report test-results"
   },
   "keywords": [
     "mdxdb",
@@ -54,9 +57,16 @@
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
+    "@playwright/test": "^1.57.0",
     "@types/node": "^22.0.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxdb/studio"
+  },
+  "author": "MDX.org.ai"
 }

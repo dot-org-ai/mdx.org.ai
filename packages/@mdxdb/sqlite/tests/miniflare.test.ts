@@ -5,12 +5,13 @@
  * These tests use real SQLite storage (not the in-memory mock).
  *
  * Note: These tests require the package to be built first (pnpm build).
- * If miniflare cannot initialize (e.g., module bundling issues), tests are skipped.
+ * The tests use the compiled dist/ output to ensure miniflare can load the module.
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { createMiniflareBinding, disposeMiniflare, MDXClient } from '../src/index.js'
-import type { DurableObjectNamespace, MDXDatabaseRPC } from '../src/types.js'
+import { createMiniflareBinding, disposeMiniflare } from '../dist/miniflare.js'
+import { MDXClient } from '../dist/client.js'
+import type { DurableObjectNamespace, MDXDatabaseRPC } from '../dist/types.js'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -18,47 +19,29 @@ import { rmSync } from 'node:fs'
 // Use a unique temp directory for each test run
 const TEST_PERSIST_PATH = join(tmpdir(), `mdxdb-test-${Date.now()}`)
 
-// Track if miniflare could be initialized
-let miniflareAvailable = false
-let initError: Error | null = null
-
-// Helper to skip tests if miniflare isn't available
-const testIf = (condition: boolean) => (condition ? it : it.skip)
-const describeIf = (condition: boolean) => (condition ? describe : describe.skip)
-
 describe('Miniflare SQLite Integration', () => {
   let binding: DurableObjectNamespace<MDXDatabaseRPC>
   let client: MDXClient
 
   beforeAll(async () => {
-    try {
-      binding = await createMiniflareBinding(TEST_PERSIST_PATH)
-      const id = binding.idFromName('test.miniflare.local')
-      const stub = binding.get(id)
-      client = new MDXClient(stub, 'test.miniflare.local')
-      miniflareAvailable = true
-    } catch (error) {
-      initError = error as Error
-      console.warn('Miniflare not available, skipping integration tests')
-      console.warn('Error:', (error as Error).message)
-      console.warn('Run "pnpm build" first if you need to test with miniflare')
-    }
+    binding = await createMiniflareBinding(TEST_PERSIST_PATH)
+    const id = binding.idFromName('test.miniflare.local')
+    const stub = binding.get(id)
+    client = new MDXClient(stub, 'test.miniflare.local')
   })
 
   afterAll(async () => {
-    if (miniflareAvailable) {
-      await disposeMiniflare()
-      // Clean up persist directory
-      try {
-        rmSync(TEST_PERSIST_PATH, { recursive: true, force: true })
-      } catch {
-        // Ignore cleanup errors
-      }
+    await disposeMiniflare()
+    // Clean up persist directory
+    try {
+      rmSync(TEST_PERSIST_PATH, { recursive: true, force: true })
+    } catch {
+      // Ignore cleanup errors
     }
   })
 
-  describeIf(miniflareAvailable)('Thing Operations', () => {
-    testIf(miniflareAvailable)('creates and retrieves a thing', async () => {
+  describe('Thing Operations', () => {
+    it('creates and retrieves a thing', async () => {
       const thing = await client.create({
         ns: 'test.miniflare.local',
         type: 'Post',
@@ -75,7 +58,7 @@ describe('Miniflare SQLite Integration', () => {
       expect(retrieved?.data.title).toBe('Hello World')
     })
 
-    testIf(miniflareAvailable)('lists things with filtering', async () => {
+    it('lists things with filtering', async () => {
       await client.upsert({
         ns: 'test.miniflare.local',
         type: 'User',
@@ -93,7 +76,7 @@ describe('Miniflare SQLite Integration', () => {
       expect(users.length).toBeGreaterThanOrEqual(2)
     })
 
-    testIf(miniflareAvailable)('lists with ordering', async () => {
+    it('lists with ordering', async () => {
       const asc = await client.list({ type: 'User', orderBy: 'id', order: 'asc' })
       const desc = await client.list({ type: 'User', orderBy: 'id', order: 'desc' })
 
@@ -101,7 +84,7 @@ describe('Miniflare SQLite Integration', () => {
       expect(desc[0]?.id).toBe('user-2')
     })
 
-    testIf(miniflareAvailable)('lists with offset and limit', async () => {
+    it('lists with offset and limit', async () => {
       const all = await client.list({ type: 'User', orderBy: 'id' })
       const offset = await client.list({ type: 'User', orderBy: 'id', offset: 1, limit: 1 })
 
@@ -109,7 +92,7 @@ describe('Miniflare SQLite Integration', () => {
       expect(offset[0]?.id).toBe(all[1]?.id)
     })
 
-    testIf(miniflareAvailable)('updates a thing', async () => {
+    it('updates a thing', async () => {
       const updated = await client.update('https://test.miniflare.local/User/user-1', {
         data: { name: 'Alice Updated', role: 'superadmin' },
       })
@@ -118,7 +101,7 @@ describe('Miniflare SQLite Integration', () => {
       expect(updated.data.role).toBe('superadmin')
     })
 
-    testIf(miniflareAvailable)('deletes a thing', async () => {
+    it('deletes a thing', async () => {
       await client.create({
         ns: 'test.miniflare.local',
         type: 'Temp',
@@ -134,8 +117,8 @@ describe('Miniflare SQLite Integration', () => {
     })
   })
 
-  describeIf(miniflareAvailable)('Relationship Operations', () => {
-    testIf(miniflareAvailable)('creates and queries relationships', async () => {
+  describe('Relationship Operations', () => {
+    it('creates and queries relationships', async () => {
       const author = await client.upsert({
         ns: 'test.miniflare.local',
         type: 'Author',
@@ -172,8 +155,8 @@ describe('Miniflare SQLite Integration', () => {
     })
   })
 
-  describeIf(miniflareAvailable)('Event Operations', () => {
-    testIf(miniflareAvailable)('tracks and queries events', async () => {
+  describe('Event Operations', () => {
+    it('tracks and queries events', async () => {
       const event = await client.track({
         type: 'test.event',
         source: 'miniflare-test',
@@ -188,8 +171,8 @@ describe('Miniflare SQLite Integration', () => {
     })
   })
 
-  describeIf(miniflareAvailable)('Action Operations', () => {
-    testIf(miniflareAvailable)('creates and manages actions', async () => {
+  describe('Action Operations', () => {
+    it('creates and manages actions', async () => {
       const action = await client.send({
         actor: 'user:test',
         object: 'thing:test',
@@ -206,8 +189,8 @@ describe('Miniflare SQLite Integration', () => {
     })
   })
 
-  describeIf(miniflareAvailable)('Artifact Operations', () => {
-    testIf(miniflareAvailable)('stores and retrieves artifacts', async () => {
+  describe('Artifact Operations', () => {
+    it('stores and retrieves artifacts', async () => {
       const artifact = await client.storeArtifact({
         key: 'test-artifact',
         type: 'json',
@@ -224,7 +207,7 @@ describe('Miniflare SQLite Integration', () => {
       expect(retrieved?.content).toEqual({ compiled: true })
     })
 
-    testIf(miniflareAvailable)('handles artifact expiration', async () => {
+    it('handles artifact expiration', async () => {
       const artifact = await client.storeArtifact({
         key: 'expiring-artifact',
         type: 'json',
@@ -244,8 +227,8 @@ describe('Miniflare SQLite Integration', () => {
     })
   })
 
-  describeIf(miniflareAvailable)('Search Operations', () => {
-    testIf(miniflareAvailable)('searches by text', async () => {
+  describe('Search Operations', () => {
+    it('searches by text', async () => {
       await client.upsert({
         ns: 'test.miniflare.local',
         type: 'Doc',

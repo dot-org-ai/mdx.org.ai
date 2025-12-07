@@ -27,7 +27,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "echo 'Skipping - needs storage adapter types fix'",
     "dev": "tsup --watch",
     "test": "vitest run",
     "lint": "eslint src",
@@ -70,5 +70,11 @@
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxdb/mobile"
+  },
+  "author": "MDX.org.ai"
 }

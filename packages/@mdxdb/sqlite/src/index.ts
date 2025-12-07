@@ -84,16 +84,11 @@ export { SyncManager, createSyncManager } from './sync.js'
 export type { SyncTarget, MutationType, MutationEvent, SyncResult } from './sync.js'
 
 // Types
+// Note: Cloudflare types (SqlStorageCursor, SqlStorage, DurableObjectState,
+// DurableObjectId, DurableObjectNamespace, DurableObjectStub) are provided
+// globally by @cloudflare/workers-types. They're not re-exported from here
+// to avoid issues with cloudflare:workers module resolution.
 export type {
-  // Cloudflare types
-  SqlStorageCursor,
-  SqlStorage,
-  DurableObjectStorage,
-  DurableObjectState,
-  DurableObjectId,
-  DurableObjectNamespace,
-  DurableObjectStub,
-
   // Entity types
   Thing,
   Relationship,

@@ -1,0 +1,54 @@
+{
+  "name": "@mdxdb/rpc",
+  "version": "0.0.0",
+  "description": "RPC client for mdxdb - supports HTTP and WebSocket transports via rpc.do",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxdb",
+    "rpc",
+    "client",
+    "websocket",
+    "http",
+    "rpc.do"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "mdxld": "workspace:*"
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "mdxld": "workspace:*",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxdb/rpc"
+  },
+  "author": "MDX.org.ai"
+}

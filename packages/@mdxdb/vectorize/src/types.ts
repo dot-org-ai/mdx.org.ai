@@ -270,6 +270,25 @@ export interface VectorizeEnv {
 }
 
 /**
+ * RPC Stub type for Workers RPC
+ * Methods can be called directly on the stub
+ */
+export interface VectorizeRPCStub extends VectorizeDatabaseRPC {
+  /**
+   * Create instance with specific namespace
+   */
+  withNamespace(namespace: string): VectorizeRPCStub
+}
+
+/**
+ * Service binding type for Workers RPC
+ * Can be either a fetch-based binding or a direct RPC stub
+ */
+export type VectorizeServiceBinding =
+  | { fetch(request: Request): Promise<Response> }
+  | VectorizeRPCStub
+
+/**
  * Configuration for Vectorize client
  */
 export interface VectorizeClientConfig {
@@ -279,16 +298,21 @@ export interface VectorizeClientConfig {
   namespace: string
 
   /**
-   * Worker URL for RPC calls
+   * Worker URL for HTTP-based RPC calls
    */
   workerUrl?: string
 
   /**
-   * Service binding for Worker-to-Worker RPC
+   * Service binding for Worker-to-Worker communication
+   * Can be either fetch-based or direct RPC stub
    */
-  binding?: {
-    fetch(request: Request): Promise<Response>
-  }
+  binding?: VectorizeServiceBinding
+
+  /**
+   * Direct RPC stub for Workers RPC
+   * When provided, methods are called directly without fetch
+   */
+  rpcStub?: VectorizeRPCStub
 
   /**
    * Embedding function for automatic embedding

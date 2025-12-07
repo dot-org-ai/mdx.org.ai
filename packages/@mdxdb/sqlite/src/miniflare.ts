@@ -19,10 +19,8 @@
  * @packageDocumentation
  */
 
+// DurableObjectNamespace, DurableObjectId, DurableObjectStub are global from @cloudflare/workers-types
 import type {
-  DurableObjectNamespace,
-  DurableObjectId,
-  DurableObjectStub,
   MDXDatabaseRPC,
   Thing,
   Artifact,
@@ -75,30 +73,37 @@ export async function createMiniflareBinding(
   const __dirname = dirname(__filename)
 
   // Check if we're running from source (src/) or dist
-  let doPath = join(__dirname, 'durable-object.js')
+  // Miniflare needs the bundled version (no code splitting)
+  let doPath = join(__dirname, 'durable-object.bundled.js')
   if (!existsSync(doPath)) {
     // Try dist directory (when running tests from src/)
-    const distPath = join(__dirname, '..', 'dist', 'durable-object.js')
+    const distPath = join(__dirname, '..', 'dist', 'durable-object.bundled.js')
     if (existsSync(distPath)) {
       doPath = distPath
     } else {
       throw new Error(
-        `Cannot find durable-object.js. Tried:\n  - ${doPath}\n  - ${distPath}\n` +
+        `Cannot find durable-object.bundled.js. Tried:\n  - ${doPath}\n  - ${distPath}\n` +
         `Run 'pnpm build' first if testing with miniflare.`
       )
     }
   }
 
   // Create miniflare instance with the actual module file
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Using type assertion because newer miniflare versions changed the script field to required
+  // but we're using scriptPath which is a valid alternative
   miniflareInstance = new MF({
     modules: true,
     scriptPath: doPath,
     durableObjects: {
-      MDXDB: 'MDXDatabase',
+      MDXDB: {
+        className: 'MDXDatabase',
+        // Enable SQLite for this DO class
+        useSQLite: true,
+      },
     },
     durableObjectsPersist: persistPath ?? '.mf/do',
-  } as MiniflareOptions) as unknown as Miniflare
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any) as unknown as Miniflare
 
   // Get the binding
   miniflareBinding = await miniflareInstance.getDurableObjectNamespace('MDXDB')
@@ -168,16 +173,18 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         if (options.orderBy) {
           const orderBy = options.orderBy as string
           result.sort((a: Record<string, unknown>, b: Record<string, unknown>) => {
-            let aVal: unknown
-            let bVal: unknown
+            let aVal: string | number | boolean | null | undefined
+            let bVal: string | number | boolean | null | undefined
             if (['url', 'ns', 'type', 'id', 'created_at', 'updated_at'].includes(orderBy)) {
-              aVal = a[orderBy]
-              bVal = b[orderBy]
+              aVal = a[orderBy] as string | number | boolean | null | undefined
+              bVal = b[orderBy] as string | number | boolean | null | undefined
             } else {
               // JSON field
-              aVal = (a.data as Record<string, unknown>)[orderBy]
-              bVal = (b.data as Record<string, unknown>)[orderBy]
+              aVal = (a.data as Record<string, unknown>)[orderBy] as string | number | boolean | null | undefined
+              bVal = (b.data as Record<string, unknown>)[orderBy] as string | number | boolean | null | undefined
             }
+            if (aVal === undefined || aVal === null) return 1
+            if (bVal === undefined || bVal === null) return -1
             if (aVal < bVal) return -1
             if (aVal > bVal) return 1
             return 0
@@ -207,7 +214,7 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         }))
       },
 
-      async get(url) {
+      async read(url) {
         const row = things.get(url)
         if (!row || row.deleted_at) return null
 
@@ -223,9 +230,9 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         }
       },
 
-      async getById(type, id) {
+      async readById(type, id) {
         const url = `https://${name}/${type}/${id}`
-        return instance.get(url)
+        return instance.read(url)
       },
 
       async create(options) {
@@ -302,7 +309,7 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         return instance.create({ ...options, id, url })
       },
 
-      async delete(url) {
+      async remove(url) {
         const deleted = things.delete(url)
         // Also delete relationships
         for (const [key, rel] of relationships) {
@@ -370,7 +377,7 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
 
         const result = []
         for (const u of [...new Set(urls)]) {
-          const thing = await instance.get(u)
+          const thing = await instance.read(u)
           if (thing) result.push(thing)
         }
         return result
@@ -402,12 +409,16 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         return result
       },
 
-      // Vector search (placeholder)
+      // Vector search (placeholder - requires Vectorize binding in production)
       async vectorSearch() {
         return []
       },
 
       async setEmbedding() {},
+
+      async upsertEmbeddings() {},
+
+      async deleteVectors() {},
 
       // Event operations
       async track(options) {

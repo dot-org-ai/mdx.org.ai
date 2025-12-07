@@ -34,11 +34,10 @@
  * @packageDocumentation
  */
 
+// DurableObjectNamespace and DurableObjectStub are global types from @cloudflare/workers-types
 import type {
   MDXClientConfig,
   MDXDatabaseRPC,
-  DurableObjectNamespace,
-  DurableObjectStub,
   Thing,
   Relationship,
   Event,
@@ -88,12 +87,22 @@ export class MDXClient implements MDXDatabaseRPC {
     return this.stub.list(options)
   }
 
+  // Interface methods (matching MDXDatabaseRPC)
+  async read(url: string): Promise<Thing | null> {
+    return this.stub.read(url)
+  }
+
+  async readById(type: string, id: string): Promise<Thing | null> {
+    return this.stub.readById(type, id)
+  }
+
+  // Backwards-compatible aliases
   async get(url: string): Promise<Thing | null> {
-    return this.stub.get(url)
+    return this.read(url)
   }
 
   async getById(type: string, id: string): Promise<Thing | null> {
-    return this.stub.getById(type, id)
+    return this.readById(type, id)
   }
 
   async create<TData = Record<string, unknown>>(options: CreateOptions<TData>): Promise<Thing<TData>> {
@@ -129,8 +138,14 @@ export class MDXClient implements MDXDatabaseRPC {
     return thing as Thing<TData>
   }
 
+  // Interface method (matching MDXDatabaseRPC)
+  async remove(url: string): Promise<boolean> {
+    return this.stub.remove(url)
+  }
+
+  // Backwards-compatible alias
   async delete(url: string): Promise<boolean> {
-    return this.stub.delete(url)
+    return this.remove(url)
   }
 
   async search(options: SearchOptions): Promise<Thing[]> {
@@ -182,16 +197,34 @@ export class MDXClient implements MDXDatabaseRPC {
   // ===========================================================================
 
   async vectorSearch(options: VectorSearchOptions): Promise<VectorSearchResult[]> {
-    if (!this.embedFn) {
-      throw new Error('No embedding function configured')
+    // If embedding is provided directly, use it
+    if (options.embedding) {
+      return this.stub.vectorSearch(options)
     }
 
-    const embedding = await this.embedFn(options.query)
-    return this.vectorSearchWithEmbedding(embedding, options)
+    // If query is provided and we have an embed function, generate embedding
+    if (options.query && this.embedFn) {
+      const embedding = await this.embedFn(options.query)
+      return this.stub.vectorSearch({ ...options, embedding })
+    }
+
+    // No embedding and no query - delegate to stub (will return empty or error)
+    return this.stub.vectorSearch(options)
   }
 
   async setEmbedding(thingUrl: string, chunkIndex: number, embedding: number[]): Promise<void> {
     return this.stub.setEmbedding(thingUrl, chunkIndex, embedding)
+  }
+
+  async upsertEmbeddings(
+    thingUrl: string,
+    embeddings: Array<{ chunkIndex: number; embedding: number[] }>
+  ): Promise<void> {
+    return this.stub.upsertEmbeddings(thingUrl, embeddings)
+  }
+
+  async deleteVectors(thingUrl: string): Promise<void> {
+    return this.stub.deleteVectors(thingUrl)
   }
 
   /**

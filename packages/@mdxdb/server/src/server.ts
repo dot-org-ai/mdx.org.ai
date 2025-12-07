@@ -1,5 +1,5 @@
 /**
- * @mdxdb/api Server Implementation
+ * @mdxdb/server Implementation
  *
  * Hono-based REST API server for mdxdb
  *
@@ -10,19 +10,19 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import type { MDXLDData, MDXLDDocument } from 'mdxld'
 import type { Database } from 'mdxdb'
-import type { ApiServerConfig, ApiResponse, ListQuery, SearchQuery, SetBody, DeleteQuery } from './types.js'
+import type { ServerConfig, ApiResponse, ListQuery, SearchQuery, SetBody, DeleteQuery } from './types.js'
 
 /**
  * Create a Hono app that exposes a Database as a REST API
  *
  * @example
  * ```ts
- * import { createApiServer } from '@mdxdb/api'
- * import { createSqliteDatabase } from '@mdxdb/sqlite'
+ * import { createServer } from '@mdxdb/server'
+ * import { createFsDatabase } from '@mdxdb/fs'
  * import { serve } from '@hono/node-server'
  *
- * const db = createSqliteDatabase({ filename: './data.db' })
- * const app = createApiServer({ database: db })
+ * const db = createFsDatabase({ root: './content' })
+ * const app = createServer({ database: db })
  *
  * serve({ fetch: app.fetch, port: 3000 })
  * ```
@@ -35,7 +35,7 @@ import type { ApiServerConfig, ApiResponse, ListQuery, SearchQuery, SetBody, Del
  * - `PUT /api/mdxdb/:id` - Create/update document
  * - `DELETE /api/mdxdb/:id` - Delete document
  */
-export function createApiServer<TData extends MDXLDData = MDXLDData>(config: ApiServerConfig<TData>) {
+export function createServer<TData extends MDXLDData = MDXLDData>(config: ServerConfig<TData>) {
   const { database, basePath = '/api/mdxdb', cors: enableCors = true, apiKey } = config
 
   const app = new Hono()
@@ -55,7 +55,7 @@ export function createApiServer<TData extends MDXLDData = MDXLDData>(config: Api
         return c.json({ success: false, error: 'Unauthorized' } satisfies ApiResponse, 401)
       }
 
-      await next()
+      return next()
     })
   }
 
@@ -225,6 +225,16 @@ export function createApiServer<TData extends MDXLDData = MDXLDData>(config: Api
 }
 
 /**
- * Type for the Hono app returned by createApiServer
+ * @deprecated Use createServer instead
  */
-export type ApiServer = ReturnType<typeof createApiServer>
+export const createApiServer = createServer
+
+/**
+ * Type for the Hono app returned by createServer
+ */
+export type Server = ReturnType<typeof createServer>
+
+/**
+ * @deprecated Use Server instead
+ */
+export type ApiServer = Server

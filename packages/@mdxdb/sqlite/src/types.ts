@@ -9,72 +9,14 @@
  */
 
 // =============================================================================
-// Cloudflare Durable Objects Types
+// Cloudflare Types
+// These types are provided globally by @cloudflare/workers-types
 // =============================================================================
 
-/**
- * SqlStorageCursor from Cloudflare Durable Objects
- */
-export interface SqlStorageCursor<T = Record<string, unknown>> extends Iterable<T> {
-  next(): IteratorResult<T>
-  toArray(): T[]
-  one(): T
-  raw(): Iterable<unknown[]> & { toArray(): unknown[][] }
-  readonly columnNames: string[]
-  readonly rowsRead: number
-  readonly rowsWritten: number
-}
-
-/**
- * SqlStorage interface from Durable Objects
- */
-export interface SqlStorage {
-  exec<T = Record<string, unknown>>(query: string, ...bindings: unknown[]): SqlStorageCursor<T>
-  readonly databaseSize: number
-}
-
-/**
- * DurableObjectStorage with SQL support
- */
-export interface DurableObjectStorage {
-  sql: SqlStorage
-  transactionSync<T>(fn: () => T): T
-}
-
-/**
- * DurableObjectState from Cloudflare
- */
-export interface DurableObjectState {
-  storage: DurableObjectStorage
-  id: DurableObjectId
-  waitUntil(promise: Promise<unknown>): void
-}
-
-/**
- * DurableObjectId
- */
-export interface DurableObjectId {
-  toString(): string
-  name?: string
-}
-
-/**
- * DurableObjectNamespace for creating/accessing Durable Objects
- */
-export interface DurableObjectNamespace<T = unknown> {
-  idFromName(name: string): DurableObjectId
-  idFromString(id: string): DurableObjectId
-  newUniqueId(): DurableObjectId
-  get(id: DurableObjectId): DurableObjectStub<T>
-}
-
-/**
- * DurableObjectStub with RPC - methods are called directly
- */
-export type DurableObjectStub<T> = T & {
-  id: DurableObjectId
-  name?: string
-}
+// NOTE: DurableObjectState, DurableObjectId, DurableObjectNamespace,
+// DurableObjectStub, SqlStorage, SqlStorageCursor are all available
+// globally when @cloudflare/workers-types is included in tsconfig.
+// We don't re-export them to avoid issues with cloudflare:workers module.
 
 // =============================================================================
 // MDXDatabase RPC Interface
@@ -280,12 +222,22 @@ export interface ActionQueryOptions {
 
 /**
  * Vector search options
+ *
+ * For local SQLite search, provide `embedding` directly.
+ * For Cloudflare Vectorize, provide `query` and the embedding will be generated.
  */
 export interface VectorSearchOptions {
-  query: string
+  /** Text query (requires external embedding service) */
+  query?: string
+  /** Pre-computed embedding vector */
+  embedding?: number[]
+  /** Maximum results to return */
   limit?: number
+  /** Minimum similarity score (0-1) */
   minScore?: number
+  /** Filter by thing type */
   type?: string
+  /** Filter to specific thing URLs */
   thingUrls?: string[]
 }
 
@@ -306,12 +258,14 @@ export interface VectorSearchResult {
 export interface MDXDatabaseRPC {
   // Thing operations
   list(options?: QueryOptions): Promise<Thing[]>
-  get(url: string): Promise<Thing | null>
-  getById(type: string, id: string): Promise<Thing | null>
+  // Note: Using 'read' instead of 'get' to avoid conflict with DurableObjectNamespace.get()
+  read(url: string): Promise<Thing | null>
+  readById(type: string, id: string): Promise<Thing | null>
   create(options: CreateOptions): Promise<Thing>
   update(url: string, options: UpdateOptions): Promise<Thing>
   upsert(options: CreateOptions): Promise<Thing>
-  delete(url: string): Promise<boolean>
+  // Note: Using 'remove' instead of 'delete' to avoid conflict with reserved names
+  remove(url: string): Promise<boolean>
   search(options: SearchOptions): Promise<Thing[]>
 
   // Relationship operations
@@ -320,9 +274,11 @@ export interface MDXDatabaseRPC {
   related(url: string, type?: string, direction?: 'from' | 'to' | 'both'): Promise<Thing[]>
   relationships(url: string, type?: string, direction?: 'from' | 'to' | 'both'): Promise<Relationship[]>
 
-  // Vector search
+  // Vector search (uses Cloudflare Vectorize via RPC)
   vectorSearch(options: VectorSearchOptions): Promise<VectorSearchResult[]>
   setEmbedding(thingUrl: string, chunkIndex: number, embedding: number[]): Promise<void>
+  upsertEmbeddings(thingUrl: string, embeddings: Array<{ chunkIndex: number; embedding: number[] }>): Promise<void>
+  deleteVectors(thingUrl: string): Promise<void>
 
   // Event operations
   track(options: CreateEventOptions): Promise<Event>
@@ -352,6 +308,89 @@ export interface MDXDatabaseRPC {
 }
 
 // =============================================================================
+// Vectorize RPC Types (for integration with @mdxdb/vectorize)
+// =============================================================================
+
+/**
+ * Vectorize RPC interface - methods callable on the Vectorize worker
+ * This matches the VectorizeDatabaseRPC from @mdxdb/vectorize
+ */
+export interface VectorizeRPC {
+  /**
+   * Upsert vectors for a thing's chunks
+   */
+  upsert(vectors: VectorizeUpsertOptions[]): Promise<{ count: number }>
+
+  /**
+   * Search for similar vectors
+   */
+  search(options: VectorizeSearchOptions): Promise<VectorSearchResult[]>
+
+  /**
+   * Delete vectors for things
+   */
+  delete(options: { thingUrls: string[] }): Promise<{ count: number }>
+
+  /**
+   * Get vectors by thing URL
+   */
+  getByThingUrl(thingUrl: string): Promise<VectorSearchResult[]>
+
+  /**
+   * Get index info
+   */
+  describe(): Promise<VectorizeIndexDetails>
+
+  /**
+   * Get namespace
+   */
+  getNamespace(): string
+
+  /**
+   * Create instance with specific namespace
+   */
+  withNamespace(namespace: string): VectorizeRPC
+}
+
+/**
+ * Vectorize upsert options
+ */
+export interface VectorizeUpsertOptions {
+  thingUrl: string
+  chunkIndex: number
+  embedding: number[]
+  content: string
+  type?: string
+  metadata?: Record<string, string | number | boolean>
+}
+
+/**
+ * Vectorize search options (subset of VectorSearchOptions for RPC)
+ */
+export interface VectorizeSearchOptions {
+  embedding: number[]
+  topK?: number
+  type?: string
+  thingUrls?: string[]
+  minScore?: number
+  namespace?: string
+}
+
+/**
+ * Vectorize index details
+ */
+export interface VectorizeIndexDetails {
+  name: string
+  dimensions: number
+  metric: 'cosine' | 'euclidean' | 'dot-product'
+  vectorCount: number
+  config: {
+    dimensions: number
+    metric: 'cosine' | 'euclidean' | 'dot-product'
+  }
+}
+
+// =============================================================================
 // Environment Bindings
 // =============================================================================
 
@@ -359,7 +398,15 @@ export interface MDXDatabaseRPC {
  * Environment with MDXDatabase Durable Object binding
  */
 export interface Env {
+  /** MDXDatabase Durable Object namespace */
   MDXDB: DurableObjectNamespace<MDXDatabaseRPC>
+
+  /**
+   * Optional Vectorize RPC binding for vector search
+   * This is a service binding to a Vectorize worker deployed via Workers for Platforms
+   * Methods can be called directly via Workers RPC
+   */
+  VECTORIZE?: VectorizeRPC
 }
 
 // =============================================================================
@@ -382,7 +429,14 @@ export interface MDXClientConfig {
   binding?: DurableObjectNamespace<MDXDatabaseRPC>
 
   /**
+   * Vectorize RPC binding for vector search
+   * When provided, vector operations are delegated to Cloudflare Vectorize
+   */
+  vectorize?: VectorizeRPC
+
+  /**
    * Embedding function for vector search (client-side)
+   * Used to generate embeddings before sending to Vectorize
    */
   embedFn?: (text: string) => Promise<number[]>
 

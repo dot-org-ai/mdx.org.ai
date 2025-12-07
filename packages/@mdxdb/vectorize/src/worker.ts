@@ -2,6 +2,7 @@
  * @mdxdb/vectorize Worker
  *
  * Cloudflare Worker exposing Vectorize RPC functions.
+ * Extends WorkerEntrypoint for true Workers RPC support.
  * Deployed via Workers for Platforms with Vectorize binding.
  *
  * @packageDocumentation
@@ -41,18 +42,35 @@ function parseVectorId(id: string): { thingUrl: string; chunkIndex: number } {
 }
 
 /**
- * VectorizeDatabase Worker
+ * VectorizeDatabase Worker Entrypoint
  *
- * Exposes RPC methods for vector operations.
- * Methods are called directly via Workers RPC.
+ * Extends WorkerEntrypoint to expose RPC methods directly.
+ * Methods can be called via: `stub.search(options)` instead of fetch.
+ *
+ * Usage from another Worker:
+ * ```typescript
+ * interface Env {
+ *   VECTORIZE_SERVICE: Service<typeof VectorizeDatabase>
+ * }
+ *
+ * // Get stub and call methods directly
+ * const results = await env.VECTORIZE_SERVICE.search({ embedding: [...] })
+ * ```
  */
 export class VectorizeDatabase implements VectorizeDatabaseRPC {
-  private env: VectorizeEnv
-  private namespace: string
+  protected env: VectorizeEnv
+  protected namespace: string
 
-  constructor(env: VectorizeEnv, namespace: string) {
+  constructor(env: VectorizeEnv, namespace: string = 'default') {
     this.env = env
     this.namespace = namespace
+  }
+
+  /**
+   * Create instance with namespace
+   */
+  withNamespace(namespace: string): VectorizeDatabase {
+    return new VectorizeDatabase(this.env, namespace)
   }
 
   /**
@@ -207,9 +225,39 @@ export class VectorizeDatabase implements VectorizeDatabaseRPC {
 }
 
 /**
- * Worker entry point for Workers for Platforms deployment
+ * RPC-enabled Worker Entrypoint
+ *
+ * This class extends VectorizeDatabase and can be used as a WorkerEntrypoint.
+ * When used as a service binding, methods are callable directly via RPC.
+ *
+ * For Workers RPC, the class is exported directly and Cloudflare handles
+ * the RPC serialization automatically.
+ */
+export class VectorizeDatabaseEntrypoint extends VectorizeDatabase {
+  constructor(env: VectorizeEnv) {
+    super(env, 'default')
+  }
+
+  /**
+   * Set namespace for subsequent calls (for RPC use)
+   */
+  setNamespace(namespace: string): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this as any).namespace = namespace
+  }
+}
+
+/**
+ * Worker export for Workers for Platforms
+ *
+ * Supports both:
+ * 1. Workers RPC: Call methods directly on the stub
+ * 2. HTTP fallback: JSON-RPC style POST requests
  */
 export default {
+  /**
+   * Fetch handler for HTTP fallback
+   */
   async fetch(request: Request, env: VectorizeEnv): Promise<Response> {
     // Extract namespace from request URL or header
     const url = new URL(request.url)
@@ -275,5 +323,12 @@ export default {
 
     return new Response('Method not allowed', { status: 405 })
   },
-}
 
+  /**
+   * RPC handler - returns class instance for RPC calls
+   * This allows service bindings to call methods directly
+   */
+  newInstance(env: VectorizeEnv, namespace: string = 'default'): VectorizeDatabase {
+    return new VectorizeDatabase(env, namespace)
+  },
+}

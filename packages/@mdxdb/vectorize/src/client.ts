@@ -15,26 +15,51 @@ import type {
   VectorSearchResult,
   DeleteVectorsOptions,
   VectorizeIndexDetails,
+  VectorizeRPCStub,
 } from './types.js'
+
+/**
+ * Check if binding is an RPC stub (has direct methods)
+ */
+function isRPCStub(binding: unknown): binding is VectorizeRPCStub {
+  return (
+    binding !== null &&
+    typeof binding === 'object' &&
+    'search' in binding &&
+    typeof (binding as VectorizeRPCStub).search === 'function'
+  )
+}
 
 /**
  * VectorizeClient
  *
- * Client for calling Vectorize worker via HTTP or service binding.
+ * Client for calling Vectorize worker.
+ * Supports three modes:
+ * 1. Direct RPC stub - methods called directly on the stub
+ * 2. Service binding with fetch - JSON-RPC over HTTP
+ * 3. Worker URL - JSON-RPC over HTTP
  */
 export class VectorizeClient implements VectorizeDatabaseRPC {
   private config: VectorizeClientConfig
   private embedFn?: (text: string) => Promise<number[]>
+  private rpcStub?: VectorizeRPCStub
 
   constructor(config: VectorizeClientConfig) {
     this.config = config
     this.embedFn = config.embedFn
+
+    // Check if we have a direct RPC stub
+    if (config.rpcStub) {
+      this.rpcStub = config.rpcStub.withNamespace(config.namespace)
+    } else if (config.binding && isRPCStub(config.binding)) {
+      this.rpcStub = config.binding.withNamespace(config.namespace)
+    }
   }
 
   /**
-   * Make RPC call to worker
+   * Make RPC call to worker via fetch (fallback)
    */
-  private async rpc<T>(method: string, params: unknown[]): Promise<T> {
+  private async fetchRpc<T>(method: string, params: unknown[]): Promise<T> {
     const body = JSON.stringify({ method, params })
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -43,9 +68,10 @@ export class VectorizeClient implements VectorizeDatabaseRPC {
 
     let response: Response
 
-    if (this.config.binding) {
-      // Use service binding (Worker-to-Worker)
-      response = await this.config.binding.fetch(
+    if (this.config.binding && 'fetch' in this.config.binding) {
+      // Use service binding (Worker-to-Worker) with fetch
+      const binding = this.config.binding as { fetch(request: Request): Promise<Response> }
+      response = await binding.fetch(
         new Request(`https://vectorize.internal/?namespace=${this.config.namespace}`, {
           method: 'POST',
           headers,
@@ -83,7 +109,11 @@ export class VectorizeClient implements VectorizeDatabaseRPC {
    * Upsert vectors
    */
   async upsert(vectors: UpsertVectorOptions[]): Promise<{ count: number }> {
-    return this.rpc('upsert', [vectors])
+    // Use direct RPC if available
+    if (this.rpcStub) {
+      return this.rpcStub.upsert(vectors)
+    }
+    return this.fetchRpc('upsert', [vectors])
   }
 
   /**
@@ -120,7 +150,11 @@ export class VectorizeClient implements VectorizeDatabaseRPC {
    * Search for similar vectors
    */
   async search(options: VectorSearchOptions): Promise<VectorSearchResult[]> {
-    return this.rpc('search', [options])
+    // Use direct RPC if available
+    if (this.rpcStub) {
+      return this.rpcStub.search(options)
+    }
+    return this.fetchRpc('search', [options])
   }
 
   /**
@@ -142,28 +176,48 @@ export class VectorizeClient implements VectorizeDatabaseRPC {
    * Delete vectors for things
    */
   async delete(options: DeleteVectorsOptions): Promise<{ count: number }> {
-    return this.rpc('delete', [options])
+    // Use direct RPC if available
+    if (this.rpcStub) {
+      return this.rpcStub.delete(options)
+    }
+    return this.fetchRpc('delete', [options])
   }
 
   /**
    * Get vectors by thing URL
    */
   async getByThingUrl(thingUrl: string): Promise<VectorSearchResult[]> {
-    return this.rpc('getByThingUrl', [thingUrl])
+    // Use direct RPC if available
+    if (this.rpcStub) {
+      return this.rpcStub.getByThingUrl(thingUrl)
+    }
+    return this.fetchRpc('getByThingUrl', [thingUrl])
   }
 
   /**
    * Get index info
    */
   async describe(): Promise<VectorizeIndexDetails> {
-    return this.rpc('describe', [])
+    // Use direct RPC if available
+    if (this.rpcStub) {
+      return this.rpcStub.describe()
+    }
+    return this.fetchRpc('describe', [])
   }
 
   /**
    * Get namespace
    */
   getNamespace(): string {
+    // This is synchronous, just return config namespace
     return this.config.namespace
+  }
+
+  /**
+   * Check if using direct RPC
+   */
+  isUsingRPC(): boolean {
+    return this.rpcStub !== undefined
   }
 
   /**

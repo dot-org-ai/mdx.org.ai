@@ -407,6 +407,119 @@ for (const [path, change] of Object.entries(changes.modified)) {
 await db.updateFromRendered('posts/draft', improved)
 ```
 
+## View Manager for Relationship Rendering
+
+The `FsViewManager` enables bi-directional rendering and extraction of entity relationships. Views are templates like `[Posts].mdx` that render related entities as tables.
+
+### Basic Usage
+
+```typescript
+import { createFsViewManager, createFsProvider } from '@mdxdb/fs'
+
+const config = { root: './content' }
+const provider = createFsProvider(config)
+const views = createFsViewManager(config, provider)
+
+// Discover available views
+const availableViews = await views.discoverViews()
+// [{ id: '[Posts]', entityType: 'Post', template: '...', components: [...] }]
+
+// Render a view for an entity
+const { markdown, entities } = await views.render('[Tag]', {
+  entityUrl: 'https://localhost/Tag/javascript'
+})
+// markdown: "# JavaScript\n\n## Posts\n| title | date |\n|---|---|\n| Hello | 2024-01-01 |"
+// entities: { Posts: [{ $id: 'hello', title: 'Hello', date: '2024-01-01' }] }
+```
+
+### View File Format
+
+View files use `[Type].mdx` naming convention:
+
+```mdx
+<!-- content/[Tag].mdx -->
+---
+$type: View
+entityType: Tag
+---
+
+# {name}
+
+{description}
+
+## Posts with this tag
+
+<Posts />
+```
+
+**Component syntax:**
+
+```tsx
+// Auto-infer columns from entity data
+<Posts />
+
+// Override columns
+<Posts columns={['title', 'date', 'author']} />
+
+// Filter related entities
+<Posts published={true} />
+
+// List format instead of table
+<Authors format="list" />
+```
+
+### Syncing Edits Back
+
+When markdown is edited, extract changes back to relationship mutations:
+
+```typescript
+// User edits the rendered markdown (adds a new post row)
+const editedMarkdown = `# JavaScript
+
+## Posts with this tag
+| title | date |
+|---|---|
+| Hello | 2024-01-01 |
+| New Post | 2024-01-15 |
+`
+
+// Sync changes back
+const { mutations, created, updated } = await views.sync('[Tag]', {
+  entityUrl: 'https://localhost/Tag/javascript'
+}, editedMarkdown)
+
+// mutations: [{ type: 'add', predicate: 'posts', from: '...Tag/javascript', to: '...Post/new-post' }]
+// created: [{ $id: 'new-post', $type: 'Post', title: 'New Post', date: '2024-01-15' }]
+```
+
+### Relationship Inference
+
+Relationships are auto-inferred from context and component names:
+
+```typescript
+// Get inferred relationship
+const rel = await views.inferRelationship('Tag', 'Posts')
+// { predicate: 'posts', direction: 'reverse' }
+
+// Context: Tag, Component: Posts → reverse of "Post has tags"
+// Context: Post, Component: Tags → forward "Post has tags"
+```
+
+### ViewManager Interface
+
+```typescript
+interface ViewManager {
+  discoverViews(): Promise<ViewDocument[]>
+  getView(viewId: string): Promise<ViewDocument | null>
+  render(viewId: string, context: ViewContext): Promise<ViewRenderResult>
+  sync(viewId: string, context: ViewContext, editedMarkdown: string): Promise<ViewSyncResult>
+  inferRelationship(contextType: string, componentName: string): Promise<{
+    predicate: string
+    direction: 'forward' | 'reverse'
+  } | null>
+}
+```
+
 ## File Structure
 
 Documents are stored as MDX files with YAML frontmatter:

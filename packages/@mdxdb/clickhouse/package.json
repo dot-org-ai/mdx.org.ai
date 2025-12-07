@@ -67,7 +67,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "ai-database": "workspace:^"
+    "ai-database": "workspace:^",
+    "mdxdb": "workspace:^",
+    "@mdxld/extract": "workspace:^"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
@@ -76,5 +78,11 @@
     "typescript": "^5.7.2",
     "vitest": "^2.1.8",
     "wrangler": "^3.93.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxdb/clickhouse"
+  },
+  "author": "MDX.org.ai"
 }

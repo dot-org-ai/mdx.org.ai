@@ -44,3 +44,33 @@ export type {
 
 // Re-export extraction functions
 export { extract, diff, applyExtract, validateTemplate, roundTripComponent } from '@mdxld/extract'
+
+// View manager for bi-directional relationship rendering/extraction
+export { FsViewManager, createFsViewManager } from './views.js'
+
+// Re-export view types
+export type {
+  ViewManager,
+  ViewDocument,
+  ViewComponent,
+  ViewContext,
+  ViewRenderResult,
+  ViewSyncResult,
+  ViewEntityItem,
+  ViewRelationshipMutation,
+  DatabaseWithViews,
+} from 'mdxdb'
+
+// Re-export entity component utilities
+export {
+  createEntityComponent,
+  getEntityComponent,
+  createEntityExtractors,
+  renderMarkdownTable,
+  renderMarkdownList,
+  diffEntities,
+  type EntityItem,
+  type EntityComponentProps,
+  type ExtractedEntities,
+  type RelationshipChange,
+} from '@mdxld/extract'

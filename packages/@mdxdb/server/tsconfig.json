@@ -1,0 +1,9 @@
+{
+  "extends": "@mdxld/config/typescript/library.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}

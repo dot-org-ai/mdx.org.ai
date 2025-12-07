@@ -53,7 +53,7 @@ import {
   SEARCH_COLUMNS,
   SEARCH_INDEXES,
   CHUNK_CONFIG,
-} from '../schema'
+} from '../src/schema'
 
 // =============================================================================
 // Schema Version Tests

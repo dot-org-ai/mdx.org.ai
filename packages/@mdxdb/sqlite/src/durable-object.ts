@@ -23,9 +23,10 @@
  * @packageDocumentation
  */
 
+import { DurableObject } from 'cloudflare:workers'
+
+// DurableObjectState and SqlStorage are global types from @cloudflare/workers-types
 import type {
-  DurableObjectState,
-  SqlStorage,
   Thing,
   Relationship,
   Event,
@@ -43,6 +44,8 @@ import type {
   ActionQueryOptions,
   VectorSearchOptions,
   VectorSearchResult,
+  VectorizeRPC,
+  VectorizeUpsertOptions,
   ThingRow,
   RelationshipRow,
   SearchRow,
@@ -54,7 +57,7 @@ import type {
   Env,
 } from './types.js'
 
-import { getAllSchemaStatements } from '../schema/index.js'
+import { getAllSchemaStatements } from './schema/index.js'
 
 // =============================================================================
 // Utilities
@@ -135,19 +138,6 @@ function chunkContent(content: string, size = 1000, overlap = 200): Chunk[] {
   return chunks
 }
 
-function cosineSimilarity(a: number[], b: number[]): number {
-  if (a.length !== b.length) return 0
-  let dotProduct = 0
-  let normA = 0
-  let normB = 0
-  for (let i = 0; i < a.length; i++) {
-    dotProduct += a[i]! * b[i]!
-    normA += a[i]! * a[i]!
-    normB += b[i]! * b[i]!
-  }
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB))
-}
-
 // =============================================================================
 // MDXDatabase Durable Object
 // =============================================================================
@@ -158,21 +148,30 @@ function cosineSimilarity(a: number[], b: number[]): number {
  * Each instance represents a namespace with its own SQLite database.
  * All public methods are exposed via Workers RPC.
  */
-export class MDXDatabase {
+export class MDXDatabase extends DurableObject<Env> {
   private sql: SqlStorage
   private namespace: string
   private initialized = false
+  private vectorize?: VectorizeRPC
+  private doCtx: DurableObjectState
 
-  constructor(private ctx: DurableObjectState, private env: Env) {
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env)
+    this.doCtx = ctx
     this.sql = ctx.storage.sql
     this.namespace = ctx.id.name ?? ctx.id.toString()
+
+    // Get Vectorize binding if available, scoped to this namespace
+    if (env.VECTORIZE) {
+      this.vectorize = env.VECTORIZE.withNamespace(this.namespace)
+    }
   }
 
   private ensureInitialized(): void {
     if (this.initialized) return
 
     // Run schema in a transaction
-    this.ctx.storage.transactionSync(() => {
+    this.doCtx.storage.transactionSync(() => {
       // Execute each schema statement from the schema module
       const statements = getAllSchemaStatements()
       for (const stmt of statements) {
@@ -231,10 +230,10 @@ export class MDXDatabase {
     }
 
     const cursor = this.sql.exec<ThingRow>(sql, ...bindings)
-    return cursor.toArray().map(row => this.rowToThing(row))
+    return cursor.toArray().map((row: ThingRow) => this.rowToThing(row))
   }
 
-  async get(url: string): Promise<Thing | null> {
+  async read(url: string): Promise<Thing | null> {
     this.ensureInitialized()
 
     const cursor = this.sql.exec<ThingRow>(
@@ -246,8 +245,8 @@ export class MDXDatabase {
     return this.rowToThing(rows[0]!)
   }
 
-  async getById(type: string, id: string): Promise<Thing | null> {
-    return this.get(buildUrl(this.namespace, type, id))
+  async readById(type: string, id: string): Promise<Thing | null> {
+    return this.read(buildUrl(this.namespace, type, id))
   }
 
   async create<TData = Record<string, unknown>>(options: CreateOptions<TData>): Promise<Thing<TData>> {
@@ -258,7 +257,7 @@ export class MDXDatabase {
     const now = new Date().toISOString()
 
     // Check if exists
-    const existing = await this.get(url)
+    const existing = await this.read(url)
     if (existing) {
       throw new Error(`Thing already exists: ${url}`)
     }
@@ -299,7 +298,7 @@ export class MDXDatabase {
   ): Promise<Thing<TData>> {
     this.ensureInitialized()
 
-    const existing = await this.get(url)
+    const existing = await this.read(url)
     if (!existing) {
       throw new Error(`Thing not found: ${url}`)
     }
@@ -331,7 +330,7 @@ export class MDXDatabase {
     const id = options.id ?? generateId()
     const url = options.url ?? buildUrl(options.ns, options.type, id)
 
-    const existing = await this.get(url)
+    const existing = await this.read(url)
     if (existing) {
       return this.update<TData>(url, { data: options.data, content: options.content })
     }
@@ -339,8 +338,11 @@ export class MDXDatabase {
     return this.create({ ...options, id, url })
   }
 
-  async delete(url: string): Promise<boolean> {
+  async remove(url: string): Promise<boolean> {
     this.ensureInitialized()
+
+    // Delete vectors from Vectorize
+    await this.deleteVectors(url)
 
     // Delete search chunks
     this.sql.exec('DELETE FROM search WHERE thing_url = ?', url)
@@ -432,7 +434,7 @@ export class MDXDatabase {
         bindings.push(type)
       }
       const cursor = this.sql.exec<{ to_url: string }>(sql, ...bindings)
-      urls.push(...cursor.toArray().map(r => r.to_url))
+      urls.push(...cursor.toArray().map((r: { to_url: string }) => r.to_url))
     }
 
     // direction='from': Return things that point TO this URL (inbound, where to_url = url)
@@ -444,7 +446,7 @@ export class MDXDatabase {
         bindings.push(type)
       }
       const cursor = this.sql.exec<{ from_url: string }>(sql, ...bindings)
-      urls.push(...cursor.toArray().map(r => r.from_url))
+      urls.push(...cursor.toArray().map((r: { from_url: string }) => r.from_url))
     }
 
     const uniqueUrls = [...new Set(urls)]
@@ -455,7 +457,7 @@ export class MDXDatabase {
       `SELECT * FROM things WHERE url IN (${placeholders}) AND deleted_at IS NULL`,
       ...uniqueUrls
     )
-    return cursor.toArray().map(row => this.rowToThing(row))
+    return cursor.toArray().map((row: ThingRow) => this.rowToThing(row))
   }
 
   async relationships(url: string, type?: string, direction: 'from' | 'to' | 'both' = 'both'): Promise<Relationship[]> {
@@ -471,7 +473,7 @@ export class MDXDatabase {
         bindings.push(type)
       }
       const cursor = this.sql.exec<RelationshipRow>(sql, ...bindings)
-      results.push(...cursor.toArray().map(row => this.rowToRelationship(row)))
+      results.push(...cursor.toArray().map((row: RelationshipRow) => this.rowToRelationship(row)))
     }
 
     if (direction === 'to' || direction === 'both') {
@@ -482,7 +484,7 @@ export class MDXDatabase {
         bindings.push(type)
       }
       const cursor = this.sql.exec<RelationshipRow>(sql, ...bindings)
-      results.push(...cursor.toArray().map(row => this.rowToRelationship(row)))
+      results.push(...cursor.toArray().map((row: RelationshipRow) => this.rowToRelationship(row)))
     }
 
     return results
@@ -492,47 +494,161 @@ export class MDXDatabase {
   // Vector Search Operations
   // ===========================================================================
 
+  /**
+   * Search for similar vectors using Cloudflare Vectorize.
+   *
+   * When a Vectorize binding is available, this method delegates the search
+   * to Cloudflare Vectorize via Workers RPC. The cosine similarity calculation
+   * is performed by Vectorize, not SQLite.
+   *
+   * @param options - Search options including embedding vector
+   * @returns Array of search results with similarity scores
+   */
   async vectorSearch(options: VectorSearchOptions): Promise<VectorSearchResult[]> {
     this.ensureInitialized()
 
-    // Get all search chunks with embeddings
-    let sql = `
-      SELECT s.*, t.type, t.ns
-      FROM search s
-      JOIN things t ON s.thing_url = t.url
-      WHERE s.embedding IS NOT NULL AND t.deleted_at IS NULL
-    `
-    const bindings: unknown[] = []
+    // If we have a Vectorize binding and an embedding, use Vectorize RPC
+    if (this.vectorize && options.embedding) {
+      const results = await this.vectorize.search({
+        embedding: options.embedding,
+        topK: options.limit ?? 10,
+        type: options.type,
+        thingUrls: options.thingUrls,
+        minScore: options.minScore,
+      })
 
-    if (options.type) {
-      sql += ' AND t.type = ?'
-      bindings.push(options.type)
+      return results
     }
 
-    if (options.thingUrls && options.thingUrls.length > 0) {
-      const placeholders = options.thingUrls.map(() => '?').join(', ')
-      sql += ` AND s.thing_url IN (${placeholders})`
-      bindings.push(...options.thingUrls)
+    // Fallback: No Vectorize binding or no embedding provided
+    // Return empty results - vector search requires Vectorize
+    if (!this.vectorize) {
+      console.warn('vectorSearch: No Vectorize binding configured. Vector search requires @mdxdb/vectorize.')
+    }
+    if (!options.embedding) {
+      console.warn('vectorSearch: No embedding provided. Use client-side embedding before calling vectorSearch.')
     }
 
-    const cursor = this.sql.exec<SearchRow & { type: string; ns: string }>(sql, ...bindings)
-    const rows = cursor.toArray()
-
-    // Parse query embedding from options (should be provided by client)
-    // For now, just return empty - client should use setEmbedding + vectorSearch
-    // This is a placeholder for when embeddings are passed in
     return []
   }
 
+  /**
+   * Set embedding for a thing's content chunk and upsert to Vectorize.
+   *
+   * This method stores the embedding in SQLite for backup and also
+   * upserts it to Cloudflare Vectorize for similarity search.
+   *
+   * @param thingUrl - The URL of the thing
+   * @param chunkIndex - The index of the content chunk
+   * @param embedding - The embedding vector
+   */
   async setEmbedding(thingUrl: string, chunkIndex: number, embedding: number[]): Promise<void> {
     this.ensureInitialized()
 
+    // Store embedding in SQLite (for backup/debugging)
     this.sql.exec(
       `UPDATE search SET embedding = ? WHERE thing_url = ? AND chunk_index = ?`,
       JSON.stringify(embedding),
       thingUrl,
       chunkIndex
     )
+
+    // If Vectorize is available, upsert the embedding there too
+    if (this.vectorize) {
+      // Get the chunk content and thing type from SQLite
+      const cursor = this.sql.exec<SearchRow & { type: string }>(
+        `SELECT s.*, t.type FROM search s
+         JOIN things t ON s.thing_url = t.url
+         WHERE s.thing_url = ? AND s.chunk_index = ?`,
+        thingUrl,
+        chunkIndex
+      )
+      const rows = cursor.toArray()
+
+      if (rows.length > 0) {
+        const row = rows[0]!
+        const upsertOptions: VectorizeUpsertOptions = {
+          thingUrl,
+          chunkIndex,
+          embedding,
+          content: row.content,
+          type: row.type,
+          metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
+        }
+
+        await this.vectorize.upsert([upsertOptions])
+      }
+    }
+  }
+
+  /**
+   * Upsert embeddings for a thing's content chunks in bulk.
+   *
+   * This is more efficient than calling setEmbedding multiple times.
+   *
+   * @param thingUrl - The URL of the thing
+   * @param embeddings - Array of chunk embeddings with their indices
+   */
+  async upsertEmbeddings(
+    thingUrl: string,
+    embeddings: Array<{ chunkIndex: number; embedding: number[] }>
+  ): Promise<void> {
+    this.ensureInitialized()
+
+    // Store embeddings in SQLite
+    for (const { chunkIndex, embedding } of embeddings) {
+      this.sql.exec(
+        `UPDATE search SET embedding = ? WHERE thing_url = ? AND chunk_index = ?`,
+        JSON.stringify(embedding),
+        thingUrl,
+        chunkIndex
+      )
+    }
+
+    // If Vectorize is available, upsert all embeddings
+    if (this.vectorize) {
+      // Get chunk content and thing type for all chunks
+      const cursor = this.sql.exec<SearchRow & { type: string }>(
+        `SELECT s.*, t.type FROM search s
+         JOIN things t ON s.thing_url = t.url
+         WHERE s.thing_url = ?`,
+        thingUrl
+      )
+      const rows = cursor.toArray()
+
+      const vectorizeOptions: VectorizeUpsertOptions[] = []
+
+      for (const { chunkIndex, embedding } of embeddings) {
+        const row = rows.find((r: SearchRow & { type: string }) => r.chunk_index === chunkIndex)
+        if (!row) continue
+
+        vectorizeOptions.push({
+          thingUrl,
+          chunkIndex,
+          embedding,
+          content: row.content,
+          type: row.type,
+          metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
+        })
+      }
+
+      if (vectorizeOptions.length > 0) {
+        await this.vectorize.upsert(vectorizeOptions)
+      }
+    }
+  }
+
+  /**
+   * Delete vector embeddings for a thing from Vectorize.
+   *
+   * Called automatically when a thing is deleted.
+   *
+   * @param thingUrl - The URL of the thing to delete vectors for
+   */
+  async deleteVectors(thingUrl: string): Promise<void> {
+    if (this.vectorize) {
+      await this.vectorize.delete({ thingUrls: [thingUrl] })
+    }
   }
 
   // ===========================================================================
@@ -619,7 +735,7 @@ export class MDXDatabase {
     }
 
     const cursor = this.sql.exec<EventRow>(sql, ...bindings)
-    return cursor.toArray().map(row => this.rowToEvent(row))
+    return cursor.toArray().map((row: EventRow) => this.rowToEvent(row))
   }
 
   // ===========================================================================
@@ -741,7 +857,7 @@ export class MDXDatabase {
     }
 
     const cursor = this.sql.exec<ActionRow>(sql, ...bindings)
-    return cursor.toArray().map(row => this.rowToAction(row))
+    return cursor.toArray().map((row: ActionRow) => this.rowToAction(row))
   }
 
   async startAction(id: string): Promise<Action> {
@@ -1025,4 +1141,17 @@ export class MDXDatabase {
       metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
     }
   }
+}
+
+/**
+ * Default export for Workers compatibility
+ * Miniflare requires a fetch handler even when using RPC
+ */
+export default {
+  async fetch(_request: Request, _env: Env): Promise<Response> {
+    return new Response('MDXDatabase uses Workers RPC. Use the Durable Object binding directly.', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' },
+    })
+  },
 }

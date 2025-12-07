@@ -1,28 +1,43 @@
 /**
- * @mdxdb/api - HTTP API server for mdxdb
+ * @mdxdb/api - HTTP API client for mdxdb
  *
- * A Hono-based REST API server that exposes any mdxdb Database implementation.
- * Works with any backend (fs, sqlite, postgres, etc.) and any runtime (Node.js, Cloudflare Workers, Deno, Bun).
+ * A fetch-based REST client that connects to a mdxdb server.
+ * Implements the Database interface for seamless integration.
+ *
+ * @example
+ * ```ts
+ * import { createClient } from '@mdxdb/api'
+ *
+ * const db = createClient({
+ *   baseUrl: 'https://api.example.com/api/mdxdb',
+ *   apiKey: process.env.MDXDB_API_KEY
+ * })
+ *
+ * // Use like any other Database implementation
+ * const docs = await db.list({ type: 'Post' })
+ * const doc = await db.get('posts/hello-world')
+ * ```
  *
  * @packageDocumentation
  */
 
-export const name = '@mdxdb/api'
+export { ApiClient, createClient, createApiClient } from './client.js'
 
-// Main exports
-export { createApiServer } from './server.js'
-export type { ApiServer } from './server.js'
-
-// Types
 export type {
-  ApiServerConfig,
+  ClientConfig,
+  ApiClientConfig,
   ApiResponse,
-  ListQuery,
-  SearchQuery,
-  SetBody,
-  DeleteQuery,
+  Database,
+  ListOptions,
+  ListResult,
+  SearchOptions,
+  SearchResult,
+  GetOptions,
+  SetOptions,
+  SetResult,
+  DeleteOptions,
+  DeleteResult,
 } from './types.js'
 
 // Re-export for convenience
-export type { Database } from 'mdxdb'
 export type { MDXLDDocument, MDXLDData } from 'mdxld'
