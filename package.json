@@ -16,6 +16,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "turbo run clean && rm -rf node_modules",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish",
     "mdxai": "node packages/mdxai/dist/cli.js",
     "mdxe": "node packages/mdxe/dist/cli.js",
     "mdxe:dev": "node packages/mdxe/dist/cli.js dev --dir examples",
@@ -25,8 +28,9 @@
     "storybook": "pnpm --filter storybook dev"
   },
   "devDependencies": {
-    "@mdxld/config": "workspace:*",
+    "@changesets/cli": "^2.29.8",
     "@eslint/js": "^9.16.0",
+    "@mdxld/config": "workspace:*",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.0",
     "eslint": "^9.16.0",
