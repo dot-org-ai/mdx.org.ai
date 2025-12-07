@@ -1,121 +1,193 @@
 ---
 $type: TestSuite
 $id: https://mdx.org.ai/tests/rpc/http
-title: HTTP Transport Integration Tests
-description: End-to-end tests for HTTP RPC transport
+title: HTTP Transport Tests
+description: Tests for rpc.do HTTP transport
 ---
 
-# HTTP Transport Integration Tests
+# HTTP Transport Tests
 
-High-level integration tests for the HTTP RPC transport.
-These tests run via `mdxe test` with global scope injection.
+Tests for the `http` transport from `rpc.do`.
 
-## Basic Operations
+## HTTP Transport Creation
 
-```ts test name="echo via HTTP"
-const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
+```ts test name="create http transport"
+import { http } from 'rpc.do'
 
-const transport = new HTTPTransport({
-  url: 'http://localhost:3456/rpc'
-})
+const transport = http('https://api.example.com/rpc')
 
-const response = await transport.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'echo',
-  params: ['hello from MDX']
-})
-
-expect(response.type).toBe('result')
-expect(response.result).toBe('hello from MDX')
+expect(transport).toBeDefined()
+expect(typeof transport.call).toBe('function')
 ```
 
-```ts test name="arithmetic operations"
-const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
+```ts test name="http transport with auth token"
+import { http } from 'rpc.do'
 
-const transport = new HTTPTransport({
-  url: 'http://localhost:3456/rpc'
-})
+// With static token
+const transport = http('https://api.example.com/rpc', 'my-api-key')
 
-const addResponse = await transport.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'add',
-  params: [10, 20]
-})
-expect(addResponse.result).toBe(30)
-
-const multiplyResponse = await transport.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'multiply',
-  params: [5, 6]
-})
-expect(multiplyResponse.result).toBe(30)
+expect(transport).toBeDefined()
 ```
 
-```ts test name="error handling"
-const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
+```ts test name="http transport with auth provider"
+import { http } from 'rpc.do'
 
-const transport = new HTTPTransport({
-  url: 'http://localhost:3456/rpc'
-})
+// With auth provider function
+const transport = http('https://api.example.com/rpc', () => 'dynamic-token')
 
-const response = await transport.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'throwError',
-  params: ['MDX error test']
-})
-
-expect(response.type).toBe('error')
-expect(response.error?.message).toContain('MDX error test')
+expect(transport).toBeDefined()
 ```
 
-## Batching
+```ts test name="http transport with async auth provider"
+import { http } from 'rpc.do'
 
-```ts test name="batch concurrent requests"
-const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
-
-const transport = new HTTPTransport({
-  url: 'http://localhost:3456/rpc',
-  batchDelay: 0
+// With async auth provider
+const transport = http('https://api.example.com/rpc', async () => {
+  // Could fetch token from oauth.do, etc.
+  return 'async-token'
 })
 
-const promises = Array.from({ length: 5 }, (_, i) =>
-  transport.request({
-    id: generateMessageId(),
-    type: 'call',
-    method: 'add',
-    params: [i, 1]
+expect(transport).toBeDefined()
+```
+
+## RPC via HTTP
+
+```ts test name="RPC calls via http transport mock"
+import { RPC, http } from 'rpc.do'
+
+// Create a mock fetch for testing
+// rpc.do sends { method: "do", path: "<method>", args: [...] }
+const originalFetch = globalThis.fetch
+globalThis.fetch = async (url, options) => {
+  const body = JSON.parse(options?.body as string)
+  const path = body.path // The actual method path
+
+  let result
+  if (path === 'echo') {
+    result = body.args[0]
+  } else if (path === 'math.add') {
+    result = body.args[0] + body.args[1]
+  } else {
+    throw new Error(`Unknown method: ${path}`)
+  }
+
+  // rpc.do expects the result directly, not wrapped
+  return new Response(JSON.stringify(result), {
+    headers: { 'Content-Type': 'application/json' }
   })
-)
+}
 
-const results = await Promise.all(promises)
-const values = results.map(r => r.result)
+try {
+  const transport = http('https://api.example.com/rpc')
+  const rpc = RPC(transport)
 
-expect(values).toEqual([1, 2, 3, 4, 5])
+  const echo = await rpc.echo('hello http')
+  expect(echo).toBe('hello http')
+
+  const sum = await rpc.math.add(5, 7)
+  expect(sum).toBe(12)
+} finally {
+  globalThis.fetch = originalFetch
+}
 ```
 
-## Complex Data
+```ts test name="HTTP transport error handling"
+import { RPC, http } from 'rpc.do'
 
-```ts test name="object results"
-const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
+const originalFetch = globalThis.fetch
+globalThis.fetch = async () => {
+  return new Response(JSON.stringify({
+    error: { message: 'Server error', code: 500 }
+  }), {
+    status: 500,
+    headers: { 'Content-Type': 'application/json' }
+  })
+}
 
-const transport = new HTTPTransport({
-  url: 'http://localhost:3456/rpc'
+try {
+  const transport = http('https://api.example.com/rpc')
+  const rpc = RPC(transport)
+
+  await expect(rpc.failing()).rejects.toThrow()
+} finally {
+  globalThis.fetch = originalFetch
+}
+```
+
+## Server-side RPC Handler
+
+```ts test name="create rpc handler"
+import { createRpcHandler, noAuth } from 'rpc.do/server'
+
+const handler = createRpcHandler({
+  dispatch: async (method, args, ctx) => {
+    if (method === 'echo') return args[0]
+    if (method === 'add') return args[0] + args[1]
+    throw new Error(`Unknown method: ${method}`)
+  },
+  auth: noAuth()
 })
 
-const response = await transport.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'getUser',
-  params: ['mdx-user']
+expect(typeof handler).toBe('function')
+```
+
+```ts test name="rpc handler processes requests"
+import { createRpcHandler, noAuth } from 'rpc.do/server'
+
+const handler = createRpcHandler({
+  dispatch: async (path, args) => {
+    if (path === 'echo') return args[0]
+    if (path === 'greet') return `Hello, ${args[0]}!`
+    throw new Error(`Unknown: ${path}`)
+  },
+  auth: noAuth()
 })
 
-expect(response.result.id).toBe('mdx-user')
-expect(response.result.name).toBe('User mdx-user')
-expect(response.result.profile.email).toBe('usermdx-user@example.com')
+// Simulate a request - rpc.do server expects { path, args }
+const request = new Request('https://example.com/rpc', {
+  method: 'POST',
+  body: JSON.stringify({ path: 'greet', args: ['World'] }),
+  headers: { 'Content-Type': 'application/json' }
+})
+
+const response = await handler(request)
+const data = await response.json()
+
+// rpc.do returns result directly, not wrapped
+expect(data).toBe('Hello, World!')
+```
+
+```ts test name="rpc handler with bearer auth"
+import { createRpcHandler, bearerAuth } from 'rpc.do/server'
+
+const handler = createRpcHandler({
+  dispatch: async (path, args, ctx) => {
+    // ctx contains the validated token info
+    return { path, user: ctx.user }
+  },
+  auth: bearerAuth(async (token) => {
+    if (token === 'valid-token') {
+      return { user: 'authenticated-user' }
+    }
+    return null
+  })
+})
+
+// Request with valid token - use { path, args } format
+const validRequest = new Request('https://example.com/rpc', {
+  method: 'POST',
+  body: JSON.stringify({ path: 'protected', args: [] }),
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer valid-token'
+  }
+})
+
+const response = await handler(validRequest)
+const data = await response.json()
+
+// Result is returned directly, not wrapped
+expect(data.user).toBe('authenticated-user')
 ```
 
 ## Run Matrix

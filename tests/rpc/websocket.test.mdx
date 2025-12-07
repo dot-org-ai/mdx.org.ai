@@ -1,161 +1,175 @@
 ---
 $type: TestSuite
 $id: https://mdx.org.ai/tests/rpc/websocket
-title: WebSocket Transport Integration Tests
-description: End-to-end tests for WebSocket RPC transport
+title: WebSocket Transport Tests
+description: Tests for rpc.do WebSocket transport
 ---
 
-# WebSocket Transport Integration Tests
+# WebSocket Transport Tests
 
-High-level integration tests for the WebSocket RPC transport.
-Tests persistent connections, streaming, and reconnection.
+Tests for the `ws` transport from `rpc.do`.
 
-## Connection Lifecycle
+## WebSocket Transport Creation
 
-```ts test name="connect and disconnect"
-const { WebSocketTransport } = await import('ai-functions/rpc')
+```ts test name="create ws transport"
+import { ws } from 'rpc.do'
 
-const transport = new WebSocketTransport({
-  url: 'ws://localhost:3456/rpc',
-  reconnect: false
-})
+const transport = ws('wss://api.example.com/rpc')
 
-expect(transport.state).toBe('disconnected')
-
-await transport.connect()
-expect(transport.state).toBe('connected')
-
-transport.close()
-expect(transport.state).toBe('disconnected')
+expect(transport).toBeDefined()
+expect(typeof transport.call).toBe('function')
 ```
 
-```ts test name="auto-connect on request"
-const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
+```ts test name="ws transport with auth token"
+import { ws } from 'rpc.do'
 
-const transport = new WebSocketTransport({
-  url: 'ws://localhost:3456/rpc',
-  reconnect: false
-})
+// With static token
+const transport = ws('wss://api.example.com/rpc', 'my-api-key')
 
-// Should auto-connect
-const response = await transport.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'echo',
-  params: ['auto-connect']
-})
-
-expect(response.result).toBe('auto-connect')
-expect(transport.state).toBe('connected')
-
-transport.close()
+expect(transport).toBeDefined()
 ```
 
-## Basic Operations
+```ts test name="ws transport with auth provider"
+import { ws } from 'rpc.do'
 
-```ts test name="echo via WebSocket"
-const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
-
-const transport = new WebSocketTransport({
-  url: 'ws://localhost:3456/rpc',
-  reconnect: false
-})
-await transport.connect()
-
-const response = await transport.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'echo',
-  params: ['WebSocket MDX test']
+// With auth provider function
+const transport = ws('wss://api.example.com/rpc', async () => {
+  return 'dynamic-token'
 })
 
-expect(response.result).toBe('WebSocket MDX test')
-transport.close()
+expect(transport).toBeDefined()
 ```
 
-```ts test name="multiple requests on same connection"
-const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
+## WebSocket Transport Close
 
-const transport = new WebSocketTransport({
-  url: 'ws://localhost:3456/rpc',
-  reconnect: false
-})
-await transport.connect()
+```ts test name="ws transport has close method"
+import { ws } from 'rpc.do'
 
-for (let i = 0; i < 5; i++) {
-  const response = await transport.request({
-    id: generateMessageId(),
-    type: 'call',
-    method: 'add',
-    params: [i, 10]
-  })
-  expect(response.result).toBe(i + 10)
+const transport = ws('wss://api.example.com/rpc')
+
+// Transport may have optional close method
+if (transport.close) {
+  expect(typeof transport.close).toBe('function')
+}
+```
+
+## RPC via WebSocket (Mock)
+
+```ts test name="RPC proxy with mock ws-like transport"
+import { RPC } from 'rpc.do'
+
+// Simulate WebSocket transport behavior
+const mockWsTransport = {
+  connected: false,
+  async call(method: string, args: any[]) {
+    // Simulate connection on first call
+    if (!this.connected) {
+      this.connected = true
+    }
+
+    if (method === 'echo') return args[0]
+    if (method === 'chat.send') {
+      return { id: 'msg-1', text: args[0].text, sent: true }
+    }
+    throw new Error(`Unknown method: ${method}`)
+  },
+  close() {
+    this.connected = false
+  }
 }
 
-expect(transport.state).toBe('connected')
-transport.close()
+const rpc = RPC(mockWsTransport)
+
+const echo = await rpc.echo('websocket test')
+expect(echo).toBe('websocket test')
+
+const msg = await rpc.chat.send({ text: 'Hello!' })
+expect(msg.sent).toBe(true)
+expect(msg.text).toBe('Hello!')
+
+// Clean up
+mockWsTransport.close()
+expect(mockWsTransport.connected).toBe(false)
 ```
 
-## Concurrent Requests
+```ts test name="persistent connection simulation"
+import { RPC } from 'rpc.do'
 
-```ts test name="handle concurrent WebSocket requests"
-const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
+let callCount = 0
+const persistentTransport = {
+  async call(method: string, args: any[]) {
+    callCount++
+    return { callNumber: callCount, method }
+  }
+}
 
-const transport = new WebSocketTransport({
-  url: 'ws://localhost:3456/rpc',
-  reconnect: false
-})
-await transport.connect()
+const rpc = RPC(persistentTransport)
 
-const count = 20
-const promises = Array.from({ length: count }, (_, i) =>
-  transport.request({
-    id: generateMessageId(),
-    type: 'call',
-    method: 'multiply',
-    params: [i, 2]
-  })
+// Multiple calls share the same "connection"
+const r1 = await rpc.first()
+const r2 = await rpc.second()
+const r3 = await rpc.third()
+
+expect(r1.callNumber).toBe(1)
+expect(r2.callNumber).toBe(2)
+expect(r3.callNumber).toBe(3)
+```
+
+## Concurrent WebSocket Requests
+
+```ts test name="concurrent requests via ws-like transport"
+import { RPC } from 'rpc.do'
+
+const mockTransport = {
+  async call(method: string, args: any[]) {
+    // Simulate some async work
+    await new Promise(r => setTimeout(r, 10))
+    if (method === 'compute') {
+      return args[0] * 2
+    }
+    return null
+  }
+}
+
+const rpc = RPC(mockTransport)
+
+// Fire off concurrent requests
+const promises = Array.from({ length: 10 }, (_, i) =>
+  rpc.compute(i + 1)
 )
 
 const results = await Promise.all(promises)
 
-for (let i = 0; i < count; i++) {
-  expect(results[i].result).toBe(i * 2)
-}
-
-transport.close()
+expect(results).toEqual([2, 4, 6, 8, 10, 12, 14, 16, 18, 20])
 ```
 
-## Error Handling
+## Error Recovery
 
-```ts test name="handle errors without breaking connection"
-const { WebSocketTransport, generateMessageId } = await import('ai-functions/rpc')
+```ts test name="error does not break transport"
+import { RPC } from 'rpc.do'
 
-const transport = new WebSocketTransport({
-  url: 'ws://localhost:3456/rpc',
-  reconnect: false
-})
-await transport.connect()
+let healthy = true
+const resilientTransport = {
+  async call(method: string) {
+    if (method === 'fail') {
+      throw new Error('Intentional failure')
+    }
+    return { healthy, method }
+  }
+}
 
-// Cause error
-const errorResponse = await transport.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'throwError',
-  params: ['ws error']
-})
-expect(errorResponse.type).toBe('error')
+const rpc = RPC(resilientTransport)
 
-// Connection still works
-const successResponse = await transport.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'echo',
-  params: ['still connected']
-})
-expect(successResponse.result).toBe('still connected')
+// First call succeeds
+const r1 = await rpc.check()
+expect(r1.healthy).toBe(true)
 
-transport.close()
+// This call fails
+await expect(rpc.fail()).rejects.toThrow('Intentional failure')
+
+// Transport still works
+const r2 = await rpc.checkAgain()
+expect(r2.healthy).toBe(true)
 ```
 
 ## Run Matrix

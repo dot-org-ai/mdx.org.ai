@@ -1,174 +1,221 @@
 ---
 $type: TestSuite
 $id: https://mdx.org.ai/tests/rpc/postmessage
-title: postMessage Transport Integration Tests
-description: End-to-end tests for postMessage RPC transport using MessageChannel
+title: Custom Transport Tests
+description: Tests for custom RPC transports using MessageChannel
 ---
 
-# postMessage Transport Integration Tests
+# Custom Transport Tests
 
-High-level integration tests for the postMessage RPC transport.
-Uses MessageChannel API for cross-runtime compatibility.
+Tests for creating custom RPC transports using the `rpc.do` Transport interface.
+Demonstrates how to build a postMessage/MessageChannel transport.
 
-## Setup Helper
+## Transport Interface
 
-```ts
-// Create a MessageChannel-based RPC pair for testing
-async function createRPCChannel() {
-  const { PostMessageTransport, generateMessageId } = await import('ai-functions/rpc')
+```ts test name="transport interface contract"
+import type { Transport } from 'rpc.do'
 
+// A Transport must have a call method
+const validTransport: Transport = {
+  async call(method: string, args: any[]) {
+    return { method, args }
+  }
+}
+
+expect(typeof validTransport.call).toBe('function')
+```
+
+```ts test name="transport with optional close"
+import type { Transport } from 'rpc.do'
+
+// Transport can optionally have a close method
+const closableTransport: Transport = {
+  async call(method: string, args: any[]) {
+    return { method, args }
+  },
+  close() {
+    // Cleanup resources
+  }
+}
+
+expect(typeof closableTransport.close).toBe('function')
+```
+
+## MessageChannel Transport
+
+```ts test name="create MessageChannel transport"
+import { RPC, type Transport } from 'rpc.do'
+
+// Create a Transport that uses MessageChannel
+function createChannelTransport(): { client: Transport; server: MessagePort } {
   const channel = new MessageChannel()
+  let messageId = 0
+  const pending = new Map<number, { resolve: Function; reject: Function }>()
 
-  const client = new PostMessageTransport({
-    target: channel.port1
-  })
-
-  // Simple echo server on port2
-  channel.port2.onmessage = async (event) => {
-    const msg = event.data
-    if (msg.type === 'call') {
-      let result
-      let error
-
-      try {
-        switch (msg.method) {
-          case 'echo':
-            result = msg.params?.[0]
-            break
-          case 'add':
-            result = (msg.params?.[0] || 0) + (msg.params?.[1] || 0)
-            break
-          case 'multiply':
-            result = (msg.params?.[0] || 0) * (msg.params?.[1] || 0)
-            break
-          case 'throwError':
-            throw new Error(msg.params?.[0] || 'error')
-          case 'getUser':
-            result = {
-              id: msg.params?.[0],
-              name: `User ${msg.params?.[0]}`,
-              email: `${msg.params?.[0]}@example.com`
-            }
-            break
-          default:
-            error = { message: `Unknown method: ${msg.method}` }
-        }
-      } catch (e) {
-        error = { message: e.message }
-      }
-
-      channel.port2.postMessage({
-        id: msg.id,
-        type: error ? 'error' : 'result',
-        result,
-        error
+  // Client side
+  const client: Transport = {
+    call(method: string, args: any[]) {
+      return new Promise((resolve, reject) => {
+        const id = ++messageId
+        pending.set(id, { resolve, reject })
+        channel.port1.postMessage({ id, method, args })
       })
+    },
+    close() {
+      channel.port1.close()
+    }
+  }
+
+  // Handle responses
+  channel.port1.onmessage = (e) => {
+    const { id, result, error } = e.data
+    const p = pending.get(id)
+    if (p) {
+      pending.delete(id)
+      if (error) p.reject(new Error(error))
+      else p.resolve(result)
     }
   }
 
   channel.port1.start()
   channel.port2.start()
 
-  return { client, channel, generateMessageId }
+  return { client, server: channel.port2 }
 }
+
+const { client, server } = createChannelTransport()
+
+// Set up server handler
+server.onmessage = (e) => {
+  const { id, method, args } = e.data
+  let result
+  let error
+
+  try {
+    if (method === 'echo') result = args[0]
+    else if (method === 'add') result = args[0] + args[1]
+    else error = `Unknown method: ${method}`
+  } catch (e: any) {
+    error = e.message
+  }
+
+  server.postMessage({ id, result, error })
+}
+
+// Test the transport
+const rpc = RPC(client)
+
+const echo = await rpc.echo('channel test')
+expect(echo).toBe('channel test')
+
+const sum = await rpc.add(10, 20)
+expect(sum).toBe(30)
+
+client.close?.()
+server.close()
 ```
 
-## Basic Operations
+```ts test name="concurrent MessageChannel requests"
+import { RPC, type Transport } from 'rpc.do'
 
-```ts test name="echo via MessageChannel"
-const { client, channel, generateMessageId } = await createRPCChannel()
+// Simplified channel transport
+const channel = new MessageChannel()
+let msgId = 0
+const pending = new Map<number, { resolve: Function; reject: Function }>()
 
-const response = await client.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'echo',
-  params: ['postMessage test']
-})
+const transport: Transport = {
+  call(method, args) {
+    return new Promise((resolve, reject) => {
+      const id = ++msgId
+      pending.set(id, { resolve, reject })
+      channel.port1.postMessage({ id, method, args })
+    })
+  },
+  close: () => channel.port1.close()
+}
 
-expect(response.result).toBe('postMessage test')
+channel.port1.onmessage = (e) => {
+  const { id, result } = e.data
+  pending.get(id)?.resolve(result)
+  pending.delete(id)
+}
 
-channel.port1.close()
-channel.port2.close()
-```
+channel.port2.onmessage = (e) => {
+  const { id, method, args } = e.data
+  // Echo the first arg multiplied by 2
+  channel.port2.postMessage({ id, result: args[0] * 2 })
+}
 
-```ts test name="arithmetic via MessageChannel"
-const { client, channel, generateMessageId } = await createRPCChannel()
+channel.port1.start()
+channel.port2.start()
 
-const addResponse = await client.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'add',
-  params: [25, 75]
-})
-expect(addResponse.result).toBe(100)
+const rpc = RPC(transport)
 
-const multiplyResponse = await client.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'multiply',
-  params: [12, 12]
-})
-expect(multiplyResponse.result).toBe(144)
+// Fire concurrent requests
+const promises = Array.from({ length: 5 }, (_, i) =>
+  rpc.double(i + 1)
+)
 
-channel.port1.close()
+const results = await Promise.all(promises)
+expect(results).toEqual([2, 4, 6, 8, 10])
+
+transport.close?.()
 channel.port2.close()
 ```
 
 ## Error Handling
 
-```ts test name="handle errors via MessageChannel"
-const { client, channel, generateMessageId } = await createRPCChannel()
+```ts test name="MessageChannel error handling"
+import { RPC, type Transport } from 'rpc.do'
 
-const response = await client.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'throwError',
-  params: ['postMessage error']
-})
+const channel = new MessageChannel()
+let msgId = 0
+const pending = new Map<number, { resolve: Function; reject: Function }>()
 
-expect(response.type).toBe('error')
-expect(response.error?.message).toContain('postMessage error')
-
-channel.port1.close()
-channel.port2.close()
-```
-
-```ts test name="handle unknown methods"
-const { client, channel, generateMessageId } = await createRPCChannel()
-
-const response = await client.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'unknownMethod',
-  params: []
-})
-
-expect(response.type).toBe('error')
-expect(response.error?.message).toContain('unknownMethod')
-
-channel.port1.close()
-channel.port2.close()
-```
-
-## Concurrent Requests
-
-```ts test name="concurrent MessageChannel requests"
-const { client, channel, generateMessageId } = await createRPCChannel()
-
-const promises = Array.from({ length: 10 }, (_, i) =>
-  client.request({
-    id: generateMessageId(),
-    type: 'call',
-    method: 'add',
-    params: [i, i]
-  })
-)
-
-const results = await Promise.all(promises)
-
-for (let i = 0; i < 10; i++) {
-  expect(results[i].result).toBe(i + i)
+const transport: Transport = {
+  call(method, args) {
+    return new Promise((resolve, reject) => {
+      const id = ++msgId
+      pending.set(id, { resolve, reject })
+      channel.port1.postMessage({ id, method, args })
+    })
+  }
 }
+
+channel.port1.onmessage = (e) => {
+  const { id, result, error } = e.data
+  const p = pending.get(id)
+  if (p) {
+    pending.delete(id)
+    if (error) p.reject(new Error(error))
+    else p.resolve(result)
+  }
+}
+
+channel.port2.onmessage = (e) => {
+  const { id, method } = e.data
+  if (method === 'fail') {
+    channel.port2.postMessage({ id, error: 'Intentional failure' })
+  } else {
+    channel.port2.postMessage({ id, result: 'ok' })
+  }
+}
+
+channel.port1.start()
+channel.port2.start()
+
+const rpc = RPC(transport)
+
+// Success case
+const ok = await rpc.success()
+expect(ok).toBe('ok')
+
+// Error case
+await expect(rpc.fail()).rejects.toThrow('Intentional failure')
+
+// Still works after error
+const ok2 = await rpc.successAgain()
+expect(ok2).toBe('ok')
 
 channel.port1.close()
 channel.port2.close()
@@ -176,38 +223,57 @@ channel.port2.close()
 
 ## Complex Data
 
-```ts test name="object results via MessageChannel"
-const { client, channel, generateMessageId } = await createRPCChannel()
-
-const response = await client.request({
-  id: generateMessageId(),
-  type: 'call',
-  method: 'getUser',
-  params: ['alice']
-})
-
-expect(response.result.id).toBe('alice')
-expect(response.result.name).toBe('User alice')
-expect(response.result.email).toBe('alice@example.com')
-
-channel.port1.close()
-channel.port2.close()
-```
-
-## Connection State
-
-```ts test name="connection state tracking"
-const { PostMessageTransport } = await import('ai-functions/rpc')
+```ts test name="structured data via MessageChannel"
+import { RPC, type Transport } from 'rpc.do'
 
 const channel = new MessageChannel()
-const transport = new PostMessageTransport({
-  target: channel.port1
-})
+let msgId = 0
+const pending = new Map<number, { resolve: Function; reject: Function }>()
 
-expect(transport.state).toBe('connected')
+const transport: Transport = {
+  call(method, args) {
+    return new Promise((resolve, reject) => {
+      const id = ++msgId
+      pending.set(id, { resolve, reject })
+      channel.port1.postMessage({ id, method, args })
+    })
+  }
+}
 
-transport.close()
-expect(transport.state).toBe('disconnected')
+channel.port1.onmessage = (e) => {
+  const p = pending.get(e.data.id)
+  if (p) {
+    pending.delete(e.data.id)
+    p.resolve(e.data.result)
+  }
+}
+
+channel.port2.onmessage = (e) => {
+  const { id, method, args } = e.data
+  if (method === 'getUser') {
+    channel.port2.postMessage({
+      id,
+      result: {
+        id: args[0],
+        name: `User ${args[0]}`,
+        profile: {
+          email: `${args[0]}@example.com`,
+          avatar: `https://example.com/avatars/${args[0]}.png`
+        }
+      }
+    })
+  }
+}
+
+channel.port1.start()
+channel.port2.start()
+
+const rpc = RPC(transport)
+
+const user = await rpc.getUser('alice')
+expect(user.id).toBe('alice')
+expect(user.name).toBe('User alice')
+expect(user.profile.email).toBe('alice@example.com')
 
 channel.port1.close()
 channel.port2.close()

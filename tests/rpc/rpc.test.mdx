@@ -1,276 +1,212 @@
 ---
 $type: TestSuite
 $id: https://mdx.org.ai/tests/rpc
-title: RPC Transport Tests
-description: Test promise pipelining, callbacks, and transports across all targets
+title: RPC.do Tests
+description: Test rpc.do Proxy-based RPC client and transports
 ---
 
-# RPC Transport Tests
+# RPC.do Tests
 
-Test the RPC infrastructure:
-- Promise pipelining (Deferred)
-- HTTP batch transport
+Test the `rpc.do` package:
+- Proxy-based RPC client
+- HTTP transport
 - WebSocket transport
-- postMessage transport
-- Bidirectional callbacks
-- Async iterators
+- Service binding transport
+- Composite transport
 
-## Promise Pipelining
+## RPC Proxy Creation
 
-```ts test name="deferred property access"
-const { createDeferred, createLocalContext } = await import('ai-functions/rpc')
+```ts test name="create RPC proxy with http transport"
+import { RPC, http } from 'rpc.do'
 
-const context = createLocalContext(() => ({
-  user: {
-    name: 'John',
-    profile: {
-      avatar: 'https://example.com/avatar.png'
-    }
+// Create a mock transport for testing
+const mockTransport = {
+  async call(method: string, args: any[]) {
+    if (method === 'echo') return args[0]
+    if (method === 'add') return args[0] + args[1]
+    throw new Error(`Unknown method: ${method}`)
   }
-}))
+}
 
-const deferred = createDeferred(context)
+const rpc = RPC(mockTransport)
 
-// Chain property access before awaiting
-const avatar = await deferred.user.profile.avatar
-expect(avatar).toBe('https://example.com/avatar.png')
-```
+const result = await rpc.echo('hello')
+expect(result).toBe('hello')
 
-```ts test name="deferred method calls"
-const { createDeferred, createLocalContext } = await import('ai-functions/rpc')
-
-const context = createLocalContext(() => ({
-  greet: (name) => `Hello, ${name}!`,
-  math: {
-    add: (a, b) => a + b,
-    multiply: (a, b) => a * b
-  }
-}))
-
-const deferred = createDeferred(context)
-
-const greeting = await deferred.greet('World')
-expect(greeting).toBe('Hello, World!')
-
-const sum = await deferred.math.add(2, 3)
+const sum = await rpc.add(2, 3)
 expect(sum).toBe(5)
 ```
 
-```ts test name="deferred map transformation"
-const { createDeferred, createLocalContext } = await import('ai-functions/rpc')
+```ts test name="nested method calls via proxy"
+import { RPC } from 'rpc.do'
 
-const context = createLocalContext(() => ({
-  numbers: [1, 2, 3, 4, 5]
-}))
-
-const deferred = createDeferred(context)
-
-// Map is applied before resolution
-const doubled = await deferred.numbers.map(n => n * 2)
-expect(doubled).toEqual([2, 4, 6, 8, 10])
-```
-
-```ts test name="deferred chaining"
-const { createDeferred, createLocalContext } = await import('ai-functions/rpc')
-
-const context = createLocalContext(() => ({
-  getUser: (id) => ({
-    id,
-    name: `User ${id}`,
-    getPosts: () => [
-      { id: 1, title: 'First' },
-      { id: 2, title: 'Second' }
-    ]
-  })
-}))
-
-const deferred = createDeferred(context)
-
-// Multiple chained operations in one await
-const titles = await deferred
-  .getUser('123')
-  .getPosts()
-  .map(p => p.title)
-
-expect(titles).toEqual(['First', 'Second'])
-```
-
-## Callback Registry
-
-```ts test name="callback registration and invocation"
-const { CallbackRegistry } = await import('ai-functions/rpc')
-
-const registry = new CallbackRegistry()
-
-const id = registry.register((x, y) => x + y)
-expect(id).toMatch(/^cb_/)
-
-const result = await registry.invoke(id, [2, 3])
-expect(result).toBe(5)
-
-registry.unregister(id)
-await expect(registry.invoke(id, [1, 2])).rejects.toThrow('Callback not found')
-```
-
-```ts test name="serialize values with callbacks"
-const { CallbackRegistry } = await import('ai-functions/rpc')
-
-const registry = new CallbackRegistry()
-
-const value = {
-  name: 'Test',
-  onClick: () => 'clicked',
-  items: [
-    { id: 1, onSelect: (x) => x * 2 }
-  ]
-}
-
-const { value: serialized, callbacks } = registry.serializeWithCallbacks(value)
-
-expect(serialized.name).toBe('Test')
-expect(serialized.onClick.__callback__).toBeDefined()
-expect(serialized.items[0].onSelect.__callback__).toBeDefined()
-expect(callbacks.size).toBe(2)
-```
-
-## HTTP Transport
-
-```ts test name="http transport batching"
-const { HTTPTransport, generateMessageId } = await import('ai-functions/rpc')
-
-// Mock fetch
-const calls = []
-globalThis.fetch = async (url, options) => {
-  const body = JSON.parse(options.body)
-  calls.push(body)
-
-  return {
-    ok: true,
-    json: async () => body.map(msg => ({
-      id: msg.id,
-      type: 'result',
-      result: `response:${msg.method}`
-    }))
+const mockTransport = {
+  async call(method: string, args: any[]) {
+    // method will be the full path like "ai.generate" or "db.users.get"
+    if (method === 'ai.generate') {
+      return { text: `Generated: ${args[0].prompt}` }
+    }
+    if (method === 'db.users.get') {
+      return { id: args[0].id, name: 'Test User' }
+    }
+    throw new Error(`Unknown method: ${method}`)
   }
 }
 
-const transport = new HTTPTransport({
-  url: 'https://api.example.com/rpc',
-  batchDelay: 0
+const rpc = RPC(mockTransport)
+
+const generated = await rpc.ai.generate({ prompt: 'hello' })
+expect(generated.text).toBe('Generated: hello')
+
+const user = await rpc.db.users.get({ id: '123' })
+expect(user.id).toBe('123')
+expect(user.name).toBe('Test User')
+```
+
+```ts test name="RPC proxy with async transport factory"
+import { RPC } from 'rpc.do'
+
+// Transport can be provided as a factory function
+const transportFactory = async () => ({
+  async call(method: string, args: any[]) {
+    return `called: ${method}`
+  }
 })
 
-// Make multiple calls - should be batched
-const p1 = transport.request({ id: generateMessageId(), type: 'call', method: 'foo' })
-const p2 = transport.request({ id: generateMessageId(), type: 'call', method: 'bar' })
-const p3 = transport.request({ id: generateMessageId(), type: 'call', method: 'baz' })
+const rpc = RPC(transportFactory)
 
-const [r1, r2, r3] = await Promise.all([p1, p2, p3])
-
-expect(r1.result).toBe('response:foo')
-expect(r2.result).toBe('response:bar')
-expect(r3.result).toBe('response:baz')
-
-// All should have been in one batch
-expect(calls.length).toBe(1)
-expect(calls[0].length).toBe(3)
+const result = await rpc.someMethod('arg1')
+expect(result).toBe('called: someMethod')
 ```
 
-## Message ID Generation
+## Transport Types
 
-```ts test name="unique message IDs"
-const { generateMessageId } = await import('ai-functions/rpc')
+```ts test name="http transport interface"
+import { http } from 'rpc.do'
 
-const ids = new Set()
-for (let i = 0; i < 1000; i++) {
-  ids.add(generateMessageId())
+// http() returns a Transport
+const transport = http('https://api.example.com/rpc')
+
+expect(typeof transport.call).toBe('function')
+```
+
+```ts test name="ws transport interface"
+import { ws } from 'rpc.do'
+
+// ws() returns a Transport
+const transport = ws('wss://api.example.com/rpc')
+
+expect(typeof transport.call).toBe('function')
+```
+
+```ts test name="composite transport fallback"
+import { RPC, composite } from 'rpc.do'
+
+let callCount = 0
+const failingTransport = {
+  async call() {
+    callCount++
+    throw new Error('Primary failed')
+  }
 }
 
-// All should be unique
-expect(ids.size).toBe(1000)
+const fallbackTransport = {
+  async call(method: string, args: any[]) {
+    callCount++
+    return 'fallback result'
+  }
+}
+
+const transport = composite(failingTransport, fallbackTransport)
+const rpc = RPC(transport)
+
+const result = await rpc.test()
+expect(result).toBe('fallback result')
+expect(callCount).toBe(2) // Tried both transports
 ```
 
-## RPC Client
+## Type Safety
 
-```ts test name="rpc client with deferred"
-const { createRPCClient, applyChain } = await import('ai-functions/rpc')
+```ts test name="typed RPC proxy"
+import { RPC, type RPCProxy, type RPCFunction } from 'rpc.do'
+
+// Define API interface
+interface API {
+  greet: (input: { name: string }) => { message: string }
+  math: {
+    add: (input: { a: number; b: number }) => { result: number }
+  }
+}
 
 const mockTransport = {
-  async batch(calls) {
-    return calls.map(call => {
-      // Simulate server applying chain
-      let result = { data: { value: 42 } }
-      if (call.chain) {
-        result = applyChain(result, call.chain)
-      }
-      return { id: call.id, result }
-    })
+  async call(method: string, args: any[]) {
+    if (method === 'greet') {
+      return { message: `Hello, ${args[0].name}!` }
+    }
+    if (method === 'math.add') {
+      return { result: args[0].a + args[0].b }
+    }
   }
 }
 
-const client = createRPCClient({ transport: mockTransport })
+// Create typed RPC client
+const rpc = RPC<API>(mockTransport)
 
-// Call with chained operations
-const deferred = client.call('getData')
-const value = await deferred.data.value
+const greeting = await rpc.greet({ name: 'World' })
+expect(greeting.message).toBe('Hello, World!')
 
-expect(value).toBe(42)
+const sum = await rpc.math.add({ a: 10, b: 20 })
+expect(sum.result).toBe(30)
 ```
 
-## Integration: Full RPC Round Trip
+## Error Handling
 
-```ts test name="full rpc round trip simulation"
-const {
-  createRPCClient,
-  createDeferred,
-  applyChain,
-  CallbackRegistry
-} = await import('ai-functions/rpc')
+```ts test name="RPC error propagation"
+import { RPC } from 'rpc.do'
 
-// Simulated server-side handler
-const serverRegistry = new CallbackRegistry()
-const serverMethods = {
-  getUser: (id) => ({
-    id,
-    name: `User ${id}`,
-    greet: (greeting) => `${greeting}, User ${id}!`
-  }),
-  transform: (items, fn) => {
-    // Server executes the callback
-    return items.map(fn)
+const errorTransport = {
+  async call(method: string) {
+    throw new Error(`Method ${method} failed`)
   }
 }
 
-// Mock transport that simulates server
-const mockTransport = {
-  async batch(calls) {
-    return calls.map(call => {
-      try {
-        const method = serverMethods[call.method]
-        if (!method) throw new Error(`Unknown method: ${call.method}`)
+const rpc = RPC(errorTransport)
 
-        let result = method(...(call.params || []))
+await expect(rpc.failingMethod()).rejects.toThrow('Method failingMethod failed')
+```
 
-        if (call.chain) {
-          result = applyChain(result, call.chain)
-        }
+```ts test name="RPC with validation errors"
+import { RPC } from 'rpc.do'
 
-        return { id: call.id, result }
-      } catch (error) {
-        return { id: call.id, error: { message: error.message } }
-      }
-    })
+const validatingTransport = {
+  async call(method: string, args: any[]) {
+    if (!args[0] || typeof args[0] !== 'object') {
+      throw new Error('First argument must be an object')
+    }
+    return { success: true }
   }
 }
 
-const client = createRPCClient({ transport: mockTransport })
+const rpc = RPC(validatingTransport)
 
-// Test simple call
-const user = await client.call('getUser', '123')
-expect(user.name).toBe('User 123')
+await expect(rpc.validate('not-an-object')).rejects.toThrow('First argument must be an object')
 
-// Test chained call
-const greeting = await client.call('getUser', '456').greet('Hello')
-expect(greeting).toBe('Hello, User 456!')
+const result = await rpc.validate({ valid: true })
+expect(result.success).toBe(true)
+```
+
+## Auth Provider
+
+```ts test name="auth provider interface"
+import { auth, type AuthProvider } from 'rpc.do'
+
+// auth() returns an AuthProvider function
+const getToken = auth()
+expect(typeof getToken).toBe('function')
+
+// It returns a token or null
+const token = await getToken()
+expect(token === null || typeof token === 'string').toBe(true)
 ```
 
 ## Run Matrix
