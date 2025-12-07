@@ -24,7 +24,7 @@ import type {
   ViewSyncResult,
   ViewEntityItem,
   ViewRelationshipMutation,
-} from 'mdxdb'
+} from '@mdxdb/fs'
 import type { ClickHouseDatabase } from './index.js'
 
 // =============================================================================

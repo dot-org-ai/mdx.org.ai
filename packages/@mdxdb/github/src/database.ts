@@ -20,7 +20,7 @@ import type {
   SetResult,
   DeleteOptions,
   DeleteResult,
-} from 'mdxdb'
+} from '@mdxdb/fs'
 import type { GitHubDatabaseConfig, GitHubFileContent, GitHubDirectoryEntry } from './types.js'
 
 /**

@@ -359,18 +359,20 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         return relationships.delete(id)
       },
 
-      async related(url, type, direction = 'from') {
+      async related(url, type, direction) {
+        // Default to 'from' if direction is not specified or undefined
+        const dir = direction ?? 'from'
         const urls: string[] = []
 
         for (const rel of relationships.values()) {
           if (type && rel.type !== type) continue
 
-          // direction='to': Return things this URL points TO (outbound, where from_url = url)
-          if ((direction === 'to' || direction === 'both') && rel.from_url === url) {
+          // dir='to': Return things this URL points TO (outbound, where from_url = url)
+          if ((dir === 'to' || dir === 'both') && rel.from_url === url) {
             urls.push(rel.to_url as string)
           }
-          // direction='from': Return things that point TO this URL (inbound, where to_url = url)
-          if ((direction === 'from' || direction === 'both') && rel.to_url === url) {
+          // dir='from': Return things that point TO this URL (inbound, where to_url = url)
+          if ((dir === 'from' || dir === 'both') && rel.to_url === url) {
             urls.push(rel.from_url as string)
           }
         }
@@ -383,16 +385,18 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         return result
       },
 
-      async relationships(url, type, direction = 'both') {
+      async relationships(url, type, direction) {
+        // Default to 'both' if direction is not specified or undefined
+        const dir = direction ?? 'both'
         const result = []
 
         for (const rel of relationships.values()) {
           if (type && rel.type !== type) continue
 
           const matches =
-            (direction === 'from' && rel.from_url === url) ||
-            (direction === 'to' && rel.to_url === url) ||
-            (direction === 'both' && (rel.from_url === url || rel.to_url === url))
+            (dir === 'from' && rel.from_url === url) ||
+            (dir === 'to' && rel.to_url === url) ||
+            (dir === 'both' && (rel.from_url === url || rel.to_url === url))
 
           if (matches) {
             result.push({

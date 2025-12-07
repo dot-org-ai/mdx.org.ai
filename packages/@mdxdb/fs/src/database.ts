@@ -19,7 +19,7 @@ import type {
   SetResult,
   DeleteOptions,
   DeleteResult,
-} from 'mdxdb'
+} from './types.js'
 import {
   extract,
   diff,

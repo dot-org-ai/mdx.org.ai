@@ -1786,7 +1786,7 @@ export { ClickHouseProvider, createClickhouseProvider } from './provider.js'
 // View manager for bi-directional relationship rendering/extraction
 export { ClickHouseViewManager, createClickHouseViewManager } from './views.js'
 
-// Re-export view types
+// Re-export view types (now from @mdxdb/fs)
 export type {
   ViewManager,
   ViewDocument,
@@ -1797,4 +1797,4 @@ export type {
   ViewEntityItem,
   ViewRelationshipMutation,
   DatabaseWithViews,
-} from 'mdxdb'
+} from '@mdxdb/fs'

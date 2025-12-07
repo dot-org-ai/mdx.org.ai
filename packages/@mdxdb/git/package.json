@@ -1,0 +1,62 @@
+{
+  "name": "@mdxdb/git",
+  "version": "1.9.0",
+  "description": "Git adapter for mdxdb - stores MDX documents in git repositories with version control",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxdb",
+    "git",
+    "isomorphic-git",
+    "version-control",
+    "adapter",
+    "mdx",
+    "database"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "isomorphic-git": "^1.27.1"
+  },
+  "peerDependencies": {
+    "@mdxdb/fs": "workspace:*",
+    "@mdxld/extract": "workspace:*",
+    "mdxld": "workspace:*"
+  },
+  "devDependencies": {
+    "@mdxdb/fs": "workspace:*",
+    "@mdxld/config": "workspace:^",
+    "@mdxld/extract": "workspace:*",
+    "mdxld": "workspace:*",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxdb/git"
+  },
+  "author": "MDX.org.ai"
+}

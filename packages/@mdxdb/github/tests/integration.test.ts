@@ -15,7 +15,7 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { createGitHubDatabase } from '../src/index.js'
-import type { Database } from 'mdxdb'
+import type { Database } from '@mdxdb/fs'
 import type { MDXLDDocument, MDXLDData } from 'mdxld'
 
 // Check for required environment variables

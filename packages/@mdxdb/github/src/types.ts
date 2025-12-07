@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import type { DatabaseConfig } from 'mdxdb'
+import type { DatabaseConfig } from '@mdxdb/fs'
 
 /**
  * GitHub authentication options

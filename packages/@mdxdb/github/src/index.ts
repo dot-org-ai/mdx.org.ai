@@ -52,7 +52,7 @@ export type {
   GitHubRateLimit,
 } from './types.js'
 
-// Re-export common types for convenience
+// Re-export common types for convenience (now from @mdxdb/fs)
 export type {
   Database,
   ListOptions,
@@ -64,6 +64,6 @@ export type {
   SetResult,
   DeleteOptions,
   DeleteResult,
-} from 'mdxdb'
+} from '@mdxdb/fs'
 
 export type { MDXLDDocument, MDXLDData } from 'mdxld'

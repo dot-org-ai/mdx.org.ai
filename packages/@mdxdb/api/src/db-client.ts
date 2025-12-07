@@ -2,6 +2,7 @@
  * @mdxdb/api DBClient Implementation
  *
  * Fetch-based HTTP client implementing ai-database DBClient interface
+ * Uses JSON:API standard format (https://jsonapi.org/)
  *
  * @packageDocumentation
  */
@@ -25,7 +26,6 @@ import type {
   EventQueryOptions,
   ActionQueryOptions,
   ArtifactType,
-  ActionStatus,
 } from 'ai-database'
 
 /**
@@ -45,16 +45,80 @@ export interface DBClientConfig {
 }
 
 /**
- * API response wrapper
+ * JSON:API resource object
  */
-interface ApiResponse<T = unknown> {
-  success: boolean
-  data?: T
-  error?: string
+interface JsonApiResource<T = Record<string, unknown>> {
+  type: string
+  id: string
+  attributes?: T
+  relationships?: Record<string, JsonApiRelationship>
+  links?: {
+    self?: string
+    related?: string
+  }
+  meta?: Record<string, unknown>
 }
 
 /**
- * HTTP client implementing DBClient interface
+ * JSON:API relationship
+ */
+interface JsonApiRelationship {
+  data: JsonApiResourceIdentifier | JsonApiResourceIdentifier[] | null
+  links?: {
+    self?: string
+    related?: string
+  }
+  meta?: Record<string, unknown>
+}
+
+/**
+ * JSON:API resource identifier
+ */
+interface JsonApiResourceIdentifier {
+  type: string
+  id: string
+}
+
+/**
+ * JSON:API document (response)
+ */
+interface JsonApiDocument<T = Record<string, unknown>> {
+  data?: JsonApiResource<T> | JsonApiResource<T>[] | null
+  errors?: JsonApiError[]
+  meta?: Record<string, unknown>
+  links?: {
+    self?: string
+    first?: string
+    last?: string
+    prev?: string
+    next?: string
+  }
+  included?: JsonApiResource[]
+}
+
+/**
+ * JSON:API error object
+ */
+interface JsonApiError {
+  id?: string
+  status?: string
+  code?: string
+  title?: string
+  detail?: string
+  source?: {
+    pointer?: string
+    parameter?: string
+  }
+  meta?: Record<string, unknown>
+}
+
+/**
+ * JSON:API content type
+ */
+const JSONAPI_CONTENT_TYPE = 'application/vnd.api+json'
+
+/**
+ * HTTP client implementing DBClient interface with JSON:API format
  *
  * @example
  * ```ts
@@ -82,43 +146,32 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
   constructor(config: DBClientConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, '')
     this.apiKey = config.apiKey
-    this.fetchFn = config.fetch ?? globalThis.fetch
-    this.defaultHeaders = config.headers ?? {}
-    this.timeout = config.timeout ?? 30000
-
-    if (!this.fetchFn) {
-      throw new Error('fetch is not available. Please provide a fetch implementation.')
+    this.fetchFn = config.fetch ?? fetch
+    this.defaultHeaders = {
+      'Content-Type': JSONAPI_CONTENT_TYPE,
+      Accept: JSONAPI_CONTENT_TYPE,
+      ...config.headers,
     }
+    this.timeout = config.timeout ?? 30000
   }
 
-  /**
-   * Make an API request
-   */
   private async request<T>(
     method: string,
     path: string,
     body?: unknown,
     query?: Record<string, string | undefined>
   ): Promise<T> {
-    let url = `${this.baseUrl}${path}`
+    const url = new URL(`${this.baseUrl}${path}`)
+
     if (query) {
-      const params = new URLSearchParams()
       for (const [key, value] of Object.entries(query)) {
         if (value !== undefined) {
-          params.set(key, value)
+          url.searchParams.set(key, value)
         }
       }
-      const queryString = params.toString()
-      if (queryString) {
-        url += `?${queryString}`
-      }
     }
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...this.defaultHeaders,
-    }
-
+    const headers: Record<string, string> = { ...this.defaultHeaders }
     if (this.apiKey) {
       headers['Authorization'] = `Bearer ${this.apiKey}`
     }
@@ -127,22 +180,66 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     try {
-      const response = await this.fetchFn(url, {
+      const response = await this.fetchFn(url.toString(), {
         method,
         headers,
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal,
       })
 
-      const result = (await response.json()) as ApiResponse<T>
-
-      if (!result.success) {
-        throw new Error(result.error ?? 'Unknown API error')
+      // Handle empty responses (e.g., 204 No Content from DELETE)
+      const text = await response.text()
+      if (!text) {
+        return {} as unknown as T
       }
 
-      return result.data as T
+      const doc = JSON.parse(text) as JsonApiDocument
+
+      if (doc.errors && doc.errors.length > 0) {
+        const error = doc.errors[0]!
+        throw new Error(error.detail || error.title || 'API Error')
+      }
+
+      return doc as unknown as T
     } finally {
       clearTimeout(timeoutId)
+    }
+  }
+
+  /**
+   * Convert a Thing to JSON:API resource format
+   */
+  private thingToResource(thing: Thing<TData>): JsonApiResource<TData> {
+    return {
+      type: thing.type,
+      id: thing.url || `${thing.ns || ''}/${thing.type}/${thing.id}`,
+      attributes: thing.data,
+      links: {
+        self: thing.url,
+      },
+      meta: {
+        ns: thing.ns,
+        createdAt: thing.createdAt?.toISOString(),
+        updatedAt: thing.updatedAt?.toISOString(),
+      },
+    }
+  }
+
+  /**
+   * Convert a JSON:API resource to Thing
+   */
+  private resourceToThing(resource: JsonApiResource<TData>): Thing<TData> {
+    const now = new Date()
+    // ts-japi puts domain fields in attributes, not at the top level
+    const attrs = resource.attributes as Record<string, unknown> || {}
+    return {
+      type: (attrs.type as string) || resource.type,
+      id: (attrs.id as string) || resource.id.split('/').pop() || resource.id,
+      url: (attrs.url as string) || resource.id,
+      ns: (attrs.ns as string) || '',
+      data: (attrs.data as TData) || ({} as TData),
+      createdAt: resource.meta?.createdAt ? new Date(resource.meta.createdAt as string) : now,
+      updatedAt: resource.meta?.updatedAt ? new Date(resource.meta.updatedAt as string) : now,
     }
   }
 
@@ -151,30 +248,33 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
   // ===========================================================================
 
   async list(options: QueryOptions = {}): Promise<Thing<TData>[]> {
-    return this.request<Thing<TData>[]>('GET', '/things', undefined, {
-      ns: options.ns,
-      type: options.type,
-      limit: options.limit?.toString(),
-      offset: options.offset?.toString(),
-      orderBy: options.orderBy,
-      order: options.order,
+    const doc = await this.request<JsonApiDocument<TData>>('GET', '/things', undefined, {
+      'filter[ns]': options.ns,
+      'filter[type]': options.type,
+      'page[limit]': options.limit?.toString(),
+      'page[offset]': options.offset?.toString(),
+      sort: options.orderBy ? `${options.order === 'desc' ? '-' : ''}${options.orderBy}` : undefined,
     })
+
+    if (!doc.data || !Array.isArray(doc.data)) return []
+    return doc.data.map((resource) => this.resourceToThing(resource))
   }
 
   async find(options: QueryOptions): Promise<Thing<TData>[]> {
-    return this.request<Thing<TData>[]>('GET', '/things/find', undefined, {
-      ns: options.ns,
-      type: options.type,
-      where: options.where ? JSON.stringify(options.where) : undefined,
-      limit: options.limit?.toString(),
-      offset: options.offset?.toString(),
-      orderBy: options.orderBy,
-      order: options.order,
+    const doc = await this.request<JsonApiDocument<TData>>('GET', '/things/find', undefined, {
+      'filter[ns]': options.ns,
+      'filter[type]': options.type,
+      'filter[where]': options.where ? JSON.stringify(options.where) : undefined,
+      'page[limit]': options.limit?.toString(),
+      'page[offset]': options.offset?.toString(),
     })
+
+    if (!doc.data || !Array.isArray(doc.data)) return []
+    return doc.data.map((resource) => this.resourceToThing(resource))
   }
 
   async search(options: ThingSearchOptions): Promise<Thing<TData>[]> {
-    return this.request<Thing<TData>[]>('GET', '/things/search', undefined, {
+    const doc = await this.request<JsonApiDocument<TData>>('GET', '/things/search', undefined, {
       query: options.query,
       ns: options.ns,
       type: options.type,
@@ -183,13 +283,22 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
       limit: options.limit?.toString(),
       offset: options.offset?.toString(),
     })
+
+    if (!doc.data || !Array.isArray(doc.data)) return []
+    return doc.data.map((resource) => this.resourceToThing(resource))
   }
 
   async get(url: string): Promise<Thing<TData> | null> {
     try {
-      return await this.request<Thing<TData>>('GET', `/things/${encodeURIComponent(url)}`)
+      const doc = await this.request<JsonApiDocument<TData>>(
+        'GET',
+        `/things/${encodeURIComponent(url)}`
+      )
+
+      if (!doc.data || Array.isArray(doc.data)) return null
+      return this.resourceToThing(doc.data)
     } catch (error) {
-      if (String(error).includes('not found')) {
+      if (String(error).includes('not found') || String(error).includes('404')) {
         return null
       }
       throw error
@@ -202,24 +311,28 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
   }
 
   async set(url: string, data: TData): Promise<Thing<TData>> {
-    // Parse URL to get ns, type, id
-    const parsed = new URL(url)
-    const parts = parsed.pathname.split('/').filter(Boolean)
-    const ns = parsed.host
-    const type = parts[0] ?? ''
-    const id = parts.slice(1).join('/')
+    const existing = await this.get(url)
+    const parsedUrl = new URL(url)
+    const parts = parsedUrl.pathname.split('/').filter(Boolean)
+    const type = parts[0] || 'Thing'
 
-    return this.upsert({
-      ns,
-      type,
-      id,
-      url,
-      data,
+    const doc = await this.request<JsonApiDocument<TData>>('PATCH', `/things/${encodeURIComponent(url)}`, {
+      data: {
+        type,
+        id: url,
+        attributes: data,
+      },
     })
+
+    if (!doc.data || Array.isArray(doc.data)) {
+      throw new Error('Invalid response')
+    }
+    return this.resourceToThing(doc.data)
   }
 
   async create(options: CreateOptions<TData>): Promise<Thing<TData>> {
-    return this.request<Thing<TData>>('POST', '/things', {
+    // Send simple JSON format (server deserializes, responds with JSON:API)
+    const doc = await this.request<JsonApiDocument<TData>>('POST', '/things', {
       ns: options.ns,
       type: options.type,
       id: options.id,
@@ -227,28 +340,46 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
       data: options.data,
       '@context': options['@context'],
     })
+
+    if (!doc.data || Array.isArray(doc.data)) {
+      throw new Error('Invalid response')
+    }
+    return this.resourceToThing(doc.data)
   }
 
   async update(url: string, options: UpdateOptions<TData>): Promise<Thing<TData>> {
-    return this.request<Thing<TData>>('PUT', `/things/${encodeURIComponent(url)}`, {
+    // Send simple JSON format (server deserializes, responds with JSON:API)
+    const doc = await this.request<JsonApiDocument<TData>>('PATCH', `/things/${encodeURIComponent(url)}`, {
       data: options.data,
     })
+
+    if (!doc.data || Array.isArray(doc.data)) {
+      throw new Error('Invalid response')
+    }
+    return this.resourceToThing(doc.data)
   }
 
   async upsert(options: CreateOptions<TData>): Promise<Thing<TData>> {
-    return this.request<Thing<TData>>('POST', '/things/upsert', {
-      ns: options.ns,
-      type: options.type,
-      id: options.id,
-      url: options.url,
-      data: options.data,
-      '@context': options['@context'],
-    })
+    const url = options.url || `https://${options.ns}/${options.type}/${options.id || ''}`
+    const existing = await this.get(url)
+
+    if (existing) {
+      return this.update(url, { data: options.data })
+    }
+    return this.create(options)
   }
 
   async delete(url: string): Promise<boolean> {
-    const result = await this.request<{ deleted: boolean }>('DELETE', `/things/${encodeURIComponent(url)}`)
-    return result.deleted
+    try {
+      await this.request<JsonApiDocument>('DELETE', `/things/${encodeURIComponent(url)}`)
+      return true
+    } catch (error) {
+      // Return false for "not found" errors
+      if (String(error).includes('not found') || String(error).includes('404')) {
+        return false
+      }
+      throw error
+    }
   }
 
   async forEach(
@@ -268,21 +399,38 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
   async relate<T extends Record<string, unknown> = Record<string, unknown>>(
     options: RelateOptions<T>
   ): Promise<Relationship<T>> {
-    return this.request<Relationship<T>>('POST', '/relationships', {
+    // Send simple JSON format
+    const doc = await this.request<JsonApiDocument>('POST', '/relationships', {
       type: options.type,
       from: options.from,
       to: options.to,
       data: options.data,
     })
+
+    return this.resourceToRelationship(doc.data as JsonApiResource) as Relationship<T>
+  }
+
+  private resourceToRelationship<T extends Record<string, unknown>>(resource: JsonApiResource): Relationship<T> {
+    // ts-japi puts domain fields in attributes
+    const attrs = resource.attributes as Record<string, unknown> || {}
+    return {
+      id: (attrs.id as string) || resource.id,
+      type: (attrs.type as string) || resource.type,
+      from: (attrs.from as string) || '',
+      to: (attrs.to as string) || '',
+      createdAt: resource.meta?.createdAt ? new Date(resource.meta.createdAt as string) : new Date(),
+      data: (attrs.data as T) || ({} as T),
+    }
   }
 
   async unrelate(from: string, type: string, to: string): Promise<boolean> {
-    const result = await this.request<{ removed: boolean }>('DELETE', '/relationships', undefined, {
+    // Note: Don't manually encode - searchParams.set() handles encoding
+    await this.request('DELETE', '/relationships', undefined, {
       from,
       type,
       to,
     })
-    return result.removed
+    return true
   }
 
   async related(
@@ -290,10 +438,18 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
     relationshipType?: string,
     direction?: 'from' | 'to' | 'both'
   ): Promise<Thing<TData>[]> {
-    return this.request<Thing<TData>[]>('GET', `/things/${encodeURIComponent(url)}/related`, undefined, {
-      type: relationshipType,
-      direction,
-    })
+    const doc = await this.request<JsonApiDocument<TData>>(
+      'GET',
+      `/things/${encodeURIComponent(url)}/related`,
+      undefined,
+      {
+        type: relationshipType,
+        direction,
+      }
+    )
+
+    if (!doc.data || !Array.isArray(doc.data)) return []
+    return doc.data.map((resource) => this.resourceToThing(resource))
   }
 
   async relationships(
@@ -301,16 +457,19 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
     type?: string,
     direction?: 'from' | 'to' | 'both'
   ): Promise<Relationship[]> {
-    return this.request<Relationship[]>('GET', `/things/${encodeURIComponent(url)}/relationships`, undefined, {
-      type,
-      direction,
-    })
+    const doc = await this.request<JsonApiDocument>(
+      'GET',
+      `/things/${encodeURIComponent(url)}/relationships`,
+      undefined,
+      { type, direction }
+    )
+
+    if (!doc.data || !Array.isArray(doc.data)) return []
+    return (doc.data as JsonApiResource[]).map((resource) => this.resourceToRelationship(resource))
   }
 
   async references(url: string, relationshipType?: string): Promise<Thing<TData>[]> {
-    return this.request<Thing<TData>[]>('GET', `/things/${encodeURIComponent(url)}/references`, undefined, {
-      type: relationshipType,
-    })
+    return this.related(url, relationshipType, 'from')
   }
 
   // ===========================================================================
@@ -318,36 +477,57 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
   // ===========================================================================
 
   async track<T extends Record<string, unknown>>(options: CreateEventOptions<T>): Promise<Event<T>> {
-    return this.request<Event<T>>('POST', '/events', {
+    // Send simple JSON format
+    const doc = await this.request<JsonApiDocument>('POST', '/events', {
       type: options.type,
       source: options.source,
       data: options.data,
       correlationId: options.correlationId,
       causationId: options.causationId,
     })
+
+    return this.resourceToEvent(doc.data as JsonApiResource) as Event<T>
   }
 
   async getEvent(id: string): Promise<Event | null> {
     try {
-      return await this.request<Event>('GET', `/events/${id}`)
+      const doc = await this.request<JsonApiDocument>('GET', `/events/${encodeURIComponent(id)}`)
+
+      if (!doc.data || Array.isArray(doc.data)) return null
+      return this.resourceToEvent(doc.data)
     } catch (error) {
-      if (String(error).includes('not found')) {
-        return null
-      }
+      if (String(error).includes('not found')) return null
       throw error
     }
   }
 
   async queryEvents(options: EventQueryOptions = {}): Promise<Event[]> {
-    return this.request<Event[]>('GET', '/events', undefined, {
-      type: options.type,
-      source: options.source,
-      correlationId: options.correlationId,
-      after: options.after?.toISOString(),
-      before: options.before?.toISOString(),
-      limit: options.limit?.toString(),
-      offset: options.offset?.toString(),
+    const doc = await this.request<JsonApiDocument>('GET', '/events', undefined, {
+      'filter[type]': options.type,
+      'filter[source]': options.source,
+      'filter[correlationId]': options.correlationId,
+      'filter[after]': options.after?.toISOString(),
+      'filter[before]': options.before?.toISOString(),
+      'page[limit]': options.limit?.toString(),
+      'page[offset]': options.offset?.toString(),
     })
+
+    if (!doc.data || !Array.isArray(doc.data)) return []
+    return (doc.data as JsonApiResource[]).map((resource) => this.resourceToEvent(resource))
+  }
+
+  private resourceToEvent(resource: JsonApiResource): Event {
+    // ts-japi puts domain fields in attributes
+    const attrs = resource.attributes as Record<string, unknown> || {}
+    return {
+      id: (attrs.id as string) || resource.id,
+      type: (attrs.type as string) || resource.type,
+      timestamp: resource.meta?.timestamp ? new Date(resource.meta.timestamp as string) : new Date(),
+      source: (attrs.source as string) || '',
+      data: (attrs.data as Record<string, unknown>) || {},
+      correlationId: attrs.correlationId as string | undefined,
+      causationId: attrs.causationId as string | undefined,
+    }
   }
 
   // ===========================================================================
@@ -355,21 +535,27 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
   // ===========================================================================
 
   async send<T extends Record<string, unknown>>(options: CreateActionOptions<T>): Promise<Action<T>> {
-    return this.request<Action<T>>('POST', '/actions/send', {
+    // Send simple JSON format
+    const doc = await this.request<JsonApiDocument>('POST', '/actions/send', {
       actor: options.actor,
       object: options.object,
       action: options.action,
       metadata: options.metadata,
     })
+
+    return this.resourceToAction(doc.data as JsonApiResource) as Action<T>
   }
 
   async do<T extends Record<string, unknown>>(options: CreateActionOptions<T>): Promise<Action<T>> {
-    return this.request<Action<T>>('POST', '/actions/do', {
+    // Send simple JSON format
+    const doc = await this.request<JsonApiDocument>('POST', '/actions/do', {
       actor: options.actor,
       object: options.object,
       action: options.action,
       metadata: options.metadata,
     })
+
+    return this.resourceToAction(doc.data as JsonApiResource) as Action<T>
   }
 
   async try<T extends Record<string, unknown>>(
@@ -387,40 +573,73 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
 
   async getAction(id: string): Promise<Action | null> {
     try {
-      return await this.request<Action>('GET', `/actions/${id}`)
+      const doc = await this.request<JsonApiDocument>('GET', `/actions/${encodeURIComponent(id)}`)
+
+      if (!doc.data || Array.isArray(doc.data)) return null
+      return this.resourceToAction(doc.data)
     } catch (error) {
-      if (String(error).includes('not found')) {
-        return null
-      }
+      if (String(error).includes('not found')) return null
       throw error
     }
   }
 
   async queryActions(options: ActionQueryOptions = {}): Promise<Action[]> {
-    return this.request<Action[]>('GET', '/actions', undefined, {
-      actor: options.actor,
-      object: options.object,
-      action: options.action,
-      status: Array.isArray(options.status) ? options.status.join(',') : options.status,
-      limit: options.limit?.toString(),
-      offset: options.offset?.toString(),
+    const doc = await this.request<JsonApiDocument>('GET', '/actions', undefined, {
+      'filter[actor]': options.actor,
+      'filter[object]': options.object,
+      'filter[action]': options.action,
+      'filter[status]': Array.isArray(options.status) ? options.status.join(',') : options.status,
+      'page[limit]': options.limit?.toString(),
+      'page[offset]': options.offset?.toString(),
     })
+
+    if (!doc.data || !Array.isArray(doc.data)) return []
+    return (doc.data as JsonApiResource[]).map((resource) => this.resourceToAction(resource))
   }
 
   async startAction(id: string): Promise<Action> {
-    return this.request<Action>('POST', `/actions/${id}/start`)
+    const doc = await this.request<JsonApiDocument>('POST', `/actions/${encodeURIComponent(id)}/start`)
+    return this.resourceToAction(doc.data as JsonApiResource)
   }
 
   async completeAction(id: string, result?: unknown): Promise<Action> {
-    return this.request<Action>('POST', `/actions/${id}/complete`, { result })
+    // Send simple JSON format
+    const doc = await this.request<JsonApiDocument>('POST', `/actions/${encodeURIComponent(id)}/complete`, {
+      result,
+    })
+    return this.resourceToAction(doc.data as JsonApiResource)
   }
 
   async failAction(id: string, error: string): Promise<Action> {
-    return this.request<Action>('POST', `/actions/${id}/fail`, { error })
+    // Send simple JSON format
+    const doc = await this.request<JsonApiDocument>('POST', `/actions/${encodeURIComponent(id)}/fail`, {
+      error,
+    })
+    return this.resourceToAction(doc.data as JsonApiResource)
   }
 
   async cancelAction(id: string): Promise<Action> {
-    return this.request<Action>('POST', `/actions/${id}/cancel`)
+    const doc = await this.request<JsonApiDocument>('POST', `/actions/${encodeURIComponent(id)}/cancel`)
+    return this.resourceToAction(doc.data as JsonApiResource)
+  }
+
+  private resourceToAction(resource: JsonApiResource): Action {
+    // ts-japi puts domain fields in attributes
+    const attrs = resource.attributes as Record<string, unknown> || {}
+    return {
+      id: (attrs.id as string) || resource.id,
+      actor: (attrs.actor as string) || '',
+      object: (attrs.object as string) || '',
+      action: (attrs.action as string) || resource.type,
+      status: (attrs.status as 'pending' | 'active' | 'completed' | 'failed' | 'cancelled') || 'pending',
+      createdAt: resource.meta?.createdAt ? new Date(resource.meta.createdAt as string) : new Date(),
+      updatedAt: resource.meta?.updatedAt ? new Date(resource.meta.updatedAt as string) : new Date(),
+      startedAt: resource.meta?.startedAt ? new Date(resource.meta.startedAt as string) : undefined,
+      completedAt: resource.meta?.completedAt ? new Date(resource.meta.completedAt as string) : undefined,
+      result: attrs.result,
+      error: attrs.error as string | undefined,
+      metadata: attrs.metadata as Record<string, unknown> | undefined,
+    }
   }
 
   // ===========================================================================
@@ -428,7 +647,8 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
   // ===========================================================================
 
   async storeArtifact<T>(options: StoreArtifactOptions<T>): Promise<Artifact<T>> {
-    return this.request<Artifact<T>>('POST', '/artifacts', {
+    // Send simple JSON format
+    const doc = await this.request<JsonApiDocument>('POST', '/artifacts', {
       key: options.key,
       type: options.type,
       source: options.source,
@@ -437,51 +657,66 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
       ttl: options.ttl,
       metadata: options.metadata,
     })
+
+    return this.resourceToArtifact(doc.data as JsonApiResource)
   }
 
   async getArtifact<T = unknown>(key: string): Promise<Artifact<T> | null> {
     try {
-      return await this.request<Artifact<T>>('GET', `/artifacts/${key}`)
+      const doc = await this.request<JsonApiDocument>('GET', `/artifacts/${encodeURIComponent(key)}`)
+
+      if (!doc.data || Array.isArray(doc.data)) return null
+      return this.resourceToArtifact(doc.data)
     } catch (error) {
-      if (String(error).includes('not found')) {
-        return null
-      }
+      if (String(error).includes('not found')) return null
       throw error
     }
   }
 
   async getArtifactBySource(source: string, type: ArtifactType): Promise<Artifact | null> {
     try {
-      return await this.request<Artifact>('GET', `/artifacts/source/${encodeURIComponent(source)}/${type}`)
+      const doc = await this.request<JsonApiDocument>(
+        'GET',
+        `/artifacts/source/${encodeURIComponent(source)}/${type}`
+      )
+
+      if (!doc.data || Array.isArray(doc.data)) return null
+      return this.resourceToArtifact(doc.data)
     } catch (error) {
-      if (String(error).includes('not found')) {
-        return null
-      }
+      if (String(error).includes('not found')) return null
       throw error
     }
   }
 
   async deleteArtifact(key: string): Promise<boolean> {
-    const result = await this.request<{ deleted: boolean }>('DELETE', `/artifacts/${key}`)
-    return result.deleted
+    await this.request<JsonApiDocument>('DELETE', `/artifacts/${encodeURIComponent(key)}`)
+    return true
   }
 
   async cleanExpiredArtifacts(): Promise<number> {
-    const result = await this.request<{ cleaned: number }>('POST', '/artifacts/clean')
-    return result.cleaned
+    const doc = await this.request<JsonApiDocument>('POST', '/artifacts/clean')
+    return (doc.meta?.cleaned as number) || 0
   }
 
-  // ===========================================================================
-  // Cleanup
-  // ===========================================================================
-
-  async close(): Promise<void> {
-    // No cleanup needed for HTTP client
+  private resourceToArtifact<T>(resource: JsonApiResource): Artifact<T> {
+    // ts-japi puts domain fields in attributes
+    const attrs = resource.attributes as Record<string, unknown> || {}
+    return {
+      key: (attrs.key as string) || resource.id,
+      type: (attrs.type as ArtifactType) || (resource.type as ArtifactType),
+      source: (attrs.source as string) || '',
+      sourceHash: attrs.sourceHash as string,
+      createdAt: resource.meta?.createdAt ? new Date(resource.meta.createdAt as string) : new Date(),
+      expiresAt: resource.meta?.expiresAt ? new Date(resource.meta.expiresAt as string) : undefined,
+      content: attrs.content as T,
+      size: (attrs.size as number) || 0,
+      metadata: attrs.metadata as Record<string, unknown> | undefined,
+    }
   }
 }
 
 /**
- * Create a DBClient HTTP client
+ * Create a DBClient HTTP client using JSON:API format
  *
  * @example
  * ```ts
@@ -492,23 +727,9 @@ export class DBApiClient<TData extends Record<string, unknown> = Record<string, 
  *   apiKey: process.env.API_KEY
  * })
  *
- * // List things
- * const users = await db.list({ ns: 'example.com', type: 'User' })
- *
- * // Create a thing
- * const user = await db.create({
- *   ns: 'example.com',
- *   type: 'User',
- *   id: 'user-1',
- *   data: { name: 'Alice', email: 'alice@example.com' }
- * })
- *
- * // Create relationship
- * await db.relate({
- *   type: 'author',
- *   from: 'https://example.com/Post/post-1',
- *   to: 'https://example.com/User/user-1'
- * })
+ * // Use like any DBClient
+ * const things = await db.list({ ns: 'example.com', type: 'User' })
+ * const thing = await db.get('https://example.com/User/123')
  * ```
  */
 export function createDBClient<TData extends Record<string, unknown> = Record<string, unknown>>(

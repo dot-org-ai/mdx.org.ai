@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 import * as os from 'node:os'
 import { createFsDatabase, FsDatabase } from './database.js'
-import type { Database } from 'mdxdb'
+import type { Database } from './types.js'
 import type { MDXLDDocument } from 'mdxld'
 
 describe('FsDatabase', () => {

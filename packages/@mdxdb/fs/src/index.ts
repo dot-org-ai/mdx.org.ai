@@ -1,8 +1,11 @@
 /**
  * @mdxdb/fs - Filesystem adapter for mdxdb
  *
- * A file system-based implementation of the mdxdb Database interface.
+ * A file system-based implementation of the Database interface.
  * Stores MDX documents as files on disk with YAML frontmatter.
+ *
+ * This package also serves as the canonical source for the core Database
+ * interface types that all database adapters implement.
  *
  * @packageDocumentation
  */
@@ -15,12 +18,13 @@ export { FsDatabase, createFsDatabase } from './database.js'
 // Provider (schema-first interface)
 export { FsProvider, createFsProvider } from './provider.js'
 
-// Types
-export type { FsDatabaseConfig, ExtractUpdateOptions, ExtractUpdateResult } from './types.js'
-
-// Re-export mdxdb types for convenience
+// Core Database interface types (now defined locally, not from mdxdb)
 export type {
+  // Database interface
   Database,
+  DatabaseConfig,
+  CreateDatabase,
+  // Query types
   ListOptions,
   ListResult,
   SearchOptions,
@@ -30,7 +34,21 @@ export type {
   SetResult,
   DeleteOptions,
   DeleteResult,
-} from 'mdxdb'
+  // View types
+  ViewManager,
+  ViewDocument,
+  ViewComponent,
+  ViewContext,
+  ViewRenderResult,
+  ViewSyncResult,
+  ViewEntityItem,
+  ViewRelationshipMutation,
+  DatabaseWithViews,
+  // Filesystem-specific
+  FsDatabaseConfig,
+  ExtractUpdateOptions,
+  ExtractUpdateResult,
+} from './types.js'
 
 export type { MDXLDDocument, MDXLDData } from 'mdxld'
 
@@ -47,19 +65,6 @@ export { extract, diff, applyExtract, validateTemplate, roundTripComponent } fro
 
 // View manager for bi-directional relationship rendering/extraction
 export { FsViewManager, createFsViewManager } from './views.js'
-
-// Re-export view types
-export type {
-  ViewManager,
-  ViewDocument,
-  ViewComponent,
-  ViewContext,
-  ViewRenderResult,
-  ViewSyncResult,
-  ViewEntityItem,
-  ViewRelationshipMutation,
-  DatabaseWithViews,
-} from 'mdxdb'
 
 // Re-export entity component utilities
 export {

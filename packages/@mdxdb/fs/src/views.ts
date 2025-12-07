@@ -50,7 +50,7 @@ import type {
   ViewSyncResult,
   ViewEntityItem,
   ViewRelationshipMutation,
-} from 'mdxdb'
+} from './types.js'
 import type { FsProvider } from './provider.js'
 import type { FsDatabaseConfig } from './types.js'
 

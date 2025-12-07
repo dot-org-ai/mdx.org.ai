@@ -9,7 +9,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import type { MDXLDData } from 'mdxld'
-import type { Database } from 'mdxdb'
+import type { Database } from '@mdxdb/fs'
 import type { ServerConfig, ApiResponse, ListQuery, SearchQuery, SetBody, DeleteQuery } from './types.js'
 
 /**

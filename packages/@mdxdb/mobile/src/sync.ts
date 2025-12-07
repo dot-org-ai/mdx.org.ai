@@ -346,6 +346,28 @@ export async function createFileSystemAdapter(
 
   await ensureDir(baseDir)
 
+  const listFiles = async (prefix?: string): Promise<string[]> => {
+    const searchDir = prefix ? resolvePath(prefix) : baseDir
+    const info = await FileSystem.getInfoAsync(searchDir)
+    if (!info.exists || !info.isDirectory) return []
+
+    const items = await FileSystem.readDirectoryAsync(searchDir)
+    const paths: string[] = []
+
+    for (const item of items) {
+      const itemPath = `${searchDir}/${item}`
+      const itemInfo = await FileSystem.getInfoAsync(itemPath)
+      if (itemInfo.isDirectory) {
+        const subItems = await listFiles(itemPath)
+        paths.push(...subItems)
+      } else {
+        paths.push(itemPath.replace(baseDir + '/', ''))
+      }
+    }
+
+    return paths
+  }
+
   return {
     async get(path: string): Promise<string | null> {
       const fullPath = resolvePath(path)
@@ -369,27 +391,7 @@ export async function createFileSystemAdapter(
       }
     },
 
-    async list(prefix?: string): Promise<string[]> {
-      const searchDir = prefix ? resolvePath(prefix) : baseDir
-      const info = await FileSystem.getInfoAsync(searchDir)
-      if (!info.exists || !info.isDirectory) return []
-
-      const items = await FileSystem.readDirectoryAsync(searchDir)
-      const paths: string[] = []
-
-      for (const item of items) {
-        const itemPath = `${searchDir}/${item}`
-        const itemInfo = await FileSystem.getInfoAsync(itemPath)
-        if (itemInfo.isDirectory) {
-          const subItems = await this.list(itemPath)
-          paths.push(...subItems)
-        } else {
-          paths.push(itemPath.replace(baseDir + '/', ''))
-        }
-      }
-
-      return paths
-    },
+    list: listFiles,
 
     async exists(path: string): Promise<boolean> {
       const fullPath = resolvePath(path)

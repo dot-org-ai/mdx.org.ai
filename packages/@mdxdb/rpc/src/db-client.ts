@@ -1,12 +1,13 @@
 /**
  * @mdxdb/rpc DBClient Implementation
  *
- * JSON-RPC client implementing ai-database DBClient interface
+ * RPC client implementing ai-database DBClient interface using rpc.do
  * Supports both HTTP and WebSocket transports
  *
  * @packageDocumentation
  */
 
+import { RPC, http, ws, type Transport, type RPCProxy } from 'rpc.do'
 import type {
   DBClient,
   DBClientExtended,
@@ -31,12 +32,7 @@ import type {
 /**
  * RPC transport type
  */
-export type Transport = 'http' | 'ws' | 'websocket'
-
-/**
- * Connection state for WebSocket transport
- */
-export type ConnectionState = 'connecting' | 'connected' | 'disconnected' | 'reconnecting'
+export type TransportType = 'http' | 'ws' | 'websocket'
 
 /**
  * Configuration for the DBClient RPC client
@@ -45,54 +41,61 @@ export interface DBRpcClientConfig {
   /** RPC endpoint URL */
   url: string
   /** Transport type (default: auto-detected from URL scheme) */
-  transport?: Transport
+  transport?: TransportType
   /** API key or token for authentication */
   apiKey?: string
-  /** Custom headers for HTTP transport */
-  headers?: Record<string, string>
-  /** Request timeout in milliseconds (default: 30000) */
-  timeout?: number
-  /** WebSocket reconnect options */
-  reconnect?: {
-    enabled?: boolean
-    maxAttempts?: number
-    delay?: number
+}
+
+/**
+ * DBClient RPC interface - methods exposed by the server
+ */
+interface DBClientRPC<TData extends Record<string, unknown> = Record<string, unknown>> {
+  db: {
+    // Thing operations
+    list(options?: QueryOptions): Thing<TData>[]
+    find(options: QueryOptions): Thing<TData>[]
+    search(options: ThingSearchOptions): Thing<TData>[]
+    get(url: string): Thing<TData> | null
+    getById(ns: string, type: string, id: string): Thing<TData> | null
+    set(url: string, data: TData): Thing<TData>
+    create(options: CreateOptions<TData>): Thing<TData>
+    update(url: string, options: UpdateOptions<TData>): Thing<TData>
+    upsert(options: CreateOptions<TData>): Thing<TData>
+    delete(url: string): boolean
+
+    // Relationship operations
+    relate<T extends Record<string, unknown>>(options: RelateOptions<T>): Relationship<T>
+    unrelate(from: string, type: string, to: string): boolean
+    related(url: string, type?: string, direction?: 'from' | 'to' | 'both'): Thing<TData>[]
+    relationships(url: string, type?: string, direction?: 'from' | 'to' | 'both'): Relationship[]
+    references(url: string, type?: string): Thing<TData>[]
+
+    // Event operations
+    track<T extends Record<string, unknown>>(options: CreateEventOptions<T>): Event<T>
+    getEvent(id: string): Event | null
+    queryEvents(options?: EventQueryOptions): Event[]
+
+    // Action operations
+    send<T extends Record<string, unknown>>(options: CreateActionOptions<T>): Action<T>
+    do<T extends Record<string, unknown>>(options: CreateActionOptions<T>): Action<T>
+    getAction(id: string): Action | null
+    queryActions(options?: ActionQueryOptions): Action[]
+    startAction(id: string): Action
+    completeAction(id: string, result?: unknown): Action
+    failAction(id: string, error: string): Action
+    cancelAction(id: string): Action
+
+    // Artifact operations
+    storeArtifact<T>(options: StoreArtifactOptions<T>): Artifact<T>
+    getArtifact<T>(key: string): Artifact<T> | null
+    getArtifactBySource(source: string, type: ArtifactType): Artifact | null
+    deleteArtifact(key: string): boolean
+    cleanExpiredArtifacts(): number
   }
 }
 
 /**
- * JSON-RPC 2.0 request
- */
-interface JsonRpcRequest {
-  jsonrpc: '2.0'
-  id: string | number
-  method: string
-  params?: unknown[] | Record<string, unknown>
-}
-
-/**
- * JSON-RPC 2.0 response
- */
-interface JsonRpcResponse<T = unknown> {
-  jsonrpc: '2.0'
-  id: string | number | null
-  result?: T
-  error?: {
-    code: number
-    message: string
-    data?: unknown
-  }
-}
-
-let requestId = 0
-function nextId(): number {
-  return ++requestId
-}
-
-/**
- * RPC client implementing DBClient interface
- *
- * Supports both HTTP and WebSocket transports for JSON-RPC 2.0 communication.
+ * RPC client implementing DBClient interface using rpc.do
  *
  * @example
  * ```ts
@@ -117,208 +120,92 @@ function nextId(): number {
 export class DBRpcClient<TData extends Record<string, unknown> = Record<string, unknown>>
   implements DBClientExtended<TData>
 {
-  private readonly url: string
+  private readonly rpc: RPCProxy<DBClientRPC<TData>>
   private readonly transport: Transport
-  private readonly apiKey?: string
-  private readonly headers: Record<string, string>
-  private readonly timeout: number
-  private readonly reconnectConfig: {
-    enabled: boolean
-    maxAttempts: number
-    delay: number
-  }
-
-  // WebSocket state
-  private ws: WebSocket | null = null
-  private connectionState: ConnectionState = 'disconnected'
-  private reconnectAttempts = 0
-  private pendingRequests = new Map<
-    number | string,
-    { resolve: (value: unknown) => void; reject: (error: Error) => void }
-  >()
 
   constructor(config: DBRpcClientConfig) {
-    this.url = config.url
-    this.transport = config.transport ?? this.detectTransport(config.url)
-    this.apiKey = config.apiKey
-    this.headers = config.headers ?? {}
-    this.timeout = config.timeout ?? 30000
-    this.reconnectConfig = {
-      enabled: config.reconnect?.enabled ?? true,
-      maxAttempts: config.reconnect?.maxAttempts ?? 5,
-      delay: config.reconnect?.delay ?? 1000,
+    const transportType = config.transport ?? this.detectTransport(config.url)
+    const authProvider = config.apiKey ? () => config.apiKey : undefined
+
+    if (transportType === 'ws' || transportType === 'websocket') {
+      this.transport = ws(config.url, authProvider)
+    } else {
+      this.transport = http(config.url, authProvider)
     }
+
+    this.rpc = RPC<DBClientRPC<TData>>(this.transport)
   }
 
-  private detectTransport(url: string): Transport {
+  private detectTransport(url: string): TransportType {
     if (url.startsWith('ws://') || url.startsWith('wss://')) {
       return 'ws'
     }
     return 'http'
   }
 
-  private async callHttp<T>(method: string, params: unknown): Promise<T> {
-    const request: JsonRpcRequest = {
-      jsonrpc: '2.0',
-      id: nextId(),
-      method: `db.${method}`,
-      params: params as Record<string, unknown>,
-    }
+  // ===========================================================================
+  // Date Conversion Helpers (JSON serialization loses Date types)
+  // ===========================================================================
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...this.headers,
-    }
-
-    if (this.apiKey) {
-      headers['Authorization'] = `Bearer ${this.apiKey}`
-    }
-
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
-
-    try {
-      const response = await fetch(this.url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(request),
-        signal: controller.signal,
-      })
-
-      const result = (await response.json()) as JsonRpcResponse<T>
-
-      if (result.error) {
-        throw new Error(result.error.message)
-      }
-
-      return result.result as T
-    } finally {
-      clearTimeout(timeoutId)
+  private convertThingDates(thing: Thing<TData> | null): Thing<TData> | null {
+    if (!thing) return null
+    return {
+      ...thing,
+      createdAt: thing.createdAt ? new Date(thing.createdAt as unknown as string) : new Date(),
+      updatedAt: thing.updatedAt ? new Date(thing.updatedAt as unknown as string) : new Date(),
     }
   }
 
-  private async ensureConnection(): Promise<void> {
-    if (this.connectionState === 'connected' && this.ws?.readyState === WebSocket.OPEN) {
-      return
-    }
-
-    if (this.connectionState === 'connecting') {
-      return new Promise((resolve, reject) => {
-        const checkConnection = setInterval(() => {
-          if (this.connectionState === 'connected') {
-            clearInterval(checkConnection)
-            resolve()
-          } else if (this.connectionState === 'disconnected') {
-            clearInterval(checkConnection)
-            reject(new Error('WebSocket connection failed'))
-          }
-        }, 100)
-      })
-    }
-
-    this.connectionState = 'connecting'
-
-    return new Promise((resolve, reject) => {
-      const wsUrl = this.apiKey ? `${this.url}?token=${this.apiKey}` : this.url
-      this.ws = new WebSocket(wsUrl)
-
-      this.ws.onopen = () => {
-        this.connectionState = 'connected'
-        this.reconnectAttempts = 0
-        resolve()
-      }
-
-      this.ws.onclose = () => {
-        this.connectionState = 'disconnected'
-        this.handleDisconnect()
-      }
-
-      this.ws.onerror = () => {
-        this.connectionState = 'disconnected'
-        reject(new Error('WebSocket connection error'))
-      }
-
-      this.ws.onmessage = (event) => {
-        try {
-          const response = JSON.parse(event.data) as JsonRpcResponse
-          const pending = this.pendingRequests.get(response.id!)
-
-          if (pending) {
-            this.pendingRequests.delete(response.id!)
-            if (response.error) {
-              pending.reject(new Error(response.error.message))
-            } else {
-              pending.resolve(response.result)
-            }
-          }
-        } catch {
-          // Ignore malformed messages
-        }
-      }
-    })
+  private convertThingsDates(things: Thing<TData>[]): Thing<TData>[] {
+    return things.map((thing) => this.convertThingDates(thing)!)
   }
 
-  private handleDisconnect(): void {
-    for (const [, pending] of this.pendingRequests) {
-      pending.reject(new Error('WebSocket disconnected'))
-    }
-    this.pendingRequests.clear()
-
-    if (
-      this.reconnectConfig.enabled &&
-      this.reconnectAttempts < this.reconnectConfig.maxAttempts
-    ) {
-      this.connectionState = 'reconnecting'
-      this.reconnectAttempts++
-
-      const delay = this.reconnectConfig.delay * Math.pow(2, this.reconnectAttempts - 1)
-      setTimeout(() => {
-        this.ensureConnection().catch(() => {})
-      }, delay)
+  private convertRelationshipDates<T extends Record<string, unknown>>(rel: Relationship<T> | null): Relationship<T> | null {
+    if (!rel) return null
+    return {
+      ...rel,
+      createdAt: rel.createdAt ? new Date(rel.createdAt as unknown as string) : new Date(),
     }
   }
 
-  private async callWs<T>(method: string, params: unknown): Promise<T> {
-    await this.ensureConnection()
-
-    const id = nextId()
-    const request: JsonRpcRequest = {
-      jsonrpc: '2.0',
-      id,
-      method: `db.${method}`,
-      params: params as Record<string, unknown>,
-    }
-
-    return new Promise((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
-        this.pendingRequests.delete(id)
-        reject(new Error('RPC request timeout'))
-      }, this.timeout)
-
-      this.pendingRequests.set(id, {
-        resolve: (value) => {
-          clearTimeout(timeoutId)
-          resolve(value as T)
-        },
-        reject: (error) => {
-          clearTimeout(timeoutId)
-          reject(error)
-        },
-      })
-
-      this.ws!.send(JSON.stringify(request))
-    })
+  private convertRelationshipsDates<T extends Record<string, unknown>>(rels: Relationship<T>[]): Relationship<T>[] {
+    return rels.map((rel) => this.convertRelationshipDates(rel)!)
   }
 
-  private async call<T>(method: string, params: unknown): Promise<T> {
-    if (this.transport === 'http') {
-      return this.callHttp<T>(method, params)
+  private convertEventDates<T extends Record<string, unknown>>(event: Event<T> | null): Event<T> | null {
+    if (!event) return null
+    return {
+      ...event,
+      timestamp: event.timestamp ? new Date(event.timestamp as unknown as string) : new Date(),
     }
-    return this.callWs<T>(method, params)
   }
 
-  getConnectionState(): ConnectionState {
-    return this.connectionState
+  private convertEventsDates<T extends Record<string, unknown>>(events: Event<T>[]): Event<T>[] {
+    return events.map((event) => this.convertEventDates(event)!)
+  }
+
+  private convertActionDates<T extends Record<string, unknown>>(action: Action<T> | null): Action<T> | null {
+    if (!action) return null
+    return {
+      ...action,
+      createdAt: action.createdAt ? new Date(action.createdAt as unknown as string) : new Date(),
+      updatedAt: action.updatedAt ? new Date(action.updatedAt as unknown as string) : new Date(),
+      startedAt: action.startedAt ? new Date(action.startedAt as unknown as string) : undefined,
+      completedAt: action.completedAt ? new Date(action.completedAt as unknown as string) : undefined,
+    }
+  }
+
+  private convertActionsDates<T extends Record<string, unknown>>(actions: Action<T>[]): Action<T>[] {
+    return actions.map((action) => this.convertActionDates(action)!)
+  }
+
+  private convertArtifactDates<T>(artifact: Artifact<T> | null): Artifact<T> | null {
+    if (!artifact) return null
+    return {
+      ...artifact,
+      createdAt: artifact.createdAt ? new Date(artifact.createdAt as unknown as string) : new Date(),
+      expiresAt: artifact.expiresAt ? new Date(artifact.expiresAt as unknown as string) : undefined,
+    }
   }
 
   // ===========================================================================
@@ -326,50 +213,52 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
   // ===========================================================================
 
   async list(options: QueryOptions = {}): Promise<Thing<TData>[]> {
-    return this.call<Thing<TData>[]>('list', options)
+    const things = await this.rpc.db.list(options)
+    return this.convertThingsDates(things)
   }
 
   async find(options: QueryOptions): Promise<Thing<TData>[]> {
-    return this.call<Thing<TData>[]>('find', options)
+    const things = await this.rpc.db.find(options)
+    return this.convertThingsDates(things)
   }
 
   async search(options: ThingSearchOptions): Promise<Thing<TData>[]> {
-    return this.call<Thing<TData>[]>('search', options)
+    const things = await this.rpc.db.search(options)
+    return this.convertThingsDates(things)
   }
 
   async get(url: string): Promise<Thing<TData> | null> {
-    try {
-      return await this.call<Thing<TData> | null>('get', { url })
-    } catch (error) {
-      if (String(error).includes('not found')) {
-        return null
-      }
-      throw error
-    }
+    const thing = await this.rpc.db.get(url)
+    return this.convertThingDates(thing)
   }
 
   async getById(ns: string, type: string, id: string): Promise<Thing<TData> | null> {
-    return this.call<Thing<TData> | null>('getById', { ns, type, id })
+    const thing = await this.rpc.db.getById(ns, type, id)
+    return this.convertThingDates(thing)
   }
 
   async set(url: string, data: TData): Promise<Thing<TData>> {
-    return this.call<Thing<TData>>('set', { url, data })
+    const thing = await this.rpc.db.set(url, data)
+    return this.convertThingDates(thing)!
   }
 
   async create(options: CreateOptions<TData>): Promise<Thing<TData>> {
-    return this.call<Thing<TData>>('create', options)
+    const thing = await this.rpc.db.create(options)
+    return this.convertThingDates(thing)!
   }
 
   async update(url: string, options: UpdateOptions<TData>): Promise<Thing<TData>> {
-    return this.call<Thing<TData>>('update', { url, ...options })
+    const thing = await this.rpc.db.update(url, options)
+    return this.convertThingDates(thing)!
   }
 
   async upsert(options: CreateOptions<TData>): Promise<Thing<TData>> {
-    return this.call<Thing<TData>>('upsert', options)
+    const thing = await this.rpc.db.upsert(options)
+    return this.convertThingDates(thing)!
   }
 
   async delete(url: string): Promise<boolean> {
-    return this.call<boolean>('delete', { url })
+    return this.rpc.db.delete(url)
   }
 
   async forEach(
@@ -389,11 +278,12 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
   async relate<T extends Record<string, unknown> = Record<string, unknown>>(
     options: RelateOptions<T>
   ): Promise<Relationship<T>> {
-    return this.call<Relationship<T>>('relate', options)
+    const rel = await this.rpc.db.relate(options)
+    return this.convertRelationshipDates(rel as Relationship<T>)!
   }
 
   async unrelate(from: string, type: string, to: string): Promise<boolean> {
-    return this.call<boolean>('unrelate', { from, type, to })
+    return this.rpc.db.unrelate(from, type, to)
   }
 
   async related(
@@ -401,7 +291,8 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
     relationshipType?: string,
     direction?: 'from' | 'to' | 'both'
   ): Promise<Thing<TData>[]> {
-    return this.call<Thing<TData>[]>('related', { url, type: relationshipType, direction })
+    const things = await this.rpc.db.related(url, relationshipType, direction)
+    return this.convertThingsDates(things)
   }
 
   async relationships(
@@ -409,11 +300,13 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
     type?: string,
     direction?: 'from' | 'to' | 'both'
   ): Promise<Relationship[]> {
-    return this.call<Relationship[]>('relationships', { url, type, direction })
+    const rels = await this.rpc.db.relationships(url, type, direction)
+    return this.convertRelationshipsDates(rels)
   }
 
   async references(url: string, relationshipType?: string): Promise<Thing<TData>[]> {
-    return this.call<Thing<TData>[]>('references', { url, type: relationshipType })
+    const things = await this.rpc.db.references(url, relationshipType)
+    return this.convertThingsDates(things)
   }
 
   // ===========================================================================
@@ -421,22 +314,18 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
   // ===========================================================================
 
   async track<T extends Record<string, unknown>>(options: CreateEventOptions<T>): Promise<Event<T>> {
-    return this.call<Event<T>>('track', options)
+    const event = await this.rpc.db.track(options)
+    return this.convertEventDates(event as Event<T>)!
   }
 
   async getEvent(id: string): Promise<Event | null> {
-    try {
-      return await this.call<Event | null>('getEvent', { id })
-    } catch (error) {
-      if (String(error).includes('not found')) {
-        return null
-      }
-      throw error
-    }
+    const event = await this.rpc.db.getEvent(id)
+    return this.convertEventDates(event)
   }
 
   async queryEvents(options: EventQueryOptions = {}): Promise<Event[]> {
-    return this.call<Event[]>('queryEvents', options)
+    const events = await this.rpc.db.queryEvents(options)
+    return this.convertEventsDates(events)
   }
 
   // ===========================================================================
@@ -444,11 +333,13 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
   // ===========================================================================
 
   async send<T extends Record<string, unknown>>(options: CreateActionOptions<T>): Promise<Action<T>> {
-    return this.call<Action<T>>('send', options)
+    const action = await this.rpc.db.send(options)
+    return this.convertActionDates(action as Action<T>)!
   }
 
   async do<T extends Record<string, unknown>>(options: CreateActionOptions<T>): Promise<Action<T>> {
-    return this.call<Action<T>>('do', options)
+    const action = await this.rpc.db.do(options)
+    return this.convertActionDates(action as Action<T>)!
   }
 
   async try<T extends Record<string, unknown>>(
@@ -465,34 +356,33 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
   }
 
   async getAction(id: string): Promise<Action | null> {
-    try {
-      return await this.call<Action | null>('getAction', { id })
-    } catch (error) {
-      if (String(error).includes('not found')) {
-        return null
-      }
-      throw error
-    }
+    const action = await this.rpc.db.getAction(id)
+    return this.convertActionDates(action)
   }
 
   async queryActions(options: ActionQueryOptions = {}): Promise<Action[]> {
-    return this.call<Action[]>('queryActions', options)
+    const actions = await this.rpc.db.queryActions(options)
+    return this.convertActionsDates(actions)
   }
 
   async startAction(id: string): Promise<Action> {
-    return this.call<Action>('startAction', { id })
+    const action = await this.rpc.db.startAction(id)
+    return this.convertActionDates(action)!
   }
 
   async completeAction(id: string, result?: unknown): Promise<Action> {
-    return this.call<Action>('completeAction', { id, result })
+    const action = await this.rpc.db.completeAction(id, result)
+    return this.convertActionDates(action)!
   }
 
   async failAction(id: string, error: string): Promise<Action> {
-    return this.call<Action>('failAction', { id, error })
+    const action = await this.rpc.db.failAction(id, error)
+    return this.convertActionDates(action)!
   }
 
   async cancelAction(id: string): Promise<Action> {
-    return this.call<Action>('cancelAction', { id })
+    const action = await this.rpc.db.cancelAction(id)
+    return this.convertActionDates(action)!
   }
 
   // ===========================================================================
@@ -500,37 +390,26 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
   // ===========================================================================
 
   async storeArtifact<T>(options: StoreArtifactOptions<T>): Promise<Artifact<T>> {
-    return this.call<Artifact<T>>('storeArtifact', options)
+    const artifact = await this.rpc.db.storeArtifact(options)
+    return this.convertArtifactDates(artifact as Artifact<T>)!
   }
 
   async getArtifact<T = unknown>(key: string): Promise<Artifact<T> | null> {
-    try {
-      return await this.call<Artifact<T> | null>('getArtifact', { key })
-    } catch (error) {
-      if (String(error).includes('not found')) {
-        return null
-      }
-      throw error
-    }
+    const artifact = await this.rpc.db.getArtifact(key)
+    return this.convertArtifactDates(artifact as Artifact<T> | null)
   }
 
   async getArtifactBySource(source: string, type: ArtifactType): Promise<Artifact | null> {
-    try {
-      return await this.call<Artifact | null>('getArtifactBySource', { source, type })
-    } catch (error) {
-      if (String(error).includes('not found')) {
-        return null
-      }
-      throw error
-    }
+    const artifact = await this.rpc.db.getArtifactBySource(source, type)
+    return this.convertArtifactDates(artifact)
   }
 
   async deleteArtifact(key: string): Promise<boolean> {
-    return this.call<boolean>('deleteArtifact', { key })
+    return this.rpc.db.deleteArtifact(key)
   }
 
   async cleanExpiredArtifacts(): Promise<number> {
-    return this.call<number>('cleanExpiredArtifacts', {})
+    return this.rpc.db.cleanExpiredArtifacts()
   }
 
   // ===========================================================================
@@ -538,17 +417,14 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
   // ===========================================================================
 
   async close(): Promise<void> {
-    if (this.ws) {
-      this.ws.close()
-      this.ws = null
+    if (this.transport.close) {
+      this.transport.close()
     }
-    this.connectionState = 'disconnected'
-    this.pendingRequests.clear()
   }
 }
 
 /**
- * Create a DBClient RPC client
+ * Create a DBClient RPC client using rpc.do
  *
  * @example
  * ```ts
@@ -565,12 +441,7 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
  * const wsDb = createDBRpcClient({
  *   url: 'wss://rpc.do/namespace',
  *   transport: 'ws',
- *   apiKey: process.env.RPC_API_KEY,
- *   reconnect: {
- *     enabled: true,
- *     maxAttempts: 10,
- *     delay: 500
- *   }
+ *   apiKey: process.env.RPC_API_KEY
  * })
  *
  * // Use like any DBClient
@@ -580,6 +451,6 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
  */
 export function createDBRpcClient<TData extends Record<string, unknown> = Record<string, unknown>>(
   config: DBRpcClientConfig
-): DBClientExtended<TData> & { getConnectionState: () => ConnectionState } {
+): DBClientExtended<TData> {
   return new DBRpcClient<TData>(config)
 }

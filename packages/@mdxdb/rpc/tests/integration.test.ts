@@ -1,29 +1,28 @@
 /**
  * @mdxdb/rpc Integration Tests
  *
- * Tests the JSON-RPC client against a real server with ClickHouse backend.
- * Uses the ai-database compliance test suite.
+ * Tests the RPC client (via rpc.do) against a real server.
+ * Uses ai-database compliance test suite.
  *
- * Prerequisites:
- * - ClickHouse running on localhost:8123
- * - Set CLICKHOUSE_URL env var if using a different host
+ * Backends (in order of preference):
+ * 1. ClickHouse (if available via CLICKHOUSE_URL)
+ * 2. In-memory SQLite (always available)
  *
  * @packageDocumentation
  */
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { createExtendedTests } from 'ai-database/tests'
+import { describe, it, beforeAll, afterAll } from 'vitest'
+import { createExtendedTests, fixtures } from 'ai-database/tests'
 import { createDBRpcClient } from '../src/db-client.js'
 import { createDBServer } from '@mdxdb/server/db'
-import { createClickHouseDatabase, type ClickHouseDatabase } from '@mdxdb/clickhouse'
 import { serve, type ServerType } from '@hono/node-server'
+import type { DBClientExtended } from 'ai-database'
 
 // Test configuration
-const CLICKHOUSE_URL = process.env.CLICKHOUSE_URL ?? 'http://localhost:8123'
-const TEST_DATABASE = `mdxdb_test_rpc_${Date.now()}`
 const SERVER_PORT = 4567 + Math.floor(Math.random() * 1000)
+const CLICKHOUSE_URL = process.env.CLICKHOUSE_URL ?? 'http://localhost:8123'
 
-// Skip integration tests if ClickHouse is not available
+// Check if ClickHouse is available
 const isClickHouseAvailable = async (): Promise<boolean> => {
   try {
     const response = await fetch(CLICKHOUSE_URL, {
@@ -36,27 +35,64 @@ const isClickHouseAvailable = async (): Promise<boolean> => {
   }
 }
 
-describe('@mdxdb/rpc Integration Tests', async () => {
-  const available = await isClickHouseAvailable()
+// Dynamic import for backends
+async function createBackend(): Promise<{ client: DBClientExtended; cleanup: () => Promise<void> }> {
+  const clickhouseAvailable = await isClickHouseAvailable()
 
-  if (!available) {
-    it.skip('ClickHouse not available - skipping integration tests', () => {})
-    return
-  }
+  if (clickhouseAvailable) {
+    console.log('Using ClickHouse backend')
+    const { createClickHouseDatabase } = await import('@mdxdb/clickhouse')
+    const TEST_DATABASE = `mdxdb_test_rpc_${Date.now()}`
 
-  let clickhouse: ClickHouseDatabase
-  let server: ServerType
-
-  beforeAll(async () => {
-    // Create ClickHouse database
-    clickhouse = await createClickHouseDatabase({
+    const clickhouse = await createClickHouseDatabase({
       url: CLICKHOUSE_URL,
       database: TEST_DATABASE,
     })
 
-    // Create and start the server
-    const app = createDBServer({
+    return {
       client: clickhouse,
+      cleanup: async () => {
+        try {
+          const executor = clickhouse.getExecutor()
+          await executor.command(`DROP DATABASE IF EXISTS ${TEST_DATABASE}`)
+        } catch {
+          // Ignore cleanup errors
+        }
+        await clickhouse.close()
+      },
+    }
+  }
+
+  // Fall back to SQLite in-memory
+  console.log('Using SQLite in-memory backend')
+  // Import from specific submodules to avoid loading durable-object.js which requires cloudflare:workers
+  const { createInMemoryBinding } = await import('@mdxdb/sqlite/miniflare')
+  const { MDXClientAdapter } = await import('./sqlite-adapter.js')
+
+  const binding = createInMemoryBinding()
+  const id = binding.idFromName(fixtures.ns)
+  const stub = binding.get(id)
+
+  return {
+    // Pass the stub directly - it implements MDXDatabaseRPC
+    client: new MDXClientAdapter(stub, fixtures.ns),
+    cleanup: async () => {
+      // No cleanup needed for in-memory
+    },
+  }
+}
+
+describe('@mdxdb/rpc Integration Tests', async () => {
+  let backend: { client: DBClientExtended; cleanup: () => Promise<void> }
+  let server: ServerType
+
+  beforeAll(async () => {
+    // Create backend
+    backend = await createBackend()
+
+    // Create and start the server with RPC endpoint
+    const app = createDBServer({
+      client: backend.client,
       basePath: '/api/db',
       cors: true,
     })
@@ -67,34 +103,31 @@ describe('@mdxdb/rpc Integration Tests', async () => {
     })
 
     // Wait for server to be ready
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
   })
 
   afterAll(async () => {
     // Close server
-    await new Promise<void>(resolve => server.close(() => resolve()))
-
-    // Drop test database
-    try {
-      const executor = clickhouse.getExecutor()
-      await executor.command(`DROP DATABASE IF EXISTS ${TEST_DATABASE}`)
-    } catch {
-      // Ignore cleanup errors
+    if (server) {
+      await new Promise<void>((resolve) => server.close(() => resolve()))
     }
 
-    // Close ClickHouse connection
-    await clickhouse.close()
+    // Cleanup backend
+    if (backend) {
+      await backend.cleanup()
+    }
   })
 
-  // Run the ai-database compliance test suite
-  createExtendedTests('@mdxdb/rpc via JSON-RPC HTTP', {
-    factory: () => createDBRpcClient({
-      url: `http://localhost:${SERVER_PORT}/api/db/rpc`,
-      transport: 'http',
-    }),
+  // Run the ai-database compliance test suite via RPC
+  createExtendedTests('@mdxdb/rpc via rpc.do HTTP', {
+    factory: () =>
+      createDBRpcClient({
+        url: `http://localhost:${SERVER_PORT}/api/db/rpc`,
+        transport: 'http',
+      }),
     cleanup: async () => {
       // Cleanup handled in afterAll
     },
-    ns: 'test.example.com',
+    ns: fixtures.ns,
   })
 })

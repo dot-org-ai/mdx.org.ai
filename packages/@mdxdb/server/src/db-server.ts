@@ -2,16 +2,17 @@
  * @mdxdb/server DBClient Implementation
  *
  * Hono-based REST API server exposing ai-database DBClient interface
+ * Uses JSON:API standard format (https://jsonapi.org/)
  *
  * @packageDocumentation
  */
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { createRpcHandler, bearerAuth, noAuth } from 'rpc.do/server'
 import type { DBClient, DBClientExtended } from 'ai-database'
 import type {
   DBServerConfig,
-  ApiResponse,
   ThingQuery,
   ThingFindQuery,
   ThingSearchQuery,
@@ -26,6 +27,15 @@ import type {
   FailActionBody,
   StoreArtifactBody,
 } from './types.js'
+import {
+  serializeThings,
+  serializeRelationships,
+  serializeEvents,
+  serializeActions,
+  serializeArtifacts,
+  serializeError,
+  JSONAPI_CONTENT_TYPE,
+} from './serializers.js'
 
 /**
  * Check if client is extended (has events, actions, artifacts)
@@ -35,7 +45,7 @@ function isExtended(client: DBClient | DBClientExtended): client is DBClientExte
 }
 
 /**
- * Create a Hono app that exposes a DBClient as a REST API
+ * Create a Hono app that exposes a DBClient as a REST API using JSON:API format
  *
  * @example
  * ```ts
@@ -49,6 +59,12 @@ function isExtended(client: DBClient | DBClientExtended): client is DBClientExte
  * serve({ fetch: app.fetch, port: 3000 })
  * ```
  *
+ * ## API Format
+ *
+ * All REST endpoints use JSON:API format (https://jsonapi.org/):
+ * - Content-Type: application/vnd.api+json
+ * - Response: `{ data, meta, links }` or `{ errors }`
+ *
  * ## API Endpoints
  *
  * ### Things
@@ -57,7 +73,7 @@ function isExtended(client: DBClient | DBClientExtended): client is DBClientExte
  * - `GET /api/db/things/search` - Search things
  * - `GET /api/db/things/:url` - Get thing by URL (URL-encoded)
  * - `POST /api/db/things` - Create thing
- * - `PUT /api/db/things/:url` - Update thing
+ * - `PATCH /api/db/things/:url` - Update thing
  * - `DELETE /api/db/things/:url` - Delete thing
  *
  * ### Relationships
@@ -88,6 +104,9 @@ function isExtended(client: DBClient | DBClientExtended): client is DBClientExte
  * - `GET /api/db/artifacts/source/:source/:type` - Get artifact by source
  * - `DELETE /api/db/artifacts/:key` - Delete artifact
  * - `POST /api/db/artifacts/clean` - Clean expired artifacts
+ *
+ * ### RPC
+ * - `POST /api/db/rpc` - JSON-RPC endpoint via rpc.do
  */
 export function createDBServer<TData extends Record<string, unknown> = Record<string, unknown>>(
   config: DBServerConfig<TData>
@@ -108,11 +127,39 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
       const providedKey = authHeader?.replace('Bearer ', '')
 
       if (providedKey !== apiKey) {
-        return c.json({ success: false, error: 'Unauthorized' } satisfies ApiResponse, 401)
+        const error = await serializeError('Unauthorized', 401)
+        return c.json(error, 401, { 'Content-Type': JSONAPI_CONTENT_TYPE })
       }
 
       return next()
     })
+  }
+
+  // Helper to return JSON:API response
+  const jsonApi = (c: any, data: unknown, status = 200) => {
+    return c.json(data, status, { 'Content-Type': JSONAPI_CONTENT_TYPE })
+  }
+
+  // Helper to return JSON:API error
+  const jsonApiError = async (c: any, error: Error | string, status = 500) => {
+    const serialized = await serializeError(error, status)
+    return c.json(serialized, status, { 'Content-Type': JSONAPI_CONTENT_TYPE })
+  }
+
+  // Helper to parse JSON:API query parameters
+  // Converts filter[ns]=value to { ns: value }, page[limit]=10 to { limit: 10 }, etc.
+  const parseJsonApiQuery = (query: Record<string, string>) => {
+    const result: Record<string, string> = {}
+    for (const [key, value] of Object.entries(query)) {
+      // Handle filter[...], page[...], etc.
+      const bracketMatch = key.match(/^(filter|page)\[(.+)\]$/)
+      if (bracketMatch && bracketMatch[2]) {
+        result[bracketMatch[2]] = value
+      } else {
+        result[key] = value
+      }
+    }
+    return result
   }
 
   // ===========================================================================
@@ -122,26 +169,39 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
   // List things
   app.get(`${basePath}/things`, async (c) => {
     try {
-      const query = c.req.query() as ThingQuery
+      const query = parseJsonApiQuery(c.req.query()) as ThingQuery
+      // Parse JSON:API sort format: -field means desc, field means asc
+      const rawSort = c.req.query('sort')
+      let orderBy: string | undefined
+      let order: 'asc' | 'desc' | undefined
+      if (rawSort) {
+        if (rawSort.startsWith('-')) {
+          orderBy = rawSort.slice(1)
+          order = 'desc'
+        } else {
+          orderBy = rawSort
+          order = 'asc'
+        }
+      }
       const things = await client.list({
         ns: query.ns,
         type: query.type,
         limit: query.limit ? parseInt(query.limit, 10) : undefined,
         offset: query.offset ? parseInt(query.offset, 10) : undefined,
-        orderBy: query.orderBy,
-        order: query.order,
+        orderBy: orderBy || query.orderBy,
+        order: order || query.order,
       })
 
-      return c.json({ success: true, data: things } satisfies ApiResponse)
+      return jsonApi(c, await serializeThings(things))
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
   // Find things with where clause
   app.get(`${basePath}/things/find`, async (c) => {
     try {
-      const query = c.req.query() as ThingFindQuery
+      const query = parseJsonApiQuery(c.req.query()) as ThingFindQuery
       const where = query.where ? JSON.parse(query.where) : undefined
 
       const things = await client.find({
@@ -154,9 +214,9 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         order: query.order,
       })
 
-      return c.json({ success: true, data: things } satisfies ApiResponse)
+      return jsonApi(c, await serializeThings(things))
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
@@ -166,7 +226,7 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
       const query = c.req.query() as Partial<ThingSearchQuery> & Record<string, string>
 
       if (!query.query) {
-        return c.json({ success: false, error: 'Query parameter "query" is required' } satisfies ApiResponse, 400)
+        return jsonApiError(c, 'Query parameter "query" is required', 400)
       }
 
       const things = await client.search({
@@ -179,25 +239,68 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         offset: query.offset ? parseInt(query.offset, 10) : undefined,
       })
 
-      return c.json({ success: true, data: things } satisfies ApiResponse)
+      return jsonApi(c, await serializeThings(things))
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
-  // Get thing by URL
+  // NOTE: These relationship routes MUST be defined before the generic things/:url{.+} route
+  // Get related things
+  app.get(`${basePath}/things/:url{.+}/related`, async (c) => {
+    try {
+      const url = decodeURIComponent(c.req.param('url'))
+      const { type, direction } = c.req.query()
+
+      const things = await client.related(url, type, direction as 'from' | 'to' | 'both' | undefined)
+
+      return jsonApi(c, await serializeThings(things))
+    } catch (error) {
+      return jsonApiError(c, error as Error)
+    }
+  })
+
+  // Get relationships
+  app.get(`${basePath}/things/:url{.+}/relationships`, async (c) => {
+    try {
+      const url = decodeURIComponent(c.req.param('url'))
+      const { type, direction } = c.req.query()
+
+      const rels = await client.relationships(url, type, direction as 'from' | 'to' | 'both' | undefined)
+
+      return jsonApi(c, await serializeRelationships(rels))
+    } catch (error) {
+      return jsonApiError(c, error as Error)
+    }
+  })
+
+  // Get references (inbound)
+  app.get(`${basePath}/things/:url{.+}/references`, async (c) => {
+    try {
+      const url = decodeURIComponent(c.req.param('url'))
+      const { type } = c.req.query()
+
+      const things = await client.references(url, type)
+
+      return jsonApi(c, await serializeThings(things))
+    } catch (error) {
+      return jsonApiError(c, error as Error)
+    }
+  })
+
+  // Get thing by URL (generic catch-all - must come AFTER more specific routes)
   app.get(`${basePath}/things/:url{.+}`, async (c) => {
     try {
       const url = decodeURIComponent(c.req.param('url'))
       const thing = await client.get(url)
 
       if (!thing) {
-        return c.json({ success: false, error: 'Thing not found' } satisfies ApiResponse, 404)
+        return jsonApiError(c, 'Thing not found', 404)
       }
 
-      return c.json({ success: true, data: thing } satisfies ApiResponse)
+      return jsonApi(c, await serializeThings(thing))
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
@@ -207,7 +310,7 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
       const body = await c.req.json<CreateThingBody>()
 
       if (!body.ns || !body.type || !body.data) {
-        return c.json({ success: false, error: 'Fields "ns", "type", and "data" are required' } satisfies ApiResponse, 400)
+        return jsonApiError(c, 'Fields "ns", "type", and "data" are required', 400)
       }
 
       const thing = await client.create({
@@ -219,27 +322,45 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         '@context': body['@context'],
       })
 
-      return c.json({ success: true, data: thing } satisfies ApiResponse, 201)
+      return jsonApi(c, await serializeThings(thing), 201)
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
-  // Update thing
+  // Update thing (PATCH for JSON:API compliance)
+  app.patch(`${basePath}/things/:url{.+}`, async (c) => {
+    try {
+      const url = decodeURIComponent(c.req.param('url'))
+      const body = await c.req.json<UpdateThingBody>()
+
+      if (!body.data) {
+        return jsonApiError(c, 'Field "data" is required', 400)
+      }
+
+      const thing = await client.update(url, { data: body.data as Partial<TData> })
+
+      return jsonApi(c, await serializeThings(thing))
+    } catch (error) {
+      return jsonApiError(c, error as Error)
+    }
+  })
+
+  // Also support PUT for backwards compatibility
   app.put(`${basePath}/things/:url{.+}`, async (c) => {
     try {
       const url = decodeURIComponent(c.req.param('url'))
       const body = await c.req.json<UpdateThingBody>()
 
       if (!body.data) {
-        return c.json({ success: false, error: 'Field "data" is required' } satisfies ApiResponse, 400)
+        return jsonApiError(c, 'Field "data" is required', 400)
       }
 
       const thing = await client.update(url, { data: body.data as Partial<TData> })
 
-      return c.json({ success: true, data: thing } satisfies ApiResponse)
+      return jsonApi(c, await serializeThings(thing))
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
@@ -249,7 +370,7 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
       const body = await c.req.json<CreateThingBody>()
 
       if (!body.ns || !body.type || !body.data) {
-        return c.json({ success: false, error: 'Fields "ns", "type", and "data" are required' } satisfies ApiResponse, 400)
+        return jsonApiError(c, 'Fields "ns", "type", and "data" are required', 400)
       }
 
       const thing = await client.upsert({
@@ -261,21 +382,25 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         '@context': body['@context'],
       })
 
-      return c.json({ success: true, data: thing } satisfies ApiResponse)
+      return jsonApi(c, await serializeThings(thing))
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
-  // Delete thing
+  // Delete thing (returns 204 No Content per JSON:API spec, 404 if not found)
   app.delete(`${basePath}/things/:url{.+}`, async (c) => {
     try {
       const url = decodeURIComponent(c.req.param('url'))
       const deleted = await client.delete(url)
 
-      return c.json({ success: true, data: { deleted } } satisfies ApiResponse)
+      if (!deleted) {
+        return jsonApiError(c, 'Thing not found', 404)
+      }
+
+      return c.body(null, 204)
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
@@ -289,7 +414,7 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
       const body = await c.req.json<RelateBody>()
 
       if (!body.type || !body.from || !body.to) {
-        return c.json({ success: false, error: 'Fields "type", "from", and "to" are required' } satisfies ApiResponse, 400)
+        return jsonApiError(c, 'Fields "type", "from", and "to" are required', 400)
       }
 
       const rel = await client.relate({
@@ -299,70 +424,31 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         data: body.data,
       })
 
-      return c.json({ success: true, data: rel } satisfies ApiResponse, 201)
+      return jsonApi(c, await serializeRelationships(rel), 201)
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
-  // Remove relationship
+  // Remove relationship (returns 204 No Content)
   app.delete(`${basePath}/relationships`, async (c) => {
     try {
       const { from, type, to } = c.req.query()
 
       if (!from || !type || !to) {
-        return c.json({ success: false, error: 'Query parameters "from", "type", and "to" are required' } satisfies ApiResponse, 400)
+        return jsonApiError(c, 'Query parameters "from", "type", and "to" are required', 400)
       }
 
-      const removed = await client.unrelate(from, type, to)
+      await client.unrelate(from, type, to)
 
-      return c.json({ success: true, data: { removed } } satisfies ApiResponse)
+      return c.body(null, 204)
     } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+      return jsonApiError(c, error as Error)
     }
   })
 
-  // Get related things
-  app.get(`${basePath}/things/:url{.+}/related`, async (c) => {
-    try {
-      const url = decodeURIComponent(c.req.param('url'))
-      const { type, direction } = c.req.query()
-
-      const things = await client.related(url, type, direction as 'from' | 'to' | 'both' | undefined)
-
-      return c.json({ success: true, data: things } satisfies ApiResponse)
-    } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
-    }
-  })
-
-  // Get relationships
-  app.get(`${basePath}/things/:url{.+}/relationships`, async (c) => {
-    try {
-      const url = decodeURIComponent(c.req.param('url'))
-      const { type, direction } = c.req.query()
-
-      const rels = await client.relationships(url, type, direction as 'from' | 'to' | 'both' | undefined)
-
-      return c.json({ success: true, data: rels } satisfies ApiResponse)
-    } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
-    }
-  })
-
-  // Get references (inbound)
-  app.get(`${basePath}/things/:url{.+}/references`, async (c) => {
-    try {
-      const url = decodeURIComponent(c.req.param('url'))
-      const { type } = c.req.query()
-
-      const things = await client.references(url, type)
-
-      return c.json({ success: true, data: things } satisfies ApiResponse)
-    } catch (error) {
-      return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
-    }
-  })
+  // NOTE: Relationship GET routes (related, relationships, references) are defined
+  // before the generic things/:url{.+} route to ensure correct route matching
 
   // ===========================================================================
   // Extended Operations (Events, Actions, Artifacts)
@@ -379,7 +465,7 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const body = await c.req.json<CreateEventBody>()
 
         if (!body.type || !body.source || !body.data) {
-          return c.json({ success: false, error: 'Fields "type", "source", and "data" are required' } satisfies ApiResponse, 400)
+          return jsonApiError(c, 'Fields "type", "source", and "data" are required', 400)
         }
 
         const event = await client.track({
@@ -390,16 +476,16 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
           causationId: body.causationId,
         })
 
-        return c.json({ success: true, data: event } satisfies ApiResponse, 201)
+        return jsonApi(c, await serializeEvents(event), 201)
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
     // Query events
     app.get(`${basePath}/events`, async (c) => {
       try {
-        const query = c.req.query() as EventQuery
+        const query = parseJsonApiQuery(c.req.query()) as EventQuery
 
         const events = await client.queryEvents({
           type: query.type,
@@ -411,9 +497,9 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
           offset: query.offset ? parseInt(query.offset, 10) : undefined,
         })
 
-        return c.json({ success: true, data: events } satisfies ApiResponse)
+        return jsonApi(c, await serializeEvents(events))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -424,12 +510,12 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const event = await client.getEvent(id)
 
         if (!event) {
-          return c.json({ success: false, error: 'Event not found' } satisfies ApiResponse, 404)
+          return jsonApiError(c, 'Event not found', 404)
         }
 
-        return c.json({ success: true, data: event } satisfies ApiResponse)
+        return jsonApi(c, await serializeEvents(event))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -443,7 +529,7 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const body = await c.req.json<CreateActionBody>()
 
         if (!body.actor || !body.object || !body.action) {
-          return c.json({ success: false, error: 'Fields "actor", "object", and "action" are required' } satisfies ApiResponse, 400)
+          return jsonApiError(c, 'Fields "actor", "object", and "action" are required', 400)
         }
 
         const action = await client.send({
@@ -453,9 +539,9 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
           metadata: body.metadata,
         })
 
-        return c.json({ success: true, data: action } satisfies ApiResponse, 201)
+        return jsonApi(c, await serializeActions(action), 201)
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -465,7 +551,7 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const body = await c.req.json<CreateActionBody>()
 
         if (!body.actor || !body.object || !body.action) {
-          return c.json({ success: false, error: 'Fields "actor", "object", and "action" are required' } satisfies ApiResponse, 400)
+          return jsonApiError(c, 'Fields "actor", "object", and "action" are required', 400)
         }
 
         const action = await client.do({
@@ -475,16 +561,16 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
           metadata: body.metadata,
         })
 
-        return c.json({ success: true, data: action } satisfies ApiResponse, 201)
+        return jsonApi(c, await serializeActions(action), 201)
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
     // Query actions
     app.get(`${basePath}/actions`, async (c) => {
       try {
-        const query = c.req.query() as ActionQuery
+        const query = parseJsonApiQuery(c.req.query()) as ActionQuery
 
         const actions = await client.queryActions({
           actor: query.actor,
@@ -495,9 +581,9 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
           offset: query.offset ? parseInt(query.offset, 10) : undefined,
         })
 
-        return c.json({ success: true, data: actions } satisfies ApiResponse)
+        return jsonApi(c, await serializeActions(actions))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -508,12 +594,12 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const action = await client.getAction(id)
 
         if (!action) {
-          return c.json({ success: false, error: 'Action not found' } satisfies ApiResponse, 404)
+          return jsonApiError(c, 'Action not found', 404)
         }
 
-        return c.json({ success: true, data: action } satisfies ApiResponse)
+        return jsonApi(c, await serializeActions(action))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -523,9 +609,9 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const id = c.req.param('id')
         const action = await client.startAction(id)
 
-        return c.json({ success: true, data: action } satisfies ApiResponse)
+        return jsonApi(c, await serializeActions(action))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -537,9 +623,9 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
 
         const action = await client.completeAction(id, body.result)
 
-        return c.json({ success: true, data: action } satisfies ApiResponse)
+        return jsonApi(c, await serializeActions(action))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -550,14 +636,14 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const body = await c.req.json<FailActionBody>()
 
         if (!body.error) {
-          return c.json({ success: false, error: 'Field "error" is required' } satisfies ApiResponse, 400)
+          return jsonApiError(c, 'Field "error" is required', 400)
         }
 
         const action = await client.failAction(id, body.error)
 
-        return c.json({ success: true, data: action } satisfies ApiResponse)
+        return jsonApi(c, await serializeActions(action))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -567,9 +653,9 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const id = c.req.param('id')
         const action = await client.cancelAction(id)
 
-        return c.json({ success: true, data: action } satisfies ApiResponse)
+        return jsonApi(c, await serializeActions(action))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -583,10 +669,7 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const body = await c.req.json<StoreArtifactBody>()
 
         if (!body.key || !body.type || !body.source || !body.sourceHash || body.content === undefined) {
-          return c.json({
-            success: false,
-            error: 'Fields "key", "type", "source", "sourceHash", and "content" are required'
-          } satisfies ApiResponse, 400)
+          return jsonApiError(c, 'Fields "key", "type", "source", "sourceHash", and "content" are required', 400)
         }
 
         const artifact = await client.storeArtifact({
@@ -599,9 +682,9 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
           metadata: body.metadata,
         })
 
-        return c.json({ success: true, data: artifact } satisfies ApiResponse, 201)
+        return jsonApi(c, await serializeArtifacts(artifact), 201)
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -612,12 +695,12 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const artifact = await client.getArtifact(key)
 
         if (!artifact) {
-          return c.json({ success: false, error: 'Artifact not found' } satisfies ApiResponse, 404)
+          return jsonApiError(c, 'Artifact not found', 404)
         }
 
-        return c.json({ success: true, data: artifact } satisfies ApiResponse)
+        return jsonApi(c, await serializeArtifacts(artifact))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -629,24 +712,24 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
         const artifact = await client.getArtifactBySource(source, type as any)
 
         if (!artifact) {
-          return c.json({ success: false, error: 'Artifact not found' } satisfies ApiResponse, 404)
+          return jsonApiError(c, 'Artifact not found', 404)
         }
 
-        return c.json({ success: true, data: artifact } satisfies ApiResponse)
+        return jsonApi(c, await serializeArtifacts(artifact))
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
-    // Delete artifact
+    // Delete artifact (returns 204 No Content)
     app.delete(`${basePath}/artifacts/:key`, async (c) => {
       try {
         const key = c.req.param('key')
-        const deleted = await client.deleteArtifact(key)
+        await client.deleteArtifact(key)
 
-        return c.json({ success: true, data: { deleted } } satisfies ApiResponse)
+        return c.body(null, 204)
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
 
@@ -655,140 +738,121 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
       try {
         const count = await client.cleanExpiredArtifacts()
 
-        return c.json({ success: true, data: { cleaned: count } } satisfies ApiResponse)
+        return jsonApi(c, { data: null, meta: { cleaned: count } })
       } catch (error) {
-        return c.json({ success: false, error: String(error) } satisfies ApiResponse, 500)
+        return jsonApiError(c, error as Error)
       }
     })
   }
 
   // ==========================================================================
-  // JSON-RPC Endpoint
+  // RPC Endpoint (using rpc.do)
   // ==========================================================================
 
-  interface JsonRpcRequest {
-    jsonrpc: '2.0'
-    id: string | number | null
-    method: string
-    params?: unknown
-  }
-
-  interface JsonRpcResponse<T = unknown> {
-    jsonrpc: '2.0'
-    id: string | number | null
-    result?: T
-    error?: {
-      code: number
-      message: string
-      data?: unknown
-    }
-  }
-
-  app.post(`${basePath}/rpc`, async (c) => {
-    const request = await c.req.json<JsonRpcRequest>()
-    const { id, method, params } = request
-
-    const respond = (result: unknown): Response => {
-      return c.json({ jsonrpc: '2.0', id, result } satisfies JsonRpcResponse)
-    }
-
-    const respondError = (code: number, message: string): Response => {
-      return c.json({ jsonrpc: '2.0', id, error: { code, message } } satisfies JsonRpcResponse)
-    }
-
-    try {
-      // Parse method name (e.g., "db.list" -> "list")
+  const rpcHandler = createRpcHandler({
+    dispatch: async (method, args) => {
+      // Method format: "db.methodName"
       const methodName = method.startsWith('db.') ? method.slice(3) : method
-      const p = (params || {}) as Record<string, unknown>
+      // rpc.do passes args as an array, first element is the params object
+      const p = (args[0] || {}) as Record<string, unknown>
 
       // Route to appropriate DBClient method
       switch (methodName) {
         // Thing operations
         case 'list':
-          return respond(await client.list(p))
+          return client.list(p)
         case 'find':
-          return respond(await client.find(p))
+          return client.find(p)
         case 'search':
-          return respond(await client.search(p as any))
+          return client.search(p as any)
         case 'get':
-          return respond(await client.get(p.url as string))
+          return client.get(args[0] as string)
         case 'getById':
-          return respond(await client.getById(p.ns as string, p.type as string, p.id as string))
+          return client.getById(args[0] as string, args[1] as string, args[2] as string)
         case 'set':
-          return respond(await client.set(p.url as string, p.data as any))
+          return client.set(args[0] as string, args[1] as any)
         case 'create':
-          return respond(await client.create(p as any))
+          return client.create(p as any)
         case 'update':
-          return respond(await client.update(p.url as string, p as any))
+          return client.update(args[0] as string, args[1] as any)
         case 'upsert':
-          return respond(await client.upsert(p as any))
+          return client.upsert(p as any)
         case 'delete':
-          return respond(await client.delete(p.url as string))
+          return client.delete(args[0] as string)
 
         // Relationship operations
         case 'relate':
-          return respond(await client.relate(p as any))
+          return client.relate(p as any)
         case 'unrelate':
-          return respond(await client.unrelate(p.from as string, p.type as string, p.to as string))
+          return client.unrelate(args[0] as string, args[1] as string, args[2] as string)
         case 'related':
-          return respond(await client.related(p.url as string, p.type as string | undefined, p.direction as any))
+          return client.related(args[0] as string, args[1] as string | undefined, args[2] as any)
         case 'relationships':
-          return respond(await client.relationships(p.url as string, p.type as string | undefined, p.direction as any))
+          return client.relationships(args[0] as string, args[1] as string | undefined, args[2] as any)
         case 'references':
-          return respond(await client.references(p.url as string, p.type as string | undefined))
+          return client.references(args[0] as string, args[1] as string | undefined)
 
         // Extended operations (Events, Actions, Artifacts)
         default:
           if (!isExtended(client)) {
-            return respondError(-32601, `Method not found: ${methodName}`)
+            throw new Error(`Method not found: ${methodName}`)
           }
 
           switch (methodName) {
             // Event operations
             case 'track':
-              return respond(await client.track(p as any))
+              return client.track(p as any)
             case 'getEvent':
-              return respond(await client.getEvent(p.id as string))
+              return client.getEvent(args[0] as string)
             case 'queryEvents':
-              return respond(await client.queryEvents(p as any))
+              return client.queryEvents(p as any)
 
             // Action operations
             case 'send':
-              return respond(await client.send(p as any))
+              return client.send(p as any)
             case 'do':
-              return respond(await client.do(p as any))
+              return client.do(p as any)
             case 'getAction':
-              return respond(await client.getAction(p.id as string))
+              return client.getAction(args[0] as string)
             case 'queryActions':
-              return respond(await client.queryActions(p as any))
+              return client.queryActions(p as any)
             case 'startAction':
-              return respond(await client.startAction(p.id as string))
+              return client.startAction(args[0] as string)
             case 'completeAction':
-              return respond(await client.completeAction(p.id as string, p.result))
+              return client.completeAction(args[0] as string, args[1])
             case 'failAction':
-              return respond(await client.failAction(p.id as string, p.error as string))
+              return client.failAction(args[0] as string, args[1] as string)
             case 'cancelAction':
-              return respond(await client.cancelAction(p.id as string))
+              return client.cancelAction(args[0] as string)
 
             // Artifact operations
             case 'storeArtifact':
-              return respond(await client.storeArtifact(p as any))
+              return client.storeArtifact(p as any)
             case 'getArtifact':
-              return respond(await client.getArtifact(p.key as string))
+              return client.getArtifact(args[0] as string)
             case 'getArtifactBySource':
-              return respond(await client.getArtifactBySource(p.source as string, p.type as any))
+              return client.getArtifactBySource(args[0] as string, args[1] as any)
             case 'deleteArtifact':
-              return respond(await client.deleteArtifact(p.key as string))
+              return client.deleteArtifact(args[0] as string)
             case 'cleanExpiredArtifacts':
-              return respond(await client.cleanExpiredArtifacts())
+              return client.cleanExpiredArtifacts()
 
             default:
-              return respondError(-32601, `Method not found: ${methodName}`)
+              throw new Error(`Method not found: ${methodName}`)
           }
       }
-    } catch (error) {
-      return respondError(-32000, String(error))
-    }
+    },
+    auth: apiKey ? bearerAuth(async (token) => {
+      if (token === apiKey) {
+        return { token }
+      }
+      return null
+    }) : noAuth(),
+  })
+
+  // Mount the RPC handler
+  app.post(`${basePath}/rpc`, async (c) => {
+    return rpcHandler(c.req.raw)
   })
 
   return app

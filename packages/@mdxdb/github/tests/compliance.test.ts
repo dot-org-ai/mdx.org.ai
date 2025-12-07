@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest'
 import { GitHubDatabase } from '../src/database.js'
-import type { Database } from 'mdxdb'
+import type { Database } from '@mdxdb/fs'
 import type { MDXLDDocument, MDXLDData } from 'mdxld'
 
 // Mock Octokit
