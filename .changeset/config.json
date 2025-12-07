@@ -14,13 +14,9 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@mdxld/config",
-    "@mdxdb/sqlite",
-    "@mdxdb/desktop",
-    "@mdxdb/mobile",
-    "@mdxe/expo",
-    "@mdxui/codehike",
-    "@mdxui/editor",
-    "@mdxui/gluestack"
-  ]
+    "@mdxld/config"
+  ],
+  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
+    "onlyUpdatePeerDependentsWhenOutOfRange": true
+  }
 }
