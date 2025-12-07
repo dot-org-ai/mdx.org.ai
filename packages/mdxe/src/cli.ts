@@ -1024,59 +1024,46 @@ export async function runStart(options: CliOptions): Promise<void> {
 }
 
 /**
- * Run database commands via mdxdb CLI
+ * Run database commands (local implementation, no longer depends on mdxdb package)
  */
 async function runDbCommand(options: CliOptions): Promise<void> {
-  // Import mdxdb CLI functions
-  const { parseArgs: mdxdbParseArgs, main: mdxdbMain } = await import('mdxdb/cli')
+  const db = await import('./commands/db.js')
 
-  // Map mdxe options to mdxdb options
-  const mdxdbArgs: string[] = []
-
-  // Map command
-  if (options.command === 'db') {
-    mdxdbArgs.push('dev')
-  } else if (options.command === 'db:server') {
-    mdxdbArgs.push('server')
-  } else if (options.command === 'db:client') {
-    mdxdbArgs.push('client')
-  } else if (options.command === 'db:publish') {
-    mdxdbArgs.push('publish')
-  }
-
-  // Map options
-  if (options.projectDir !== process.cwd()) {
-    mdxdbArgs.push('--path', options.projectDir)
-  }
-  if (options.projectName) {
-    mdxdbArgs.push('--name', options.projectName)
-  }
-  if (options.httpPort !== 8123) {
-    mdxdbArgs.push('--http-port', String(options.httpPort))
-  }
-  if (options.clickhouseUrl !== 'http://localhost:8123') {
-    mdxdbArgs.push('--clickhouse', options.clickhouseUrl)
-  }
-  if (options.dryRun) {
-    mdxdbArgs.push('--dry-run')
-  }
-  if (options.verbose) {
-    mdxdbArgs.push('--verbose')
+  // Map mdxe CliOptions to DbCliOptions
+  const dbOptions: db.DbCliOptions = {
+    command: options.command === 'db' ? 'dev'
+      : options.command === 'db:server' ? 'server'
+      : options.command === 'db:client' ? 'client'
+      : options.command === 'db:publish' ? 'publish'
+      : 'dev',
+    path: options.projectDir,
+    name: options.projectName,
+    baseUrl: process.env.DO_API_URL || 'https://apis.do',
+    clickhouseUrl: options.clickhouseUrl,
+    port: options.port,
+    httpPort: options.httpPort,
+    studioPort: 4000,
+    dryRun: options.dryRun,
+    verbose: options.verbose,
+    useClickhouse: !!options.clickhouseUrl && options.clickhouseUrl !== 'http://localhost:8123',
   }
 
-  // Parse with mdxdb's parser and run
-  const mdxdbOptions = mdxdbParseArgs(mdxdbArgs)
-
-  // Call the appropriate mdxdb function based on command
-  const mdxdb = await import('mdxdb/cli')
-
-  switch (mdxdbOptions.command) {
+  switch (dbOptions.command) {
     case 'publish':
-      await mdxdb.runPublish(mdxdbOptions)
+      await db.runPublish(dbOptions)
       break
+    case 'server':
+      await db.runServer(dbOptions)
+      break
+    case 'client':
+      await db.runClient(dbOptions)
+      break
+    case 'studio':
+      await db.runStudio(dbOptions)
+      break
+    case 'dev':
     default:
-      // For dev/server/client, call the main function which handles these
-      await mdxdbMain()
+      await db.runDev(dbOptions)
       break
   }
 }

@@ -6,7 +6,17 @@
  * @packageDocumentation
  */
 
-import type { DBClient } from 'mdxdb'
+// Simplified DBClient interface for SDK provider
+interface DBClient {
+  list?(options?: Record<string, unknown>): Promise<unknown[]>
+  get?(id: string): Promise<unknown>
+  create?(options: Record<string, unknown>): Promise<unknown>
+  update?(id: string, options: Record<string, unknown>): Promise<unknown>
+  delete?(id: string): Promise<boolean>
+  search?(options: Record<string, unknown>): Promise<unknown[]>
+  close?(): Promise<void>
+  ns?: string
+}
 
 export interface SDKProviderConfig {
   /** Execution context */
@@ -75,61 +85,60 @@ async function createLocalSDKProvider(config: SDKProviderConfig): Promise<SDKPro
   // Create database client based on backend
   let db: DBClient
 
-  // Try to import mdxdb, fall back to stub if not available
+  // Try to import ai-database, fall back to stub if not available
   try {
-    const mdxdbModule = await import('mdxdb')
-    const { MemoryDBClient } = mdxdbModule
+    const aiDbModule = await import('ai-database')
+    const { createMemoryProvider } = aiDbModule
 
     switch (config.db) {
       case 'fs': {
         try {
           const { createFsDatabase } = await import('@mdxdb/fs')
-          const { createDBClient } = mdxdbModule
           const fsDb = createFsDatabase({ root: config.dbPath || './content' })
-          db = createDBClient(fsDb, { ns: config.ns })
+          // Use fs database wrapped as DBClient interface
+          db = fsDb as unknown as DBClient
         } catch {
           console.warn('@mdxdb/fs not available, falling back to memory')
-          db = new MemoryDBClient({ ns: config.ns })
+          db = createMemoryProvider() as unknown as DBClient
         }
         break
       }
       case 'sqlite': {
         try {
           const { createSqliteDatabase } = await import('@mdxdb/sqlite')
-          const { createDBClient } = mdxdbModule
           const sqliteDb = createSqliteDatabase({ path: config.dbPath || ':memory:' })
-          db = createDBClient(sqliteDb, { ns: config.ns })
+          db = sqliteDb as unknown as DBClient
         } catch {
           console.warn('@mdxdb/sqlite not available, falling back to memory')
-          db = new MemoryDBClient({ ns: config.ns })
+          db = createMemoryProvider() as unknown as DBClient
         }
         break
       }
       case 'postgres': {
         // TODO: Implement postgres backend
         console.warn('Postgres backend not yet implemented, falling back to memory')
-        db = new MemoryDBClient({ ns: config.ns })
+        db = createMemoryProvider() as unknown as DBClient
         break
       }
       case 'clickhouse': {
         // TODO: Implement clickhouse backend
         console.warn('ClickHouse backend not yet implemented, falling back to memory')
-        db = new MemoryDBClient({ ns: config.ns })
+        db = createMemoryProvider() as unknown as DBClient
         break
       }
       case 'mongo': {
         // TODO: Implement mongo backend
         console.warn('MongoDB backend not yet implemented, falling back to memory')
-        db = new MemoryDBClient({ ns: config.ns })
+        db = createMemoryProvider() as unknown as DBClient
         break
       }
       case 'memory':
       default:
-        db = new MemoryDBClient({ ns: config.ns })
+        db = createMemoryProvider() as unknown as DBClient
     }
   } catch {
-    // mdxdb not available, use stub implementation
-    console.warn('mdxdb not available, using stub implementation')
+    // ai-database not available, use stub implementation
+    console.warn('ai-database not available, using stub implementation')
     db = createStubDBClient(config.ns || 'default')
   }
 
