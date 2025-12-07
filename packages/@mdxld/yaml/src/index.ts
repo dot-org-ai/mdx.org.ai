@@ -315,8 +315,8 @@ export async function fetchYAML<T = Record<string, unknown>>(
   try {
     const response = await fetchFn(url, {
       headers: requestHeaders,
-      signal: controller.signal,
-    })
+      signal: controller.signal as AbortSignal,
+    } as RequestInit)
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)

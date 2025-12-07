@@ -1,71 +1,76 @@
 /**
- * @mdxld/jsx - MDX compilation and build tooling
+ * @mdxld/jsx - JSX types and MDX compilation for MDXLD
  *
- * Provides JSX-runtime agnostic MDX compilation for React, Preact, and Hono/JSX.
+ * Default JSX runtime is Hono/JSX. Also supports React and Preact.
  *
- * ## Key Features
- * - Compile MDX files to JavaScript
- * - Support for React, Preact, Hono/JSX via automatic JSX runtime
- * - esbuild/tsup/vite plugins
- * - TypeScript type generation from MDX frontmatter
+ * ## JSX Types (Hono default)
  *
- * ## Basic Usage
+ * ```ts
+ * import type { FC, HtmlEscapedString } from '@mdxld/jsx'
+ * import { jsxRenderer, jsx, Fragment } from '@mdxld/jsx'
+ * ```
+ *
+ * ## MDX Compilation
  *
  * ```ts
  * import { compileMDX } from '@mdxld/jsx'
  *
- * const result = await compileMDX(mdxContent)
- * console.log(result.code)
- * ```
- *
- * ## With Different Runtimes
- *
- * ```ts
- * // React (default)
+ * // Hono (default)
  * const result = await compileMDX(content)
+ *
+ * // React
+ * const result = await compileMDX(content, { jsx: 'react' })
  *
  * // Preact
  * const result = await compileMDX(content, { jsx: 'preact' })
- *
- * // Hono/JSX
- * const result = await compileMDX(content, { jsx: 'hono' })
  * ```
  *
  * ## Build Plugins
  *
  * ```ts
- * // esbuild
- * import { mdxPlugin } from '@mdxld/jsx/esbuild'
- *
- * // Vite/Rollup
  * import { mdxVitePlugin } from '@mdxld/jsx/plugin'
- *
- * // tsup
- * import { mdxTsupPlugin } from '@mdxld/jsx/plugin'
+ * import { mdxPlugin } from '@mdxld/jsx/esbuild'
  * ```
- *
- * ## Runtime Agnostic Builds
- *
- * For maximum compatibility, compile without specifying a runtime:
- *
- * ```ts
- * const result = await compileMDX(content, {
- *   jsx: { importSource: undefined }
- * })
- * ```
- *
- * Then consumers can use bundler aliases:
- * - React: (default, no config needed)
- * - Preact: `alias: { 'react': 'preact/compat' }`
- * - Hono: `alias: { 'react': 'hono/jsx' }`
  *
  * @packageDocumentation
  */
 
-// Core compiler
+// =============================================================================
+// Hono JSX Types (default runtime)
+// =============================================================================
+
+export type { FC, PropsWithChildren, Child, JSXNode } from 'hono/jsx'
+export type { HtmlEscapedString } from 'hono/utils/html'
+export { jsxRenderer } from 'hono/jsx-renderer'
+export { jsx, Fragment } from 'hono/jsx'
+
+/**
+ * Props for MDXLD renderer components
+ */
+export interface MDXLDRendererProps {
+  title?: string
+  description?: string
+  jsonld?: Record<string, unknown>
+  children: unknown
+  head?: unknown
+  className?: string
+}
+
+/**
+ * Props for MDXLD document components
+ */
+export interface MDXLDDocumentProps {
+  frontmatter?: Record<string, unknown>
+  children: unknown
+  Layout?: import('hono/jsx').FC
+}
+
+// =============================================================================
+// MDX Compiler
+// =============================================================================
+
 export { compileMDX, compileMDXBatch } from './compiler.js'
 
-// Types
 export type {
   CompileMDXOptions,
   CompileMDXResult,
@@ -74,10 +79,12 @@ export type {
   JSXPreset,
 } from './types.js'
 
-// JSX presets
 export { JSX_PRESETS } from './types.js'
 
-// Plugin re-exports for convenience
+// =============================================================================
+// Build Plugins
+// =============================================================================
+
 export {
   mdxRollupPlugin,
   mdxVitePlugin,

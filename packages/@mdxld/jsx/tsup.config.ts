@@ -5,6 +5,7 @@ export default defineConfig({
     index: 'src/index.ts',
     plugin: 'src/plugin.ts',
     esbuild: 'src/esbuild.ts',
+    dom: 'src/dom.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,
