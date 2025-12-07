@@ -220,7 +220,9 @@ export function extractSlides(doc: MDXLDDocument, options: ExtractOptions = {}):
 
   // Parse each section into a slide
   for (let i = 0; i < sections.length; i++) {
-    const section = sections[i].trim()
+    const sectionContent = sections[i]
+    if (!sectionContent) continue
+    const section = sectionContent.trim()
     if (!section) continue
 
     const slide = parseSlideSection(section, i, opts)
@@ -279,7 +281,7 @@ function parseSlideSection(section: string, index: number, opts: ExtractOptions)
   // Extract speaker notes
   if (opts.notesPattern) {
     const notesMatch = slide.content.match(opts.notesPattern)
-    if (notesMatch) {
+    if (notesMatch && notesMatch[1]) {
       slide.notes = notesMatch[1].trim()
       slide.content = slide.content.replace(opts.notesPattern, '').trim()
     }
@@ -301,6 +303,7 @@ function extractCodeBlocks(content: string): CodeBlock[] {
 
   while ((match = codeBlockRegex.exec(content)) !== null) {
     const [, language, meta, code] = match
+    if (!code) continue
     const block: CodeBlock = {
       language: language || undefined,
       code: code.trim(),
@@ -333,16 +336,19 @@ function parseYamlLike(content: string): Record<string, unknown> {
   for (const line of lines) {
     const match = line.match(/^(\w+):\s*(.+)$/)
     if (match) {
-      const [, key, value] = match
-      // Try to parse as JSON, fall back to string
-      try {
-        result[key] = JSON.parse(value)
-      } catch {
-        // Handle unquoted strings
-        if (value === 'true') result[key] = true
-        else if (value === 'false') result[key] = false
-        else if (!isNaN(Number(value))) result[key] = Number(value)
-        else result[key] = value.trim()
+      const key = match[1]
+      const value = match[2]
+      if (key && value) {
+        // Try to parse as JSON, fall back to string
+        try {
+          result[key] = JSON.parse(value)
+        } catch {
+          // Handle unquoted strings
+          if (value === 'true') result[key] = true
+          else if (value === 'false') result[key] = false
+          else if (!isNaN(Number(value))) result[key] = Number(value)
+          else result[key] = value.trim()
+        }
       }
     }
   }

@@ -301,7 +301,9 @@ export function extractScenes(
   // Parse each section into a scene
   let currentTime = 0
   for (let i = 0; i < sections.length; i++) {
-    const section = sections[i].trim()
+    const sectionContent = sections[i]
+    if (!sectionContent) continue
+    const section = sectionContent.trim()
     if (!section) continue
 
     const scene = parseSceneSection(section, i, currentTime, opts)
@@ -386,6 +388,7 @@ function extractCodeBlocks(content: string): CodeBlock[] {
 
   while ((match = codeBlockRegex.exec(content)) !== null) {
     const [, language, meta, code] = match
+    if (!code) continue
     const block: CodeBlock = {
       language: language || undefined,
       code: code.trim(),
@@ -415,14 +418,17 @@ function parseYamlLike(content: string): Record<string, unknown> {
   for (const line of lines) {
     const match = line.match(/^(\w+):\s*(.+)$/)
     if (match) {
-      const [, key, value] = match
-      try {
-        result[key] = JSON.parse(value)
-      } catch {
-        if (value === 'true') result[key] = true
-        else if (value === 'false') result[key] = false
-        else if (!isNaN(Number(value))) result[key] = Number(value)
-        else result[key] = value.trim()
+      const key = match[1]
+      const value = match[2]
+      if (key && value) {
+        try {
+          result[key] = JSON.parse(value)
+        } catch {
+          if (value === 'true') result[key] = true
+          else if (value === 'false') result[key] = false
+          else if (!isNaN(Number(value))) result[key] = Number(value)
+          else result[key] = value.trim()
+        }
       }
     }
   }
@@ -452,7 +458,8 @@ export function getSceneAtTime(composition: VideoComposition, time: number): Sce
  * Get scene at a specific frame
  */
 export function getSceneAtFrame(composition: VideoComposition, frame: number): Scene | undefined {
-  const time = frame / composition.config.fps
+  const fps = composition.config.fps ?? 30
+  const time = frame / fps
   return getSceneAtTime(composition, time)
 }
 
