@@ -2,9 +2,9 @@
  * @mdxdb/api - HTTP API client for mdxdb
  *
  * A fetch-based REST client that connects to a mdxdb server.
- * Implements the Database interface for seamless integration.
+ * Supports both the simple Database interface and the ai-database DBClient interface.
  *
- * @example
+ * @example Simple Database interface
  * ```ts
  * import { createClient } from '@mdxdb/api'
  *
@@ -18,10 +18,29 @@
  * const doc = await db.get('posts/hello-world')
  * ```
  *
+ * @example DBClient interface (ai-database compatible)
+ * ```ts
+ * import { createDBClient } from '@mdxdb/api/db'
+ *
+ * const db = createDBClient({
+ *   baseUrl: 'http://localhost:3000/api/db',
+ *   apiKey: process.env.API_KEY
+ * })
+ *
+ * // Use like any DBClient implementation
+ * const things = await db.list({ ns: 'example.com', type: 'User' })
+ * const thing = await db.get('https://example.com/User/123')
+ * ```
+ *
  * @packageDocumentation
  */
 
+// Simple Database interface client
 export { ApiClient, createClient, createApiClient } from './client.js'
+
+// DBClient interface client (ai-database compatible)
+export { DBApiClient, createDBClient } from './db-client.js'
+export type { DBClientConfig } from './db-client.js'
 
 export type {
   ClientConfig,

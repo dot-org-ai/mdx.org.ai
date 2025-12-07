@@ -11,6 +11,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./db": {
+      "types": "./dist/db-server.d.ts",
+      "import": "./dist/db-server.js",
+      "require": "./dist/db-server.cjs"
     }
   },
   "files": [
@@ -39,12 +44,14 @@
     "hono": "^4.6.0"
   },
   "peerDependencies": {
+    "ai-database": "workspace:*",
     "mdxdb": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
     "@mdxdb/fs": "workspace:*",
+    "ai-database": "workspace:*",
     "mdxdb": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",

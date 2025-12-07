@@ -4,7 +4,11 @@
  * Supports both HTTP and WebSocket transports for JSON-RPC 2.0 communication.
  * Compatible with rpc.do services.
  *
- * @example
+ * Supports two interfaces:
+ * - `createRpcClient()` - Simple Database interface for MDX documents
+ * - `createDBRpcClient()` - ai-database DBClient interface for Things, Relationships, Events, Actions, Artifacts
+ *
+ * @example Simple Database interface
  * ```ts
  * import { createRpcClient } from '@mdxdb/rpc'
  *
@@ -25,10 +29,28 @@
  * const doc = await wsDb.get('posts/hello-world')
  * ```
  *
+ * @example DBClient interface (ai-database compatible)
+ * ```ts
+ * import { createDBRpcClient } from '@mdxdb/rpc/db'
+ *
+ * const db = createDBRpcClient({
+ *   url: 'https://rpc.do/namespace',
+ *   apiKey: process.env.API_KEY
+ * })
+ *
+ * // Use like any DBClient implementation
+ * const things = await db.list({ ns: 'example.com', type: 'User' })
+ * ```
+ *
  * @packageDocumentation
  */
 
+// Simple Database interface client
 export { RpcClient, createRpcClient } from './client.js'
+
+// DBClient interface client (ai-database compatible)
+export { DBRpcClient, createDBRpcClient } from './db-client.js'
+export type { DBRpcClientConfig } from './db-client.js'
 
 export type {
   // Database types

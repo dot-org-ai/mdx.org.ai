@@ -11,6 +11,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./db": {
+      "types": "./dist/db-client.d.ts",
+      "import": "./dist/db-client.js",
+      "require": "./dist/db-client.cjs"
     }
   },
   "files": [
@@ -36,10 +41,15 @@
   ],
   "license": "MIT",
   "peerDependencies": {
+    "ai-database": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
+    "@hono/node-server": "^1.13.0",
+    "@mdxdb/clickhouse": "workspace:*",
+    "@mdxdb/server": "workspace:*",
     "@mdxld/config": "workspace:^",
+    "ai-database": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

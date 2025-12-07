@@ -8,7 +8,7 @@
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import type { MDXLDData, MDXLDDocument } from 'mdxld'
+import type { MDXLDData } from 'mdxld'
 import type { Database } from 'mdxdb'
 import type { ServerConfig, ApiResponse, ListQuery, SearchQuery, SetBody, DeleteQuery } from './types.js'
 
@@ -162,12 +162,11 @@ export function createServer<TData extends MDXLDData = MDXLDData>(config: Server
         )
       }
 
-      const document = {
+      const document: { type?: string; data?: TData; content?: string } = {
         type: body.type,
-        context: body.context,
         data: (body.data ?? {}) as TData,
         content: body.content,
-      } as MDXLDDocument<TData>
+      }
 
       const result = await database.set(id, document, {
         createOnly: body.createOnly,
