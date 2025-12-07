@@ -15,7 +15,6 @@
     "@mdxui/chat": "workspace:^",
     "@mdxui/css": "workspace:^",
     "@mdxui/editor": "workspace:^",
-    "@mdxui/examples": "workspace:^",
     "@mdxui/html": "workspace:^",
     "@mdxui/shadcn": "workspace:^",
     "@mdxui/shadcnblocks": "workspace:^",
