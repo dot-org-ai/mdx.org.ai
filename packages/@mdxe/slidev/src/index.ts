@@ -136,7 +136,7 @@ function parseSlide(section: string): Slide {
 
   // Extract speaker notes (marked with <!-- notes --> or at bottom after ---)
   const notesMatch = slide.content.match(/<!--\s*notes?\s*-->\s*([\s\S]*?)(?:<!--|$)/)
-  if (notesMatch) {
+  if (notesMatch && notesMatch[1]) {
     slide.notes = notesMatch[1].trim()
     slide.content = slide.content.replace(/<!--\s*notes?\s*-->[\s\S]*?(?:<!--|$)/, '').trim()
   }
@@ -154,12 +154,15 @@ function parseFrontmatter(content: string): Record<string, unknown> {
   for (const line of lines) {
     const match = line.match(/^(\w+):\s*(.+)$/)
     if (match) {
-      const [, key, value] = match
-      // Try to parse as JSON, fall back to string
-      try {
-        result[key] = JSON.parse(value)
-      } catch {
-        result[key] = value.trim()
+      const key = match[1]
+      const value = match[2]
+      if (key && value) {
+        // Try to parse as JSON, fall back to string
+        try {
+          result[key] = JSON.parse(value)
+        } catch {
+          result[key] = value.trim()
+        }
       }
     }
   }

@@ -115,7 +115,7 @@ export function extractSlides(doc: MDXLDDocument): SlideContent[] {
     while ((match = codeBlockRegex.exec(section)) !== null) {
       codeBlocks.push({
         language: match[1] || undefined,
-        code: match[2],
+        code: match[2] ?? '',
       })
     }
 
@@ -240,13 +240,13 @@ export function MDXComposition({ doc, config = {}, SlideComponent = DefaultSlide
           key: index,
           from: index * framesPerSlide,
           durationInFrames: framesPerSlide,
-        },
-        React.createElement(SlideContent, {
-          content: slide,
-          index,
-          framesPerSlide,
-          SlideComponent,
-        })
+          children: React.createElement(SlideContent, {
+            content: slide,
+            index,
+            framesPerSlide,
+            SlideComponent,
+          }),
+        } as React.ComponentProps<typeof Sequence>
       )
     )
   )
