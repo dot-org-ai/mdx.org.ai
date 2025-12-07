@@ -137,9 +137,11 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
-# Vite logs files
+# Vite/Vitest cache files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+vitest.config.js.timestamp-*
+vitest.config.ts.timestamp-*
 
 # Turborepo
 .turbo
@@ -164,3 +166,6 @@ storybook-static
 preprocessed_configs/
 .mdx/db/
 packages/@mdxdb/clickhouse/.mdx/
+
+# MDXE generated test files
+.mdxe-tests/
