@@ -8,7 +8,7 @@
 
 import { z } from 'zod'
 import { tool } from '@anthropic-ai/claude-agent-sdk'
-import type { Database, ListOptions, SearchOptions, GetOptions, SetOptions, DeleteOptions } from 'mdxdb'
+import type { Database, ListOptions, SearchOptions, GetOptions, SetOptions, DeleteOptions } from '@mdxdb/fs'
 import type { Executor, DoOptions, TestOptions, DeployOptions } from 'mdxe'
 import type { MDXLDData, MDXLDDocument } from 'mdxld'
 

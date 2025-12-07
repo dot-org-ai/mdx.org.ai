@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import type { Database } from 'mdxdb'
+import type { Database } from '@mdxdb/fs'
 import type { Executor } from 'mdxe'
 import type { MDXLDData } from 'mdxld'
 

@@ -18,6 +18,6 @@ export { createDatabaseTools, createExecutorTools } from './tools.js'
 export type { ClaudeServerConfig, ToolResult, ToolContent, TextContent, ImageContent, ResourceContent } from './types.js'
 
 // Re-export dependencies for convenience
-export type { Database, ListOptions, SearchOptions, GetOptions, SetOptions, DeleteOptions } from 'mdxdb'
+export type { Database, ListOptions, SearchOptions, GetOptions, SetOptions, DeleteOptions } from '@mdxdb/fs'
 export type { Executor, DoOptions, TestOptions, DeployOptions } from 'mdxe'
 export type { MDXLDDocument, MDXLDData } from 'mdxld'

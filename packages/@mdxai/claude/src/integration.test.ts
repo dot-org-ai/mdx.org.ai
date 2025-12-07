@@ -4,7 +4,7 @@ import * as path from 'node:path'
 import * as os from 'node:os'
 import { createFsDatabase } from '@mdxdb/fs'
 import { createDatabaseTools } from './tools.js'
-import type { Database } from 'mdxdb'
+import type { Database } from '@mdxdb/fs'
 
 describe('Integration: @mdxai/claude with @mdxdb/fs', () => {
   let testDir: string

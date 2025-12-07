@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import type { Database, ListResult, SearchResult, SetResult, DeleteResult } from 'mdxdb'
+import type { Database, ListResult, SearchResult, SetResult, DeleteResult } from '@mdxdb/fs'
 import type { Executor, DoResult, TestResult, DeployResult } from 'mdxe'
 import type { MDXLDDocument, MDXLDData } from 'mdxld'
 import { createDatabaseTools, createExecutorTools } from './tools.js'
