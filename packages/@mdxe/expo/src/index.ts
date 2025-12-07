@@ -145,5 +145,4 @@ export async function fetchMDX(url: string): Promise<MDXLDDocument> {
   return parse(content)
 }
 
-// Re-export types
-export type { MDXLDDocument } from 'mdxld'
+// MDXLDDocument is already exported above

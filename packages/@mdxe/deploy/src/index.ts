@@ -20,9 +20,37 @@ import type {
   GitHubOptions,
   PlatformOptions,
   DetectionResult,
+  DeployState,
 } from './types.js'
 
 export * from './types.js'
+
+/**
+ * Normalize deployment state to lowercase
+ */
+function normalizeState(state?: string): DeployState | undefined {
+  if (!state) return undefined
+  const lower = state.toLowerCase()
+  switch (lower) {
+    case 'queued':
+    case 'pending':
+      return 'queued'
+    case 'building':
+    case 'initializing':
+      return 'building'
+    case 'deploying':
+      return 'deploying'
+    case 'ready':
+      return 'ready'
+    case 'error':
+      return 'error'
+    case 'canceled':
+    case 'cancelled':
+      return 'canceled'
+    default:
+      return 'pending'
+  }
+}
 
 /**
  * .do Platform deploy provider (default)
@@ -155,6 +183,7 @@ class VercelProvider implements DeployProvider {
     return {
       ...result,
       platform: 'vercel',
+      state: normalizeState(result.state),
     }
   }
 

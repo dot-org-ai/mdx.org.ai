@@ -294,7 +294,9 @@ export async function deploy(options: DoDeployOptions): Promise<DeployResult> {
     if (options.buildCommand || !options.dryRun) {
       logs.push('Building project...')
       const buildCmd = options.buildCommand || 'npm run build'
-      const [cmd, ...args] = buildCmd.split(' ')
+      const parts = buildCmd.split(' ')
+      const cmd = parts[0] || 'npm'
+      const args = parts.slice(1)
       const buildResult = runCommand(cmd, args, projectDir, { dryRun: options.dryRun })
 
       if (!buildResult.success && !options.dryRun) {
@@ -347,7 +349,7 @@ export async function deploy(options: DoDeployOptions): Promise<DeployResult> {
       name: options.projectName || 'mdxe-worker',
       code: workerCode,
       mode,
-      compatibilityDate: options.compatibilityDate || new Date().toISOString().split('T')[0],
+      compatibilityDate: options.compatibilityDate ?? new Date().toISOString().slice(0, 10),
       compatibilityFlags: options.compatibilityFlags,
       env: options.env,
       kvNamespaces: options.kvNamespaces,

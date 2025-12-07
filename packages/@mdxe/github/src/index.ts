@@ -227,7 +227,7 @@ async function getRepositoryFromGit(projectDir: string): Promise<{ owner: string
   const url = result.output
   let match = url.match(/github\.com[:/]([^/]+)\/([^/.]+)/)
 
-  if (match) {
+  if (match && match[1] && match[2]) {
     return { owner: match[1], repo: match[2].replace('.git', '') }
   }
 

@@ -26,7 +26,7 @@ async function getTransformTestCode(): Promise<(code: string) => Promise<string>
       transformTestCode = async (code: string) => code
     }
   }
-  return transformTestCode
+  return transformTestCode as (code: string) => Promise<string>
 }
 
 /**
@@ -180,7 +180,8 @@ export function extractTests(content: string, options: ExtractTestsOptions = {})
     }
   }
 
-  visitNode(ast)
+  // Cast AST to MDXLDAstNode (types have minor differences in position.offset optionality)
+  visitNode(ast as unknown as MDXLDAstNode)
   return tests
 }
 
@@ -1110,18 +1111,18 @@ function createShouldAssertion(actual: unknown, negated: boolean = false): Shoul
     get empty() {
       const isEmpty = actual === '' ||
         (Array.isArray(actual) && actual.length === 0) ||
-        (actual && typeof actual === 'object' && Object.keys(actual).length === 0)
+        !!(actual && typeof actual === 'object' && Object.keys(actual as object).length === 0)
       check(isEmpty, `Expected ${JSON.stringify(actual)} to be empty`)
       return chainable()
     },
 
     // Frozen/Sealed
     get frozen() {
-      check(Object.isFrozen(actual), `Expected ${JSON.stringify(actual)} to be frozen`)
+      check(Object.isFrozen(actual as object), `Expected ${JSON.stringify(actual)} to be frozen`)
       return chainable()
     },
     get sealed() {
-      check(Object.isSealed(actual), `Expected ${JSON.stringify(actual)} to be sealed`)
+      check(Object.isSealed(actual as object), `Expected ${JSON.stringify(actual)} to be sealed`)
       return chainable()
     },
   }

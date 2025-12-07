@@ -16,6 +16,10 @@ import type {
   WorkerBinding,
   DispatchNamespace,
   UploadResult,
+  VectorizeIndexConfig,
+  VectorizeIndex,
+  VectorizeVector,
+  VectorizeMatch,
 } from './types.js'
 
 /**
@@ -315,6 +319,202 @@ export class CloudflareApi {
     }
   }
 
+  // ===========================================================================
+  // Vectorize API
+  // ===========================================================================
+
+  /**
+   * Create a Vectorize index
+   */
+  async createVectorizeIndex(config: VectorizeIndexConfig): Promise<{ success: boolean; index?: VectorizeIndex; errors?: Array<{ code: number; message: string }> }> {
+    const response = await this.request<VectorizeIndex>(
+      'POST',
+      `/accounts/${this.config.accountId}/vectorize/indexes`,
+      {
+        name: config.name,
+        description: config.description,
+        config: {
+          dimensions: config.dimensions,
+          metric: config.metric,
+        },
+      }
+    )
+
+    return {
+      success: response.success,
+      index: response.result,
+      errors: response.errors,
+    }
+  }
+
+  /**
+   * Get a Vectorize index
+   */
+  async getVectorizeIndex(indexName: string): Promise<{ success: boolean; index?: VectorizeIndex; errors?: Array<{ code: number; message: string }> }> {
+    const response = await this.request<VectorizeIndex>(
+      'GET',
+      `/accounts/${this.config.accountId}/vectorize/indexes/${indexName}`
+    )
+
+    return {
+      success: response.success,
+      index: response.result,
+      errors: response.errors,
+    }
+  }
+
+  /**
+   * List all Vectorize indexes
+   */
+  async listVectorizeIndexes(): Promise<{ success: boolean; indexes?: VectorizeIndex[]; errors?: Array<{ code: number; message: string }> }> {
+    const response = await this.request<VectorizeIndex[]>(
+      'GET',
+      `/accounts/${this.config.accountId}/vectorize/indexes`
+    )
+
+    return {
+      success: response.success,
+      indexes: response.result,
+      errors: response.errors,
+    }
+  }
+
+  /**
+   * Delete a Vectorize index
+   */
+  async deleteVectorizeIndex(indexName: string): Promise<{ success: boolean; errors?: Array<{ code: number; message: string }> }> {
+    const response = await this.request(
+      'DELETE',
+      `/accounts/${this.config.accountId}/vectorize/indexes/${indexName}`
+    )
+
+    return {
+      success: response.success,
+      errors: response.errors,
+    }
+  }
+
+  /**
+   * Insert vectors into a Vectorize index
+   */
+  async insertVectors(
+    indexName: string,
+    vectors: VectorizeVector[]
+  ): Promise<{ success: boolean; mutationId?: string; errors?: Array<{ code: number; message: string }> }> {
+    // Vectorize uses NDJSON format for bulk inserts
+    const ndjson = vectors.map(v => JSON.stringify(v)).join('\n')
+
+    const response = await this.request<{ mutationId: string }>(
+      'POST',
+      `/accounts/${this.config.accountId}/vectorize/indexes/${indexName}/insert`,
+      ndjson,
+      'application/x-ndjson'
+    )
+
+    return {
+      success: response.success,
+      mutationId: response.result?.mutationId,
+      errors: response.errors,
+    }
+  }
+
+  /**
+   * Upsert vectors into a Vectorize index
+   */
+  async upsertVectors(
+    indexName: string,
+    vectors: VectorizeVector[]
+  ): Promise<{ success: boolean; mutationId?: string; errors?: Array<{ code: number; message: string }> }> {
+    const ndjson = vectors.map(v => JSON.stringify(v)).join('\n')
+
+    const response = await this.request<{ mutationId: string }>(
+      'POST',
+      `/accounts/${this.config.accountId}/vectorize/indexes/${indexName}/upsert`,
+      ndjson,
+      'application/x-ndjson'
+    )
+
+    return {
+      success: response.success,
+      mutationId: response.result?.mutationId,
+      errors: response.errors,
+    }
+  }
+
+  /**
+   * Delete vectors from a Vectorize index
+   */
+  async deleteVectors(
+    indexName: string,
+    ids: string[]
+  ): Promise<{ success: boolean; mutationId?: string; errors?: Array<{ code: number; message: string }> }> {
+    const response = await this.request<{ mutationId: string }>(
+      'POST',
+      `/accounts/${this.config.accountId}/vectorize/indexes/${indexName}/delete-by-ids`,
+      { ids }
+    )
+
+    return {
+      success: response.success,
+      mutationId: response.result?.mutationId,
+      errors: response.errors,
+    }
+  }
+
+  /**
+   * Query vectors in a Vectorize index
+   */
+  async queryVectors(
+    indexName: string,
+    vector: number[],
+    options: {
+      topK?: number
+      filter?: Record<string, unknown>
+      returnValues?: boolean
+      returnMetadata?: boolean
+      namespace?: string
+    } = {}
+  ): Promise<{ success: boolean; matches?: VectorizeMatch[]; errors?: Array<{ code: number; message: string }> }> {
+    const response = await this.request<{ matches: VectorizeMatch[] }>(
+      'POST',
+      `/accounts/${this.config.accountId}/vectorize/indexes/${indexName}/query`,
+      {
+        vector,
+        topK: options.topK ?? 10,
+        filter: options.filter,
+        returnValues: options.returnValues ?? false,
+        returnMetadata: options.returnMetadata ?? true,
+        namespace: options.namespace,
+      }
+    )
+
+    return {
+      success: response.success,
+      matches: response.result?.matches,
+      errors: response.errors,
+    }
+  }
+
+  /**
+   * Get vectors by IDs from a Vectorize index
+   */
+  async getVectorsByIds(
+    indexName: string,
+    ids: string[]
+  ): Promise<{ success: boolean; vectors?: VectorizeVector[]; errors?: Array<{ code: number; message: string }> }> {
+    const response = await this.request<VectorizeVector[]>(
+      'POST',
+      `/accounts/${this.config.accountId}/vectorize/indexes/${indexName}/get-by-ids`,
+      { ids }
+    )
+
+    return {
+      success: response.success,
+      vectors: response.result,
+      errors: response.errors,
+    }
+  }
+
   /**
    * Upload static assets for Workers Sites
    */
@@ -530,4 +730,14 @@ export function createCloudflareApiFromEnv(overrides?: Partial<CloudflareApiConf
   })
 }
 
-export type { CloudflareApiConfig, WorkerMetadata, WorkerBinding, DispatchNamespace, UploadResult }
+export type {
+  CloudflareApiConfig,
+  WorkerMetadata,
+  WorkerBinding,
+  DispatchNamespace,
+  UploadResult,
+  VectorizeIndexConfig,
+  VectorizeIndex,
+  VectorizeVector,
+  VectorizeMatch,
+}

@@ -65,7 +65,7 @@ export function success<T>(data: T): MDXResult<T> {
 /**
  * Create an MDX result error response
  */
-export function error(message: string): MDXResult {
+export function error<T>(message: string): MDXResult<T> {
   return { success: false, error: message }
 }
 

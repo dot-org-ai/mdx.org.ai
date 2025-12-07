@@ -701,5 +701,3 @@ export async function deployToWorkers(options: CloudflareWorkersOptions): Promis
     return { ...result, logs: [...logs, ...(result.logs || [])] }
   }
 }
-
-export { detectSourceType }

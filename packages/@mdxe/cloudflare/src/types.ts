@@ -202,10 +202,60 @@ export type WorkerBinding =
   | { type: 'r2_bucket'; name: string; bucket_name: string }
   | { type: 'service'; name: string; service: string; environment?: string }
   | { type: 'dispatch_namespace'; name: string; namespace: string }
+  | { type: 'vectorize'; name: string; index_name: string }
   | { type: 'plain_text'; name: string; text: string }
   | { type: 'secret_text'; name: string; text: string }
   | { type: 'json'; name: string; json: unknown }
   | { type: 'assets'; name: string }
+
+/**
+ * Vectorize index configuration
+ */
+export interface VectorizeIndexConfig {
+  /** Index name */
+  name: string
+  /** Description */
+  description?: string
+  /** Dimensions of the embedding vectors */
+  dimensions: number
+  /** Distance metric */
+  metric: 'cosine' | 'euclidean' | 'dot-product'
+}
+
+/**
+ * Vectorize index info
+ */
+export interface VectorizeIndex {
+  id: string
+  name: string
+  description?: string
+  config: {
+    dimensions: number
+    metric: 'cosine' | 'euclidean' | 'dot-product'
+  }
+  created_on: string
+  modified_on: string
+}
+
+/**
+ * Vectorize vector with metadata
+ */
+export interface VectorizeVector {
+  id: string
+  values: number[]
+  namespace?: string
+  metadata?: Record<string, unknown>
+}
+
+/**
+ * Vectorize query result
+ */
+export interface VectorizeMatch {
+  id: string
+  score: number
+  values?: number[]
+  metadata?: Record<string, unknown>
+}
 
 /**
  * Dispatch namespace configuration

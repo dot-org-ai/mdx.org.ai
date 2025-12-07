@@ -5,7 +5,7 @@
  */
 
 // Re-export from ai-functions
-export { RPC, RPCPromise } from 'ai-functions'
+export type { RPC, RPCPromise } from 'ai-functions'
 
 export interface MDXLDDocument {
   id?: string
@@ -227,7 +227,7 @@ export class RPCClient<T extends Record<string, (...args: unknown[]) => unknown>
         : undefined,
     })
 
-    const result: RPCResponse = await response.json()
+    const result = (await response.json()) as RPCResponse
 
     if (result.error) {
       throw new RPCError(result.error.code, result.error.message)
@@ -289,14 +289,3 @@ export interface RPCMethodSchema {
   parameters?: Record<string, unknown>
 }
 
-// Export types
-export type {
-  MDXLDDocument,
-  RPCFunction,
-  RPCServerOptions,
-  RPCClientOptions,
-  RPCRequest,
-  RPCResponse,
-  RPCSchema,
-  RPCMethodSchema,
-}

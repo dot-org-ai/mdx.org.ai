@@ -54,5 +54,11 @@
   },
   "peerDependencies": {
     "mdxld": "workspace:^"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxe/rpc"
+  },
+  "author": "MDX.org.ai"
 }

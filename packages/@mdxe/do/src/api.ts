@@ -152,7 +152,7 @@ export class DoApi {
         throw new Error(`HTTP ${response.status}: ${error}`)
       }
 
-      const worker = await response.json()
+      const worker = await response.json() as { id: string; name: string; url?: string; createdAt?: string; updatedAt?: string }
       return { success: true, worker }
     } catch (error) {
       return {
