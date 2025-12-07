@@ -19,13 +19,14 @@
     "app"
   ],
   "scripts": {
-    "dev": "cd app && next dev --turbopack --port 3333",
-    "build": "cd app && next build",
-    "start": "cd app && next start --port 3333",
-    "test": "cd app && vitest run",
-    "test:e2e": "cd app && playwright test",
-    "test:e2e:ui": "cd app && playwright test --ui",
-    "lint": "cd app && next lint"
+    "dev": "pnpm --dir app dev",
+    "build": "echo 'Source-only package - no build required'",
+    "build:app": "pnpm --dir app build",
+    "start": "pnpm --dir app start",
+    "test": "pnpm --dir app test:run",
+    "test:e2e": "pnpm --dir app test:e2e",
+    "test:e2e:ui": "pnpm --dir app test:e2e:ui",
+    "lint": "pnpm --dir app lint"
   },
   "keywords": [
     "mdxui",
@@ -48,5 +49,11 @@
     "next": {
       "optional": true
     }
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxui/editor"
+  },
+  "author": "MDX.org.ai"
 }

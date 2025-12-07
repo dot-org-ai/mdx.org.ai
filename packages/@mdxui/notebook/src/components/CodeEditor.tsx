@@ -13,6 +13,9 @@ const languageExtensions: Record<Language, () => ReturnType<typeof javascript>> 
   sql: () => sql(),
   markdown: () => javascript(), // Use basic for markdown
   json: () => javascript(), // Use basic for JSON
+  jsx: () => javascript({ jsx: true, typescript: false }),
+  tsx: () => javascript({ jsx: true, typescript: true }),
+  mdx: () => javascript({ jsx: true, typescript: false }), // Use JSX mode for MDX
 }
 
 export function CodeEditor({

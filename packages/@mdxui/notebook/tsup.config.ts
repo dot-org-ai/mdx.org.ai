@@ -5,7 +5,7 @@ export default defineConfig({
     'src/index.ts',
     'src/components/index.ts',
     'src/execution/index.ts',
-    'src/outputs/index.ts',
+    'src/outputs/index.tsx',
     'src/hooks/index.ts',
   ],
   format: ['esm', 'cjs'],

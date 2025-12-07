@@ -59,5 +59,11 @@
     "react",
     "components"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxui/magicui"
+  },
+  "author": "MDX.org.ai"
 }

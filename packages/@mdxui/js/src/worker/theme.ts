@@ -14,7 +14,7 @@
  * <script src="/theme?theme=auto"></script>
  *
  * <!-- Or inline the script -->
- * <script>/* generated theme script */</script>
+ * <script>...</script>
  * ```
  */
 

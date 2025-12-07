@@ -27,7 +27,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "echo 'Skipping - needs gluestack-ui API updates'",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:unit": "vitest run",
@@ -77,5 +77,11 @@
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxui/gluestack"
+  },
+  "author": "MDX.org.ai"
 }

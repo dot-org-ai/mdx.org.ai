@@ -58,11 +58,21 @@
     "react": ">=18.0.0"
   },
   "peerDependenciesMeta": {
-    "fumadocs-core": { "optional": true },
-    "fumadocs-ui": { "optional": true },
-    "hono": { "optional": true },
-    "next": { "optional": true },
-    "react": { "optional": true }
+    "fumadocs-core": {
+      "optional": true
+    },
+    "fumadocs-ui": {
+      "optional": true
+    },
+    "hono": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
@@ -75,5 +85,11 @@
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxui/fumadocs"
+  },
+  "author": "MDX.org.ai"
 }

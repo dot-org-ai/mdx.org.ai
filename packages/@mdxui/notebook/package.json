@@ -78,5 +78,6 @@
     "url": "https://github.com/dot-org-ai/mdx.org.ai",
     "directory": "packages/@mdxui/notebook"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "author": "MDX.org.ai"
 }

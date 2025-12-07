@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 export type Language =
   | 'javascript'
   | 'typescript'
+  | 'python'
   | 'mdx'
   | 'markdown'
   | 'json'

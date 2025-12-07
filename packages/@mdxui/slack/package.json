@@ -52,5 +52,11 @@
   "peerDependencies": {
     "mdxld": "workspace:^",
     "react": "^18.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxui/slack"
+  },
+  "author": "MDX.org.ai"
 }

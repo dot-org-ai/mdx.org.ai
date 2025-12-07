@@ -60,5 +60,10 @@
     "@types/react-dom": "^18.2.0",
     "tsup": "^8.0.0",
     "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxui/shadcnblocks"
   }
 }

@@ -10,6 +10,13 @@ import { parse, stringify, type MDXLDDocument } from 'mdxld'
 import { toAst, type MDXLDAst, type MDXLDAstNode } from '@mdxld/ast'
 
 /**
+ * Get a property from an AST node with type safety
+ */
+function getNodeProp<T>(node: MDXLDAstNode, prop: string): T | undefined {
+  return (node as unknown as Record<string, unknown>)[prop] as T | undefined
+}
+
+/**
  * Options for rendering markdown
  */
 export interface RenderOptions {
@@ -241,7 +248,7 @@ function renderNode(node: MDXLDAstNode, opts: Required<RenderOptions>): string {
     case 'footnoteDefinition':
       return renderFootnoteDefinition(node, opts)
     case 'footnoteReference':
-      return `[^${node.identifier || node.label || ''}]`
+      return `[^${getNodeProp<string>(node, 'identifier') || getNodeProp<string>(node, 'label') || ''}]`
 
     default:
       // For unknown nodes, try to render children
@@ -344,8 +351,8 @@ function renderImage(node: MDXLDAstNode): string {
  * Render a list
  */
 function renderList(node: MDXLDAstNode, opts: Required<RenderOptions>): string {
-  const ordered = node.ordered as boolean
-  const start = (node.start as number) || 1
+  const ordered = getNodeProp<boolean>(node, 'ordered') ?? false
+  const start = getNodeProp<number>(node, 'start') ?? 1
 
   if (!node.children) return ''
 
@@ -375,7 +382,7 @@ function renderListItem(node: MDXLDAstNode, opts: Required<RenderOptions>): stri
   if (!node.children) return ''
 
   // Check if it's a task list item
-  const checked = node.checked as boolean | null
+  const checked = getNodeProp<boolean | null>(node, 'checked')
   let prefix = ''
   if (checked !== null && checked !== undefined) {
     prefix = checked ? '[x] ' : '[ ] '
@@ -413,7 +420,7 @@ function renderBlockquote(node: MDXLDAstNode, opts: Required<RenderOptions>): st
 function renderTable(node: MDXLDAstNode, opts: Required<RenderOptions>): string {
   if (!node.children || node.children.length === 0) return ''
 
-  const align = (node.align as (string | null)[]) || []
+  const align = getNodeProp<(string | null)[]>(node, 'align') ?? []
   const rows = node.children
 
   // Render header row
@@ -456,9 +463,9 @@ function renderTableRow(node: MDXLDAstNode, opts: Required<RenderOptions>): stri
  * Render a link/image definition
  */
 function renderDefinition(node: MDXLDAstNode): string {
-  const identifier = (node.identifier as string) || (node.label as string) || ''
-  const url = (node.url as string) || ''
-  const title = node.title as string
+  const identifier = getNodeProp<string>(node, 'identifier') || getNodeProp<string>(node, 'label') || ''
+  const url = getNodeProp<string>(node, 'url') || ''
+  const title = getNodeProp<string>(node, 'title')
 
   if (title) {
     return `[${identifier}]: ${url} "${title}"`
@@ -470,7 +477,7 @@ function renderDefinition(node: MDXLDAstNode): string {
  * Render a footnote definition
  */
 function renderFootnoteDefinition(node: MDXLDAstNode, opts: Required<RenderOptions>): string {
-  const identifier = (node.identifier as string) || (node.label as string) || ''
+  const identifier = getNodeProp<string>(node, 'identifier') || getNodeProp<string>(node, 'label') || ''
   const content = node.children ? renderNodes(node.children, opts) : ''
   return `[^${identifier}]: ${content}`
 }

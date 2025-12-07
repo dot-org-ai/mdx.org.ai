@@ -193,7 +193,8 @@ export const defaultComponents: MDXComponents = {
       source={{ uri: src }}
       width="100%"
       height={200}
-      borderRadius="$4"
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      borderRadius={"$4" as any}
       marginVertical="$3"
       resizeMode="cover"
       accessibilityLabel={alt}

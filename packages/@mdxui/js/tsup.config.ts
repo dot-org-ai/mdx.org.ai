@@ -11,10 +11,10 @@ function getComponentEntries() {
     const files = readdirSync(componentsDir)
 
     return files
-      .filter(file => file.endsWith('.ts') || file.endsWith('.tsx'))
-      .filter(file => file !== 'index.ts')
+      .filter(file => file.endsWith('.tsx'))
+      .filter(file => file !== 'index.tsx')
       .reduce((entries, file) => {
-        const name = file.replace(/\.(ts|tsx)$/, '')
+        const name = file.replace(/\.tsx$/, '')
         entries[`components/${name}`] = `src/components/${file}`
         return entries
       }, {} as Record<string, string>)
@@ -31,6 +31,9 @@ export default defineConfig([
       'runtime/index': 'src/runtime/index.ts',
       'components/index': 'src/components/index.ts',
       'hooks/index': 'src/hooks/index.ts',
+      'worker/index': 'src/worker/index.ts',
+      'worker/theme': 'src/worker/theme.ts',
+      'worker/hydrate': 'src/worker/hydrate.ts',
     },
     format: ['esm', 'cjs'],
     dts: true,
