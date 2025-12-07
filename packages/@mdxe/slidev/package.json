@@ -1,0 +1,51 @@
+{
+  "name": "@mdxe/slidev",
+  "version": "0.0.0",
+  "description": "Slidev presentation runtime for rendering MDX content as slides",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxe",
+    "slidev",
+    "slides",
+    "presentation",
+    "mdx",
+    "markdown"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "peerDependencies": {
+    "@slidev/cli": "^0.50.0"
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "@slidev/cli": "^0.50.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
