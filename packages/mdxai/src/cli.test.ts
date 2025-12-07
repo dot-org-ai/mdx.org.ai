@@ -16,7 +16,7 @@ import { tmpdir } from 'node:os'
 import { parseArgs, createDatabase, type CliOptions } from './cli.js'
 import { createMcpServer } from './server.js'
 import { createSqliteDatabase } from '@mdxdb/sqlite'
-import type { Database } from 'mdxdb'
+import type { Database } from '@mdxdb/fs'
 
 // Path to the built CLI
 const CLI_PATH = resolve(import.meta.dirname, '../dist/cli.js')

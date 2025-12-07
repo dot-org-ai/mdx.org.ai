@@ -347,7 +347,7 @@ export { createFsDatabase } from '@mdxdb/fs'
 export { createSqliteDatabase } from '@mdxdb/sqlite'
 
 // Re-export types
-export type { Database, ListOptions, SearchOptions, GetOptions, SetOptions, DeleteOptions, DBClient, Thing } from 'mdxdb'
+export type { Database, ListOptions, SearchOptions, GetOptions, SetOptions, DeleteOptions } from '@mdxdb/fs'
 export type { FsDatabaseConfig } from '@mdxdb/fs'
 export type { SqliteDatabaseConfig } from '@mdxdb/sqlite'
 export type { MDXLDDocument, MDXLDData } from 'mdxld'
@@ -356,7 +356,7 @@ export type { MDXLDDocument, MDXLDData } from 'mdxld'
 // AI Database Tools for Agents
 // =============================================================================
 
-import type { Database } from 'mdxdb'
+import type { Database } from '@mdxdb/fs'
 
 /**
  * Flexible database interface that works with both mdxdb Database and ai-database DBClient

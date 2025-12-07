@@ -9,7 +9,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
-import type { Database } from 'mdxdb'
+import type { Database } from '@mdxdb/fs'
 import type { MDXLDData } from 'mdxld'
 
 export interface McpServerConfig {

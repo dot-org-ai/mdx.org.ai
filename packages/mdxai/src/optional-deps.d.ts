@@ -5,7 +5,7 @@
 
 // @mdxdb/sqlite - optional SQLite database (requires Cloudflare Workers types)
 declare module '@mdxdb/sqlite' {
-  import type { Database } from 'mdxdb'
+  import type { Database } from '@mdxdb/fs'
   import type { MDXLDData } from 'mdxld'
 
   export interface SqliteDatabaseConfig {

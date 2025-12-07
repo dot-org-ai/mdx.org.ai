@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import type { Database } from 'mdxdb'
+import type { Database } from '@mdxdb/fs'
 import type {
   FunctionRegistry,
   DefinedFunction,

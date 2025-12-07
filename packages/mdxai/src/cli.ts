@@ -212,7 +212,7 @@ async function main(): Promise<void> {
   // Run MCP server with stdio transport
   await runMcpServer({
     name: options.name,
-    database: db as unknown as import('mdxdb').Database,
+    database: db as unknown as import('@mdxdb/fs').Database,
   })
 }
 
