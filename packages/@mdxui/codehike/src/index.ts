@@ -20,26 +20,35 @@
  * @packageDocumentation
  */
 
-// Re-export all Code Hike components and utilities
+// Re-export Code Hike code components and utilities from codehike/code
 export {
-  Block,
-  Code,
-  CodeContent,
-  Pre,
   highlight,
+  Pre,
+  Inline,
+  InnerPre,
+  InnerLine,
+  InnerToken,
+  getPreRef,
   type AnnotationHandler,
-  type BlockProps,
   type CustomPreProps,
   type HighlightedCode,
   type InlineAnnotation,
-  type InnerLine,
-  type InnerPre,
-  type InnerToken,
-  type PreProps,
   type RawCode,
   type Token,
-  type TokenGroup,
-} from 'codehike'
+} from 'codehike/code'
+
+// Re-export Code Hike blocks utilities from codehike/blocks
+export {
+  Block,
+  CodeBlock,
+  HighlightedCodeBlock,
+  ImageBlock,
+  parseRoot,
+  parseProps,
+} from 'codehike/blocks'
+
+// Re-export main parse function
+export { parse } from 'codehike'
 
 // Re-export MDX components
 export { MDXComponents } from './components.js'

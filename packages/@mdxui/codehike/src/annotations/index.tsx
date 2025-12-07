@@ -2,7 +2,7 @@
  * Custom annotation handlers for Code Hike
  */
 
-import type { AnnotationHandler } from 'codehike'
+import type { AnnotationHandler } from 'codehike/code'
 
 /**
  * Callout annotation handler

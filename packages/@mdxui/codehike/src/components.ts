@@ -2,7 +2,8 @@
  * MDX components configuration for Code Hike
  */
 
-import { Block, Code, Pre, type BlockProps, type CustomPreProps } from 'codehike'
+import { Pre, Inline, type CustomPreProps } from 'codehike/code'
+import { Block } from 'codehike/blocks'
 import type { ComponentType, ReactNode } from 'react'
 
 /**
@@ -38,10 +39,11 @@ export interface CodeHikeProps {
 export const MDXComponents: Record<string, ComponentType<unknown>> = {
   // Code Hike's Pre component for code blocks
   pre: Pre as ComponentType<unknown>,
-  // Code Hike's Code component for inline code
-  Code: Code as ComponentType<unknown>,
-  // Code Hike's Block component for structured content
-  Block: Block as ComponentType<unknown>,
+  // Code Hike's Inline component for inline code
+  code: Inline as ComponentType<unknown>,
 }
 
-export type { BlockProps, CustomPreProps }
+// Note: Block from codehike/blocks is a Zod schema, not a React component
+// Use it for parsing MDX content structure, not as a direct component
+
+export type { CustomPreProps }

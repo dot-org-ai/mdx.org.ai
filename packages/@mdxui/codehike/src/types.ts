@@ -10,7 +10,7 @@
  */
 
 import type { ReactNode, ComponentType } from 'react'
-import type { HighlightedCode, AnnotationHandler } from 'codehike'
+import type { HighlightedCode, AnnotationHandler } from 'codehike/code'
 
 // =============================================================================
 // Code Variants
@@ -308,12 +308,19 @@ export function parseHighlights(highlights: string): number[] {
 
   for (const part of parts) {
     if (part.includes('-')) {
-      const [start, end] = part.split('-').map(Number)
-      for (let i = start; i <= end; i++) {
-        lines.push(i)
+      const [startStr, endStr] = part.split('-')
+      const start = Number(startStr)
+      const end = Number(endStr)
+      if (!isNaN(start) && !isNaN(end)) {
+        for (let i = start; i <= end; i++) {
+          lines.push(i)
+        }
       }
     } else {
-      lines.push(Number(part))
+      const num = Number(part)
+      if (!isNaN(num)) {
+        lines.push(num)
+      }
     }
   }
 
