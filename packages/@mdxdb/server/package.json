@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/server",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "HTTP API server for mdxdb using Hono - works with any runtime",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,6 +16,11 @@
       "types": "./dist/db-server.d.ts",
       "import": "./dist/db-server.js",
       "require": "./dist/db-server.cjs"
+    },
+    "./serializers": {
+      "types": "./dist/serializers.d.ts",
+      "import": "./dist/serializers.js",
+      "require": "./dist/serializers.cjs"
     }
   },
   "files": [
@@ -41,18 +46,19 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "hono": "^4.6.0"
+    "hono": "^4.6.0",
+    "rpc.do": "^0.1.2",
+    "ts-japi": "^1.12.1"
   },
   "peerDependencies": {
+    "@mdxdb/fs": "workspace:*",
     "ai-database": "workspace:*",
-    "mdxdb": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
-    "@mdxld/config": "workspace:^",
     "@mdxdb/fs": "workspace:*",
+    "@mdxld/config": "workspace:^",
     "ai-database": "workspace:*",
-    "mdxdb": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

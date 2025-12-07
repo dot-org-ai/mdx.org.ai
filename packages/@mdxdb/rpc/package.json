@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/rpc",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "RPC client for mdxdb - supports HTTP and WebSocket transports via rpc.do",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -40,6 +40,9 @@
     "rpc.do"
   ],
   "license": "MIT",
+  "dependencies": {
+    "rpc.do": "^0.1.2"
+  },
   "peerDependencies": {
     "ai-database": "workspace:*",
     "mdxld": "workspace:*"
@@ -48,6 +51,7 @@
     "@hono/node-server": "^1.13.0",
     "@mdxdb/clickhouse": "workspace:*",
     "@mdxdb/server": "workspace:*",
+    "@mdxdb/sqlite": "workspace:*",
     "@mdxld/config": "workspace:^",
     "ai-database": "workspace:*",
     "mdxld": "workspace:*",

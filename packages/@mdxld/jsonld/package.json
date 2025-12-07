@@ -1,6 +1,6 @@
 {
   "name": "@mdxld/jsonld",
-  "version": "0.0.1",
+  "version": "1.9.0",
   "description": "Convert between JSON-LD and MDXLD formats",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,11 +1,14 @@
 {
   "name": "@mdxe/bun",
-  "version": "0.0.0",
-  "description": "Bun runtime for mdxe - fast MDX server with native Bun APIs",
+  "version": "1.9.0",
+  "description": "Bun runtime for mdxe - fast MDX server, test runner, and script executor with native Bun APIs",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "mdxe-bun": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -16,6 +19,31 @@
       "types": "./dist/server.d.ts",
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "./loader": {
+      "types": "./dist/loader.d.ts",
+      "import": "./dist/loader.js",
+      "require": "./dist/loader.cjs"
+    },
+    "./test": {
+      "types": "./dist/test.d.ts",
+      "import": "./dist/test.js",
+      "require": "./dist/test.cjs"
+    },
+    "./evaluate": {
+      "types": "./dist/evaluate.d.ts",
+      "import": "./dist/evaluate.js",
+      "require": "./dist/evaluate.cjs"
+    },
+    "./extract": {
+      "types": "./dist/extract.d.ts",
+      "import": "./dist/extract.js",
+      "require": "./dist/extract.cjs"
+    },
+    "./runner": {
+      "types": "./dist/runner.d.ts",
+      "import": "./dist/runner.js",
+      "require": "./dist/runner.cjs"
     }
   },
   "files": [
@@ -37,11 +65,14 @@
     "server",
     "mdx",
     "mdxld",
-    "runtime"
+    "runtime",
+    "test",
+    "runner"
   ],
   "license": "MIT",
   "dependencies": {
     "mdxld": "workspace:*",
+    "@mdxld/ast": "workspace:*",
     "hono": "^4.0.0"
   },
   "peerDependencies": {

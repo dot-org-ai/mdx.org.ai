@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/github",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "GitHub adapter for mdxdb - stores MDX documents in GitHub repositories via Octokit",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -41,12 +41,12 @@
     "octokit": "^4.0.2"
   },
   "peerDependencies": {
-    "mdxdb": "workspace:*",
+    "@mdxdb/fs": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
+    "@mdxdb/fs": "workspace:*",
     "@mdxld/config": "workspace:^",
-    "mdxdb": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

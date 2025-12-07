@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/desktop",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "MDXDB for Electron - desktop document database with editor",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -37,7 +37,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "echo 'Skipping - needs Electron types fix'",
+    "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "lint": "eslint src",

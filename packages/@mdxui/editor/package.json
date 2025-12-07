@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/editor",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Database editor UI for mdxdb - built with Next.js, Monaco, and ClickHouse",
   "type": "module",
   "main": "./src/index.ts",

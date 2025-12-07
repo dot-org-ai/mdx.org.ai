@@ -1,6 +1,6 @@
 {
   "name": "@mdxld/xlsx",
-  "version": "0.0.1",
+  "version": "1.9.0",
   "description": "Excel (XLSX) format support with bi-directional conversion",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/notebook",
-  "version": "0.1.0",
+  "version": "1.9.0",
   "description": "Jupyter Notebook-style components for MDX with browser and RPC execution",
   "type": "module",
   "main": "./dist/index.cjs",

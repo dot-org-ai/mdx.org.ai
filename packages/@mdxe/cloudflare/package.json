@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/cloudflare",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Deploy MDX projects to Cloudflare Workers and Pages",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/css",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Pure CSS framework for semantic HTML - variables, themes, layouts, backgrounds, with Cloudflare Worker for dynamic CSS",
   "type": "module",
   "exports": {

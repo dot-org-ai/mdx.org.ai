@@ -1,6 +1,6 @@
 {
   "name": "@mdxld/pdf",
-  "version": "0.0.1",
+  "version": "1.9.0",
   "description": "PDF format support with text and metadata extraction (read-only)",
   "type": "module",
   "main": "./dist/index.cjs",

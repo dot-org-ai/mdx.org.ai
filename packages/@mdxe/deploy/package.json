@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/deploy",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Unified deployment interface for MDX projects - deploy to .do, Cloudflare, Vercel, or GitHub Pages",
   "type": "module",
   "main": "./dist/index.cjs",

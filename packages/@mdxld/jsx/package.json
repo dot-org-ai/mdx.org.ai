@@ -1,6 +1,6 @@
 {
   "name": "@mdxld/jsx",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "MDX compilation and build tooling - tsup/vite/esbuild plugins for MDX files",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -21,6 +21,11 @@
       "types": "./dist/esbuild.d.ts",
       "import": "./dist/esbuild.js",
       "require": "./dist/esbuild.cjs"
+    },
+    "./dom": {
+      "types": "./dist/dom.d.ts",
+      "import": "./dist/dom.js",
+      "require": "./dist/dom.cjs"
     }
   },
   "files": [
@@ -53,10 +58,14 @@
   },
   "peerDependencies": {
     "esbuild": ">=0.17.0",
+    "hono": "^4.0.0",
     "react": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "esbuild": {
+      "optional": true
+    },
+    "hono": {
       "optional": true
     },
     "react": {
@@ -66,6 +75,7 @@
   "devDependencies": {
     "@types/react": "^18.3.0",
     "esbuild": "^0.24.0",
+    "hono": "^4.6.0",
     "react": "^18.3.1",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/slides",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Abstract slides rendering interface for MDX presentations",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "mdxai",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Manage, Deploy, & Run MDX-based AI Agents",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -62,7 +62,6 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
-    "mdxdb": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

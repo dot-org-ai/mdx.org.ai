@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/vercel",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Deploy MDX projects to Vercel",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/org.ai",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Ontology UI components for org.ai - Thing detail views, directory lists, and layouts",
   "type": "module",
   "main": "./dist/index.cjs",

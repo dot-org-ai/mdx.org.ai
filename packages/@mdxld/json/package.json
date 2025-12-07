@@ -1,6 +1,6 @@
 {
   "name": "@mdxld/json",
-  "version": "0.0.1",
+  "version": "1.9.0",
   "description": "Bi-directional conversion between Objects and JSON formats (JSON, JSON-LD, JSON Schema, OpenAPI, MCP, GraphQL)",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/vitest",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Vitest integration for testing MDX documents with inline test blocks",
   "type": "module",
   "main": "./dist/index.cjs",

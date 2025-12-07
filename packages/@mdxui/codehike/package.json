@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/codehike",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Code Hike components for annotated code walkthroughs in MDX",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -19,7 +19,7 @@
     "src/styles.css"
   ],
   "scripts": {
-    "build": "echo 'Skipping - needs codehike API update'",
+    "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:unit": "vitest run",

@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/video",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Abstract video rendering interface for MDX content",
   "type": "module",
   "main": "./dist/index.cjs",

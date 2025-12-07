@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/payload",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Custom Payload CMS UI components for MDX editing",
   "type": "module",
   "main": "./dist/index.cjs",

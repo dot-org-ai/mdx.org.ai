@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/next",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Next.js integration for mdxe - App Router, widgets, and content loading",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "mdxui",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Compose, Design, & Publish MDX-based UI Components",
   "type": "module",
   "main": "./dist/index.cjs",

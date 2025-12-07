@@ -1,6 +1,6 @@
 {
   "name": "@mdxai/agentkit",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Agent kit for mdxai",
   "type": "module",
   "main": "./dist/index.cjs",

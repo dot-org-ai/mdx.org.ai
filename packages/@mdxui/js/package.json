@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/js",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Lightweight client-side interactivity using Hono JSX DOM (2.8KB)",
   "type": "module",
   "main": "./dist/index.cjs",

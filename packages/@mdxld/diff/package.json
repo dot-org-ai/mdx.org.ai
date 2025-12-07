@@ -1,6 +1,6 @@
 {
   "name": "@mdxld/diff",
-  "version": "0.0.1",
+  "version": "1.9.0",
   "description": "Git-style diffing, patching, and 3-way merge for text and structured data",
   "type": "module",
   "main": "./dist/index.cjs",

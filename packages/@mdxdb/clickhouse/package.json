@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/clickhouse",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "ClickHouse adapter for mdxdb - optimized for analytics and event sourcing",
   "type": "module",
   "main": "./dist/src/index.cjs",
@@ -68,8 +68,10 @@
   "license": "MIT",
   "dependencies": {
     "ai-database": "workspace:^",
-    "mdxdb": "workspace:^",
     "@mdxld/extract": "workspace:^"
+  },
+  "peerDependencies": {
+    "@mdxdb/fs": "workspace:^"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",

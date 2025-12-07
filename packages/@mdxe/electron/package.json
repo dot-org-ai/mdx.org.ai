@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/electron",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Electron runtime for MDXLD documents - desktop apps with full Node.js",
   "type": "module",
   "main": "./dist/index.cjs",

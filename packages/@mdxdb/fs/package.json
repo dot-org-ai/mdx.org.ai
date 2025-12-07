@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/fs",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Filesystem adapter for mdxdb - stores MDX documents as files",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -38,14 +38,12 @@
   "peerDependencies": {
     "@mdxld/extract": "workspace:*",
     "ai-database": "workspace:*",
-    "mdxdb": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
     "@mdxld/extract": "workspace:*",
     "ai-database": "workspace:*",
-    "mdxdb": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

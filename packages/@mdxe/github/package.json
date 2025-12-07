@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/github",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Deploy MDX projects to GitHub Pages",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "mdxe",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Execute, Test, & Deploy MDX-based Agents, Apps, APIs, and Sites",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -63,17 +63,21 @@
   },
   "dependencies": {
     "@mdxdb/clickhouse": "workspace:*",
+    "@mdxdb/fs": "workspace:*",
     "@mdxe/deploy": "workspace:*",
     "@mdxe/hono": "workspace:*",
     "@mdxe/payload": "workspace:*",
+    "ai-database": "workspace:*",
     "ai-functions": "file:../../primitives/packages/ai-functions",
     "ai-sandbox": "file:../../primitives/packages/ai-sandbox",
     "ai-workflows": "file:../../primitives/packages/ai-workflows",
     "esbuild": "^0.27.0",
     "glob": "^10.4.5",
     "hono": "^4.6.0",
-    "mdxdb": "workspace:*",
     "oauth.do": "^0.1.4"
+  },
+  "optionalDependencies": {
+    "@mdxdb/studio": "workspace:*"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.9",

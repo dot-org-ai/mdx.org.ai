@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/api",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "HTTP API client for mdxdb - fetch-based REST client",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -48,6 +48,7 @@
     "@hono/node-server": "^1.13.0",
     "@mdxdb/clickhouse": "workspace:*",
     "@mdxdb/server": "workspace:*",
+    "@mdxdb/sqlite": "workspace:*",
     "@mdxld/config": "workspace:^",
     "ai-database": "workspace:*",
     "mdxld": "workspace:*",

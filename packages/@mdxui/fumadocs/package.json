@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/fumadocs",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Fumadocs UI components and utilities for MDX documentation sites",
   "type": "module",
   "main": "./dist/index.cjs",

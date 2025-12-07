@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/sqlite",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Cloudflare Durable Objects SQLite adapter for mdxdb - namespace-isolated storage with Workers RPC",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -37,7 +37,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "echo 'Skipping - needs Cloudflare Workers types configuration'",
+    "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:unit": "vitest run",

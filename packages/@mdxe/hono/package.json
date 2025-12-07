@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/hono",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Serve and render MDXLD documents with Hono",
   "type": "module",
   "main": "./dist/index.cjs",

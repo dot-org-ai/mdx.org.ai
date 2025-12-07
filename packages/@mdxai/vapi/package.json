@@ -1,6 +1,6 @@
 {
   "name": "@mdxai/vapi",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Vapi voice AI integration for mdxai",
   "type": "module",
   "main": "./dist/index.cjs",

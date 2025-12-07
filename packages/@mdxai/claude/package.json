@@ -1,6 +1,6 @@
 {
   "name": "@mdxai/claude",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Claude Agent SDK integration for MDX - exposes mdxdb and mdxe as Claude tools",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -59,13 +59,12 @@
     "zod": "^3.24.0"
   },
   "peerDependencies": {
-    "mdxdb": "workspace:*",
+    "@mdxdb/fs": "workspace:*",
     "mdxe": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
-    "mdxdb": "workspace:*",
     "mdxe": "workspace:*",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",

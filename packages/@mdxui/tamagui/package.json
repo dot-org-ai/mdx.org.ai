@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/tamagui",
-  "version": "0.0.0",
+  "version": "1.9.0",
   "description": "Tamagui components for rendering MDX content - universal React Native & Web",
   "type": "module",
   "main": "./dist/index.cjs",
