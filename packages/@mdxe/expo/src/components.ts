@@ -143,24 +143,25 @@ export interface MDXContentProps {
 
 /**
  * Component map for MDX elements
+ * Note: children is optional in type since React.createElement passes it as 3rd argument
  */
 export interface MDXComponents {
-  h1: React.ComponentType<{ children: React.ReactNode }>
-  h2: React.ComponentType<{ children: React.ReactNode }>
-  h3: React.ComponentType<{ children: React.ReactNode }>
-  h4: React.ComponentType<{ children: React.ReactNode }>
-  h5: React.ComponentType<{ children: React.ReactNode }>
-  h6: React.ComponentType<{ children: React.ReactNode }>
-  p: React.ComponentType<{ children: React.ReactNode }>
-  a: React.ComponentType<{ href: string; children: React.ReactNode }>
-  strong: React.ComponentType<{ children: React.ReactNode }>
-  em: React.ComponentType<{ children: React.ReactNode }>
-  code: React.ComponentType<{ children: React.ReactNode }>
-  pre: React.ComponentType<{ children: React.ReactNode }>
-  blockquote: React.ComponentType<{ children: React.ReactNode }>
-  ul: React.ComponentType<{ children: React.ReactNode }>
-  ol: React.ComponentType<{ children: React.ReactNode }>
-  li: React.ComponentType<{ children: React.ReactNode }>
+  h1: React.ComponentType<{ children?: React.ReactNode }>
+  h2: React.ComponentType<{ children?: React.ReactNode }>
+  h3: React.ComponentType<{ children?: React.ReactNode }>
+  h4: React.ComponentType<{ children?: React.ReactNode }>
+  h5: React.ComponentType<{ children?: React.ReactNode }>
+  h6: React.ComponentType<{ children?: React.ReactNode }>
+  p: React.ComponentType<{ children?: React.ReactNode }>
+  a: React.ComponentType<{ href: string; children?: React.ReactNode }>
+  strong: React.ComponentType<{ children?: React.ReactNode }>
+  em: React.ComponentType<{ children?: React.ReactNode }>
+  code: React.ComponentType<{ children?: React.ReactNode }>
+  pre: React.ComponentType<{ children?: React.ReactNode }>
+  blockquote: React.ComponentType<{ children?: React.ReactNode }>
+  ul: React.ComponentType<{ children?: React.ReactNode }>
+  ol: React.ComponentType<{ children?: React.ReactNode }>
+  li: React.ComponentType<{ children?: React.ReactNode }>
   img: React.ComponentType<{ src: string; alt?: string }>
   hr: React.ComponentType<Record<string, never>>
 }

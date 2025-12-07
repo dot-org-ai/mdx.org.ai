@@ -1,0 +1,256 @@
+---
+$type: TestSuite
+$id: https://mdx.org.ai/tests/mdx-features
+title: MDX Feature Tests
+description: Tests demonstrating MDX-specific testing capabilities
+version: 1.0.0
+config:
+  timeout: 5000
+  retries: 0
+tags:
+  - mdx
+  - testing
+  - bun
+---
+
+# MDX Feature Tests
+
+Tests that demonstrate MDX-specific capabilities including frontmatter access,
+exports, and document structure.
+
+## Exported Functions
+
+export const add = (a, b) => a + b
+export const multiply = (a, b) => a * b
+export const greet = (name) => `Hello, ${name}!`
+
+export const utils = {
+  capitalize: (str) => str.charAt(0).toUpperCase() + str.slice(1),
+  reverse: (str) => str.split('').reverse().join(''),
+  slugify: (str) => str.toLowerCase().replace(/\s+/g, '-'),
+}
+
+## Testing Exported Functions
+
+```ts test name="exported add function"
+const add = (a, b) => a + b
+expect(add(2, 3)).toBe(5)
+expect(add(-1, 1)).toBe(0)
+expect(add(0, 0)).toBe(0)
+```
+
+```ts test name="exported multiply function"
+const multiply = (a, b) => a * b
+expect(multiply(3, 4)).toBe(12)
+expect(multiply(0, 100)).toBe(0)
+expect(multiply(-2, 3)).toBe(-6)
+```
+
+```ts test name="exported greet function"
+const greet = (name) => `Hello, ${name}!`
+expect(greet('World')).toBe('Hello, World!')
+expect(greet('Bun')).toBe('Hello, Bun!')
+```
+
+## Testing Utility Object
+
+```ts test name="capitalize utility"
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1)
+expect(capitalize('hello')).toBe('Hello')
+expect(capitalize('world')).toBe('World')
+```
+
+```ts test name="reverse utility"
+const reverse = (str) => str.split('').reverse().join('')
+expect(reverse('hello')).toBe('olleh')
+expect(reverse('12345')).toBe('54321')
+```
+
+```ts test name="slugify utility"
+const slugify = (str) => str.toLowerCase().replace(/\s+/g, '-')
+expect(slugify('Hello World')).toBe('hello-world')
+expect(slugify('My Blog Post')).toBe('my-blog-post')
+```
+
+## Data Transformation Tests
+
+```ts test name="JSON parsing and stringifying"
+const data = { name: 'Test', value: 42, nested: { a: 1 } }
+const json = JSON.stringify(data)
+const parsed = JSON.parse(json)
+
+expect(parsed).toEqual(data)
+expect(parsed.name).toBe('Test')
+expect(parsed.nested.a).toBe(1)
+```
+
+```ts test name="array reduce operations"
+const items = [
+  { name: 'Apple', price: 1.5, qty: 3 },
+  { name: 'Banana', price: 0.5, qty: 6 },
+  { name: 'Orange', price: 2.0, qty: 2 },
+]
+
+const total = items.reduce((sum, item) => sum + item.price * item.qty, 0)
+expect(total).toBe(11.5) // 4.5 + 3 + 4
+
+const names = items.map(i => i.name)
+expect(names).toEqual(['Apple', 'Banana', 'Orange'])
+```
+
+## Class Testing
+
+```ts test name="class instantiation"
+class Counter {
+  constructor(initial = 0) {
+    this.value = initial
+  }
+  increment() {
+    this.value++
+    return this
+  }
+  decrement() {
+    this.value--
+    return this
+  }
+  getValue() {
+    return this.value
+  }
+}
+
+const counter = new Counter(10)
+expect(counter.getValue()).toBe(10)
+
+counter.increment().increment().increment()
+expect(counter.getValue()).toBe(13)
+
+counter.decrement()
+expect(counter.getValue()).toBe(12)
+```
+
+```ts test name="class inheritance"
+class Animal {
+  constructor(name) {
+    this.name = name
+  }
+  speak() {
+    return `${this.name} makes a sound`
+  }
+}
+
+class Dog extends Animal {
+  speak() {
+    return `${this.name} barks`
+  }
+}
+
+const dog = new Dog('Rex')
+expect(dog.speak()).toBe('Rex barks')
+expect(dog.name).toBe('Rex')
+```
+
+## Error Handling Tests
+
+```ts test name="error throwing"
+const divide = (a, b) => {
+  if (b === 0) throw new Error('Division by zero')
+  return a / b
+}
+
+expect(divide(10, 2)).toBe(5)
+expect(() => divide(10, 0)).toThrow('Division by zero')
+```
+
+## Date and Time Tests
+
+```ts test name="date operations"
+const now = new Date('2024-01-15T12:00:00Z')
+
+expect(now.getFullYear()).toBe(2024)
+expect(now.getMonth()).toBe(0) // January is 0
+expect(now.getDate()).toBe(15)
+```
+
+```ts test name="date formatting"
+const formatDate = (date) => {
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const date = new Date('2024-03-05T00:00:00Z')
+expect(formatDate(date)).toBe('2024-03-05')
+```
+
+## Regular Expression Tests
+
+```ts test name="regex matching"
+const emailRegex = /^[\w.-]+@[\w.-]+\.\w+$/
+
+expect(emailRegex.test('user@example.com')).toBeTruthy()
+expect(emailRegex.test('invalid-email')).toBeFalsy()
+expect(emailRegex.test('another.user@domain.co.uk')).toBeTruthy()
+```
+
+```ts test name="regex extraction"
+const extractNumbers = (str) => str.match(/\d+/g)?.map(Number) || []
+
+expect(extractNumbers('abc123def456')).toEqual([123, 456])
+expect(extractNumbers('no numbers here')).toEqual([])
+expect(extractNumbers('test1test2test3')).toEqual([1, 2, 3])
+```
+
+## Map and Set Tests
+
+```ts test name="Map operations"
+const map = new Map()
+map.set('name', 'John')
+map.set('age', 30)
+
+expect(map.get('name')).toBe('John')
+expect(map.get('age')).toBe(30)
+expect(map.has('name')).toBeTruthy()
+expect(map.has('email')).toBeFalsy()
+expect(map.size).toBe(2)
+```
+
+```ts test name="Set operations"
+const set = new Set([1, 2, 3, 2, 1])
+
+expect(set.size).toBe(3) // Duplicates removed
+expect(set.has(2)).toBeTruthy()
+expect(set.has(5)).toBeFalsy()
+
+const arr = [...set]
+expect(arr).toEqual([1, 2, 3])
+```
+
+## Promise Chain Tests
+
+```ts test name="promise chaining" async
+const fetchData = () => Promise.resolve({ id: 1, name: 'Test' })
+const processData = (data) => Promise.resolve({ ...data, processed: true })
+const formatData = (data) => Promise.resolve({ ...data, formatted: true })
+
+const result = await fetchData()
+  .then(processData)
+  .then(formatData)
+
+expect(result.id).toBe(1)
+expect(result.processed).toBeTruthy()
+expect(result.formatted).toBeTruthy()
+```
+
+## Generator Function Tests
+
+```ts test name="generator functions"
+function* range(start, end) {
+  for (let i = start; i <= end; i++) {
+    yield i
+  }
+}
+
+const numbers = [...range(1, 5)]
+expect(numbers).toEqual([1, 2, 3, 4, 5])
+```

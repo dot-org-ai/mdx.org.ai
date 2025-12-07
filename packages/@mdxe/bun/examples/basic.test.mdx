@@ -1,0 +1,147 @@
+---
+$type: TestSuite
+title: Basic MDX Test Examples
+description: Simple tests demonstrating @mdxe/bun test capabilities
+---
+
+# Basic MDX Tests
+
+These tests demonstrate how to write tests directly in MDX files.
+
+## Simple Assertions
+
+```ts test name="basic equality"
+expect(1 + 1).toBe(2)
+expect('hello').toBe('hello')
+```
+
+```ts test name="object equality"
+const obj = { a: 1, b: 2 }
+expect(obj).toEqual({ a: 1, b: 2 })
+```
+
+```ts test name="truthiness"
+expect(true).toBeTruthy()
+expect(false).toBeFalsy()
+expect(null).toBeFalsy()
+expect('').toBeFalsy()
+expect('hello').toBeTruthy()
+```
+
+## Array Operations
+
+```ts test name="array contains"
+const arr = [1, 2, 3, 4, 5]
+expect(arr).toContain(3)
+expect(arr).toHaveLength(5)
+```
+
+```ts test name="array filtering"
+const numbers = [1, 2, 3, 4, 5]
+const evens = numbers.filter(n => n % 2 === 0)
+expect(evens).toEqual([2, 4])
+expect(evens).toHaveLength(2)
+```
+
+```ts test name="array mapping"
+const doubled = [1, 2, 3].map(n => n * 2)
+expect(doubled).toEqual([2, 4, 6])
+```
+
+## String Operations
+
+```ts test name="string contains"
+const message = 'Hello, World!'
+expect(message).toContain('World')
+expect(message).toContain('Hello')
+```
+
+```ts test name="string manipulation"
+const str = '  hello  '
+expect(str.trim()).toBe('hello')
+expect(str.toUpperCase()).toBe('  HELLO  ')
+```
+
+## Object Operations
+
+```ts test name="object properties"
+const user = {
+  name: 'John',
+  age: 30,
+  email: 'john@example.com'
+}
+
+expect(user).toHaveProperty('name')
+expect(user).toHaveProperty('age', 30)
+expect(user.name).toBe('John')
+```
+
+```ts test name="object spread"
+const base = { a: 1, b: 2 }
+const extended = { ...base, c: 3 }
+
+expect(extended).toEqual({ a: 1, b: 2, c: 3 })
+expect(extended).toHaveProperty('c', 3)
+```
+
+## Async Operations
+
+```ts test name="async/await" async
+const result = await Promise.resolve(42)
+expect(result).toBe(42)
+```
+
+```ts test name="async array operations" async
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+await delay(10)
+
+const items = await Promise.all([
+  Promise.resolve(1),
+  Promise.resolve(2),
+  Promise.resolve(3)
+])
+
+expect(items).toEqual([1, 2, 3])
+```
+
+## Function Testing
+
+```ts test name="function returns"
+const add = (a, b) => a + b
+const multiply = (a, b) => a * b
+
+expect(add(2, 3)).toBe(5)
+expect(multiply(4, 5)).toBe(20)
+```
+
+```ts test name="higher order functions"
+const createMultiplier = (factor) => (n) => n * factor
+const double = createMultiplier(2)
+const triple = createMultiplier(3)
+
+expect(double(5)).toBe(10)
+expect(triple(5)).toBe(15)
+```
+
+## Comparison Operators
+
+```ts test name="greater/less than"
+expect(10).toBeGreaterThan(5)
+expect(5).toBeLessThan(10)
+expect(5).toBe(5)
+```
+
+## Negation
+
+```ts test name="negated assertions"
+expect(1).not.toBe(2)
+expect([1, 2, 3]).not.toContain(5)
+expect({ a: 1 }).not.toEqual({ a: 2 })
+```
+
+## Skipped Test
+
+```ts test name="this test is skipped" skip
+// This test will be skipped
+expect(true).toBe(false)
+```
