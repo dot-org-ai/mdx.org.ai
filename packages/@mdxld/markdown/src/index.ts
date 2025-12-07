@@ -5,6 +5,8 @@
  * Convention-based automatic layouts from object structure.
  */
 
+import type { DocumentFormat, FormatFetchOptions } from '@mdxld/types'
+
 export interface ToMarkdownOptions {
   /** Starting heading depth (default: 1) */
   headingDepth?: number
@@ -303,3 +305,93 @@ export function applyExtract<T extends object>(
 
   return result
 }
+
+// ============================================================================
+// Fetch
+// ============================================================================
+
+/**
+ * Fetch Markdown from URL and parse.
+ *
+ * @example
+ * ```ts
+ * const doc = await fetchMarkdown('https://example.com/README.md')
+ * ```
+ */
+export async function fetchMarkdown<T = Record<string, unknown>>(
+  url: string,
+  options: FormatFetchOptions & FromMarkdownOptions = {}
+): Promise<T> {
+  const { headers: requestHeaders, timeout, fetch: customFetch, ...parseOptions } = options
+  const fetchFn = customFetch ?? globalThis.fetch
+
+  const controller = new AbortController()
+  const timeoutId = timeout ? setTimeout(() => controller.abort(), timeout) : undefined
+
+  try {
+    const response = await fetchFn(url, {
+      headers: requestHeaders,
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const text = await response.text()
+    return fromMarkdown<T>(text, parseOptions)
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId)
+  }
+}
+
+// ============================================================================
+// Format Object
+// ============================================================================
+
+/**
+ * Markdown Format object implementing the standard Format interface.
+ *
+ * @example
+ * ```ts
+ * import { Markdown } from '@mdxld/markdown'
+ *
+ * const data = Markdown.parse('# Title\n\nContent')
+ * const str = Markdown.stringify(data)
+ * const remote = await Markdown.fetch('https://example.com/README.md')
+ * ```
+ */
+export const Markdown: DocumentFormat<Record<string, unknown>, FromMarkdownOptions, ToMarkdownOptions> = {
+  name: 'markdown',
+  mimeTypes: ['text/markdown', 'text/x-markdown'] as const,
+  extensions: ['md', 'markdown', 'mdx'] as const,
+  parse: fromMarkdown,
+  stringify: toMarkdown,
+  fetch: fetchMarkdown,
+  extractMeta(input: string): Record<string, unknown> {
+    // Extract YAML frontmatter if present
+    const match = input.match(/^---\n([\s\S]*?)\n---\n/)
+    if (match && match[1]) {
+      try {
+        // Simple YAML parsing for frontmatter
+        const lines = match[1].split('\n')
+        const meta: Record<string, unknown> = {}
+        for (const line of lines) {
+          const colonIndex = line.indexOf(':')
+          if (colonIndex > 0) {
+            const key = line.slice(0, colonIndex).trim()
+            const value = line.slice(colonIndex + 1).trim()
+            meta[key] = value
+          }
+        }
+        return meta
+      } catch {
+        return {}
+      }
+    }
+    return {}
+  },
+}
+
+// Default export
+export default Markdown

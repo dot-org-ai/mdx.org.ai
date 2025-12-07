@@ -91,3 +91,19 @@ export {
 export {
   ExtractError,
 } from './extract.js'
+
+// Entity components for relationship rendering/extraction
+export {
+  createEntityComponent,
+  getEntityComponent,
+  createEntityExtractors,
+  parseMarkdownTable,
+  renderMarkdownTable,
+  renderMarkdownList,
+  diffEntities,
+  type EntityItem,
+  type EntityComponentProps,
+  type EntityRenderOptions,
+  type ExtractedEntities,
+  type RelationshipChange,
+} from './entity.js'

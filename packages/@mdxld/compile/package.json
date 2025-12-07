@@ -50,5 +50,6 @@
     "type": "git",
     "url": "https://github.com/ai-primitives/mdx.org.ai",
     "directory": "packages/@mdxld/compile"
-  }
+  },
+  "author": "MDX.org.ai"
 }

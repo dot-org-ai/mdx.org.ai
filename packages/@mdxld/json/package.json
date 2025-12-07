@@ -46,6 +46,7 @@
     "directory": "packages/@mdxld/json"
   },
   "dependencies": {
+    "@mdxld/types": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 {
-  "name": "@mdxld/html",
+  "name": "@mdxld/types",
   "version": "0.0.1",
-  "description": "Bi-directional conversion between Objects and semantic HTML with microdata",
+  "description": "Shared type definitions for MDXLD format packages",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -20,36 +20,25 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run",
-    "test:watch": "vitest",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo"
   },
   "keywords": [
     "mdxld",
-    "html",
-    "semantic",
-    "microdata",
-    "schema.org",
-    "convert",
-    "structured-data",
-    "seo"
+    "types",
+    "format",
+    "typescript"
   ],
   "author": "MDX.org.ai",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ai-primitives/mdx.org.ai",
-    "directory": "packages/@mdxld/html"
-  },
-  "dependencies": {
-    "@mdxld/types": "workspace:*",
-    "mdxld": "workspace:*"
+    "directory": "packages/@mdxld/types"
   },
   "devDependencies": {
     "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "typescript": "^5.7.2"
   }
 }

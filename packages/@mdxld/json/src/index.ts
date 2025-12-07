@@ -5,6 +5,8 @@
  * Supports plain JSON, JSON-LD, JSON Schema, OpenAPI, MCP, and GraphQL.
  */
 
+import type { TextFormat, FormatFetchOptions } from '@mdxld/types'
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -593,3 +595,75 @@ export function toGraphQL(types: GraphQLTypeDef[], options: ToGraphQLOptions = {
 
   return lines.join('\n').trim()
 }
+
+// ============================================================================
+// Fetch
+// ============================================================================
+
+/**
+ * Fetch JSON from URL and parse.
+ *
+ * @example
+ * ```ts
+ * const data = await fetchJSON('https://api.example.com/data.json')
+ * ```
+ */
+export async function fetchJSON<T = Record<string, unknown>>(
+  url: string,
+  options: FormatFetchOptions & FromJSONOptions = {}
+): Promise<T> {
+  const { headers: requestHeaders, timeout, fetch: customFetch, ...parseOptions } = options
+  const fetchFn = customFetch ?? globalThis.fetch
+
+  const controller = new AbortController()
+  const timeoutId = timeout ? setTimeout(() => controller.abort(), timeout) : undefined
+
+  try {
+    const response = await fetchFn(url, {
+      headers: requestHeaders,
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const text = await response.text()
+    return fromJSON<T>(text, parseOptions)
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId)
+  }
+}
+
+// ============================================================================
+// Format Object
+// ============================================================================
+
+/**
+ * JSONFormat object implementing the standard Format interface.
+ * Named JSONFormat to avoid shadowing the global JSON object.
+ *
+ * @example
+ * ```ts
+ * import { JSONFormat } from '@mdxld/json'
+ *
+ * const data = JSONFormat.parse('{"name": "test"}')
+ * const str = JSONFormat.stringify(data)
+ * const remote = await JSONFormat.fetch('https://api.example.com/data.json')
+ * ```
+ */
+export const JSONFormat: TextFormat<unknown, FromJSONOptions, ToJSONOptions> = {
+  name: 'json',
+  mimeTypes: ['application/json', 'text/json'] as const,
+  extensions: ['json'] as const,
+  parse: fromJSON,
+  stringify: toJSON,
+  fetch: fetchJSON,
+}
+
+// Alias for parse/stringify to match JSON.parse/JSON.stringify pattern
+export const parse = fromJSON
+export const stringify = toJSON
+
+// Default export
+export default JSONFormat

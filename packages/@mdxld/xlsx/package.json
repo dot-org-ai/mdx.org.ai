@@ -1,7 +1,7 @@
 {
-  "name": "@mdxld/html",
+  "name": "@mdxld/xlsx",
   "version": "0.0.1",
-  "description": "Bi-directional conversion between Objects and semantic HTML with microdata",
+  "description": "Excel (XLSX) format support with bi-directional conversion",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -28,24 +28,24 @@
   },
   "keywords": [
     "mdxld",
-    "html",
-    "semantic",
-    "microdata",
-    "schema.org",
-    "convert",
-    "structured-data",
-    "seo"
+    "xlsx",
+    "excel",
+    "spreadsheet",
+    "tabular",
+    "parse",
+    "stringify",
+    "format"
   ],
   "author": "MDX.org.ai",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ai-primitives/mdx.org.ai",
-    "directory": "packages/@mdxld/html"
+    "directory": "packages/@mdxld/xlsx"
   },
   "dependencies": {
     "@mdxld/types": "workspace:*",
-    "mdxld": "workspace:*"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "tsup": "^8.3.5",

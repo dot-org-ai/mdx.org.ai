@@ -43,6 +43,7 @@
     "directory": "packages/@mdxld/yaml"
   },
   "dependencies": {
+    "@mdxld/types": "workspace:*",
     "yaml": "^2.6.1"
   },
   "devDependencies": {

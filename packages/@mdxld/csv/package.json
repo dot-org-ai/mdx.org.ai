@@ -1,7 +1,7 @@
 {
-  "name": "@mdxld/html",
+  "name": "@mdxld/csv",
   "version": "0.0.1",
-  "description": "Bi-directional conversion between Objects and semantic HTML with microdata",
+  "description": "CSV and TSV format support with bi-directional conversion",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -28,26 +28,26 @@
   },
   "keywords": [
     "mdxld",
-    "html",
-    "semantic",
-    "microdata",
-    "schema.org",
-    "convert",
-    "structured-data",
-    "seo"
+    "csv",
+    "tsv",
+    "tabular",
+    "parse",
+    "stringify",
+    "format"
   ],
   "author": "MDX.org.ai",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ai-primitives/mdx.org.ai",
-    "directory": "packages/@mdxld/html"
+    "directory": "packages/@mdxld/csv"
   },
   "dependencies": {
     "@mdxld/types": "workspace:*",
-    "mdxld": "workspace:*"
+    "papaparse": "^5.4.1"
   },
   "devDependencies": {
+    "@types/papaparse": "^5.3.14",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

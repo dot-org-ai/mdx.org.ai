@@ -429,6 +429,169 @@ mdxdb (storage)
 └── @mdxld/extract ← Reverse the rendering
 ```
 
+## Entity Components for Relationships
+
+The package includes pre-built components for rendering and extracting entity relationships. These are designed for views like `[Posts].mdx` and `[Tags].mdx` that render related entities.
+
+### Simple Syntax
+
+Entity components use the entity type as the component name:
+
+```tsx
+// Just works - auto-detects columns from entity data
+<Tags />
+
+// Optional column override
+<Tags columns={['name', 'slug']} />
+
+// Optional filter props
+<Posts published={true} />
+
+// List format instead of table
+<Authors format="list" />
+```
+
+### `createEntityComponent(type, options?)`
+
+Create a round-trip component for an entity type:
+
+```typescript
+import { createEntityComponent } from '@mdxld/extract'
+
+const Tags = createEntityComponent('Tag')
+
+// Render to markdown table
+const rendered = Tags.render({
+  items: [
+    { $id: 'js', name: 'JavaScript', count: 5 },
+    { $id: 'ts', name: 'TypeScript', count: 3 },
+  ],
+  columns: ['name', 'count'],
+})
+// | name | count |
+// |---|---|
+// | JavaScript | 5 |
+// | TypeScript | 3 |
+
+// Extract back from markdown
+const extracted = Tags.extract(rendered)
+// { items: [{ $id: '0', name: 'JavaScript', count: '5', $type: 'Tag' }, ...], columns: ['name', 'count'] }
+```
+
+### `getEntityComponent(name, options?)`
+
+Get or create a cached entity component. Handles pluralization automatically:
+
+```typescript
+import { getEntityComponent } from '@mdxld/extract'
+
+const Tags = getEntityComponent('Tags')     // type = 'Tag'
+const Posts = getEntityComponent('Posts')   // type = 'Post'
+const Categories = getEntityComponent('Categories')  // type = 'Category'
+
+// Components are cached - same instance returned
+getEntityComponent('Tags') === getEntityComponent('Tags')  // true
+```
+
+### `createEntityExtractors(template)`
+
+Auto-discover entity components in a template and create extractors:
+
+```typescript
+import { createEntityExtractors } from '@mdxld/extract'
+
+const template = `# {name}
+
+## Posts
+<Posts />
+
+## Related Tags
+<Tags published={true} />
+`
+
+const extractors = createEntityExtractors(template)
+// { Posts: PostsExtractor, Tags: TagsExtractor }
+
+// Use with extract()
+const result = extract({
+  template,
+  rendered: editedMarkdown,
+  components: extractors,
+})
+```
+
+### `diffEntities(before, after)`
+
+Track changes between two entity lists:
+
+```typescript
+import { diffEntities } from '@mdxld/extract'
+
+const before = [
+  { $id: 'js', name: 'JavaScript' },
+  { $id: 'ts', name: 'TypeScript' },
+]
+
+const after = [
+  { $id: 'js', name: 'JavaScript (Updated)' },
+  { $id: 'go', name: 'Go' },
+]
+
+const changes = diffEntities(before, after)
+// [
+//   { type: 'add', entityId: 'go', data: { $id: 'go', name: 'Go' } },
+//   { type: 'remove', entityId: 'ts', previousData: { $id: 'ts', name: 'TypeScript' } },
+//   { type: 'update', entityId: 'js', data: { ... }, previousData: { ... } }
+// ]
+```
+
+### Render Formats
+
+Entity components support multiple output formats:
+
+```typescript
+// Table format (default)
+<Posts />
+// | title | date |
+// |---|---|
+// | Hello | 2024-01-01 |
+
+// List format
+<Posts format="list" />
+// - Hello
+// - World
+
+// List with links
+const Posts = createEntityComponent('Post', {
+  format: 'list',
+  linkPattern: '/posts/{$id}'
+})
+// - [Hello](/posts/hello)
+// - [World](/posts/world)
+```
+
+### Integration with mdxdb Views
+
+Entity components are designed to work with mdxdb's ViewManager for bi-directional relationship sync:
+
+```typescript
+import { createFsViewManager } from '@mdxdb/fs'
+
+const views = createFsViewManager(config, provider)
+
+// Render: Entity → Markdown with related entities as tables
+const { markdown, entities } = await views.render('[Tag]', {
+  entityUrl: 'https://localhost/Tag/javascript'
+})
+
+// Sync: Markdown → Relationship mutations
+const { mutations, created } = await views.sync('[Tag]', {
+  entityUrl: 'https://localhost/Tag/javascript'
+}, editedMarkdown)
+
+// mutations = [{ type: 'add', predicate: 'posts', from: '...', to: '...' }]
+```
+
 ## Limitations
 
 ### What Works Well

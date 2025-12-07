@@ -1,7 +1,7 @@
 {
-  "name": "@mdxld/html",
+  "name": "@mdxld/formats",
   "version": "0.0.1",
-  "description": "Bi-directional conversion between Objects and semantic HTML with microdata",
+  "description": "Unified format utilities - JSON, YAML, CSV, XLSX, PDF, Markdown, HTML with consistent parse/stringify/fetch API",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -28,24 +28,35 @@
   },
   "keywords": [
     "mdxld",
+    "formats",
+    "json",
+    "yaml",
+    "csv",
+    "xlsx",
+    "pdf",
+    "markdown",
     "html",
-    "semantic",
-    "microdata",
-    "schema.org",
-    "convert",
-    "structured-data",
-    "seo"
+    "parse",
+    "stringify",
+    "fetch",
+    "convert"
   ],
   "author": "MDX.org.ai",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ai-primitives/mdx.org.ai",
-    "directory": "packages/@mdxld/html"
+    "directory": "packages/@mdxld/formats"
   },
   "dependencies": {
     "@mdxld/types": "workspace:*",
-    "mdxld": "workspace:*"
+    "@mdxld/json": "workspace:*",
+    "@mdxld/yaml": "workspace:*",
+    "@mdxld/csv": "workspace:*",
+    "@mdxld/xlsx": "workspace:*",
+    "@mdxld/pdf": "workspace:*",
+    "@mdxld/markdown": "workspace:*",
+    "@mdxld/html": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.5",

@@ -6,6 +6,7 @@
  */
 
 import { stringify, parse, parseAllDocuments, Document } from 'yaml'
+import type { TextFormat, FormatFetchOptions } from '@mdxld/types'
 
 // ============================================================================
 // Types
@@ -288,3 +289,70 @@ export function jsonldToYamlld<T extends Record<string, unknown>>(
 
   return result
 }
+
+// ============================================================================
+// Fetch
+// ============================================================================
+
+/**
+ * Fetch YAML from URL and parse.
+ *
+ * @example
+ * ```ts
+ * const config = await fetchYAML('https://example.com/config.yaml')
+ * ```
+ */
+export async function fetchYAML<T = Record<string, unknown>>(
+  url: string,
+  options: FormatFetchOptions & FromYAMLOptions = {}
+): Promise<T> {
+  const { headers: requestHeaders, timeout, fetch: customFetch, ...parseOptions } = options
+  const fetchFn = customFetch ?? globalThis.fetch
+
+  const controller = new AbortController()
+  const timeoutId = timeout ? setTimeout(() => controller.abort(), timeout) : undefined
+
+  try {
+    const response = await fetchFn(url, {
+      headers: requestHeaders,
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const text = await response.text()
+    return fromYAML<T>(text, parseOptions)
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId)
+  }
+}
+
+// ============================================================================
+// Format Object
+// ============================================================================
+
+/**
+ * YAML Format object implementing the standard Format interface.
+ *
+ * @example
+ * ```ts
+ * import { YAML } from '@mdxld/yaml'
+ *
+ * const data = YAML.parse('name: test')
+ * const str = YAML.stringify(data)
+ * const remote = await YAML.fetch('https://example.com/config.yaml')
+ * ```
+ */
+export const YAML: TextFormat<unknown, FromYAMLOptions, ToYAMLOptions> = {
+  name: 'yaml',
+  mimeTypes: ['application/yaml', 'text/yaml', 'application/x-yaml', 'text/x-yaml'] as const,
+  extensions: ['yaml', 'yml'] as const,
+  parse: fromYAML,
+  stringify: toYAML,
+  fetch: fetchYAML,
+}
+
+// Default export
+export default YAML

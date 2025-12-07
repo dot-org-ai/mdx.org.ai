@@ -43,6 +43,7 @@
     "directory": "packages/@mdxld/markdown"
   },
   "dependencies": {
+    "@mdxld/types": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {

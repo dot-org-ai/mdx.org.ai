@@ -1,7 +1,7 @@
 {
-  "name": "@mdxld/html",
+  "name": "@mdxld/pdf",
   "version": "0.0.1",
-  "description": "Bi-directional conversion between Objects and semantic HTML with microdata",
+  "description": "PDF format support with text and metadata extraction (read-only)",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -28,26 +28,25 @@
   },
   "keywords": [
     "mdxld",
-    "html",
-    "semantic",
-    "microdata",
-    "schema.org",
-    "convert",
-    "structured-data",
-    "seo"
+    "pdf",
+    "extract",
+    "parse",
+    "text",
+    "format"
   ],
   "author": "MDX.org.ai",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ai-primitives/mdx.org.ai",
-    "directory": "packages/@mdxld/html"
+    "directory": "packages/@mdxld/pdf"
   },
   "dependencies": {
     "@mdxld/types": "workspace:*",
-    "mdxld": "workspace:*"
+    "pdf-parse": "^1.1.1"
   },
   "devDependencies": {
+    "@types/pdf-parse": "^1.1.4",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

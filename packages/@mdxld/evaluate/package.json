@@ -46,5 +46,6 @@
     "type": "git",
     "url": "https://github.com/ai-primitives/mdx.org.ai",
     "directory": "packages/@mdxld/evaluate"
-  }
+  },
+  "author": "MDX.org.ai"
 }

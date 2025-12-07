@@ -5,6 +5,8 @@
  * Produces clean, accessible HTML with Schema.org microdata.
  */
 
+import type { DocumentFormat, FormatFetchOptions } from '@mdxld/types'
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -381,3 +383,91 @@ export function toJSONLDScript<T extends Record<string, unknown>>(
 
   return `<script type="application/ld+json">\n${JSON.stringify(jsonld, null, 2)}\n</script>`
 }
+
+// ============================================================================
+// Fetch
+// ============================================================================
+
+/**
+ * Fetch HTML from URL and parse.
+ *
+ * @example
+ * ```ts
+ * const doc = await fetchHTML('https://example.com/page.html')
+ * ```
+ */
+export async function fetchHTML<T = Record<string, unknown>>(
+  url: string,
+  options: FormatFetchOptions & FromHTMLOptions = {}
+): Promise<T> {
+  const { headers: requestHeaders, timeout, fetch: customFetch, ...parseOptions } = options
+  const fetchFn = customFetch ?? globalThis.fetch
+
+  const controller = new AbortController()
+  const timeoutId = timeout ? setTimeout(() => controller.abort(), timeout) : undefined
+
+  try {
+    const response = await fetchFn(url, {
+      headers: requestHeaders,
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const text = await response.text()
+    return fromHTML<T>(text, parseOptions)
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId)
+  }
+}
+
+// ============================================================================
+// Format Object
+// ============================================================================
+
+/**
+ * HTML Format object implementing the standard Format interface.
+ *
+ * @example
+ * ```ts
+ * import { HTML } from '@mdxld/html'
+ *
+ * const data = HTML.parse('<h1>Title</h1>')
+ * const str = HTML.stringify(data)
+ * const remote = await HTML.fetch('https://example.com/page.html')
+ * ```
+ */
+export const HTML: DocumentFormat<Record<string, unknown>, FromHTMLOptions, ToHTMLOptions> = {
+  name: 'html',
+  mimeTypes: ['text/html', 'application/xhtml+xml'] as const,
+  extensions: ['html', 'htm', 'xhtml'] as const,
+  parse: fromHTML,
+  stringify: toHTML,
+  fetch: fetchHTML,
+  extractMeta(input: string): Record<string, unknown> {
+    // Extract meta tags from HTML head
+    const meta: Record<string, unknown> = {}
+
+    // Extract title
+    const titleMatch = input.match(/<title[^>]*>([^<]+)<\/title>/i)
+    if (titleMatch && titleMatch[1]) {
+      meta.title = titleMatch[1].trim()
+    }
+
+    // Extract meta name/content pairs
+    const metaRegex = /<meta\s+(?:name|property)="([^"]+)"\s+content="([^"]+)"/gi
+    let match
+    while ((match = metaRegex.exec(input)) !== null) {
+      if (match[1] && match[2]) {
+        meta[match[1]] = match[2]
+      }
+    }
+
+    return meta
+  },
+}
+
+// Default export
+export default HTML
