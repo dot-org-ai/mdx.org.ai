@@ -323,4 +323,52 @@ describe('getNavigation', () => {
     expect(nav.previous?.href).toBe('/docs/first')
     expect(nav.next?.href).toBe('/docs/third')
   })
+
+  it('handles array slug values', () => {
+    const docsWithArraySlugs = [
+      createMockDocument({ title: 'First', slug: ['docs', 'first'] }),
+      createMockDocument({ title: 'Second', slug: ['docs', 'second'] }),
+    ]
+
+    const nav = getNavigation(['docs', 'second'], docsWithArraySlugs)
+
+    expect(nav.previous?.title).toBe('First')
+    expect(nav.previous?.href).toBe('/docs/first')
+  })
+})
+
+describe('widgets', () => {
+  it('exports widget utilities', async () => {
+    const mod = await import('./widgets.js')
+    expect(mod.getWidgetCSS).toBeDefined()
+    expect(mod.getWidgetJS).toBeDefined()
+    expect(mod.getAllWidgetCSS).toBeDefined()
+    expect(mod.getAllWidgetJS).toBeDefined()
+    expect(mod.parseWidgetQuery).toBeDefined()
+    expect(mod.createWidgetCSSHandler).toBeDefined()
+    expect(mod.createWidgetJSHandler).toBeDefined()
+  })
+})
+
+describe('app router utilities', () => {
+  it('exports app utilities', async () => {
+    const mod = await import('./app.js')
+    expect(mod.ContentLoader).toBeDefined()
+    expect(mod.createContentLoader).toBeDefined()
+    expect(mod.getLayoutConfig).toBeDefined()
+    expect(mod.extractToc).toBeDefined()
+    expect(mod.generateSitemap).toBeDefined()
+    expect(mod.renderSitemapXML).toBeDefined()
+    expect(mod.createSitemapHandler).toBeDefined()
+  })
+})
+
+describe('type exports', () => {
+  it('exports all core types', async () => {
+    const mod = await import('./index.js')
+    // Type exports are compile-time only, just verify module loads
+    expect(mod).toBeDefined()
+    expect(mod.withMDXE).toBeDefined()
+    expect(mod.createMDXRouteHandler).toBeDefined()
+  })
 })

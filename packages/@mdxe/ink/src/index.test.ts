@@ -332,5 +332,180 @@ Content`)
 
       expect(text).toContain('meta:')
     })
+
+    it('should handle boolean values in frontmatter', () => {
+      const doc = parse(`---
+published: true
+draft: false
+---
+
+Content`)
+
+      const text = renderToText(doc)
+
+      expect(text).toContain('published: true')
+      expect(text).toContain('draft: false')
+    })
+
+    it('should handle numeric values in frontmatter', () => {
+      const doc = parse(`---
+version: 1
+rating: 4.5
+---
+
+Content`)
+
+      const text = renderToText(doc)
+
+      expect(text).toContain('version: 1')
+      expect(text).toContain('rating: 4.5')
+    })
+
+    it('should handle null values in frontmatter', () => {
+      const doc = {
+        data: {
+          value: null,
+          empty: undefined,
+        },
+        content: 'Test',
+      }
+
+      const text = renderToText(doc)
+
+      expect(text).toContain('null')
+    })
+  })
+
+  describe('custom themes', () => {
+    it('should accept custom theme', () => {
+      const doc = parse('# Test')
+      const customTheme = {
+        heading: { 1: 'red' },
+        bold: 'yellow',
+        code: 'blue',
+      }
+
+      const { lastFrame } = render(
+        React.createElement(MDXDocument, { doc, options: { theme: customTheme } })
+      )
+
+      expect(lastFrame()).toContain('Test')
+    })
+
+    it('should merge custom theme with default', () => {
+      const doc = parse('# Test')
+      const customTheme = {
+        heading: { 1: 'red' },
+      }
+
+      const { lastFrame } = render(
+        React.createElement(MDXDocument, { doc, options: { theme: customTheme } })
+      )
+
+      // Should still render even with partial theme
+      expect(lastFrame()).toContain('Test')
+    })
+  })
+
+  describe('render options', () => {
+    it('should respect maxWidth option', () => {
+      const doc = parse('---')
+
+      const text = renderToText(doc, { maxWidth: 40, showFrontmatter: false })
+
+      // Thematic break should respect maxWidth
+      expect(text).toContain('─')
+    })
+
+    it('should respect indentSize option', () => {
+      const doc = parse('- Item 1\n- Item 2')
+
+      const text = renderToText(doc, { indentSize: 4, showFrontmatter: false })
+
+      expect(text).toContain('• Item 1')
+    })
+
+    it('should render with all options disabled', () => {
+      const doc = parse(`---
+title: Test
+---
+
+# Content`)
+
+      const text = renderToText(doc, {
+        showFrontmatter: false,
+        maxWidth: 0,
+        indentSize: 0,
+      })
+
+      expect(text).not.toContain('title')
+      expect(text).toContain('# Content')
+    })
+  })
+
+  describe('special markdown features', () => {
+    it('should handle task lists', () => {
+      const doc = parse(`- [x] Completed task
+- [ ] Incomplete task`)
+
+      const { lastFrame } = render(React.createElement(MDXDocument, { doc }))
+
+      expect(lastFrame()).toContain('Completed task')
+      expect(lastFrame()).toContain('Incomplete task')
+    })
+
+    it('should handle nested lists', () => {
+      const doc = parse(`- Parent
+  - Child 1
+  - Child 2`)
+
+      const { lastFrame } = render(React.createElement(MDXDocument, { doc }))
+
+      expect(lastFrame()).toContain('Parent')
+      expect(lastFrame()).toContain('Child 1')
+    })
+
+    it('should handle inline code', () => {
+      const doc = parse('Use `const x = 1` for variables')
+
+      const { lastFrame } = render(React.createElement(MDXDocument, { doc }))
+
+      expect(lastFrame()).toContain('`const x = 1`')
+    })
+
+    it('should handle multiple paragraphs', () => {
+      const doc = parse(`First paragraph.
+
+Second paragraph.
+
+Third paragraph.`)
+
+      const { lastFrame } = render(React.createElement(MDXDocument, { doc }))
+
+      expect(lastFrame()).toContain('First paragraph')
+      expect(lastFrame()).toContain('Second paragraph')
+      expect(lastFrame()).toContain('Third paragraph')
+    })
+  })
+
+  describe('exported utilities', () => {
+    it('should export parse function', async () => {
+      const { parse: exportedParse } = await import('./index.js')
+      expect(exportedParse).toBeDefined()
+      expect(typeof exportedParse).toBe('function')
+    })
+
+    it('should export defaultTheme', async () => {
+      const { defaultTheme: theme } = await import('./index.js')
+      expect(theme).toBeDefined()
+      expect(theme.heading).toBeDefined()
+    })
+
+    it('should export all components', async () => {
+      const mod = await import('./index.js')
+      expect(mod.MDXDocument).toBeDefined()
+      expect(mod.MDXContent).toBeDefined()
+      expect(mod.renderToText).toBeDefined()
+    })
   })
 })
