@@ -6,17 +6,14 @@ describe('@mdxui/codehike', () => {
   describe('MDXComponents', () => {
     it('should export pre component', () => {
       expect(MDXComponents).toHaveProperty('pre')
-      expect(typeof MDXComponents.pre).toBe('function')
+      // Pre is a forwardRef component (object with $$typeof), not a plain function
+      expect(MDXComponents.pre).toBeDefined()
+      expect(['function', 'object'].includes(typeof MDXComponents.pre)).toBe(true)
     })
 
-    it('should export Code component', () => {
-      expect(MDXComponents).toHaveProperty('Code')
-      expect(typeof MDXComponents.Code).toBe('function')
-    })
-
-    it('should export Block component', () => {
-      expect(MDXComponents).toHaveProperty('Block')
-      expect(typeof MDXComponents.Block).toBe('function')
+    it('should export code component for inline code', () => {
+      expect(MDXComponents).toHaveProperty('code')
+      expect(typeof MDXComponents.code).toBe('function')
     })
   })
 
