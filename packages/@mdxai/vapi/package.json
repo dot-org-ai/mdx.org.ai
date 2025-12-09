@@ -33,8 +33,15 @@
     "ai"
   ],
   "license": "MIT",
+  "dependencies": {
+    "@vapi-ai/server-sdk": "^0.10.2",
+    "@vapi-ai/web": "^2.5.2",
+    "mdxld": "workspace:^",
+    "zod": "^3.24.1"
+  },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
+    "@types/node": "^22.10.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
