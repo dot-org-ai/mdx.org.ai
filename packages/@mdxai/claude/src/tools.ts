@@ -102,7 +102,7 @@ export function createDatabaseTools<TData extends MDXLDData = MDXLDData>(db: Dat
                   documents: result.documents.map((doc) => ({
                     id: doc.id ?? doc.data.$id,
                     type: doc.type ?? doc.data.$type,
-                    score: doc.score,
+                    score: (doc as { score?: number }).score,
                     data: doc.data,
                     contentPreview: doc.content.slice(0, 200),
                   })),

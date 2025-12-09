@@ -33,6 +33,9 @@
     "agents"
   ],
   "license": "MIT",
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
     "tsup": "^8.3.5",

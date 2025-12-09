@@ -8,12 +8,13 @@ export default defineConfig([
       tools: 'src/tools.ts',
       server: 'src/server.ts',
       types: 'src/types.ts',
+      batch: 'src/batch.ts',
     },
     format: ['esm', 'cjs'],
     dts: true,
     clean: true,
     sourcemap: true,
-    external: ['mdxdb', 'mdxe', 'mdxld', '@anthropic-ai/claude-agent-sdk', 'zod'],
+    external: ['mdxdb', 'mdxe', 'mdxld', '@anthropic-ai/claude-agent-sdk', '@anthropic-ai/sdk', '@mdxai/batch', 'ai-database', 'zod'],
   },
   // CLI build
   {
