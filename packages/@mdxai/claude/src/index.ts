@@ -17,10 +17,6 @@ export { createDatabaseTools, createExecutorTools } from './tools.js'
 // Types
 export type { ClaudeServerConfig, ToolResult, ToolContent, TextContent, ImageContent, ResourceContent } from './types.js'
 
-// Batch API support
-export { ClaudeBatchProvider, createClaudeBatchProvider } from './batch.js'
-export type { ClaudeBatchConfig } from './batch.js'
-
 // Re-export dependencies for convenience
 export type { Database, ListOptions, SearchOptions, GetOptions, SetOptions, DeleteOptions } from '@mdxdb/fs'
 export type { Executor, DoOptions, TestOptions, DeployOptions } from 'mdxe'
