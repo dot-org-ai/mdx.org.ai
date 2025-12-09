@@ -1,4 +1,4 @@
-import { Slot } from "@radix-ui/react-slot"
+import { Slot } from "@mdxui/jsx/primitives"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "../../lib/utils.js"

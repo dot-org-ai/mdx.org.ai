@@ -1,36 +1,36 @@
 {
   "name": "@mdxui/tremor",
-  "version": "1.9.0",
-  "description": "Tremor dashboard components and charts mapped to MDXUI abstract Site/App types",
+  "version": "2.0.0",
+  "description": "Tremor-inspired dashboard components built with @mdxui/headless for Hono JSX compatibility",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./charts": {
-      "types": "./dist/charts/index.d.ts",
+      "types": "./src/charts/index.ts",
       "import": "./dist/charts/index.js",
       "require": "./dist/charts/index.cjs"
     },
     "./blocks": {
-      "types": "./dist/blocks/index.d.ts",
+      "types": "./src/blocks/index.ts",
       "import": "./dist/blocks/index.js",
       "require": "./dist/blocks/index.cjs"
     },
+    "./ui": {
+      "types": "./src/ui/index.ts",
+      "import": "./dist/ui/index.js",
+      "require": "./dist/ui/index.cjs"
+    },
     "./templates": {
-      "types": "./dist/templates/index.d.ts",
+      "types": "./src/templates/index.ts",
       "import": "./dist/templates/index.js",
       "require": "./dist/templates/index.cjs"
-    },
-    "./templates/layouts": {
-      "types": "./dist/templates/layouts/index.d.ts",
-      "import": "./dist/templates/layouts/index.js",
-      "require": "./dist/templates/layouts/index.cjs"
     }
   },
   "files": [
@@ -47,20 +47,35 @@
     "tremor",
     "dashboard",
     "charts",
-    "react",
     "components",
-    "mdxui"
+    "mdxui",
+    "hono",
+    "headless"
   ],
   "author": "MDX.org.ai",
   "license": "MIT",
   "peerDependencies": {
+    "hono": "^4.0.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
+  "peerDependenciesMeta": {
+    "hono": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
   "dependencies": {
-    "@tremor/react": "^3.18.0"
+    "@mdxui/jsx": "workspace:^",
+    "@mdxui/headless": "workspace:^"
   },
   "devDependencies": {
+    "@mdxld/config": "workspace:^",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "tsup": "^8.0.0",

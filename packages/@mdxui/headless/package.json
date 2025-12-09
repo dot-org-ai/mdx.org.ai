@@ -1,0 +1,167 @@
+{
+  "name": "@mdxui/headless",
+  "version": "1.0.0",
+  "description": "Headless UI primitives with React/Hono JSX runtime support",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./disclosure": {
+      "types": "./dist/components/disclosure.d.ts",
+      "import": "./dist/components/disclosure.js",
+      "require": "./dist/components/disclosure.cjs"
+    },
+    "./dialog": {
+      "types": "./dist/components/dialog.d.ts",
+      "import": "./dist/components/dialog.js",
+      "require": "./dist/components/dialog.cjs"
+    },
+    "./menu": {
+      "types": "./dist/components/menu.d.ts",
+      "import": "./dist/components/menu.js",
+      "require": "./dist/components/menu.cjs"
+    },
+    "./listbox": {
+      "types": "./dist/components/listbox.d.ts",
+      "import": "./dist/components/listbox.js",
+      "require": "./dist/components/listbox.cjs"
+    },
+    "./combobox": {
+      "types": "./dist/components/combobox.d.ts",
+      "import": "./dist/components/combobox.js",
+      "require": "./dist/components/combobox.cjs"
+    },
+    "./popover": {
+      "types": "./dist/components/popover.d.ts",
+      "import": "./dist/components/popover.js",
+      "require": "./dist/components/popover.cjs"
+    },
+    "./tabs": {
+      "types": "./dist/components/tabs.d.ts",
+      "import": "./dist/components/tabs.js",
+      "require": "./dist/components/tabs.cjs"
+    },
+    "./switch": {
+      "types": "./dist/components/switch.d.ts",
+      "import": "./dist/components/switch.js",
+      "require": "./dist/components/switch.cjs"
+    },
+    "./checkbox": {
+      "types": "./dist/components/checkbox.d.ts",
+      "import": "./dist/components/checkbox.js",
+      "require": "./dist/components/checkbox.cjs"
+    },
+    "./radio-group": {
+      "types": "./dist/components/radio-group.d.ts",
+      "import": "./dist/components/radio-group.js",
+      "require": "./dist/components/radio-group.cjs"
+    },
+    "./transition": {
+      "types": "./dist/components/transition.d.ts",
+      "import": "./dist/components/transition.js",
+      "require": "./dist/components/transition.cjs"
+    },
+    "./field": {
+      "types": "./dist/components/field.d.ts",
+      "import": "./dist/components/field.js",
+      "require": "./dist/components/field.cjs"
+    },
+    "./input": {
+      "types": "./dist/components/input.d.ts",
+      "import": "./dist/components/input.js",
+      "require": "./dist/components/input.cjs"
+    },
+    "./textarea": {
+      "types": "./dist/components/textarea.d.ts",
+      "import": "./dist/components/textarea.js",
+      "require": "./dist/components/textarea.cjs"
+    },
+    "./select": {
+      "types": "./dist/components/select.d.ts",
+      "import": "./dist/components/select.js",
+      "require": "./dist/components/select.cjs"
+    },
+    "./button": {
+      "types": "./dist/components/button.d.ts",
+      "import": "./dist/components/button.js",
+      "require": "./dist/components/button.cjs"
+    },
+    "./label": {
+      "types": "./dist/components/label.d.ts",
+      "import": "./dist/components/label.js",
+      "require": "./dist/components/label.cjs"
+    },
+    "./description": {
+      "types": "./dist/components/description.d.ts",
+      "import": "./dist/components/description.js",
+      "require": "./dist/components/description.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxui",
+    "headless",
+    "headlessui",
+    "primitives",
+    "components",
+    "ui",
+    "react",
+    "hono",
+    "jsx"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@mdxui/jsx": "workspace:^",
+    "@floating-ui/dom": "^1.6.0"
+  },
+  "peerDependencies": {
+    "hono": "^4.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "hono": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "hono": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxui/headless"
+  },
+  "author": "MDX.org.ai"
+}

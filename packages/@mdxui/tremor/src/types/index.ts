@@ -2,10 +2,10 @@
  * Shared Types for Tremor
  *
  * Types for dashboard components, charts, and analytics blocks.
- * Maps to DashboardLayout/AppLayout from @mdxui/html.
+ * Compatible with both React and Hono JSX runtimes.
  */
 
-import type { ReactNode } from 'react'
+import type { ReactNode } from '@mdxui/jsx'
 
 /**
  * Chart data point
@@ -173,9 +173,9 @@ export type DashboardBlockCategory =
   | 'filter'        // Filter controls
   | 'date-picker'   // Date range pickers
   | 'search'        // Search inputs
-  | 'billing'       // Billing/usage displays (GAP)
-  | 'activity'      // Activity feeds (GAP)
-  | 'notification'  // Notification panels (GAP)
+  | 'billing'       // Billing/usage displays
+  | 'activity'      // Activity feeds
+  | 'notification'  // Notification panels
 
 /**
  * Dashboard Layout props (maps to DashboardLayout)
@@ -204,35 +204,3 @@ export interface DashboardLayoutProps {
   }>
   children: ReactNode
 }
-
-// =============================================================================
-// GAPS IDENTIFIED:
-// =============================================================================
-//
-// Missing from @mdxui/html views:
-// - Billing/Usage view
-// - Activity feed view
-// - Notification panel
-// - Analytics/Metrics view (specialized dashboard)
-//
-// Missing chart types from current implementation:
-// - Sparkline (only have Stat with trend)
-// - Funnel chart
-// - Radar chart
-// - Scatter plot
-// - Treemap
-// - Heatmap
-//
-// Missing from DashboardStatProps:
-// - Icon support
-// - Sparkline
-// - Comparison period
-// - Color theming
-//
-// Missing interactions:
-// - Date range picker component
-// - Filter/facet controls
-// - Dashboard grid layout system
-// - Widget resize/drag
-//
-// =============================================================================

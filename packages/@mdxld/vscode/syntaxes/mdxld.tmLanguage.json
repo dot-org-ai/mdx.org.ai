@@ -1,0 +1,420 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "MDXLD",
+  "scopeName": "source.mdxld",
+  "patterns": [
+    { "include": "#frontmatter" },
+    { "include": "#jsx-component" },
+    { "include": "#jsx-expression" },
+    { "include": "#inline-tagged-template" },
+    { "include": "#fenced-code-block" },
+    { "include": "#import-export" },
+    { "include": "#markdown" }
+  ],
+  "repository": {
+    "frontmatter": {
+      "name": "meta.embedded.block.yaml",
+      "begin": "\\A---\\s*$",
+      "end": "^---\\s*$",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.frontmatter.begin.mdxld" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.frontmatter.end.mdxld" }
+      },
+      "contentName": "source.yaml",
+      "patterns": [
+        { "include": "source.yaml" }
+      ]
+    },
+    "import-export": {
+      "patterns": [
+        {
+          "name": "meta.import.mdxld",
+          "begin": "^(import)\\s+",
+          "end": "$",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.import.mdxld" }
+          },
+          "patterns": [
+            {
+              "name": "keyword.control.type.mdxld",
+              "match": "\\btype\\b"
+            },
+            {
+              "name": "keyword.control.from.mdxld",
+              "match": "\\bfrom\\b"
+            },
+            {
+              "name": "string.quoted.single.mdxld",
+              "match": "'[^']*'"
+            },
+            {
+              "name": "string.quoted.double.mdxld",
+              "match": "\"[^\"]*\""
+            },
+            {
+              "name": "variable.other.mdxld",
+              "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.export.mdxld",
+          "begin": "^(export)\\s+",
+          "end": "$",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.export.mdxld" }
+          },
+          "patterns": [
+            {
+              "name": "keyword.control.type.mdxld",
+              "match": "\\btype\\b"
+            },
+            {
+              "name": "keyword.control.default.mdxld",
+              "match": "\\bdefault\\b"
+            },
+            {
+              "name": "keyword.control.from.mdxld",
+              "match": "\\bfrom\\b"
+            },
+            { "include": "source.ts" }
+          ]
+        }
+      ]
+    },
+    "jsx-component": {
+      "patterns": [
+        {
+          "name": "meta.jsx.component.self-closing.mdxld",
+          "match": "(<)([A-Z][a-zA-Z0-9]*)([^>]*)(/>)",
+          "captures": {
+            "1": { "name": "punctuation.definition.tag.begin.mdxld" },
+            "2": { "name": "entity.name.tag.component.mdxld" },
+            "3": { "patterns": [{ "include": "#jsx-attributes" }] },
+            "4": { "name": "punctuation.definition.tag.end.mdxld" }
+          }
+        },
+        {
+          "name": "meta.jsx.component.open.mdxld",
+          "match": "(<)([A-Z][a-zA-Z0-9]*)([^>]*)(>)",
+          "captures": {
+            "1": { "name": "punctuation.definition.tag.begin.mdxld" },
+            "2": { "name": "entity.name.tag.component.mdxld" },
+            "3": { "patterns": [{ "include": "#jsx-attributes" }] },
+            "4": { "name": "punctuation.definition.tag.end.mdxld" }
+          }
+        },
+        {
+          "name": "meta.jsx.component.close.mdxld",
+          "match": "(</)([A-Z][a-zA-Z0-9]*)(>)",
+          "captures": {
+            "1": { "name": "punctuation.definition.tag.begin.mdxld" },
+            "2": { "name": "entity.name.tag.component.mdxld" },
+            "3": { "name": "punctuation.definition.tag.end.mdxld" }
+          }
+        }
+      ]
+    },
+    "jsx-attributes": {
+      "patterns": [
+        {
+          "name": "entity.other.attribute-name.mdxld",
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_-]*)\\s*(?==)"
+        },
+        {
+          "name": "string.quoted.double.mdxld",
+          "match": "\"[^\"]*\""
+        },
+        {
+          "name": "string.quoted.single.mdxld",
+          "match": "'[^']*'"
+        },
+        {
+          "name": "meta.embedded.expression.mdxld",
+          "begin": "\\{",
+          "end": "\\}",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.expression.begin.mdxld" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.expression.end.mdxld" }
+          },
+          "patterns": [
+            { "include": "source.ts" }
+          ]
+        }
+      ]
+    },
+    "jsx-expression": {
+      "name": "meta.embedded.expression.mdxld",
+      "begin": "(?<!`)\\{(?!\\{)",
+      "end": "\\}(?!\\})",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.expression.begin.mdxld" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.expression.end.mdxld" }
+      },
+      "patterns": [
+        { "include": "source.ts" }
+      ]
+    },
+    "inline-tagged-template": {
+      "patterns": [
+        {
+          "name": "meta.embedded.inline.yaml",
+          "match": "(yaml)(`[^`]*`)",
+          "captures": {
+            "1": { "name": "entity.name.tag.template.mdxld" },
+            "2": {
+              "name": "string.template.yaml.mdxld",
+              "patterns": [{ "include": "source.yaml" }]
+            }
+          }
+        },
+        {
+          "name": "meta.embedded.inline.sql",
+          "match": "(sql)(`[^`]*`)",
+          "captures": {
+            "1": { "name": "entity.name.tag.template.mdxld" },
+            "2": {
+              "name": "string.template.sql.mdxld",
+              "patterns": [{ "include": "source.sql" }]
+            }
+          }
+        },
+        {
+          "name": "meta.embedded.inline.csv",
+          "match": "(csv|tsv)(`[^`]*`)",
+          "captures": {
+            "1": { "name": "entity.name.tag.template.mdxld" },
+            "2": { "name": "string.template.csv.mdxld" }
+          }
+        },
+        {
+          "name": "meta.embedded.inline.json",
+          "match": "(json)(`[^`]*`)",
+          "captures": {
+            "1": { "name": "entity.name.tag.template.mdxld" },
+            "2": {
+              "name": "string.template.json.mdxld",
+              "patterns": [{ "include": "source.json" }]
+            }
+          }
+        }
+      ]
+    },
+    "fenced-code-block": {
+      "patterns": [
+        {
+          "name": "meta.embedded.block.mermaid",
+          "begin": "^(\\s*)(```)\\s*(mermaid)\\s*$",
+          "end": "^(\\1)(```)\\s*$",
+          "beginCaptures": {
+            "2": { "name": "punctuation.definition.code.begin.mdxld" },
+            "3": { "name": "fenced_code.block.language.mdxld" }
+          },
+          "endCaptures": {
+            "2": { "name": "punctuation.definition.code.end.mdxld" }
+          },
+          "contentName": "source.mermaid"
+        },
+        {
+          "name": "meta.embedded.block.typescript",
+          "begin": "^(\\s*)(```)\\s*(typescript|ts|tsx)(\\s+\\{[^}]*\\})?\\s*$",
+          "end": "^(\\1)(```)\\s*$",
+          "beginCaptures": {
+            "2": { "name": "punctuation.definition.code.begin.mdxld" },
+            "3": { "name": "fenced_code.block.language.mdxld" },
+            "4": { "name": "comment.block.attributes.mdxld" }
+          },
+          "endCaptures": {
+            "2": { "name": "punctuation.definition.code.end.mdxld" }
+          },
+          "contentName": "source.ts",
+          "patterns": [{ "include": "source.ts" }]
+        },
+        {
+          "name": "meta.embedded.block.javascript",
+          "begin": "^(\\s*)(```)\\s*(javascript|js|jsx)(\\s+\\{[^}]*\\})?\\s*$",
+          "end": "^(\\1)(```)\\s*$",
+          "beginCaptures": {
+            "2": { "name": "punctuation.definition.code.begin.mdxld" },
+            "3": { "name": "fenced_code.block.language.mdxld" },
+            "4": { "name": "comment.block.attributes.mdxld" }
+          },
+          "endCaptures": {
+            "2": { "name": "punctuation.definition.code.end.mdxld" }
+          },
+          "contentName": "source.js",
+          "patterns": [{ "include": "source.js" }]
+        },
+        {
+          "name": "meta.embedded.block.sql",
+          "begin": "^(\\s*)(```)\\s*(sql)(\\s+\\{[^}]*\\})?\\s*$",
+          "end": "^(\\1)(```)\\s*$",
+          "beginCaptures": {
+            "2": { "name": "punctuation.definition.code.begin.mdxld" },
+            "3": { "name": "fenced_code.block.language.mdxld" },
+            "4": { "name": "comment.block.attributes.mdxld" }
+          },
+          "endCaptures": {
+            "2": { "name": "punctuation.definition.code.end.mdxld" }
+          },
+          "contentName": "source.sql",
+          "patterns": [{ "include": "source.sql" }]
+        },
+        {
+          "name": "meta.embedded.block.yaml",
+          "begin": "^(\\s*)(```)\\s*(yaml|yml)(\\s+\\{[^}]*\\})?\\s*$",
+          "end": "^(\\1)(```)\\s*$",
+          "beginCaptures": {
+            "2": { "name": "punctuation.definition.code.begin.mdxld" },
+            "3": { "name": "fenced_code.block.language.mdxld" },
+            "4": { "name": "comment.block.attributes.mdxld" }
+          },
+          "endCaptures": {
+            "2": { "name": "punctuation.definition.code.end.mdxld" }
+          },
+          "contentName": "source.yaml",
+          "patterns": [{ "include": "source.yaml" }]
+        },
+        {
+          "name": "meta.embedded.block.json",
+          "begin": "^(\\s*)(```)\\s*(json|jsonld)(\\s+\\{[^}]*\\})?\\s*$",
+          "end": "^(\\1)(```)\\s*$",
+          "beginCaptures": {
+            "2": { "name": "punctuation.definition.code.begin.mdxld" },
+            "3": { "name": "fenced_code.block.language.mdxld" },
+            "4": { "name": "comment.block.attributes.mdxld" }
+          },
+          "endCaptures": {
+            "2": { "name": "punctuation.definition.code.end.mdxld" }
+          },
+          "contentName": "source.json",
+          "patterns": [{ "include": "source.json" }]
+        },
+        {
+          "name": "markup.fenced_code.block.markdown",
+          "begin": "^(\\s*)(```)\\s*([a-zA-Z0-9_+-]*)(\\s+\\{[^}]*\\})?\\s*$",
+          "end": "^(\\1)(```)\\s*$",
+          "beginCaptures": {
+            "2": { "name": "punctuation.definition.code.begin.mdxld" },
+            "3": { "name": "fenced_code.block.language.mdxld" },
+            "4": { "name": "comment.block.attributes.mdxld" }
+          },
+          "endCaptures": {
+            "2": { "name": "punctuation.definition.code.end.mdxld" }
+          },
+          "contentName": "markup.raw.code.fenced.mdxld"
+        }
+      ]
+    },
+    "markdown": {
+      "patterns": [
+        {
+          "name": "markup.heading.1.mdxld",
+          "match": "^(#{1})\\s+(.*)$",
+          "captures": {
+            "1": { "name": "punctuation.definition.heading.mdxld" },
+            "2": { "name": "entity.name.section.mdxld" }
+          }
+        },
+        {
+          "name": "markup.heading.2.mdxld",
+          "match": "^(#{2})\\s+(.*)$",
+          "captures": {
+            "1": { "name": "punctuation.definition.heading.mdxld" },
+            "2": { "name": "entity.name.section.mdxld" }
+          }
+        },
+        {
+          "name": "markup.heading.3.mdxld",
+          "match": "^(#{3})\\s+(.*)$",
+          "captures": {
+            "1": { "name": "punctuation.definition.heading.mdxld" },
+            "2": { "name": "entity.name.section.mdxld" }
+          }
+        },
+        {
+          "name": "markup.heading.mdxld",
+          "match": "^(#{4,6})\\s+(.*)$",
+          "captures": {
+            "1": { "name": "punctuation.definition.heading.mdxld" },
+            "2": { "name": "entity.name.section.mdxld" }
+          }
+        },
+        {
+          "name": "markup.bold.mdxld",
+          "match": "(\\*\\*|__)([^*_]+)(\\*\\*|__)",
+          "captures": {
+            "1": { "name": "punctuation.definition.bold.begin.mdxld" },
+            "2": { "name": "markup.bold.content.mdxld" },
+            "3": { "name": "punctuation.definition.bold.end.mdxld" }
+          }
+        },
+        {
+          "name": "markup.italic.mdxld",
+          "match": "(\\*|_)([^*_]+)(\\*|_)",
+          "captures": {
+            "1": { "name": "punctuation.definition.italic.begin.mdxld" },
+            "2": { "name": "markup.italic.content.mdxld" },
+            "3": { "name": "punctuation.definition.italic.end.mdxld" }
+          }
+        },
+        {
+          "name": "markup.strikethrough.mdxld",
+          "match": "(~~)([^~]+)(~~)",
+          "captures": {
+            "1": { "name": "punctuation.definition.strikethrough.begin.mdxld" },
+            "2": { "name": "markup.strikethrough.content.mdxld" },
+            "3": { "name": "punctuation.definition.strikethrough.end.mdxld" }
+          }
+        },
+        {
+          "name": "markup.inline.raw.mdxld",
+          "match": "(`[^`]+`)",
+          "captures": {
+            "1": { "name": "markup.inline.raw.string.mdxld" }
+          }
+        },
+        {
+          "name": "markup.underline.link.mdxld",
+          "match": "(\\[)([^\\]]+)(\\])(\\()([^)]+)(\\))",
+          "captures": {
+            "1": { "name": "punctuation.definition.link.begin.mdxld" },
+            "2": { "name": "string.other.link.title.mdxld" },
+            "3": { "name": "punctuation.definition.link.end.mdxld" },
+            "4": { "name": "punctuation.definition.link.begin.mdxld" },
+            "5": { "name": "markup.underline.link.mdxld" },
+            "6": { "name": "punctuation.definition.link.end.mdxld" }
+          }
+        },
+        {
+          "name": "markup.list.unnumbered.mdxld",
+          "match": "^(\\s*)([-*+])\\s+(\\[[ xX]\\])?",
+          "captures": {
+            "2": { "name": "punctuation.definition.list.begin.mdxld" },
+            "3": { "name": "punctuation.definition.checkbox.mdxld" }
+          }
+        },
+        {
+          "name": "markup.list.numbered.mdxld",
+          "match": "^(\\s*)(\\d+\\.)\\s+",
+          "captures": {
+            "2": { "name": "punctuation.definition.list.begin.mdxld" }
+          }
+        },
+        {
+          "name": "markup.quote.mdxld",
+          "match": "^(>)\\s*",
+          "captures": {
+            "1": { "name": "punctuation.definition.quote.begin.mdxld" }
+          }
+        }
+      ]
+    }
+  }
+}

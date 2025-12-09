@@ -1,0 +1,47 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "MDXLD Code Block Injections",
+  "scopeName": "markdown.mdxld.codeblock",
+  "injectionSelector": "L:meta.embedded.block.mermaid",
+  "patterns": [
+    { "include": "#mermaid" }
+  ],
+  "repository": {
+    "mermaid": {
+      "patterns": [
+        {
+          "name": "keyword.control.mermaid",
+          "match": "\\b(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|mindmap|timeline|gitGraph|journey|quadrantChart|requirementDiagram|c4Context)\\b"
+        },
+        {
+          "name": "keyword.control.direction.mermaid",
+          "match": "\\b(TB|TD|BT|RL|LR)\\b"
+        },
+        {
+          "name": "keyword.other.mermaid",
+          "match": "\\b(participant|actor|activate|deactivate|loop|alt|else|opt|par|and|critical|break|note|over|left of|right of|class|subgraph|end|title|section|dateFormat|axisFormat|excludes|includes)\\b"
+        },
+        {
+          "name": "entity.name.tag.mermaid",
+          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b"
+        },
+        {
+          "name": "string.quoted.mermaid",
+          "match": "\"[^\"]*\""
+        },
+        {
+          "name": "punctuation.mermaid.arrow",
+          "match": "-->|-->>|->|--[>x)]|==>|-.->?|\\|\\||--\\*|--o|<\\|--"
+        },
+        {
+          "name": "punctuation.mermaid.bracket",
+          "match": "[\\[\\]\\(\\)\\{\\}\\<\\>]"
+        },
+        {
+          "name": "comment.line.mermaid",
+          "match": "%%.*$"
+        }
+      ]
+    }
+  }
+}

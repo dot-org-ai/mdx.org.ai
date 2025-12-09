@@ -9,7 +9,7 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', '@mdxui/jsx', '@mdxui/jsx/primitives', '@mdxui/radix', '@mdxui/vaul', '@mdxui/cmdk', '@mdxui/sonner'],
   banner: {
     js: '"use client";',
   },

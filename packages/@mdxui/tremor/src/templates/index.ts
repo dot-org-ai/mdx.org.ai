@@ -4,14 +4,12 @@
  * Pre-built dashboard page templates.
  */
 
-export * from './dashboard'
-export * from './analytics'
+export { DashboardTemplate } from './dashboard'
+export type { DashboardTemplateProps } from './dashboard'
 
-/**
- * Tremor Layout Templates
- *
- * Official Tremor templates translated to unified @mdxui Layout types.
- * These layouts use semantic naming (kpis, sections, navigation) and
- * standard props interfaces for consistency across the platform.
- */
-export * from './layouts'
+export { AnalyticsTemplate } from './analytics'
+export type { AnalyticsTemplateProps } from './analytics'
+
+// Note: Layouts temporarily excluded during migration to @mdxui/headless
+// TODO: Migrate layouts to use @mdxui/jsx instead of @tremor/react
+// export * from './layouts'

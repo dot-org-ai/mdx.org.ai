@@ -1,0 +1,207 @@
+{
+  "name": "@mdxui/radix",
+  "version": "1.0.0",
+  "description": "Radix UI primitives with React/Hono JSX runtime support",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./separator": {
+      "types": "./dist/components/separator.d.ts",
+      "import": "./dist/components/separator.js",
+      "require": "./dist/components/separator.cjs"
+    },
+    "./label": {
+      "types": "./dist/components/label.d.ts",
+      "import": "./dist/components/label.js",
+      "require": "./dist/components/label.cjs"
+    },
+    "./aspect-ratio": {
+      "types": "./dist/components/aspect-ratio.d.ts",
+      "import": "./dist/components/aspect-ratio.js",
+      "require": "./dist/components/aspect-ratio.cjs"
+    },
+    "./visually-hidden": {
+      "types": "./dist/components/visually-hidden.d.ts",
+      "import": "./dist/components/visually-hidden.js",
+      "require": "./dist/components/visually-hidden.cjs"
+    },
+    "./progress": {
+      "types": "./dist/components/progress.d.ts",
+      "import": "./dist/components/progress.js",
+      "require": "./dist/components/progress.cjs"
+    },
+    "./checkbox": {
+      "types": "./dist/components/checkbox.d.ts",
+      "import": "./dist/components/checkbox.js",
+      "require": "./dist/components/checkbox.cjs"
+    },
+    "./switch": {
+      "types": "./dist/components/switch.d.ts",
+      "import": "./dist/components/switch.js",
+      "require": "./dist/components/switch.cjs"
+    },
+    "./toggle": {
+      "types": "./dist/components/toggle.d.ts",
+      "import": "./dist/components/toggle.js",
+      "require": "./dist/components/toggle.cjs"
+    },
+    "./toggle-group": {
+      "types": "./dist/components/toggle-group.d.ts",
+      "import": "./dist/components/toggle-group.js",
+      "require": "./dist/components/toggle-group.cjs"
+    },
+    "./slider": {
+      "types": "./dist/components/slider.d.ts",
+      "import": "./dist/components/slider.js",
+      "require": "./dist/components/slider.cjs"
+    },
+    "./tabs": {
+      "types": "./dist/components/tabs.d.ts",
+      "import": "./dist/components/tabs.js",
+      "require": "./dist/components/tabs.cjs"
+    },
+    "./accordion": {
+      "types": "./dist/components/accordion.d.ts",
+      "import": "./dist/components/accordion.js",
+      "require": "./dist/components/accordion.cjs"
+    },
+    "./collapsible": {
+      "types": "./dist/components/collapsible.d.ts",
+      "import": "./dist/components/collapsible.js",
+      "require": "./dist/components/collapsible.cjs"
+    },
+    "./radio-group": {
+      "types": "./dist/components/radio-group.d.ts",
+      "import": "./dist/components/radio-group.js",
+      "require": "./dist/components/radio-group.cjs"
+    },
+    "./dialog": {
+      "types": "./dist/components/dialog.d.ts",
+      "import": "./dist/components/dialog.js",
+      "require": "./dist/components/dialog.cjs"
+    },
+    "./alert-dialog": {
+      "types": "./dist/components/alert-dialog.d.ts",
+      "import": "./dist/components/alert-dialog.js",
+      "require": "./dist/components/alert-dialog.cjs"
+    },
+    "./dropdown-menu": {
+      "types": "./dist/components/dropdown-menu.d.ts",
+      "import": "./dist/components/dropdown-menu.js",
+      "require": "./dist/components/dropdown-menu.cjs"
+    },
+    "./context-menu": {
+      "types": "./dist/components/context-menu.d.ts",
+      "import": "./dist/components/context-menu.js",
+      "require": "./dist/components/context-menu.cjs"
+    },
+    "./select": {
+      "types": "./dist/components/select.d.ts",
+      "import": "./dist/components/select.js",
+      "require": "./dist/components/select.cjs"
+    },
+    "./popover": {
+      "types": "./dist/components/popover.d.ts",
+      "import": "./dist/components/popover.js",
+      "require": "./dist/components/popover.cjs"
+    },
+    "./tooltip": {
+      "types": "./dist/components/tooltip.d.ts",
+      "import": "./dist/components/tooltip.js",
+      "require": "./dist/components/tooltip.cjs"
+    },
+    "./hover-card": {
+      "types": "./dist/components/hover-card.d.ts",
+      "import": "./dist/components/hover-card.js",
+      "require": "./dist/components/hover-card.cjs"
+    },
+    "./navigation-menu": {
+      "types": "./dist/components/navigation-menu.d.ts",
+      "import": "./dist/components/navigation-menu.js",
+      "require": "./dist/components/navigation-menu.cjs"
+    },
+    "./menubar": {
+      "types": "./dist/components/menubar.d.ts",
+      "import": "./dist/components/menubar.js",
+      "require": "./dist/components/menubar.cjs"
+    },
+    "./avatar": {
+      "types": "./dist/components/avatar.d.ts",
+      "import": "./dist/components/avatar.js",
+      "require": "./dist/components/avatar.cjs"
+    },
+    "./scroll-area": {
+      "types": "./dist/components/scroll-area.d.ts",
+      "import": "./dist/components/scroll-area.js",
+      "require": "./dist/components/scroll-area.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxui",
+    "radix",
+    "radix-ui",
+    "primitives",
+    "components",
+    "ui",
+    "react",
+    "hono",
+    "jsx"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@mdxui/jsx": "workspace:^",
+    "@floating-ui/dom": "^1.6.0"
+  },
+  "peerDependencies": {
+    "hono": "^4.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "hono": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "hono": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxui/radix"
+  },
+  "author": "MDX.org.ai"
+}

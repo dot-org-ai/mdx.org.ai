@@ -2,10 +2,13 @@
  * MDX Compiler - Compiles MDX files to JavaScript
  *
  * Supports multiple JSX runtimes: React, Preact, Hono/JSX
+ * Includes MDXLD remark plugin for GFM, TypeScript, and mermaid support
  */
 
 import { compile as mdxCompile } from '@mdx-js/mdx'
 import matter from 'gray-matter'
+import remarkGfm from 'remark-gfm'
+import { remarkMDXLD, presets as remarkPresets, parseTypeScriptESM, hasTypeScriptImportExport } from '@mdxld/remark'
 import type {
   CompileMDXOptions,
   CompileMDXResult,
@@ -26,6 +29,34 @@ function resolveJSXRuntime(jsx?: JSXRuntime | JSXPreset): JSXRuntime {
     return JSX_PRESETS[jsx] ?? JSX_PRESETS.react
   }
   return jsx
+}
+
+/**
+ * Preprocess MDX content to strip TypeScript-specific syntax from import/export statements
+ * This is necessary because MDX uses acorn which doesn't support TypeScript syntax
+ *
+ * @param content - Raw MDX content
+ * @returns Content with TypeScript type imports/exports stripped for acorn compatibility
+ */
+function preprocessTypeScriptImportsExports(content: string): { content: string; hadTypeScript: boolean } {
+  // Quick check to avoid processing if no TypeScript syntax
+  if (!hasTypeScriptImportExport(content)) {
+    return { content, hadTypeScript: false }
+  }
+
+  // Use the TypeScript parser to strip all TypeScript-specific syntax
+  // This handles:
+  // - import type { ... }
+  // - import { type Foo, ... }
+  // - export type { ... }
+  // - export type X = ...
+  // - export interface X { ... }
+  const result = parseTypeScriptESM(content)
+
+  return {
+    content: result.strippedContent,
+    hadTypeScript: result.hasTypeScript,
+  }
 }
 
 /**
@@ -71,10 +102,28 @@ export async function compileMDX(
   const warnings: string[] = []
 
   // Extract frontmatter
-  const { data: frontmatter, content: mdxContent } = matter(content) as {
+  const { data: frontmatter, content: rawMdxContent } = matter(content) as {
     data: MDXLDFrontmatter
     content: string
   }
+
+  // Preprocess TypeScript import/export statements for acorn compatibility
+  // This strips `import type`, `export type`, and `type` specifiers that acorn can't parse
+  const { content: mdxContent, hadTypeScript } = preprocessTypeScriptImportsExports(rawMdxContent)
+
+  if (hadTypeScript) {
+    warnings.push('TypeScript type imports/exports were stripped for acorn compatibility')
+  }
+
+  // Build remark plugins with MDXLD defaults
+  const allRemarkPlugins = [
+    // GFM for tables, strikethrough, autolinks, task lists
+    remarkGfm,
+    // MDXLD plugin for mermaid, attributes, TypeScript support
+    [remarkMDXLD, remarkPresets.full],
+    // User-provided plugins
+    ...remarkPlugins,
+  ]
 
   // Compile MDX
   const mdxResult = await mdxCompile(mdxContent, {
@@ -84,7 +133,7 @@ export async function compileMDX(
     jsxImportSource: jsxRuntime.importSource,
     development: jsxRuntime.development ?? false,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    remarkPlugins: remarkPlugins as any[],
+    remarkPlugins: allRemarkPlugins as any[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rehypePlugins: rehypePlugins as any[],
   })

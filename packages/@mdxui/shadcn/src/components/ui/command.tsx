@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Command as CommandPrimitive } from "cmdk"
+import { Command as CommandPrimitive } from "@mdxui/cmdk"
 import { SearchIcon } from "lucide-react"
 
 import { cn } from "../../lib/utils.js"

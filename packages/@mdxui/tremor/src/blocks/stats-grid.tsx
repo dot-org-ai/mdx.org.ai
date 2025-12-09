@@ -4,8 +4,14 @@
  * Grid of statistics with optional charts.
  */
 
-import * as React from 'react'
-import { Card, Metric, Text, AreaChart } from '@tremor/react'
+import {
+  forwardRef,
+  type ComponentPropsWithoutRef,
+} from '@mdxui/jsx'
+import { Primitive } from '@mdxui/jsx/primitives'
+import { Card } from '../ui/card'
+import { Text, Metric } from '../ui/text'
+import { Sparkline } from '../charts/sparkline'
 
 export interface StatWithChartProps {
   title: string
@@ -15,62 +21,73 @@ export interface StatWithChartProps {
     positive: boolean
   }
   chart?: {
-    data: Array<{ date: string; value: number }>
+    data: number[]
     color?: string
   }
 }
 
-export function StatWithChart({
-  title,
-  value,
-  change,
-  chart,
-}: StatWithChartProps) {
-  return (
-    <Card>
-      <Text>{title}</Text>
-      <Metric className="mt-2">{value}</Metric>
-      {change && (
-        <Text className={`mt-2 text-sm ${change.positive ? 'text-green-600' : 'text-red-600'}`}>
-          {change.positive ? '↑' : '↓'} {change.value}
-        </Text>
-      )}
-      {chart && (
-        <AreaChart
-          className="mt-4 h-16"
-          data={chart.data}
-          index="date"
-          categories={['value']}
-          colors={[chart.color || 'blue']}
-          showLegend={false}
-          showYAxis={false}
-          showXAxis={false}
-          showGridLines={false}
-          showTooltip={false}
-        />
-      )}
-    </Card>
-  )
-}
+type StatWithChartElement = HTMLDivElement
 
-export function StatsGrid({
-  stats,
-  columns = 4,
-}: {
+const StatWithChart = forwardRef<StatWithChartElement, StatWithChartProps & ComponentPropsWithoutRef<'div'>>(
+  ({
+    title,
+    value,
+    change,
+    chart,
+    className = '',
+    ...props
+  }, ref) => {
+    return (
+      <Card ref={ref} className={className} {...props}>
+        <Text>{title}</Text>
+        <Metric className="mt-2">{value}</Metric>
+        {change && (
+          <Text className={`mt-2 text-sm ${change.positive ? 'text-green-600' : 'text-red-600'}`}>
+            {change.positive ? '↑' : '↓'} {change.value}
+          </Text>
+        )}
+        {chart && chart.data.length > 0 && (
+          <Sparkline
+            data={chart.data}
+            color={chart.color || '#3b82f6'}
+            height={48}
+            variant="area"
+            className="mt-4"
+          />
+        )}
+      </Card>
+    )
+  }
+)
+StatWithChart.displayName = 'StatWithChart'
+
+interface StatsGridProps extends ComponentPropsWithoutRef<'div'> {
   stats: StatWithChartProps[]
   columns?: 2 | 3 | 4
-}) {
-  const gridCols = {
-    2: 'md:grid-cols-2',
-    3: 'md:grid-cols-3',
-    4: 'md:grid-cols-2 lg:grid-cols-4',
-  }
-
-  return (
-    <div className={`grid gap-4 ${gridCols[columns]}`}>
-      {stats.map((stat, i) => (
-        <StatWithChart key={i} {...stat} />
-      ))}
-    </div>
-  )
 }
+
+const StatsGrid = forwardRef<HTMLDivElement, StatsGridProps>(
+  ({ stats, columns = 4, className = '', ...props }, ref) => {
+    const gridCols = {
+      2: 'md:grid-cols-2',
+      3: 'md:grid-cols-3',
+      4: 'md:grid-cols-2 lg:grid-cols-4',
+    }
+
+    return (
+      <Primitive.div
+        ref={ref}
+        className={`grid gap-4 ${gridCols[columns]} ${className}`.trim()}
+        {...props}
+      >
+        {stats.map((stat, i) => (
+          <StatWithChart key={i} {...stat} />
+        ))}
+      </Primitive.div>
+    )
+  }
+)
+StatsGrid.displayName = 'StatsGrid'
+
+export { StatWithChart, StatsGrid }
+export type { StatsGridProps }

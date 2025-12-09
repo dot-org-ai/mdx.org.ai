@@ -44,5 +44,18 @@ export { isType, isOneOfTypes, createTypedDocument } from './types.js'
 export { parse } from './parse.js'
 export { stringify } from './stringify.js'
 
+// Format utilities
+export { format, formatTypeComments, formatTypeDefinition, type FormatOptions } from './format.js'
+
+// Types extraction utilities
+export {
+  extractTypesFromContent,
+  generateDtsFromTypes,
+  deduplicateTypes,
+  sortTypes,
+  type ExtractedType,
+  type TypesExtractOptions,
+} from './types-extract.js'
+
 // AST utilities
 export { toAst } from './ast.js'

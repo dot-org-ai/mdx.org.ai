@@ -1,0 +1,133 @@
+{
+  "name": "mdxld-vscode",
+  "displayName": "MDXLD Language Support",
+  "description": "Enhanced MDX support with GFM, embedded languages (yaml`, sql`, csv`), mermaid diagrams, and TypeScript type imports",
+  "version": "1.9.0",
+  "publisher": "mdxld",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters",
+    "Linters"
+  ],
+  "keywords": [
+    "mdx",
+    "mdxld",
+    "markdown",
+    "yaml",
+    "sql",
+    "csv",
+    "mermaid",
+    "typescript"
+  ],
+  "activationEvents": [
+    "onLanguage:mdx",
+    "onLanguage:mdxld"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "mdxld",
+        "aliases": ["MDXLD", "mdxld"],
+        "extensions": [".mdx"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "mdxld",
+        "scopeName": "source.mdxld",
+        "path": "./syntaxes/mdxld.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.yaml": "yaml",
+          "meta.embedded.block.typescript": "typescript",
+          "meta.embedded.block.javascript": "javascript",
+          "meta.embedded.block.sql": "sql",
+          "meta.embedded.block.json": "json",
+          "meta.embedded.block.mermaid": "mermaid",
+          "meta.embedded.inline.yaml": "yaml",
+          "meta.embedded.inline.sql": "sql",
+          "meta.embedded.inline.csv": "csv"
+        }
+      },
+      {
+        "scopeName": "markdown.mdxld.codeblock",
+        "path": "./syntaxes/codeblock.tmLanguage.json",
+        "injectTo": ["source.mdxld"],
+        "embeddedLanguages": {
+          "meta.embedded.block.mermaid": "mermaid"
+        }
+      }
+    ],
+    "configuration": {
+      "title": "MDXLD",
+      "properties": {
+        "mdxld.format.onSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Format MDXLD files on save"
+        },
+        "mdxld.validate.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable MDXLD validation"
+        },
+        "mdxld.mermaid.preview": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable mermaid diagram preview"
+        },
+        "mdxld.typescript.stripTypes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Strip TypeScript types in compiled output while preserving AST for tooling"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "mdxld.formatDocument",
+        "title": "Format MDXLD Document"
+      },
+      {
+        "command": "mdxld.previewMermaid",
+        "title": "Preview Mermaid Diagram"
+      },
+      {
+        "command": "mdxld.extractTypeInfo",
+        "title": "Show TypeScript Type Information"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run build",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:compile": "tsc -p ./tsconfig.test.json",
+    "test:integration": "pnpm run test:compile && vscode-test",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
+  },
+  "dependencies": {
+    "@mdxld/remark": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^2.22.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxld/vscode"
+  },
+  "license": "MIT"
+}

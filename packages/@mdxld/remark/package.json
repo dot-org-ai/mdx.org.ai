@@ -1,0 +1,68 @@
+{
+  "name": "@mdxld/remark",
+  "version": "1.9.0",
+  "description": "Remark plugin preset for MDXLD with GFM, attributes, and TypeScript support",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./typescript": {
+      "import": "./dist/typescript.js",
+      "types": "./dist/typescript.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "remark-gfm": "^4.0.0",
+    "typescript": "^5.7.2",
+    "unified": "^11.0.5",
+    "vfile": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/unist": "^3.0.3",
+    "remark": "^15.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "tsup": "^8.3.5",
+    "vitest": "^2.1.9"
+  },
+  "peerDependencies": {
+    "remark": "^15.0.0"
+  },
+  "peerDependenciesMeta": {
+    "remark": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "mdx",
+    "mdxld",
+    "remark",
+    "remark-plugin",
+    "gfm",
+    "typescript",
+    "ast"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxld/remark"
+  },
+  "author": "MDX.org.ai"
+}
