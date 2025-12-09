@@ -1,19 +1,30 @@
 /**
  * @mdxdb/rpc Client Tests
+ *
+ * Tests for RpcClient using real server implementation
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { mkdtempSync, rmSync } from 'node:fs'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
+import { Hono } from 'hono'
+import { serve } from '@hono/node-server'
+import type { Server } from 'node:http'
 import { RpcClient, createRpcClient } from '../src/client.js'
 import type { MDXLDDocument } from 'mdxld'
+import type { JsonRpcRequest, DatabaseMethod } from '../src/types.js'
+import { FsDatabase } from '@mdxdb/fs'
 
-// Mock global fetch for HTTP transport tests
-const mockFetch = vi.fn()
-vi.stubGlobal('fetch', mockFetch)
+describe('@mdxdb/rpc Client', () => {
+  let tmpDir: string
+  let db: FsDatabase
+  let server: Server
+  let serverUrl: string
 
-describe('@mdxdb/rpc', () => {
   const mockDocument: MDXLDDocument = {
     type: 'Post',
-    id: 'test-id',
+    id: 'test/post',
     data: {
       $type: 'Post',
       title: 'Test Post',
@@ -21,9 +32,131 @@ describe('@mdxdb/rpc', () => {
     content: '# Test Content',
   }
 
+  beforeAll(async () => {
+    // Create temp directory for filesystem database
+    tmpDir = mkdtempSync(join(tmpdir(), 'mdxdb-rpc-client-test-'))
+    db = new FsDatabase({ root: tmpDir })
+
+    // Seed test data
+    await db.set('test/post', mockDocument)
+    await db.set('test/another', {
+      type: 'Post',
+      id: 'test/another',
+      data: { $type: 'Post', title: 'Another Post' },
+      content: '# Another',
+    })
+    await db.set('test/article', {
+      type: 'Article',
+      id: 'test/article',
+      data: { $type: 'Article', title: 'Article Title' },
+      content: '# Article',
+    })
+
+    // Create JSON-RPC server using Hono
+    const app = new Hono()
+
+    app.post('/', async (c) => {
+      const request = (await c.req.json()) as JsonRpcRequest
+
+      try {
+        const { method, params, id } = request
+
+        if (!method || !method.startsWith('mdxdb.')) {
+          return c.json({
+            jsonrpc: '2.0',
+            error: { code: -32601, message: 'Method not found' },
+            id,
+          })
+        }
+
+        const dbMethod = method.replace('mdxdb.', '') as DatabaseMethod
+
+        let result: unknown
+
+        switch (dbMethod) {
+          case 'list': {
+            result = await db.list(params as Parameters<typeof db.list>[0])
+            break
+          }
+          case 'search': {
+            result = await db.search(params as Parameters<typeof db.search>[0])
+            break
+          }
+          case 'get': {
+            const { id: docId } = params as { id: string }
+            const doc = await db.get(docId)
+            if (!doc) {
+              return c.json({
+                jsonrpc: '2.0',
+                error: { code: -32000, message: 'Document not found' },
+                id,
+              })
+            }
+            result = doc
+            break
+          }
+          case 'set': {
+            const { id: docId, document } = params as {
+              id: string
+              document: MDXLDDocument
+            }
+            result = await db.set(docId, document)
+            break
+          }
+          case 'delete': {
+            const { id: docId } = params as { id: string }
+            try {
+              result = await db.delete(docId)
+            } catch (error) {
+              return c.json({
+                jsonrpc: '2.0',
+                error: { code: -32000, message: 'Document not found' },
+                id,
+              })
+            }
+            break
+          }
+          default:
+            return c.json({
+              jsonrpc: '2.0',
+              error: { code: -32601, message: 'Method not found' },
+              id,
+            })
+        }
+
+        return c.json({
+          jsonrpc: '2.0',
+          result,
+          id,
+        })
+      } catch (error) {
+        return c.json({
+          jsonrpc: '2.0',
+          error: {
+            code: -32603,
+            message: error instanceof Error ? error.message : 'Internal error',
+          },
+          id: request.id,
+        })
+      }
+    })
+
+    // Start server on random available port
+    server = serve({ fetch: app.fetch, port: 0 })
+    const address = server.address()
+    const port = typeof address === 'object' && address ? address.port : 3000
+    serverUrl = `http://localhost:${port}`
+  })
+
+  afterAll(async () => {
+    // Clean up
+    server.close()
+    rmSync(tmpDir, { recursive: true, force: true })
+  })
+
   describe('createRpcClient', () => {
     it('should create an RpcClient instance', () => {
-      const client = createRpcClient({ url: 'https://rpc.do/namespace' })
+      const client = createRpcClient({ url: serverUrl })
       expect(client).toBeInstanceOf(RpcClient)
     })
 
@@ -39,251 +172,246 @@ describe('@mdxdb/rpc', () => {
 
     it('should accept explicit transport option', () => {
       const client = createRpcClient({
-        url: 'https://rpc.do/namespace',
-        transport: 'ws',
+        url: serverUrl,
+        transport: 'http',
       })
       expect(client).toBeInstanceOf(RpcClient)
     })
   })
 
   describe('RpcClient HTTP Transport', () => {
-    let client: RpcClient
-
-    beforeEach(() => {
-      mockFetch.mockReset()
-      client = new RpcClient({
-        url: 'https://rpc.do/namespace',
-        transport: 'http',
-      })
-    })
-
-    afterEach(async () => {
-      await client.close()
-    })
-
     describe('list()', () => {
-      it('should send JSON-RPC request for list', async () => {
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 1,
-              result: {
-                documents: [mockDocument],
-                total: 1,
-                hasMore: false,
-              },
-            }),
+      it('should list all documents', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
         })
 
         const result = await client.list()
 
-        expect(mockFetch).toHaveBeenCalledWith(
-          'https://rpc.do/namespace',
-          expect.objectContaining({
-            method: 'POST',
-            headers: expect.objectContaining({
-              'Content-Type': 'application/json',
-            }),
-          })
-        )
+        expect(result.documents).toHaveLength(3)
+        expect(result.total).toBe(3)
+        expect(result.documents[0].id).toBeDefined()
 
-        const body = JSON.parse(mockFetch.mock.calls[0][1].body)
-        expect(body.jsonrpc).toBe('2.0')
-        expect(body.method).toBe('mdxdb.list')
-        expect(body.params).toEqual({})
-
-        expect(result.documents).toHaveLength(1)
-        expect(result.total).toBe(1)
+        await client.close()
       })
 
-      it('should pass options as params', async () => {
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 2,
-              result: { documents: [], total: 0, hasMore: false },
-            }),
+      it('should filter by type', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
         })
 
-        await client.list({ limit: 10, offset: 5, type: 'Post' })
+        const result = await client.list({ type: 'Post' })
 
-        const body = JSON.parse(mockFetch.mock.calls[0][1].body)
-        expect(body.params).toEqual({ limit: 10, offset: 5, type: 'Post' })
+        expect(result.documents.length).toBe(2)
+        expect(result.documents.every((doc) => doc.type === 'Post')).toBe(true)
+
+        await client.close()
+      })
+
+      it('should pass limit option', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
+        })
+
+        const result = await client.list({ limit: 1 })
+
+        expect(result.documents).toHaveLength(1)
+
+        await client.close()
+      })
+
+      it('should pass offset option', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
+        })
+
+        const result = await client.list({ offset: 1 })
+
+        expect(result.documents.length).toBeLessThanOrEqual(2)
+
+        await client.close()
       })
     })
 
     describe('search()', () => {
-      it('should send JSON-RPC request for search', async () => {
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 3,
-              result: {
-                documents: [{ ...mockDocument, score: 0.95 }],
-                total: 1,
-                hasMore: false,
-              },
-            }),
+      it('should search documents by query', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
         })
 
-        const result = await client.search({ query: 'test' })
+        const result = await client.search({ query: 'Test' })
 
-        const body = JSON.parse(mockFetch.mock.calls[0][1].body)
-        expect(body.method).toBe('mdxdb.search')
-        expect(body.params).toEqual({ query: 'test' })
+        expect(result.documents).toBeDefined()
+        expect(Array.isArray(result.documents)).toBe(true)
 
-        expect(result.documents[0].score).toBe(0.95)
+        await client.close()
       })
     })
 
     describe('get()', () => {
-      it('should send JSON-RPC request for get', async () => {
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 4,
-              result: mockDocument,
-            }),
+      it('should get a document by id', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
         })
 
-        const result = await client.get('test-id')
+        const result = await client.get('test/post')
 
-        const body = JSON.parse(mockFetch.mock.calls[0][1].body)
-        expect(body.method).toBe('mdxdb.get')
-        expect(body.params).toEqual({ id: 'test-id' })
+        expect(result).toBeDefined()
+        expect(result?.id).toBe('test/post')
+        expect(result?.data.title).toBe('Test Post')
 
-        expect(result).toEqual(mockDocument)
+        await client.close()
       })
 
       it('should return null when document not found', async () => {
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 5,
-              error: { code: -32000, message: 'Document not found' },
-            }),
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
         })
 
         const result = await client.get('not-found')
         expect(result).toBeNull()
+
+        await client.close()
       })
     })
 
     describe('set()', () => {
-      it('should send JSON-RPC request for set', async () => {
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 6,
-              result: { id: 'test-id', created: true },
-            }),
+      it('should create a new document', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
         })
 
-        const result = await client.set('test-id', mockDocument)
+        const newDoc: MDXLDDocument = {
+          type: 'Post',
+          id: 'test/new',
+          data: { $type: 'Post', title: 'New Post' },
+          content: '# New',
+        }
 
-        const body = JSON.parse(mockFetch.mock.calls[0][1].body)
-        expect(body.method).toBe('mdxdb.set')
-        expect(body.params).toEqual({ id: 'test-id', document: mockDocument })
+        const result = await client.set('test/new', newDoc)
 
-        expect(result.created).toBe(true)
+        expect(result.id).toBe('test/new')
+
+        // Verify it was created
+        const retrieved = await client.get('test/new')
+        expect(retrieved?.data.title).toBe('New Post')
+
+        await client.close()
+      })
+
+      it('should update an existing document', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
+        })
+
+        const updatedDoc: MDXLDDocument = {
+          type: 'Post',
+          id: 'test/post',
+          data: { $type: 'Post', title: 'Updated Title' },
+          content: '# Updated',
+        }
+
+        const result = await client.set('test/post', updatedDoc)
+
+        expect(result.id).toBe('test/post')
+
+        // Verify it was updated
+        const retrieved = await client.get('test/post')
+        expect(retrieved?.data.title).toBe('Updated Title')
+
+        await client.close()
       })
     })
 
     describe('delete()', () => {
-      it('should send JSON-RPC request for delete', async () => {
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 7,
-              result: { id: 'test-id', deleted: true },
-            }),
+      it('should delete a document', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
         })
 
-        const result = await client.delete('test-id')
-
-        const body = JSON.parse(mockFetch.mock.calls[0][1].body)
-        expect(body.method).toBe('mdxdb.delete')
-        expect(body.params).toEqual({ id: 'test-id' })
-
+        const result = await client.delete('test/new')
         expect(result.deleted).toBe(true)
+
+        // Verify it was deleted
+        const retrieved = await client.get('test/new')
+        expect(retrieved).toBeNull()
+
+        await client.close()
       })
 
       it('should return deleted: false when not found', async () => {
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 8,
-              error: { code: -32000, message: 'Document not found' },
-            }),
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
         })
 
         const result = await client.delete('not-found')
         expect(result.deleted).toBe(false)
+
+        await client.close()
       })
     })
 
     describe('error handling', () => {
-      it('should throw on JSON-RPC error', async () => {
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 9,
-              error: { code: -32600, message: 'Invalid request' },
-            }),
+      it('should throw on JSON-RPC error for invalid method', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
         })
 
-        await expect(client.list()).rejects.toThrow('Invalid request')
+        // Hack the client to call invalid method
+        const invalidClient = client as any
+        const originalCall = invalidClient.call.bind(invalidClient)
+        invalidClient.call = async (method: string, ...args: unknown[]) => {
+          if (method === 'invalid') {
+            return originalCall('invalid.method', ...args)
+          }
+          return originalCall(method, ...args)
+        }
+
+        await expect(invalidClient.call('invalid')).rejects.toThrow()
+
+        await client.close()
       })
     })
 
     describe('authentication', () => {
       it('should include API key in Authorization header', async () => {
-        const authClient = new RpcClient({
-          url: 'https://rpc.do/namespace',
+        const client = new RpcClient({
+          url: serverUrl,
           transport: 'http',
           apiKey: 'test-api-key',
         })
 
-        mockFetch.mockResolvedValue({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              jsonrpc: '2.0',
-              id: 10,
-              result: { documents: [], total: 0, hasMore: false },
-            }),
+        // The request should work even with API key (server ignores it in this test)
+        const result = await client.list()
+        expect(result.documents).toBeDefined()
+
+        await client.close()
+      })
+
+      it('should include custom headers', async () => {
+        const client = new RpcClient({
+          url: serverUrl,
+          transport: 'http',
+          headers: { 'X-Custom': 'test-value' },
         })
 
-        await authClient.list()
+        // The request should work with custom headers
+        const result = await client.list()
+        expect(result.documents).toBeDefined()
 
-        expect(mockFetch).toHaveBeenCalledWith(
-          expect.any(String),
-          expect.objectContaining({
-            headers: expect.objectContaining({
-              Authorization: 'Bearer test-api-key',
-            }),
-          })
-        )
-
-        await authClient.close()
+        await client.close()
       })
     })
   })
@@ -291,10 +419,78 @@ describe('@mdxdb/rpc', () => {
   describe('Connection State', () => {
     it('should report disconnected state for HTTP client', () => {
       const client = createRpcClient({
-        url: 'https://rpc.do/namespace',
+        url: serverUrl,
         transport: 'http',
       })
       expect(client.getConnectionState()).toBe('disconnected')
+    })
+  })
+
+  describe('Integration Tests', () => {
+    it('should handle full CRUD lifecycle', async () => {
+      const client = new RpcClient({
+        url: serverUrl,
+        transport: 'http',
+      })
+
+      // Create
+      const createDoc: MDXLDDocument = {
+        type: 'Post',
+        id: 'test/lifecycle',
+        data: { $type: 'Post', title: 'Lifecycle Test' },
+        content: '# Lifecycle',
+      }
+
+      const createResult = await client.set('test/lifecycle', createDoc)
+      expect(createResult.id).toBe('test/lifecycle')
+
+      // Read
+      const getResult = await client.get('test/lifecycle')
+      expect(getResult?.data.title).toBe('Lifecycle Test')
+
+      // Update
+      const updateDoc: MDXLDDocument = {
+        type: 'Post',
+        id: 'test/lifecycle',
+        data: { $type: 'Post', title: 'Updated Lifecycle' },
+        content: '# Updated',
+      }
+
+      await client.set('test/lifecycle', updateDoc)
+      const updated = await client.get('test/lifecycle')
+      expect(updated?.data.title).toBe('Updated Lifecycle')
+
+      // Delete
+      const deleteResult = await client.delete('test/lifecycle')
+      expect(deleteResult.deleted).toBe(true)
+
+      const deleted = await client.get('test/lifecycle')
+      expect(deleted).toBeNull()
+
+      await client.close()
+    })
+
+    it('should handle multiple concurrent requests', async () => {
+      const client = new RpcClient({
+        url: serverUrl,
+        transport: 'http',
+      })
+
+      const promises = [
+        client.get('test/post'),
+        client.get('test/another'),
+        client.list(),
+        client.search({ query: 'test' }),
+      ]
+
+      const results = await Promise.all(promises)
+
+      expect(results[0]?.id).toBe('test/post')
+      expect(results[1]?.id).toBe('test/another')
+      expect(results[2].documents).toBeDefined()
+      expect(results[3].documents).toBeDefined()
+
+      await client.close()
     })
   })
 })

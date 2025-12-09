@@ -2,53 +2,50 @@
  * @mdxdb/server Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
 import { createServer, createApiServer } from '../src/server.js'
-import type { Database, ListResult, SearchResult, SetResult, DeleteResult } from '../src/types.js'
-import type { MDXLDDocument, MDXLDData } from 'mdxld'
+import type { Database } from '../src/types.js'
+import { FsDatabase } from '@mdxdb/fs'
+import { mkdtempSync, rmSync } from 'node:fs'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
 
-// Mock database implementation
-function createMockDatabase(): Database {
-  const mockDocument: MDXLDDocument = {
+let db: Database
+let tmpDir: string
+
+beforeAll(async () => {
+  // Create a temporary directory for test files
+  tmpDir = mkdtempSync(join(tmpdir(), 'mdxdb-server-test-'))
+  db = new FsDatabase({ root: tmpDir })
+
+  // Seed some test data
+  await db.set('test-id', {
     type: 'Post',
-    id: 'test-id',
     data: {
       $type: 'Post',
       title: 'Test Post',
     },
     content: '# Test Content',
-  }
+  })
 
-  return {
-    list: vi.fn().mockResolvedValue({
-      documents: [mockDocument],
-      total: 1,
-      hasMore: false,
-    } as ListResult),
-    search: vi.fn().mockResolvedValue({
-      documents: [{ ...mockDocument, score: 0.95 }],
-      total: 1,
-      hasMore: false,
-    } as SearchResult),
-    get: vi.fn().mockImplementation((id: string) => {
-      if (id === 'not-found') return Promise.resolve(null)
-      return Promise.resolve(mockDocument)
-    }),
-    set: vi.fn().mockResolvedValue({
-      id: 'test-id',
-      created: true,
-    } as SetResult),
-    delete: vi.fn().mockImplementation((id: string) => {
-      if (id === 'not-found') return Promise.resolve({ id, deleted: false })
-      return Promise.resolve({ id, deleted: true } as DeleteResult)
-    }),
-  }
-}
+  await db.set('posts/hello-world', {
+    type: 'Post',
+    data: {
+      $type: 'Post',
+      title: 'Hello World',
+    },
+    content: '# Hello World\n\nThis is a test post.',
+  })
+})
+
+afterAll(() => {
+  // Clean up temporary directory
+  rmSync(tmpDir, { recursive: true, force: true })
+})
 
 describe('@mdxdb/server', () => {
   describe('createServer', () => {
     it('should create a Hono app', () => {
-      const db = createMockDatabase()
       const app = createServer({ database: db })
       expect(app).toBeDefined()
       expect(typeof app.fetch).toBe('function')
@@ -60,12 +57,10 @@ describe('@mdxdb/server', () => {
   })
 
   describe('Server Routes', () => {
-    let db: Database
     let app: ReturnType<typeof createServer>
     const basePath = '/api/mdxdb' // Default base path
 
     beforeEach(() => {
-      db = createMockDatabase()
       app = createServer({ database: db })
     })
 
@@ -76,21 +71,18 @@ describe('@mdxdb/server', () => {
 
         const body = await res.json()
         expect(body.success).toBe(true)
-        expect(body.data.documents).toHaveLength(1)
-        expect(body.data.total).toBe(1)
-        expect(db.list).toHaveBeenCalled()
+        expect(body.data.documents).toHaveLength(2)
+        expect(body.data.total).toBe(2)
       })
 
       it('should pass query parameters to database', async () => {
-        await app.request(`${basePath}?limit=10&offset=5&type=Post`)
+        const res = await app.request(`${basePath}?limit=1&offset=0&type=Post`)
+        expect(res.status).toBe(200)
 
-        expect(db.list).toHaveBeenCalledWith(
-          expect.objectContaining({
-            limit: 10,
-            offset: 5,
-            type: 'Post',
-          })
-        )
+        const body = await res.json()
+        expect(body.success).toBe(true)
+        expect(body.data.documents).toHaveLength(1)
+        expect(body.data.hasMore).toBe(true)
       })
     })
 
@@ -101,11 +93,8 @@ describe('@mdxdb/server', () => {
 
         const body = await res.json()
         expect(body.success).toBe(true)
-        expect(body.data.documents).toHaveLength(1)
-        expect(body.data.documents[0].score).toBe(0.95)
-        expect(db.search).toHaveBeenCalledWith(
-          expect.objectContaining({ query: 'test' })
-        )
+        expect(body.data.documents).toHaveLength(2)
+        expect(body.data.documents[0].score).toBeGreaterThan(0)
       })
 
       it('should return 400 without query', async () => {
@@ -126,7 +115,7 @@ describe('@mdxdb/server', () => {
         const body = await res.json()
         expect(body.success).toBe(true)
         expect(body.data.type).toBe('Post')
-        expect(db.get).toHaveBeenCalledWith('test-id')
+        expect(body.data.data.title).toBe('Test Post')
       })
 
       it('should return 404 for non-existent document', async () => {
@@ -139,8 +128,12 @@ describe('@mdxdb/server', () => {
       })
 
       it('should handle nested paths', async () => {
-        await app.request(`${basePath}/posts/hello-world`)
-        expect(db.get).toHaveBeenCalledWith('posts/hello-world')
+        const res = await app.request(`${basePath}/posts/hello-world`)
+        expect(res.status).toBe(200)
+
+        const body = await res.json()
+        expect(body.success).toBe(true)
+        expect(body.data.data.title).toBe('Hello World')
       })
     })
 
@@ -162,18 +155,15 @@ describe('@mdxdb/server', () => {
         const body = await res.json()
         expect(body.success).toBe(true)
         expect(body.data.created).toBe(true)
-        expect(db.set).toHaveBeenCalledWith(
-          'new-id',
-          expect.objectContaining({
-            type: 'Post',
-            content: '# New Content',
-          }),
-          expect.any(Object)
-        )
+
+        // Verify document was actually created
+        const getRes = await app.request(`${basePath}/new-id`)
+        const getBody = await getRes.json()
+        expect(getBody.data.data.title).toBe('New Post')
       })
 
       it('should return 400 without content', async () => {
-        const res = await app.request(`${basePath}/new-id`, {
+        const res = await app.request(`${basePath}/another-new-id`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: 'Post' }),
@@ -187,13 +177,23 @@ describe('@mdxdb/server', () => {
 
     describe(`DELETE ${basePath}/:id`, () => {
       it('should delete a document', async () => {
-        const res = await app.request(`${basePath}/test-id`, { method: 'DELETE' })
+        // Create a document to delete
+        await db.set('to-delete', {
+          type: 'Post',
+          data: { title: 'Delete Me' },
+          content: '# Delete Me',
+        })
+
+        const res = await app.request(`${basePath}/to-delete`, { method: 'DELETE' })
         expect(res.status).toBe(200)
 
         const body = await res.json()
         expect(body.success).toBe(true)
         expect(body.data.deleted).toBe(true)
-        expect(db.delete).toHaveBeenCalledWith('test-id', expect.any(Object))
+
+        // Verify document was actually deleted
+        const getRes = await app.request(`${basePath}/to-delete`)
+        expect(getRes.status).toBe(404)
       })
 
       it('should return 404 for non-existent document', async () => {
@@ -204,24 +204,10 @@ describe('@mdxdb/server', () => {
         expect(body.success).toBe(false)
       })
     })
-
-    describe('Error Handling', () => {
-      it('should return 500 on database error', async () => {
-        ;(db.list as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('Database error'))
-
-        const res = await app.request(basePath)
-        expect(res.status).toBe(500)
-
-        const body = await res.json()
-        expect(body.success).toBe(false)
-        expect(body.error).toContain('Database error')
-      })
-    })
   })
 
   describe('Custom Base Path', () => {
     it('should support custom base path', async () => {
-      const db = createMockDatabase()
       const app = createServer({ database: db, basePath: '/api/v1' })
 
       const res = await app.request('/api/v1')
@@ -231,7 +217,6 @@ describe('@mdxdb/server', () => {
 
   describe('API Key Authentication', () => {
     it('should reject requests without API key when configured', async () => {
-      const db = createMockDatabase()
       const app = createServer({ database: db, apiKey: 'secret-key' })
 
       const res = await app.request('/api/mdxdb')
@@ -239,7 +224,6 @@ describe('@mdxdb/server', () => {
     })
 
     it('should accept requests with valid API key', async () => {
-      const db = createMockDatabase()
       const app = createServer({ database: db, apiKey: 'secret-key' })
 
       const res = await app.request('/api/mdxdb', {

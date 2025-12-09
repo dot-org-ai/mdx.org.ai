@@ -690,6 +690,49 @@ await db.set('articles/typescript-tips', {
 
 ## Types
 
+The core document database types are defined in `ai-database` and re-exported from this package. This allows the same types to be used across all environments (Node.js, Bun, Deno, Workers, Browser).
+
+### Core Types (from ai-database)
+
+```typescript
+import type {
+  Document,
+  DocumentDatabase,
+  DocListOptions,
+  DocListResult,
+  DocSearchOptions,
+  DocSearchResult,
+  DocGetOptions,
+  DocSetOptions,
+  DocSetResult,
+  DocDeleteOptions,
+  DocDeleteResult,
+} from 'ai-database'
+
+// Or import from @mdxdb/fs (re-exports from ai-database)
+import type { Document, DocumentDatabase } from '@mdxdb/fs'
+```
+
+### Backward Compatibility
+
+For existing code, the old type names are available as deprecated aliases:
+
+```typescript
+// These still work but show deprecation warnings
+import type {
+  Database,       // → use DocumentDatabase from ai-database
+  ListOptions,    // → use DocListOptions from ai-database
+  ListResult,     // → use DocListResult from ai-database
+  SearchOptions,  // → use DocSearchOptions from ai-database
+  SearchResult,   // → use DocSearchResult from ai-database
+  GetOptions,     // → use DocGetOptions from ai-database
+  SetOptions,     // → use DocSetOptions from ai-database
+  SetResult,      // → use DocSetResult from ai-database
+  DeleteOptions,  // → use DocDeleteOptions from ai-database
+  DeleteResult,   // → use DocDeleteResult from ai-database
+} from '@mdxdb/fs'
+```
+
 ### `MDXLDDocument`
 
 ```typescript
@@ -717,6 +760,7 @@ interface FsDatabaseConfig {
 
 | Package | Description |
 |---------|-------------|
+| [ai-database](https://github.com/ai-primitives/ai-primitives/tree/main/packages/ai-database) | Core database types and schema-first API |
 | [mdxdb](https://www.npmjs.com/package/mdxdb) | Database abstraction layer |
 | [@mdxdb/sqlite](https://www.npmjs.com/package/@mdxdb/sqlite) | SQLite backend with vector search |
 | [@mdxdb/api](https://www.npmjs.com/package/@mdxdb/api) | REST API server |

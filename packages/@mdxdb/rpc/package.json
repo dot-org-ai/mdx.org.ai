@@ -50,10 +50,12 @@
   "devDependencies": {
     "@hono/node-server": "^1.13.0",
     "@mdxdb/clickhouse": "workspace:*",
+    "@mdxdb/fs": "workspace:*",
     "@mdxdb/server": "workspace:*",
     "@mdxdb/sqlite": "workspace:*",
     "@mdxld/config": "workspace:^",
     "ai-database": "workspace:*",
+    "hono": "^4.6.18",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

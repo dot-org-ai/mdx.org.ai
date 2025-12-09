@@ -1,0 +1,96 @@
+# Example wrangler.toml for @mdxdb/vectorize
+#
+# This file shows how to configure a Cloudflare Worker with Vectorize support.
+# Copy this to your project as wrangler.toml and customize as needed.
+
+name = "vectorize-worker"
+main = "src/index.ts"
+compatibility_date = "2024-12-08"
+
+# Vectorize index binding
+# Create your index first: wrangler vectorize create <index-name> --dimensions=384 --metric=cosine
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "my-embeddings"
+
+# Optional: Workers AI for embeddings
+[ai]
+binding = "AI"
+
+# Optional: Service binding to another vectorize worker (for Worker-to-Worker RPC)
+[[services]]
+binding = "VECTORIZE_SERVICE"
+service = "vectorize-worker"
+environment = "production"
+
+# Optional: D1 database for full-text search
+[[d1_databases]]
+binding = "DB"
+database_name = "my-database"
+database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Optional: Queue for async indexing
+[[queues.producers]]
+binding = "QUEUE"
+queue = "index-queue"
+
+[[queues.consumers]]
+queue = "index-queue"
+max_batch_size = 100
+max_batch_timeout = 30
+
+# Environment variables
+[env.production]
+VECTORIZE_NAMESPACE = "production"
+
+[env.staging]
+VECTORIZE_NAMESPACE = "staging"
+
+# Example worker code structure:
+#
+# src/index.ts:
+# ```typescript
+# import { VectorizeDatabase } from '@mdxdb/vectorize/worker'
+#
+# export interface Env {
+#   VECTORIZE: VectorizeIndex
+#   AI?: Ai
+#   DB?: D1Database
+#   QUEUE?: Queue
+#   VECTORIZE_SERVICE?: Service<VectorizeDatabase>
+# }
+#
+# export default {
+#   async fetch(request: Request, env: Env) {
+#     const db = new VectorizeDatabase(env, 'my-namespace')
+#
+#     // Your logic here
+#     const results = await db.search({
+#       embedding: [...],
+#       topK: 10
+#     })
+#
+#     return Response.json(results)
+#   }
+# }
+# ```
+
+# CLI Commands:
+#
+# Create Vectorize index:
+#   wrangler vectorize create my-embeddings --dimensions=384 --metric=cosine
+#
+# List indexes:
+#   wrangler vectorize list
+#
+# Get index info:
+#   wrangler vectorize info my-embeddings
+#
+# Deploy worker:
+#   wrangler deploy
+#
+# Test locally with miniflare:
+#   wrangler dev
+#
+# Tail logs:
+#   wrangler tail

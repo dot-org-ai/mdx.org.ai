@@ -34,8 +34,13 @@
     "adapter"
   ],
   "license": "MIT",
+  "dependencies": {
+    "ai-database": "workspace:^",
+    "pg": "^8.13.1"
+  },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
+    "@types/pg": "^8.11.10",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

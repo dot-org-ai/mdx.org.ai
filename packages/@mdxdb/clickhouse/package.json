@@ -75,6 +75,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
+    "@mdxdb/fs": "workspace:^",
     "@mdxld/config": "workspace:^",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
