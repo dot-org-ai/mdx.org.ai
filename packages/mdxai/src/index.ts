@@ -501,10 +501,15 @@ export function createDatabaseTools(db: AnyDatabase): DatabaseTool[] {
           if (!identifier) {
             return error('Either id or url is required')
           }
-          // Set data directly - the db.set wraps it in a thing.data property
-          // Also include type metadata if provided
-          const docData = { ...(data || {}), ...(type ? { $type: type } : {}) }
-          await db.set(identifier, docData)
+          // Create a proper MDXLDDocument structure
+          const document = {
+            id: identifier,
+            type: type || (data as { $type?: string })?.$type || 'Document',
+            data: { ...(data || {}), ...(type ? { $type: type } : {}) },
+            content: content || '',
+            context: {},
+          }
+          await db.set(identifier, document as never)
           return success({ success: true, id: identifier })
         } catch (err) {
           return error(`Failed to set document: ${err instanceof Error ? err.message : String(err)}`)

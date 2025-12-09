@@ -117,7 +117,7 @@ export function createMcpServer<TData extends MDXLDData = MDXLDData>(
                   documents: result.documents.map((doc) => ({
                     id: doc.id,
                     type: doc.type,
-                    score: doc.score,
+                    score: (doc as { score?: number }).score,
                     data: doc.data,
                   })),
                 },
