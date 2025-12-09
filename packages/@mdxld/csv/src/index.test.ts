@@ -34,7 +34,8 @@ describe('parse', () => {
 
     it('should handle empty values', () => {
       const result = parse('name,age\nAlice,\nBob,25')
-      expect(result[0]?.age).toBe('')
+      // With dynamicTyping=true (default), empty values become null
+      expect(result[0]?.age).toBe(null)
       expect(result[1]?.age).toBe(25)
     })
 

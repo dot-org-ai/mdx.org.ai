@@ -75,15 +75,20 @@ export function parse(input: string | ArrayBuffer, options: XLSXParseOptions = {
     headers = true,
     range,
     skipEmpty = true,
-    raw = false,
+    raw,
     password,
   } = options
 
-  const workbook = XLSX_LIB.read(input, {
+  // Build read options - only pass raw if explicitly set
+  const readOpts: XLSX_LIB.ParsingOptions = {
     type: typeof input === 'string' ? 'binary' : 'array',
-    raw,
     password,
-  })
+  }
+  if (raw !== undefined) {
+    readOpts.raw = raw
+  }
+
+  const workbook = XLSX_LIB.read(input, readOpts)
 
   // Get sheet by name or index
   let sheetName: string
@@ -99,35 +104,27 @@ export function parse(input: string | ArrayBuffer, options: XLSXParseOptions = {
   }
 
   // Parse options for sheet_to_json
+  // When headers === true (default), don't pass header option to use first row as headers automatically
+  // When headers === false, pass header: 1 to get array of arrays
+  // When headers is an array, pass it as custom headers
   const parseOpts: XLSX_LIB.Sheet2JSONOpts = {
-    header: headers === true ? 1 : (Array.isArray(headers) ? headers : undefined),
+    header: headers === false ? 1 : (Array.isArray(headers) ? headers : undefined),
     range,
     defval: null,
     blankrows: !skipEmpty,
-    raw,
+  }
+  // Only pass raw if explicitly set
+  if (raw !== undefined) {
+    parseOpts.raw = raw
   }
 
   let data = XLSX_LIB.utils.sheet_to_json<XLSXRecord>(worksheet, parseOpts)
 
-  // If headers is true, use first row as headers
-  if (headers === true && data.length > 0) {
-    const firstRow = data[0]
-    if (firstRow && typeof Object.values(firstRow)[0] === 'string') {
-      // First row might already be used as headers by xlsx
-    }
-  }
-
-  // Apply custom headers
-  if (Array.isArray(headers) && data.length > 0) {
-    data = data.map((row) => {
-      const values = Object.values(row)
-      const obj: XLSXRecord = {}
-      headers.forEach((header, i) => {
-        obj[header] = values[i]
-      })
-      return obj
-    })
-  }
+  // Remove __rowNum__ property that xlsx adds
+  data = data.map((row) => {
+    const { __rowNum__, ...rest } = row as XLSXRecord & { __rowNum__?: number }
+    return rest
+  })
 
   return data
 }
@@ -141,22 +138,32 @@ export const fromXLSX = parse
  * Parse all sheets from XLSX.
  */
 export function parseAllSheets(input: string | ArrayBuffer, options: XLSXParseOptions = {}): XLSXMultiSheet {
-  const workbook = XLSX_LIB.read(input, {
+  // Build read options - only pass raw if explicitly set
+  const readOpts: XLSX_LIB.ParsingOptions = {
     type: typeof input === 'string' ? 'binary' : 'array',
-    raw: options.raw,
     password: options.password,
-  })
+  }
+  if (options.raw !== undefined) {
+    readOpts.raw = options.raw
+  }
+
+  const workbook = XLSX_LIB.read(input, readOpts)
 
   const result: XLSXMultiSheet = {}
 
   for (const sheetName of workbook.SheetNames) {
     const worksheet = workbook.Sheets[sheetName]
     if (worksheet) {
-      result[sheetName] = XLSX_LIB.utils.sheet_to_json<XLSXRecord>(worksheet, {
+      const parseOpts: XLSX_LIB.Sheet2JSONOpts = {
         header: options.headers === true ? 1 : undefined,
         defval: null,
         blankrows: !options.skipEmpty,
-      })
+      }
+      // Only pass raw if explicitly set
+      if (options.raw !== undefined) {
+        parseOpts.raw = options.raw
+      }
+      result[sheetName] = XLSX_LIB.utils.sheet_to_json<XLSXRecord>(worksheet, parseOpts)
     }
   }
 
@@ -184,10 +191,11 @@ export function stringify(data: XLSXData, options: XLSXStringifyOptions = {}): A
     compression = 6,
   } = options
 
-  // Create worksheet
+  // Create worksheet with cellDates option to preserve types
   const worksheet = XLSX_LIB.utils.json_to_sheet(data, {
     header: Array.isArray(headers) ? headers : undefined,
     skipHeader: headers === false,
+    cellDates: true,
   })
 
   // Set column widths
@@ -199,11 +207,13 @@ export function stringify(data: XLSXData, options: XLSXStringifyOptions = {}): A
   const workbook = XLSX_LIB.utils.book_new()
   XLSX_LIB.utils.book_append_sheet(workbook, worksheet, sheetName)
 
-  // Write to buffer
+  // Write to buffer with cellDates and bookSST to preserve types
   const buffer = XLSX_LIB.write(workbook, {
     type: 'array',
     bookType,
     compression: compression > 0,
+    cellDates: true,
+    bookSST: false,
   })
 
   return buffer
@@ -316,9 +326,10 @@ export const XLSX: TabularBinaryFormat<XLSXData, XLSXParseOptions, XLSXStringify
  * Get sheet names from XLSX buffer.
  */
 export function getSheetNames(input: string | ArrayBuffer): string[] {
-  const workbook = XLSX_LIB.read(input, {
+  const readOpts: XLSX_LIB.ParsingOptions = {
     type: typeof input === 'string' ? 'binary' : 'array',
-  })
+  }
+  const workbook = XLSX_LIB.read(input, readOpts)
   return workbook.SheetNames
 }
 
@@ -336,12 +347,19 @@ export function toCSV(input: string | ArrayBuffer, options: XLSXParseOptions = {
   const {
     sheet = 0,
     password,
+    raw,
   } = options
 
-  const workbook = XLSX_LIB.read(input, {
+  // Build read options - only pass raw if explicitly set
+  const readOpts: XLSX_LIB.ParsingOptions = {
     type: typeof input === 'string' ? 'binary' : 'array',
     password,
-  })
+  }
+  if (raw !== undefined) {
+    readOpts.raw = raw
+  }
+
+  const workbook = XLSX_LIB.read(input, readOpts)
 
   let sheetName: string
   if (typeof sheet === 'number') {

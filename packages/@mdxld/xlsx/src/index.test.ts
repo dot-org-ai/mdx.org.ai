@@ -10,21 +10,15 @@ import {
 } from './index.js'
 
 // =============================================================================
-// Helper to create test XLSX buffer
-// =============================================================================
-
-function createTestXLSX(data: Record<string, unknown>[]): ArrayBuffer {
-  return stringify(data)
-}
-
-// =============================================================================
 // parse Tests
 // =============================================================================
 
 describe('parse', () => {
   describe('basic parsing', () => {
     it('should parse simple XLSX', () => {
-      const buffer = createTestXLSX([{ name: 'Alice', age: 30 }])
+      // Create test data using stringify for round-trip testing
+      const testData = [{ name: 'Alice', age: 30 }]
+      const buffer = stringify(testData)
       const result = parse(buffer)
       expect(result).toHaveLength(1)
       expect(result[0]?.name).toBe('Alice')
@@ -32,20 +26,24 @@ describe('parse', () => {
     })
 
     it('should handle multiple rows', () => {
-      const buffer = createTestXLSX([
+      const testData = [
         { name: 'Alice', age: 30 },
         { name: 'Bob', age: 25 },
-      ])
+      ]
+      const buffer = stringify(testData)
       const result = parse(buffer)
       expect(result).toHaveLength(2)
+      expect(result[0]?.name).toBe('Alice')
+      expect(result[1]?.name).toBe('Bob')
     })
 
     it('should handle different data types', () => {
-      const buffer = createTestXLSX([{
+      const testData = [{
         string: 'hello',
         number: 42,
         bool: true,
-      }])
+      }]
+      const buffer = stringify(testData)
       const result = parse(buffer)
       expect(result[0]?.string).toBe('hello')
       expect(result[0]?.number).toBe(42)
@@ -55,26 +53,30 @@ describe('parse', () => {
 
   describe('options', () => {
     it('should parse specific sheet by index', () => {
-      const buffer = createTestXLSX([{ name: 'Alice' }])
+      const testData = [{ name: 'Alice' }]
+      const buffer = stringify(testData)
       const result = parse(buffer, { sheet: 0 })
       expect(result).toHaveLength(1)
+      expect(result[0]?.name).toBe('Alice')
     })
 
     it('should throw for non-existent sheet', () => {
-      const buffer = createTestXLSX([{ name: 'Alice' }])
+      const testData = [{ name: 'Alice' }]
+      const buffer = stringify(testData)
       expect(() => parse(buffer, { sheet: 'NonExistent' })).toThrow()
     })
   })
 
   describe('edge cases', () => {
     it('should handle empty data', () => {
-      const buffer = createTestXLSX([])
+      const buffer = stringify([])
       const result = parse(buffer)
       expect(result).toEqual([])
     })
 
     it('should handle unicode', () => {
-      const buffer = createTestXLSX([{ name: '客户', emoji: '🎉' }])
+      const testData = [{ name: '客户', emoji: '🎉' }]
+      const buffer = stringify(testData)
       const result = parse(buffer)
       expect(result[0]?.name).toBe('客户')
       expect(result[0]?.emoji).toBe('🎉')
@@ -147,7 +149,8 @@ describe('XLSX Format Object', () => {
   })
 
   it('should parse via format object', () => {
-    const buffer = createTestXLSX([{ name: 'Alice' }])
+    const testData = [{ name: 'Alice' }]
+    const buffer = stringify(testData)
     const result = XLSX.parse(buffer)
     expect(result[0]?.name).toBe('Alice')
   })
