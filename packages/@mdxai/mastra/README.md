@@ -2,9 +2,7 @@
 
 Mastra AI framework integration for MDXAI. Build AI agents and workflows with MDX-driven prompts and Mastra's orchestration capabilities.
 
-> **Note:** This package is currently a placeholder. Implementation coming soon.
-
-## Planned Features
+## Features
 
 - **Agent Workflows** - Define AI agent workflows in MDX
 - **Tool Integration** - Use Mastra tools from MDX documents
@@ -13,7 +11,17 @@ Mastra AI framework integration for MDXAI. Build AI agents and workflows with MD
 - **Multi-Agent** - Orchestrate multiple agents from MDX
 - **Type-Safe** - Full TypeScript support
 
-## Planned API
+## Installation
+
+```bash
+npm install @mdxai/mastra @mastra/core
+# or
+pnpm add @mdxai/mastra @mastra/core
+# or
+yarn add @mdxai/mastra @mastra/core
+```
+
+## Agent API
 
 ```typescript
 import { createMastraAgent, MastraWorkflow } from '@mdxai/mastra'
@@ -43,7 +51,7 @@ for await (const chunk of agent.stream('Tell me about MDX')) {
 }
 ```
 
-## Planned Workflow API
+## Workflow API
 
 ```typescript
 import { MastraWorkflow } from '@mdxai/mastra'
@@ -67,14 +75,70 @@ workflow
 const result = await workflow.run('Write an article about AI')
 ```
 
-## Installation
+## Tools Integration
 
-```bash
-npm install @mdxai/mastra
-# or
-pnpm add @mdxai/mastra
-# or
-yarn add @mdxai/mastra
+```typescript
+import { createMastraDbTools } from '@mdxai/mastra'
+import { createFsDatabase } from '@mdxdb/fs'
+
+const db = createFsDatabase({ root: './content' })
+const tools = createMastraDbTools(db)
+
+const agent = createMastraAgent(doc, { tools })
+
+// Agent can now use database tools:
+// - mdxdb_list: List documents
+// - mdxdb_search: Search documents
+// - mdxdb_get: Get a document
+// - mdxdb_set: Create/update document
+// - mdxdb_delete: Delete document
+```
+
+## Memory Management
+
+```typescript
+import { createMastraMemory } from '@mdxai/mastra'
+import { createFsDatabase } from '@mdxdb/fs'
+
+const db = createFsDatabase({ root: './memory' })
+const memory = createMastraMemory({
+  type: 'both', // 'conversation', 'vector', or 'both'
+  database: db,
+  collection: 'agent-memory',
+})
+
+// Store conversation
+await memory.addConversation({
+  threadId: 'thread-1',
+  role: 'user',
+  content: 'Hello!',
+})
+
+// Retrieve history
+const history = await memory.getConversation('thread-1')
+
+// Vector memory
+await memory.addVector({
+  content: 'Important fact',
+  metadata: { category: 'fact' },
+})
+
+const results = await memory.searchVector('fact about...')
+```
+
+## Streaming Support
+
+```typescript
+import { createMastraAgent } from '@mdxai/mastra'
+
+const agent = createMastraAgent(doc)
+
+// Stream responses
+for await (const chunk of agent.stream('Tell me about MDX')) {
+  if (chunk.type === 'text') {
+    process.stdout.write(chunk.text)
+  }
+}
 ```
 
 ## Related Packages

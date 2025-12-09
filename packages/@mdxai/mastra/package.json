@@ -33,11 +33,24 @@
     "framework"
   ],
   "license": "MIT",
+  "dependencies": {
+    "@mdxdb/fs": "workspace:^",
+    "mdxld": "workspace:^"
+  },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
+    "@mastra/core": "^0.24.6",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
+  },
+  "peerDependencies": {
+    "@mastra/core": "^0.24.0"
+  },
+  "peerDependenciesMeta": {
+    "@mastra/core": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",
