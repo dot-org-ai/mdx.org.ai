@@ -15,7 +15,7 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { parseArgs, createDatabase, type CliOptions } from './cli.js'
 import { createMcpServer } from './server.js'
-import { createSqliteDatabase } from '@mdxdb/sqlite'
+import { createInMemoryBinding, MDXClient } from '@mdxdb/sqlite'
 import type { Database } from '@mdxdb/fs'
 
 // Path to the built CLI
@@ -194,11 +194,14 @@ describe.skip('CLI Startup', () => {
 })
 
 describe.skip('MCP Server', () => {
-  // Skipped: requires native sqlite module which may not be available in test environment
-  let db: Database
+  // Skipped: requires MDXClient which has different interface than Database
+  let db: MDXClient
 
   beforeEach(async () => {
-    db = await createSqliteDatabase({ url: ':memory:' })
+    const binding = createInMemoryBinding()
+    const id = binding.idFromName('test.local')
+    const stub = binding.get(id)
+    db = new MDXClient(stub, 'test.local')
   })
 
   afterEach(async () => {
@@ -221,11 +224,14 @@ describe.skip('MCP Server', () => {
 })
 
 describe.skip('Database Operations (used by MCP tools)', () => {
-  // Skipped: requires native sqlite module which may not be available in test environment
-  let db: Database
+  // Skipped: requires MDXClient which has different interface than Database
+  let db: MDXClient
 
   beforeEach(async () => {
-    db = await createSqliteDatabase({ url: ':memory:' })
+    const binding = createInMemoryBinding()
+    const id = binding.idFromName('test.local')
+    const stub = binding.get(id)
+    db = new MDXClient(stub, 'test.local')
   })
 
   afterEach(async () => {

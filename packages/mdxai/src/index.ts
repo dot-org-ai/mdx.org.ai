@@ -344,12 +344,14 @@ export type { McpServerConfig } from './server.js'
 
 // Re-export database factories for convenience
 export { createFsDatabase } from '@mdxdb/fs'
-export { createSqliteDatabase } from '@mdxdb/sqlite'
+
+// Re-export Node.js-safe exports from @mdxdb/sqlite (MDXDatabase must be imported
+// directly from '@mdxdb/sqlite/durable-object' for Workers usage)
+export { createMiniflareClient, createMiniflareBinding, createInMemoryBinding } from '@mdxdb/sqlite'
 
 // Re-export types
 export type { Database, ListOptions, SearchOptions, GetOptions, SetOptions, DeleteOptions } from '@mdxdb/fs'
 export type { FsDatabaseConfig } from '@mdxdb/fs'
-export type { SqliteDatabaseConfig } from '@mdxdb/sqlite'
 export type { MDXLDDocument, MDXLDData } from 'mdxld'
 
 // =============================================================================

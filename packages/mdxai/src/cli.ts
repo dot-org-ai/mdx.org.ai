@@ -7,7 +7,7 @@
  */
 
 import { createFsDatabase } from '@mdxdb/fs'
-import { createSqliteDatabase } from '@mdxdb/sqlite'
+import { createMiniflareClient } from '@mdxdb/sqlite'
 import type { AnyDatabase } from './index.js'
 import { resolve } from 'node:path'
 import { runMcpServer } from './server.js'
@@ -131,8 +131,15 @@ export function parseArgs(args: string[]): CliOptions {
 
 export async function createDatabase(options: CliOptions): Promise<AnyDatabase> {
   if (options.database === 'sqlite') {
-    const url = options.path === ':memory:' ? ':memory:' : `file:${resolve(options.path)}`
-    return createSqliteDatabase({ url }) as unknown as AnyDatabase
+    // Use miniflare for local SQLite via Durable Objects emulation
+    const persistPath = options.path === ':memory:' ? undefined : resolve(options.path)
+    // Extract namespace from path or use default
+    const namespace = 'mdxai.local'
+    const client = await createMiniflareClient({
+      namespace,
+      persistPath,
+    })
+    return client as unknown as AnyDatabase
   }
 
   return createFsDatabase({

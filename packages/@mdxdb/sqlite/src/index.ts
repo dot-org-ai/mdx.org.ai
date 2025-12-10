@@ -66,8 +66,11 @@
 
 export const name = '@mdxdb/sqlite'
 
-// Durable Object class (export for Workers)
-export { MDXDatabase } from './durable-object.js'
+// NOTE: MDXDatabase is NOT exported from the main entry point because it imports
+// cloudflare:workers which breaks Node.js imports. For Workers, import directly:
+//   import { MDXDatabase } from '@mdxdb/sqlite/durable-object'
+//
+// For Node.js usage with miniflare, use createMiniflareClient or createInMemoryBinding.
 
 // Client for calling DO methods via RPC
 export { MDXClient, createMDXClient, createMiniflareClient } from './client.js'
