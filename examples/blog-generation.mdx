@@ -1,0 +1,220 @@
+---
+$type: Example
+$id: https://mdx.org.ai/examples/blog-generation
+title: Blog Post Generation
+description: Test examples for generating blog posts with realtime and batch execution
+---
+
+# Blog Post Generation Examples
+
+This file demonstrates the `list` and `write` template literal functions for generating blog posts in both **realtime** and **batch** execution contexts.
+
+## Basic Usage
+
+```ts test name="list generates titles"
+import { list } from 'ai-functions'
+
+const topic = 'building AI products'
+const titles = await list`10 blog post titles about ${topic}`
+
+expect(titles).toHaveLength(10)
+expect(titles[0]).toBeTypeOf('string')
+```
+
+```ts test name="write generates a blog post"
+import { write } from 'ai-functions'
+
+const title = 'The Future of AI'
+const post = await write`a blog post starting with "# ${title}"`
+
+expect(post).toContain(`# ${title}`)
+expect(post.length).toBeGreaterThan(100)
+```
+
+## Realtime Execution
+
+Realtime execution processes each request immediately. Best for interactive applications where you need results right away.
+
+```ts test name="realtime: list then write"
+import { list, write, configure } from 'ai-functions'
+
+// Configure for immediate (realtime) execution
+configure({ batchMode: 'immediate' })
+
+const topic = 'developer productivity'
+const titles = await list`5 blog post titles about ${topic}`
+
+expect(titles).toHaveLength(5)
+
+// Write first post immediately
+const firstPost = await write`a blog post starting with "# ${titles[0]}"`
+
+expect(firstPost).toContain(`# ${titles[0]}`)
+```
+
+```ts test name="realtime: parallel writes"
+import { list, write, configure } from 'ai-functions'
+
+configure({ batchMode: 'immediate' })
+
+const titles = ['Building APIs', 'Testing Strategies', 'DevOps Best Practices']
+
+// Execute all writes in parallel
+const posts = await Promise.all(
+  titles.map(title => write`a blog post starting with "# ${title}"`)
+)
+
+expect(posts).toHaveLength(3)
+posts.forEach((post, i) => {
+  expect(post).toContain(`# ${titles[i]}`)
+})
+```
+
+## Batch Execution
+
+Batch execution collects requests and submits them together. Best for bulk operations where you want cost savings (up to 50% with OpenAI/Anthropic batch APIs).
+
+```ts test name="batch: list then batch write"
+import { list, write, configure, createBatch } from 'ai-functions'
+
+// Configure for batch execution
+configure({ batchMode: 'deferred' })
+
+const topic = 'startup lessons'
+const titles = await list`10 blog post titles about ${topic}`
+
+// Create explicit batch
+const batch = createBatch({ provider: 'openai', model: 'gpt-4o' })
+
+// Add all writes to batch
+const items = titles.map((title, i) =>
+  batch.add(`Write a blog post starting with "# ${title}"`, {
+    customId: `blog-${i}`,
+    metadata: { title }
+  })
+)
+
+expect(batch.size).toBe(10)
+
+// Submit and wait for results
+const { job, completion } = await batch.submit()
+const results = await completion
+
+expect(results).toHaveLength(10)
+results.forEach((result, i) => {
+  expect(result.status).toBe('completed')
+  expect(result.result).toContain(`# ${titles[i]}`)
+})
+```
+
+```ts test name="batch: automatic batching with map"
+import { list, write, configure } from 'ai-functions'
+
+// Auto mode batches when >= threshold items
+configure({
+  batchMode: 'auto',
+  batchThreshold: 5,
+  provider: 'openai',
+  model: 'gpt-4o'
+})
+
+const titles = await list`10 blog post titles about building startups`
+
+// This automatically batches because 10 >= 5 (threshold)
+const posts = titles.map(title => write`a blog post starting with "# ${title}"`)
+
+// Await resolves via batch API
+const results = await Promise.all(posts)
+
+expect(results).toHaveLength(10)
+```
+
+## Three-Tier Execution
+
+The system supports three execution tiers based on volume:
+
+1. **Immediate** (< 5 items): Direct API calls, fastest response
+2. **Flex** (5-499 items): Flexible processing, moderate latency
+3. **Batch** (500+ items): Full batch API, 50% cost savings, 24hr turnaround
+
+```ts test name="tier: automatic tier selection"
+import { configure, getExecutionTier } from 'ai-functions'
+
+configure({
+  batchMode: 'auto',
+  flexThreshold: 5,
+  batchThreshold: 500
+})
+
+expect(getExecutionTier(3)).toBe('immediate')
+expect(getExecutionTier(10)).toBe('flex')
+expect(getExecutionTier(1000)).toBe('batch')
+```
+
+## Provider Context
+
+Use `withContext` to switch providers for specific operations:
+
+```ts test name="context: scoped provider"
+import { list, write, configure, withContext, getProvider } from 'ai-functions'
+
+// Global: OpenAI
+configure({ provider: 'openai', model: 'gpt-4o' })
+expect(getProvider()).toBe('openai')
+
+// Scoped: Anthropic
+await withContext(
+  { provider: 'anthropic', model: 'claude-sonnet-4-20250514' },
+  async () => {
+    expect(getProvider()).toBe('anthropic')
+
+    const titles = await list`3 creative blog titles`
+    expect(titles).toHaveLength(3)
+  }
+)
+
+// Back to global
+expect(getProvider()).toBe('openai')
+```
+
+## Full Workflow Example
+
+Complete workflow generating a blog series:
+
+```ts test name="workflow: complete blog series"
+import { list, write, configure, createBatch } from 'ai-functions'
+
+configure({
+  provider: 'openai',
+  model: 'gpt-4o',
+  batchMode: 'auto',
+  batchThreshold: 5
+})
+
+// Step 1: Generate titles for a series
+const topic = 'building AI-first companies in 2026'
+const titles = await list`10 blog post titles about ${topic}`
+
+expect(titles).toHaveLength(10)
+
+// Step 2: Generate all posts (auto-batched)
+const posts = await Promise.all(
+  titles.map(title =>
+    write`a blog post starting with "# ${title}"
+
+Include:
+- Engaging introduction
+- 3-5 key sections
+- Practical examples
+- Clear conclusion`
+  )
+)
+
+expect(posts).toHaveLength(10)
+
+// Step 3: Validate all posts
+posts.forEach((post, i) => {
+  expect(post).toContain(`# ${titles[i]}`)
+  expect(post.length).toBeGreaterThan(500)
+})
+```
