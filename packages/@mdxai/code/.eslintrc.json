@@ -1,0 +1,4 @@
+{
+  "extends": ["../../@mdxld/config/eslint"],
+  "ignorePatterns": ["dist", "node_modules"]
+}

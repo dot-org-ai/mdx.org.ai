@@ -1,0 +1,33 @@
+# Wrangler configuration for @mdxai/sandbox
+# Cloudflare Sandbox execution for Claude Code
+
+name = "mdxai-sandbox"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# Note: Cloudflare Sandbox is currently in beta
+# This configuration may need updates as the API stabilizes
+
+# Sandbox binding configuration
+# Update this section once @cloudflare/sandbox API is finalized
+[sandbox]
+binding = "SANDBOX"
+# Container image reference
+image = "./container/Dockerfile"
+
+# Environment variables for sandbox
+[vars]
+# Service URL for reporting events
+SERVICE_URL = "https://agents.do"
+
+# Secrets (set via wrangler secret put)
+# - ANTHROPIC_API_KEY: API key for Claude Code
+# - AUTH_TOKEN: Token for authenticating with agents.do
+
+# Development configuration
+[env.dev]
+vars = { SERVICE_URL = "http://localhost:8787" }
+
+# Production configuration
+[env.production]
+vars = { SERVICE_URL = "https://agents.do" }

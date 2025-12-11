@@ -1,0 +1,30 @@
+# @mdxai/service - Agent Session Platform
+name = "agents-do"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+node_compat = true
+
+# Routes for agents.do domain
+# Uncomment when ready to deploy
+# routes = [
+#   { pattern = "agents.do/*", zone_name = "do" }
+# ]
+
+# Durable Objects
+[durable_objects]
+bindings = [
+  { name = "SESSIONS", class_name = "SessionDO" }
+]
+
+# Durable Objects migrations
+[[migrations]]
+tag = "v1"
+new_classes = ["SessionDO"]
+
+# Environment variables
+[vars]
+OAUTH_ISSUER = "https://oauth.do"
+
+# Development settings
+[dev]
+port = 8787
