@@ -15,7 +15,7 @@ import {
  *
  * Rejects URLs containing shell metacharacters that could enable command injection.
  */
-function validateGitUrl(url: string): void {
+export function validateGitUrl(url: string): void {
   // Check for shell metacharacters that could enable command injection
   const dangerousChars = /[;&|`$(){}[\]<>\\'"!\n\r\t]/
   if (dangerousChars.test(url)) {
@@ -47,7 +47,7 @@ function validateGitUrl(url: string): void {
  * Git branch names can contain alphanumeric characters, hyphens, underscores,
  * forward slashes (for hierarchical branches), and dots.
  */
-function validateBranchName(branch: string): void {
+export function validateBranchName(branch: string): void {
   // Check for shell metacharacters
   const dangerousChars = /[;&|`$(){}[\]<>\\'"!\n\r\t]/
   if (dangerousChars.test(branch)) {

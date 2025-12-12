@@ -2,10 +2,10 @@ import { spawn, type ChildProcess } from 'node:child_process'
 import type { SpawnOptions } from '../types.js'
 
 /**
- * Spawn a Claude CLI process with stream-json output
+ * Build the argument array for spawning Claude CLI
  */
-export function spawnClaude(options: SpawnOptions): ChildProcess {
-  const args = [
+export function buildClaudeArgs(options: SpawnOptions): string[] {
+  return [
     'claude',
     '--output-format',
     'stream-json',
@@ -16,6 +16,13 @@ export function spawnClaude(options: SpawnOptions): ChildProcess {
     '-p',
     options.prompt,
   ]
+}
+
+/**
+ * Spawn a Claude CLI process with stream-json output
+ */
+export function spawnClaude(options: SpawnOptions): ChildProcess {
+  const args = buildClaudeArgs(options)
 
   return spawn('pnpm', args, {
     cwd: options.cwd ?? process.cwd(),

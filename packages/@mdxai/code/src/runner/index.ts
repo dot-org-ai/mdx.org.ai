@@ -51,6 +51,6 @@ export async function runSession(config: SessionConfig, authToken: string, baseU
   })
 }
 
-export { spawnClaude } from './spawn.js'
+export { spawnClaude, buildClaudeArgs } from './spawn.js'
 export { parseStreamJson, parseStreamLines } from './parser.js'
 export { EventReporter } from './reporter.js'

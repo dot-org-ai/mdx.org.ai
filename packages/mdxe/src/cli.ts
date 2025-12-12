@@ -13,7 +13,7 @@ import { glob } from 'glob'
 import { transform } from 'esbuild'
 
 export interface CliOptions {
-  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'admin' | 'notebook' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
+  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'run' | 'admin' | 'notebook' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
   projectDir: string
   platform: 'do' | 'cloudflare' | 'vercel' | 'github'
   mode?: 'static' | 'opennext'
@@ -71,6 +71,7 @@ Commands:
   build               Build for production
   start               Start production server
   test                Run MDX tests with vitest
+  run <file.mdx>      Execute script blocks from an MDX file
   admin               Start Payload admin UI with mdxdb backend
   notebook            Launch interactive notebook for MDX files
   deploy              Deploy to cloud platforms
@@ -140,6 +141,21 @@ Test Matrix Examples:
 
   # Run ALL combinations (full matrix)
   mdxe test --target all --db all
+
+Run Options:
+  --dir, -d <path>       Directory context for the script (default: current directory)
+  --verbose, -v          Show detailed output
+  --name, -n <name>      Run only the script block with this name
+
+Run Examples:
+  # Execute all script blocks in an MDX file
+  mdxe run ./scripts/check-deps.mdx
+
+  # Execute a specific named script block
+  mdxe run ./scripts/check-deps.mdx --name main
+
+  # Execute with verbose output
+  mdxe run ./scripts/deploy.mdx --verbose
 
 Database Examples:
   # Start local dev environment (auto-downloads ClickHouse)
@@ -260,6 +276,8 @@ export function parseArgs(args: string[]): CliOptions {
       options.command = 'start'
     } else if (cmd === 'test') {
       options.command = 'test'
+    } else if (cmd === 'run') {
+      options.command = 'run'
     } else if (cmd === 'deploy') {
       options.command = 'deploy'
     } else if (cmd === 'admin') {
@@ -615,6 +633,33 @@ function extractTestBlocks(content: string): { name: string; code: string; impor
   }
 
   return tests
+}
+
+/**
+ * Extract script blocks from MDX content
+ * Uses line-start anchoring to avoid matching backticks inside code
+ */
+function extractScriptBlocks(content: string): { name: string; code: string; imports: string[] }[] {
+  const scripts: { name: string; code: string; imports: string[] }[] = []
+
+  // Match code blocks with 'script' in the meta
+  // Use multiline mode and anchor to line start to avoid matching backticks inside code
+  const codeBlockRegex = /^```(?:ts|typescript|js|javascript)\s+script(?:\s+name="([^"]*)")?[^\n]*\n([\s\S]*?)^```$/gm
+
+  let match
+  let scriptIndex = 0
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    scriptIndex++
+    const name = match[1] || `script ${scriptIndex}`
+    const rawCode = match[2].trim()
+
+    // Extract imports from this script block
+    const { imports, codeWithoutImports } = extractImports(rawCode)
+
+    scripts.push({ name, code: codeWithoutImports, imports })
+  }
+
+  return scripts
 }
 
 /**
@@ -1013,6 +1058,147 @@ export async function runTest(options: CliOptions): Promise<void> {
 }
 
 /**
+ * Run script blocks from an MDX file
+ */
+export async function runScript(options: CliOptions): Promise<void> {
+  const filePath = options.projectDir
+
+  console.log('⚡ mdxe run\n')
+  console.log(`📄 File: ${filePath}`)
+
+  // Check if file exists
+  if (!existsSync(filePath)) {
+    console.error(`❌ File not found: ${filePath}`)
+    process.exit(1)
+  }
+
+  // Check if it's an MDX file
+  if (!filePath.endsWith('.mdx') && !filePath.endsWith('.md')) {
+    console.error(`❌ File must be an MDX or MD file: ${filePath}`)
+    process.exit(1)
+  }
+
+  // Read file content
+  const content = readFileSync(filePath, 'utf-8')
+
+  // Extract MDX-level imports
+  const mdxImports = extractMdxImports(content)
+
+  // Extract script blocks
+  const scriptBlocks = extractScriptBlocks(content)
+
+  if (scriptBlocks.length === 0) {
+    console.log('⚠️  No script blocks found')
+    console.log('   Looking for: ```ts script or ```typescript script')
+    return
+  }
+
+  // Filter by name if specified
+  let scriptsToRun = scriptBlocks
+  if (options.filter) {
+    scriptsToRun = scriptBlocks.filter(s => s.name === options.filter)
+    if (scriptsToRun.length === 0) {
+      console.error(`❌ No script block named "${options.filter}" found`)
+      console.log(`   Available scripts: ${scriptBlocks.map(s => s.name).join(', ')}`)
+      process.exit(1)
+    }
+  }
+
+  console.log(`📋 Found ${scriptsToRun.length} script block(s)`)
+  console.log('\n' + '─'.repeat(60) + '\n')
+
+  // Collect all imports from scripts and MDX content
+  const allImports: string[] = []
+  for (const imp of mdxImports) {
+    if (!allImports.includes(imp)) {
+      allImports.push(imp)
+    }
+  }
+  for (const script of scriptsToRun) {
+    for (const imp of script.imports) {
+      if (!allImports.includes(imp)) {
+        allImports.push(imp)
+      }
+    }
+  }
+
+  // Combine all script code into a single module
+  const combinedCode = scriptsToRun.map(s => s.code).join('\n\n')
+
+  // Create the full script with hoisted imports
+  const fullScript = allImports.join('\n') + '\n\n' + combinedCode
+
+  if (options.verbose) {
+    console.log('📝 Generated script:')
+    console.log('─'.repeat(40))
+    console.log(fullScript)
+    console.log('─'.repeat(40))
+    console.log('')
+  }
+
+  // Write to temp file and execute with tsx/bun
+  const path = await import('node:path')
+  const fs = await import('node:fs/promises')
+
+  // Write temp file in the same directory as the script for proper module resolution
+  const scriptDir = path.dirname(resolve(filePath))
+  const tempFile = path.join(scriptDir, `.mdxe-script-${Date.now()}.ts`)
+
+  await fs.writeFile(tempFile, fullScript, 'utf-8')
+
+  const startTime = Date.now()
+
+  try {
+    // Try to detect bun or fallback to tsx
+    const runtime = process.versions.bun ? 'bun' : 'tsx'
+
+    if (options.verbose) {
+      console.log(`🔧 Runtime: ${runtime}`)
+      console.log(`📄 Temp file: ${tempFile}`)
+    }
+
+    // Execute the script from the same directory for proper module resolution
+    const result = spawn(runtime, [tempFile], {
+      cwd: scriptDir,
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        // Pass through useful env vars
+        MDXE_FILE: filePath,
+        MDXE_DIR: scriptDir,
+      },
+    })
+
+    // Wait for script to complete
+    const exitCode = await new Promise<number>((resolve) => {
+      result.on('close', (code) => resolve(code ?? 0))
+      result.on('error', (err) => {
+        console.error(`❌ Failed to run script: ${err.message}`)
+        resolve(1)
+      })
+    })
+
+    const duration = Date.now() - startTime
+
+    console.log('\n' + '─'.repeat(60))
+
+    if (exitCode === 0) {
+      console.log(`✅ Script completed successfully (${duration}ms)`)
+    } else {
+      console.log(`❌ Script failed with exit code ${exitCode} (${duration}ms)`)
+      process.exit(exitCode)
+    }
+  } finally {
+    // Clean up temp file
+    try {
+      await fs.unlink(tempFile)
+    } catch {
+      // Ignore cleanup errors
+    }
+  }
+}
+
+/**
  * Run dev server
  */
 export async function runDev(options: CliOptions): Promise<void> {
@@ -1197,6 +1383,9 @@ export async function main(): Promise<void> {
       break
     case 'test':
       await runTest(options)
+      break
+    case 'run':
+      await runScript(options)
       break
     case 'deploy':
       await runDeploy(options)
