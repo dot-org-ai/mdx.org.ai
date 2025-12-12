@@ -1,0 +1,83 @@
+{
+  "name": "@mdxe/fumadocs",
+  "version": "0.0.1",
+  "description": "Zero-config Fumadocs integration for mdxe - automatic docs site generation",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./detect": {
+      "import": "./dist/detect.js",
+      "types": "./dist/detect.d.ts"
+    },
+    "./scaffold": {
+      "import": "./dist/scaffold.js",
+      "types": "./dist/scaffold.d.ts"
+    },
+    "./dev": {
+      "import": "./dist/dev.js",
+      "types": "./dist/dev.d.ts"
+    },
+    "./build": {
+      "import": "./dist/build.js",
+      "types": "./dist/build.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "fumadocs-core": ">=16.0.0",
+    "fumadocs-mdx": ">=14.0.0",
+    "fumadocs-ui": ">=16.0.0",
+    "@opennextjs/cloudflare": "*",
+    "next": ">=14.0.0"
+  },
+  "peerDependenciesMeta": {
+    "fumadocs-core": {
+      "optional": true
+    },
+    "fumadocs-mdx": {
+      "optional": true
+    },
+    "fumadocs-ui": {
+      "optional": true
+    },
+    "@opennextjs/cloudflare": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "mdx",
+    "fumadocs",
+    "documentation",
+    "next.js",
+    "cloudflare",
+    "zero-config"
+  ],
+  "author": "MDX.org.ai",
+  "license": "MIT"
+}

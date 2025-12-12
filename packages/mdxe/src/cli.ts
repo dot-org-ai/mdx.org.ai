@@ -46,6 +46,20 @@ export interface CliOptions {
 
 export const VERSION = '0.0.0'
 
+/**
+ * Check if project is a Docs type (has index.mdx with $type: Docs)
+ */
+async function checkDocsType(projectDir: string): Promise<{ isDocsType: boolean; detection?: any }> {
+  try {
+    const { detectDocsType } = await import('@mdxe/fumadocs')
+    const detection = detectDocsType(projectDir)
+    return { isDocsType: detection.isDocsType, detection }
+  } catch {
+    // @mdxe/fumadocs not available, skip detection
+    return { isDocsType: false }
+  }
+}
+
 const HELP_TEXT = `
 mdxe - Execute, Test, & Deploy MDX-based Agents, Apps, APIs, and Sites
 
@@ -418,6 +432,36 @@ export function parseArgs(args: string[]): CliOptions {
 }
 
 export async function runDeploy(options: CliOptions): Promise<void> {
+  // Check for Docs type project
+  const { isDocsType } = await checkDocsType(options.projectDir)
+
+  if (isDocsType) {
+    console.log('🚀 mdxe deploy (Fumadocs)\n')
+    console.log(`📁 Project: ${options.projectDir}`)
+
+    if (options.dryRun) {
+      console.log('🔬 Dry run mode - no changes will be made\n')
+    }
+
+    const { deployFumadocs } = await import('@mdxe/fumadocs')
+    const result = await deployFumadocs({
+      projectDir: options.projectDir,
+      force: options.force,
+      verbose: options.verbose,
+    })
+
+    if (!result.success) {
+      console.error('\n❌ Deployment failed!')
+      if (result.error) {
+        console.error(`   Error: ${result.error}`)
+      }
+      process.exit(1)
+    }
+
+    console.log('\n✅ Deployment successful!')
+    return
+  }
+
   console.log('🚀 mdxe deploy\n')
   console.log(`📁 Project: ${options.projectDir}`)
 
@@ -972,6 +1016,26 @@ export async function runTest(options: CliOptions): Promise<void> {
  * Run dev server
  */
 export async function runDev(options: CliOptions): Promise<void> {
+  // Check for Docs type project
+  const { isDocsType, detection } = await checkDocsType(options.projectDir)
+
+  if (isDocsType) {
+    console.log('📚 mdxe dev (Fumadocs)\n')
+    console.log(`📁 Project: ${options.projectDir}`)
+    console.log(`🌐 Server: http://${options.host}:${options.port}`)
+    console.log('')
+
+    const { runFumadocsDev } = await import('@mdxe/fumadocs')
+    await runFumadocsDev({
+      projectDir: options.projectDir,
+      port: options.port,
+      host: options.host,
+      force: options.force,
+      verbose: options.verbose,
+    })
+    return
+  }
+
   console.log('🚀 mdxe dev\n')
   console.log(`📁 Project: ${options.projectDir}`)
   console.log(`🌐 Server: http://${options.host}:${options.port}`)
@@ -991,6 +1055,33 @@ export async function runDev(options: CliOptions): Promise<void> {
  * Build for production
  */
 export async function runBuild(options: CliOptions): Promise<void> {
+  // Check for Docs type project
+  const { isDocsType } = await checkDocsType(options.projectDir)
+
+  if (isDocsType) {
+    console.log('📦 mdxe build (Fumadocs)\n')
+    console.log(`📁 Project: ${options.projectDir}`)
+
+    const { buildFumadocs } = await import('@mdxe/fumadocs')
+    const result = await buildFumadocs({
+      projectDir: options.projectDir,
+      deploy: false,
+      force: options.force,
+      verbose: options.verbose,
+    })
+
+    if (!result.success) {
+      console.error('\n❌ Build failed!')
+      if (result.error) {
+        console.error(`   Error: ${result.error}`)
+      }
+      process.exit(1)
+    }
+
+    console.log('\n✅ Build complete!')
+    return
+  }
+
   console.log('📦 mdxe build\n')
   console.log(`📁 Project: ${options.projectDir}`)
 

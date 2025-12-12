@@ -65,6 +65,7 @@
     "@mdxdb/clickhouse": "workspace:*",
     "@mdxdb/fs": "workspace:*",
     "@mdxe/deploy": "workspace:*",
+    "@mdxe/fumadocs": "workspace:*",
     "@mdxe/hono": "workspace:*",
     "@mdxe/payload": "workspace:*",
     "ai-database": "workspace:*",
