@@ -23,7 +23,7 @@ PACKAGES=(
   "ai-providers"
   "ai-functions"
   "ai-database"
-  "ai-sandbox"
+  "ai-evaluate"
 )
 
 echo "=== Publishing Primitives Packages ==="

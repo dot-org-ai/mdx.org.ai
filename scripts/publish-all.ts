@@ -40,7 +40,7 @@ const PRIMITIVES_ORDER = [
   { name: 'ai-database', path: 'packages/ai-database' },
 
   // Optional/utility
-  { name: 'ai-sandbox', path: 'packages/ai-sandbox' },
+  { name: 'ai-evaluate', path: 'packages/ai-evaluate' },
 ]
 
 const MDX_ORG_AI_ORDER = [

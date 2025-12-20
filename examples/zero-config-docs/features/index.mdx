@@ -1,0 +1,47 @@
+---
+title: Features
+description: Overview of MDX.org.ai features
+---
+
+# Features
+
+MDX.org.ai provides a comprehensive set of features for building documentation and content-driven applications.
+
+## Core Features
+
+### Structured Data (YAML-LD)
+
+Define typed, validated metadata with JSON-LD semantics:
+
+```yaml
+---
+$type: Article
+$id: /articles/hello-world
+author: /authors/jane
+---
+```
+
+### Unstructured Content (Markdown)
+
+Write rich content with full Markdown support plus custom components.
+
+### Executable Code (TypeScript)
+
+Include TypeScript code that runs at build time or runtime:
+
+```typescript
+export const getStaticProps = async () => {
+  const posts = await fetchPosts()
+  return { props: { posts } }
+}
+```
+
+### UI Components (React)
+
+Use React components inline in your content:
+
+```mdx
+<Card title="Hello World">
+  This is a card component
+</Card>
+```
