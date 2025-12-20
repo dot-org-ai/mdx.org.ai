@@ -7,15 +7,33 @@
 export interface WranglerConfigOptions {
   projectName: string
   domain?: string
+  route?: string
+  zone?: string
+}
+
+/**
+ * Derive zone from domain (e.g., beads.workflows.do -> workflows.do)
+ */
+function deriveZone(domain: string): string {
+  const parts = domain.split('.')
+  // If it's a subdomain like beads.workflows.do, return workflows.do
+  if (parts.length >= 3) {
+    return parts.slice(-2).join('.')
+  }
+  return domain
 }
 
 export function generateWranglerConfig(options: WranglerConfigOptions): string {
-  const routeConfig = options.domain
+  // Use explicit route/zone or derive from domain
+  const route = options.route || (options.domain ? `${options.domain}/*` : undefined)
+  const zone = options.zone || (options.domain ? deriveZone(options.domain) : undefined)
+
+  const routeConfig = route && zone
     ? `
   "routes": [
     {
-      "pattern": "${options.domain}/*",
-      "zone_name": "${options.domain}"
+      "pattern": "${route}",
+      "zone_name": "${zone}"
     }
   ],`
     : ''

@@ -142,6 +142,8 @@ export async function scaffoldFumadocs(options: ScaffoldOptions): Promise<Scaffo
   const githubUrl = config.githubUrl || ''
   const baseUrl = config.baseUrl || '/'
   const domain = config.domain
+  const route = config.route
+  const zone = config.zone
 
   // Generate files
   const fileOpts = { force, verbose }
@@ -194,6 +196,8 @@ export async function scaffoldFumadocs(options: ScaffoldOptions): Promise<Scaffo
     generateWranglerConfig({
       projectName: title,
       domain,
+      route,
+      zone,
     }),
     fileOpts,
     result

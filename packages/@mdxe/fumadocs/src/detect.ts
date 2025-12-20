@@ -25,8 +25,12 @@ export interface DocsConfig {
   pages?: string[]
   /** Base URL for the site */
   baseUrl?: string
-  /** Custom domain */
+  /** Custom domain (e.g., beads.workflows.do) */
   domain?: string
+  /** Cloudflare route pattern (e.g., beads.workflows.do/*) - derived from domain if not set */
+  route?: string
+  /** Cloudflare zone name (e.g., workflows.do) - derived from domain if not set */
+  zone?: string
 }
 
 /**
@@ -96,6 +100,12 @@ function extractConfig(data: Record<string, unknown>): DocsConfig {
   }
   if (typeof get('domain') === 'string') {
     config.domain = get('domain') as string
+  }
+  if (typeof get('route') === 'string') {
+    config.route = get('route') as string
+  }
+  if (typeof get('zone') === 'string') {
+    config.zone = get('zone') as string
   }
   if (Array.isArray(get('pages'))) {
     config.pages = get('pages') as string[]
