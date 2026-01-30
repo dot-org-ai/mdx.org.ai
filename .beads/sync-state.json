@@ -1,7 +1,7 @@
 {
-  "last_failure": "2026-01-30T07:56:03.960229-06:00",
-  "failure_count": 5,
-  "backoff_until": "2026-01-30T08:06:03.96023-06:00",
+  "last_failure": "2026-01-30T08:06:09.329016-06:00",
+  "failure_count": 6,
+  "backoff_until": "2026-01-30T08:36:09.329016-06:00",
   "needs_manual_sync": true,
   "failure_reason": "git pull failed in worktree: exit status 128\nfatal: .git/index: index file open failed: Not a directory\n"
 }
