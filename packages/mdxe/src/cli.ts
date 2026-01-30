@@ -1072,8 +1072,8 @@ export async function runTest(options: CliOptions): Promise<void> {
 
   console.log('\n' + '─'.repeat(60) + '\n')
 
-  // Import ai-sandbox dynamically
-  const { evaluate } = await import('ai-sandbox')
+  // Import ai-evaluate dynamically (formerly ai-sandbox)
+  const { evaluate } = await import('ai-evaluate')
 
   // Track results
   const results: {

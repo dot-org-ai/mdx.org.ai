@@ -5,7 +5,27 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { parseArgs, runDeploy, main, VERSION, getWorkerdRuntime, type CliOptions } from '../src/cli.js'
 
-// Mock the deploy module
+// Mock @mdxe/fumadocs for checkDocsType
+vi.mock('@mdxe/fumadocs', () => ({
+  detectDocsType: vi.fn(() => ({ isDocsType: false })),
+  deployFumadocs: vi.fn(() => Promise.resolve({ success: true })),
+}))
+
+// Mock @mdxe/deploy for unified deployment
+const mockDeploy = vi.fn()
+const mockDetectPlatform = vi.fn(() => ({
+  platform: 'do',
+  confidence: 0.9,
+  reason: 'default',
+  framework: undefined,
+  isStatic: true,
+}))
+vi.mock('@mdxe/deploy', () => ({
+  deploy: mockDeploy,
+  detectPlatform: mockDetectPlatform,
+}))
+
+// Legacy mock for old deploy module (kept for other tests)
 vi.mock('../src/commands/deploy.js', () => ({
   deploy: vi.fn(),
   detectSourceType: vi.fn(() => ({ isStatic: true, adapter: 'fs' })),
@@ -180,9 +200,9 @@ describe('CLI parseArgs', () => {
   })
 
   describe('Defaults', () => {
-    it('should default platform to cloudflare', () => {
+    it('should default platform to do', () => {
       const result = parseArgs(['deploy'])
-      expect(result.platform).toBe('cloudflare')
+      expect(result.platform).toBe('do')
     })
 
     it('should default to current directory', () => {
@@ -350,17 +370,22 @@ describe('runDeploy', () => {
   let exitCode: number | undefined
   let logs: string[] = []
   let errors: string[] = []
-  let mockDeploy: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
     exitCode = undefined
     logs = []
     errors = []
 
-    // Get the mocked deploy function
-    const deployModule = await import('../src/commands/deploy.js')
-    mockDeploy = deployModule.deploy as ReturnType<typeof vi.fn>
+    // Reset the mocked deploy function
     mockDeploy.mockReset()
+    mockDetectPlatform.mockReset()
+    mockDetectPlatform.mockReturnValue({
+      platform: 'do',
+      confidence: 0.9,
+      reason: 'default',
+      framework: undefined,
+      isStatic: true,
+    })
 
     // Mock process.exit
     process.exit = vi.fn((code?: number) => {
@@ -393,7 +418,7 @@ describe('runDeploy', () => {
     const options: CliOptions = {
       command: 'deploy',
       projectDir: '/test/project',
-      platform: 'cloudflare',
+      platform: 'do',
       dryRun: false,
       force: false,
       verbose: false,
@@ -417,7 +442,7 @@ describe('runDeploy', () => {
     const options: CliOptions = {
       command: 'deploy',
       projectDir: '/test/project',
-      platform: 'cloudflare',
+      platform: 'do',
       dryRun: false,
       force: false,
       verbose: true,
@@ -441,7 +466,7 @@ describe('runDeploy', () => {
     const options: CliOptions = {
       command: 'deploy',
       projectDir: '/test/project',
-      platform: 'cloudflare',
+      platform: 'do',
       dryRun: false,
       force: false,
       verbose: false,
@@ -454,11 +479,16 @@ describe('runDeploy', () => {
     expect(errors.some(l => l.includes('Build failed: syntax error'))).toBe(true)
   })
 
-  it('should reject unsupported platforms', async () => {
+  it('should support vercel platform (now unified deployment)', async () => {
+    mockDeploy.mockResolvedValue({
+      success: true,
+      url: 'https://my-app.vercel.app',
+    })
+
     const options: CliOptions = {
       command: 'deploy',
       projectDir: '/test/project',
-      platform: 'vercel' as 'cloudflare',
+      platform: 'vercel' as 'do',
       dryRun: false,
       force: false,
       verbose: false,
@@ -466,8 +496,10 @@ describe('runDeploy', () => {
       help: false,
     }
 
-    await expect(runDeploy(options)).rejects.toThrow('process.exit(1)')
-    expect(errors.some(l => l.includes('not yet supported'))).toBe(true)
+    await runDeploy(options)
+
+    expect(mockDeploy).toHaveBeenCalled()
+    expect(logs.some(l => l.includes('Deployment successful'))).toBe(true)
   })
 
   it('should show dry run message', async () => {
@@ -478,7 +510,7 @@ describe('runDeploy', () => {
     const options: CliOptions = {
       command: 'deploy',
       projectDir: '/test/project',
-      platform: 'cloudflare',
+      platform: 'do',
       dryRun: true,
       force: false,
       verbose: false,
@@ -509,12 +541,15 @@ describe('runDeploy', () => {
 
     await runDeploy(options)
 
-    expect(mockDeploy).toHaveBeenCalledWith('/my/project', {
+    // @mdxe/deploy uses a unified options object
+    expect(mockDeploy).toHaveBeenCalledWith({
+      projectDir: '/my/project',
       platform: 'cloudflare',
-      projectName: 'my-docs',
+      name: 'my-docs',
       mode: 'static',
       dryRun: true,
       force: true,
+      verbose: false,
       env: { API_URL: 'https://api.example.com' },
     })
   })
@@ -528,7 +563,7 @@ describe('runDeploy', () => {
     const options: CliOptions = {
       command: 'deploy',
       projectDir: '/test/project',
-      platform: 'cloudflare',
+      platform: 'do',
       dryRun: false,
       force: false,
       verbose: false,
@@ -573,17 +608,22 @@ describe('main', () => {
   let exitCode: number | undefined
   let logs: string[] = []
   let errors: string[] = []
-  let mockDeploy: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
     exitCode = undefined
     logs = []
     errors = []
 
-    // Get the mocked deploy function
-    const deployModule = await import('../src/commands/deploy.js')
-    mockDeploy = deployModule.deploy as ReturnType<typeof vi.fn>
+    // Reset the module-level mock deploy function (from @mdxe/deploy)
     mockDeploy.mockReset()
+    mockDetectPlatform.mockReset()
+    mockDetectPlatform.mockReturnValue({
+      platform: 'do',
+      confidence: 0.9,
+      reason: 'default',
+      framework: undefined,
+      isStatic: true,
+    })
 
     // Mock process.exit
     process.exit = vi.fn((code?: number) => {

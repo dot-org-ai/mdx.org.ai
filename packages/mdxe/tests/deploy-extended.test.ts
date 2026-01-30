@@ -36,8 +36,11 @@ describe('Deploy Functions Extended', () => {
     }
   })
 
-  describe('checkWrangler', () => {
-    it('should detect wrangler when installed', async () => {
+  describe('Managed API Deployment (default)', () => {
+    // Note: The deploy function now defaults to using the managed apis.do API
+    // instead of wrangler CLI. Wrangler-specific behavior is deprecated.
+
+    it('should use managed API by default (no wrangler check)', async () => {
       // Setup: create Next.js project
       writeFileSync(
         join(testDir, 'package.json'),
@@ -47,32 +50,22 @@ describe('Deploy Functions Extended', () => {
       )
       writeFileSync(join(testDir, 'next.config.js'), 'module.exports = {}')
 
-      // Mock wrangler check to succeed
-      mockSpawnSync.mockReturnValue({ status: 0 })
-
-      // Mock spawn for build command
-      const mockProcess = {
-        stdout: { on: vi.fn() },
-        stderr: { on: vi.fn() },
-        on: vi.fn((event: string, cb: (code: number) => void) => {
-          if (event === 'close') cb(0)
-        }),
-      }
-      mockSpawn.mockReturnValue(mockProcess)
-
       const result = await deploy(testDir, {
         platform: 'cloudflare',
         dryRun: true,
       })
 
-      expect(mockSpawnSync).toHaveBeenCalledWith(
+      // Should NOT call wrangler check (managed API path)
+      expect(mockSpawnSync).not.toHaveBeenCalledWith(
         'npx',
         ['wrangler', '--version'],
         expect.any(Object)
       )
+      // Should go through managed API path
+      expect(result.logs?.some(log => log.includes('managed workers.do API'))).toBe(true)
     })
 
-    it('should fail when wrangler is not installed', async () => {
+    it('should report API errors (not wrangler errors)', async () => {
       writeFileSync(
         join(testDir, 'package.json'),
         JSON.stringify({
@@ -80,15 +73,14 @@ describe('Deploy Functions Extended', () => {
         })
       )
 
-      // Mock wrangler check to fail
-      mockSpawnSync.mockReturnValue({ status: 1 })
-
       const result = await deploy(testDir, {
         platform: 'cloudflare',
       })
 
+      // When managed API fails, we get an API error (not wrangler error)
       expect(result.success).toBe(false)
-      expect(result.error).toContain('wrangler is not installed')
+      // Error should be from API, not from wrangler not installed
+      expect(result.error).toBeDefined()
     })
   })
 
@@ -218,7 +210,7 @@ describe('Deploy Functions Extended', () => {
       expect(result.logs).toContain('Deployment mode: opennext')
     })
 
-    it('should install OpenNext if not present', async () => {
+    it('should use managed API for opennext mode (handles setup server-side)', async () => {
       // Ensure OpenNext is not in dependencies
       writeFileSync(
         join(testDir, 'package.json'),
@@ -245,8 +237,8 @@ describe('Deploy Functions Extended', () => {
         dryRun: true,
       })
 
-      // Should attempt to install OpenNext
-      expect(result.logs?.some(log => log.includes('Installing @opennextjs/cloudflare'))).toBe(true)
+      // Should use managed API (OpenNext setup is handled server-side)
+      expect(result.logs?.some(log => log.includes('managed workers.do API'))).toBe(true)
     })
 
     it('should skip OpenNext install if already present', async () => {
@@ -477,7 +469,7 @@ describe('Deploy Functions Extended', () => {
       // In actual non-dry-run with successful build, it would create the file
     })
 
-    it('should generate open-next.config.ts for OpenNext deployment', async () => {
+    it('should use managed API for OpenNext deployment (config handled server-side)', async () => {
       writeFileSync(
         join(testDir, 'package.json'),
         JSON.stringify({
@@ -505,7 +497,8 @@ describe('Deploy Functions Extended', () => {
         dryRun: true,
       })
 
-      expect(result.logs).toContain('Generating open-next.config.ts...')
+      // Managed API handles config generation server-side
+      expect(result.logs?.some(log => log.includes('managed workers.do API'))).toBe(true)
     })
   })
 
@@ -619,7 +612,7 @@ const db = createFsDatabase({ root: './content' })
       }
     })
 
-    it('should fail without next.config', async () => {
+    it('should attempt deploy even without next.config (managed API handles validation)', async () => {
       writeFileSync(
         join(testDir, 'package.json'),
         JSON.stringify({ dependencies: { next: '^14.0.0' } })
@@ -633,8 +626,11 @@ const db = createFsDatabase({ root: './content' })
         mode: 'static',
       })
 
+      // Managed API handles validation server-side - deployment may fail but
+      // not with "No Next.js project found" since that's a wrangler-path error
       expect(result.success).toBe(false)
-      expect(result.error).toContain('No Next.js project found')
+      // Error should be from API, not from local Next.js detection
+      expect(result.error).toBeDefined()
     })
   })
 

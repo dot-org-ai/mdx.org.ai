@@ -194,7 +194,7 @@ export {
   type SanitizedError,
 } from './utils/errors.js'
 
-// Re-export ai-sandbox types and functions
+// Re-export ai-evaluate types and functions (formerly ai-sandbox)
 export {
   evaluate,
   createEvaluator,
@@ -205,7 +205,7 @@ export {
   type TestResult as SandboxTestResult,
   type SandboxEnv,
   type SDKConfig,
-} from 'ai-sandbox'
+} from 'ai-evaluate'
 
 // Re-export ai-workflows types (for use in MDX documents)
 export type {

@@ -243,9 +243,9 @@ export const db = createApiClient({ baseUrl: 'https://api.example.com' })
       expect(result.command).toBe('version')
     })
 
-    it('should default to cloudflare platform', () => {
+    it('should default to do platform', () => {
       const result = parseArgs(['deploy'])
-      expect(result.platform).toBe('cloudflare')
+      expect(result.platform).toBe('do')
     })
 
     it('should default to current directory', () => {
@@ -291,7 +291,7 @@ describe('Deploy Command Integration', () => {
     }
   })
 
-  it('should fail gracefully when no Next.js project is found', async () => {
+  it('should deploy via managed API in dry-run mode', async () => {
     const { deploy } = await import('../src/commands/deploy.js')
 
     writeFileSync(
@@ -299,13 +299,18 @@ describe('Deploy Command Integration', () => {
       JSON.stringify({ name: 'test' })
     )
 
+    // In dry-run mode, the managed API deployment succeeds
+    // because all commands are simulated
     const result = await deploy(testDir, {
       platform: 'cloudflare',
       dryRun: true,
     })
 
-    expect(result.success).toBe(false)
-    expect(result.error).toContain('No Next.js project found')
+    // Dry-run should succeed (commands are simulated)
+    expect(result.success).toBe(true)
+    // Should contain logs about the deployment process
+    expect(result.logs).toBeDefined()
+    expect(result.logs!.some(log => log.includes('managed') || log.includes('dry-run'))).toBe(true)
   })
 
   it('should detect mode based on source adapter', async () => {
