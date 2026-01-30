@@ -1,6 +1,6 @@
 {
   "name": "mdxe",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Execute, Test, & Deploy MDX-based Agents, Apps, APIs, and Sites",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -59,16 +59,16 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "mdxld": "workspace:*"
+    "mdxld": "^1.9.0"
   },
   "dependencies": {
-    "@mdxdb/clickhouse": "workspace:*",
-    "@mdxdb/fs": "workspace:*",
-    "@mdxe/deploy": "workspace:*",
-    "@mdxe/fumadocs": "workspace:*",
-    "@mdxe/hono": "workspace:*",
-    "@mdxe/payload": "workspace:*",
-    "ai-database": "workspace:*",
+    "@mdxdb/clickhouse": "^1.9.0",
+    "@mdxdb/fs": "^1.9.0",
+    "@mdxe/deploy": "^1.9.0",
+    "@mdxe/fumadocs": "^0.0.1",
+    "@mdxe/hono": "^1.9.0",
+    "@mdxe/payload": "^1.9.0",
+    "ai-database": "^0.2.0",
     "ai-functions": "^0.4.0",
     "ai-evaluate": "^0.1.0",
     "ai-workflows": "^2.0.0",
@@ -77,12 +77,9 @@
     "hono": "^4.6.0",
     "oauth.do": "^0.1.4"
   },
-  "optionalDependencies": {
-    "@mdxdb/studio": "workspace:*"
-  },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.9",
-    "mdxld": "workspace:*",
+    "mdxld": "^1.9.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

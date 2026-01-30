@@ -1,6 +1,6 @@
 {
   "name": "@mdxld/extract",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Bi-directional MDX ↔ Markdown translation - extract structured data from rendered content",
   "type": "module",
   "main": "dist/index.js",

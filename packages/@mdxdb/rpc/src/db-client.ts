@@ -2,12 +2,12 @@
  * @mdxdb/rpc DBClient Implementation
  *
  * RPC client implementing ai-database DBClient interface using rpc.do
- * Supports both HTTP and WebSocket transports
+ * Uses HTTP transport for stateless requests
  *
  * @packageDocumentation
  */
 
-import { RPC, http, ws, type Transport, type RPCProxy } from 'rpc.do'
+import { RPC, http, type Transport, type RPCProxy } from 'rpc.do'
 import type {
   DBClient,
   DBClientExtended,
@@ -32,7 +32,7 @@ import type {
 /**
  * RPC transport type
  */
-export type TransportType = 'http' | 'ws' | 'websocket'
+export type TransportType = 'http'
 
 /**
  * Configuration for the DBClient RPC client
@@ -40,7 +40,7 @@ export type TransportType = 'http' | 'ws' | 'websocket'
 export interface DBRpcClientConfig {
   /** RPC endpoint URL */
   url: string
-  /** Transport type (default: auto-detected from URL scheme) */
+  /** Transport type (default: 'http') */
   transport?: TransportType
   /** API key or token for authentication */
   apiKey?: string
@@ -102,19 +102,13 @@ interface DBClientRPC<TData extends Record<string, unknown> = Record<string, unk
  * import { createDBRpcClient } from '@mdxdb/rpc/db'
  *
  * // HTTP transport
- * const httpDb = createDBRpcClient({
+ * const db = createDBRpcClient({
  *   url: 'https://rpc.do/namespace',
- *   transport: 'http'
- * })
- *
- * // WebSocket transport
- * const wsDb = createDBRpcClient({
- *   url: 'wss://rpc.do/namespace',
- *   transport: 'ws'
+ *   apiKey: process.env.RPC_API_KEY
  * })
  *
  * // Use like any DBClient
- * const things = await httpDb.list({ ns: 'example.com', type: 'User' })
+ * const things = await db.list({ ns: 'example.com', type: 'User' })
  * ```
  */
 export class DBRpcClient<TData extends Record<string, unknown> = Record<string, unknown>>
@@ -124,23 +118,9 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
   private readonly transport: Transport
 
   constructor(config: DBRpcClientConfig) {
-    const transportType = config.transport ?? this.detectTransport(config.url)
     const authProvider = config.apiKey ? () => config.apiKey : undefined
-
-    if (transportType === 'ws' || transportType === 'websocket') {
-      this.transport = ws(config.url, authProvider)
-    } else {
-      this.transport = http(config.url, authProvider)
-    }
-
+    this.transport = http(config.url, authProvider)
     this.rpc = RPC<DBClientRPC<TData>>(this.transport)
-  }
-
-  private detectTransport(url: string): TransportType {
-    if (url.startsWith('ws://') || url.startsWith('wss://')) {
-      return 'ws'
-    }
-    return 'http'
   }
 
   // ===========================================================================
@@ -430,23 +410,15 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
  * ```ts
  * import { createDBRpcClient } from '@mdxdb/rpc/db'
  *
- * // HTTP transport (stateless)
- * const httpDb = createDBRpcClient({
+ * // HTTP transport
+ * const db = createDBRpcClient({
  *   url: 'https://rpc.do/namespace',
- *   transport: 'http',
- *   apiKey: process.env.RPC_API_KEY
- * })
- *
- * // WebSocket transport (persistent connection)
- * const wsDb = createDBRpcClient({
- *   url: 'wss://rpc.do/namespace',
- *   transport: 'ws',
  *   apiKey: process.env.RPC_API_KEY
  * })
  *
  * // Use like any DBClient
- * const things = await httpDb.list({ ns: 'example.com', type: 'User' })
- * const thing = await wsDb.get('https://example.com/User/123')
+ * const things = await db.list({ ns: 'example.com', type: 'User' })
+ * const thing = await db.get('https://example.com/User/123')
  * ```
  */
 export function createDBRpcClient<TData extends Record<string, unknown> = Record<string, unknown>>(

@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/deploy",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Unified deployment interface for MDX projects - deploy to .do, Cloudflare, Vercel, or GitHub Pages",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -42,10 +42,10 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxe/do": "workspace:*",
-    "@mdxe/cloudflare": "workspace:*",
-    "@mdxe/github": "workspace:*",
-    "@mdxe/vercel": "workspace:*"
+    "@mdxe/do": "^1.9.0",
+    "@mdxe/cloudflare": "^1.9.0",
+    "@mdxe/github": "^1.9.0",
+    "@mdxe/vercel": "^1.9.0"
   },
   "devDependencies": {
     "tsup": "^8.3.5",

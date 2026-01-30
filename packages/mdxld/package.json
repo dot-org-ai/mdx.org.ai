@@ -1,6 +1,6 @@
 {
   "name": "mdxld",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Lightweight MDX + Linked Data parser and stringifier",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -67,9 +67,9 @@
     "arktype": "^2.0.0"
   },
   "peerDependencies": {
-    "ai-functions": "workspace:*",
-    "ai-database": "workspace:*",
-    "ai-workflows": "workspace:*"
+    "ai-functions": ">=2.0.0",
+    "ai-database": ">=2.0.0",
+    "ai-workflows": ">=2.0.0"
   },
   "peerDependenciesMeta": {
     "ai-functions": {

@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/fumadocs",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Fumadocs UI components and utilities for MDX documentation sites",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -47,8 +47,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxdb/fumadocs": "workspace:*",
-    "mdxld": "workspace:*"
+    "@mdxdb/fumadocs": "^1.9.1",
+    "mdxld": "^1.9.1"
   },
   "peerDependencies": {
     "fumadocs-core": ">=14.0.0",

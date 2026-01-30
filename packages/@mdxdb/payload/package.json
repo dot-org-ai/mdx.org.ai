@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/payload",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Payload CMS database adapter for mdxdb - supports SQLite (Durable Objects) and ClickHouse backends on Cloudflare Workers",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -49,8 +49,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxdb/sqlite": "workspace:^",
-    "@mdxdb/clickhouse": "workspace:^"
+    "@mdxdb/sqlite": "^1.9.0",
+    "@mdxdb/clickhouse": "^1.9.1"
   },
   "peerDependencies": {
     "payload": ">=3.0.0"

@@ -1,4 +1,4 @@
-# @mdxld/compile
+cd# @mdxld/compile
 
 Fast JSX/TSX compilation for MDXLD documents using esbuild. Transform JSX syntax to plain JavaScript function calls, compile MDX content to executable components, and prepare code for sandbox execution.
 

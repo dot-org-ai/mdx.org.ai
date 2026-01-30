@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/fumadocs",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Fumadocs content source adapter for mdxdb",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -35,8 +35,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxdb/fs": "workspace:*",
-    "mdxld": "workspace:*"
+    "@mdxdb/fs": "^1.9.1",
+    "mdxld": "^1.9.1"
   },
   "peerDependencies": {
     "fumadocs-core": ">=14.0.0"
