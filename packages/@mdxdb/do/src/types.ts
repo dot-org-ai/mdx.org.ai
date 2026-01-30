@@ -40,50 +40,6 @@ export interface ExportOptions {
 }
 
 /**
- * WebSocket session data for hibernation
- */
-export interface SessionData {
-  /** Session ID */
-  id: string
-  /** User/client identifier */
-  clientId?: string
-  /** Authentication token */
-  token?: string
-  /** Session metadata */
-  metadata?: Record<string, unknown>
-  /** Last activity timestamp */
-  lastActivity: number
-}
-
-/**
- * RPC message format for WebSocket
- */
-export interface RPCMessage {
-  /** Message ID for response correlation */
-  id: string
-  /** RPC method name */
-  method: string
-  /** Method parameters */
-  params?: unknown[]
-}
-
-/**
- * RPC response format
- */
-export interface RPCResponse {
-  /** Message ID matching request */
-  id: string
-  /** Success result */
-  result?: unknown
-  /** Error if failed */
-  error?: {
-    code: number
-    message: string
-    data?: unknown
-  }
-}
-
-/**
  * Extended environment with DO bindings
  */
 export interface Env {

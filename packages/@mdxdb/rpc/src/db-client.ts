@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import { RPC, http, type Transport, type RPCProxy, type RPCPromise } from 'rpc.do'
+import { RPC, http, ws, capnweb, type Transport, type RPCProxy, type RPCPromise } from 'rpc.do'
 import type {
   DBClient,
   DBClientExtended,
@@ -57,8 +57,12 @@ export type ThingRef<TData extends Record<string, unknown> = Record<string, unkn
 
 /**
  * RPC transport type
+ *
+ * - 'http' - Simple HTTP POST (stateless)
+ * - 'ws' - WebSocket (persistent, message correlation)
+ * - 'capnweb' - capnweb RPC (pipelining, .map(), pass-by-reference)
  */
-export type TransportType = 'http'
+export type TransportType = 'http' | 'ws' | 'capnweb'
 
 /**
  * Configuration for the DBClient RPC client
@@ -66,7 +70,7 @@ export type TransportType = 'http'
 export interface DBRpcClientConfig {
   /** RPC endpoint URL */
   url: string
-  /** Transport type (default: 'http') */
+  /** Transport type (default: 'capnweb') */
   transport?: TransportType
   /** API key or token for authentication */
   apiKey?: string
@@ -166,7 +170,21 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
 
   constructor(config: DBRpcClientConfig) {
     const authProvider = config.apiKey ? () => config.apiKey : undefined
-    this.transport = http(config.url, authProvider)
+    const transportType = config.transport ?? 'capnweb'
+
+    switch (transportType) {
+      case 'ws':
+        this.transport = ws(config.url, authProvider)
+        break
+      case 'http':
+        this.transport = http(config.url, authProvider)
+        break
+      case 'capnweb':
+      default:
+        this.transport = capnweb(config.url)
+        break
+    }
+
     this.rpc = RPC<DBClientRPC<TData>>(this.transport)
   }
 

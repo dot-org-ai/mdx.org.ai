@@ -69,7 +69,8 @@
   "license": "MIT",
   "dependencies": {
     "@mdxdb/parquet": "workspace:^",
-    "@mdxdb/sqlite": "workspace:^"
+    "@mdxdb/sqlite": "workspace:^",
+    "capnweb": "^0.2.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
