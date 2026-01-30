@@ -22,6 +22,11 @@ yarn add mdxe
 - **Primitives Integration** - Built-in support for ai-functions, ai-workflows, ai-sandbox
 - **Type-Safe** - Full TypeScript support
 
+## Documentation
+
+- [ECOSYSTEM.md](./ECOSYSTEM.md) - How mdxe integrates with mdxld, mdxdb, mdxui, and mdxai
+- [INTEGRATION.md](./INTEGRATION.md) - Primitives integration details (ai-sandbox, ai-functions, ai-workflows)
+
 ## Quick Start
 
 ```typescript
@@ -204,7 +209,44 @@ interface CloudflareApi {
 
 The SDK Provider creates local or remote implementations of the SDK globals (`$`, `db`, `ai`, `on`, `every`, `send`) used in MDX documents.
 
-### Creating an SDK Provider
+mdxe provides two SDK provider implementations:
+- **`createSDKProvider`** - Multi-runtime provider for Node.js, Bun, and general environments
+- **`createWorkerdSDKProvider`** - Optimized provider for Cloudflare Workers (workerd runtime)
+
+### Decision Tree: Which SDK Provider to Use?
+
+```
+Is your target runtime Cloudflare Workers?
+├── YES → Use createWorkerdSDKProvider
+│   ├── Production deployment? → context: 'remote' with Worker Loader bindings
+│   └── Local development? → context: 'local' with Miniflare
+│
+└── NO → Use createSDKProvider
+    ├── Node.js/Bun server? → context: 'local' with sqlite/postgres/fs
+    └── Multi-tenant SaaS? → context: 'remote' with RPC
+```
+
+**Quick Decision:**
+- Deploying to **Cloudflare Workers**? → `createWorkerdSDKProvider`
+- Running on **Node.js, Bun, or other runtimes**? → `createSDKProvider`
+
+### Comparison Table
+
+| Feature | `createSDKProvider` | `createWorkerdSDKProvider` |
+|---------|---------------------|----------------------------|
+| **Source File** | [`sdk-provider.ts`](./src/sdk-provider.ts) | [`sdk-workerd.ts`](./src/sdk-workerd.ts) |
+| **Target Runtime** | Node.js, Bun, general JS | Cloudflare Workers (workerd) |
+| **Database Backends** | memory, fs, sqlite, postgres, clickhouse, mongo | D1 SQLite, KV, R2 (via bindings) |
+| **AI Mode** | local (stub) or remote (RPC) | local (stub) or remote (RPC) |
+| **Remote Context** | HTTP RPC to `rpc.do` | Worker Loader bindings |
+| **Local Development** | In-process with mdxdb | In-memory (Miniflare-compatible) |
+| **Code Injection** | `generateSDKInjectionCode()` | `generateWorkerdSDKCode()` |
+| **Cleanup Method** | `sdk.close()` | `sdk.dispose()` |
+| **Context Object** | `sdk.context` | `sdk.$` |
+
+### createSDKProvider (Multi-Runtime)
+
+Use for Node.js, Bun, or environments where you need flexible database backends.
 
 ```typescript
 import { createSDKProvider } from 'mdxe'
@@ -235,7 +277,7 @@ sdk.workflows.on.Post.created(async (post, $) => {
 await sdk.close()
 ```
 
-### Local vs Remote Context
+#### Local vs Remote Context
 
 **Local Context** - Uses in-process implementations:
 - `db`: Uses mdxdb with specified backend (memory, fs, sqlite, postgres, clickhouse, mongo)
@@ -254,34 +296,9 @@ const sdk = await createSDKProvider({
 })
 ```
 
-### Code Generation for Sandboxed Execution
+#### Database Backends
 
-Generate SDK code to inject into sandboxed workers:
-
-```typescript
-import { generateSDKInjectionCode, evaluate } from 'mdxe'
-
-const sdkCode = generateSDKInjectionCode({
-  context: 'local',
-  db: 'memory',
-  aiMode: 'remote',
-  ns: 'my-app'
-})
-
-const result = await evaluate({
-  code: userCode,
-  sdkConfig: {
-    context: 'local',
-    db: 'memory',
-    aiMode: 'remote',
-    ns: 'my-app'
-  }
-})
-```
-
-### Database Backends
-
-Supported backends:
+Supported backends for `createSDKProvider`:
 - `memory` - In-memory (testing, development)
 - `fs` - File system (git-friendly .mdx files)
 - `sqlite` - SQLite/Turso (vector search, local-first)
@@ -308,6 +325,267 @@ const sdk = await createSDKProvider({
   ns: 'my-app'
 })
 ```
+
+### createWorkerdSDKProvider (Cloudflare Workers)
+
+Use for Cloudflare Workers deployments with native Worker bindings (D1, KV, R2).
+
+```typescript
+import { createWorkerdSDKProvider } from 'mdxe'
+
+// Local development (Miniflare-compatible)
+const sdk = await createWorkerdSDKProvider({
+  context: 'local',
+  ns: 'my-app'
+})
+
+// Use the SDK (same API as createSDKProvider)
+const post = await sdk.db.create({
+  type: 'Post',
+  data: { title: 'Hello World' }
+})
+
+// Access via $ context object
+console.log(sdk.$.ns) // 'my-app'
+
+// Get all globals for MDX injection
+const globals = sdk.getGlobals()
+// { $, db, ai, on, every, send }
+
+// Clean up
+await sdk.dispose()
+```
+
+#### Production with Worker Bindings
+
+```typescript
+// In your Worker handler
+export default {
+  async fetch(request: Request, env: WorkerEnv) {
+    const sdk = await createWorkerdSDKProvider({
+      context: 'remote',
+      ns: 'my-app',
+      env, // Pass Worker environment with LOADER binding
+      bindings: {
+        D1: env.DB,    // D1 database
+        KV: env.KV,    // KV namespace
+        R2: env.BUCKET // R2 bucket
+      }
+    })
+
+    // Database operations use D1/KV/R2 bindings
+    const posts = await sdk.db.list({ type: 'Post' })
+
+    await sdk.dispose()
+    return new Response(JSON.stringify(posts))
+  }
+}
+```
+
+#### Context Detection
+
+```typescript
+import { isLocalContext, isRemoteContext } from 'mdxe'
+
+export default {
+  async fetch(request: Request, env: WorkerEnv) {
+    if (isLocalContext(env)) {
+      // Running in Miniflare or local dev
+      console.log('Local development mode')
+    }
+
+    if (isRemoteContext(env)) {
+      // Running in production Workers
+      console.log('Production mode with Worker Loader')
+    }
+  }
+}
+```
+
+### Code Generation for Sandboxed Execution
+
+Both providers support generating SDK code for injection into sandboxed environments.
+
+#### Using createSDKProvider
+
+```typescript
+import { generateSDKInjectionCode, evaluate } from 'mdxe'
+
+const sdkCode = generateSDKInjectionCode({
+  context: 'local',
+  db: 'memory',
+  aiMode: 'remote',
+  ns: 'my-app'
+})
+
+const result = await evaluate({
+  code: userCode,
+  sdkConfig: {
+    context: 'local',
+    db: 'memory',
+    aiMode: 'remote',
+    ns: 'my-app'
+  }
+})
+```
+
+#### Using createWorkerdSDKProvider
+
+```typescript
+import { generateWorkerdSDKCode } from 'mdxe'
+
+// For local execution
+const localCode = generateWorkerdSDKCode({
+  ns: 'my-app',
+  context: 'local'
+})
+
+// For Worker Loader execution
+const remoteCode = generateWorkerdSDKCode({
+  ns: 'my-app',
+  context: 'remote'
+})
+```
+
+### Side-by-Side Examples
+
+#### Local Development
+
+```typescript
+// Node.js/Bun with SQLite
+import { createSDKProvider } from 'mdxe'
+
+const sdk = await createSDKProvider({
+  context: 'local',
+  db: 'sqlite',
+  dbPath: './data.db',
+  aiMode: 'remote',
+  ns: 'my-app'
+})
+
+await sdk.db.create({ type: 'Post', data: { title: 'Hello' } })
+await sdk.close()
+```
+
+```typescript
+// Cloudflare Workers (local dev)
+import { createWorkerdSDKProvider } from 'mdxe'
+
+const sdk = await createWorkerdSDKProvider({
+  context: 'local',
+  ns: 'my-app'
+})
+
+await sdk.db.create({ type: 'Post', data: { title: 'Hello' } })
+await sdk.dispose()
+```
+
+#### Production Deployment
+
+```typescript
+// Node.js server with PostgreSQL
+import { createSDKProvider } from 'mdxe'
+
+const sdk = await createSDKProvider({
+  context: 'local',
+  db: 'postgres',
+  dbPath: process.env.DATABASE_URL,
+  aiMode: 'remote',
+  ns: 'production'
+})
+```
+
+```typescript
+// Cloudflare Workers with D1
+import { createWorkerdSDKProvider } from 'mdxe'
+
+export default {
+  async fetch(request: Request, env: WorkerEnv) {
+    const sdk = await createWorkerdSDKProvider({
+      context: 'remote',
+      ns: 'production',
+      env,
+      bindings: { D1: env.DB }
+    })
+    // ...
+  }
+}
+```
+
+### Migration Guide: Legacy to Workerd SDK
+
+If you're migrating from `createSDKProvider` to `createWorkerdSDKProvider` for Cloudflare Workers:
+
+1. **Update imports:**
+   ```typescript
+   // Before
+   import { createSDKProvider, generateSDKInjectionCode } from 'mdxe'
+
+   // After
+   import { createWorkerdSDKProvider, generateWorkerdSDKCode } from 'mdxe'
+   ```
+
+2. **Update configuration:**
+   ```typescript
+   // Before
+   const sdk = await createSDKProvider({
+     context: 'local',
+     db: 'memory',
+     aiMode: 'remote',
+     ns: 'my-app'
+   })
+
+   // After
+   const sdk = await createWorkerdSDKProvider({
+     context: 'local',
+     ns: 'my-app'
+     // Note: No db/aiMode needed - workerd uses bindings
+   })
+   ```
+
+3. **Update cleanup:**
+   ```typescript
+   // Before
+   await sdk.close()
+
+   // After
+   await sdk.dispose()
+   ```
+
+4. **Update context access:**
+   ```typescript
+   // Before
+   sdk.context.ns
+
+   // After
+   sdk.$.ns
+   ```
+
+5. **Update code generation:**
+   ```typescript
+   // Before
+   const code = generateSDKInjectionCode({ context: 'local', db: 'memory', aiMode: 'remote', ns: 'app' })
+
+   // After
+   const code = generateWorkerdSDKCode({ context: 'local', ns: 'app' })
+   ```
+
+6. **Add Worker bindings for production:**
+   ```typescript
+   // Add to wrangler.toml
+   [[d1_databases]]
+   binding = "DB"
+   database_name = "my-db"
+   database_id = "xxx"
+
+   // Pass env to SDK
+   const sdk = await createWorkerdSDKProvider({
+     context: 'remote',
+     ns: 'my-app',
+     env,
+     bindings: { D1: env.DB }
+   })
+   ```
 
 ## Execution Contexts
 

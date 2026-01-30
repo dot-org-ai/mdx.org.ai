@@ -23,20 +23,54 @@ export interface ExecutionContext {
 }
 
 /**
- * Execution result
+ * Base fields shared by all execution results
  */
-export interface ExecutionResult {
-  /** Whether execution succeeded */
-  success: boolean
-  /** Output from execution */
-  output?: unknown
-  /** Error message if failed */
-  error?: string
+interface ExecutionResultBase {
   /** Execution duration in ms */
   duration?: number
   /** Logs from execution */
   logs?: string[]
 }
+
+/**
+ * Successful execution result
+ */
+interface ExecutionSuccess extends ExecutionResultBase {
+  /** Indicates successful execution */
+  success: true
+  /** Output from execution */
+  output?: unknown
+}
+
+/**
+ * Failed execution result
+ */
+interface ExecutionError extends ExecutionResultBase {
+  /** Indicates failed execution */
+  success: false
+  /** Error message describing the failure */
+  error: string
+}
+
+/**
+ * Execution result - discriminated union type
+ *
+ * Use type narrowing via the `success` property to access type-specific fields:
+ *
+ * @example
+ * ```ts
+ * const result = await executor.do(document)
+ *
+ * if (result.success) {
+ *   // TypeScript knows result.output is available here
+ *   console.log('Output:', result.output)
+ * } else {
+ *   // TypeScript knows result.error is available here
+ *   console.error('Error:', result.error)
+ * }
+ * ```
+ */
+export type ExecutionResult = ExecutionSuccess | ExecutionError
 
 /**
  * Do options for executing/invoking an MDX document
@@ -49,12 +83,56 @@ export interface DoOptions extends ExecutionContext {
 }
 
 /**
- * Do result
+ * Base fields shared by all do results
  */
-export interface DoResult extends ExecutionResult {
+interface DoResultBase {
+  /** Execution duration in ms */
+  duration?: number
+  /** Logs from execution */
+  logs?: string[]
+}
+
+/**
+ * Successful do result
+ */
+interface DoSuccess extends DoResultBase {
+  /** Indicates successful execution */
+  success: true
+  /** Output from execution */
+  output?: unknown
   /** Return value from the action */
   returnValue?: unknown
 }
+
+/**
+ * Failed do result
+ */
+interface DoError extends DoResultBase {
+  /** Indicates failed execution */
+  success: false
+  /** Error message describing the failure */
+  error: string
+}
+
+/**
+ * Do result - discriminated union type
+ *
+ * Use type narrowing via the `success` property to access type-specific fields:
+ *
+ * @example
+ * ```ts
+ * const result = await executor.do(document, { action: 'myAction' })
+ *
+ * if (result.success) {
+ *   // TypeScript knows result.returnValue is available here
+ *   console.log('Return value:', result.returnValue)
+ * } else {
+ *   // TypeScript knows result.error is available here
+ *   console.error('Error:', result.error)
+ * }
+ * ```
+ */
+export type DoResult = DoSuccess | DoError
 
 /**
  * Test options for running tests on MDX documents
@@ -203,19 +281,171 @@ export interface SourceTypeInfo {
 }
 
 /**
- * Deploy result
+ * Base fields shared by all deploy results
  */
-export interface DeployResult {
-  /** Whether deployment succeeded */
-  success: boolean
+interface DeployResultBase {
+  /** Build logs */
+  logs?: string[]
+}
+
+/**
+ * Successful deploy result
+ */
+interface DeploySuccess extends DeployResultBase {
+  /** Indicates successful deployment */
+  success: true
   /** Deployment URL */
   url?: string
   /** Deployment ID */
   deploymentId?: string
-  /** Error message if failed */
-  error?: string
-  /** Build logs */
-  logs?: string[]
+}
+
+/**
+ * Failed deploy result
+ */
+interface DeployError extends DeployResultBase {
+  /** Indicates failed deployment */
+  success: false
+  /** Error message describing the failure */
+  error: string
+}
+
+/**
+ * Deploy result - discriminated union type
+ *
+ * Use type narrowing via the `success` property to access type-specific fields:
+ *
+ * @example
+ * ```ts
+ * const result = await deploy(projectDir, options)
+ *
+ * if (result.success) {
+ *   // TypeScript knows result.url and result.deploymentId are available here
+ *   console.log('Deployed to:', result.url)
+ * } else {
+ *   // TypeScript knows result.error is available here
+ *   console.error('Deployment failed:', result.error)
+ * }
+ * ```
+ */
+export type DeployResult = DeploySuccess | DeployError
+
+// ============================================================================
+// Type Guards for Result Types
+// ============================================================================
+
+/**
+ * Generic result type that can be narrowed via success property
+ */
+export type Result<TSuccess, TError> =
+  | { success: true } & TSuccess
+  | { success: false; error: string } & TError
+
+/**
+ * Type guard to check if an ExecutionResult is successful
+ *
+ * @example
+ * ```ts
+ * const result = await executor.do(document)
+ *
+ * if (isSuccess(result)) {
+ *   // TypeScript knows result.output is available here
+ *   console.log('Output:', result.output)
+ * }
+ * ```
+ */
+export function isSuccess<T extends { success: boolean }>(
+  result: T
+): result is T & { success: true } {
+  return result.success === true
+}
+
+/**
+ * Type guard to check if an ExecutionResult is an error
+ *
+ * @example
+ * ```ts
+ * const result = await executor.do(document)
+ *
+ * if (isError(result)) {
+ *   // TypeScript knows result.error is available here
+ *   console.error('Error:', result.error)
+ * }
+ * ```
+ */
+export function isError<T extends { success: boolean }>(
+  result: T
+): result is T & { success: false; error: string } {
+  return result.success === false
+}
+
+/**
+ * Type guard specifically for ExecutionResult
+ *
+ * @example
+ * ```ts
+ * const result = await executor.do(document)
+ *
+ * if (isExecutionSuccess(result)) {
+ *   console.log('Output:', result.output)
+ * }
+ * ```
+ */
+export function isExecutionSuccess(result: ExecutionResult): result is ExecutionSuccess {
+  return result.success === true
+}
+
+/**
+ * Type guard specifically for ExecutionResult errors
+ */
+export function isExecutionError(result: ExecutionResult): result is ExecutionError {
+  return result.success === false
+}
+
+/**
+ * Type guard specifically for DoResult
+ *
+ * @example
+ * ```ts
+ * const result = await executor.do(document, { action: 'myAction' })
+ *
+ * if (isDoSuccess(result)) {
+ *   console.log('Return value:', result.returnValue)
+ * }
+ * ```
+ */
+export function isDoSuccess(result: DoResult): result is DoSuccess {
+  return result.success === true
+}
+
+/**
+ * Type guard specifically for DoResult errors
+ */
+export function isDoError(result: DoResult): result is DoError {
+  return result.success === false
+}
+
+/**
+ * Type guard specifically for DeployResult
+ *
+ * @example
+ * ```ts
+ * const result = await deploy(projectDir, options)
+ *
+ * if (isDeploySuccess(result)) {
+ *   console.log('Deployed to:', result.url)
+ * }
+ * ```
+ */
+export function isDeploySuccess(result: DeployResult): result is DeploySuccess {
+  return result.success === true
+}
+
+/**
+ * Type guard specifically for DeployResult errors
+ */
+export function isDeployError(result: DeployResult): result is DeployError {
+  return result.success === false
 }
 
 /**

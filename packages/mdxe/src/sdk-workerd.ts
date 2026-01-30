@@ -11,6 +11,8 @@
  * @packageDocumentation
  */
 
+import { WorkerdSDKConfigSchema, ValidationError } from './schemas.js'
+
 // Types are defined locally to avoid dependency on @mdxe/workers during compilation
 // The runtime will use @mdxe/workers when available
 
@@ -611,7 +613,15 @@ function createWorkflowProvider(): WorkerdWorkflowProvider {
  * Create a workerd-based SDK provider
  */
 export async function createWorkerdSDKProvider(config: WorkerdSDKConfig): Promise<WorkerdSDKProvider> {
-  const { context: contextType, ns, env = {} as WorkerEnv, rpcUrl, token } = config
+  // Validate configuration at runtime
+  const result = WorkerdSDKConfigSchema.safeParse(config)
+  if (!result.success) {
+    const issues = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
+    throw new ValidationError(`Invalid workerd SDK configuration: ${issues}`, result.error.issues)
+  }
+
+  const validatedConfig = result.data as WorkerdSDKConfig
+  const { context: contextType, ns, env = {} as WorkerEnv, rpcUrl, token } = validatedConfig
 
   // Determine if local or remote
   const isLocal = contextType === 'local' || isLocalContext(env)

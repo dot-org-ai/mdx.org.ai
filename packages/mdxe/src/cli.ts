@@ -52,9 +52,37 @@ export interface CliOptions {
 export const VERSION = '0.0.0'
 
 /**
+ * Configuration extracted from docs frontmatter
+ */
+interface DocsConfig {
+  title?: string
+  description?: string
+  logo?: string
+  githubUrl?: string
+  pages?: string[]
+  baseUrl?: string
+  domain?: string
+  route?: string
+  zone?: string
+}
+
+/**
+ * Result of docs type detection
+ * Matches DocsDetectionResult from @mdxe/fumadocs
+ */
+interface DocsDetectionResult {
+  isDocsType: boolean
+  indexPath: string | null
+  readmePath: string | null
+  contentDir: string
+  projectName: string
+  config: DocsConfig
+}
+
+/**
  * Check if project is a Docs type (has index.mdx with $type: Docs)
  */
-async function checkDocsType(projectDir: string): Promise<{ isDocsType: boolean; detection?: any }> {
+async function checkDocsType(projectDir: string): Promise<{ isDocsType: boolean; detection?: DocsDetectionResult }> {
   try {
     const { detectDocsType } = await import('@mdxe/fumadocs')
     const detection = detectDocsType(projectDir)
@@ -1360,16 +1388,37 @@ export async function runDev(options: CliOptions): Promise<void> {
   console.log('🚀 mdxe dev\n')
   console.log(`📁 Project: ${options.projectDir}`)
   console.log(`🌐 Server: http://${options.host}:${options.port}`)
-  console.log('')
 
-  // Dynamic import of @mdxe/hono server
-  const { createDevServer } = await import('@mdxe/hono/server')
-  await createDevServer({
-    projectDir: options.projectDir,
-    port: options.port,
-    host: options.host,
-    verbose: options.verbose,
-  })
+  // Check if we should use Miniflare (workers-first approach)
+  const useMiniflare = options.target === 'workers' || process.env.MDXE_USE_MINIFLARE === 'true'
+
+  if (useMiniflare) {
+    console.log('⚡ Runtime: workerd (via Miniflare)')
+    console.log('')
+
+    // Use Miniflare-based dev server for workers-consistent execution
+    const { createMiniflareDevServer } = await import('./commands/dev-server.js')
+    await createMiniflareDevServer({
+      projectDir: options.projectDir,
+      port: options.port,
+      host: options.host,
+      verbose: options.verbose,
+      env: options.env,
+      hotReload: true,
+    })
+  } else {
+    console.log('⚡ Runtime: Node.js (Hono)')
+    console.log('')
+
+    // Dynamic import of @mdxe/hono server (Node.js-based)
+    const { createDevServer } = await import('@mdxe/hono/server')
+    await createDevServer({
+      projectDir: options.projectDir,
+      port: options.port,
+      host: options.host,
+      verbose: options.verbose,
+    })
+  }
 }
 
 /**

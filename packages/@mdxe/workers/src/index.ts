@@ -79,6 +79,57 @@ export {
 } from './generate.js'
 
 // =============================================================================
+// ERROR UTILITIES - Safe error responses for production
+// =============================================================================
+
+export {
+  // Error response creation
+  createErrorResponse,
+  type ErrorResponse,
+  type SanitizeOptions,
+
+  // Error codes
+  ErrorCode,
+  type ErrorCodeType,
+
+  // Error classes
+  WorkersError,
+  TimeoutError,
+  MemoryError,
+  SandboxError,
+  ParseError,
+  MissingExportError,
+  ValidationError,
+
+  // Error options types
+  type TimeoutErrorOptions,
+  type MemoryErrorOptions,
+  type SandboxErrorOptions,
+  type ParseErrorOptions,
+  type MissingExportErrorOptions,
+  type ValidationErrorOptions,
+  type ViolationType,
+
+  // Type guards
+  isTimeoutError,
+  isMemoryError,
+  isSandboxError,
+  isParseError,
+  isMissingExportError,
+  isValidationError,
+  isWorkersError,
+
+  // Factory functions
+  createTimeoutError,
+  createMemoryError,
+  createNetworkBlockedError,
+  createParseError,
+  createMissingExportError,
+  createValidationError,
+  wrapError,
+} from './errors.js'
+
+// =============================================================================
 // WORKER LOADERS INTEGRATION
 // Dynamic Worker Loaders API wrapper for MDX execution
 // =============================================================================

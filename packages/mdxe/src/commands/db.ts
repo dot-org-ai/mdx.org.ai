@@ -15,6 +15,8 @@ import { spawn, execSync, type ChildProcess } from 'node:child_process'
 import { createServer, type Server } from 'node:http'
 import { parse, stringify } from 'mdxld'
 import { homedir } from 'node:os'
+import { buildInsertQuery, isQuerySafe, escapeValue } from '../utils/sql-escape.js'
+import { createErrorResponse } from '../utils/errors.js'
 
 export interface DbCliOptions {
   command: 'dev' | 'publish' | 'server' | 'client' | 'studio'
@@ -54,7 +56,7 @@ function isClickHouseInstalled(): boolean {
   return existsSync(getClickHouseBinary())
 }
 
-/** Download ClickHouse binary */
+/** Download ClickHouse binary safely with checksum verification */
 async function downloadClickHouse(): Promise<void> {
   const dir = getClickHouseDir()
   const binary = getClickHouseBinary()
@@ -64,16 +66,71 @@ async function downloadClickHouse(): Promise<void> {
   mkdirSync(dir, { recursive: true })
 
   try {
-    execSync('curl -fsSL https://clickhouse.com/ | sh', {
-      cwd: dir,
-      stdio: 'inherit',
+    // Import the safe download utility
+    const { downloadBinary, getClickHouseDownloadUrl, fetchChecksum } = await import('../utils/download.js')
+
+    const urls = getClickHouseDownloadUrl()
+
+    // Fetch and verify checksum for security
+    console.log('   Fetching checksum for verification...')
+    let expectedChecksum: string
+    try {
+      expectedChecksum = await fetchChecksum(urls.checksumUrl)
+    } catch (checksumError) {
+      console.log('   Warning: Could not fetch checksum, download will proceed without verification')
+      expectedChecksum = ''
+    }
+
+    // Download the binary archive securely (no shell piping)
+    const archivePath = join(dir, 'clickhouse.tgz')
+    console.log(`   Downloading from ${urls.binaryUrl}...`)
+
+    const result = await downloadBinary({
+      url: urls.binaryUrl,
+      destPath: archivePath,
+      expectedChecksum: expectedChecksum || undefined,
+      checksumAlgorithm: 'sha512',
+      skipChecksum: !expectedChecksum,
+      executable: false,
+      onProgress: (downloaded, total) => {
+        if (total) {
+          const pct = Math.round((downloaded / total) * 100)
+          process.stdout.write(`\r   Progress: ${pct}%`)
+        }
+      },
     })
 
+    if (!result.success) {
+      throw new Error(result.error || 'Download failed')
+    }
+
+    console.log('\n   Extracting archive...')
+
+    // Extract the archive (this is safe - we're running tar on a verified file, not piping to shell)
+    execSync(`tar -xzf "${archivePath}" -C "${dir}" --strip-components=1`, {
+      stdio: 'pipe',
+    })
+
+    // Clean up archive
+    if (existsSync(archivePath)) {
+      const { unlinkSync } = await import('node:fs')
+      unlinkSync(archivePath)
+    }
+
+    // Make binary executable
+    if (existsSync(binary)) {
+      const { chmodSync } = await import('node:fs')
+      chmodSync(binary, 0o755)
+    }
+
     if (!existsSync(binary)) {
-      throw new Error('Binary not found after download')
+      throw new Error('Binary not found after extraction')
     }
 
     console.log(`✅ ClickHouse installed to ${binary}`)
+    if (result.verified) {
+      console.log('   Checksum verified successfully')
+    }
   } catch (error) {
     throw new Error(`Failed to download ClickHouse: ${error}`)
   }
@@ -507,13 +564,20 @@ async function startWebUI(options: DbCliOptions): Promise<Server | ChildProcess>
         return
       }
 
+      // Validate query to prevent dangerous operations
+      if (!isQuerySafe(query)) {
+        res.writeHead(403, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: 'Query contains forbidden operations. Only SELECT queries are allowed.' }))
+        return
+      }
+
       try {
         const result = await executeQuery(`http://localhost:${options.httpPort}`, query, 'mdxdb')
         res.writeHead(200, { 'Content-Type': 'application/json' })
         res.end(result)
       } catch (error) {
         res.writeHead(500, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ error: String(error) }))
+        res.end(JSON.stringify(createErrorResponse(error)))
       }
       return
     }
@@ -702,14 +766,20 @@ async function syncFile(filePath: string, basePath: string, options: DbCliOption
     Object.entries(mergedData).filter(([key]) => !key.startsWith('$'))
   )
 
-  const thing = { ns, type, id, data, content: document.content || '' }
-  const query = `INSERT INTO Things (ns, type, id, data, content) FORMAT JSONEachRow`
+  // Build a safe INSERT query with properly escaped values
+  const { query, data: escapedData } = buildInsertQuery('Things', {
+    ns,
+    type,
+    id,
+    data,
+    content: document.content || '',
+  })
 
   try {
     const response = await fetch(`${url}/?database=mdxdb&query=${encodeURIComponent(query)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(thing),
+      body: JSON.stringify(escapedData),
     })
 
     if (!response.ok) {

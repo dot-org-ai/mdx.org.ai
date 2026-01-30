@@ -51,7 +51,7 @@ Defines rendering conventions for core components (`Site`, `Docs`, `App`, etc.) 
 
 **"Where and how does MDX execute?"**
 
-Defines runtimes, servers, and communication protocols:
+Defines runtimes, servers, and communication protocols. See the [Ecosystem Integration Guide](./packages/mdxe/ECOSYSTEM.md) for detailed integration patterns with other packages.
 
 | Package | Purpose | Runtimes |
 |---------|---------|----------|
@@ -103,6 +103,57 @@ Defines runtimes, servers, and communication protocols:
 | **@mdxai/mastra** | Mastra agent framework |
 | **@mdxai/agentkit** | Agent composition toolkit |
 | **@mdxai/vapi** | Vapi voice AI |
+
+## @mdxe Packages
+
+Detailed taxonomy of all `@mdxe` scoped packages for execution environments and protocols.
+
+### Core Runtimes
+
+| Package | Description | Status |
+|---------|-------------|--------|
+| **@mdxe/workers** | Cloudflare Workers runtime (production) | Recommended |
+| **@mdxe/workers/local** | Local development via Miniflare | Development |
+| **@mdxe/bun** | Bun runtime for fast local execution | Stable |
+| **@mdxe/node** | Node.js runtime (deprecated, use workers/local for dev) | Deprecated |
+
+> **Recommendation:** Use `@mdxe/workers` for production and `@mdxe/workers/local` (Miniflare) for local development. This provides the most consistent environment between development and production.
+
+### Framework Integrations
+
+| Package | Description | Quick Start |
+|---------|-------------|-------------|
+| **@mdxe/next** | Next.js App Router integration | [Next.js Guide](./packages/@mdxe/next/README.md) |
+| **@mdxe/hono** | Hono HTTP servers and middleware | [Hono Guide](./packages/@mdxe/hono/README.md) |
+| **@mdxe/honox** | HonoX full-stack framework | [HonoX Guide](./packages/@mdxe/honox/README.md) |
+| **@mdxe/nuxt** | Nuxt.js integration | Coming soon |
+
+### Protocols
+
+| Package | Description | Use Case |
+|---------|-------------|----------|
+| **@mdxe/rpc** | capnweb RPC protocol implementation | Distributed function calls |
+| **@mdxe/mcp** | Model Context Protocol for AI tools | Claude Code, AI integrations |
+
+### Deployment
+
+| Package | Description | Target Platform |
+|---------|-------------|-----------------|
+| **@mdxe/cloudflare** | Cloudflare Workers and Pages deployment | [Cloudflare](https://developers.cloudflare.com/workers/) |
+| **@mdxe/do** | .do platform deployment | [.do Platform](https://do.md) |
+| **@mdxe/vercel** | Vercel deployment | [Vercel](https://vercel.com) |
+| **@mdxe/github** | GitHub Pages deployment | [GitHub Pages](https://pages.github.com) |
+
+### Specialized
+
+| Package | Description | Use Case |
+|---------|-------------|----------|
+| **@mdxe/vitest** | Vitest integration for testing MDX | Test runner |
+| **@mdxe/ink** | Terminal UI with React Ink | CLI applications |
+| **@mdxe/electron** | Desktop applications | Cross-platform desktop |
+| **@mdxe/expo** | React Native mobile apps | iOS/Android |
+| **@mdxe/remotion** | Programmatic video rendering | Video generation |
+| **@mdxe/slidev** | Presentation slides | Technical presentations |
 
 ## Quick Start
 

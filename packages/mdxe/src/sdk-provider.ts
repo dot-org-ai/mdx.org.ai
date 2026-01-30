@@ -6,8 +6,13 @@
  * @packageDocumentation
  */
 
-// Simplified DBClient interface for SDK provider
-interface DBClient {
+import { getEnvironment, getAuthToken } from './env-utils.js'
+import { SDKProviderConfigSchema, ValidationError } from './schemas.js'
+
+/**
+ * Simplified DBClient interface for SDK provider
+ */
+export interface DBClient {
   list?(options?: Record<string, unknown>): Promise<unknown[]>
   get?(id: string): Promise<unknown>
   create?(options: Record<string, unknown>): Promise<unknown>
@@ -17,6 +22,12 @@ interface DBClient {
   close?(): Promise<void>
   ns?: string
 }
+
+/**
+ * Stub DB client type for when mdxdb packages are not available.
+ * This is a minimal interface with only ns and close methods.
+ */
+export type StubDBClient = Pick<DBClient, 'ns' | 'close'>
 
 export interface SDKProviderConfig {
   /** Execution context */
@@ -72,10 +83,18 @@ export interface ContextProvider {
  * Create an SDK provider based on configuration
  */
 export async function createSDKProvider(config: SDKProviderConfig): Promise<SDKProvider> {
-  if (config.context === 'remote') {
-    return createRemoteSDKProvider(config)
+  // Validate configuration at runtime
+  const result = SDKProviderConfigSchema.safeParse(config)
+  if (!result.success) {
+    const issues = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
+    throw new ValidationError(`Invalid SDK provider configuration: ${issues}`, result.error.issues)
   }
-  return createLocalSDKProvider(config)
+
+  const validatedConfig = result.data as SDKProviderConfig
+  if (validatedConfig.context === 'remote') {
+    return createRemoteSDKProvider(validatedConfig)
+  }
+  return createLocalSDKProvider(validatedConfig)
 }
 
 /**
@@ -148,12 +167,12 @@ async function createLocalSDKProvider(config: SDKProviderConfig): Promise<SDKPro
   // Create workflow provider
   const workflows = await createLocalWorkflowProvider(db)
 
-  // Create context
+  // Create context - use getEnvironment to safely access env vars in local context
   const context: ContextProvider = {
     ns: config.ns || 'default',
     user: { id: 'anonymous', name: 'Anonymous', role: 'guest' },
     request: { method: 'GET', path: '/', headers: {}, body: null },
-    env: { ...process.env } as Record<string, string>,
+    env: getEnvironment('local') as Record<string, string>,
     config: {},
   }
 
@@ -173,7 +192,8 @@ async function createLocalSDKProvider(config: SDKProviderConfig): Promise<SDKPro
  */
 async function createRemoteSDKProvider(config: SDKProviderConfig): Promise<SDKProvider> {
   const rpcUrl = config.rpcUrl || 'https://rpc.do'
-  const token = config.token || process.env.DO_TOKEN || ''
+  // In remote context, NEVER access process.env - only use explicit token
+  const token = getAuthToken('remote', config.token) || ''
 
   // Create RPC client
   const rpc = createRPCClient(rpcUrl, token)
@@ -214,7 +234,8 @@ async function createLocalAIProvider(config: SDKProviderConfig): Promise<AIProvi
 
   if (config.aiMode === 'remote') {
     const rpcUrl = config.rpcUrl || 'https://rpc.do'
-    const token = config.token || process.env.DO_TOKEN || ''
+    // In local context with remote AI, we can fall back to process.env.DO_TOKEN
+    const token = getAuthToken('local', config.token) || ''
 
     return {
       generate: async (prompt, options) => {
@@ -424,7 +445,7 @@ $.ns = __SDK_CONFIG__.ns;
  * Create a stub DB client when mdxdb is not available
  */
 function createStubDBClient(ns: string): DBClient {
-  const stub: any = {
+  const stub: StubDBClient = {
     ns,
     close: async () => {},
   }
@@ -432,7 +453,7 @@ function createStubDBClient(ns: string): DBClient {
   // Create a proxy that returns stub methods
   return new Proxy(stub, {
     get: (target, prop) => {
-      if (prop in target) return target[prop]
+      if (prop in target) return target[prop as keyof StubDBClient]
       // Return async stub functions for unknown methods
       return async () => {
         console.warn(`DBClient.${String(prop)}() called but mdxdb is not available`)

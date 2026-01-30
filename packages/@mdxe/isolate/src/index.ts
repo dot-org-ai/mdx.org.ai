@@ -114,15 +114,31 @@ export { Fragment, jsx, jsxs };
 
 /**
  * Worker entry module template
+ *
+ * Note: Error responses are sanitized by default (no stack traces).
+ * Set DEBUG=true in env bindings to enable stack traces for debugging.
  */
 const WORKER_ENTRY_TEMPLATE = `
 import * as MDXModule from './mdx.js';
+
+// Sanitize internal paths from error messages
+function sanitizeError(error, debug = false) {
+  if (error == null) return { error: 'Unknown error' };
+  const message = error instanceof Error ? error.message : String(error);
+  const sanitized = debug ? message : message.replace(/\\/(?:Users|home|app|var|opt|usr|tmp)\\/[^\\s'"]+/g, '[path]').replace(/node_modules\\/[^\\s'"]+/g, '[path]');
+  const response = { error: sanitized };
+  if (debug && error instanceof Error && error.stack) {
+    response.stack = error.stack;
+  }
+  return response;
+}
 
 // Default export handler - Workers only allow handlers as exports
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const path = url.pathname;
+    const debug = env?.DEBUG === 'true' || env?.DEBUG === true;
 
     // Health check
     if (path === '/health') {
@@ -162,10 +178,7 @@ export default {
           headers: { 'Content-Type': 'application/json' }
         });
       } catch (error) {
-        return new Response(JSON.stringify({
-          error: error.message,
-          stack: error.stack
-        }), {
+        return new Response(JSON.stringify(sanitizeError(error, debug)), {
           status: 500,
           headers: { 'Content-Type': 'application/json' }
         });

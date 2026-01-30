@@ -10,6 +10,7 @@ import {
   type RPCRequest,
   type RPCResponse,
 } from './index.js'
+import { createTestServer, type TestServerContext, delay } from './test-utils.js'
 
 describe('@mdxe/rpc', () => {
   describe('module exports', () => {
@@ -62,8 +63,9 @@ describe('@mdxe/rpc', () => {
     })
 
     it('should accept port and host options', () => {
+      // Using port 0 allows OS to pick an available port
       const server = createRPCServer({
-        port: 4000,
+        port: 0,
         host: '0.0.0.0',
       })
       expect(server).toBeInstanceOf(RPCServer)
@@ -181,7 +183,8 @@ describe('@mdxe/rpc', () => {
 
       it('should handle async function handlers', async () => {
         const handler = async () => {
-          await new Promise((resolve) => setTimeout(resolve, 10))
+          // Use a slightly longer delay to be reliable across systems
+          await delay(50)
           return 'async success'
         }
         server.register('asyncMethod', handler)
@@ -437,8 +440,7 @@ describe('@mdxe/rpc', () => {
   })
 
   describe('RPCClient with real HTTP server', () => {
-    let httpServer: Server
-    let port: number
+    let testServer: TestServerContext
     let rpcServer: RPCServer
 
     beforeEach(async () => {
@@ -451,49 +453,12 @@ describe('@mdxe/rpc', () => {
         throw new Error('Test error')
       })
 
-      // Create HTTP server that handles JSON-RPC requests
-      httpServer = createServer(async (req, res) => {
-        if (req.method === 'POST') {
-          let body = ''
-          for await (const chunk of req) {
-            body += chunk
-          }
-
-          try {
-            const request = JSON.parse(body) as RPCRequest
-            const response = await rpcServer.handle(request)
-
-            res.writeHead(200, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify(response))
-          } catch (error) {
-            res.writeHead(500, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ error: 'Invalid request' }))
-          }
-        } else {
-          res.writeHead(405)
-          res.end()
-        }
-      })
-
-      // Start server on random port
-      await new Promise<void>((resolve) => {
-        httpServer.listen(0, () => {
-          const address = httpServer.address()
-          if (address && typeof address === 'object') {
-            port = address.port
-          }
-          resolve()
-        })
-      })
+      // Use test utilities for automatic port allocation and cleanup
+      testServer = await createTestServer({ rpcServer })
     })
 
     afterEach(async () => {
-      await new Promise<void>((resolve, reject) => {
-        httpServer.close((err) => {
-          if (err) reject(err)
-          else resolve()
-        })
-      })
+      await testServer.close()
     })
 
     describe('call', () => {
@@ -501,7 +466,7 @@ describe('@mdxe/rpc', () => {
         const client = new RPCClient<{
           add: (a: number, b: number) => number
         }>({
-          url: `http://localhost:${port}`,
+          url: testServer.url,
         })
 
         const result = await client.call('add', 2, 3)
@@ -512,7 +477,7 @@ describe('@mdxe/rpc', () => {
         const client = new RPCClient<{
           echo: (msg: string) => string
         }>({
-          url: `http://localhost:${port}`,
+          url: testServer.url,
         })
 
         const result1 = await client.call('echo', 'first')
@@ -526,7 +491,7 @@ describe('@mdxe/rpc', () => {
         const client = new RPCClient<{
           nonExistent: () => void
         }>({
-          url: `http://localhost:${port}`,
+          url: testServer.url,
         })
 
         await expect(client.call('nonExistent')).rejects.toThrow(RPCError)
@@ -537,7 +502,7 @@ describe('@mdxe/rpc', () => {
         const client = new RPCClient<{
           error: () => void
         }>({
-          url: `http://localhost:${port}`,
+          url: testServer.url,
         })
 
         await expect(client.call('error')).rejects.toThrow(RPCError)
@@ -545,8 +510,19 @@ describe('@mdxe/rpc', () => {
       })
 
       it('should include custom headers in request', async () => {
-        // Create a new HTTP server that checks headers
+        // Create a new HTTP server that checks headers using test utilities
         let receivedHeaders: Record<string, string | string[] | undefined> = {}
+
+        const headerTestServer = await createTestServer({
+          rpcServer,
+          onRequest: () => {
+            // Headers are captured via the test server's request handling
+          },
+        })
+
+        // Override to capture headers - create custom server for header testing
+        await headerTestServer.close()
+
         const headerServer = createServer(async (req, res) => {
           receivedHeaders = req.headers
 
@@ -571,72 +547,53 @@ describe('@mdxe/rpc', () => {
           })
         })
 
-        const clientWithHeaders = new RPCClient<{
-          echo: (msg: string) => string
-        }>({
-          url: `http://localhost:${headerPort}`,
-          headers: {
-            Authorization: 'Bearer token',
-            'X-Custom': 'value',
-          },
-        })
-
-        await clientWithHeaders.call('echo', 'test')
-
-        expect(receivedHeaders['authorization']).toBe('Bearer token')
-        expect(receivedHeaders['x-custom']).toBe('value')
-        expect(receivedHeaders['content-type']).toBe('application/json')
-
-        await new Promise<void>((resolve, reject) => {
-          headerServer.close((err) => {
-            if (err) reject(err)
-            else resolve()
+        try {
+          const clientWithHeaders = new RPCClient<{
+            echo: (msg: string) => string
+          }>({
+            url: `http://localhost:${headerPort}`,
+            headers: {
+              Authorization: 'Bearer token',
+              'X-Custom': 'value',
+            },
           })
-        })
+
+          await clientWithHeaders.call('echo', 'test')
+
+          expect(receivedHeaders['authorization']).toBe('Bearer token')
+          expect(receivedHeaders['x-custom']).toBe('value')
+          expect(receivedHeaders['content-type']).toBe('application/json')
+        } finally {
+          await new Promise<void>((resolve, reject) => {
+            headerServer.close((err) => {
+              if (err) reject(err)
+              else resolve()
+            })
+          })
+        }
       })
 
       it('should handle timeout option', async () => {
-        // Create a slow server
-        const slowServer = createServer(async (req, res) => {
-          // Wait longer than timeout
-          await new Promise((resolve) => setTimeout(resolve, 200))
-
-          let body = ''
-          for await (const chunk of req) {
-            body += chunk
-          }
-
-          const request = JSON.parse(body) as RPCRequest
-          const response = await rpcServer.handle(request)
-
-          res.writeHead(200, { 'Content-Type': 'application/json' })
-          res.end(JSON.stringify(response))
+        // Create a slow server using test utilities with a 500ms delay
+        // Use a larger delay to be reliable (500ms) and a larger timeout (100ms)
+        // to avoid flakiness on slower CI systems
+        const slowTestServer = await createTestServer({
+          rpcServer,
+          responseDelay: 500, // Server takes 500ms to respond
         })
 
-        const slowPort = await new Promise<number>((resolve) => {
-          slowServer.listen(0, () => {
-            const address = slowServer.address()
-            if (address && typeof address === 'object') {
-              resolve(address.port)
-            }
+        try {
+          const clientWithTimeout = new RPCClient<{
+            echo: (msg: string) => string
+          }>({
+            url: slowTestServer.url,
+            timeout: 100, // 100ms timeout - will expire before 500ms response
           })
-        })
 
-        const clientWithTimeout = new RPCClient<{
-          echo: (msg: string) => string
-        }>({
-          url: `http://localhost:${slowPort}`,
-          timeout: 50, // 50ms timeout
-        })
-
-        await expect(clientWithTimeout.call('echo', 'test')).rejects.toThrow()
-
-        await new Promise<void>((resolve, reject) => {
-          slowServer.close((err) => {
-            if (err) reject(err)
-            else resolve()
-          })
-        })
+          await expect(clientWithTimeout.call('echo', 'test')).rejects.toThrow()
+        } finally {
+          await slowTestServer.close()
+        }
       })
     })
 
@@ -645,7 +602,7 @@ describe('@mdxe/rpc', () => {
         const client = new RPCClient<{
           greet: (name: string) => string
         }>({
-          url: `http://localhost:${port}`,
+          url: testServer.url,
         })
 
         const proxy = client.proxy
@@ -659,7 +616,7 @@ describe('@mdxe/rpc', () => {
           add: (a: number, b: number) => number
           greet: (name: string) => string
         }>({
-          url: `http://localhost:${port}`,
+          url: testServer.url,
         })
 
         const proxy = client.proxy

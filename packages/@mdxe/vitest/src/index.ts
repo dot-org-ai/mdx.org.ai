@@ -1062,30 +1062,41 @@ function createShouldAssertion(actual: unknown, negated: boolean = false): Shoul
         fail('Expected a function')
         return chainable()
       }
+      let didThrow = false
+      let thrownError: Error | undefined
       try {
         (actual as () => void)()
-        if (!negated) fail('Expected function to throw')
       } catch (e) {
-        if (negated) {
-          fail(`Expected function not to throw, but threw: ${(e as Error).message}`)
+        didThrow = true
+        thrownError = e as Error
+      }
+
+      if (negated) {
+        if (didThrow) {
+          fail(`Expected function not to throw, but threw: ${thrownError?.message}`)
         }
-        if (errorType) {
+      } else {
+        if (!didThrow) {
+          fail('Expected function to throw')
+        }
+        // Check error type and message if provided
+        if (didThrow && errorType) {
           if (typeof errorType === 'function') {
-            check(e instanceof errorType, `Expected to throw ${errorType.name}`)
+            check(thrownError instanceof errorType, `Expected to throw ${errorType.name}`)
           } else if (typeof errorType === 'string') {
-            check((e as Error).message.includes(errorType),
+            check(thrownError?.message.includes(errorType) ?? false,
               `Expected error message to contain "${errorType}"`)
           } else if (errorType instanceof RegExp) {
-            check(errorType.test((e as Error).message),
+            check(errorType.test(thrownError?.message ?? ''),
               `Expected error message to match ${errorType}`)
           }
         }
-        if (message) {
+        if (didThrow && message) {
           if (typeof message === 'string') {
-            check((e as Error).message.includes(message),
+            check(thrownError?.message.includes(message) ?? false,
               `Expected error message to contain "${message}"`)
           } else {
-            check(message.test((e as Error).message),
+            check(message.test(thrownError?.message ?? ''),
               `Expected error message to match ${message}`)
           }
         }
@@ -1141,14 +1152,14 @@ function createShouldAssertion(actual: unknown, negated: boolean = false): Shoul
  * value.should.have.lengthOf(5)
  * ```
  */
-export function should<T>(value: T): T & { should: ShouldAssertion } {
-  const wrapped = value as T & { should: ShouldAssertion }
-  Object.defineProperty(wrapped, 'should', {
-    get: () => createShouldAssertion(value),
-    configurable: true,
-    enumerable: false,
-  })
-  return wrapped
+export function should<T>(value: T): { should: ShouldAssertion; valueOf: () => T; toString: () => string } {
+  // For primitives, we can't use Object.defineProperty directly
+  // Instead, return a wrapper object with a should property
+  return {
+    should: createShouldAssertion(value),
+    valueOf: () => value,
+    toString: () => String(value),
+  }
 }
 
 /**

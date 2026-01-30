@@ -1,0 +1,89 @@
+{
+  "name": "@mdxe/test-utils",
+  "version": "1.9.0",
+  "description": "Shared test utilities for MDX packages - fixtures, mocks, and custom matchers",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./fixtures": {
+      "types": "./dist/fixtures.d.ts",
+      "import": "./dist/fixtures.js",
+      "require": "./dist/fixtures.cjs"
+    },
+    "./mocks": {
+      "types": "./dist/mocks.d.ts",
+      "import": "./dist/mocks.js",
+      "require": "./dist/mocks.cjs"
+    },
+    "./matchers": {
+      "types": "./dist/matchers.d.ts",
+      "import": "./dist/matchers.js",
+      "require": "./dist/matchers.cjs"
+    },
+    "./ports": {
+      "types": "./dist/ports.d.ts",
+      "import": "./dist/ports.js",
+      "require": "./dist/ports.cjs"
+    },
+    "./timing": {
+      "types": "./dist/timing.d.ts",
+      "import": "./dist/timing.js",
+      "require": "./dist/timing.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdx",
+    "mdxe",
+    "test",
+    "testing",
+    "utilities",
+    "fixtures",
+    "mocks",
+    "matchers",
+    "vitest"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "mdxld": "workspace:*"
+  },
+  "peerDependencies": {
+    "vitest": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxe/test-utils"
+  },
+  "author": "MDX.org.ai"
+}
