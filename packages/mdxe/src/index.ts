@@ -307,3 +307,154 @@ export type {
   Target,
   CliContextType,
 } from './schemas.js'
+
+// =============================================================================
+// DO STORAGE
+// =============================================================================
+
+/**
+ * Durable Object Storage Integration
+ *
+ * Functions for storing and managing MDX content in Cloudflare Durable Objects:
+ * - DO-based content storage (store MDX in DO SQLite)
+ * - R2 backup for large files (>1MB)
+ * - Parquet storage for structured data
+ * - Content retrieval via worker_loaders
+ * - Content versioning and history
+ *
+ * @see {@link ./commands/do-storage.ts} for implementation
+ */
+export {
+  // Core storage functions
+  storeContentInDO,
+  getContentFromDO,
+  storeInR2,
+  getFromR2,
+  storeContentWithR2Backup,
+  // Parquet storage
+  storeMetadataAsParquet,
+  exportToParquet,
+  // Worker loader integration
+  loadContentForWorker,
+  // Versioning
+  getVersionHistory,
+  rollbackToVersion,
+  diffVersions,
+  // Tiered storage
+  storeWithTiering,
+  promoteToHot,
+  getAccessStats,
+  determineTier,
+  // Content diffing
+  computeDiff,
+  applyDiff,
+  storeWithDiff,
+  // Garbage collection
+  cleanupOldVersions,
+  cleanupOrphanedR2,
+  // Metrics
+  getStorageMetrics,
+  // Batch operations
+  batchStore,
+  batchGet,
+  batchDelete,
+  // Worker integration
+  storeCompiledModules,
+  getCompiledModule,
+  // Utilities
+  hashContentForStorage,
+  shouldStoreInR2,
+  getNamespaceFromUrl,
+  // Constants
+  R2_THRESHOLD,
+  HOT_ACCESS_THRESHOLD,
+  COLD_DAYS_THRESHOLD,
+  DEFAULT_RETENTION_DAYS,
+  DEFAULT_MIN_VERSIONS,
+} from './commands/do-storage.js'
+
+export type {
+  StorageEnv as DOStorageEnv,
+  ContentRecord,
+  ContentVersion,
+  StorageTier,
+  TieredStorageResult,
+  DiffOperation,
+  ContentDiff,
+  DiffStorageResult,
+  CleanupOptions,
+  CleanupResult,
+  OrphanedR2Result,
+  StorageMetrics,
+  WorkerLoadResult,
+  VersionHistoryOptions,
+  DiffVersionsResult,
+  ParquetExportResult,
+  AccessStats,
+} from './commands/do-storage.js'
+
+// =============================================================================
+// GITHUB SYNC
+// =============================================================================
+
+/**
+ * GitHub Webhook Sync
+ *
+ * Keep deployed DOs in sync with GitHub repos via gitx:
+ * - Webhook payload handling (parse GitHub push events)
+ * - Post-receive hook triggers deployment
+ * - Conflict resolution on concurrent edits
+ * - Branch-based deployment (main -> production, other branches -> preview)
+ * - Incremental deployment (only changed files)
+ * - PR preview deployments
+ *
+ * @see {@link ./commands/github-sync.ts} for implementation
+ */
+export {
+  // Webhook handling
+  handleGitHubWebhook,
+  computeWebhookSignature,
+  // Push event parsing
+  parseGitHubPushEvent,
+  getChangedFiles,
+  // Deployment
+  triggerDeployment,
+  incrementalDeploy,
+  // Branch mapping
+  mapBranchToEnvironment,
+  // Conflict resolution
+  resolveConflict,
+  // Status reporting
+  reportDeploymentStatus,
+  // Sync status
+  getSyncStatus,
+  getSyncHistory,
+  // PR previews
+  deployPRPreview,
+  cleanupPRPreview,
+  commentPreviewUrl,
+} from './commands/github-sync.js'
+
+export type {
+  StorageEnv as GitHubStorageEnv,
+  GitHubPushEvent,
+  GitHubCommit,
+  ParsedPushEvent,
+  DeploymentEnvironment,
+  ChangedFilesResult,
+  DeploymentResult,
+  ConflictResolutionOptions,
+  ConflictResolutionResult,
+  LocalContent,
+  RemoteContent,
+  DeploymentStatusOptions,
+  SyncStatusResult,
+  SyncHistoryResult,
+  PRPreviewOptions,
+  PRPreviewResult,
+  PRCleanupOptions,
+  PRCleanupResult,
+  PRCommentOptions,
+  BranchMappingOptions,
+  IncrementalDeployOptions,
+} from './commands/github-sync.js'
