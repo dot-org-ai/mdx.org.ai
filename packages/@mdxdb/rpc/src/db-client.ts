@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import { RPC, http, type Transport, type RPCProxy } from 'rpc.do'
+import { RPC, http, type Transport, type RPCProxy, type RPCPromise } from 'rpc.do'
 import type {
   DBClient,
   DBClientExtended,
@@ -30,6 +30,32 @@ import type {
 } from 'ai-database'
 
 /**
+ * ThingRef - A Thing that supports calling exported functions directly
+ *
+ * With capnweb's RPCPromise pipelining, you can call methods on a Thing
+ * without awaiting, and they get batched into a single round trip.
+ *
+ * @example
+ * ```ts
+ * const thing = db.get('https://example.com/Post/hello')
+ *
+ * // Call exported functions directly - pipelined!
+ * const result = await thing.add(1, 2)
+ *
+ * // Chain multiple calls - still one round trip
+ * const doubled = await thing.add(1, 2).then(r => thing.multiply(r, 2))
+ *
+ * // Use .map() to run transforms server-side
+ * const titles = await db.list().map(t => t.data.title)
+ * ```
+ */
+export type ThingRef<TData extends Record<string, unknown> = Record<string, unknown>> =
+  Thing<TData> & {
+    /** Call any exported function - routes through RPC */
+    [key: string]: ((...args: unknown[]) => RPCPromise<unknown>) | unknown
+  }
+
+/**
  * RPC transport type
  */
 export type TransportType = 'http'
@@ -49,6 +75,24 @@ export interface DBRpcClientConfig {
 /**
  * DBClient RPC interface - methods exposed by the server
  */
+/**
+ * Call options for executing exported functions
+ */
+interface CallOptions {
+  fn: string
+  args?: unknown[]
+  timeout?: number
+}
+
+/**
+ * Result from calling a function
+ */
+interface CallResult<T = unknown> {
+  result: T
+  duration: number
+  logs?: string[]
+}
+
 interface DBClientRPC<TData extends Record<string, unknown> = Record<string, unknown>> {
   db: {
     // Thing operations
@@ -62,6 +106,9 @@ interface DBClientRPC<TData extends Record<string, unknown> = Record<string, unk
     update(url: string, options: UpdateOptions<TData>): Thing<TData>
     upsert(options: CreateOptions<TData>): Thing<TData>
     delete(url: string): boolean
+
+    // Code execution
+    call<T = unknown>(url: string, options: CallOptions): CallResult<T>
 
     // Relationship operations
     relate<T extends Record<string, unknown>>(options: RelateOptions<T>): Relationship<T>
@@ -192,29 +239,75 @@ export class DBRpcClient<TData extends Record<string, unknown> = Record<string, 
   // Thing Operations
   // ===========================================================================
 
-  async list(options: QueryOptions = {}): Promise<Thing<TData>[]> {
-    const things = await this.rpc.db.list(options)
-    return this.convertThingsDates(things)
+  /**
+   * List things with optional filtering
+   *
+   * Returns an RPCPromise that supports .map() for server-side transforms.
+   *
+   * @example
+   * ```ts
+   * // Get all titles - .map() runs server-side!
+   * const titles = await db.list({ type: 'Post' }).map(t => t.data.title)
+   * ```
+   */
+  list(options: QueryOptions = {}): RPCPromise<Thing<TData>[]> {
+    return this.rpc.db.list(options) as RPCPromise<Thing<TData>[]>
   }
 
-  async find(options: QueryOptions): Promise<Thing<TData>[]> {
-    const things = await this.rpc.db.find(options)
-    return this.convertThingsDates(things)
+  /**
+   * Find things matching criteria
+   *
+   * Returns an RPCPromise that supports .map() for server-side transforms.
+   */
+  find(options: QueryOptions): RPCPromise<Thing<TData>[]> {
+    return this.rpc.db.find(options) as RPCPromise<Thing<TData>[]>
   }
 
-  async search(options: ThingSearchOptions): Promise<Thing<TData>[]> {
-    const things = await this.rpc.db.search(options)
-    return this.convertThingsDates(things)
+  /**
+   * Search things by query
+   *
+   * Returns an RPCPromise that supports .map() for server-side transforms.
+   */
+  search(options: ThingSearchOptions): RPCPromise<Thing<TData>[]> {
+    return this.rpc.db.search(options) as RPCPromise<Thing<TData>[]>
   }
 
-  async get(url: string): Promise<Thing<TData> | null> {
-    const thing = await this.rpc.db.get(url)
-    return this.convertThingDates(thing)
+  /**
+   * Get a Thing reference by URL
+   *
+   * Returns an RPCPromise that supports pipelining - you can call methods
+   * on it without awaiting first, and they'll be batched into a single round trip.
+   *
+   * @example
+   * ```ts
+   * // These get pipelined into a single round trip
+   * const thing = db.get('https://example.com/Post/hello')
+   * const result = await thing.add(1, 2)
+   *
+   * // Or with .map() which runs server-side
+   * const items = await db.list().map(t => t.data.title)
+   * ```
+   */
+  get(url: string): RPCPromise<Thing<TData> | null> & ThingRef<TData> {
+    // Return the RPC promise directly - capnweb handles pipelining
+    // Any method calls on this will be proxied to the server
+    return this.rpc.db.get(url) as RPCPromise<Thing<TData> | null> & ThingRef<TData>
   }
 
-  async getById(ns: string, type: string, id: string): Promise<Thing<TData> | null> {
-    const thing = await this.rpc.db.getById(ns, type, id)
-    return this.convertThingDates(thing)
+  /**
+   * Call an exported function on a thing
+   */
+  call<T = unknown>(url: string, options: CallOptions): RPCPromise<CallResult<T>> {
+    return this.rpc.db.call(url, options) as RPCPromise<CallResult<T>>
+  }
+
+  /**
+   * Get a Thing reference by namespace, type, and id
+   *
+   * Like get(), supports pipelining for direct method calls.
+   */
+  getById(ns: string, type: string, id: string): RPCPromise<Thing<TData> | null> & ThingRef<TData> {
+    return this.rpc.db.getById(ns, type, id) as RPCPromise<Thing<TData> | null> & ThingRef<TData>
   }
 
   async set(url: string, data: TData): Promise<Thing<TData>> {
