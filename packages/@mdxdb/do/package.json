@@ -70,7 +70,7 @@
   "dependencies": {
     "@mdxdb/parquet": "workspace:^",
     "@mdxdb/sqlite": "workspace:^",
-    "capnweb": "^0.2.0"
+    "rpc.do": "^0.1.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",

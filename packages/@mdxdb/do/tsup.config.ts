@@ -17,7 +17,7 @@ export default defineConfig([
     dts: false,
     clean: true,
     sourcemap: true,
-    external: ['cloudflare:workers', '@mdxdb/sqlite', '@mdxdb/parquet', '@mdxe/isolate', 'capnweb'],
+    external: ['cloudflare:workers', '@mdxdb/sqlite', '@mdxdb/parquet', '@mdxe/isolate', 'rpc.do'],
   },
   // Bundled durable-object for deployment
   {
@@ -33,7 +33,7 @@ export default defineConfig([
     bundle: true,
     esbuildOptions(options) {
       options.mainFields = ['module', 'main']
-      options.external = ['cloudflare:workers', '@mdxdb/parquet', '@mdxe/isolate', 'capnweb']
+      options.external = ['cloudflare:workers', '@mdxdb/parquet', '@mdxe/isolate', 'rpc.do']
     },
   },
 ])
