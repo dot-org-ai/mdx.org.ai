@@ -14,7 +14,7 @@ export default defineConfig([
     dts: false,
     clean: true,
     sourcemap: true,
-    external: ['miniflare', 'cloudflare:workers'],
+    external: ['miniflare', 'cloudflare:workers', '@mdxe/isolate'],
   },
   // Bundled durable-object for miniflare
   {
@@ -30,7 +30,7 @@ export default defineConfig([
     bundle: true,
     esbuildOptions(options) {
       options.mainFields = ['module', 'main']
-      options.external = ['cloudflare:workers']
+      options.external = ['cloudflare:workers', '@mdxe/isolate']
     },
   },
 ])

@@ -59,9 +59,13 @@
   "license": "MIT",
   "dependencies": {},
   "peerDependencies": {
+    "@mdxe/isolate": "workspace:^",
     "miniflare": "^3.0.0"
   },
   "peerDependenciesMeta": {
+    "@mdxe/isolate": {
+      "optional": true
+    },
     "miniflare": {
       "optional": true
     }

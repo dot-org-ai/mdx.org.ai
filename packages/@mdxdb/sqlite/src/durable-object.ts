@@ -16,9 +16,14 @@ import type {
   UpdateOptions,
   RelateOptions,
   RelationshipQueryOptions,
+  CallOptions,
+  CallResult,
+  ExportMeta,
+  CompiledModule,
   DataRow,
   RelsRow,
   Env,
+  WorkerLoader,
 } from './types.js'
 import { getAllSchemaStatements } from './schema/index.js'
 
@@ -47,6 +52,16 @@ function buildUrl(baseId: string, type: string, id: string): string {
   return `${base}/${type}/${id}`
 }
 
+function hashContent(content: string): string {
+  let hash = 0
+  for (let i = 0; i < content.length; i++) {
+    const char = content.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  return Math.abs(hash).toString(36)
+}
+
 // =============================================================================
 // MDXDatabase Durable Object
 // =============================================================================
@@ -62,11 +77,13 @@ export class MDXDatabase extends DurableObject<Env> {
   private baseId: string
   private initialized = false
   private doCtx: DurableObjectState
+  protected loader?: WorkerLoader
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env)
     this.doCtx = ctx
     this.sql = ctx.storage.sql
+    this.loader = env.LOADER
 
     // Derive $id from DO name
     // If name looks like a domain, prefix with https://
@@ -174,15 +191,20 @@ export class MDXDatabase extends DurableObject<Env> {
       throw new Error(`Thing already exists: ${url}`)
     }
 
+    // Compute content hash if content provided
+    const hash = options.content ? hashContent(options.content) : null
+
     this.sql.exec(
-      `INSERT INTO _data (url, type, id, data, content, context, at, by, "in")
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO _data (url, type, id, data, content, context, code, hash, at, by, "in")
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       url,
       options.type,
       id,
       JSON.stringify(options.data),
       options.content ?? null,
       options['@context'] ? JSON.stringify(options['@context']) : null,
+      options.code ?? null,
+      hash,
       now,
       options.by ?? null,
       options.in ?? null
@@ -195,6 +217,8 @@ export class MDXDatabase extends DurableObject<Env> {
       data: options.data,
       content: options.content,
       '@context': options['@context'],
+      code: options.code,
+      hash: hash ?? undefined,
       at: new Date(now),
       by: options.by,
       in: options.in,
@@ -223,11 +247,17 @@ export class MDXDatabase extends DurableObject<Env> {
       : existing.data
     const now = new Date().toISOString()
 
+    // If content changed, recompute hash and clear compiled code
+    const contentChanged = options.content !== undefined && options.content !== existing.content
+    const newHash = contentChanged ? hashContent(options.content!) : existing.hash
+
     this.sql.exec(
-      `UPDATE _data SET data = ?, content = COALESCE(?, content), at = ?, by = ?, "in" = ?, version = version + 1
+      `UPDATE _data SET data = ?, content = COALESCE(?, content), hash = ?, code = CASE WHEN ? THEN NULL ELSE code END, at = ?, by = ?, "in" = ?, version = version + 1
        WHERE url = ?`,
       JSON.stringify(merged),
       options.content ?? null,
+      newHash ?? null,
+      contentChanged ? 1 : 0,
       now,
       options.by ?? null,
       options.in ?? null,
@@ -238,6 +268,8 @@ export class MDXDatabase extends DurableObject<Env> {
       ...existing,
       data: merged as TData,
       content: options.content ?? existing.content,
+      hash: newHash,
+      code: contentChanged ? undefined : existing.code,
       at: new Date(now),
       by: options.by,
       in: options.in,
@@ -417,6 +449,185 @@ export class MDXDatabase extends DurableObject<Env> {
   }
 
   // ===========================================================================
+  // Code Execution
+  // ===========================================================================
+
+  /**
+   * Compile MDX content to executable code
+   */
+  async compile(url: string): Promise<CompiledModule> {
+    this.ensureInitialized()
+
+    const thing = await this.get(url)
+    if (!thing) {
+      throw new Error(`Thing not found: ${url}`)
+    }
+
+    if (!thing.content) {
+      throw new Error(`Thing has no content to compile: ${url}`)
+    }
+
+    // Dynamic import to avoid bundling @mdxe/isolate when not needed
+    const { compileToModule } = await import('@mdxe/isolate')
+    const compiled = await compileToModule(thing.content)
+
+    // Store compiled code for caching
+    const codeJson = JSON.stringify(compiled)
+    this.sql.exec(
+      'UPDATE _data SET code = ?, hash = ? WHERE url = ?',
+      codeJson,
+      compiled.hash,
+      url
+    )
+
+    return compiled
+  }
+
+  /**
+   * Call a function exported by a thing's compiled code
+   */
+  async call<T = unknown>(url: string, options: CallOptions): Promise<CallResult<T>> {
+    this.ensureInitialized()
+
+    const thing = await this.get(url)
+    if (!thing) {
+      throw new Error(`Thing not found: ${url}`)
+    }
+
+    // Get or compile the module
+    let compiled: CompiledModule
+    if (thing.code) {
+      compiled = JSON.parse(thing.code) as CompiledModule
+      // Check if content changed (hash mismatch)
+      if (thing.content && thing.hash !== compiled.hash) {
+        compiled = await this.compile(url)
+      }
+    } else if (thing.content) {
+      compiled = await this.compile(url)
+    } else {
+      throw new Error(`Thing has no executable code: ${url}`)
+    }
+
+    if (!this.loader) {
+      throw new Error('Worker loader not available. Set env.LOADER binding.')
+    }
+
+    const start = Date.now()
+    const logs: string[] = []
+
+    // Create worker config
+    const { createWorkerConfig } = await import('@mdxe/isolate')
+    const config = createWorkerConfig(compiled, { blockNetwork: true })
+
+    // Get or create the worker
+    const worker = await this.loader.get(compiled.hash, async () => ({
+      modules: Object.entries(config.modules).map(([name, esModule]) => ({
+        name,
+        esModule,
+      })),
+      compatibilityDate: config.compatibilityDate,
+    }))
+
+    // Call the function
+    const request = new Request(`http://worker/call/${options.fn}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ args: options.args ?? [] }),
+    })
+
+    const response = await worker.fetch(request)
+    const data = await response.json() as { result?: T; error?: string }
+
+    if (data.error) {
+      throw new Error(data.error)
+    }
+
+    return {
+      result: data.result as T,
+      duration: Date.now() - start,
+      logs,
+    }
+  }
+
+  /**
+   * Get metadata about a thing's exports
+   */
+  async meta(url: string): Promise<ExportMeta> {
+    this.ensureInitialized()
+
+    const thing = await this.get(url)
+    if (!thing) {
+      throw new Error(`Thing not found: ${url}`)
+    }
+
+    // Get or compile the module
+    let compiled: CompiledModule
+    if (thing.code) {
+      compiled = JSON.parse(thing.code) as CompiledModule
+    } else if (thing.content) {
+      compiled = await this.compile(url)
+    } else {
+      return { functions: [], hasDefault: false, exports: [] }
+    }
+
+    // Extract exports from compiled code
+    const { getExports } = await import('@mdxe/isolate')
+    const allExports = getExports(compiled)
+
+    // Determine which are functions (heuristic: check for function patterns)
+    const mdxCode = compiled.modules['mdx.js'] ?? ''
+    const functions: string[] = []
+    const other: string[] = []
+
+    for (const name of allExports) {
+      if (
+        mdxCode.includes(`function ${name}`) ||
+        mdxCode.includes(`async function ${name}`) ||
+        mdxCode.match(new RegExp(`(?:const|let|var)\\s+${name}\\s*=\\s*(?:async\\s+)?(?:\\([^)]*\\)|\\w+)\\s*=>`))
+      ) {
+        functions.push(name)
+      } else {
+        other.push(name)
+      }
+    }
+
+    return {
+      functions,
+      hasDefault: allExports.includes('default'),
+      exports: other,
+    }
+  }
+
+  /**
+   * Render a thing's default MDX component
+   */
+  async render(url: string, props?: Record<string, unknown>): Promise<string> {
+    this.ensureInitialized()
+
+    // Call the default export with props
+    const result = await this.call<{ html?: string; toString?: () => string }>(url, {
+      fn: 'default',
+      args: [props ?? {}],
+    })
+
+    // Handle different return types
+    if (typeof result.result === 'string') {
+      return result.result
+    }
+    if (result.result && typeof result.result === 'object') {
+      if ('html' in result.result && typeof result.result.html === 'string') {
+        return result.result.html
+      }
+      if ('toString' in result.result && typeof result.result.toString === 'function') {
+        return result.result.toString()
+      }
+    }
+
+    // Serialize as JSON if nothing else works
+    return JSON.stringify(result.result)
+  }
+
+  // ===========================================================================
   // Private Helpers
   // ===========================================================================
 
@@ -428,6 +639,8 @@ export class MDXDatabase extends DurableObject<Env> {
       data: JSON.parse(row.data) as TData,
       content: row.content ?? undefined,
       '@context': row.context ? JSON.parse(row.context) : undefined,
+      code: row.code ?? undefined,
+      hash: row.hash ?? undefined,
       at: new Date(row.at),
       by: row.by ?? undefined,
       in: row.in ?? undefined,

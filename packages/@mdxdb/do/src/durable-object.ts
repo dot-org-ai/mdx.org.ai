@@ -299,6 +299,14 @@ export class MDXDurableObject extends MDXDatabase {
         return this.getChild(args[0] as string)
       case 'exportToParquet':
         return this.exportToParquet(args[0] as ExportOptions)
+      case 'compile':
+        return this.compile(args[0] as string)
+      case 'call':
+        return this.call(args[0] as string, args[1] as Parameters<typeof this.call>[1])
+      case 'meta':
+        return this.meta(args[0] as string)
+      case 'render':
+        return this.render(args[0] as string, args[1] as Record<string, unknown>)
       default:
         throw new Error(`Unknown method: ${method}`)
     }

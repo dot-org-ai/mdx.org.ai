@@ -22,10 +22,14 @@ export interface Thing<TData = Record<string, unknown>> {
   id: string
   /** JSON data payload */
   data: TData
-  /** Markdown/text content */
+  /** Markdown/text content (MDX source) */
   content?: string
   /** JSON-LD @context */
   '@context'?: string | Record<string, unknown>
+  /** Compiled JavaScript code (from MDX) */
+  code?: string
+  /** Content hash for cache invalidation */
+  hash?: string
   /** Last modified timestamp */
   at: Date
   /** Who made this change */
@@ -108,10 +112,12 @@ export interface CreateOptions<TData = Record<string, unknown>> extends Provenan
   id?: string
   /** JSON data payload */
   data: TData
-  /** Markdown/text content */
+  /** Markdown/text content (MDX source) */
   content?: string
   /** JSON-LD @context */
   '@context'?: string | Record<string, unknown>
+  /** Pre-compiled JavaScript code */
+  code?: string
 }
 
 /**
@@ -158,6 +164,56 @@ export interface RelationshipQueryOptions {
   offset?: number
 }
 
+/**
+ * Options for calling a function on a thing
+ */
+export interface CallOptions {
+  /** Function name to call */
+  fn: string
+  /** Arguments to pass */
+  args?: unknown[]
+  /** Timeout in milliseconds */
+  timeout?: number
+}
+
+/**
+ * Result of calling a function
+ */
+export interface CallResult<T = unknown> {
+  /** Return value */
+  result: T
+  /** Execution time in ms */
+  duration: number
+  /** Logs captured during execution */
+  logs?: string[]
+}
+
+/**
+ * Metadata about exports from a thing's code
+ */
+export interface ExportMeta {
+  /** Exported function names */
+  functions: string[]
+  /** Has default export (MDX component) */
+  hasDefault: boolean
+  /** Other named exports */
+  exports: string[]
+}
+
+/**
+ * Compiled module structure (matches @mdxe/isolate)
+ */
+export interface CompiledModule {
+  /** Main entry module name */
+  mainModule: string
+  /** Module map: filename -> code */
+  modules: Record<string, string>
+  /** Frontmatter data */
+  data: Record<string, unknown>
+  /** Content hash */
+  hash: string
+}
+
 // =============================================================================
 // Row Types (internal SQLite representation)
 // =============================================================================
@@ -172,6 +228,8 @@ export interface DataRow {
   data: string
   content: string | null
   context: string | null
+  code: string | null
+  hash: string | null
   at: string
   by: string | null
   in: string | null
@@ -226,6 +284,16 @@ export interface MDXDatabaseRPC {
   /** Get relationships from a thing */
   relationships(url: string, options?: RelationshipQueryOptions): Promise<Relationship[]>
 
+  // Code execution operations
+  /** Compile MDX content to executable code */
+  compile(url: string): Promise<CompiledModule>
+  /** Call a function exported by a thing's code */
+  call<T = unknown>(url: string, options: CallOptions): Promise<CallResult<T>>
+  /** Get metadata about a thing's exports */
+  meta(url: string): Promise<ExportMeta>
+  /** Render a thing's default export (MDX component) */
+  render(url: string, props?: Record<string, unknown>): Promise<string>
+
   // Database info
   getDatabaseSize(): number
 }
@@ -235,11 +303,41 @@ export interface MDXDatabaseRPC {
 // =============================================================================
 
 /**
+ * Worker loader interface for dynamic worker creation
+ */
+export interface WorkerLoader {
+  get(
+    id: string,
+    factory: () => Promise<WorkerConfig> | WorkerConfig
+  ): Promise<WorkerInstance>
+}
+
+/**
+ * Worker configuration for loader
+ */
+export interface WorkerConfig {
+  modules: Array<{ name: string; esModule: string }>
+  bindings?: Record<string, unknown>
+  compatibilityDate?: string
+  compatibilityFlags?: string[]
+}
+
+/**
+ * Worker instance from loader
+ */
+export interface WorkerInstance {
+  fetch(request: Request): Promise<Response>
+  scheduled?(event: ScheduledEvent): Promise<void>
+}
+
+/**
  * Environment with MDXDatabase binding
  */
 export interface Env {
   /** MDXDatabase Durable Object namespace */
   MDXDB: DurableObjectNamespace<MDXDatabaseRPC>
+  /** Worker loader for dynamic code execution */
+  LOADER?: WorkerLoader
 }
 
 /**

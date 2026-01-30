@@ -19,7 +19,7 @@ export const DATA_TABLE = '_data' as const
 export const RELS_TABLE = '_rels' as const
 
 /**
- * _data table schema - graph nodes
+ * _data table schema - graph nodes with executable code
  */
 export const DATA_SCHEMA = `
 CREATE TABLE IF NOT EXISTS _data (
@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS _data (
   data TEXT NOT NULL DEFAULT '{}',
   content TEXT,
   context TEXT,
+  code TEXT,
+  hash TEXT,
   at TEXT NOT NULL,
   by TEXT,
   "in" TEXT,
@@ -42,7 +44,8 @@ CREATE TABLE IF NOT EXISTS _data (
 export const DATA_INDEXES = `
 CREATE INDEX IF NOT EXISTS idx_data_type ON _data(type);
 CREATE INDEX IF NOT EXISTS idx_data_type_id ON _data(type, id);
-CREATE INDEX IF NOT EXISTS idx_data_at ON _data(at)
+CREATE INDEX IF NOT EXISTS idx_data_at ON _data(at);
+CREATE INDEX IF NOT EXISTS idx_data_hash ON _data(hash)
 `.trim()
 
 /**
