@@ -1,205 +1,102 @@
 /**
  * SQLite Schema Module
  *
- * Modular schema definitions for the mdxdb SQLite adapter.
- * Each table is defined in its own file for maintainability.
- *
- * Tables:
- * - things: Core graph nodes (versioned resources)
- * - relationships: Graph edges connecting things
- * - search: Chunked content with optional embeddings
- * - actions: Pending/active work items
- * - events: Immutable event log (streams to ClickHouse)
- * - artifacts: Cached compiled content (streams to ClickHouse/R2)
+ * Clean schema with _data and _rels tables.
+ * - _data: Things (graph nodes)
+ * - _rels: Relationships (graph edges with bidirectional predicates)
  *
  * @packageDocumentation
  */
 
-// Re-export individual table schemas
-export * from './things.js'
-export * from './relationships.js'
-export * from './search.js'
-export * from './actions.js'
-export * from './events.js'
-export * from './artifacts.js'
+/**
+ * _data table name
+ */
+export const DATA_TABLE = '_data' as const
 
-// Import schemas for combined export
-import { THINGS_TABLE, THINGS_SCHEMA, THINGS_INDEXES } from './things.js'
-import { RELATIONSHIPS_TABLE, RELATIONSHIPS_SCHEMA, RELATIONSHIPS_INDEXES } from './relationships.js'
-import { SEARCH_TABLE, SEARCH_SCHEMA, SEARCH_INDEXES } from './search.js'
-import { ACTIONS_TABLE, ACTIONS_SCHEMA, ACTIONS_INDEXES } from './actions.js'
-import { EVENTS_TABLE, EVENTS_SCHEMA, EVENTS_INDEXES } from './events.js'
-import { ARTIFACTS_TABLE, ARTIFACTS_SCHEMA, ARTIFACTS_INDEXES } from './artifacts.js'
+/**
+ * _rels table name
+ */
+export const RELS_TABLE = '_rels' as const
+
+/**
+ * _data table schema - graph nodes
+ */
+export const DATA_SCHEMA = `
+CREATE TABLE IF NOT EXISTS _data (
+  url TEXT PRIMARY KEY,
+  type TEXT NOT NULL,
+  id TEXT NOT NULL,
+  data TEXT NOT NULL DEFAULT '{}',
+  content TEXT,
+  context TEXT,
+  at TEXT NOT NULL,
+  by TEXT,
+  "in" TEXT,
+  version INTEGER NOT NULL DEFAULT 1
+)
+`.trim()
+
+/**
+ * _data table indexes
+ */
+export const DATA_INDEXES = `
+CREATE INDEX IF NOT EXISTS idx_data_type ON _data(type);
+CREATE INDEX IF NOT EXISTS idx_data_type_id ON _data(type, id);
+CREATE INDEX IF NOT EXISTS idx_data_at ON _data(at)
+`.trim()
+
+/**
+ * _rels table schema - graph edges with bidirectional predicates
+ */
+export const RELS_SCHEMA = `
+CREATE TABLE IF NOT EXISTS _rels (
+  id TEXT PRIMARY KEY,
+  predicate TEXT NOT NULL,
+  reverse TEXT,
+  "from" TEXT NOT NULL,
+  "to" TEXT NOT NULL,
+  data TEXT,
+  at TEXT NOT NULL,
+  by TEXT,
+  "in" TEXT,
+  do TEXT,
+  FOREIGN KEY ("from") REFERENCES _data(url) ON DELETE CASCADE
+)
+`.trim()
+
+/**
+ * _rels table indexes - indexed both directions for efficient lookups
+ */
+export const RELS_INDEXES = `
+CREATE INDEX IF NOT EXISTS idx_rels_from ON _rels("from");
+CREATE INDEX IF NOT EXISTS idx_rels_to ON _rels("to");
+CREATE INDEX IF NOT EXISTS idx_rels_predicate ON _rels(predicate);
+CREATE INDEX IF NOT EXISTS idx_rels_reverse ON _rels(reverse);
+CREATE INDEX IF NOT EXISTS idx_rels_from_predicate ON _rels("from", predicate);
+CREATE INDEX IF NOT EXISTS idx_rels_to_reverse ON _rels("to", reverse);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_rels_unique ON _rels("from", predicate, "to")
+`.trim()
 
 /**
  * All table names
  */
-export const TABLES = [
-  THINGS_TABLE,
-  RELATIONSHIPS_TABLE,
-  SEARCH_TABLE,
-  ACTIONS_TABLE,
-  EVENTS_TABLE,
-  ARTIFACTS_TABLE,
-] as const
+export const TABLES = [DATA_TABLE, RELS_TABLE] as const
 
 export type TableName = (typeof TABLES)[number]
 
 /**
- * Core tables (always needed)
- */
-export const CORE_TABLES = [
-  THINGS_TABLE,
-  RELATIONSHIPS_TABLE,
-  SEARCH_TABLE,
-  ACTIONS_TABLE,
-] as const
-
-/**
- * Streaming tables (synced to ClickHouse/R2)
- */
-export const STREAMING_TABLES = [
-  EVENTS_TABLE,
-  ARTIFACTS_TABLE,
-] as const
-
-/**
- * Map of table name to schema
- */
-export const TABLE_SCHEMAS: Record<TableName, string> = {
-  [THINGS_TABLE]: THINGS_SCHEMA,
-  [RELATIONSHIPS_TABLE]: RELATIONSHIPS_SCHEMA,
-  [SEARCH_TABLE]: SEARCH_SCHEMA,
-  [ACTIONS_TABLE]: ACTIONS_SCHEMA,
-  [EVENTS_TABLE]: EVENTS_SCHEMA,
-  [ARTIFACTS_TABLE]: ARTIFACTS_SCHEMA,
-}
-
-/**
- * Map of table name to indexes
- */
-export const TABLE_INDEXES: Record<TableName, string> = {
-  [THINGS_TABLE]: THINGS_INDEXES,
-  [RELATIONSHIPS_TABLE]: RELATIONSHIPS_INDEXES,
-  [SEARCH_TABLE]: SEARCH_INDEXES,
-  [ACTIONS_TABLE]: ACTIONS_INDEXES,
-  [EVENTS_TABLE]: EVENTS_INDEXES,
-  [ARTIFACTS_TABLE]: ARTIFACTS_INDEXES,
-}
-
-/**
- * Core schema (things, relationships, search, actions)
- * Execute each statement individually
- */
-export const CORE_SCHEMA = [
-  THINGS_SCHEMA,
-  RELATIONSHIPS_SCHEMA,
-  SEARCH_SCHEMA,
-  ACTIONS_SCHEMA,
-].join('\n\n')
-
-/**
- * Core indexes
- */
-export const CORE_INDEXES = [
-  THINGS_INDEXES,
-  RELATIONSHIPS_INDEXES,
-  SEARCH_INDEXES,
-  ACTIONS_INDEXES,
-].join('\n')
-
-/**
- * Full schema for all tables
- */
-export const FULL_SCHEMA = [
-  THINGS_SCHEMA,
-  RELATIONSHIPS_SCHEMA,
-  SEARCH_SCHEMA,
-  ACTIONS_SCHEMA,
-  EVENTS_SCHEMA,
-  ARTIFACTS_SCHEMA,
-].join('\n\n')
-
-/**
- * Full indexes for all tables
- */
-export const FULL_INDEXES = [
-  THINGS_INDEXES,
-  RELATIONSHIPS_INDEXES,
-  SEARCH_INDEXES,
-  ACTIONS_INDEXES,
-  EVENTS_INDEXES,
-  ARTIFACTS_INDEXES,
-].join('\n')
-
-/**
- * Get schema for a specific table
- */
-export function getTableSchema(table: TableName): string {
-  return TABLE_SCHEMAS[table]
-}
-
-/**
- * Get indexes for a specific table
- */
-export function getTableIndexes(table: TableName): string {
-  return TABLE_INDEXES[table]
-}
-
-/**
- * Parse schema into individual statements
- */
-export function parseSchemaStatements(schema: string): string[] {
-  return schema
-    .split(';')
-    .map(s => s.trim())
-    .filter(s => s.length > 0 && !s.startsWith('--'))
-}
-
-/**
- * Get all schema statements (tables + indexes)
+ * Get all schema statements for initialization
  */
 export function getAllSchemaStatements(): string[] {
-  const statements: string[] = []
-
-  // Add table schemas
-  for (const table of TABLES) {
-    statements.push(TABLE_SCHEMAS[table].trim())
-  }
-
-  // Add indexes (split by semicolon since multiple per table)
-  for (const table of TABLES) {
-    const indexStatements = parseSchemaStatements(TABLE_INDEXES[table])
-    statements.push(...indexStatements)
-  }
-
-  return statements
+  return [
+    DATA_SCHEMA,
+    ...DATA_INDEXES.split(';').map(s => s.trim()).filter(Boolean),
+    RELS_SCHEMA,
+    ...RELS_INDEXES.split(';').map(s => s.trim()).filter(Boolean),
+  ]
 }
 
 /**
- * Get core schema statements (tables + indexes)
+ * Schema version
  */
-export function getCoreSchemaStatements(): string[] {
-  const statements: string[] = []
-
-  for (const table of CORE_TABLES) {
-    statements.push(TABLE_SCHEMAS[table].trim())
-    const indexStatements = parseSchemaStatements(TABLE_INDEXES[table])
-    statements.push(...indexStatements)
-  }
-
-  return statements
-}
-
-/**
- * Schema version for migration tracking
- * Increment when schema changes
- */
-export const SCHEMA_VERSION = 1
-
-/**
- * Schema version history
- */
-export const SCHEMA_VERSIONS = {
-  1: 'Initial modular schema with things, relationships, search, actions, events, artifacts',
-} as const
+export const SCHEMA_VERSION = 2

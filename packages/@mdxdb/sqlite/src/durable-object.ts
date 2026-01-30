@@ -1,62 +1,25 @@
 /**
  * MDXDatabase Durable Object
  *
- * A Durable Object that provides SQLite storage for a namespace.
- * Methods are exposed via Workers RPC - call them directly on the stub.
- *
- * @example
- * ```ts
- * // In a Worker
- * const id = env.MDXDB.idFromName('example.com')
- * const db = env.MDXDB.get(id)
- *
- * // Call methods directly via RPC
- * const thing = await db.create({
- *   ns: 'example.com',
- *   type: 'Post',
- *   data: { title: 'Hello' }
- * })
- *
- * const posts = await db.list({ type: 'Post' })
- * ```
+ * Clean implementation with _data and _rels tables.
+ * $id is derived from the DO name, not stored.
  *
  * @packageDocumentation
  */
 
 import { DurableObject } from 'cloudflare:workers'
-
-// DurableObjectState and SqlStorage are global types from @cloudflare/workers-types
 import type {
   Thing,
   Relationship,
-  Event,
-  Action,
-  Artifact,
-  QueryOptions,
-  SearchOptions,
+  ListOptions,
   CreateOptions,
   UpdateOptions,
   RelateOptions,
-  CreateEventOptions,
-  CreateActionOptions,
-  StoreArtifactOptions,
-  EventQueryOptions,
-  ActionQueryOptions,
-  VectorSearchOptions,
-  VectorSearchResult,
-  VectorizeRPC,
-  VectorizeUpsertOptions,
-  ThingRow,
-  RelationshipRow,
-  SearchRow,
-  EventRow,
-  ActionRow,
-  ArtifactRow,
-  Chunk,
-  ArtifactType,
+  RelationshipQueryOptions,
+  DataRow,
+  RelsRow,
   Env,
 } from './types.js'
-
 import { getAllSchemaStatements } from './schema/index.js'
 
 // =============================================================================
@@ -67,9 +30,9 @@ function generateId(): string {
   return `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`
 }
 
-function generateRelationshipId(from: string, type: string, to: string): string {
+function generateRelId(from: string, predicate: string, to: string): string {
   let hash = 0
-  const str = `${from}:${type}:${to}`
+  const str = `${from}:${predicate}:${to}`
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i)
     hash = ((hash << 5) - hash) + char
@@ -78,64 +41,10 @@ function generateRelationshipId(from: string, type: string, to: string): string 
   return `rel_${Math.abs(hash).toString(36)}`
 }
 
-function buildUrl(ns: string, type: string, id: string): string {
-  return `https://${ns}/${type}/${id}`
-}
-
-function parseThingUrl(url: string): { ns: string; type: string; id: string } {
-  const parsed = new URL(url)
-  const parts = parsed.pathname.split('/').filter(Boolean)
-
-  if (parts.length >= 2) {
-    return {
-      ns: parsed.host,
-      type: parts[0]!,
-      id: parts.slice(1).join('/'),
-    }
-  }
-
-  throw new Error(`Invalid thing URL: ${url}`)
-}
-
-function chunkContent(content: string, size = 1000, overlap = 200): Chunk[] {
-  if (!content || content.length === 0) return []
-
-  const chunks: Chunk[] = []
-  let start = 0
-  let index = 0
-
-  while (start < content.length) {
-    let end = Math.min(start + size, content.length)
-
-    if (end < content.length) {
-      const slice = content.slice(start, end)
-      const lastPara = slice.lastIndexOf('\n\n')
-      const lastSentence = Math.max(
-        slice.lastIndexOf('. '),
-        slice.lastIndexOf('! '),
-        slice.lastIndexOf('? ')
-      )
-
-      if (lastPara > size * 0.5) {
-        end = start + lastPara + 2
-      } else if (lastSentence > size * 0.5) {
-        end = start + lastSentence + 2
-      }
-    }
-
-    chunks.push({
-      content: content.slice(start, end).trim(),
-      index,
-      start,
-      end,
-    })
-
-    start = end - overlap
-    if (start >= content.length - overlap) break
-    index++
-  }
-
-  return chunks
+function buildUrl(baseId: string, type: string, id: string): string {
+  // Remove trailing slash from baseId if present
+  const base = baseId.endsWith('/') ? baseId.slice(0, -1) : baseId
+  return `${base}/${type}/${id}`
 }
 
 // =============================================================================
@@ -145,34 +54,30 @@ function chunkContent(content: string, size = 1000, overlap = 200): Chunk[] {
 /**
  * MDXDatabase Durable Object
  *
- * Each instance represents a namespace with its own SQLite database.
- * All public methods are exposed via Workers RPC.
+ * Clean graph database with _data (nodes) and _rels (edges).
+ * $id is derived from the DO name.
  */
 export class MDXDatabase extends DurableObject<Env> {
   private sql: SqlStorage
-  private namespace: string
+  private baseId: string
   private initialized = false
-  private vectorize?: VectorizeRPC
   private doCtx: DurableObjectState
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env)
     this.doCtx = ctx
     this.sql = ctx.storage.sql
-    this.namespace = ctx.id.name ?? ctx.id.toString()
 
-    // Get Vectorize binding if available, scoped to this namespace
-    if (env.VECTORIZE) {
-      this.vectorize = env.VECTORIZE.withNamespace(this.namespace)
-    }
+    // Derive $id from DO name
+    // If name looks like a domain, prefix with https://
+    const name = ctx.id.name ?? ctx.id.toString()
+    this.baseId = name.includes('://') ? name : `https://${name}`
   }
 
   private ensureInitialized(): void {
     if (this.initialized) return
 
-    // Run schema in a transaction
     this.doCtx.storage.transactionSync(() => {
-      // Execute each schema statement from the schema module
       const statements = getAllSchemaStatements()
       for (const stmt of statements) {
         this.sql.exec(stmt)
@@ -183,19 +88,25 @@ export class MDXDatabase extends DurableObject<Env> {
   }
 
   // ===========================================================================
+  // Identity
+  // ===========================================================================
+
+  /**
+   * Get the DO's canonical $id
+   */
+  $id(): string {
+    return this.baseId
+  }
+
+  // ===========================================================================
   // Thing Operations
   // ===========================================================================
 
-  async list(options: QueryOptions = {}): Promise<Thing[]> {
+  async list(options: ListOptions = {}): Promise<Thing[]> {
     this.ensureInitialized()
 
-    let sql = 'SELECT * FROM things WHERE deleted_at IS NULL'
+    let sql = 'SELECT * FROM _data WHERE 1=1'
     const bindings: unknown[] = []
-
-    if (options.ns) {
-      sql += ' AND ns = ?'
-      bindings.push(options.ns)
-    }
 
     if (options.type) {
       sql += ' AND type = ?'
@@ -209,16 +120,15 @@ export class MDXDatabase extends DurableObject<Env> {
       }
     }
 
-    // Order
-    const orderDir = options.order === 'desc' ? 'DESC' : 'ASC'
+    const orderDir = options.order === 'asc' ? 'ASC' : 'DESC'
     if (options.orderBy) {
-      if (['url', 'ns', 'type', 'id', 'created_at', 'updated_at'].includes(options.orderBy)) {
+      if (['url', 'type', 'id', 'at', 'version'].includes(options.orderBy)) {
         sql += ` ORDER BY ${options.orderBy} ${orderDir}`
       } else {
         sql += ` ORDER BY json_extract(data, '$.${options.orderBy}') ${orderDir}`
       }
     } else {
-      sql += ` ORDER BY updated_at DESC`
+      sql += ` ORDER BY at DESC`
     }
 
     if (options.limit) {
@@ -229,15 +139,15 @@ export class MDXDatabase extends DurableObject<Env> {
       sql += ` OFFSET ${options.offset}`
     }
 
-    const cursor = this.sql.exec<ThingRow>(sql, ...bindings)
-    return cursor.toArray().map((row: ThingRow) => this.rowToThing(row))
+    const cursor = this.sql.exec<DataRow>(sql, ...bindings)
+    return cursor.toArray().map((row) => this.rowToThing(row))
   }
 
-  async read(url: string): Promise<Thing | null> {
+  async get(url: string): Promise<Thing | null> {
     this.ensureInitialized()
 
-    const cursor = this.sql.exec<ThingRow>(
-      'SELECT * FROM things WHERE url = ? AND deleted_at IS NULL',
+    const cursor = this.sql.exec<DataRow>(
+      'SELECT * FROM _data WHERE url = ?',
       url
     )
     const rows = cursor.toArray()
@@ -245,50 +155,50 @@ export class MDXDatabase extends DurableObject<Env> {
     return this.rowToThing(rows[0]!)
   }
 
-  async readById(type: string, id: string): Promise<Thing | null> {
-    return this.read(buildUrl(this.namespace, type, id))
+  async getById(type: string, id: string): Promise<Thing | null> {
+    return this.get(buildUrl(this.baseId, type, id))
   }
 
-  async create<TData = Record<string, unknown>>(options: CreateOptions<TData>): Promise<Thing<TData>> {
+  async create<TData = Record<string, unknown>>(
+    options: CreateOptions<TData>
+  ): Promise<Thing<TData>> {
     this.ensureInitialized()
 
     const id = options.id ?? generateId()
-    const url = options.url ?? buildUrl(options.ns, options.type, id)
+    const url = buildUrl(this.baseId, options.type, id)
     const now = new Date().toISOString()
 
     // Check if exists
-    const existing = await this.read(url)
+    const existing = await this.get(url)
     if (existing) {
       throw new Error(`Thing already exists: ${url}`)
     }
 
     this.sql.exec(
-      `INSERT INTO things (url, ns, type, id, context, data, content, created_at, updated_at)
+      `INSERT INTO _data (url, type, id, data, content, context, at, by, "in")
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       url,
-      options.ns,
       options.type,
       id,
-      options['@context'] ? JSON.stringify(options['@context']) : null,
       JSON.stringify(options.data),
-      options.content ?? '',
+      options.content ?? null,
+      options['@context'] ? JSON.stringify(options['@context']) : null,
       now,
-      now
+      options.by ?? null,
+      options.in ?? null
     )
 
-    // Index for search
-    await this.indexThing(url, options.data as Record<string, unknown>, options.content)
-
     return {
-      ns: options.ns,
+      url,
       type: options.type,
       id,
-      url,
       data: options.data,
       content: options.content,
-      createdAt: new Date(now),
-      updatedAt: new Date(now),
       '@context': options['@context'],
+      at: new Date(now),
+      by: options.by,
+      in: options.in,
+      version: 1,
     }
   }
 
@@ -298,433 +208,193 @@ export class MDXDatabase extends DurableObject<Env> {
   ): Promise<Thing<TData>> {
     this.ensureInitialized()
 
-    const existing = await this.read(url)
+    const existing = await this.get(url)
     if (!existing) {
       throw new Error(`Thing not found: ${url}`)
     }
 
-    const merged = { ...existing.data, ...options.data } as TData
+    // Optimistic locking
+    if (options.version !== undefined && options.version !== existing.version) {
+      throw new Error(`Version conflict: expected ${options.version}, got ${existing.version}`)
+    }
+
+    const merged = options.data
+      ? { ...existing.data, ...options.data }
+      : existing.data
     const now = new Date().toISOString()
 
     this.sql.exec(
-      `UPDATE things SET data = ?, content = COALESCE(?, content), updated_at = ?, version = version + 1
+      `UPDATE _data SET data = ?, content = COALESCE(?, content), at = ?, by = ?, "in" = ?, version = version + 1
        WHERE url = ?`,
       JSON.stringify(merged),
       options.content ?? null,
       now,
+      options.by ?? null,
+      options.in ?? null,
       url
     )
 
-    // Re-index for search
-    await this.indexThing(url, merged as Record<string, unknown>, options.content ?? existing.content)
-
     return {
       ...existing,
-      data: merged,
+      data: merged as TData,
       content: options.content ?? existing.content,
-      updatedAt: new Date(now),
-    } as Thing<TData>
+      at: new Date(now),
+      by: options.by,
+      in: options.in,
+      version: existing.version + 1,
+    }
   }
 
-  async upsert<TData = Record<string, unknown>>(options: CreateOptions<TData>): Promise<Thing<TData>> {
+  async upsert<TData = Record<string, unknown>>(
+    options: CreateOptions<TData>
+  ): Promise<Thing<TData>> {
     const id = options.id ?? generateId()
-    const url = options.url ?? buildUrl(options.ns, options.type, id)
+    const url = buildUrl(this.baseId, options.type, id)
 
-    const existing = await this.read(url)
+    const existing = await this.get(url)
     if (existing) {
-      return this.update<TData>(url, { data: options.data, content: options.content })
+      return this.update<TData>(url, {
+        data: options.data,
+        content: options.content,
+        by: options.by,
+        in: options.in,
+      })
     }
 
-    return this.create({ ...options, id, url })
+    return this.create({ ...options, id })
   }
 
-  async remove(url: string): Promise<boolean> {
+  async delete(url: string): Promise<boolean> {
     this.ensureInitialized()
-
-    // Delete vectors from Vectorize
-    await this.deleteVectors(url)
-
-    // Delete search chunks
-    this.sql.exec('DELETE FROM search WHERE thing_url = ?', url)
 
     // Delete relationships
-    this.sql.exec('DELETE FROM relationships WHERE from_url = ? OR to_url = ?', url, url)
+    this.sql.exec('DELETE FROM _rels WHERE "from" = ? OR "to" = ?', url, url)
 
     // Delete thing
-    const cursor = this.sql.exec('DELETE FROM things WHERE url = ?', url)
+    const cursor = this.sql.exec('DELETE FROM _data WHERE url = ?', url)
     return cursor.rowsWritten > 0
-  }
-
-  async search(options: SearchOptions): Promise<Thing[]> {
-    this.ensureInitialized()
-
-    // Simple text search fallback
-    const queryLower = options.query.toLowerCase()
-    const things = await this.list({
-      type: options.type,
-      limit: options.limit,
-      offset: options.offset,
-    })
-
-    return things.filter(thing => {
-      const searchText = [
-        thing.id,
-        thing.type,
-        (thing.data as Record<string, unknown>).title,
-        (thing.data as Record<string, unknown>).name,
-        (thing.data as Record<string, unknown>).content,
-        thing.content,
-        JSON.stringify(thing.data),
-      ].filter(Boolean).join(' ').toLowerCase()
-
-      return searchText.includes(queryLower)
-    })
   }
 
   // ===========================================================================
   // Relationship Operations
   // ===========================================================================
 
-  async relate<TData = Record<string, unknown>>(options: RelateOptions<TData>): Promise<Relationship<TData>> {
+  async relate<TData = Record<string, unknown>>(
+    options: RelateOptions<TData>
+  ): Promise<Relationship<TData>> {
     this.ensureInitialized()
 
-    const id = generateRelationshipId(options.from, options.type, options.to)
+    const id = generateRelId(options.from, options.predicate, options.to)
     const now = new Date().toISOString()
 
     this.sql.exec(
-      `INSERT OR REPLACE INTO relationships (id, type, from_url, to_url, data, created_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT OR REPLACE INTO _rels (id, predicate, reverse, "from", "to", data, at, by, "in", do)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       id,
-      options.type,
+      options.predicate,
+      options.reverse ?? null,
       options.from,
       options.to,
       options.data ? JSON.stringify(options.data) : null,
-      now
+      now,
+      options.by ?? null,
+      options.in ?? null,
+      options.do ?? null
     )
 
     return {
       id,
-      type: options.type,
+      predicate: options.predicate,
+      reverse: options.reverse,
       from: options.from,
       to: options.to,
       data: options.data,
-      createdAt: new Date(now),
+      at: new Date(now),
+      by: options.by,
+      in: options.in,
+      do: options.do,
     }
   }
 
-  async unrelate(from: string, type: string, to: string): Promise<boolean> {
+  async unrelate(from: string, predicate: string, to: string): Promise<boolean> {
     this.ensureInitialized()
 
-    const id = generateRelationshipId(from, type, to)
-    const cursor = this.sql.exec('DELETE FROM relationships WHERE id = ?', id)
+    const id = generateRelId(from, predicate, to)
+    const cursor = this.sql.exec('DELETE FROM _rels WHERE id = ?', id)
     return cursor.rowsWritten > 0
   }
 
-  async related(url: string, type?: string, direction: 'from' | 'to' | 'both' = 'from'): Promise<Thing[]> {
+  /**
+   * Get related things via predicate (forward direction)
+   * Example: post.related('author') returns the author
+   */
+  async related(url: string, predicate: string): Promise<Thing[]> {
     this.ensureInitialized()
 
-    const urls: string[] = []
-
-    // direction='to': Return things this URL points TO (outbound, where from_url = url)
-    if (direction === 'to' || direction === 'both') {
-      let sql = 'SELECT to_url FROM relationships WHERE from_url = ?'
-      const bindings: unknown[] = [url]
-      if (type) {
-        sql += ' AND type = ?'
-        bindings.push(type)
-      }
-      const cursor = this.sql.exec<{ to_url: string }>(sql, ...bindings)
-      urls.push(...cursor.toArray().map((r: { to_url: string }) => r.to_url))
-    }
-
-    // direction='from': Return things that point TO this URL (inbound, where to_url = url)
-    if (direction === 'from' || direction === 'both') {
-      let sql = 'SELECT from_url FROM relationships WHERE to_url = ?'
-      const bindings: unknown[] = [url]
-      if (type) {
-        sql += ' AND type = ?'
-        bindings.push(type)
-      }
-      const cursor = this.sql.exec<{ from_url: string }>(sql, ...bindings)
-      urls.push(...cursor.toArray().map((r: { from_url: string }) => r.from_url))
-    }
-
-    const uniqueUrls = [...new Set(urls)]
-    if (uniqueUrls.length === 0) return []
-
-    const placeholders = uniqueUrls.map(() => '?').join(', ')
-    const cursor = this.sql.exec<ThingRow>(
-      `SELECT * FROM things WHERE url IN (${placeholders}) AND deleted_at IS NULL`,
-      ...uniqueUrls
+    const cursor = this.sql.exec<{ to: string }>(
+      'SELECT "to" FROM _rels WHERE "from" = ? AND predicate = ?',
+      url,
+      predicate
     )
-    return cursor.toArray().map((row: ThingRow) => this.rowToThing(row))
-  }
+    const urls = cursor.toArray().map((r) => r.to)
 
-  async relationships(url: string, type?: string, direction: 'from' | 'to' | 'both' = 'both'): Promise<Relationship[]> {
-    this.ensureInitialized()
+    if (urls.length === 0) return []
 
-    const results: Relationship[] = []
-
-    if (direction === 'from' || direction === 'both') {
-      let sql = 'SELECT * FROM relationships WHERE from_url = ?'
-      const bindings: unknown[] = [url]
-      if (type) {
-        sql += ' AND type = ?'
-        bindings.push(type)
-      }
-      const cursor = this.sql.exec<RelationshipRow>(sql, ...bindings)
-      results.push(...cursor.toArray().map((row: RelationshipRow) => this.rowToRelationship(row)))
-    }
-
-    if (direction === 'to' || direction === 'both') {
-      let sql = 'SELECT * FROM relationships WHERE to_url = ?'
-      const bindings: unknown[] = [url]
-      if (type) {
-        sql += ' AND type = ?'
-        bindings.push(type)
-      }
-      const cursor = this.sql.exec<RelationshipRow>(sql, ...bindings)
-      results.push(...cursor.toArray().map((row: RelationshipRow) => this.rowToRelationship(row)))
-    }
-
-    return results
-  }
-
-  // ===========================================================================
-  // Vector Search Operations
-  // ===========================================================================
-
-  /**
-   * Search for similar vectors using Cloudflare Vectorize.
-   *
-   * When a Vectorize binding is available, this method delegates the search
-   * to Cloudflare Vectorize via Workers RPC. The cosine similarity calculation
-   * is performed by Vectorize, not SQLite.
-   *
-   * @param options - Search options including embedding vector
-   * @returns Array of search results with similarity scores
-   */
-  async vectorSearch(options: VectorSearchOptions): Promise<VectorSearchResult[]> {
-    this.ensureInitialized()
-
-    // If we have a Vectorize binding and an embedding, use Vectorize RPC
-    if (this.vectorize && options.embedding) {
-      const results = await this.vectorize.search({
-        embedding: options.embedding,
-        topK: options.limit ?? 10,
-        type: options.type,
-        thingUrls: options.thingUrls,
-        minScore: options.minScore,
-      })
-
-      return results
-    }
-
-    // Fallback: No Vectorize binding or no embedding provided
-    // Return empty results - vector search requires Vectorize
-    if (!this.vectorize) {
-      console.warn('vectorSearch: No Vectorize binding configured. Vector search requires @mdxdb/vectorize.')
-    }
-    if (!options.embedding) {
-      console.warn('vectorSearch: No embedding provided. Use client-side embedding before calling vectorSearch.')
-    }
-
-    return []
-  }
-
-  /**
-   * Set embedding for a thing's content chunk and upsert to Vectorize.
-   *
-   * This method stores the embedding in SQLite for backup and also
-   * upserts it to Cloudflare Vectorize for similarity search.
-   *
-   * @param thingUrl - The URL of the thing
-   * @param chunkIndex - The index of the content chunk
-   * @param embedding - The embedding vector
-   */
-  async setEmbedding(thingUrl: string, chunkIndex: number, embedding: number[]): Promise<void> {
-    this.ensureInitialized()
-
-    // Store embedding in SQLite (for backup/debugging)
-    this.sql.exec(
-      `UPDATE search SET embedding = ? WHERE thing_url = ? AND chunk_index = ?`,
-      JSON.stringify(embedding),
-      thingUrl,
-      chunkIndex
+    const placeholders = urls.map(() => '?').join(', ')
+    const thingCursor = this.sql.exec<DataRow>(
+      `SELECT * FROM _data WHERE url IN (${placeholders})`,
+      ...urls
     )
-
-    // If Vectorize is available, upsert the embedding there too
-    if (this.vectorize) {
-      // Get the chunk content and thing type from SQLite
-      const cursor = this.sql.exec<SearchRow & { type: string }>(
-        `SELECT s.*, t.type FROM search s
-         JOIN things t ON s.thing_url = t.url
-         WHERE s.thing_url = ? AND s.chunk_index = ?`,
-        thingUrl,
-        chunkIndex
-      )
-      const rows = cursor.toArray()
-
-      if (rows.length > 0) {
-        const row = rows[0]!
-        const upsertOptions: VectorizeUpsertOptions = {
-          thingUrl,
-          chunkIndex,
-          embedding,
-          content: row.content,
-          type: row.type,
-          metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
-        }
-
-        await this.vectorize.upsert([upsertOptions])
-      }
-    }
+    return thingCursor.toArray().map((row) => this.rowToThing(row))
   }
 
   /**
-   * Upsert embeddings for a thing's content chunks in bulk.
-   *
-   * This is more efficient than calling setEmbedding multiple times.
-   *
-   * @param thingUrl - The URL of the thing
-   * @param embeddings - Array of chunk embeddings with their indices
+   * Get related things via reverse (reverse direction)
+   * Example: user.relatedBy('posts') returns posts where user is the author
    */
-  async upsertEmbeddings(
-    thingUrl: string,
-    embeddings: Array<{ chunkIndex: number; embedding: number[] }>
-  ): Promise<void> {
+  async relatedBy(url: string, reverse: string): Promise<Thing[]> {
     this.ensureInitialized()
 
-    // Store embeddings in SQLite
-    for (const { chunkIndex, embedding } of embeddings) {
-      this.sql.exec(
-        `UPDATE search SET embedding = ? WHERE thing_url = ? AND chunk_index = ?`,
-        JSON.stringify(embedding),
-        thingUrl,
-        chunkIndex
-      )
-    }
-
-    // If Vectorize is available, upsert all embeddings
-    if (this.vectorize) {
-      // Get chunk content and thing type for all chunks
-      const cursor = this.sql.exec<SearchRow & { type: string }>(
-        `SELECT s.*, t.type FROM search s
-         JOIN things t ON s.thing_url = t.url
-         WHERE s.thing_url = ?`,
-        thingUrl
-      )
-      const rows = cursor.toArray()
-
-      const vectorizeOptions: VectorizeUpsertOptions[] = []
-
-      for (const { chunkIndex, embedding } of embeddings) {
-        const row = rows.find((r: SearchRow & { type: string }) => r.chunk_index === chunkIndex)
-        if (!row) continue
-
-        vectorizeOptions.push({
-          thingUrl,
-          chunkIndex,
-          embedding,
-          content: row.content,
-          type: row.type,
-          metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
-        })
-      }
-
-      if (vectorizeOptions.length > 0) {
-        await this.vectorize.upsert(vectorizeOptions)
-      }
-    }
-  }
-
-  /**
-   * Delete vector embeddings for a thing from Vectorize.
-   *
-   * Called automatically when a thing is deleted.
-   *
-   * @param thingUrl - The URL of the thing to delete vectors for
-   */
-  async deleteVectors(thingUrl: string): Promise<void> {
-    if (this.vectorize) {
-      await this.vectorize.delete({ thingUrls: [thingUrl] })
-    }
-  }
-
-  // ===========================================================================
-  // Event Operations
-  // ===========================================================================
-
-  async track<TData = Record<string, unknown>>(options: CreateEventOptions<TData>): Promise<Event<TData>> {
-    this.ensureInitialized()
-
-    const id = generateId()
-    const now = new Date().toISOString()
-
-    this.sql.exec(
-      `INSERT INTO events (id, type, timestamp, source, data, correlation_id, causation_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      id,
-      options.type,
-      now,
-      options.source,
-      JSON.stringify(options.data),
-      options.correlationId ?? null,
-      options.causationId ?? null
+    const cursor = this.sql.exec<{ from: string }>(
+      'SELECT "from" FROM _rels WHERE "to" = ? AND reverse = ?',
+      url,
+      reverse
     )
+    const urls = cursor.toArray().map((r) => r.from)
 
-    return {
-      id,
-      type: options.type,
-      timestamp: new Date(now),
-      source: options.source,
-      data: options.data,
-      correlationId: options.correlationId,
-      causationId: options.causationId,
-    }
+    if (urls.length === 0) return []
+
+    const placeholders = urls.map(() => '?').join(', ')
+    const thingCursor = this.sql.exec<DataRow>(
+      `SELECT * FROM _data WHERE url IN (${placeholders})`,
+      ...urls
+    )
+    return thingCursor.toArray().map((row) => this.rowToThing(row))
   }
 
-  async getEvent(id: string): Promise<Event | null> {
+  /**
+   * Get all relationships for a thing
+   */
+  async relationships(
+    url: string,
+    options: RelationshipQueryOptions = {}
+  ): Promise<Relationship[]> {
     this.ensureInitialized()
 
-    const cursor = this.sql.exec<EventRow>('SELECT * FROM events WHERE id = ?', id)
-    const rows = cursor.toArray()
-    if (rows.length === 0) return null
-    return this.rowToEvent(rows[0]!)
-  }
+    let sql = 'SELECT * FROM _rels WHERE ("from" = ? OR "to" = ?)'
+    const bindings: unknown[] = [url, url]
 
-  async queryEvents(options: EventQueryOptions = {}): Promise<Event[]> {
-    this.ensureInitialized()
-
-    let sql = 'SELECT * FROM events WHERE 1=1'
-    const bindings: unknown[] = []
-
-    if (options.type) {
-      sql += ' AND type = ?'
-      bindings.push(options.type)
+    if (options.predicate) {
+      sql += ' AND predicate = ?'
+      bindings.push(options.predicate)
     }
 
-    if (options.source) {
-      sql += ' AND source = ?'
-      bindings.push(options.source)
+    if (options.reverse) {
+      sql += ' AND reverse = ?'
+      bindings.push(options.reverse)
     }
 
-    if (options.correlationId) {
-      sql += ' AND correlation_id = ?'
-      bindings.push(options.correlationId)
-    }
-
-    if (options.after) {
-      sql += ' AND timestamp > ?'
-      bindings.push(options.after.toISOString())
-    }
-
-    if (options.before) {
-      sql += ' AND timestamp < ?'
-      bindings.push(options.before.toISOString())
-    }
-
-    sql += ' ORDER BY timestamp DESC'
+    sql += ' ORDER BY at DESC'
 
     if (options.limit) {
       sql += ` LIMIT ${options.limit}`
@@ -734,294 +404,8 @@ export class MDXDatabase extends DurableObject<Env> {
       sql += ` OFFSET ${options.offset}`
     }
 
-    const cursor = this.sql.exec<EventRow>(sql, ...bindings)
-    return cursor.toArray().map((row: EventRow) => this.rowToEvent(row))
-  }
-
-  // ===========================================================================
-  // Action Operations
-  // ===========================================================================
-
-  async send<TData = Record<string, unknown>>(options: CreateActionOptions<TData>): Promise<Action<TData>> {
-    this.ensureInitialized()
-
-    const id = generateId()
-    const now = new Date().toISOString()
-
-    this.sql.exec(
-      `INSERT INTO actions (id, actor, object, action, status, created_at, updated_at, metadata)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      id,
-      options.actor,
-      options.object,
-      options.action,
-      options.status ?? 'pending',
-      now,
-      now,
-      options.metadata ? JSON.stringify(options.metadata) : null
-    )
-
-    return {
-      id,
-      actor: options.actor,
-      object: options.object,
-      action: options.action,
-      status: options.status ?? 'pending',
-      createdAt: new Date(now),
-      updatedAt: new Date(now),
-      metadata: options.metadata,
-    }
-  }
-
-  async do<TData = Record<string, unknown>>(options: CreateActionOptions<TData>): Promise<Action<TData>> {
-    this.ensureInitialized()
-
-    const id = generateId()
-    const now = new Date().toISOString()
-
-    this.sql.exec(
-      `INSERT INTO actions (id, actor, object, action, status, created_at, updated_at, started_at, metadata)
-       VALUES (?, ?, ?, ?, 'active', ?, ?, ?, ?)`,
-      id,
-      options.actor,
-      options.object,
-      options.action,
-      now,
-      now,
-      now,
-      options.metadata ? JSON.stringify(options.metadata) : null
-    )
-
-    return {
-      id,
-      actor: options.actor,
-      object: options.object,
-      action: options.action,
-      status: 'active',
-      createdAt: new Date(now),
-      updatedAt: new Date(now),
-      startedAt: new Date(now),
-      metadata: options.metadata,
-    }
-  }
-
-  async getAction(id: string): Promise<Action | null> {
-    this.ensureInitialized()
-
-    const cursor = this.sql.exec<ActionRow>('SELECT * FROM actions WHERE id = ?', id)
-    const rows = cursor.toArray()
-    if (rows.length === 0) return null
-    return this.rowToAction(rows[0]!)
-  }
-
-  async queryActions(options: ActionQueryOptions = {}): Promise<Action[]> {
-    this.ensureInitialized()
-
-    let sql = 'SELECT * FROM actions WHERE 1=1'
-    const bindings: unknown[] = []
-
-    if (options.actor) {
-      sql += ' AND actor = ?'
-      bindings.push(options.actor)
-    }
-
-    if (options.object) {
-      sql += ' AND object = ?'
-      bindings.push(options.object)
-    }
-
-    if (options.action) {
-      sql += ' AND action = ?'
-      bindings.push(options.action)
-    }
-
-    if (options.status) {
-      if (Array.isArray(options.status)) {
-        const placeholders = options.status.map(() => '?').join(', ')
-        sql += ` AND status IN (${placeholders})`
-        bindings.push(...options.status)
-      } else {
-        sql += ' AND status = ?'
-        bindings.push(options.status)
-      }
-    }
-
-    sql += ' ORDER BY created_at DESC'
-
-    if (options.limit) {
-      sql += ` LIMIT ${options.limit}`
-    }
-
-    if (options.offset) {
-      sql += ` OFFSET ${options.offset}`
-    }
-
-    const cursor = this.sql.exec<ActionRow>(sql, ...bindings)
-    return cursor.toArray().map((row: ActionRow) => this.rowToAction(row))
-  }
-
-  async startAction(id: string): Promise<Action> {
-    this.ensureInitialized()
-
-    const now = new Date().toISOString()
-    this.sql.exec(
-      `UPDATE actions SET status = 'active', started_at = ?, updated_at = ? WHERE id = ?`,
-      now,
-      now,
-      id
-    )
-
-    const action = await this.getAction(id)
-    if (!action) throw new Error(`Action not found: ${id}`)
-    return action
-  }
-
-  async completeAction(id: string, result?: unknown): Promise<Action> {
-    this.ensureInitialized()
-
-    const now = new Date().toISOString()
-    this.sql.exec(
-      `UPDATE actions SET status = 'completed', completed_at = ?, updated_at = ?, result = ? WHERE id = ?`,
-      now,
-      now,
-      result !== undefined ? JSON.stringify(result) : null,
-      id
-    )
-
-    const action = await this.getAction(id)
-    if (!action) throw new Error(`Action not found: ${id}`)
-    return action
-  }
-
-  async failAction(id: string, error: string): Promise<Action> {
-    this.ensureInitialized()
-
-    const now = new Date().toISOString()
-    this.sql.exec(
-      `UPDATE actions SET status = 'failed', completed_at = ?, updated_at = ?, error = ? WHERE id = ?`,
-      now,
-      now,
-      error,
-      id
-    )
-
-    const action = await this.getAction(id)
-    if (!action) throw new Error(`Action not found: ${id}`)
-    return action
-  }
-
-  async cancelAction(id: string): Promise<Action> {
-    this.ensureInitialized()
-
-    const now = new Date().toISOString()
-    this.sql.exec(
-      `UPDATE actions SET status = 'cancelled', completed_at = ?, updated_at = ? WHERE id = ?`,
-      now,
-      now,
-      id
-    )
-
-    const action = await this.getAction(id)
-    if (!action) throw new Error(`Action not found: ${id}`)
-    return action
-  }
-
-  // ===========================================================================
-  // Artifact Operations
-  // ===========================================================================
-
-  async storeArtifact<TContent = unknown>(options: StoreArtifactOptions<TContent>): Promise<Artifact<TContent>> {
-    this.ensureInitialized()
-
-    const now = new Date().toISOString()
-    const content = JSON.stringify(options.content)
-    const expiresAt = options.ttl
-      ? new Date(Date.now() + options.ttl).toISOString()
-      : null
-
-    this.sql.exec(
-      `INSERT OR REPLACE INTO artifacts (key, type, source, source_hash, created_at, expires_at, content, size, metadata)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      options.key,
-      options.type,
-      options.source,
-      options.sourceHash,
-      now,
-      expiresAt,
-      content,
-      content.length,
-      options.metadata ? JSON.stringify(options.metadata) : null
-    )
-
-    return {
-      key: options.key,
-      type: options.type,
-      source: options.source,
-      sourceHash: options.sourceHash,
-      createdAt: new Date(now),
-      expiresAt: expiresAt ? new Date(expiresAt) : undefined,
-      content: options.content,
-      size: content.length,
-      metadata: options.metadata,
-    }
-  }
-
-  async getArtifact<TContent = unknown>(key: string): Promise<Artifact<TContent> | null> {
-    this.ensureInitialized()
-
-    const cursor = this.sql.exec<ArtifactRow>('SELECT * FROM artifacts WHERE key = ?', key)
-    const rows = cursor.toArray()
-    if (rows.length === 0) return null
-
-    const row = rows[0]!
-
-    // Check if expired
-    if (row.expires_at && new Date(row.expires_at) < new Date()) {
-      await this.deleteArtifact(key)
-      return null
-    }
-
-    return this.rowToArtifact<TContent>(row)
-  }
-
-  async getArtifactBySource(source: string, type: ArtifactType): Promise<Artifact | null> {
-    this.ensureInitialized()
-
-    const cursor = this.sql.exec<ArtifactRow>(
-      'SELECT * FROM artifacts WHERE source = ? AND type = ?',
-      source,
-      type
-    )
-    const rows = cursor.toArray()
-    if (rows.length === 0) return null
-
-    const row = rows[0]!
-
-    // Check if expired
-    if (row.expires_at && new Date(row.expires_at) < new Date()) {
-      await this.deleteArtifact(row.key)
-      return null
-    }
-
-    return this.rowToArtifact(row)
-  }
-
-  async deleteArtifact(key: string): Promise<boolean> {
-    this.ensureInitialized()
-
-    const cursor = this.sql.exec('DELETE FROM artifacts WHERE key = ?', key)
-    return cursor.rowsWritten > 0
-  }
-
-  async cleanExpiredArtifacts(): Promise<number> {
-    this.ensureInitialized()
-
-    const now = new Date().toISOString()
-    const cursor = this.sql.exec(
-      'DELETE FROM artifacts WHERE expires_at IS NOT NULL AND expires_at < ?',
-      now
-    )
-    return cursor.rowsWritten
+    const cursor = this.sql.exec<RelsRow>(sql, ...bindings)
+    return cursor.toArray().map((row) => this.rowToRelationship(row))
   }
 
   // ===========================================================================
@@ -1032,120 +416,43 @@ export class MDXDatabase extends DurableObject<Env> {
     return this.sql.databaseSize
   }
 
-  getNamespace(): string {
-    return this.namespace
-  }
-
   // ===========================================================================
   // Private Helpers
   // ===========================================================================
 
-  private async indexThing(url: string, data: Record<string, unknown>, content?: string): Promise<void> {
-    // Delete existing chunks
-    this.sql.exec('DELETE FROM search WHERE thing_url = ?', url)
-
-    // Get content to index
-    const textContent = [
-      data.title,
-      data.name,
-      data.description,
-      data.content,
-      data.text,
-      content,
-    ].filter(v => typeof v === 'string').join('\n\n')
-
-    if (!textContent) return
-
-    // Chunk content
-    const chunks = chunkContent(textContent)
-
-    // Insert chunks (embeddings will be set separately by client)
-    for (const chunk of chunks) {
-      const chunkId = `${url}_chunk_${chunk.index}`
-      this.sql.exec(
-        `INSERT INTO search (id, thing_url, chunk_index, content, metadata)
-         VALUES (?, ?, ?, ?, ?)`,
-        chunkId,
-        url,
-        chunk.index,
-        chunk.content,
-        JSON.stringify({ start: chunk.start, end: chunk.end })
-      )
-    }
-  }
-
-  private rowToThing<TData = Record<string, unknown>>(row: ThingRow): Thing<TData> {
+  private rowToThing<TData = Record<string, unknown>>(row: DataRow): Thing<TData> {
     return {
-      ns: row.ns,
-      type: row.type,
-      id: row.id,
       url: row.url,
+      type: row.type,
+      id: row.id,
       data: JSON.parse(row.data) as TData,
-      content: row.content || undefined,
-      createdAt: new Date(row.created_at),
-      updatedAt: new Date(row.updated_at),
+      content: row.content ?? undefined,
       '@context': row.context ? JSON.parse(row.context) : undefined,
+      at: new Date(row.at),
+      by: row.by ?? undefined,
+      in: row.in ?? undefined,
+      version: row.version,
     }
   }
 
-  private rowToRelationship<TData = Record<string, unknown>>(row: RelationshipRow): Relationship<TData> {
+  private rowToRelationship<TData = Record<string, unknown>>(row: RelsRow): Relationship<TData> {
     return {
       id: row.id,
-      type: row.type,
-      from: row.from_url,
-      to: row.to_url,
-      data: row.data ? JSON.parse(row.data) : undefined,
-      createdAt: new Date(row.created_at),
-    }
-  }
-
-  private rowToEvent<TData = Record<string, unknown>>(row: EventRow): Event<TData> {
-    return {
-      id: row.id,
-      type: row.type,
-      timestamp: new Date(row.timestamp),
-      source: row.source,
-      data: JSON.parse(row.data) as TData,
-      correlationId: row.correlation_id ?? undefined,
-      causationId: row.causation_id ?? undefined,
-    }
-  }
-
-  private rowToAction<TData = Record<string, unknown>>(row: ActionRow): Action<TData> {
-    return {
-      id: row.id,
-      actor: row.actor,
-      object: row.object,
-      action: row.action,
-      status: row.status,
-      createdAt: new Date(row.created_at),
-      updatedAt: new Date(row.updated_at),
-      startedAt: row.started_at ? new Date(row.started_at) : undefined,
-      completedAt: row.completed_at ? new Date(row.completed_at) : undefined,
-      result: row.result ? JSON.parse(row.result) : undefined,
-      error: row.error ?? undefined,
-      metadata: row.metadata ? JSON.parse(row.metadata) as TData : undefined,
-    }
-  }
-
-  private rowToArtifact<TContent = unknown>(row: ArtifactRow): Artifact<TContent> {
-    return {
-      key: row.key,
-      type: row.type as ArtifactType,
-      source: row.source,
-      sourceHash: row.source_hash,
-      createdAt: new Date(row.created_at),
-      expiresAt: row.expires_at ? new Date(row.expires_at) : undefined,
-      content: JSON.parse(row.content) as TContent,
-      size: row.size ?? undefined,
-      metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
+      predicate: row.predicate,
+      reverse: row.reverse ?? undefined,
+      from: row.from,
+      to: row.to,
+      data: row.data ? (JSON.parse(row.data) as TData) : undefined,
+      at: new Date(row.at),
+      by: row.by ?? undefined,
+      in: row.in ?? undefined,
+      do: row.do ?? undefined,
     }
   }
 }
 
 /**
- * Default export for Workers compatibility
- * Miniflare requires a fetch handler even when using RPC
+ * Default export for Workers
  */
 export default {
   async fetch(_request: Request, _env: Env): Promise<Response> {

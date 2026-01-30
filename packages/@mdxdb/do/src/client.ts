@@ -1,7 +1,7 @@
 /**
- * MDXDatabase Client
+ * MDXDurableObject Client
  *
- * Client wrapper for calling MDXDatabase via Workers RPC.
+ * Client wrapper for calling MDXDurableObject via Workers RPC.
  *
  * @packageDocumentation
  */
@@ -14,22 +14,20 @@ import type {
   UpdateOptions,
   RelateOptions,
   RelationshipQueryOptions,
-  MDXDatabaseRPC,
-  MDXClientConfig,
+  ExportOptions,
+  ChildInfo,
+  MDXDurableObjectRPC,
+  MDXDOClientConfig,
 } from './types.js'
 
 /**
- * MDXClient - wrapper for MDXDatabase RPC calls
+ * MDXDOClient - wrapper for MDXDurableObject RPC calls
  */
-export class MDXClient implements MDXDatabaseRPC {
-  private stub: DurableObjectStub<MDXDatabaseRPC>
+export class MDXDOClient implements MDXDurableObjectRPC {
+  private stub: DurableObjectStub<MDXDurableObjectRPC>
   private _$id: string
 
-  constructor(config: MDXClientConfig) {
-    if (!config.binding) {
-      throw new Error('MDXClient requires a binding')
-    }
-
+  constructor(config: MDXDOClientConfig) {
     this._$id = config.$id
     const doId = config.binding.idFromName(config.$id)
     this.stub = config.binding.get(doId)
@@ -37,6 +35,14 @@ export class MDXClient implements MDXDatabaseRPC {
 
   $id(): string {
     return this._$id
+  }
+
+  async $context(): Promise<string | null> {
+    return this.stub.$context()
+  }
+
+  async $contextDoId(): Promise<string | null> {
+    return this.stub.$contextDoId()
   }
 
   async list(options?: ListOptions): Promise<Thing[]> {
@@ -99,16 +105,30 @@ export class MDXClient implements MDXDatabaseRPC {
     return this.stub.relationships(url, options)
   }
 
+  async getChildren(): Promise<ChildInfo[]> {
+    return this.stub.getChildren()
+  }
+
+  async getChild(path: string): Promise<ChildInfo | null> {
+    return this.stub.getChild(path)
+  }
+
+  async exportToParquet(options?: ExportOptions): Promise<ArrayBuffer> {
+    return this.stub.exportToParquet(options)
+  }
+
+  async fetch(request: Request): Promise<Response> {
+    return this.stub.fetch(request)
+  }
+
   getDatabaseSize(): number {
-    // Note: This is sync in the DO but async over RPC
-    // Return 0 as placeholder - use stub directly for this
     return 0
   }
 }
 
 /**
- * Create an MDXClient instance
+ * Create an MDXDOClient instance
  */
-export function createClient(config: MDXClientConfig): MDXClient {
-  return new MDXClient(config)
+export function createClient(config: MDXDOClientConfig): MDXDOClient {
+  return new MDXDOClient(config)
 }

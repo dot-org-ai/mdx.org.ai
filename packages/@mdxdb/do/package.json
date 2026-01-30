@@ -1,7 +1,7 @@
 {
-  "name": "@mdxdb/sqlite",
-  "version": "2.0.0",
-  "description": "Cloudflare Durable Objects SQLite adapter - clean graph database with _data and _rels tables",
+  "name": "@mdxdb/do",
+  "version": "1.0.0",
+  "description": "Extended Durable Object with parent/child hierarchy, hibernatable WebSocket, and parquet export",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -22,15 +22,25 @@
       "import": "./dist/client.js",
       "require": "./dist/client.cjs"
     },
-    "./miniflare": {
-      "types": "./dist/miniflare.d.ts",
-      "import": "./dist/miniflare.js",
-      "require": "./dist/miniflare.cjs"
-    },
     "./schema": {
       "types": "./dist/schema.d.ts",
       "import": "./dist/schema.js",
       "require": "./dist/schema.cjs"
+    },
+    "./hierarchy": {
+      "types": "./dist/hierarchy.d.ts",
+      "import": "./dist/hierarchy.js",
+      "require": "./dist/hierarchy.cjs"
+    },
+    "./hibernatable-ws": {
+      "types": "./dist/hibernatable-ws.d.ts",
+      "import": "./dist/hibernatable-ws.js",
+      "require": "./dist/hibernatable-ws.cjs"
+    },
+    "./parquet-export": {
+      "types": "./dist/parquet-export.d.ts",
+      "import": "./dist/parquet-export.js",
+      "require": "./dist/parquet-export.cjs"
     }
   },
   "files": [
@@ -40,7 +50,6 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
-    "test:unit": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
@@ -48,28 +57,23 @@
   },
   "keywords": [
     "mdxdb",
-    "sqlite",
-    "cloudflare",
     "durable-objects",
+    "cloudflare",
     "workers",
-    "database",
-    "graph",
+    "hierarchy",
+    "hibernatable",
+    "websocket",
+    "parquet",
     "rpc"
   ],
   "license": "MIT",
-  "dependencies": {},
-  "peerDependencies": {
-    "miniflare": "^3.0.0"
-  },
-  "peerDependenciesMeta": {
-    "miniflare": {
-      "optional": true
-    }
+  "dependencies": {
+    "@mdxdb/parquet": "workspace:^",
+    "@mdxdb/sqlite": "workspace:^"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
     "@mdxld/config": "workspace:^",
-    "miniflare": "^3.20241106.1",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
@@ -77,7 +81,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ai-primitives/mdx.org.ai",
-    "directory": "packages/@mdxdb/sqlite"
+    "directory": "packages/@mdxdb/do"
   },
   "author": "MDX.org.ai"
 }

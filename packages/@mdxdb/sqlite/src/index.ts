@@ -1,135 +1,68 @@
 /**
- * @mdxdb/sqlite - Cloudflare Durable Objects SQLite adapter for mdxdb
+ * @mdxdb/sqlite
  *
- * A Durable Objects-based implementation with:
- * - Things: Graph nodes following ai-database conventions
- * - Relationships: Graph edges between things
- * - Search: Chunked content with vector embeddings for semantic search
- * - Events: Immutable event log
- * - Actions: Durable action tracking
- * - Artifacts: Cached compiled content
+ * Cloudflare Durable Objects SQLite adapter.
+ * Clean graph database with _data (nodes) and _rels (edges).
  *
- * Uses Workers RPC for direct method calls on Durable Object stubs.
- * Each namespace gets its own Durable Object with isolated SQLite storage.
- *
- * @example Workers
+ * @example
  * ```ts
- * import { createMDXClient, MDXDatabase } from '@mdxdb/sqlite'
+ * // In a Worker
+ * const id = env.MDXDB.idFromName('headless.ly')
+ * const db = env.MDXDB.get(id)
  *
- * // Export the Durable Object for wrangler.toml
- * export { MDXDatabase }
- *
- * export default {
- *   async fetch(request: Request, env: Env) {
- *     const client = createMDXClient({
- *       namespace: 'example.com',
- *       binding: env.MDXDB,
- *     })
- *
- *     const posts = await client.list({ type: 'Post' })
- *     return Response.json(posts)
- *   }
- * }
- * ```
- *
- * @example Node.js with miniflare
- * ```ts
- * import { createMiniflareClient } from '@mdxdb/sqlite'
- *
- * const client = await createMiniflareClient({
- *   namespace: 'example.com',
- *   persistPath: './.data',
- * })
- *
- * await client.create({
- *   ns: 'example.com',
+ * // Create a thing
+ * const post = await db.create({
  *   type: 'Post',
  *   data: { title: 'Hello World' }
  * })
- * ```
  *
- * @example In-memory testing
- * ```ts
- * import { createInMemoryBinding, MDXClient } from '@mdxdb/sqlite'
+ * // Create a relationship with bidirectional predicates
+ * await db.relate({
+ *   predicate: 'author',    // Post.author -> User
+ *   reverse: 'posts',       // User.posts -> Post[]
+ *   from: post.url,
+ *   to: userUrl
+ * })
  *
- * const binding = createInMemoryBinding()
- * const id = binding.idFromName('test.local')
- * const stub = binding.get(id)
- * const client = new MDXClient(stub, 'test.local')
+ * // Query forward: get author of post
+ * const author = await db.related(post.url, 'author')
  *
- * // Use in tests
- * const thing = await client.create({ ... })
+ * // Query reverse: get posts by user
+ * const posts = await db.relatedBy(userUrl, 'posts')
  * ```
  *
  * @packageDocumentation
  */
 
-export const name = '@mdxdb/sqlite'
-
-// NOTE: MDXDatabase is NOT exported from the main entry point because it imports
-// cloudflare:workers which breaks Node.js imports. For Workers, import directly:
-//   import { MDXDatabase } from '@mdxdb/sqlite/durable-object'
-//
-// For Node.js usage with miniflare, use createMiniflareClient or createInMemoryBinding.
-
-// Client for calling DO methods via RPC
-export { MDXClient, createMDXClient, createMiniflareClient } from './client.js'
-
-// Miniflare integration for Node.js
-export {
-  createMiniflareBinding,
-  createInMemoryBinding,
-  disposeMiniflare,
-} from './miniflare.js'
-
-// Sync manager for forwarding mutations
-export { SyncManager, createSyncManager } from './sync.js'
-export type { SyncTarget, MutationType, MutationEvent, SyncResult } from './sync.js'
-
 // Types
-// Note: Cloudflare types (SqlStorageCursor, SqlStorage, DurableObjectState,
-// DurableObjectId, DurableObjectNamespace, DurableObjectStub) are provided
-// globally by @cloudflare/workers-types. They're not re-exported from here
-// to avoid issues with cloudflare:workers module resolution.
 export type {
-  // Entity types
   Thing,
   Relationship,
-  Event,
-  Action,
-  Artifact,
-  ActionStatus,
-  ArtifactType,
-
-  // Query/operation options
-  QueryOptions,
-  SearchOptions,
+  Provenance,
+  ListOptions,
   CreateOptions,
   UpdateOptions,
   RelateOptions,
-  CreateEventOptions,
-  CreateActionOptions,
-  StoreArtifactOptions,
-  EventQueryOptions,
-  ActionQueryOptions,
-  VectorSearchOptions,
-  VectorSearchResult,
-
-  // RPC interface
+  RelationshipQueryOptions,
+  DataRow,
+  RelsRow,
   MDXDatabaseRPC,
-
-  // Environment
   Env,
-
-  // Config
   MDXClientConfig,
-
-  // Internal row types
-  ThingRow,
-  RelationshipRow,
-  SearchRow,
-  EventRow,
-  ActionRow,
-  ArtifactRow,
-  Chunk,
 } from './types.js'
+
+// Durable Object
+export { MDXDatabase } from './durable-object.js'
+
+// Schema
+export {
+  DATA_TABLE,
+  RELS_TABLE,
+  DATA_SCHEMA,
+  DATA_INDEXES,
+  RELS_SCHEMA,
+  RELS_INDEXES,
+  TABLES,
+  getAllSchemaStatements,
+  SCHEMA_VERSION,
+} from './schema/index.js'

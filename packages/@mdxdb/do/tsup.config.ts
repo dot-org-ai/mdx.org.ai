@@ -8,15 +8,18 @@ export default defineConfig([
       'durable-object': 'src/durable-object.ts',
       client: 'src/client.ts',
       types: 'src/types.ts',
+      hierarchy: 'src/hierarchy.ts',
+      'hibernatable-ws': 'src/hibernatable-ws.ts',
+      'parquet-export': 'src/parquet-export.ts',
       schema: 'src/schema/index.ts',
     },
     format: ['esm', 'cjs'],
     dts: false,
     clean: true,
     sourcemap: true,
-    external: ['miniflare', 'cloudflare:workers'],
+    external: ['cloudflare:workers', '@mdxdb/sqlite', '@mdxdb/parquet'],
   },
-  // Bundled durable-object for miniflare
+  // Bundled durable-object for deployment
   {
     entry: {
       'durable-object.bundled': 'src/durable-object.ts',

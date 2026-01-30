@@ -1,0 +1,139 @@
+/**
+ * @mdxdb/do Types
+ *
+ * Extended type definitions for Durable Object with hierarchy support.
+ *
+ * @packageDocumentation
+ */
+
+// Re-export base types from @mdxdb/sqlite
+export type {
+  Thing,
+  Relationship,
+  Provenance,
+  ListOptions,
+  CreateOptions,
+  UpdateOptions,
+  RelateOptions,
+  RelationshipQueryOptions,
+  DataRow,
+  RelsRow,
+  MDXDatabaseRPC,
+  Env as BaseEnv,
+  MDXClientConfig as BaseMDXClientConfig,
+} from '@mdxdb/sqlite'
+
+/**
+ * Parquet export options
+ */
+export interface ExportOptions {
+  /** Include child DOs recursively */
+  includeChildren?: boolean
+  /** Maximum depth for recursive export */
+  maxDepth?: number
+  /** Filter by thing types */
+  types?: string[]
+  /** Only things updated since this date */
+  since?: Date
+  /** Compression for parquet output */
+  compression?: 'UNCOMPRESSED' | 'SNAPPY' | 'GZIP' | 'ZSTD'
+}
+
+/**
+ * WebSocket session data for hibernation
+ */
+export interface SessionData {
+  /** Session ID */
+  id: string
+  /** User/client identifier */
+  clientId?: string
+  /** Authentication token */
+  token?: string
+  /** Session metadata */
+  metadata?: Record<string, unknown>
+  /** Last activity timestamp */
+  lastActivity: number
+}
+
+/**
+ * RPC message format for WebSocket
+ */
+export interface RPCMessage {
+  /** Message ID for response correlation */
+  id: string
+  /** RPC method name */
+  method: string
+  /** Method parameters */
+  params?: unknown[]
+}
+
+/**
+ * RPC response format
+ */
+export interface RPCResponse {
+  /** Message ID matching request */
+  id: string
+  /** Success result */
+  result?: unknown
+  /** Error if failed */
+  error?: {
+    code: number
+    message: string
+    data?: unknown
+  }
+}
+
+/**
+ * Extended environment with DO bindings
+ */
+export interface Env {
+  /** MDXDurableObject namespace */
+  MDXDB: DurableObjectNamespace<MDXDurableObjectRPC>
+}
+
+/**
+ * Child DO info
+ */
+export interface ChildInfo {
+  /** Child's $id URL */
+  id: string
+  /** Path on parent (e.g., '/headless.ly') */
+  path: string
+  /** DO stub ID for direct access */
+  doId: string
+}
+
+/**
+ * Extended RPC interface for MDXDurableObject
+ */
+export interface MDXDurableObjectRPC extends import('@mdxdb/sqlite').MDXDatabaseRPC {
+  // Context (parent DO relationship)
+  /** Get parent DO's $id (null if root) */
+  $context(): Promise<string | null>
+  /** Get parent DO's stub ID */
+  $contextDoId(): Promise<string | null>
+
+  // Child management
+  /** Get all child DOs */
+  getChildren(): Promise<ChildInfo[]>
+  /** Get child by path */
+  getChild(path: string): Promise<ChildInfo | null>
+
+  // Parquet export
+  /** Export this namespace to parquet */
+  exportToParquet(options?: ExportOptions): Promise<ArrayBuffer>
+
+  // WebSocket
+  /** Handle incoming fetch (including WS upgrade) */
+  fetch(request: Request): Promise<Response>
+}
+
+/**
+ * Client configuration for MDXDurableObject
+ */
+export interface MDXDOClientConfig {
+  /** The canonical URL ($id) of the target DO */
+  $id: string
+  /** DO namespace binding */
+  binding: DurableObjectNamespace<MDXDurableObjectRPC>
+}
