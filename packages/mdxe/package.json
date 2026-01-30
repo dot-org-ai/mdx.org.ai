@@ -29,6 +29,11 @@
       "types": "./dist/cloudflare/api.d.ts",
       "import": "./dist/cloudflare/api.js",
       "require": "./dist/cloudflare/api.cjs"
+    },
+    "./tail": {
+      "types": "./dist/tail/index.d.ts",
+      "import": "./dist/tail/index.js",
+      "require": "./dist/tail/index.cjs"
     }
   },
   "files": [
@@ -75,7 +80,8 @@
     "esbuild": "^0.27.0",
     "glob": "^10.4.5",
     "hono": "^4.6.0",
-    "oauth.do": "^0.1.4"
+    "oauth.do": "^0.1.4",
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.9",

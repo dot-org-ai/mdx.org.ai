@@ -120,7 +120,7 @@ importers:
     devDependencies:
       '@opennextjs/cloudflare':
         specifier: ^1.14.3
-        version: 1.14.3(encoding@0.1.13)(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(wrangler@4.53.0(@cloudflare/workers-types@4.20251205.0))
+        version: 1.14.3(encoding@0.1.13)(next@15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(wrangler@4.53.0(@cloudflare/workers-types@4.20251205.0))
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.1
@@ -614,18 +614,18 @@ importers:
   packages/@mdxdb/clickhouse:
     dependencies:
       '@mdxld/extract':
-        specifier: workspace:^
-        version: link:../../@mdxld/extract
+        specifier: ^1.9.0
+        version: 1.9.1(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3))
       ai-database:
-        specifier: workspace:^
-        version: link:../../../primitives/packages/ai-database
+        specifier: ^2.1.3
+        version: 2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1))
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20241127.0
         version: 4.20251205.0
       '@mdxdb/fs':
-        specifier: workspace:^
-        version: link:../fs
+        specifier: ^1.9.0
+        version: 1.9.0(@mdxld/extract@1.9.1(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)))(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))
       '@mdxld/config':
         specifier: workspace:^
         version: link:../../@mdxld/config
@@ -670,20 +670,45 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)
 
+  packages/@mdxdb/do:
+    dependencies:
+      '@mdxdb/parquet':
+        specifier: workspace:^
+        version: link:../parquet
+      '@mdxdb/sqlite':
+        specifier: workspace:^
+        version: link:../sqlite
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20241127.0
+        version: 4.20251205.0
+      '@mdxld/config':
+        specifier: workspace:^
+        version: link:../../@mdxld/config
+      tsup:
+        specifier: ^8.3.5
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)
+
   packages/@mdxdb/fs:
     devDependencies:
       '@mdxld/config':
         specifier: workspace:^
         version: link:../../@mdxld/config
       '@mdxld/extract':
-        specifier: workspace:*
-        version: link:../../@mdxld/extract
+        specifier: ^1.9.0
+        version: 1.9.1(ai-database@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))
       ai-database:
-        specifier: workspace:*
-        version: link:../../../primitives/packages/ai-database
+        specifier: ^2.1.3
+        version: 2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1))
       mdxld:
-        specifier: workspace:*
-        version: link:../../mdxld
+        specifier: ^1.9.0
+        version: 1.9.0(ai-database@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3))
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.3)(yaml@2.8.2)
@@ -697,11 +722,11 @@ importers:
   packages/@mdxdb/fumadocs:
     dependencies:
       '@mdxdb/fs':
-        specifier: workspace:*
-        version: link:../fs
+        specifier: ^1.9.0
+        version: 1.9.0(ai-database@primitives+packages+ai-database)(mdxld@1.9.0(ai-database@primitives+packages+ai-database))
       mdxld:
-        specifier: workspace:*
-        version: link:../../mdxld
+        specifier: ^1.9.0
+        version: 1.9.0(ai-database@primitives+packages+ai-database)
     devDependencies:
       '@mdxld/config':
         specifier: workspace:^
@@ -840,14 +865,33 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)
 
+  packages/@mdxdb/parquet:
+    dependencies:
+      hyparquet:
+        specifier: ^1.7.1
+        version: 1.24.1
+    devDependencies:
+      '@mdxld/config':
+        specifier: workspace:^
+        version: link:../../@mdxld/config
+      tsup:
+        specifier: ^8.3.5
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)
+
   packages/@mdxdb/payload:
     dependencies:
       '@mdxdb/clickhouse':
-        specifier: workspace:^
-        version: link:../clickhouse
+        specifier: ^1.9.0
+        version: 1.9.0(@mdxdb/fs@1.9.0(ai-database@0.2.0(ai-workflows@2.0.0)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(mdxld@1.9.0(ai-database@0.2.0(ai-workflows@2.0.0)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@0.4.0)(ai-workflows@2.0.0)))
       '@mdxdb/sqlite':
-        specifier: workspace:^
-        version: link:../sqlite
+        specifier: ^1.9.0
+        version: 1.9.0(miniflare@3.20250718.2)
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20241127.0
@@ -1000,9 +1044,6 @@ importers:
       '@mdxld/config':
         specifier: workspace:^
         version: link:../../@mdxld/config
-      ai-database:
-        specifier: workspace:*
-        version: link:../../../primitives/packages/ai-database
       miniflare:
         specifier: ^3.20241106.1
         version: 3.20250718.2
@@ -1061,6 +1102,9 @@ importers:
 
   packages/@mdxe/bun:
     dependencies:
+      '@mdxe/isolate':
+        specifier: workspace:*
+        version: link:../isolate
       '@mdxld/ast':
         specifier: workspace:*
         version: link:../../@mdxld/ast
@@ -1073,6 +1117,9 @@ importers:
       mdxld:
         specifier: workspace:*
         version: link:../../mdxld
+      miniflare:
+        specifier: ^4.20250508.2
+        version: 4.20251202.1
     devDependencies:
       '@types/bun':
         specifier: ^1.1.0
@@ -1109,17 +1156,17 @@ importers:
   packages/@mdxe/deploy:
     dependencies:
       '@mdxe/cloudflare':
-        specifier: workspace:*
-        version: link:../cloudflare
+        specifier: ^1.9.0
+        version: 1.9.0(wrangler@4.53.0(@cloudflare/workers-types@4.20251205.0))
       '@mdxe/do':
-        specifier: workspace:*
-        version: link:../do
+        specifier: ^1.9.0
+        version: 1.9.0
       '@mdxe/github':
-        specifier: workspace:*
-        version: link:../github
+        specifier: ^1.9.0
+        version: 1.9.0
       '@mdxe/vercel':
-        specifier: workspace:*
-        version: link:../vercel
+        specifier: ^1.9.0
+        version: 1.9.0(vercel@39.4.2(encoding@0.1.13)(rollup@4.53.3))
     devDependencies:
       tsup:
         specifier: ^8.3.5
@@ -1262,11 +1309,11 @@ importers:
         specifier: ^1.13.0
         version: 1.19.6(hono@4.10.7)
       '@mdxui/fumadocs':
-        specifier: workspace:*
-        version: link:../../@mdxui/fumadocs
+        specifier: ^1.9.0
+        version: 1.9.0(akhzddm2sjzfm4cmf6hs6gjp4a)
       mdxld:
-        specifier: workspace:*
-        version: link:../../mdxld
+        specifier: ^1.9.0
+        version: 1.9.0(ai-database@primitives+packages+ai-database)
     devDependencies:
       hono:
         specifier: ^4.6.0
@@ -1426,12 +1473,9 @@ importers:
 
   packages/@mdxe/node:
     dependencies:
-      '@mdxe/isolate':
+      '@mdxe/workers':
         specifier: workspace:*
-        version: link:../isolate
-      miniflare:
-        specifier: ^4.20250508.2
-        version: 4.20251202.1
+        version: link:../workers
     devDependencies:
       tsup:
         specifier: ^8.3.5
@@ -1446,14 +1490,14 @@ importers:
   packages/@mdxe/payload:
     dependencies:
       '@mdxdb/payload':
-        specifier: workspace:^
-        version: link:../../@mdxdb/payload
+        specifier: ^1.9.0
+        version: 1.9.0(payload@3.66.0(graphql@16.12.0)(typescript@5.9.3))
       '@mdxdb/sqlite':
-        specifier: workspace:^
-        version: link:../../@mdxdb/sqlite
+        specifier: ^1.9.0
+        version: 1.9.0(miniflare@3.20250718.2)
       mdxld:
-        specifier: workspace:^
-        version: link:../../mdxld
+        specifier: ^1.9.0
+        version: 1.9.0(ai-database@primitives+packages+ai-database)
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20241127.0
@@ -1604,22 +1648,20 @@ importers:
       '@mdxe/isolate':
         specifier: workspace:*
         version: link:../isolate
+    optionalDependencies:
       esbuild:
         specifier: ^0.24.0
         version: 0.24.2
       mdxld:
         specifier: workspace:*
         version: link:../../mdxld
+      miniflare:
+        specifier: ^4.20250508.2
+        version: 4.20251202.1
     devDependencies:
-      '@cloudflare/vitest-pool-workers':
-        specifier: ^0.8.0
-        version: 0.8.71(@cloudflare/workers-types@4.20251205.0)(@vitest/runner@4.0.15)(@vitest/snapshot@3.2.4)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1))
       '@cloudflare/workers-types':
         specifier: ^4.20241127.0
         version: 4.20251205.0
-      miniflare:
-        specifier: ^4.20250817.0
-        version: 4.20251202.1
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.3)(yaml@2.8.2)
@@ -2194,11 +2236,11 @@ importers:
   packages/@mdxui/fumadocs:
     dependencies:
       '@mdxdb/fumadocs':
-        specifier: workspace:*
-        version: link:../../@mdxdb/fumadocs
+        specifier: ^1.9.0
+        version: 1.9.0(fumadocs-core@14.7.7(@types/react@18.3.27)(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@18.3.1))(react@18.3.1))(react-dom@19.1.0(react@18.3.1))(react@18.3.1))
       mdxld:
-        specifier: workspace:*
-        version: link:../../mdxld
+        specifier: ^1.9.0
+        version: 1.9.0(ai-database@primitives+packages+ai-database)
     devDependencies:
       '@mdxld/config':
         specifier: workspace:^
@@ -3278,6 +3320,9 @@ importers:
       oauth.do:
         specifier: ^0.1.4
         version: 0.1.9
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
     devDependencies:
       '@vitest/coverage-v8':
         specifier: ^2.1.9
@@ -5290,6 +5335,28 @@ packages:
   '@digitalbazaar/http-client@3.4.1':
     resolution: {integrity: sha512-Ahk1N+s7urkgj7WvvUND5f8GiWEPfUw0D41hdElaqLgu8wZScI8gdI0q+qWw5N1d35x7GCRH2uk9mi+Uzo9M3g==}
     engines: {node: '>=14.0'}
+
+  '@dotdo/collections@0.1.1':
+    resolution: {integrity: sha512-lh4QFfsdCFXDNNrUOzlGHcl90bCv/GALVIAoQUngI2RalQ2LMxXhw5WC4KRLTFPFPBENqOaIMq5qiiVeE0mvgQ==}
+    peerDependencies:
+      '@cloudflare/workers-types': ^4.0.0
+    peerDependenciesMeta:
+      '@cloudflare/workers-types':
+        optional: true
+
+  '@dotdo/oauth@0.1.7':
+    resolution: {integrity: sha512-I0NPrpxcuGvogOH5jPtyUbCQPdcqnrwNPTSqj4hw+UFicHMCaw5K/NP8PsASm1mWMZH3RcTWljgJDYA5pL0+Bg==}
+    peerDependencies:
+      hono: '>=4.0.0'
+
+  '@dotdo/types@0.1.1':
+    resolution: {integrity: sha512-7khQZk/+aJpzudoFojJiYt01QVjXmBkzwbOZFVgBn2ZPtH8l2/GonQViFsk8tuczthcxV1yzRSp1atI0Vc5XKw==}
+    hasBin: true
+    peerDependencies:
+      typescript: '>=5.0.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   '@dotenvx/dotenvx@1.31.0':
     resolution: {integrity: sha512-GeDxvtjiRuoyWVU9nQneId879zIyNdL05bS7RKiqMkfBSKpHMWHLoRyRqjYWLaXmX/llKO1hTlqHDmatkQAjPA==}
@@ -7682,8 +7749,37 @@ packages:
       ai-database: workspace:*
       mdxld: workspace:*
 
+  '@mdxdb/fumadocs@1.9.0':
+    resolution: {integrity: sha512-k8fsBV/SETOQGKPmE1xWJfIw9ocZwWnK0hntK0YzyXByRXg1LsZAUfFbKtuDu6UgtJ2wq4xiEzw+rC0ak2SnGQ==}
+    peerDependencies:
+      fumadocs-core: '>=14.0.0'
+
+  '@mdxdb/payload@1.9.0':
+    resolution: {integrity: sha512-FgQZTyHLFOHun1E7tRU+3OnTaMkmKVjckfW2TfGvkSgCH7o4uTo/v6TGJuQP9N/0wOrSDtq4KfM/FjdulQCfrQ==}
+    peerDependencies:
+      payload: '>=3.0.0'
+
+  '@mdxdb/sqlite@1.9.0':
+    resolution: {integrity: sha512-FjM7Uu2RukE30+erW3RKxTCJWlZKetFZ0u6R20oXpgYZrfuMlqf0uyIaTbQg5qM2EXqUkj0SmtzJudAJf3wEJA==}
+    peerDependencies:
+      miniflare: ^3.0.0
+    peerDependenciesMeta:
+      miniflare:
+        optional: true
+
+  '@mdxe/cloudflare@1.9.0':
+    resolution: {integrity: sha512-rkk4K+Onfaj2o2T3n8qCeWQTtSzNshZPR5qdiHO4t+oBsgq8q/2ac1E4ZEmAV1+P5P+vGlqtX107LLRq3rsHJw==}
+    peerDependencies:
+      wrangler: ^4.0.0
+    peerDependenciesMeta:
+      wrangler:
+        optional: true
+
   '@mdxe/deploy@1.9.0':
     resolution: {integrity: sha512-6RIvUH41AZs1YCssBmVhcu89xdHiI+CHdcFsIDkKzqch8zCmlNknSE/SitCxbcmVP/xnpxoxZJh5hnpTIXGDuw==}
+
+  '@mdxe/do@1.9.0':
+    resolution: {integrity: sha512-VqPYI42uFA+oS5TN4HMiB4PSfy18YSMa+27ZdTozbL56KEPyoqb7iDuS/hxha+Nh9qnArNYJmkroghbQmFlW2A==}
 
   '@mdxe/fumadocs@0.0.1':
     resolution: {integrity: sha512-B1jk+gP6mZnmi2j71lh4Pirc1Oly2NnYjamPS+rumhkSA2mfcqKiM9RJDrViNhqNCUu9YXjByKo/gnjlYh8qZg==}
@@ -7705,6 +7801,9 @@ packages:
       next:
         optional: true
 
+  '@mdxe/github@1.9.0':
+    resolution: {integrity: sha512-5zAugVzEp2P8CTVVuHs6fdx5L6Bx+JnDEVh1l7aMbergoKPfEC6DV7kWwC/l+mqaLzHazU6egD+FpOm0LqX35Q==}
+
   '@mdxe/hono@1.9.0':
     resolution: {integrity: sha512-M924NTWjb+c/swlNVZH025JTWqZe3t/gQLOPPb71GiZQVDbsSQOrS2RUChzKYjyUcpSxOonZzM1HoEbTRPOqkw==}
     peerDependencies:
@@ -7718,6 +7817,37 @@ packages:
       payload: '>=3.0.0'
     peerDependenciesMeta:
       miniflare:
+        optional: true
+
+  '@mdxe/vercel@1.9.0':
+    resolution: {integrity: sha512-cGmeA/g5IO/28ltbdL64zVi+YuvLtxsoMtjAa6af1qujHoYT4NPbwt8+sbKKkzjTHvqY91zS9GNDBR3FdrR5ww==}
+    peerDependencies:
+      vercel: ^39.0.0
+    peerDependenciesMeta:
+      vercel:
+        optional: true
+
+  '@mdxld/extract@1.9.1':
+    resolution: {integrity: sha512-sC1lXkJV6cez8qXsi/HJoZWauL7mZMll/bucE0IQby2JLB40wNRmubo75qIm4Wnt9daGv+hO8gpwodWaZsj+sQ==}
+
+  '@mdxui/fumadocs@1.9.0':
+    resolution: {integrity: sha512-ATUcTyLTlzctpoHAtLZ4fOn5DE0XV1Jgv0RazzNs1P8b/hDeaTCKC/qkWwdnqcGTCeustQysbkVlcbrb4qzHcA==}
+    peerDependencies:
+      fumadocs-core: '>=14.0.0'
+      fumadocs-ui: '>=14.0.0'
+      hono: '>=4.0.0'
+      next: '>=14.0.0'
+      react: '>=18.0.0'
+    peerDependenciesMeta:
+      fumadocs-core:
+        optional: true
+      fumadocs-ui:
+        optional: true
+      hono:
+        optional: true
+      next:
+        optional: true
+      react:
         optional: true
 
   '@mermaid-js/parser@0.6.3':
@@ -8490,6 +8620,9 @@ packages:
   '@orama/orama@3.1.16':
     resolution: {integrity: sha512-scSmQBD8eANlMUOglxHrN1JdSW8tDghsPuS83otqealBiIeMukCQMOf/wc0JJjDXomqwNdEQFLXLGHrU6PGxuA==}
     engines: {node: '>= 20.0.0'}
+
+  '@org.ai/core@2.1.3':
+    resolution: {integrity: sha512-LJjJJsQgOd/KvJOJWPEOpGP4bzCwV0Ybj51zFMY1TRGWKZ/SjqyjnlLah+5ebIY9Osisz2asRCO4m6RZNlqZ6g==}
 
   '@oven/bun-darwin-aarch64@1.3.3':
     resolution: {integrity: sha512-eJopQrUk0WR7jViYDC29+Rp50xGvs4GtWOXBeqCoFMzutkkO3CZvHehA4JqnjfWMTSS8toqvRhCSOpOz62Wf9w==}
@@ -12408,11 +12541,25 @@ packages:
       vitest:
         optional: true
 
+  ai-database@2.1.3:
+    resolution: {integrity: sha512-XOLspP1h/LoDXiOjD99OlQzLPZz83iCvXTRNp5Uc/IDg+UTMSQ2F3XoW/SDyCCmwKPSUiwSa4wIuvcBEXqRR5A==}
+    peerDependencies:
+      vitest: ^2.0.0
+    peerDependenciesMeta:
+      vitest:
+        optional: true
+
   ai-evaluate@0.1.0:
     resolution: {integrity: sha512-d1S7lBHKsbdCXgO7mmqymi5v9AyhgLl5qaKBAiSFCzoH0sOG5o0nFI6hGrsCWzGyI94iC4OnQxI+5pWIU1AMIQ==}
 
   ai-functions@0.4.0:
     resolution: {integrity: sha512-77GPrtWL5EgLP5Cztf63UZPi3eGXg2Y7NYSqAGaDZ4MaSs1xC+HwL01zvSdc0aTj55y1xW9OYX+ONRfcnyFU9Q==}
+
+  ai-functions@2.1.3:
+    resolution: {integrity: sha512-DSyAyt67iZjpMaJHK4rhiKiPvq2hC1yKs9eUdf34Lch926k08CBdmy8sOy6JipuFSy+4i9GvHqjRtFGxPopyhA==}
+
+  ai-providers@2.1.3:
+    resolution: {integrity: sha512-r23v4wxWa7upj2CkBZPhXoObXAffaDuY8jAbkLe7F5x4q5zNoQX3rQK7zKXV2d7F2NudRSm1Lt6mf1pt7j8KOg==}
 
   ai-workflows@2.0.0:
     resolution: {integrity: sha512-ifM1bkaoyxNL0TsGqlVaF84txcoRKZ1BCfOgMcL08/WamTRbnvzgcdQykk+g8latIYDv1kr+uOAMXNHElPDNBQ==}
@@ -15792,6 +15939,9 @@ packages:
   humanize-ms@1.2.1:
     resolution: {integrity: sha512-Fl70vYtsAFb/C06PTS9dZBo7ihau+Tu/DNCk/OyHhea07S+aeMWpFFkUaXRa8fI+ScZbEI8dfSxwY7gxZ9SAVQ==}
 
+  hyparquet@1.24.1:
+    resolution: {integrity: sha512-t8mZwSrV7BFhJ0HuXK2dARkPIGqTMfIYmNa2ZhbTIwH/OLFwfNQmXGz1TzCSuX+Nu46KVgmHplc14COq/sMcfA==}
+
   hyphenate-style-name@1.1.0:
     resolution: {integrity: sha512-WDC/ui2VVRrz3jOVi+XtjqkDjiVjTtFaAGiW37k6b+ohyQ5wYDOGkvCZa8+H0nx3gyvv0+BST9xuOgIyGQ00gw==}
 
@@ -16506,6 +16656,9 @@ packages:
   langium@3.3.1:
     resolution: {integrity: sha512-QJv/h939gDpvT+9SiLVlY7tZC3xB2qK57v0J04Sh9wpMb6MP1q8gB21L3WIo8T5P1MSMg3Ep14L7KkDCFG3y4w==}
     engines: {node: '>=16.0.0'}
+
+  language-models@2.1.3:
+    resolution: {integrity: sha512-XyDPhbvBmigoUiTs4GC/MZOTenk4ZnGUnIAzcsfmPZoRofyeOmqiPep7PwwnFnNnfXOx+MMpi6A4f/svGIyXQQ==}
 
   layout-base@1.0.2:
     resolution: {integrity: sha512-8h2oVEZNktL4BH2JCOI90iD1yXwL6iNW7KcCKT2QZgQJR2vbqDsldCTPRU9NifTCqHZci57XvQQ15YTu+sTYPg==}
@@ -17884,6 +18037,25 @@ packages:
     resolution: {integrity: sha512-8NhxD1fn20O9qDZ6sBwS/YM02HR9ciY6Q0UTA816vzySLaOJdZHBNa2MKHdIKNG1XLZFO6YQ3HJRWDqwspYkAg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
+
+  oauth.do@0.2.5:
+    resolution: {integrity: sha512-KoGw5yy9pZIjrm2xBWq7IrUwzYV8IgbA5ehz/At0NzxkpV7T93DHnxtLd6uRl3AMHfZ21uscnzmWKFqcf17uGA==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+    peerDependencies:
+      '@dotdo/types': '>=0.1.0'
+      hono: '>=4.0.0'
+      itty-router: '>=5.0.0'
+      jose: '>=5.0.0'
+    peerDependenciesMeta:
+      '@dotdo/types':
+        optional: true
+      hono:
+        optional: true
+      itty-router:
+        optional: true
+      jose:
+        optional: true
 
   ob1@0.81.5:
     resolution: {integrity: sha512-iNpbeXPLmaiT9I5g16gFFFjsF3sGxLpYG2EGP3dfFB4z+l9X60mp/yRzStHhMtuNt8qmf7Ww80nOPQHngHhnIQ==}
@@ -21665,6 +21837,13 @@ snapshots:
       '@vercel/oidc': 3.0.5
       zod: 4.1.13
 
+  '@ai-sdk/google@2.0.40(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.17(zod@3.25.76)
+      zod: 3.25.76
+    optional: true
+
   '@ai-sdk/google@2.0.40(zod@4.1.13)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
@@ -21683,6 +21862,13 @@ snapshots:
       '@ai-sdk/provider-utils': 3.0.12(zod@4.1.13)
       zod: 4.1.13
 
+  '@ai-sdk/openai@2.0.53(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.12(zod@3.25.76)
+      zod: 3.25.76
+    optional: true
+
   '@ai-sdk/openai@2.0.53(zod@4.1.13)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
@@ -21695,6 +21881,14 @@ snapshots:
       nanoid: 3.3.11
       secure-json-parse: 2.7.0
       zod: 4.1.13
+
+  '@ai-sdk/provider-utils@3.0.12(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@standard-schema/spec': 1.0.0
+      eventsource-parser: 3.0.6
+      zod: 3.25.76
+    optional: true
 
   '@ai-sdk/provider-utils@3.0.12(zod@4.1.13)':
     dependencies:
@@ -24382,6 +24576,29 @@ snapshots:
     transitivePeerDependencies:
       - web-streams-polyfill
 
+  '@dotdo/collections@0.1.1(@cloudflare/workers-types@4.20251205.0)(typescript@5.9.3)':
+    dependencies:
+      '@dotdo/types': 0.1.1(typescript@5.9.3)
+    optionalDependencies:
+      '@cloudflare/workers-types': 4.20251205.0
+    transitivePeerDependencies:
+      - typescript
+    optional: true
+
+  '@dotdo/oauth@0.1.7(@cloudflare/workers-types@4.20251205.0)(hono@4.10.7)(typescript@5.9.3)':
+    dependencies:
+      '@dotdo/collections': 0.1.1(@cloudflare/workers-types@4.20251205.0)(typescript@5.9.3)
+      hono: 4.10.7
+    transitivePeerDependencies:
+      - '@cloudflare/workers-types'
+      - typescript
+    optional: true
+
+  '@dotdo/types@0.1.1(typescript@5.9.3)':
+    optionalDependencies:
+      typescript: 5.9.3
+    optional: true
+
   '@dotenvx/dotenvx@1.31.0':
     dependencies:
       commander: 11.1.0
@@ -27057,10 +27274,42 @@ snapshots:
       '@mdxld/extract': link:packages/@mdxld/extract
       ai-database: link:primitives/packages/ai-database
 
+  '@mdxdb/fs@1.9.0(@mdxld/extract@1.9.1(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)))(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))':
+    dependencies:
+      '@mdxld/extract': 1.9.1(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3))
+      ai-database: 2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1))
+
   '@mdxdb/fs@1.9.0(ai-database@0.2.0(ai-workflows@2.0.0)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(mdxld@1.9.0(ai-database@0.2.0(ai-workflows@2.0.0)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@0.4.0)(ai-workflows@2.0.0))':
     dependencies:
       ai-database: 0.2.0(ai-workflows@2.0.0)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1))
       mdxld: 1.9.0(ai-database@0.2.0(ai-workflows@2.0.0)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@0.4.0)(ai-workflows@2.0.0)
+
+  '@mdxdb/fs@1.9.0(ai-database@primitives+packages+ai-database)(mdxld@1.9.0(ai-database@primitives+packages+ai-database))':
+    dependencies:
+      ai-database: link:primitives/packages/ai-database
+      mdxld: 1.9.0(ai-database@primitives+packages+ai-database)
+
+  '@mdxdb/fumadocs@1.9.0(fumadocs-core@14.7.7(@types/react@18.3.27)(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@18.3.1))(react@18.3.1))(react-dom@19.1.0(react@18.3.1))(react@18.3.1))':
+    dependencies:
+      '@mdxdb/fs': link:packages/@mdxdb/fs
+      fumadocs-core: 14.7.7(@types/react@18.3.27)(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@18.3.1))(react@18.3.1))(react-dom@19.1.0(react@18.3.1))(react@18.3.1)
+      mdxld: link:packages/mdxld
+
+  '@mdxdb/payload@1.9.0(payload@3.66.0(graphql@16.12.0)(typescript@5.9.3))':
+    dependencies:
+      '@mdxdb/clickhouse': link:packages/@mdxdb/clickhouse
+      '@mdxdb/sqlite': link:packages/@mdxdb/sqlite
+      payload: 3.66.0(graphql@16.12.0)(typescript@5.9.3)
+
+  '@mdxdb/sqlite@1.9.0(miniflare@3.20250718.2)':
+    optionalDependencies:
+      miniflare: 3.20250718.2
+
+  '@mdxe/cloudflare@1.9.0(wrangler@4.53.0(@cloudflare/workers-types@4.20251205.0))':
+    dependencies:
+      oauth.do: 0.1.9
+    optionalDependencies:
+      wrangler: 4.53.0(@cloudflare/workers-types@4.20251205.0)
 
   '@mdxe/deploy@1.9.0':
     dependencies:
@@ -27068,6 +27317,10 @@ snapshots:
       '@mdxe/do': link:packages/@mdxe/do
       '@mdxe/github': link:packages/@mdxe/github
       '@mdxe/vercel': link:packages/@mdxe/vercel
+
+  '@mdxe/do@1.9.0':
+    dependencies:
+      oauth.do: 0.1.9
 
   '@mdxe/fumadocs@0.0.1(nx4ibtsifejahjde6lzsginetq)':
     dependencies:
@@ -27078,6 +27331,10 @@ snapshots:
       fumadocs-mdx: 14.1.0(fumadocs-core@16.2.4(@types/react@19.1.17)(lucide-react@0.555.0(react@19.1.0))(next@15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(waku@0.27.5(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.1.0(react@19.1.0))(react-server-dom-webpack@19.2.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(webpack@5.96.1(esbuild@0.27.1)))(react@19.1.0)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(zod@3.25.76))(next@15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(vite@7.3.0(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       fumadocs-ui: 16.2.4(@types/react-dom@19.1.11(@types/react@19.1.17))(@types/react@19.1.17)(lucide-react@0.555.0(react@19.1.0))(next@15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.17)(waku@0.27.5(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.1.0(react@19.1.0))(react-server-dom-webpack@19.2.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(webpack@5.96.1(esbuild@0.27.1)))(react@19.1.0)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(zod@3.25.76)
       next: 15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+
+  '@mdxe/github@1.9.0':
+    dependencies:
+      oauth.do: 0.1.9
 
   '@mdxe/hono@1.9.0(hono@4.10.7)':
     dependencies:
@@ -27094,6 +27351,39 @@ snapshots:
       payload: 3.66.0(graphql@16.12.0)(typescript@5.9.3)
     optionalDependencies:
       miniflare: 4.20251202.1
+
+  '@mdxe/vercel@1.9.0(vercel@39.4.2(encoding@0.1.13)(rollup@4.53.3))':
+    dependencies:
+      oauth.do: 0.1.9
+    optionalDependencies:
+      vercel: 39.4.2(encoding@0.1.13)(rollup@4.53.3)
+
+  '@mdxld/extract@1.9.1(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3))':
+    dependencies:
+      mdxld: 1.9.0(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3))
+    transitivePeerDependencies:
+      - ai-database
+      - ai-functions
+      - ai-workflows
+
+  '@mdxld/extract@1.9.1(ai-database@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))':
+    dependencies:
+      mdxld: 1.9.0(ai-database@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3))
+    transitivePeerDependencies:
+      - ai-database
+      - ai-functions
+      - ai-workflows
+
+  '@mdxui/fumadocs@1.9.0(akhzddm2sjzfm4cmf6hs6gjp4a)':
+    dependencies:
+      '@mdxdb/fumadocs': link:packages/@mdxdb/fumadocs
+      mdxld: link:packages/mdxld
+    optionalDependencies:
+      fumadocs-core: 16.2.4(@types/react@19.1.17)(lucide-react@0.555.0(react@19.1.0))(next@15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(waku@0.27.5(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.1.0(react@19.1.0))(react-server-dom-webpack@19.2.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(webpack@5.96.1(esbuild@0.27.1)))(react@19.1.0)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(zod@4.1.13)
+      fumadocs-ui: 16.2.4(@types/react-dom@19.1.11(@types/react@19.1.17))(@types/react@19.1.17)(lucide-react@0.555.0(react@19.1.0))(next@15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.17)(waku@0.27.5(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.1.0(react@19.1.0))(react-server-dom-webpack@19.2.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(webpack@5.96.1(esbuild@0.27.1)))(react@19.1.0)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(zod@4.1.13)
+      hono: 4.10.7
+      next: 15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react: 19.1.0
 
   '@mermaid-js/parser@0.6.3':
     dependencies:
@@ -27467,30 +27757,6 @@ snapshots:
       - aws-crt
       - supports-color
 
-  '@opennextjs/aws@3.9.4(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
-    dependencies:
-      '@ast-grep/napi': 0.40.0
-      '@aws-sdk/client-cloudfront': 3.398.0
-      '@aws-sdk/client-dynamodb': 3.943.0
-      '@aws-sdk/client-lambda': 3.945.0
-      '@aws-sdk/client-s3': 3.943.0
-      '@aws-sdk/client-sqs': 3.943.0
-      '@node-minify/core': 8.0.6
-      '@node-minify/terser': 8.0.6
-      '@tsconfig/node18': 1.0.3
-      aws4fetch: 1.0.20
-      chalk: 5.6.2
-      cookie: 1.1.1
-      esbuild: 0.25.4
-      express: 5.2.1
-      next: 15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      path-to-regexp: 6.3.0
-      urlpattern-polyfill: 10.1.0
-      yaml: 2.8.2
-    transitivePeerDependencies:
-      - aws-crt
-      - supports-color
-
   '@opennextjs/cloudflare@1.14.3(encoding@0.1.13)(next@15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(wrangler@4.53.0(@cloudflare/workers-types@4.20251205.0))':
     dependencies:
       '@ast-grep/napi': 0.40.0
@@ -27500,23 +27766,6 @@ snapshots:
       enquirer: 2.4.1
       glob: 12.0.0
       next: 15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      ts-tqdm: 0.8.6
-      wrangler: 4.53.0(@cloudflare/workers-types@4.20251205.0)
-      yargs: 18.0.0
-    transitivePeerDependencies:
-      - aws-crt
-      - encoding
-      - supports-color
-
-  '@opennextjs/cloudflare@1.14.3(encoding@0.1.13)(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(wrangler@4.53.0(@cloudflare/workers-types@4.20251205.0))':
-    dependencies:
-      '@ast-grep/napi': 0.40.0
-      '@dotenvx/dotenvx': 1.31.0
-      '@opennextjs/aws': 3.9.4(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
-      cloudflare: 4.5.0(encoding@0.1.13)
-      enquirer: 2.4.1
-      glob: 12.0.0
-      next: 15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       ts-tqdm: 0.8.6
       wrangler: 4.53.0(@cloudflare/workers-types@4.20251205.0)
       yargs: 18.0.0
@@ -28240,6 +28489,14 @@ snapshots:
   '@orama/orama@2.1.1': {}
 
   '@orama/orama@3.1.16': {}
+
+  '@org.ai/core@2.1.3':
+    dependencies:
+      ai: 5.0.97(zod@3.25.76)
+      ai-providers: 2.1.3(zod@3.25.76)
+      language-models: 2.1.3
+      yaml: 2.8.2
+      zod: 3.25.76
 
   '@oven/bun-darwin-aarch64@1.3.3':
     optional: true
@@ -31024,7 +31281,7 @@ snapshots:
   '@shikijs/vitepress-twoslash@1.29.2(@nuxt/kit@3.20.1(magicast@0.5.1))(typescript@5.6.3)':
     dependencies:
       '@shikijs/twoslash': 3.19.0(typescript@5.6.3)
-      floating-vue: 5.2.2(@nuxt/kit@3.20.1(magicast@0.5.1))(vue@3.5.25(typescript@5.6.3))
+      floating-vue: 5.2.2(@nuxt/kit@3.20.1(magicast@0.5.1))(vue@3.5.25(typescript@5.9.3))
       mdast-util-from-markdown: 2.0.2
       mdast-util-gfm: 3.1.0
       mdast-util-to-hast: 13.2.1
@@ -31082,8 +31339,8 @@ snapshots:
       '@slidev/types': 0.50.0(@nuxt/kit@3.20.1(magicast@0.5.1))(@vue/compiler-sfc@3.5.25)(postcss@8.5.6)(rollup@4.53.3)(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       '@unocss/extractor-mdc': 0.65.4
       '@unocss/reset': 0.65.4
-      '@vitejs/plugin-vue': 5.2.4(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
-      '@vitejs/plugin-vue-jsx': 4.2.0(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      '@vitejs/plugin-vue': 5.2.4(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
+      '@vitejs/plugin-vue-jsx': 4.2.0(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
       chokidar: 4.0.3
       cli-progress: 3.12.0
       connect: 3.7.0
@@ -31119,13 +31376,13 @@ snapshots:
       resolve-global: 2.0.0
       semver: 7.7.3
       shiki: 1.29.2
-      shiki-magic-move: 0.5.2(react@19.1.0)(shiki@1.29.2)(vue@3.5.25(typescript@5.6.3))
+      shiki-magic-move: 0.5.2(react@19.1.0)(shiki@1.29.2)(vue@3.5.25(typescript@5.9.3))
       sirv: 3.0.2
       source-map-js: 1.2.1
       typescript: 5.6.3
-      unocss: 0.65.4(postcss@8.5.6)(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      unocss: 0.65.4(postcss@8.5.6)(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
       unplugin-icons: 0.22.0(@vue/compiler-sfc@3.5.25)
-      unplugin-vue-components: 0.28.0(@babel/parser@7.28.5)(@nuxt/kit@3.20.1(magicast@0.5.1))(rollup@4.53.3)(vue@3.5.25(typescript@5.6.3))
+      unplugin-vue-components: 0.28.0(@babel/parser@7.28.5)(@nuxt/kit@3.20.1(magicast@0.5.1))(rollup@4.53.3)(vue@3.5.25(typescript@5.9.3))
       unplugin-vue-markdown: 0.28.0(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       untun: 0.1.3
       uqr: 0.1.2
@@ -31133,7 +31390,7 @@ snapshots:
       vite-plugin-inspect: 0.10.6(@nuxt/kit@3.20.1(magicast@0.5.1))(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       vite-plugin-remote-assets: 0.6.0(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       vite-plugin-static-copy: 2.3.2(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
-      vite-plugin-vue-server-ref: 0.4.2(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      vite-plugin-vue-server-ref: 0.4.2(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
       vitefu: 1.1.1(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       vue: 3.5.25(typescript@5.6.3)
       yaml: 2.8.2
@@ -31178,14 +31435,14 @@ snapshots:
       '@slidev/rough-notation': 0.1.0
       '@slidev/types': 0.50.0(@nuxt/kit@3.20.1(magicast@0.5.1))(@vue/compiler-sfc@3.5.25)(postcss@8.5.6)(rollup@4.53.3)(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       '@typescript/ata': 0.9.8(typescript@5.6.3)
-      '@unhead/vue': 1.11.20(vue@3.5.25(typescript@5.6.3))
+      '@unhead/vue': 1.11.20(vue@3.5.25(typescript@5.9.3))
       '@unocss/reset': 0.65.4
       '@vueuse/core': 12.8.2(typescript@5.6.3)
       '@vueuse/math': 12.8.2(typescript@5.6.3)
-      '@vueuse/motion': 2.2.6(magicast@0.5.1)(vue@3.5.25(typescript@5.6.3))
+      '@vueuse/motion': 2.2.6(magicast@0.5.1)(vue@3.5.25(typescript@5.9.3))
       drauu: 0.4.3
       file-saver: 2.0.5
-      floating-vue: 5.2.2(@nuxt/kit@3.20.1(magicast@0.5.1))(vue@3.5.25(typescript@5.6.3))
+      floating-vue: 5.2.2(@nuxt/kit@3.20.1(magicast@0.5.1))(vue@3.5.25(typescript@5.9.3))
       fuse.js: 7.1.0
       html-to-image: 1.11.13
       katex: 0.16.25
@@ -31197,11 +31454,11 @@ snapshots:
       prettier: 3.7.4
       recordrtc: 5.6.2
       shiki: 1.29.2
-      shiki-magic-move: 0.5.2(react@19.1.0)(shiki@1.29.2)(vue@3.5.25(typescript@5.6.3))
+      shiki-magic-move: 0.5.2(react@19.1.0)(shiki@1.29.2)(vue@3.5.25(typescript@5.9.3))
       typescript: 5.6.3
-      unocss: 0.65.4(postcss@8.5.6)(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      unocss: 0.65.4(postcss@8.5.6)(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
       vue: 3.5.25(typescript@5.6.3)
-      vue-router: 4.6.3(vue@3.5.25(typescript@5.6.3))
+      vue-router: 4.6.3(vue@3.5.25(typescript@5.9.3))
       yaml: 2.8.2
     transitivePeerDependencies:
       - '@nuxt/kit'
@@ -31249,21 +31506,21 @@ snapshots:
     dependencies:
       '@antfu/utils': 0.7.10
       '@shikijs/markdown-it': 1.29.2
-      '@vitejs/plugin-vue': 5.2.4(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
-      '@vitejs/plugin-vue-jsx': 4.2.0(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      '@vitejs/plugin-vue': 5.2.4(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
+      '@vitejs/plugin-vue-jsx': 4.2.0(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
       katex: 0.16.25
       mermaid: 11.12.2
       monaco-editor: 0.51.0
       shiki: 1.29.2
-      unocss: 0.65.4(postcss@8.5.6)(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      unocss: 0.65.4(postcss@8.5.6)(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
       unplugin-icons: 0.22.0(@vue/compiler-sfc@3.5.25)
       unplugin-vue-markdown: 0.28.0(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       vite-plugin-inspect: 0.10.6(@nuxt/kit@3.20.1(magicast@0.5.1))(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       vite-plugin-remote-assets: 0.6.0(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
       vite-plugin-static-copy: 2.3.2(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))
-      vite-plugin-vue-server-ref: 0.4.2(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      vite-plugin-vue-server-ref: 0.4.2(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
       vue: 3.5.25(typescript@5.6.3)
-      vue-router: 4.6.3(vue@3.5.25(typescript@5.6.3))
+      vue-router: 4.6.3(vue@3.5.25(typescript@5.9.3))
     transitivePeerDependencies:
       - '@nuxt/kit'
       - '@svgr/core'
@@ -33855,7 +34112,7 @@ snapshots:
       '@unhead/schema': 1.11.20
       packrup: 0.1.2
 
-  '@unhead/vue@1.11.20(vue@3.5.25(typescript@5.6.3))':
+  '@unhead/vue@1.11.20(vue@3.5.25(typescript@5.9.3))':
     dependencies:
       '@unhead/schema': 1.11.20
       '@unhead/shared': 1.11.20
@@ -33863,11 +34120,11 @@ snapshots:
       unhead: 1.11.20
       vue: 3.5.25(typescript@5.6.3)
 
-  '@unocss/astro@0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))':
+  '@unocss/astro@0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))':
     dependencies:
       '@unocss/core': 0.65.4
       '@unocss/reset': 0.65.4
-      '@unocss/vite': 0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      '@unocss/vite': 0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
     optionalDependencies:
       vite: 6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2)
     transitivePeerDependencies:
@@ -33909,14 +34166,14 @@ snapshots:
 
   '@unocss/extractor-mdc@0.65.4': {}
 
-  '@unocss/inspector@0.65.4(vue@3.5.25(typescript@5.6.3))':
+  '@unocss/inspector@0.65.4(vue@3.5.25(typescript@5.9.3))':
     dependencies:
       '@unocss/core': 0.65.4
       '@unocss/rule-utils': 0.65.4
       colorette: 2.0.20
       gzip-size: 6.0.0
       sirv: 3.0.2
-      vue-flow-layout: 0.1.1(vue@3.5.25(typescript@5.6.3))
+      vue-flow-layout: 0.1.1(vue@3.5.25(typescript@5.9.3))
     transitivePeerDependencies:
       - vue
 
@@ -34001,13 +34258,13 @@ snapshots:
     dependencies:
       '@unocss/core': 0.65.4
 
-  '@unocss/vite@0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))':
+  '@unocss/vite@0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@rollup/pluginutils': 5.3.0(rollup@4.53.3)
       '@unocss/config': 0.65.4
       '@unocss/core': 0.65.4
-      '@unocss/inspector': 0.65.4(vue@3.5.25(typescript@5.6.3))
+      '@unocss/inspector': 0.65.4(vue@3.5.25(typescript@5.9.3))
       chokidar: 3.6.0
       magic-string: 0.30.21
       tinyglobby: 0.2.15
@@ -34258,7 +34515,7 @@ snapshots:
       react-server-dom-webpack: 19.2.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(webpack@5.96.1(esbuild@0.27.1))
     optional: true
 
-  '@vitejs/plugin-vue-jsx@4.2.0(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))':
+  '@vitejs/plugin-vue-jsx@4.2.0(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-typescript': 7.28.5(@babel/core@7.28.5)
@@ -34269,7 +34526,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue@5.2.4(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))':
+  '@vitejs/plugin-vue@5.2.4(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))':
     dependencies:
       vite: 6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2)
       vue: 3.5.25(typescript@5.6.3)
@@ -34674,12 +34931,12 @@ snapshots:
 
   '@vue/shared@3.5.25': {}
 
-  '@vueuse/core@10.11.1(vue@3.5.25(typescript@5.6.3))':
+  '@vueuse/core@10.11.1(vue@3.5.25(typescript@5.9.3))':
     dependencies:
       '@types/web-bluetooth': 0.0.20
       '@vueuse/metadata': 10.11.1
-      '@vueuse/shared': 10.11.1(vue@3.5.25(typescript@5.6.3))
-      vue-demi: 0.14.10(vue@3.5.25(typescript@5.6.3))
+      '@vueuse/shared': 10.11.1(vue@3.5.25(typescript@5.9.3))
+      vue-demi: 0.14.10(vue@3.5.25(typescript@5.9.3))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -34704,10 +34961,10 @@ snapshots:
 
   '@vueuse/metadata@12.8.2': {}
 
-  '@vueuse/motion@2.2.6(magicast@0.5.1)(vue@3.5.25(typescript@5.6.3))':
+  '@vueuse/motion@2.2.6(magicast@0.5.1)(vue@3.5.25(typescript@5.9.3))':
     dependencies:
-      '@vueuse/core': 10.11.1(vue@3.5.25(typescript@5.6.3))
-      '@vueuse/shared': 10.11.1(vue@3.5.25(typescript@5.6.3))
+      '@vueuse/core': 10.11.1(vue@3.5.25(typescript@5.9.3))
+      '@vueuse/shared': 10.11.1(vue@3.5.25(typescript@5.9.3))
       csstype: 3.2.3
       framesync: 6.1.2
       popmotion: 11.0.5
@@ -34719,9 +34976,9 @@ snapshots:
       - '@vue/composition-api'
       - magicast
 
-  '@vueuse/shared@10.11.1(vue@3.5.25(typescript@5.6.3))':
+  '@vueuse/shared@10.11.1(vue@3.5.25(typescript@5.9.3))':
     dependencies:
-      vue-demi: 0.14.10(vue@3.5.25(typescript@5.6.3))
+      vue-demi: 0.14.10(vue@3.5.25(typescript@5.9.3))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -34886,6 +35143,36 @@ snapshots:
     transitivePeerDependencies:
       - ai-workflows
 
+  ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)):
+    dependencies:
+      ai-functions: 2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)
+      mdxld: 1.9.0(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3))
+    optionalDependencies:
+      vitest: 2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)
+    transitivePeerDependencies:
+      - '@cloudflare/workers-types'
+      - '@dotdo/types'
+      - ai-workflows
+      - hono
+      - itty-router
+      - jose
+      - typescript
+
+  ai-database@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)):
+    dependencies:
+      ai-functions: 2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)
+      mdxld: 1.9.0(ai-database@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3))
+    optionalDependencies:
+      vitest: 2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)
+    transitivePeerDependencies:
+      - '@cloudflare/workers-types'
+      - '@dotdo/types'
+      - ai-workflows
+      - hono
+      - itty-router
+      - jose
+      - typescript
+
   ai-evaluate@0.1.0:
     dependencies:
       ai-functions: link:primitives/packages/ai-functions
@@ -34908,6 +35195,37 @@ snapshots:
       rpc.do: 0.1.2
       yaml: 2.8.2
       zod: 3.25.76
+
+  ai-functions@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3):
+    dependencies:
+      '@ai-sdk/amazon-bedrock': 3.0.69(zod@3.25.76)
+      '@org.ai/core': 2.1.3
+      ai: 5.0.97(zod@3.25.76)
+      ai-providers: 2.1.3(zod@3.25.76)
+      language-models: 2.1.3
+      yaml: 2.8.2
+      zod: 3.25.76
+    optionalDependencies:
+      oauth.do: 0.2.5(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)
+    transitivePeerDependencies:
+      - '@cloudflare/workers-types'
+      - '@dotdo/types'
+      - hono
+      - itty-router
+      - jose
+      - typescript
+
+  ai-providers@2.1.3(zod@3.25.76):
+    dependencies:
+      ai: 5.0.97(zod@3.25.76)
+      language-models: 2.1.3
+    optionalDependencies:
+      '@ai-sdk/amazon-bedrock': 3.0.69(zod@3.25.76)
+      '@ai-sdk/anthropic': 2.0.55(zod@3.25.76)
+      '@ai-sdk/google': 2.0.40(zod@3.25.76)
+      '@ai-sdk/openai': 2.0.53(zod@3.25.76)
+    transitivePeerDependencies:
+      - zod
 
   ai-workflows@2.0.0:
     dependencies:
@@ -38349,11 +38667,11 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  floating-vue@5.2.2(@nuxt/kit@3.20.1(magicast@0.5.1))(vue@3.5.25(typescript@5.6.3)):
+  floating-vue@5.2.2(@nuxt/kit@3.20.1(magicast@0.5.1))(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       '@floating-ui/dom': 1.1.1
       vue: 3.5.25(typescript@5.6.3)
-      vue-resize: 2.0.0-alpha.1(vue@3.5.25(typescript@5.6.3))
+      vue-resize: 2.0.0-alpha.1(vue@3.5.25(typescript@5.9.3))
     optionalDependencies:
       '@nuxt/kit': 3.20.1(magicast@0.5.1)
 
@@ -38574,7 +38892,7 @@ snapshots:
       shiki: 2.5.0
       unist-util-visit: 5.0.0
     optionalDependencies:
-      next: 15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
     transitivePeerDependencies:
@@ -38665,7 +38983,7 @@ snapshots:
       vfile: 6.0.3
       zod: 4.1.13
     optionalDependencies:
-      next: 15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
       vite: 7.3.0(@types/node@22.19.1)(jiti@1.21.7)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2)
     transitivePeerDependencies:
@@ -38692,7 +39010,7 @@ snapshots:
       vfile: 6.0.3
       zod: 4.1.13
     optionalDependencies:
-      next: 15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
       vite: 7.3.0(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2)
     transitivePeerDependencies:
@@ -38796,7 +39114,7 @@ snapshots:
       fumadocs-core: 14.7.7(@types/react@19.1.17)(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       lodash.merge: 4.6.2
       lucide-react: 0.473.0(react@19.1.0)
-      next: 15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.5.7(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-themes: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       postcss-selector-parser: 7.1.1
       react: 19.1.0
@@ -39452,6 +39770,8 @@ snapshots:
   humanize-ms@1.2.1:
     dependencies:
       ms: 2.1.3
+
+  hyparquet@1.24.1: {}
 
   hyphenate-style-name@1.1.0: {}
 
@@ -40217,6 +40537,8 @@ snapshots:
       vscode-languageserver-textdocument: 1.0.12
       vscode-uri: 3.0.8
 
+  language-models@2.1.3: {}
+
   layout-base@1.0.2: {}
 
   layout-base@2.0.1: {}
@@ -40849,6 +41171,26 @@ snapshots:
       ai-database: 0.2.0(ai-workflows@2.0.0)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1))
       ai-functions: 0.4.0
       ai-workflows: 2.0.0
+
+  mdxld@1.9.0(ai-database@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)):
+    dependencies:
+      arktype: 2.1.28
+    optionalDependencies:
+      ai-database: 2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1))
+      ai-functions: 2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)
+
+  mdxld@1.9.0(ai-database@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1)))(ai-functions@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)):
+    dependencies:
+      arktype: 2.1.28
+    optionalDependencies:
+      ai-database: 2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@22.19.1)(happy-dom@15.11.7)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.44.1))
+      ai-functions: 2.1.3(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3)
+
+  mdxld@1.9.0(ai-database@primitives+packages+ai-database):
+    dependencies:
+      arktype: 2.1.28
+    optionalDependencies:
+      ai-database: link:primitives/packages/ai-database
 
   media-typer@0.3.0: {}
 
@@ -42084,32 +42426,6 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
-    dependencies:
-      '@next/env': 15.5.7
-      '@swc/helpers': 0.5.15
-      caniuse-lite: 1.0.30001759
-      postcss: 8.4.31
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      styled-jsx: 5.1.6(@babel/core@7.28.5)(react@19.1.0)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 15.5.7
-      '@next/swc-darwin-x64': 15.5.7
-      '@next/swc-linux-arm64-gnu': 15.5.7
-      '@next/swc-linux-arm64-musl': 15.5.7
-      '@next/swc-linux-x64-gnu': 15.5.7
-      '@next/swc-linux-x64-musl': 15.5.7
-      '@next/swc-win32-arm64-msvc': 15.5.7
-      '@next/swc-win32-x64-msvc': 15.5.7
-      '@opentelemetry/api': 1.9.0
-      '@playwright/test': 1.57.0
-      babel-plugin-react-compiler: 1.0.0
-      sharp: 0.34.5
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
-
   nice-try@1.0.5: {}
 
   node-abi@3.85.0:
@@ -42257,6 +42573,20 @@ snapshots:
       open: 10.2.0
     optionalDependencies:
       keytar: 7.9.0
+
+  oauth.do@0.2.5(@cloudflare/workers-types@4.20251205.0)(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.10.7)(jose@6.1.3)(typescript@5.9.3):
+    dependencies:
+      '@dotdo/oauth': 0.1.7(@cloudflare/workers-types@4.20251205.0)(hono@4.10.7)(typescript@5.9.3)
+      keytar: 7.9.0
+      open: 10.2.0
+    optionalDependencies:
+      '@dotdo/types': 0.1.1(typescript@5.9.3)
+      hono: 4.10.7
+      jose: 6.1.3
+    transitivePeerDependencies:
+      - '@cloudflare/workers-types'
+      - typescript
+    optional: true
 
   ob1@0.81.5:
     dependencies:
@@ -44538,7 +44868,7 @@ snapshots:
 
   shell-quote@1.8.3: {}
 
-  shiki-magic-move@0.5.2(react@19.1.0)(shiki@1.29.2)(vue@3.5.25(typescript@5.6.3)):
+  shiki-magic-move@0.5.2(react@19.1.0)(shiki@1.29.2)(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       diff-match-patch-es: 0.1.1
       ohash: 1.1.6
@@ -45747,9 +46077,9 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unocss@0.65.4(postcss@8.5.6)(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3)):
+  unocss@0.65.4(postcss@8.5.6)(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3)):
     dependencies:
-      '@unocss/astro': 0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      '@unocss/astro': 0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
       '@unocss/cli': 0.65.4(rollup@4.53.3)
       '@unocss/core': 0.65.4
       '@unocss/postcss': 0.65.4(postcss@8.5.6)
@@ -45765,7 +46095,7 @@ snapshots:
       '@unocss/transformer-compile-class': 0.65.4
       '@unocss/transformer-directives': 0.65.4
       '@unocss/transformer-variant-group': 0.65.4
-      '@unocss/vite': 0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3))
+      '@unocss/vite': 0.65.4(rollup@4.53.3)(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
     optionalDependencies:
       vite: 6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2)
     transitivePeerDependencies:
@@ -45790,7 +46120,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  unplugin-vue-components@0.28.0(@babel/parser@7.28.5)(@nuxt/kit@3.20.1(magicast@0.5.1))(rollup@4.53.3)(vue@3.5.25(typescript@5.6.3)):
+  unplugin-vue-components@0.28.0(@babel/parser@7.28.5)(@nuxt/kit@3.20.1(magicast@0.5.1))(rollup@4.53.3)(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.3.0(rollup@4.53.3)
@@ -46169,7 +46499,7 @@ snapshots:
       picocolors: 1.1.1
       vite: 6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2)
 
-  vite-plugin-vue-server-ref@0.4.2(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.6.3)):
+  vite-plugin-vue-server-ref@0.4.2(vite@6.4.1(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.3)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       '@antfu/utils': 0.7.10
       debug: 4.4.3(supports-color@8.1.1)
@@ -46545,19 +46875,19 @@ snapshots:
 
   vscode-uri@3.0.8: {}
 
-  vue-demi@0.14.10(vue@3.5.25(typescript@5.6.3)):
+  vue-demi@0.14.10(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       vue: 3.5.25(typescript@5.6.3)
 
-  vue-flow-layout@0.1.1(vue@3.5.25(typescript@5.6.3)):
+  vue-flow-layout@0.1.1(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       vue: 3.5.25(typescript@5.6.3)
 
-  vue-resize@2.0.0-alpha.1(vue@3.5.25(typescript@5.6.3)):
+  vue-resize@2.0.0-alpha.1(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       vue: 3.5.25(typescript@5.6.3)
 
-  vue-router@4.6.3(vue@3.5.25(typescript@5.6.3)):
+  vue-router@4.6.3(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.25(typescript@5.6.3)

@@ -1,23 +1,24 @@
+/**
+ * @mdxe/workers/local tests - Miniflare-based local execution
+ *
+ * These tests verify the local execution functionality using Miniflare
+ * to run workerd locally for development and testing in Node.js.
+ */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import {
-  compileToModule,
-  createWorkerConfig,
-  generateModuleId,
-  getActiveInstanceCount,
-  disposeAll,
-  createEvaluator,
-  createLocalEvaluator,
   evaluate,
+  createLocalEvaluator,
   run,
   test as testMdx,
+  disposeAll,
+  getActiveInstanceCount,
   type EvaluateResult,
-  type Evaluator,
   type LocalEvaluator,
-} from './index.js'
+} from './local.js'
 
-describe('@mdxe/node', () => {
+describe('@mdxe/workers/local', () => {
   // ============================================================================
-  // Test Fixtures - Real MDX content that will be executed
+  // Test Fixtures - Real MDX content that will be executed via Miniflare
   // ============================================================================
 
   const fixtures = {
@@ -115,49 +116,6 @@ export const getEmoji = () => '🚀'`,
 
   afterEach(async () => {
     await disposeAll()
-  })
-
-  // ============================================================================
-  // Re-exports from @mdxe/workers/local
-  // ============================================================================
-
-  describe('re-exports from @mdxe/workers/local', () => {
-    it('exports compileToModule', () => {
-      expect(typeof compileToModule).toBe('function')
-    })
-
-    it('exports createWorkerConfig', () => {
-      expect(typeof createWorkerConfig).toBe('function')
-    })
-
-    it('exports generateModuleId', () => {
-      expect(typeof generateModuleId).toBe('function')
-    })
-
-    it('exports createLocalEvaluator (new name)', () => {
-      expect(typeof createLocalEvaluator).toBe('function')
-    })
-
-    it('exports createEvaluator (deprecated alias)', () => {
-      expect(typeof createEvaluator).toBe('function')
-      // Should be the same function
-      expect(createEvaluator).toBe(createLocalEvaluator)
-    })
-
-    it('compileToModule compiles MDX', async () => {
-      const module = await compileToModule(fixtures.simple)
-
-      expect(module.mainModule).toBe('entry.js')
-      expect(module.modules).toHaveProperty('entry.js')
-      expect(module.modules).toHaveProperty('mdx.js')
-    })
-
-    it('generateModuleId is consistent', () => {
-      const id1 = generateModuleId('test')
-      const id2 = generateModuleId('test')
-
-      expect(id1).toBe(id2)
-    })
   })
 
   // ============================================================================
@@ -373,12 +331,12 @@ export const getEmoji = () => '🚀'`,
   })
 
   // ============================================================================
-  // createEvaluator
+  // createLocalEvaluator
   // ============================================================================
 
-  describe('createEvaluator', () => {
+  describe('createLocalEvaluator', () => {
     it('returns evaluator with expected interface', () => {
-      const evaluator = createEvaluator()
+      const evaluator = createLocalEvaluator()
 
       expect(typeof evaluator.evaluate).toBe('function')
       expect(typeof evaluator.dispose).toBe('function')
@@ -386,12 +344,12 @@ export const getEmoji = () => '🚀'`,
     })
 
     it('starts with zero instances', () => {
-      const evaluator = createEvaluator()
+      const evaluator = createLocalEvaluator()
       expect(evaluator.getInstanceCount()).toBe(0)
     })
 
     it('tracks instances', async () => {
-      const evaluator = createEvaluator()
+      const evaluator = createLocalEvaluator()
 
       await evaluator.evaluate(fixtures.simple)
       expect(evaluator.getInstanceCount()).toBe(1)
@@ -404,7 +362,7 @@ export const getEmoji = () => '🚀'`,
     })
 
     it('evaluator instances work correctly', async () => {
-      const evaluator = createEvaluator()
+      const evaluator = createLocalEvaluator()
 
       const result = await evaluator.evaluate(fixtures.calculator)
       const sum = await result.call<number>('add', 5, 7)
@@ -414,7 +372,7 @@ export const getEmoji = () => '🚀'`,
     })
 
     it('applies default options', async () => {
-      const evaluator = createEvaluator({
+      const evaluator = createLocalEvaluator({
         sandbox: { blockNetwork: true },
       })
 
@@ -426,8 +384,8 @@ export const getEmoji = () => '🚀'`,
     })
 
     it('multiple independent evaluators', async () => {
-      const evaluator1 = createEvaluator()
-      const evaluator2 = createEvaluator()
+      const evaluator1 = createLocalEvaluator()
+      const evaluator2 = createLocalEvaluator()
 
       await evaluator1.evaluate(fixtures.simple)
       await evaluator2.evaluate(fixtures.calculator)
@@ -553,7 +511,7 @@ export const getEmoji = () => '🚀'`,
     })
 
     it('evaluator with multiple modules', async () => {
-      const evaluator = createEvaluator()
+      const evaluator = createLocalEvaluator()
 
       const calc = await evaluator.evaluate(fixtures.calculator)
       const greet = await evaluator.evaluate(fixtures.withExports)
@@ -634,14 +592,6 @@ title: Only Frontmatter
       expect(result).toHaveProperty('dispose')
 
       await result.dispose()
-    })
-
-    it('Evaluator (deprecated alias) has correct shape', () => {
-      const evaluator: Evaluator = createEvaluator()
-
-      expect(evaluator).toHaveProperty('evaluate')
-      expect(evaluator).toHaveProperty('dispose')
-      expect(evaluator).toHaveProperty('getInstanceCount')
     })
 
     it('LocalEvaluator has correct shape', () => {

@@ -6,13 +6,22 @@ import {
   stringify as indexStringify,
 } from './index.js'
 
-// Evaluation functions
+// Evaluation functions (Miniflare-based)
 import {
   evaluate,
   run,
   createExpect,
+  createEvaluator,
+  disposeAll,
+  getActiveInstanceCount,
+  // Re-exports from @mdxe/isolate
+  compileToModule,
+  createWorkerConfig,
+  generateModuleId,
+  getExports,
   type EvaluateOptions,
   type EvaluateResult,
+  type Evaluator,
 } from './index.js'
 
 // Extract functions
@@ -142,6 +151,40 @@ export const createUser = (name: string, age: number): User => ({ name, age })`,
 
       expect(doc2.data.title).toBe(doc1.data.title)
       expect(doc2.content.trim()).toBe(doc1.content.trim())
+    })
+  })
+
+  // ============================================================================
+  // Miniflare exports from @mdxe/isolate
+  // ============================================================================
+
+  describe('miniflare re-exports', () => {
+    it('exports createEvaluator function', () => {
+      expect(typeof createEvaluator).toBe('function')
+    })
+
+    it('exports disposeAll function', () => {
+      expect(typeof disposeAll).toBe('function')
+    })
+
+    it('exports getActiveInstanceCount function', () => {
+      expect(typeof getActiveInstanceCount).toBe('function')
+    })
+
+    it('exports compileToModule function', () => {
+      expect(typeof compileToModule).toBe('function')
+    })
+
+    it('exports createWorkerConfig function', () => {
+      expect(typeof createWorkerConfig).toBe('function')
+    })
+
+    it('exports generateModuleId function', () => {
+      expect(typeof generateModuleId).toBe('function')
+    })
+
+    it('exports getExports function', () => {
+      expect(typeof getExports).toBe('function')
     })
   })
 

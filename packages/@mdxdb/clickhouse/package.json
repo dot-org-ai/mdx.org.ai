@@ -68,7 +68,7 @@
   "license": "MIT",
   "dependencies": {
     "ai-database": "^2.1.3",
-    "@mdxld/extract": "^1.9.1"
+    "@mdxld/extract": "^1.9.0"
   },
   "peerDependencies": {
     "@mdxdb/fs": ">=1.9.0"
@@ -78,7 +78,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
-    "@mdxdb/fs": "^1.9.1",
+    "@mdxdb/fs": "^1.9.0",
     "@mdxld/config": "workspace:^",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

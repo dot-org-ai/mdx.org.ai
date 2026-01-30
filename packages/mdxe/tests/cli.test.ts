@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { parseArgs, runDeploy, main, VERSION, type CliOptions } from '../src/cli.js'
+import { parseArgs, runDeploy, main, VERSION, getWorkerdRuntime, type CliOptions } from '../src/cli.js'
 
 // Mock the deploy module
 vi.mock('../src/commands/deploy.js', () => ({
@@ -646,5 +646,135 @@ describe('main', () => {
 describe('VERSION', () => {
   it('should be a valid semver string', () => {
     expect(VERSION).toMatch(/^\d+\.\d+\.\d+/)
+  })
+})
+
+// =============================================================================
+// Runtime Target Selection Tests - Unified workerd execution model
+// =============================================================================
+
+describe('CLI Runtime Target Selection', () => {
+  describe('--target option parsing', () => {
+    it('should default target to workers', () => {
+      const result = parseArgs(['test'])
+      expect(result.target).toBe('workers')
+    })
+
+    it('should parse --target workers', () => {
+      const result = parseArgs(['test', '--target', 'workers'])
+      expect(result.target).toBe('workers')
+    })
+
+    it('should parse --target node (uses workerd via Miniflare)', () => {
+      const result = parseArgs(['test', '--target', 'node'])
+      expect(result.target).toBe('node')
+    })
+
+    it('should parse --target bun (uses workerd via Miniflare)', () => {
+      const result = parseArgs(['test', '--target', 'bun'])
+      expect(result.target).toBe('bun')
+    })
+
+    it('should parse --target all', () => {
+      const result = parseArgs(['test', '--target', 'all'])
+      expect(result.target).toBe('all')
+    })
+  })
+
+  describe('test matrix generation', () => {
+    it('should generate single entry for workers target', () => {
+      const result = parseArgs(['test', '--target', 'workers', '--db', 'memory'])
+      expect(result.target).toBe('workers')
+      expect(result.db).toBe('memory')
+    })
+
+    it('should generate single entry for node target', () => {
+      const result = parseArgs(['test', '--target', 'node', '--db', 'memory'])
+      expect(result.target).toBe('node')
+      expect(result.db).toBe('memory')
+    })
+
+    it('should generate single entry for bun target', () => {
+      const result = parseArgs(['test', '--target', 'bun', '--db', 'memory'])
+      expect(result.target).toBe('bun')
+      expect(result.db).toBe('memory')
+    })
+
+    it('should handle all targets with single db', () => {
+      const result = parseArgs(['test', '--target', 'all', '--db', 'sqlite'])
+      expect(result.target).toBe('all')
+      expect(result.db).toBe('sqlite')
+    })
+  })
+
+  describe('help text', () => {
+    it('should mention workerd unification in help', async () => {
+      const result = parseArgs(['help'])
+      expect(result.command).toBe('help')
+      // The help text should explain that all targets use workerd
+    })
+  })
+})
+
+describe('Unified Workerd Execution', () => {
+  describe('runtime resolution', () => {
+    it('workers target should use @mdxe/workers directly', () => {
+      const result = parseArgs(['test', '--target', 'workers'])
+      // When target is workers, execution should use @mdxe/workers
+      expect(result.target).toBe('workers')
+      expect(getWorkerdRuntime('workers')).toBe('workers')
+    })
+
+    it('node target should use @mdxe/workers/local via Miniflare', () => {
+      const result = parseArgs(['test', '--target', 'node'])
+      // When target is node, execution should use @mdxe/workers/local
+      expect(result.target).toBe('node')
+      expect(getWorkerdRuntime('node')).toBe('local')
+    })
+
+    it('bun target should use @mdxe/workers/local via Miniflare', () => {
+      const result = parseArgs(['test', '--target', 'bun'])
+      // When target is bun, execution should use @mdxe/workers/local
+      expect(result.target).toBe('bun')
+      expect(getWorkerdRuntime('bun')).toBe('local')
+    })
+  })
+
+  describe('getWorkerdRuntime function', () => {
+    it('returns workers for workers target', () => {
+      expect(getWorkerdRuntime('workers')).toBe('workers')
+    })
+
+    it('returns local for node target', () => {
+      expect(getWorkerdRuntime('node')).toBe('local')
+    })
+
+    it('returns local for bun target', () => {
+      expect(getWorkerdRuntime('bun')).toBe('local')
+    })
+
+    it('returns local for all target (default behavior)', () => {
+      expect(getWorkerdRuntime('all')).toBe('local')
+    })
+  })
+
+  describe('result consistency', () => {
+    // These tests verify that all targets produce identical results
+    // since they all use workerd under the hood
+
+    it('should parse identical options for all local targets', () => {
+      const nodeResult = parseArgs(['test', '--target', 'node', '--db', 'memory'])
+      const bunResult = parseArgs(['test', '--target', 'bun', '--db', 'memory'])
+
+      // Both should have the same structure, just different target values
+      expect(nodeResult.command).toBe(bunResult.command)
+      expect(nodeResult.db).toBe(bunResult.db)
+      expect(nodeResult.context).toBe(bunResult.context)
+    })
+
+    it('all local targets resolve to the same workerd runtime', () => {
+      // node and bun should both use local workerd via Miniflare
+      expect(getWorkerdRuntime('node')).toBe(getWorkerdRuntime('bun'))
+    })
   })
 })

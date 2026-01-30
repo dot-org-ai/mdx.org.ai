@@ -27,15 +27,31 @@ export {
   type SiteConfig,
 } from './server.js'
 
-// Evaluate exports
+// Evaluate exports (Miniflare-based)
 export {
   evaluate,
   evaluateFile,
   run,
   runFile,
   createExpect,
+  createEvaluator,
+  disposeAll,
+  getActiveInstanceCount,
+  test,
+  // Types
   type EvaluateOptions,
   type EvaluateResult,
+  type Evaluator,
+  type MiniflareConfig,
+  // Re-exports from @mdxe/isolate
+  compileToModule,
+  createWorkerConfig,
+  generateModuleId,
+  getExports,
+  type CompiledModule,
+  type CompileToModuleOptions,
+  type SandboxOptions,
+  type WorkerConfig,
 } from './evaluate.js'
 
 // Extract exports

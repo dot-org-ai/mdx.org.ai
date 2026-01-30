@@ -47,8 +47,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxdb/fumadocs": "^1.9.1",
-    "mdxld": "^1.9.1"
+    "@mdxdb/fumadocs": "^1.9.0",
+    "mdxld": "^1.9.0"
   },
   "peerDependencies": {
     "fumadocs-core": ">=14.0.0",

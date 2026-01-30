@@ -287,3 +287,22 @@ export type {
   WorkflowProvider,
   ContextProvider,
 } from './sdk-provider.js'
+
+/**
+ * Workerd SDK Provider Types - Re-exported from sdk-workerd.ts
+ */
+
+export type {
+  WorkerdSDKConfig,
+  WorkerdSDKProvider,
+  WorkerdSDKContext,
+  WorkerdContext,
+  WorkerdDBClient,
+  WorkerdAIProvider,
+  WorkerdWorkflowProvider,
+  DatabaseBindings,
+  WorkerEnv,
+  D1Database,
+  KVNamespace,
+  R2Bucket,
+} from './sdk-workerd.js'

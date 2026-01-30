@@ -71,9 +71,11 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@mdxe/isolate": "workspace:*",
     "mdxld": "workspace:*",
     "@mdxld/ast": "workspace:*",
-    "hono": "^4.0.0"
+    "hono": "^4.0.0",
+    "miniflare": "^4.20250508.2"
   },
   "peerDependencies": {
     "bun": ">=1.0.0"

@@ -679,7 +679,7 @@ level1:
 
       const module = await compileToModule(content)
 
-      expect(module.data.level1.level2.level3.level4.value).toBe('deep')
+      expect((module.data.level1 as any).level2.level3.level4.value).toBe('deep')
     })
 
     it('handles MDX with special characters in exports', async () => {
@@ -698,7 +698,7 @@ level1:
       const module = await compileToModule(sections)
 
       expect(module.hash).toBeDefined()
-      expect(module.modules['mdx.js'].length).toBeGreaterThan(1000)
+      expect(module.modules['mdx.js']!.length).toBeGreaterThan(1000)
     })
 
     it('handles MDX with code blocks', async () => {

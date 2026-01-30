@@ -1,7 +1,7 @@
 {
   "name": "@mdxe/workers",
   "version": "1.9.0",
-  "description": "Securely evaluate MDX in Cloudflare Workers using Dynamic Worker Loader",
+  "description": "Pure Cloudflare Workers execution for MDX - evaluate MDX securely at the edge",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -11,6 +11,21 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./build": {
+      "types": "./dist/build-entry.d.ts",
+      "import": "./dist/build-entry.js",
+      "require": "./dist/build-entry.cjs"
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "import": "./dist/runtime.js",
+      "require": "./dist/runtime.cjs"
+    },
+    "./local": {
+      "types": "./dist/local.d.ts",
+      "import": "./dist/local.js",
+      "require": "./dist/local.cjs"
     }
   },
   "files": [
@@ -34,22 +49,32 @@
     "isolate",
     "sandbox",
     "mdx",
-    "evaluate"
+    "evaluate",
+    "edge"
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxe/isolate": "workspace:*",
+    "@mdxe/isolate": "workspace:*"
+  },
+  "optionalDependencies": {
     "esbuild": "^0.24.0",
-    "mdxld": "workspace:*"
+    "mdxld": "workspace:*",
+    "miniflare": "^4.20250508.2"
   },
   "devDependencies": {
-    "miniflare": "^4.20250817.0",
-    "@cloudflare/vitest-pool-workers": "^0.8.0",
     "@cloudflare/workers-types": "^4.20241127.0",
-    "wrangler": "^4.21.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "wrangler": "^4.21.0"
+  },
+  "peerDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "peerDependenciesMeta": {
+    "esbuild": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",

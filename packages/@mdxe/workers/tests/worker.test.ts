@@ -1,23 +1,54 @@
 /**
  * E2E tests for running built workers with Miniflare
+ *
+ * NOTE: This test file tests the BUILD TOOLS output, not the runtime.
+ * It requires Miniflare to be installed as an optional devDependency.
+ * Tests are skipped if Miniflare is not available.
+ *
+ * These tests verify that the build() function produces valid Workers code
+ * that can be executed in the workerd runtime via Miniflare.
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { join } from 'node:path'
-import { buildWorker } from '../src/build.js'
+
+// Dynamic import to handle optional dependency
+let Miniflare: typeof import('miniflare').Miniflare | undefined
+let buildWorker: typeof import('../src/build.js').buildWorker | undefined
 
 const FIXTURES_DIR = join(__dirname, 'fixtures', 'sample-site')
 
-describe('@mdxe/workers runtime', () => {
+// Check if Miniflare is available
+let miniflareAvailable = false
+try {
+  const miniflareModule = await import('miniflare')
+  Miniflare = miniflareModule.Miniflare
+  miniflareAvailable = true
+} catch {
+  // Miniflare not available
+}
+
+// Check if build module is available
+try {
+  const buildModule = await import('../src/build.js')
+  buildWorker = buildModule.buildWorker
+} catch {
+  // Build module not available (might happen in pure Workers environment)
+}
+
+describe.skipIf(!miniflareAvailable || !buildWorker)('@mdxe/workers/build E2E', () => {
   let workerCode: string
-  let mf: import('miniflare').Miniflare
+  let mf: InstanceType<typeof import('miniflare').Miniflare>
 
   beforeAll(async () => {
+    if (!Miniflare || !buildWorker) {
+      return
+    }
+
     // Build the worker
     workerCode = await buildWorker(FIXTURES_DIR, { minify: false })
 
     // Start Miniflare
-    const { Miniflare } = await import('miniflare')
     mf = new Miniflare({
       modules: true,
       script: workerCode,

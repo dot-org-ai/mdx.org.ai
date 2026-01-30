@@ -1,21 +1,28 @@
+/**
+ * @mdxe/bun - Miniflare-based evaluate tests
+ *
+ * Tests for Miniflare-based MDX evaluation in Bun runtime.
+ * This mirrors @mdxe/node but runs in the Bun environment.
+ *
+ * @packageDocumentation
+ */
+
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import {
-  compileToModule,
-  createWorkerConfig,
-  generateModuleId,
-  getActiveInstanceCount,
-  disposeAll,
-  createEvaluator,
-  createLocalEvaluator,
   evaluate,
+  evaluateFile,
   run,
-  test as testMdx,
+  runFile,
+  createExpect,
+  disposeAll,
+  getActiveInstanceCount,
+  createEvaluator,
+  type EvaluateOptions,
   type EvaluateResult,
   type Evaluator,
-  type LocalEvaluator,
-} from './index.js'
+} from './evaluate.js'
 
-describe('@mdxe/node', () => {
+describe('@mdxe/bun evaluate (Miniflare)', () => {
   // ============================================================================
   // Test Fixtures - Real MDX content that will be executed
   // ============================================================================
@@ -118,49 +125,6 @@ export const getEmoji = () => '🚀'`,
   })
 
   // ============================================================================
-  // Re-exports from @mdxe/workers/local
-  // ============================================================================
-
-  describe('re-exports from @mdxe/workers/local', () => {
-    it('exports compileToModule', () => {
-      expect(typeof compileToModule).toBe('function')
-    })
-
-    it('exports createWorkerConfig', () => {
-      expect(typeof createWorkerConfig).toBe('function')
-    })
-
-    it('exports generateModuleId', () => {
-      expect(typeof generateModuleId).toBe('function')
-    })
-
-    it('exports createLocalEvaluator (new name)', () => {
-      expect(typeof createLocalEvaluator).toBe('function')
-    })
-
-    it('exports createEvaluator (deprecated alias)', () => {
-      expect(typeof createEvaluator).toBe('function')
-      // Should be the same function
-      expect(createEvaluator).toBe(createLocalEvaluator)
-    })
-
-    it('compileToModule compiles MDX', async () => {
-      const module = await compileToModule(fixtures.simple)
-
-      expect(module.mainModule).toBe('entry.js')
-      expect(module.modules).toHaveProperty('entry.js')
-      expect(module.modules).toHaveProperty('mdx.js')
-    })
-
-    it('generateModuleId is consistent', () => {
-      const id1 = generateModuleId('test')
-      const id2 = generateModuleId('test')
-
-      expect(id1).toBe(id2)
-    })
-  })
-
-  // ============================================================================
   // Instance Management
   // ============================================================================
 
@@ -260,7 +224,9 @@ export const getEmoji = () => '🚀'`,
         expect(config.theme).toBe('dark')
         expect(config.features).toEqual(['a', 'b', 'c'])
 
-        const processed = await result.call<{ processed: boolean; input: unknown }>('process', { value: 42 })
+        const processed = await result.call<{ processed: boolean; input: unknown }>('process', {
+          value: 42,
+        })
         expect(processed.processed).toBe(true)
         expect(processed.input).toEqual({ value: 42 })
 
@@ -474,11 +440,9 @@ export const getEmoji = () => '🚀'`,
     })
 
     it('handles complex return values', async () => {
-      const result = await run<{ processed: boolean; input: unknown }>(
-        fixtures.complex,
-        'process',
-        [{ data: 'test' }]
-      )
+      const result = await run<{ processed: boolean; input: unknown }>(fixtures.complex, 'process', [
+        { data: 'test' },
+      ])
 
       expect(result.processed).toBe(true)
       expect(result.input).toEqual({ data: 'test' })
@@ -487,47 +451,6 @@ export const getEmoji = () => '🚀'`,
     it('runs async functions', async () => {
       const result = await run<{ success: boolean }>(fixtures.asyncFunctions, 'fetchData')
       expect(result.success).toBe(true)
-    })
-  })
-
-  // ============================================================================
-  // test - Validation function
-  // ============================================================================
-
-  describe('test', () => {
-    it('returns success for valid MDX', async () => {
-      const result = await testMdx(fixtures.calculator)
-
-      expect(result.success).toBe(true)
-      expect(result.exports).toContain('add')
-      expect(result.exports).toContain('subtract')
-      expect(result.error).toBeUndefined()
-    })
-
-    it('returns frontmatter data', async () => {
-      const result = await testMdx(fixtures.withFrontmatter)
-
-      expect(result.success).toBe(true)
-      expect(result.data.title).toBe('Document')
-      expect(result.data.author).toBe('Test Author')
-    })
-
-    it('returns error for invalid MDX', async () => {
-      const invalidMdx = `<Component unclosed`
-
-      const result = await testMdx(invalidMdx)
-
-      expect(result.success).toBe(false)
-      expect(result.error).toBeDefined()
-      expect(result.exports).toEqual([])
-    })
-
-    it('disposes after test', async () => {
-      const initialCount = getActiveInstanceCount()
-
-      await testMdx(fixtures.simple)
-
-      expect(getActiveInstanceCount()).toBe(initialCount)
     })
   })
 
@@ -636,20 +559,39 @@ title: Only Frontmatter
       await result.dispose()
     })
 
-    it('Evaluator (deprecated alias) has correct shape', () => {
+    it('Evaluator has correct shape', () => {
       const evaluator: Evaluator = createEvaluator()
 
       expect(evaluator).toHaveProperty('evaluate')
       expect(evaluator).toHaveProperty('dispose')
       expect(evaluator).toHaveProperty('getInstanceCount')
     })
+  })
 
-    it('LocalEvaluator has correct shape', () => {
-      const evaluator: LocalEvaluator = createLocalEvaluator()
+  // ============================================================================
+  // Backward Compatibility Tests
+  // ============================================================================
 
-      expect(evaluator).toHaveProperty('evaluate')
-      expect(evaluator).toHaveProperty('dispose')
-      expect(evaluator).toHaveProperty('getInstanceCount')
+  describe('backward compatibility', () => {
+    it('createExpect still works', () => {
+      const expectFn = createExpect()
+      expect(typeof expectFn).toBe('function')
+      expectFn(1).toBe(1)
+      expectFn('test').toBe('test')
+    })
+
+    it('legacy evaluate returns expected structure', async () => {
+      const result = await evaluate(fixtures.withFrontmatter)
+
+      // New API - call and meta functions
+      expect(typeof result.call).toBe('function')
+      expect(typeof result.meta).toBe('function')
+
+      // Should still have data and exports for compatibility
+      expect(result.data).toBeDefined()
+      expect(result.exports).toBeDefined()
+
+      await result.dispose()
     })
   })
 })

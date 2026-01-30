@@ -1,34 +1,114 @@
 /**
- * @mdxe/workers - Build, publish, and evaluate MDX in Cloudflare Workers
+ * @mdxe/workers - Pure Cloudflare Workers execution for MDX
  *
- * This package provides:
- * - Build: Bundle MDX projects into Workers-compatible bundles
- * - Publish: Deploy bundles to Cloudflare Workers for Platforms
- * - Evaluate: Run compiled MDX code in isolated workerd instances
+ * This is the MAIN EXPORT - it contains ONLY code that runs in Cloudflare Workers
+ * with ZERO Node.js dependencies.
+ *
+ * For build-time tools (build, publish, etc.) that run on your development machine,
+ * import from '@mdxe/workers/build' instead.
+ *
+ * ## Architecture
+ *
+ * This package separates concerns:
+ * - **Runtime** (this file): Pure Workers APIs, runs at the edge
+ * - **Build** ('@mdxe/workers/build'): Node.js tools for bundling and deployment
+ *
+ * ## Usage
+ *
+ * ```ts
+ * // In your Cloudflare Worker (wrangler.toml must have [[worker_loaders]] binding)
+ * import { evaluateModule, type WorkerEnv } from '@mdxe/workers'
+ *
+ * export default {
+ *   async fetch(request: Request, env: WorkerEnv) {
+ *     // Pre-compiled module (compile at build time with @mdxe/isolate)
+ *     const result = await evaluateModule(compiledModule, env)
+ *     const greeting = await result.call('greet', 'World')
+ *     return new Response(greeting)
+ *   }
+ * }
+ * ```
  *
  * @packageDocumentation
  */
 
-// Build and publish exports
-export { build, buildWorker } from './build.js'
-export { publish, buildAndPublish } from './publish.js'
-export type {
-  BuildOptions,
-  BuildResult,
-  NamespaceBundle,
-  WorkerBundle,
-  ContentBundle,
-  ContentDocument,
-  ContentFunction,
-  AssetBundle,
-  AssetFile,
-  NamespaceMeta,
-  WorkerConfig as WorkerMetaConfig,
-  BindingConfig,
-  BuildInfo,
-  PublishOptions,
-  PublishResult,
-} from './types.js'
+// =============================================================================
+// RUNTIME EXPORTS - Pure Cloudflare Workers, no Node.js dependencies
+// =============================================================================
+
+export {
+  // Core evaluation (requires pre-compiled modules)
+  evaluateModule,
+  createModuleHandler,
+
+  // Cache utilities
+  clearCache,
+  isCached,
+  getCacheStats,
+  getCachedModule,
+  cacheModule,
+
+  // Pure utility functions
+  createWorkerConfigFromModule,
+  generateModuleIdFromContent,
+
+  // Types
+  type WorkerLoader,
+  type WorkerInstance,
+  type WorkerEntrypoint,
+  type WorkerEnv,
+  type WorkerConfig,
+  type CompiledModule,
+  type SandboxOptions,
+  type EvaluateOptions as RuntimeEvaluateOptions,
+  type EvaluateResult,
+} from './runtime.js'
+
+// =============================================================================
+// CODE GENERATION UTILITIES - Pure, no Node.js dependencies
+// These can be used in Workers or Node.js
+// =============================================================================
+
+export {
+  generateWorkerCode,
+  generateWorkerFromMDX,
+  transformModuleCode,
+  getExportNames,
+  wrapScriptForReturn,
+  type GenerateWorkerOptions,
+} from './generate.js'
+
+// =============================================================================
+// WORKER LOADERS INTEGRATION
+// Dynamic Worker Loaders API wrapper for MDX execution
+// =============================================================================
+
+export {
+  // Main API
+  createWorkerFromMDX,
+  createWorkerLoaderAdapter,
+
+  // Cache utilities
+  clearWorkerCache,
+  isWorkerCached,
+  getWorkerCacheStats,
+  clearModuleCache,
+  getModuleCacheStats,
+
+  // Types
+  type WorkerLoaderBinding,
+  type LoaderWorkerInstance,
+  type LoaderWorkerEntrypoint,
+  type WorkerLoaderConfig,
+  type WorkerLoaderEnv,
+  type WorkerLoaderOptions,
+  type MDXWorker,
+} from './loader.js'
+
+// =============================================================================
+// RE-EXPORTS FROM @mdxe/isolate (compilation utilities)
+// Note: These pull in @mdx-js/mdx which works in both Workers and Node.js
+// =============================================================================
 
 import {
   compileToModule,
@@ -36,62 +116,41 @@ import {
   createWorkerConfig,
   generateModuleId,
   getExports,
-  type CompiledModule,
+  type CompiledModule as IsolateCompiledModule,
   type CompileToModuleOptions,
-  type SandboxOptions,
-  type WorkerConfig,
+  type SandboxOptions as IsolateSandboxOptions,
+  type WorkerConfig as IsolateWorkerConfig,
 } from '@mdxe/isolate'
 
-// Re-export from isolate
 export {
+  // Compilation functions (work in both Workers and Node.js)
   compileToModule,
   compileToWorkerConfig,
   createWorkerConfig,
   generateModuleId,
   getExports,
-  type CompiledModule,
+  // Types
   type CompileToModuleOptions,
-  type SandboxOptions,
-  type WorkerConfig,
-} from '@mdxe/isolate'
-
-/**
- * Worker Loader binding interface
- * This is the type for env.LOADER when using [[worker_loaders]] binding
- */
-export interface WorkerLoader {
-  get(
-    id: string,
-    callback: () => Promise<WorkerConfig>
-  ): WorkerInstance
 }
 
-/**
- * Worker instance returned by Worker Loader
- */
-export interface WorkerInstance {
-  getEntrypoint(name?: string): WorkerEntrypoint
-}
+// =============================================================================
+// CONVENIENCE FUNCTIONS
+// These combine compilation + evaluation for environments that support both
+// =============================================================================
+
+import type {
+  WorkerEnv,
+  CompiledModule,
+  SandboxOptions,
+  EvaluateResult,
+} from './runtime.js'
+import { evaluateModule, generateModuleIdFromContent, cacheModule, isCached as runtimeIsCached, getCachedModule } from './runtime.js'
 
 /**
- * Worker entrypoint with fetch capability
- */
-export interface WorkerEntrypoint {
-  fetch(request: Request | string): Promise<Response>
-}
-
-/**
- * Environment with Worker Loader binding
- */
-export interface WorkerEnv {
-  LOADER: WorkerLoader
-}
-
-/**
- * Evaluate options for MDX execution
+ * Extended evaluate options that include compilation options
  */
 export interface EvaluateOptions extends CompileToModuleOptions {
-  /** Sandbox options */
+  /** Sandbox options for secure execution */
   sandbox?: SandboxOptions
   /** Cache compiled modules */
   cache?: boolean
@@ -99,31 +158,14 @@ export interface EvaluateOptions extends CompileToModuleOptions {
   moduleId?: string
 }
 
-/**
- * Evaluate result containing exports and utilities
- */
-export interface EvaluateResult<T = unknown> {
-  /** Default MDX component export */
-  default?: T
-  /** All named exports */
-  exports: Record<string, unknown>
-  /** Frontmatter data */
-  data: Record<string, unknown>
-  /** Call an exported function */
-  call: <R = unknown>(name: string, ...args: unknown[]) => Promise<R>
-  /** Get module metadata */
-  meta: () => Promise<{ exports: string[]; hasDefault: boolean }>
-  /** Module ID for caching reference */
-  moduleId: string
-}
+// Note: We use the cache from runtime.js for consistency
 
 /**
- * Module cache for compiled MDX
- */
-const moduleCache = new Map<string, CompiledModule>()
-
-/**
- * Evaluate MDX content securely in an isolated Worker
+ * Evaluate MDX content in an isolated Worker
+ *
+ * This function compiles MDX at runtime, which requires @mdxe/isolate.
+ * For production Workers, consider pre-compiling your MDX at build time
+ * and using evaluateModule() directly.
  *
  * @param content - MDX content string
  * @param env - Worker environment with LOADER binding
@@ -132,7 +174,6 @@ const moduleCache = new Map<string, CompiledModule>()
  *
  * @example
  * ```ts
- * // In your Cloudflare Worker
  * import { evaluate } from '@mdxe/workers'
  *
  * export default {
@@ -161,58 +202,22 @@ export async function evaluate<T = unknown>(
   const { sandbox, cache = true, moduleId: customId, ...compileOpts } = options
 
   // Generate module ID
-  const moduleId = customId || generateModuleId(content)
+  const moduleId = customId || generateModuleIdFromContent(content)
 
-  // Check cache
+  // Check cache (using runtime cache)
   let module: CompiledModule
-  if (cache && moduleCache.has(moduleId)) {
-    module = moduleCache.get(moduleId)!
+  const cachedModule = getCachedModule(moduleId)
+  if (cache && cachedModule) {
+    module = cachedModule
   } else {
+    // Compile using @mdxe/isolate
     module = await compileToModule(content, compileOpts)
     if (cache) {
-      moduleCache.set(moduleId, module)
+      cacheModule(module, moduleId)
     }
   }
 
-  // Create worker config
-  const config = createWorkerConfig(module, sandbox)
-
-  // Get worker instance from loader
-  const worker = env.LOADER.get(moduleId, async () => config)
-  const entrypoint = worker.getEntrypoint()
-
-  // Helper to call exported functions
-  const call = async <R = unknown>(name: string, ...args: unknown[]): Promise<R> => {
-    const response = await entrypoint.fetch(
-      new Request(`http://worker/call/${name}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ args }),
-      })
-    )
-
-    if (!response.ok) {
-      const error = await response.json() as { error: string; stack?: string }
-      throw new Error(error.error)
-    }
-
-    const result = await response.json() as { result: R }
-    return result.result
-  }
-
-  // Helper to get metadata
-  const meta = async () => {
-    const response = await entrypoint.fetch('http://worker/meta')
-    return response.json() as Promise<{ exports: string[]; hasDefault: boolean }>
-  }
-
-  return {
-    exports: {},
-    data: module.data,
-    call,
-    meta,
-    moduleId,
-  }
+  return evaluateModule<T>(module, env, { sandbox, cache: false, moduleId })
 }
 
 /**
@@ -231,47 +236,9 @@ export async function evaluate<T = unknown>(
  * const result = await evaluator(mdxContent)
  * ```
  */
-export function createEvaluator(
-  env: WorkerEnv,
-  defaultOptions: EvaluateOptions = {}
-) {
+export function createEvaluator(env: WorkerEnv, defaultOptions: EvaluateOptions = {}) {
   return <T = unknown>(content: string, options: EvaluateOptions = {}) =>
     evaluate<T>(content, env, { ...defaultOptions, ...options })
-}
-
-/**
- * Clear the module cache
- *
- * @param moduleId - Specific module ID to clear, or all if not provided
- */
-export function clearCache(moduleId?: string): void {
-  if (moduleId) {
-    moduleCache.delete(moduleId)
-  } else {
-    moduleCache.clear()
-  }
-}
-
-/**
- * Check if a module is cached
- *
- * @param moduleId - Module ID to check
- * @returns Whether the module is cached
- */
-export function isCached(moduleId: string): boolean {
-  return moduleCache.has(moduleId)
-}
-
-/**
- * Get cache statistics
- *
- * @returns Cache size and module IDs
- */
-export function getCacheStats(): { size: number; moduleIds: string[] } {
-  return {
-    size: moduleCache.size,
-    moduleIds: Array.from(moduleCache.keys()),
-  }
 }
 
 /**
@@ -281,13 +248,10 @@ export function getCacheStats(): { size: number; moduleIds: string[] } {
  * @param options - Compile options
  * @returns Module ID for later use
  */
-export async function precompile(
-  content: string,
-  options: CompileToModuleOptions = {}
-): Promise<string> {
+export async function precompile(content: string, options: CompileToModuleOptions = {}): Promise<string> {
   const module = await compileToModule(content, options)
   const moduleId = generateModuleId(content)
-  moduleCache.set(moduleId, module)
+  cacheModule(module, moduleId)
   return moduleId
 }
 
@@ -311,17 +275,14 @@ export async function precompile(
  * }
  * ```
  */
-export function createHandler(
-  env: WorkerEnv,
-  options: EvaluateOptions = {}
-): (request: Request) => Promise<Response> {
+export function createHandler(env: WorkerEnv, options: EvaluateOptions = {}): (request: Request) => Promise<Response> {
   return async (request: Request) => {
     if (request.method !== 'POST') {
       return new Response('Method not allowed', { status: 405 })
     }
 
     try {
-      const body = await request.json() as {
+      const body = (await request.json()) as {
         content: string
         action?: string
         args?: unknown[]
@@ -341,22 +302,28 @@ export function createHandler(
       }
 
       const meta = await result.meta()
-      return new Response(JSON.stringify({
-        moduleId: result.moduleId,
-        data: result.data,
-        ...meta,
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({
+          moduleId: result.moduleId,
+          data: result.data,
+          ...meta,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
     } catch (error) {
       const err = error as Error
-      return new Response(JSON.stringify({
-        error: err.message,
-        stack: err.stack,
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({
+          error: err.message,
+          stack: err.stack,
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
     }
   }
 }

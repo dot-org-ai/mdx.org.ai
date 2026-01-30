@@ -56,9 +56,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxdb/payload": "^1.9.1",
+    "@mdxdb/payload": "^1.9.0",
     "@mdxdb/sqlite": "^1.9.0",
-    "mdxld": "^1.9.1"
+    "mdxld": "^1.9.0"
   },
   "peerDependencies": {
     "miniflare": ">=3.0.0",

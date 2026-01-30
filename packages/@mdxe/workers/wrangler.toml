@@ -1,8 +1,25 @@
-# Test configuration for @mdxe/workers
-name = "mdxe-workers-test"
+# @mdxe/workers - Cloudflare Workers configuration
+#
+# This is an example configuration showing how to set up
+# the Dynamic Worker Loader binding for MDX evaluation.
+#
+# The [[worker_loaders]] binding is a Cloudflare feature that allows
+# dynamically creating and executing worker code at runtime.
+# See: https://developers.cloudflare.com/workers/configuration/worker-loaders/
+
+name = "mdxe-workers-example"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
-# Note: The Dynamic Worker Loader binding (worker_loaders) is a special
-# Cloudflare feature that may not be available in all environments.
-# Tests that require LOADER binding will be skipped if not available.
+# Required: Dynamic Worker Loader binding
+# This binding allows evaluating MDX code in isolated worker instances
+[[worker_loaders]]
+binding = "LOADER"
+
+# Note: The Dynamic Worker Loader is a special Cloudflare feature that
+# may require specific account settings or enterprise features.
+#
+# Alternative approaches for local development:
+# - Use wrangler dev (includes workerd runtime)
+# - Use @mdxe/node for Node.js evaluation
+# - Pre-compile MDX at build time and deploy static workers

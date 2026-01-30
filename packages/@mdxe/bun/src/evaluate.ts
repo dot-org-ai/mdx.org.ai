@@ -1,140 +1,227 @@
 /**
- * @mdxe/bun - MDX evaluation using Bun's native capabilities
+ * @mdxe/bun - MDX evaluation using Miniflare (workerd)
  *
- * Compile and execute MDX content directly using Bun's fast TypeScript/JSX support.
+ * Securely evaluate MDX in Bun using miniflare. Provides the same
+ * secure isolation as Cloudflare Workers, with the same API as @mdxe/node.
  *
  * @packageDocumentation
  */
 
-import { parse, type MDXLDDocument } from 'mdxld'
-import { stripTypeScript } from './extract.js'
+import { Miniflare } from 'miniflare'
+import {
+  compileToModule,
+  createWorkerConfig,
+  generateModuleId,
+  getExports,
+  type CompiledModule,
+  type CompileToModuleOptions,
+  type SandboxOptions,
+  type WorkerConfig,
+} from '@mdxe/isolate'
+
+// Re-export from isolate
+export {
+  compileToModule,
+  createWorkerConfig,
+  generateModuleId,
+  getExports,
+  type CompiledModule,
+  type CompileToModuleOptions,
+  type SandboxOptions,
+  type WorkerConfig,
+} from '@mdxe/isolate'
 
 /**
- * Options for MDX evaluation
+ * Miniflare configuration options
  */
-export interface EvaluateOptions {
-  /** Global variables to expose to the evaluated code */
-  globals?: Record<string, unknown>
-  /** Whether to strip TypeScript types (default: true for Bun's native TS) */
-  stripTypes?: boolean
-  /** JSX runtime ('react' | 'preact' | 'hono' | 'none') */
-  jsxRuntime?: 'react' | 'preact' | 'hono' | 'none'
+export interface MiniflareConfig {
+  /** Compatibility date */
+  compatibilityDate?: string
+  /** Additional miniflare options */
+  [key: string]: unknown
 }
 
 /**
- * Result of MDX evaluation
+ * Evaluate options for MDX execution
+ */
+export interface EvaluateOptions extends CompileToModuleOptions {
+  /** Sandbox options */
+  sandbox?: SandboxOptions
+  /** Miniflare options override */
+  miniflareOptions?: MiniflareConfig
+  /** Global variables to expose to the evaluated code (for backward compatibility) */
+  globals?: Record<string, unknown>
+  /** Whether to strip TypeScript types (legacy, not used with Miniflare) */
+  stripTypes?: boolean
+}
+
+/**
+ * Evaluate result containing exports and utilities
  */
 export interface EvaluateResult<T = unknown> {
-  /** All exports from the MDX module */
-  exports: Record<string, unknown>
-  /** Default export (if any) */
+  /** Default MDX component export */
   default?: T
-  /** Frontmatter/data from the MDX document */
+  /** All named exports */
+  exports: Record<string, unknown>
+  /** Frontmatter data */
   data: Record<string, unknown>
   /** Raw content (markdown body) */
   content: string
-  /** The original parsed document */
-  doc: MDXLDDocument
+  /** The original parsed document (for backward compatibility) */
+  doc?: { data: Record<string, unknown>; content: string }
+  /** Call an exported function */
+  call: <R = unknown>(name: string, ...args: unknown[]) => Promise<R>
+  /** Get module metadata */
+  meta: () => Promise<{ exports: string[]; hasDefault: boolean }>
+  /** Module ID for caching reference */
+  moduleId: string
+  /** Dispose the miniflare instance */
+  dispose: () => Promise<void>
 }
 
 /**
- * Evaluate MDX content and return its exports
+ * Evaluator instance that manages miniflare lifecycle
+ */
+export interface Evaluator {
+  /** Evaluate MDX content */
+  evaluate: <T = unknown>(content: string, options?: EvaluateOptions) => Promise<EvaluateResult<T>>
+  /** Dispose all miniflare instances */
+  dispose: () => Promise<void>
+  /** Get active instance count */
+  getInstanceCount: () => number
+}
+
+/**
+ * Active miniflare instances
+ */
+const instances = new Map<string, Miniflare>()
+
+/**
+ * Create a miniflare instance for the compiled module
+ */
+async function createMiniflareInstance(
+  module: CompiledModule,
+  sandbox: SandboxOptions = {},
+  options: MiniflareConfig = {}
+): Promise<Miniflare> {
+  const config = createWorkerConfig(module, sandbox)
+
+  // Build ES modules array for Miniflare
+  const modules = Object.entries(config.modules).map(([name, content]) => ({
+    type: 'ESModule' as const,
+    path: `./${name}`,
+    contents: content,
+  }))
+
+  // Find the main module
+  const mainModule = modules.find((m) => m.path === `./${config.mainModule}`)
+  if (!mainModule) {
+    throw new Error(`Main module ${config.mainModule} not found`)
+  }
+
+  const mf = new Miniflare({
+    modules: [
+      // Main module first
+      mainModule,
+      // Then other modules
+      ...modules.filter((m) => m !== mainModule),
+    ],
+    compatibilityDate: config.compatibilityDate,
+    ...options,
+  })
+
+  return mf
+}
+
+/**
+ * Evaluate MDX content securely in an isolated workerd instance
  *
- * Uses Bun's native TypeScript support for fast evaluation.
- *
- * @param mdxContent - MDX content string
- * @param options - Evaluation options
- * @returns Evaluated module exports and metadata
+ * @param content - MDX content string
+ * @param options - Evaluate options
+ * @returns Evaluate result with exports and call utilities
  *
  * @example
  * ```ts
- * const result = await evaluate(`
- * ---
- * title: Hello
- * ---
+ * import { evaluate } from '@mdxe/bun'
  *
- * export const greet = (name: string) => \`Hello, \${name}!\`
- * export const add = (a: number, b: number) => a + b
- * `)
+ * const mdx = `
+ *   export function greet(name) {
+ *     return \`Hello, \${name}!\`
+ *   }
+ * `
  *
- * console.log(result.exports.greet('World')) // "Hello, World!"
- * console.log(result.data.title) // "Hello"
+ * const result = await evaluate(mdx, {
+ *   sandbox: { blockNetwork: true }
+ * })
+ *
+ * const greeting = await result.call('greet', 'World')
+ * console.log(greeting) // "Hello, World!"
+ *
+ * await result.dispose()
  * ```
  */
 export async function evaluate<T = unknown>(
-  mdxContent: string,
+  content: string,
   options: EvaluateOptions = {}
 ): Promise<EvaluateResult<T>> {
-  const { globals = {}, stripTypes = false } = options
+  const { sandbox, miniflareOptions, ...compileOpts } = options
 
-  // Parse the MDX document
-  const doc = parse(mdxContent)
+  // Compile MDX to module - always bundle JSX runtime since we're in isolated env
+  const module = await compileToModule(content, {
+    bundleRuntime: true,
+    ...compileOpts,
+  })
+  const moduleId = generateModuleId(content)
 
-  // Extract code blocks that are exports
-  const codeToEvaluate = extractExecutableCode(mdxContent)
+  // Create or reuse miniflare instance
+  let mf = instances.get(moduleId)
+  if (!mf) {
+    mf = await createMiniflareInstance(module, sandbox, miniflareOptions)
+    instances.set(moduleId, mf)
+  }
 
-  // Optionally strip TypeScript types for non-Bun environments
-  const code = stripTypes ? stripTypeScript(codeToEvaluate) : codeToEvaluate
+  // Helper to call exported functions
+  const call = async <R = unknown>(name: string, ...args: unknown[]): Promise<R> => {
+    const response = await mf!.dispatchFetch(`http://localhost/call/${name}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ args }),
+    })
 
-  // Create the evaluation context
-  const exports: Record<string, unknown> = {}
-  const module = { exports }
-
-  // Build the function body with globals
-  const globalNames = Object.keys(globals)
-  const globalValues = Object.values(globals)
-
-  try {
-    // Use AsyncFunction for async support
-    const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
-
-    // Wrap exports in a module pattern
-    const wrappedCode = `
-      const exports = {};
-      const module = { exports };
-      ${code}
-      return { exports, module };
-    `
-
-    const fn = new AsyncFunction(...globalNames, wrappedCode)
-    const result = await fn(...globalValues)
-
-    return {
-      exports: { ...result.exports, ...result.module.exports },
-      default: result.exports.default || result.module.exports.default,
-      data: doc.data,
-      content: doc.content,
-      doc,
+    if (!response.ok) {
+      const error = (await response.json()) as { error: string; stack?: string }
+      throw new Error(error.error)
     }
-  } catch (error) {
-    throw new Error(
-      `Failed to evaluate MDX: ${error instanceof Error ? error.message : String(error)}`
-    )
-  }
-}
 
-/**
- * Extract executable code from MDX content
- *
- * Finds code blocks marked as executable and export statements.
- */
-function extractExecutableCode(content: string): string {
-  const lines: string[] = []
-
-  // Extract export statements from the document
-  const exportRegex = /^export\s+(?:const|let|var|function|class|async\s+function)\s+[\s\S]*?(?=\n(?:export|$)|$)/gm
-  let match
-  while ((match = exportRegex.exec(content)) !== null) {
-    lines.push(match[0])
+    const result = (await response.json()) as { result: R }
+    return result.result
   }
 
-  // Also extract code blocks marked as executable
-  const codeBlockRegex = /```(?:ts|typescript|js|javascript)\s+(?:run|exec|export)\s*\n([\s\S]*?)```/g
-  while ((match = codeBlockRegex.exec(content)) !== null) {
-    lines.push(match[1])
+  // Helper to get metadata
+  const meta = async () => {
+    const response = await mf!.dispatchFetch('http://localhost/meta')
+    return response.json() as Promise<{ exports: string[]; hasDefault: boolean }>
   }
 
-  return lines.join('\n\n')
+  // Dispose helper
+  const dispose = async () => {
+    const instance = instances.get(moduleId)
+    if (instance) {
+      await instance.dispose()
+      instances.delete(moduleId)
+    }
+  }
+
+  return {
+    exports: {},
+    data: module.data,
+    content: content,
+    doc: { data: module.data, content: content },
+    call,
+    meta,
+    moduleId,
+    dispose,
+  }
 }
 
 /**
@@ -153,16 +240,18 @@ export async function evaluateFile<T = unknown>(
 }
 
 /**
- * Run a specific exported function from MDX content
+ * Run MDX content and get result directly (convenience function)
  *
- * @param mdxContent - MDX content string
- * @param functionName - Name of the function to call
- * @param args - Arguments to pass to the function
- * @param options - Evaluation options
+ * @param content - MDX content string
+ * @param functionName - Function to call
+ * @param args - Arguments to pass
+ * @param options - Evaluate options
  * @returns Function result
  *
  * @example
  * ```ts
+ * import { run } from '@mdxe/bun'
+ *
  * const result = await run(
  *   'export const add = (a, b) => a + b',
  *   'add',
@@ -172,19 +261,17 @@ export async function evaluateFile<T = unknown>(
  * ```
  */
 export async function run<R = unknown>(
-  mdxContent: string,
+  content: string,
   functionName: string,
   args: unknown[] = [],
   options: EvaluateOptions = {}
 ): Promise<R> {
-  const { exports } = await evaluate(mdxContent, options)
-
-  const fn = exports[functionName]
-  if (typeof fn !== 'function') {
-    throw new Error(`Export '${functionName}' is not a function`)
+  const result = await evaluate(content, options)
+  try {
+    return await result.call<R>(functionName, ...args)
+  } finally {
+    await result.dispose()
   }
-
-  return fn(...args) as R
 }
 
 /**
@@ -207,7 +294,106 @@ export async function runFile<R = unknown>(
 }
 
 /**
+ * Create an MDX evaluator with pre-configured options
+ *
+ * @param defaultOptions - Default options for all evaluations
+ * @returns Evaluator instance
+ *
+ * @example
+ * ```ts
+ * const evaluator = createEvaluator({
+ *   sandbox: { blockNetwork: true }
+ * })
+ *
+ * const result = await evaluator.evaluate(mdxContent)
+ * const greeting = await result.call('greet', 'World')
+ *
+ * // Clean up when done
+ * await evaluator.dispose()
+ * ```
+ */
+export function createEvaluator(defaultOptions: EvaluateOptions = {}): Evaluator {
+  const localInstances = new Set<string>()
+
+  return {
+    evaluate: async <T = unknown>(content: string, options: EvaluateOptions = {}) => {
+      const result = await evaluate<T>(content, { ...defaultOptions, ...options })
+      localInstances.add(result.moduleId)
+      return result
+    },
+
+    dispose: async () => {
+      for (const moduleId of localInstances) {
+        const instance = instances.get(moduleId)
+        if (instance) {
+          await instance.dispose()
+          instances.delete(moduleId)
+        }
+      }
+      localInstances.clear()
+    },
+
+    getInstanceCount: () => localInstances.size,
+  }
+}
+
+/**
+ * Dispose all active miniflare instances
+ */
+export async function disposeAll(): Promise<void> {
+  const disposals = Array.from(instances.entries()).map(async ([id, mf]) => {
+    await mf.dispose()
+    instances.delete(id)
+  })
+  await Promise.all(disposals)
+}
+
+/**
+ * Get the number of active miniflare instances
+ */
+export function getActiveInstanceCount(): number {
+  return instances.size
+}
+
+/**
+ * Test MDX content by running it and checking for errors
+ *
+ * @param content - MDX content string
+ * @param options - Evaluate options
+ * @returns Test result
+ */
+export async function test(
+  content: string,
+  options: EvaluateOptions = {}
+): Promise<{
+  success: boolean
+  exports: string[]
+  data: Record<string, unknown>
+  error?: string
+}> {
+  try {
+    const result = await evaluate(content, options)
+    const metaData = await result.meta()
+    await result.dispose()
+
+    return {
+      success: true,
+      exports: metaData.exports,
+      data: result.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      exports: [],
+      data: {},
+      error: (error as Error).message,
+    }
+  }
+}
+
+/**
  * Create a simple expect function for test assertions
+ * Kept for backward compatibility with existing @mdxe/bun tests
  */
 export function createExpect() {
   return function expect(actual: unknown) {
@@ -219,7 +405,9 @@ export function createExpect() {
       },
       toEqual(expected: unknown) {
         if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-          throw new Error(`Expected ${JSON.stringify(actual)} to equal ${JSON.stringify(expected)}`)
+          throw new Error(
+            `Expected ${JSON.stringify(actual)} to equal ${JSON.stringify(expected)}`
+          )
         }
       },
       toBeTruthy() {
@@ -273,7 +461,7 @@ export function createExpect() {
           throw new Error(`Expected a function`)
         }
         try {
-          (actual as () => void)()
+          ;(actual as () => void)()
           throw new Error(`Expected function to throw`)
         } catch (e) {
           if (message) {
@@ -307,16 +495,24 @@ export function createExpect() {
       not: {
         toBe(expected: unknown) {
           if (actual === expected) {
-            throw new Error(`Expected ${JSON.stringify(actual)} not to be ${JSON.stringify(expected)}`)
+            throw new Error(
+              `Expected ${JSON.stringify(actual)} not to be ${JSON.stringify(expected)}`
+            )
           }
         },
         toEqual(expected: unknown) {
           if (JSON.stringify(actual) === JSON.stringify(expected)) {
-            throw new Error(`Expected ${JSON.stringify(actual)} not to equal ${JSON.stringify(expected)}`)
+            throw new Error(
+              `Expected ${JSON.stringify(actual)} not to equal ${JSON.stringify(expected)}`
+            )
           }
         },
         toContain(expected: unknown) {
-          if (typeof actual === 'string' && typeof expected === 'string' && actual.includes(expected)) {
+          if (
+            typeof actual === 'string' &&
+            typeof expected === 'string' &&
+            actual.includes(expected)
+          ) {
             throw new Error(`Expected "${actual}" not to contain "${expected}"`)
           }
           if (Array.isArray(actual) && actual.includes(expected)) {

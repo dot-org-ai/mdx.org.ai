@@ -11,6 +11,7 @@ export default defineConfig([
       'commands/deploy': 'src/commands/deploy.ts',
       'commands/db': 'src/commands/db.ts',
       'cloudflare/api': 'src/cloudflare/api.ts',
+      'tail/index': 'src/tail/index.ts',
     },
     format: ['esm', 'cjs'],
     dts: true,

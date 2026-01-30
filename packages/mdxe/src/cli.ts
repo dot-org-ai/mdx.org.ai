@@ -13,7 +13,7 @@ import { glob } from 'glob'
 import { transform } from 'esbuild'
 
 export interface CliOptions {
-  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'run' | 'admin' | 'notebook' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
+  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'run' | 'admin' | 'notebook' | 'tail' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
   projectDir: string
   platform: 'do' | 'cloudflare' | 'vercel' | 'github'
   mode?: 'static' | 'opennext'
@@ -42,6 +42,11 @@ export interface CliOptions {
   // Notebook options
   open: boolean
   // Deploy options (always uses managed apis.do API)
+  // Worker loaders deployment options
+  workers?: boolean
+  subcommand?: 'workers'
+  contentHash?: boolean
+  compatibilityDate?: string
 }
 
 export const VERSION = '0.0.0'
@@ -74,6 +79,7 @@ Commands:
   run <file.mdx>      Execute script blocks from an MDX file
   admin               Start Payload admin UI with mdxdb backend
   notebook            Launch interactive notebook for MDX files
+  tail                Stream or fetch events from mdxe applications
   deploy              Deploy to cloud platforms
   db                  Start local dev environment (ClickHouse + sync + UI)
   db:server           Start only the ClickHouse server
@@ -104,6 +110,39 @@ Notebook Examples:
   # Open with browser auto-launch
   mdxe notebook --open
 
+Tail Options:
+  --live               Use WebSocket for live event streaming
+  --follow, -f         Use HTTP polling for continuous updates
+  --source <pattern>   Filter by source (supports * wildcard)
+  --type <type>        Filter by event type (exact match)
+  --importance, -i <level>  Minimum importance: critical | high | normal | low
+  --since <time>       Start time (ISO date or relative: 1h, 30m, 2d)
+  --until <time>       End time (ISO date or relative)
+  --limit, -n <count>  Maximum events to show
+  --json               Output events as JSON (one per line)
+  --no-color           Disable colored output
+  --url <url>          Tail API URL (default: $MDXE_TAIL_URL)
+  --verbose, -v        Show detailed output
+
+Tail Examples:
+  # Live WebSocket streaming
+  mdxe tail --live
+
+  # Follow mode (HTTP polling)
+  mdxe tail --follow
+
+  # Historical events from last hour
+  mdxe tail --since 1h
+
+  # Filter by source and importance
+  mdxe tail --source "mdxe-*" --importance high
+
+  # JSON output for piping
+  mdxe tail --json | jq '.type'
+
+  # Show only errors
+  mdxe tail --type error --importance critical
+
 Database Options (db commands):
   --path, -p <path>      Path to MDX files (default: ./content)
   --name, -n <name>      Database name/namespace
@@ -119,7 +158,11 @@ Test Options:
   --ui                   Open vitest UI
   --verbose, -v          Show detailed output
   --context, -c <ctx>    Execution context: local | remote | all (default: local)
-  --target <runtime>     Target runtime: node | bun | workers | all (default: node)
+  --target <runtime>     Target runtime: workers | node | bun | all (default: workers)
+                         All targets use workerd for consistent execution:
+                         - workers: Direct Cloudflare Workers (@mdxe/workers)
+                         - node: Local workerd via Miniflare (@mdxe/workers/local)
+                         - bun: Local workerd via Miniflare (@mdxe/workers/local)
   --db <backend>         Database backend: memory | fs | sqlite | sqlite-do | clickhouse | all
   --ai <mode>            AI mode: local | remote (default: local)
 
@@ -255,7 +298,7 @@ export function parseArgs(args: string[]): CliOptions {
     coverage: false,
     ui: false,
     context: 'local',
-    target: 'node',
+    target: 'workers',
     db: 'memory',
     aiMode: 'local',
     port: 3000,
@@ -284,6 +327,8 @@ export function parseArgs(args: string[]): CliOptions {
       options.command = 'admin'
     } else if (cmd === 'notebook') {
       options.command = 'notebook'
+    } else if (cmd === 'tail') {
+      options.command = 'tail'
     } else if (cmd === 'db') {
       options.command = 'db'
     } else if (cmd === 'db:server') {
@@ -301,9 +346,15 @@ export function parseArgs(args: string[]): CliOptions {
   }
 
   // Handle positional argument after command (e.g., mdxe notebook ./path/to/file.mdx)
+  // For deploy, check if it's a subcommand like 'workers'
   if (args.length > 0 && !args[0].startsWith('-')) {
-    options.projectDir = resolve(args[0])
-    args = args.slice(1)
+    if (options.command === 'deploy' && args[0] === 'workers') {
+      options.subcommand = 'workers'
+      args = args.slice(1)
+    } else {
+      options.projectDir = resolve(args[0])
+      args = args.slice(1)
+    }
   }
 
   // Parse options
@@ -443,6 +494,17 @@ export function parseArgs(args: string[]): CliOptions {
       case '-o':
         options.open = true
         break
+      // Worker loaders deployment options
+      case '--workers':
+        options.workers = true
+        break
+      case '--content-hash':
+        options.contentHash = true
+        break
+      case '--compatibility-date':
+        options.compatibilityDate = next
+        i++
+        break
     }
   }
 
@@ -450,6 +512,52 @@ export function parseArgs(args: string[]): CliOptions {
 }
 
 export async function runDeploy(options: CliOptions): Promise<void> {
+  // Handle workers deployment subcommand
+  if (options.subcommand === 'workers' || options.workers) {
+    console.log('🔧 mdxe deploy workers\n')
+    console.log(`📁 Project: ${options.projectDir}`)
+
+    if (options.dryRun) {
+      console.log('🔬 Dry run mode - no changes will be made\n')
+    }
+
+    const { deployWorkers } = await import('./commands/deploy-workers.js')
+    const result = await deployWorkers({
+      projectDir: options.projectDir,
+      name: options.projectName || 'mdx-workers',
+      useContentHash: options.contentHash,
+      compatibilityDate: options.compatibilityDate,
+      dryRun: options.dryRun,
+      verbose: options.verbose,
+    })
+
+    // Show logs
+    if (options.verbose && result.logs.length > 0) {
+      console.log('\n📋 Logs:')
+      for (const log of result.logs) {
+        console.log(`   ${log}`)
+      }
+    }
+
+    if (result.success) {
+      console.log('\n✅ Worker deployment successful!')
+      if (result.workerIds) {
+        console.log(`📦 Workers: ${result.workerIds.length}`)
+      }
+      if (result.contentHash) {
+        console.log(`🔑 Content Hash: ${result.contentHash}`)
+      }
+      console.log(`⏱️  Duration: ${result.duration}ms`)
+    } else {
+      console.error('\n❌ Worker deployment failed!')
+      if (result.error) {
+        console.error(`   Error: ${result.error}`)
+      }
+      process.exit(1)
+    }
+    return
+  }
+
   // Check for Docs type project
   const { isDocsType } = await checkDocsType(options.projectDir)
 
@@ -831,9 +939,18 @@ function getDbConfig(db: CliOptions['db'], target: CliOptions['target']): { prov
 
 /**
  * Generate test matrix from target and db options
+ *
+ * All targets use workerd for consistent execution:
+ * - workers: Direct Cloudflare Workers (@mdxe/workers)
+ * - node: Local workerd via Miniflare (@mdxe/workers/local)
+ * - bun: Local workerd via Miniflare (@mdxe/workers/local)
+ *
+ * This unified model ensures tests produce identical results across all runtimes
+ * since they all execute in the same workerd environment.
  */
 function generateTestMatrix(target: CliOptions['target'], db: CliOptions['db']): Array<{ target: string; db: string }> {
-  const targets = target === 'all' ? ['node', 'bun', 'workers'] : [target]
+  // All targets use workerd - order reflects the recommended default (workers first)
+  const targets = target === 'all' ? ['workers', 'node', 'bun'] : [target]
   const dbs = db === 'all'
     ? ['memory', 'fs', 'sqlite', 'sqlite-do', 'clickhouse']
     : [db]
@@ -852,6 +969,24 @@ function generateTestMatrix(target: CliOptions['target'], db: CliOptions['db']):
   }
 
   return matrix
+}
+
+/**
+ * Get the runtime module path for a given target
+ *
+ * All targets use workerd for execution:
+ * - workers: Direct Cloudflare Workers (@mdxe/workers)
+ * - node/bun: Local workerd via Miniflare (@mdxe/workers/local)
+ */
+export function getWorkerdRuntime(target: CliOptions['target']): 'workers' | 'local' {
+  switch (target) {
+    case 'workers':
+      return 'workers'
+    case 'node':
+    case 'bun':
+    default:
+      return 'local'
+  }
 }
 
 /**
@@ -1402,6 +1537,14 @@ export async function main(): Promise<void> {
         open: options.open,
         verbose: options.verbose,
       })
+      break
+    case 'tail':
+      // Pass remaining args to tail command for its own parsing
+      const tailArgs = process.argv.slice(3) // Skip node, script, 'tail'
+      const { parseTailArgs, runTail } = await import('./commands/tail.js')
+      const tailOptions = parseTailArgs(tailArgs)
+      tailOptions.verbose = tailOptions.verbose || options.verbose
+      await runTail(tailOptions)
       break
     case 'db':
     case 'db:server':

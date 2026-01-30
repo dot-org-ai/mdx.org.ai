@@ -29,11 +29,30 @@ export type {
   ContextProvider,
 } from './types.js'
 
-// Export SDK provider (programmatic access)
+// Export SDK provider (programmatic access) - legacy multi-runtime
 export {
   createSDKProvider,
   generateSDKInjectionCode,
 } from './sdk-provider.js'
+
+// Export Workerd SDK provider - simplified workerd-based execution
+export {
+  createWorkerdSDKProvider,
+  generateWorkerdSDKCode,
+  createWorkerdContext,
+  injectDatabaseBindings,
+  isLocalContext,
+  isRemoteContext,
+  type WorkerdSDKConfig,
+  type WorkerdSDKProvider,
+  type WorkerdSDKContext,
+  type WorkerdContext,
+  type WorkerdDBClient,
+  type WorkerdAIProvider,
+  type WorkerdWorkflowProvider,
+  type DatabaseBindings,
+  type WorkerEnv,
+} from './sdk-workerd.js'
 
 // Export Cloudflare API client
 export {
@@ -49,6 +68,45 @@ export {
 
 // Export deploy command
 export { deploy, detectSourceType } from './commands/deploy.js'
+
+// Export tail command types and functions
+export {
+  parseTailArgs,
+  formatEvent,
+  getColorForImportance,
+  runTail,
+  type TailCommandOptions,
+} from './commands/tail.js'
+
+// Re-export tail module types
+export {
+  type MdxeEvent,
+  type EventImportance,
+  type CreateEventOptions,
+  createEvent,
+  isValidImportance,
+  IMPORTANCE_LEVELS,
+} from './tail/types.js'
+
+export {
+  type EventFilter,
+  matchesFilter,
+  compareImportance,
+} from './tail/filter.js'
+
+export {
+  TailClient,
+  type TailClientOptions,
+  type TailClientMetrics,
+} from './tail/ws-client.js'
+
+export {
+  fetchHistoricalEvents,
+  HistoricalTailPoller,
+  type HistoricalTailOptions,
+  type HistoricalTailResult,
+  type PollingOptions,
+} from './tail/historical.js'
 
 // Re-export mdxld types for convenience
 export type { MDXLDDocument, MDXLDData } from 'mdxld'

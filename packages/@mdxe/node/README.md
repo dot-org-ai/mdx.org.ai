@@ -1,6 +1,23 @@
 # @mdxe/node
 
+> **DEPRECATED**: This package is deprecated. Use `@mdxe/workers/local` instead.
+
 Secure MDX evaluation in Node.js using Miniflare's workerd runtime. Execute MDX code in isolated V8 contexts.
+
+## Migration to @mdxe/workers/local
+
+This package now re-exports from `@mdxe/workers/local`. Please update your imports:
+
+```typescript
+// Before (deprecated)
+import { evaluate, createEvaluator, run, test } from '@mdxe/node'
+
+// After (recommended)
+import { evaluate, createLocalEvaluator, run, test } from '@mdxe/workers/local'
+```
+
+**Note:** `createEvaluator` has been renamed to `createLocalEvaluator` for clarity.
+The original `createEvaluator` name is still exported from `@mdxe/node` for backwards compatibility.
 
 ## Installation
 
