@@ -2,7 +2,7 @@
  * MDXDurableObject
  *
  * Extended Durable Object with hierarchy support and parquet export.
- * Uses capnweb's newWorkersRpcResponse for automatic RPC exposure over
+ * Uses rpc.do/server's newWorkersRpcResponse for automatic RPC exposure over
  * WebSocket (hibernatable) and HTTP batch - all methods exposed automatically.
  *
  * @packageDocumentation
@@ -10,20 +10,17 @@
 
 import { MDXDatabase } from '@mdxdb/sqlite/durable-object'
 import { writeThings, writeRelationshipsIndexed } from '@mdxdb/parquet'
-import { newWorkersRpcResponse } from 'capnweb'
+import { newWorkersRpcResponse } from 'rpc.do/server'
 import type { ExportOptions, ChildInfo, Env } from './types.js'
 
 /**
  * MDXDurableObject extends MDXDatabase with:
  * - Parent/child hierarchy via $context relationship
  * - Parquet export
- * - capnweb RPC (WebSocket + HTTP) via newWorkersRpcResponse
+ * - capnweb RPC (WebSocket + HTTP) via rpc.do/server
  *
  * All public methods on MDXDatabase are automatically exposed via RPC.
  * Clients use rpc.do transports (capnweb, reconnectingWs, http) to connect.
- *
- * rpc.do v0.2+ is a client-only library - server-side uses capnweb directly.
- * This provides full capnweb features: pipelining, .map(), pass-by-reference.
  *
  * @example
  * ```ts
@@ -31,7 +28,7 @@ import type { ExportOptions, ChildInfo, Env } from './types.js'
  * const stub = env.MDXDB.get(id)
  * await stub.create({ type: 'Post', data: { title: 'Hello' } })
  *
- * // rpc.do client with capnweb transport
+ * // rpc.do client
  * import { RPC } from 'rpc.do'
  * const db = RPC('wss://my-do.workers.dev')
  * await db.create({ type: 'Post', data: { title: 'Hello' } })
@@ -147,7 +144,7 @@ export class MDXDurableObject extends MDXDatabase {
   /**
    * Handle incoming HTTP requests
    *
-   * Uses capnweb's newWorkersRpcResponse which automatically handles:
+   * Uses rpc.do/server's newWorkersRpcResponse which automatically handles:
    * - WebSocket upgrade → hibernatable capnweb RPC session
    * - HTTP POST → capnweb batch RPC
    *
