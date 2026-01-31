@@ -235,11 +235,55 @@ export class MDXDurableObject extends MDXDatabase {
   }
 
   /**
+   * Simple ping for measuring baseline network latency
+   * Returns server timestamp to verify round trip
+   */
+  ping(): { ts: number; id: string } {
+    return { ts: Date.now(), id: this.$id() }
+  }
+
+  /**
+   * Get database statistics
+   */
+  async stats(): Promise<{
+    things: number
+    relationships: number
+    types: { type: string; count: number }[]
+  }> {
+    const things = await this.list({ limit: 100000 })
+    const typeMap = new Map<string, number>()
+    for (const t of things) {
+      typeMap.set(t.type, (typeMap.get(t.type) || 0) + 1)
+    }
+
+    // Count relationships by querying each thing
+    let relCount = 0
+    for (const t of things.slice(0, 100)) { // Sample first 100
+      const rels = await this.relationships(t.url)
+      relCount += rels.length
+    }
+    // Estimate total
+    const estimatedRels = things.length > 0 ? Math.round((relCount / Math.min(100, things.length)) * things.length) : 0
+
+    return {
+      things: things.length,
+      relationships: estimatedRels,
+      types: Array.from(typeMap.entries())
+        .map(([type, count]) => ({ type, count }))
+        .sort((a, b) => b.count - a.count),
+    }
+  }
+
+  /**
    * Create RPC handler that only exposes safe methods
    * (avoiding serialization of internal state like sql, doCtx)
    */
   private createRpcTarget() {
     return {
+      // Diagnostics
+      ping: () => this.ping(),
+      stats: () => this.stats(),
+
       // Core CRUD
       $id: () => this.$id(),
       get: <TData = Record<string, unknown>>(url: string) => this.get<TData>(url),
