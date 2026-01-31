@@ -31,9 +31,30 @@ export default defineConfig([
     splitting: false,
     noExternal: [/^(?!cloudflare:).*/],
     bundle: true,
+    esbuildPlugins: [
+      {
+        name: 'stub-isolate',
+        setup(build) {
+          // Replace @mdxe/isolate imports with a stub that throws at runtime
+          build.onResolve({ filter: /^@mdxe\/isolate$/ }, () => ({
+            path: '@mdxe/isolate',
+            namespace: 'stub-isolate',
+          }))
+          build.onLoad({ filter: /.*/, namespace: 'stub-isolate' }, () => ({
+            contents: `
+              export const compileToModule = () => { throw new Error('Code execution not available in MDXDurableObject') }
+              export const createWorkerConfig = () => { throw new Error('Code execution not available in MDXDurableObject') }
+              export const getExports = () => { throw new Error('Code execution not available in MDXDurableObject') }
+            `,
+            loader: 'js',
+          }))
+        },
+      },
+    ],
     esbuildOptions(options) {
       options.mainFields = ['module', 'main']
-      options.external = ['cloudflare:workers', '@mdxdb/parquet', '@mdxe/isolate', 'rpc.do']
+      // Only cloudflare: should be external
+      options.external = ['cloudflare:workers']
     },
   },
 ])

@@ -1,13 +1,14 @@
 /**
  * Parquet Writer
  *
- * Pure JS parquet writing using hyparquet.
+ * Pure JS parquet writing using hyparquet-writer.
  * Larger bundle (~100KB) - use lazy loading in Snippets.
  *
  * @packageDocumentation
  */
 
-import { parquetWrite } from 'hyparquet'
+import { parquetWriteBuffer } from 'hyparquet-writer'
+import type { ColumnSource, BasicType } from 'hyparquet-writer'
 import type {
   ParquetWriter as IParquetWriter,
   ParquetSchema,
@@ -18,79 +19,74 @@ import type {
 import { thingSchema, relationshipSchema, relationshipIndexSchema, inferSchema } from './schema.js'
 
 /**
- * Convert our schema type to hyparquet schema format
+ * Convert our field type to hyparquet BasicType
  */
-function convertSchemaToHyparquet(schema: ParquetSchema): Record<string, string> {
-  const result: Record<string, string> = {}
-
-  for (const field of schema.fields) {
-    let type: string
-
-    switch (field.type) {
-      case 'BOOLEAN':
-        type = 'BOOLEAN'
-        break
-      case 'INT32':
-        type = 'INT32'
-        break
-      case 'INT64':
-        type = 'INT64'
-        break
-      case 'FLOAT':
-        type = 'FLOAT'
-        break
-      case 'DOUBLE':
-        type = 'DOUBLE'
-        break
-      case 'UTF8':
-        type = 'UTF8'
-        break
-      case 'JSON':
-        type = 'UTF8' // JSON stored as UTF8 string
-        break
-      case 'TIMESTAMP':
-        type = 'INT64' // Timestamp as milliseconds
-        break
-      default:
-        type = 'UTF8'
-    }
-
-    if (field.optional) {
-      type = type + ',OPTIONAL'
-    }
-
-    result[field.name] = type
+function convertType(type: string): BasicType {
+  switch (type) {
+    case 'BOOLEAN':
+      return 'BOOLEAN'
+    case 'INT32':
+      return 'INT32'
+    case 'INT64':
+      return 'INT64'
+    case 'FLOAT':
+      return 'FLOAT'
+    case 'DOUBLE':
+      return 'DOUBLE'
+    case 'UTF8':
+    case 'JSON':
+      return 'STRING'
+    case 'TIMESTAMP':
+      return 'TIMESTAMP'
+    default:
+      return 'STRING'
   }
-
-  return result
 }
 
 /**
- * Prepare data for writing by converting types
+ * Convert rows to columnData format for hyparquet-writer
  */
-function prepareData<T>(data: T[], schema?: ParquetSchema): Record<string, unknown>[] {
-  return data.map((row) => {
-    const prepared: Record<string, unknown> = {}
+function rowsToColumnData(
+  rows: Record<string, unknown>[],
+  schema: ParquetSchema
+): ColumnSource[] {
+  if (rows.length === 0) {
+    return schema.fields.map((field) => ({
+      name: field.name,
+      data: [],
+      type: convertType(field.type),
+      nullable: field.optional ?? true,
+    }))
+  }
 
-    for (const [key, value] of Object.entries(row as Record<string, unknown>)) {
-      if (value === undefined) {
-        prepared[key] = null
-      } else if (value instanceof Date) {
-        prepared[key] = value.toISOString()
-      } else if (typeof value === 'object' && value !== null) {
-        // JSON fields - stringify objects
-        const field = schema?.fields.find((f) => f.name === key)
-        if (field?.type === 'JSON' || (typeof value === 'object' && !Array.isArray(value))) {
-          prepared[key] = JSON.stringify(value)
-        } else {
-          prepared[key] = value
-        }
-      } else {
-        prepared[key] = value
+  return schema.fields.map((field) => {
+    const values = rows.map((row) => {
+      const value = row[field.name]
+
+      // Handle null/undefined
+      if (value === null || value === undefined) {
+        return null
       }
-    }
 
-    return prepared
+      // Handle JSON fields
+      if (field.type === 'JSON' && typeof value === 'object') {
+        return JSON.stringify(value)
+      }
+
+      // Handle Date to ISO string for timestamps
+      if (value instanceof Date) {
+        return value.toISOString()
+      }
+
+      return value
+    })
+
+    return {
+      name: field.name,
+      data: values,
+      type: convertType(field.type),
+      nullable: field.optional ?? true,
+    }
   })
 }
 
@@ -102,27 +98,24 @@ export async function write<T = Record<string, unknown>>(
   schema?: ParquetSchema,
   options?: WriteOptions
 ): Promise<ArrayBuffer> {
-  if (data.length === 0) {
-    // Return empty parquet file
-    const emptySchema = schema ?? { fields: [] }
-    return parquetWrite({
-      schema: convertSchemaToHyparquet(emptySchema),
-      data: [],
-      compression: options?.compression ?? 'UNCOMPRESSED',
-    })
-  }
+  // Infer schema if not provided
+  const finalSchema = schema ?? inferSchema(data as Record<string, unknown>[])
 
-  const inferredSchema = schema ?? inferSchema(data as Record<string, unknown>[])
-  const hyparquetSchema = convertSchemaToHyparquet(inferredSchema)
-  const preparedData = prepareData(data, inferredSchema)
+  // Convert to column data format
+  const columnData = rowsToColumnData(data as Record<string, unknown>[], finalSchema)
 
-  return parquetWrite({
-    schema: hyparquetSchema,
-    data: preparedData,
-    compression: options?.compression ?? 'UNCOMPRESSED',
+  // Convert keyValueMetadata from Record to KeyValue array
+  const kvMetadata = options?.keyValueMetadata
+    ? Object.entries(options.keyValueMetadata).map(([key, value]) => ({ key, value }))
+    : undefined
+
+  // Write to buffer
+  return parquetWriteBuffer({
+    columnData,
+    codec: options?.compression === 'UNCOMPRESSED' ? 'UNCOMPRESSED' : options?.compression ?? 'UNCOMPRESSED',
     rowGroupSize: options?.rowGroupSize,
     pageSize: options?.pageSize,
-    keyValueMetadata: options?.keyValueMetadata,
+    kvMetadata,
   })
 }
 
@@ -137,7 +130,7 @@ function thingToRow<TData>(thing: Thing<TData>): Record<string, unknown> {
     data: JSON.stringify(thing.data),
     content: thing.content ?? null,
     context: thing['@context'] ? JSON.stringify(thing['@context']) : null,
-    at: thing.at.toISOString(),
+    at: thing.at,
     by: thing.by ?? null,
     in: thing.in ?? null,
     version: thing.version,
@@ -155,7 +148,7 @@ function relationshipToRow<TData>(rel: Relationship<TData>): Record<string, unkn
     from: rel.from,
     to: rel.to,
     data: rel.data ? JSON.stringify(rel.data) : null,
-    at: rel.at.toISOString(),
+    at: rel.at,
     by: rel.by ?? null,
     in: rel.in ?? null,
     do: rel.do ?? null,
@@ -174,7 +167,7 @@ function relationshipToIndexRows<TData>(rel: Relationship<TData>): Record<string
     from: rel.from,
     to: rel.to,
     data: rel.data ? JSON.stringify(rel.data) : null,
-    at: rel.at.toISOString(),
+    at: rel.at,
     by: rel.by ?? null,
     in: rel.in ?? null,
     do: rel.do ?? null,
@@ -253,4 +246,5 @@ export function createWriter(): IParquetWriter {
   }
 }
 
-export { write as parquetWrite, writeThings, writeRelationships }
+// Re-export write as parquetWrite for backwards compatibility
+export { write as parquetWrite }

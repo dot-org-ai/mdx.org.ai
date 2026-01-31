@@ -53,19 +53,18 @@ export function createAsyncBuffer(url: string, options: AsyncBufferOptions): Asy
  * Convert hyparquet metadata to our interface
  */
 function convertMetadata(meta: Awaited<ReturnType<typeof parquetMetadata>>): ParquetMetadata {
-  // Handle the nested metadata structure from hyparquet
-  const metadata = meta.metadata ?? meta
-  const fileMetadata = (metadata as { file_metadata?: unknown }).file_metadata ?? metadata
+  // FileMetaData is returned directly from parquetMetadata
+  const fileMetadata = meta as unknown as Record<string, unknown>
 
-  const numRows = (fileMetadata as { num_rows?: number }).num_rows ?? 0
+  const numRows = (fileMetadata.num_rows as number) ?? 0
 
   // Extract row groups
-  const rowGroups = (metadata as { row_groups?: unknown[] }).row_groups ?? []
+  const rowGroups = (fileMetadata.row_groups as unknown[]) ?? []
   const numRowGroups = rowGroups.length
 
   // Extract schema elements
-  const schemaElements = (metadata as { schema?: unknown[] }).schema ?? []
-  const schema: ParquetSchemaElement[] = schemaElements.map((elem: Record<string, unknown>) => ({
+  const schemaElements = (fileMetadata.schema as Record<string, unknown>[]) ?? []
+  const schema: ParquetSchemaElement[] = schemaElements.map((elem) => ({
     name: (elem.name as string) ?? 'unknown',
     type: elem.type as ParquetSchemaElement['type'],
     typeLength: elem.type_length as number | undefined,
@@ -121,7 +120,7 @@ function convertMetadata(meta: Awaited<ReturnType<typeof parquetMetadata>>): Par
  * Optimized for minimal data transfer - only reads file header/footer
  */
 export async function metadata(file: ArrayBuffer | AsyncBuffer): Promise<ParquetMetadata> {
-  const meta = await parquetMetadata(file)
+  const meta = await parquetMetadata(file as ArrayBuffer)
   return convertMetadata(meta)
 }
 
@@ -139,9 +138,9 @@ export async function read<T = Record<string, unknown>>(
     columns: options?.columns,
     rowStart: options?.rowStart,
     rowEnd: options?.rowEnd,
-    rowGroups: options?.rowGroups,
-    onComplete: (rows: T[]) => {
-      results.push(...rows)
+    rowFormat: 'object',
+    onComplete: (rows) => {
+      results.push(...(rows as T[]))
     },
   })
 
@@ -150,32 +149,38 @@ export async function read<T = Record<string, unknown>>(
 
 /**
  * Stream rows from parquet file using async generator
+ * Reads in batches based on rowStart/rowEnd
  */
 export async function* stream<T = Record<string, unknown>>(
   file: ArrayBuffer | AsyncBuffer,
   options?: ReadOptions
 ): AsyncIterable<T> {
-  // For streaming, we read row groups one at a time
   const meta = await metadata(file)
+  const batchSize = 1000 // Read in batches for memory efficiency
+  const totalRows = meta.numRows
 
-  for (let rgIndex = 0; rgIndex < meta.numRowGroups; rgIndex++) {
-    // Skip row groups if specific ones are requested
-    if (options?.rowGroups && !options.rowGroups.includes(rgIndex)) {
-      continue
-    }
+  for (let start = options?.rowStart ?? 0; start < totalRows; start += batchSize) {
+    const end = Math.min(start + batchSize, options?.rowEnd ?? totalRows)
 
     const rows: T[] = []
     await parquetRead({
       file,
       columns: options?.columns,
-      rowGroups: [rgIndex],
-      onComplete: (data: T[]) => {
-        rows.push(...data)
+      rowStart: start,
+      rowEnd: end,
+      rowFormat: 'object',
+      onComplete: (data) => {
+        rows.push(...(data as T[]))
       },
     })
 
     for (const row of rows) {
       yield row
+    }
+
+    // Stop if we've reached the requested end
+    if (options?.rowEnd && end >= options.rowEnd) {
+      break
     }
   }
 }

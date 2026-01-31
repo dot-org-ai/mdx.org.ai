@@ -93,3 +93,39 @@ export interface MDXDOClientConfig {
   /** DO namespace binding */
   binding: DurableObjectNamespace<MDXDurableObjectRPC>
 }
+
+/**
+ * Serializable Thing (Date converted to ISO string)
+ * Used for RPC transport where Date objects aren't serializable
+ */
+export interface SerializableThing<TData = Record<string, unknown>> {
+  url: string
+  type: string
+  id: string
+  data: TData
+  content?: string
+  '@context'?: string | Record<string, unknown>
+  code?: string
+  hash?: string
+  at: string // ISO string instead of Date
+  by?: string
+  in?: string
+  version: number
+}
+
+/**
+ * Serializable Relationship (Date converted to ISO string)
+ * Used for RPC transport where Date objects aren't serializable
+ */
+export interface SerializableRelationship<TData = Record<string, unknown>> {
+  id: string
+  predicate: string
+  reverse?: string
+  from: string
+  to: string
+  data?: TData
+  at: string // ISO string instead of Date
+  by?: string
+  in?: string
+  do?: string
+}

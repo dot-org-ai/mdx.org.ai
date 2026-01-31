@@ -1,0 +1,23 @@
+# @mdxdb/do Wrangler Configuration
+#
+# Deploy: wrangler deploy
+# Dev:    wrangler dev
+
+name = "mdxdb-do"
+main = "dist/durable-object.bundled.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Durable Object bindings
+[[durable_objects.bindings]]
+name = "MDXDB"
+class_name = "MDXDurableObject"
+
+# Durable Object migrations
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["MDXDurableObject"]
+
+# Environment variables (override in wrangler.toml or via secrets)
+[vars]
+# MDXDB_URL = "https://example.com"
