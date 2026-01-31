@@ -2,25 +2,28 @@
  * MDXDurableObject
  *
  * Extended Durable Object with hierarchy support and parquet export.
- * Uses rpc.do's createRpcHandler for automatic RPC exposure over
- * HTTP and WebSocket - keeping client and server on the same stack.
+ * Uses capnweb's newWorkersRpcResponse for automatic RPC exposure over
+ * WebSocket (hibernatable) and HTTP batch - all methods exposed automatically.
  *
  * @packageDocumentation
  */
 
 import { MDXDatabase } from '@mdxdb/sqlite/durable-object'
 import { writeThings, writeRelationshipsIndexed } from '@mdxdb/parquet'
-import { createRpcHandler, noAuth } from 'rpc.do/server'
+import { newWorkersRpcResponse } from 'capnweb'
 import type { ExportOptions, ChildInfo, Env } from './types.js'
 
 /**
  * MDXDurableObject extends MDXDatabase with:
  * - Parent/child hierarchy via $context relationship
  * - Parquet export
- * - rpc.do RPC (WebSocket + HTTP) via createRpcHandler
+ * - capnweb RPC (WebSocket + HTTP) via newWorkersRpcResponse
  *
  * All public methods on MDXDatabase are automatically exposed via RPC.
- * Clients use rpc.do transports (capnweb, ws, http) to connect.
+ * Clients use rpc.do transports (capnweb, reconnectingWs, http) to connect.
+ *
+ * rpc.do v0.2+ is a client-only library - server-side uses capnweb directly.
+ * This provides full capnweb features: pipelining, .map(), pass-by-reference.
  *
  * @example
  * ```ts
@@ -28,41 +31,20 @@ import type { ExportOptions, ChildInfo, Env } from './types.js'
  * const stub = env.MDXDB.get(id)
  * await stub.create({ type: 'Post', data: { title: 'Hello' } })
  *
- * // rpc.do client (capnweb transport with pipelining)
- * import { RPC, capnweb } from 'rpc.do'
- * const db = RPC(capnweb('wss://rpc.do/namespace'))
+ * // rpc.do client with capnweb transport
+ * import { RPC } from 'rpc.do'
+ * const db = RPC('wss://my-do.workers.dev')
  * await db.create({ type: 'Post', data: { title: 'Hello' } })
  *
- * // Direct method calls via proxy
+ * // With reconnection support
+ * const db = RPC('wss://my-do.workers.dev', { reconnect: true })
+ *
+ * // capnweb pipelining - single round trip
  * const thing = db.get('https://example.com/Post/hello')
- * const result = await thing.add(1, 2)
+ * const result = await thing.add(1, 2) // runs server-side
  * ```
  */
 export class MDXDurableObject extends MDXDatabase {
-  private rpcHandler: (request: Request) => Promise<Response>
-
-  constructor(ctx: DurableObjectState, env: Env) {
-    super(ctx, env)
-    this.rpcHandler = createRpcHandler({
-      auth: noAuth(),
-      dispatch: async (method: string, args: unknown[]) => {
-        return this.dispatchMethod(method, args)
-      },
-    })
-  }
-
-  /**
-   * Dispatch RPC method calls to this DO's methods
-   * Supports dotted paths like "get" or nested access
-   */
-  private async dispatchMethod(method: string, args: unknown[]): Promise<unknown> {
-    const target = (this as Record<string, unknown>)[method]
-    if (typeof target !== 'function') {
-      throw new Error(`Unknown method: ${method}`)
-    }
-    return (target as (...a: unknown[]) => unknown).call(this, ...args)
-  }
-
   /**
    * Get parent DO's $id URL
    * Returns null if this is a root DO
@@ -165,14 +147,15 @@ export class MDXDurableObject extends MDXDatabase {
   /**
    * Handle incoming HTTP requests
    *
-   * Uses rpc.do's createRpcHandler which supports:
-   * - WebSocket upgrade → persistent RPC session
-   * - HTTP POST → stateless RPC call
+   * Uses capnweb's newWorkersRpcResponse which automatically handles:
+   * - WebSocket upgrade → hibernatable capnweb RPC session
+   * - HTTP POST → capnweb batch RPC
    *
-   * All public methods on this DO are dispatched automatically.
+   * All public methods on this DO are automatically exposed via capnweb's
+   * RpcTarget mechanism - no manual dispatch needed.
    */
   async fetch(request: Request): Promise<Response> {
-    return this.rpcHandler(request)
+    return newWorkersRpcResponse(request, this)
   }
 }
 
