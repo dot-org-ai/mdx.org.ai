@@ -18,6 +18,11 @@ class_name = "MDXDurableObject"
 tag = "v1"
 new_sqlite_classes = ["MDXDurableObject"]
 
+# R2 bucket for caching and parquet exports
+[[r2_buckets]]
+binding = "CACHE"
+bucket_name = "mdxdb-cache"
+
 # Environment variables (override in wrangler.toml or via secrets)
 [vars]
 # MDXDB_URL = "https://example.com"

@@ -45,6 +45,8 @@ export interface ExportOptions {
 export interface Env {
   /** MDXDurableObject namespace */
   MDXDB: DurableObjectNamespace<MDXDurableObjectRPC>
+  /** Optional R2 bucket for caching */
+  CACHE?: R2Bucket
 }
 
 /**
