@@ -17,6 +17,7 @@ import {
   disposeAll,
   getActiveInstanceCount,
   createEvaluator,
+  MAX_INSTANCES,
   type EvaluateOptions,
   type EvaluateResult,
   type Evaluator,
@@ -501,6 +502,78 @@ export const getEmoji = () => '🚀'`,
 
       await result.dispose()
     })
+  })
+
+  // ============================================================================
+  // LRU Cache and Instance Limits
+  // ============================================================================
+
+  describe('LRU cache and instance limits', () => {
+    it('uses different cache keys for same content with different sandbox options', async () => {
+      await disposeAll()
+
+      const content = `export const test = 1`
+
+      // Evaluate with different sandbox options
+      const result1 = await evaluate(content, { sandbox: { blockNetwork: true } })
+      const result2 = await evaluate(content, { sandbox: { blockNetwork: false } })
+
+      // Both should work independently
+      expect(result1.moduleId).toBeDefined()
+      expect(result2.moduleId).toBeDefined()
+
+      // The cache keys should be different (we can check via instance count)
+      // If they had the same cache key, we'd only have 1 instance
+      expect(getActiveInstanceCount()).toBe(2)
+
+      await result1.dispose()
+      await result2.dispose()
+    })
+
+    it('updates lastUsed time when reusing cached instance', async () => {
+      await disposeAll()
+
+      const content = `export const x = 42`
+
+      // First evaluation
+      const result1 = await evaluate(content)
+
+      // Wait a small amount
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
+      // Second evaluation with same content should reuse
+      const result2 = await evaluate(content)
+
+      // Should still be same instance (same moduleId)
+      expect(result1.moduleId).toBe(result2.moduleId)
+      expect(getActiveInstanceCount()).toBe(1)
+
+      await result1.dispose()
+    })
+
+    it(
+      'evicts least recently used instances when limit is reached',
+      async () => {
+        // Clean up any existing instances
+        await disposeAll()
+        expect(getActiveInstanceCount()).toBe(0)
+
+        // Create MAX_INSTANCES + 2 instances to trigger eviction
+        const results: EvaluateResult[] = []
+        for (let i = 0; i < MAX_INSTANCES + 2; i++) {
+          const content = `export const value${i} = ${i}`
+          const result = await evaluate(content)
+          results.push(result)
+        }
+
+        // Should not exceed MAX_INSTANCES
+        expect(getActiveInstanceCount()).toBeLessThanOrEqual(MAX_INSTANCES)
+
+        // Clean up remaining instances
+        await disposeAll()
+      },
+      { timeout: 120000 }
+    ) // 2 minute timeout for creating many instances
   })
 
   // ============================================================================

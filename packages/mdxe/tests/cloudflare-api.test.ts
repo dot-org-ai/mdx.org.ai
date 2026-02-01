@@ -866,6 +866,37 @@ describe('Asset Upload', () => {
     // All hashes should be unique
     expect(new Set(hashes).size).toBe(hashes.length)
   })
+
+  it('should generate collision-resistant SHA-256 hashes', async () => {
+    const { join } = await import('node:path')
+    const fs = await import('node:fs')
+
+    // Create files that could collide with weak hash functions
+    // These patterns are known to cause collisions in djb2-style hashes
+    fs.writeFileSync(join(testDir, 'assets', 'test-a.txt'), 'aaaaaaaaaaaaaaa')
+    fs.writeFileSync(join(testDir, 'assets', 'test-b.txt'), 'bbbbbbbbbbbbbbb')
+    fs.writeFileSync(join(testDir, 'assets', 'test-c.txt'), Buffer.alloc(1000, 0x00))
+    fs.writeFileSync(join(testDir, 'assets', 'test-d.txt'), Buffer.alloc(1000, 0xff))
+
+    mockFetch.mockResolvedValue({
+      json: () => Promise.resolve({ success: true }),
+    })
+
+    const api = new CloudflareApi(assetTestConfig)
+    const result = await api.uploadAssets('my-worker', join(testDir, 'assets'))
+
+    expect(result.success).toBe(true)
+    const manifest = result.manifest || {}
+    const hashes = Object.values(manifest)
+
+    // All hashes should be unique (no collisions)
+    expect(new Set(hashes).size).toBe(hashes.length)
+
+    // Hashes should be 16 hex characters (64 bits from SHA-256)
+    for (const hash of hashes) {
+      expect(hash).toMatch(/^[0-9a-f]{16}$/)
+    }
+  })
 })
 
 describe('Multi-Tenant Workflow', () => {

@@ -69,6 +69,7 @@
     "hono": "^4.0.0"
   },
   "devDependencies": {
+    "@mdxe/test-utils": "workspace:*",
     "hono": "^4.6.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

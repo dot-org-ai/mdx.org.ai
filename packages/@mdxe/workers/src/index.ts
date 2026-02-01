@@ -82,6 +82,9 @@ export {
 // ERROR UTILITIES - Safe error responses for production
 // =============================================================================
 
+// Import createErrorResponse for internal use in this file
+import { createErrorResponse } from './errors.js'
+
 export {
   // Error response creation
   createErrorResponse,
@@ -207,6 +210,8 @@ export interface EvaluateOptions extends CompileToModuleOptions {
   cache?: boolean
   /** Custom module ID (defaults to content hash) */
   moduleId?: string
+  /** Enable debug mode to include stack traces in error responses */
+  debug?: boolean
 }
 
 // Note: We use the cache from runtime.js for consistency
@@ -364,17 +369,11 @@ export function createHandler(env: WorkerEnv, options: EvaluateOptions = {}): (r
         }
       )
     } catch (error) {
-      const err = error as Error
-      return new Response(
-        JSON.stringify({
-          error: err.message,
-          stack: err.stack,
-        }),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+      const errorResponse = createErrorResponse(error, { debug: options.debug })
+      return new Response(JSON.stringify(errorResponse), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
   }
 }

@@ -927,6 +927,71 @@ describe('Content Garbage Collection', () => {
 // Storage Metrics Tests
 // =============================================================================
 
+// =============================================================================
+// Web Crypto API Hash Tests
+// =============================================================================
+
+describe('Web Crypto API Hashing', () => {
+  describe('hashContentForStorage', () => {
+    it('should produce consistent hash for same content', async () => {
+      const { hashContentForStorage } = await import('../src/commands/do-storage.js')
+
+      const content = 'Hello, World!'
+      const hash1 = await hashContentForStorage(content)
+      const hash2 = await hashContentForStorage(content)
+
+      expect(hash1).toBe(hash2)
+    })
+
+    it('should produce different hashes for different content', async () => {
+      const { hashContentForStorage } = await import('../src/commands/do-storage.js')
+
+      const hash1 = await hashContentForStorage('Content A')
+      const hash2 = await hashContentForStorage('Content B')
+
+      expect(hash1).not.toBe(hash2)
+    })
+
+    it('should produce a 16-character hex string', async () => {
+      const { hashContentForStorage } = await import('../src/commands/do-storage.js')
+
+      const hash = await hashContentForStorage('Test content')
+
+      expect(hash).toMatch(/^[a-f0-9]{16}$/)
+      expect(hash.length).toBe(16)
+    })
+
+    it('should handle empty string', async () => {
+      const { hashContentForStorage } = await import('../src/commands/do-storage.js')
+
+      const hash = await hashContentForStorage('')
+
+      expect(hash).toMatch(/^[a-f0-9]{16}$/)
+    })
+
+    it('should handle unicode content', async () => {
+      const { hashContentForStorage } = await import('../src/commands/do-storage.js')
+
+      const hash = await hashContentForStorage('Hello \u4e16\u754c \ud83c\udf0d')
+
+      expect(hash).toMatch(/^[a-f0-9]{16}$/)
+    })
+
+    it('should handle large content efficiently', async () => {
+      const { hashContentForStorage } = await import('../src/commands/do-storage.js')
+
+      const largeContent = 'x'.repeat(1024 * 1024) // 1MB
+      const hash = await hashContentForStorage(largeContent)
+
+      expect(hash).toMatch(/^[a-f0-9]{16}$/)
+    })
+  })
+})
+
+// =============================================================================
+// Storage Metrics Tests
+// =============================================================================
+
 describe('Storage Metrics', () => {
   let env: StorageEnv
   let mockStub: MockDurableObjectStub

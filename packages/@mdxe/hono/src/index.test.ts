@@ -14,6 +14,15 @@ import {
 } from './index.js'
 import type { MDXMiddlewareOptions, RenderOptions, MDXLDDocument } from './index.js'
 
+// Import fixtures and mocks from @mdxe/test-utils
+import {
+  createMDXFixture,
+  createMDXWithFrontmatter,
+  FIXTURE_PRESETS,
+  createMockRequest,
+  createMockResponse,
+} from '@mdxe/test-utils'
+
 // ===========================================================================
 // Module Export Tests
 // ===========================================================================
@@ -1113,5 +1122,58 @@ Normal paragraph.`)
 
     const res = await app.request('/test')
     expect(res.status).toBe(500)
+  })
+})
+
+// ===========================================================================
+// @mdxe/test-utils Integration Tests
+// ===========================================================================
+
+describe('test-utils integration', () => {
+  it('uses createMDXFixture for test content', () => {
+    const content = createMDXFixture({
+      frontmatter: { title: 'Test', author: 'Test Author' },
+      content: '# Hello World',
+    })
+
+    expect(content).toBeValidMDX()
+    expect(content).toHaveFrontmatter({ title: 'Test' })
+  })
+
+  it('uses FIXTURE_PRESETS for common patterns', () => {
+    expect(FIXTURE_PRESETS.basic).toBeValidMDX()
+    expect(FIXTURE_PRESETS.blogPost).toBeValidMDX()
+    expect(FIXTURE_PRESETS.blogPost).toHaveFrontmatter({ title: 'Test Blog Post' })
+  })
+
+  it('validates MDX with custom matchers', () => {
+    const withExports = createMDXFixture({
+      exports: [
+        { name: 'greet', type: 'function', body: '(name) => `Hello, ${name}!`' },
+        { name: 'PI', type: 'const', body: '3.14159' },
+      ],
+    })
+
+    expect(withExports).toBeValidMDX()
+    expect(withExports).toHaveExports(['greet', 'PI'])
+  })
+
+  it('creates test fixtures with createMDXWithFrontmatter', () => {
+    const doc = createMDXWithFrontmatter(
+      { $type: 'Article', title: 'My Article' },
+      '# Article Content'
+    )
+
+    expect(doc).toBeValidMDX()
+    expect(doc).toHaveFrontmatter({ title: 'My Article' })
+  })
+
+  it('validates MDX code blocks', () => {
+    expect(FIXTURE_PRESETS.withTests).toBeValidMDX()
+    expect(FIXTURE_PRESETS.withTests).toHaveCodeBlock('ts', { meta: 'test' })
+  })
+
+  it('detects invalid MDX', () => {
+    expect(FIXTURE_PRESETS.invalidSyntax).not.toBeValidMDX()
   })
 })

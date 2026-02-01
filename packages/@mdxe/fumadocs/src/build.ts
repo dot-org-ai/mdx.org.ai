@@ -7,8 +7,12 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { createLogger, type Logger } from '@mdxe/test-utils/logging'
 import { detectDocsType, type DocsDetectionResult } from './detect.js'
 import { scaffoldFumadocs, getFumadocsOutputDir, needsScaffolding } from './scaffold.js'
+
+// Create a module-level logger with the [mdxe] prefix
+const log = createLogger({ level: 'info', prefix: '[mdxe]' })
 
 /**
  * Options for building
@@ -58,7 +62,7 @@ function runSync(
   options: { verbose?: boolean } = {}
 ): { success: boolean; output: string } {
   if (options.verbose) {
-    console.log(`[mdxe] Running: ${command} ${args.join(' ')}`)
+    log.debug('Running command', { command, args: args.join(' '), cwd })
   }
 
   const result = spawnSync(command, args, {
@@ -82,7 +86,7 @@ async function installDependencies(
   packageManager: string,
   options: { verbose?: boolean } = {}
 ): Promise<boolean> {
-  console.log(`[mdxe] Installing dependencies...`)
+  log.info('Installing dependencies...', { packageManager, dir: fumadocsDir })
 
   const installArgs = packageManager === 'npm' ? ['install'] : ['install']
 
@@ -98,7 +102,7 @@ async function runPostinstall(
   packageManager: string,
   options: { verbose?: boolean } = {}
 ): Promise<boolean> {
-  console.log(`[mdxe] Generating Fumadocs types...`)
+  log.info('Generating Fumadocs types...', { dir: fumadocsDir })
 
   const npx = packageManager === 'npm' ? 'npx' : packageManager === 'pnpm' ? 'pnpx' : 'npx'
 
@@ -128,8 +132,7 @@ export async function buildFumadocs(options: BuildOptions): Promise<BuildResult>
     return result
   }
 
-  console.log(`[mdxe] Building Fumadocs site...`)
-  console.log(`[mdxe] Title: ${detection.config.title || detection.projectName}`)
+  log.info('Building Fumadocs site...', { title: detection.config.title || detection.projectName })
 
   // Get output directory
   const fumadocsDir = getFumadocsOutputDir(projectDir)
@@ -172,7 +175,7 @@ export async function buildFumadocs(options: BuildOptions): Promise<BuildResult>
   if (!existsSync(sourceDir)) {
     const generated = await runPostinstall(fumadocsDir, packageManager, { verbose })
     if (!generated) {
-      console.warn('[mdxe] Warning: Failed to generate types. Continuing anyway...')
+      log.warn('Failed to generate types. Continuing anyway...')
     }
     result.logs.push('Generated types')
   }
@@ -180,7 +183,7 @@ export async function buildFumadocs(options: BuildOptions): Promise<BuildResult>
   const npx = packageManager === 'npm' ? 'npx' : packageManager === 'pnpm' ? 'pnpx' : 'npx'
 
   // Build with Next.js
-  console.log(`[mdxe] Running Next.js build...`)
+  log.info('Running Next.js build...')
 
   const buildResult = runSync(npx, ['next', 'build'], fumadocsDir, { verbose })
 
@@ -193,7 +196,7 @@ export async function buildFumadocs(options: BuildOptions): Promise<BuildResult>
 
   // If deploying, also run OpenNext build
   if (deploy) {
-    console.log(`[mdxe] Running OpenNext build...`)
+    log.info('Running OpenNext build...')
 
     const openNextResult = runSync(npx, ['opennextjs-cloudflare', 'build'], fumadocsDir, { verbose })
 
@@ -207,7 +210,7 @@ export async function buildFumadocs(options: BuildOptions): Promise<BuildResult>
   }
 
   result.success = true
-  console.log(`[mdxe] Build complete!`)
+  log.info('Build complete!', { outputDir: result.outputDir })
 
   return result
 }
@@ -236,7 +239,7 @@ export async function deployFumadocs(options: BuildOptions): Promise<BuildResult
   const packageManager = detectPackageManager(projectDir)
   const npx = packageManager === 'npm' ? 'npx' : packageManager === 'pnpm' ? 'pnpx' : 'npx'
 
-  console.log(`[mdxe] Deploying to Cloudflare...`)
+  log.info('Deploying to Cloudflare...')
 
   const deployResult = runSync(npx, ['wrangler', 'deploy'], fumadocsDir, { verbose })
 
@@ -247,7 +250,7 @@ export async function deployFumadocs(options: BuildOptions): Promise<BuildResult
   }
 
   buildResult.logs.push('Deployed to Cloudflare')
-  console.log(`[mdxe] Deployment complete!`)
+  log.info('Deployment complete!')
 
   return buildResult
 }

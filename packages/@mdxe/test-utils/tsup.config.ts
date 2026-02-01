@@ -8,6 +8,7 @@ export default defineConfig({
     matchers: 'src/matchers.ts',
     ports: 'src/ports.ts',
     timing: 'src/timing.ts',
+    logging: 'src/logging.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,

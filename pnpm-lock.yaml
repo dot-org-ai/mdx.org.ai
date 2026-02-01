@@ -1138,6 +1138,9 @@ importers:
         specifier: ^4.20250508.2
         version: 4.20260128.0
     devDependencies:
+      '@mdxe/test-utils':
+        specifier: workspace:*
+        version: link:../test-utils
       '@types/bun':
         specifier: ^1.1.0
         version: 1.3.8
@@ -1272,6 +1275,9 @@ importers:
 
   packages/@mdxe/fumadocs:
     dependencies:
+      '@mdxe/test-utils':
+        specifier: workspace:*
+        version: link:../test-utils
       '@opennextjs/cloudflare':
         specifier: '*'
         version: 1.16.1(encoding@0.1.13)(next@16.1.6(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(wrangler@4.61.1(@cloudflare/workers-types@4.20260131.0))
@@ -1332,6 +1338,9 @@ importers:
         specifier: ^1.9.0
         version: 1.9.1(ai-database@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(ai-workflows@2.1.3)(hono@4.11.7)(jose@6.1.3)(typescript@5.9.3)(vitest@2.1.9(@edge-runtime/vm@3.2.0)(@types/node@25.1.0)(happy-dom@20.4.0)(jsdom@27.4.0(@noble/hashes@1.8.0))(lightningcss@1.31.1)(terser@5.46.0)))(ai-functions@2.1.3(@dotdo/types@0.1.1(typescript@5.9.3))(hono@4.11.7)(jose@6.1.3)(typescript@5.9.3))(ai-workflows@2.1.3)
     devDependencies:
+      '@mdxe/test-utils':
+        specifier: workspace:*
+        version: link:../test-utils
       hono:
         specifier: ^4.6.0
         version: 4.11.7
@@ -1449,7 +1458,13 @@ importers:
       mdxld:
         specifier: workspace:^
         version: link:../../mdxld
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
+      '@mdxe/test-utils':
+        specifier: workspace:*
+        version: link:../test-utils
       '@mdxld/config':
         specifier: workspace:^
         version: link:../../@mdxld/config
@@ -1698,6 +1713,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20241127.0
         version: 4.20260131.0
+      '@mdxe/test-utils':
+        specifier: workspace:*
+        version: link:../test-utils
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -19753,6 +19771,7 @@ packages:
   react-server-dom-webpack@19.2.3:
     resolution: {integrity: sha512-ifo7aqqdNJyV6U2zuvvWX4rRQ51pbleuUFNG7ZYhIuSuWZzQPbfmYv11GNsyJm/3uGNbt8buJ9wmoISn/uOAfw==}
     engines: {node: '>=0.10.0'}
+    deprecated: High Security Vulnerability in React Server Components
     peerDependencies:
       react: ^19.2.3
       react-dom: ^19.2.3

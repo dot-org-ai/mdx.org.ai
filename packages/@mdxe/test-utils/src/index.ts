@@ -114,3 +114,8 @@ export {
 } from './timing'
 
 export type { RetryOptions, RetryResult } from './timing'
+
+// Re-export logging utilities
+export { createLogger } from './logging'
+
+export type { Logger, LogLevel, LogContext, LoggerOptions } from './logging'

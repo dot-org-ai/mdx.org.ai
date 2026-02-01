@@ -16,94 +16,82 @@ import {
   type LocalEvaluator,
 } from './local.js'
 
+// Import fixtures and mocks from @mdxe/test-utils
+import {
+  createMDXFixture,
+  createMDXWithFrontmatter,
+  FIXTURE_PRESETS,
+  createMockMiniflare,
+} from '@mdxe/test-utils'
+
 describe('@mdxe/workers/local', () => {
   // ============================================================================
-  // Test Fixtures - Real MDX content that will be executed via Miniflare
+  // Test Fixtures - Using @mdxe/test-utils
   // ============================================================================
 
   const fixtures = {
-    simple: `# Hello World`,
+    simple: FIXTURE_PRESETS.basic,
 
-    withExports: `---
-title: Test Document
-author: Test Author
----
+    withExports: createMDXFixture({
+      frontmatter: { title: 'Test Document', author: 'Test Author' },
+      exports: [
+        { name: 'greet', type: 'function', body: '(name) {\n  return `Hello, ${name}!`\n}' },
+        { name: 'PI', type: 'const', body: '3.14159' },
+        { name: 'add', type: 'function', body: '(a, b) {\n  return a + b\n}' },
+      ],
+      content: '# Hello World',
+    }),
 
-# Hello World
+    calculator: createMDXFixture({
+      exports: [
+        { name: 'add', type: 'function', body: '(a, b) { return a + b }' },
+        { name: 'subtract', type: 'function', body: '(a, b) { return a - b }' },
+        { name: 'multiply', type: 'function', body: '(a, b) { return a * b }' },
+        { name: 'divide', type: 'function', body: '(a, b) { return a / b }' },
+      ],
+    }),
 
-export function greet(name) {
-  return \`Hello, \${name}!\`
-}
+    asyncFunctions: createMDXFixture({
+      exports: [
+        { name: 'fetchData', type: 'function', async: true, body: '() {\n  return { success: true, timestamp: Date.now() }\n}' },
+        { name: 'delayedValue', type: 'function', async: true, body: '(value, ms = 10) {\n  await new Promise(resolve => setTimeout(resolve, ms))\n  return value\n}' },
+      ],
+    }),
 
-export const PI = 3.14159
+    withFrontmatter: createMDXFixture({
+      frontmatter: {
+        title: 'Document',
+        author: 'Test Author',
+        version: '1.0.0',
+        tags: ['test', 'mdx'],
+        metadata: { created: '2024-01-01' },
+      },
+      exports: [
+        { name: 'getTitle', type: 'const', body: "() => 'Document'" },
+      ],
+      content: '# Content',
+    }),
 
-export function add(a, b) {
-  return a + b
-}`,
+    withError: createMDXFixture({
+      exports: [
+        { name: 'throwError', type: 'function', body: "() {\n  throw new Error('Intentional test error')\n}" },
+        { name: 'safeFunction', type: 'function', body: "() {\n  return 'safe'\n}" },
+      ],
+    }),
 
-    calculator: `export function add(a, b) { return a + b }
-export function subtract(a, b) { return a - b }
-export function multiply(a, b) { return a * b }
-export function divide(a, b) { return a / b }`,
+    complex: createMDXFixture({
+      frontmatter: { title: 'Complex Module', metadata: { author: 'Test' } },
+      exports: [
+        { name: 'config', type: 'const', body: "{\n  theme: 'dark',\n  features: ['a', 'b', 'c']\n}" },
+        { name: 'process', type: 'function', body: '(data) {\n  return { processed: true, input: data }\n}' },
+        { name: 'getConfig', type: 'function', body: '() {\n  return config\n}' },
+      ],
+    }),
 
-    asyncFunctions: `export async function fetchData() {
-  return { success: true, timestamp: Date.now() }
-}
-
-export async function delayedValue(value, ms = 10) {
-  await new Promise(resolve => setTimeout(resolve, ms))
-  return value
-}`,
-
-    withFrontmatter: `---
-title: Document
-author: Test Author
-version: 1.0.0
-tags:
-  - test
-  - mdx
-metadata:
-  created: 2024-01-01
----
-
-# Content
-
-export const getTitle = () => 'Document'`,
-
-    withError: `export function throwError() {
-  throw new Error('Intentional test error')
-}
-
-export function safeFunction() {
-  return 'safe'
-}`,
-
-    complex: `---
-title: Complex Module
-metadata:
-  author: Test
----
-
-export const config = {
-  theme: 'dark',
-  features: ['a', 'b', 'c']
-}
-
-export function process(data) {
-  return { processed: true, input: data }
-}
-
-export function getConfig() {
-  return config
-}`,
-
-    unicode: `---
-title: 日本語タイトル
-emoji: 🎉
----
-
-export const greeting = '你好世界'
-export const getEmoji = () => '🚀'`,
+    unicode: createMDXWithFrontmatter(
+      { title: '日本語タイトル', emoji: '🎉' },
+      "export const greeting = '你好世界'\nexport const getEmoji = () => '🚀'"
+    ),
   }
 
   // ============================================================================
@@ -600,6 +588,33 @@ title: Only Frontmatter
       expect(evaluator).toHaveProperty('evaluate')
       expect(evaluator).toHaveProperty('dispose')
       expect(evaluator).toHaveProperty('getInstanceCount')
+    })
+  })
+
+  // ============================================================================
+  // Custom Matchers from @mdxe/test-utils
+  // ============================================================================
+
+  describe('custom matchers', () => {
+    it('validates MDX content with toBeValidMDX', () => {
+      expect(fixtures.simple).toBeValidMDX()
+      expect(fixtures.calculator).toBeValidMDX()
+      expect(fixtures.withFrontmatter).toBeValidMDX()
+    })
+
+    it('validates frontmatter with toHaveFrontmatter', () => {
+      expect(fixtures.withFrontmatter).toHaveFrontmatter({ title: 'Document' })
+      expect(fixtures.complex).toHaveFrontmatter({ title: 'Complex Module' })
+    })
+
+    it('validates exports with toHaveExports', () => {
+      expect(fixtures.calculator).toHaveExports(['add', 'subtract', 'multiply', 'divide'])
+      expect(fixtures.withExports).toHaveExports(['greet', 'PI', 'add'])
+    })
+
+    it('detects invalid MDX with toBeValidMDX', () => {
+      const invalidMdx = FIXTURE_PRESETS.invalidSyntax
+      expect(invalidMdx).not.toBeValidMDX()
     })
   })
 })

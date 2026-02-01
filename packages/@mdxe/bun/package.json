@@ -86,6 +86,7 @@
     }
   },
   "devDependencies": {
+    "@mdxe/test-utils": "workspace:*",
     "@types/bun": "^1.1.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

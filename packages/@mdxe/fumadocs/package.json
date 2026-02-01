@@ -38,6 +38,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mdxe/test-utils": "workspace:*",
     "mdxld": "workspace:*"
   },
   "devDependencies": {

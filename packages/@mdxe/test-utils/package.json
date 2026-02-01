@@ -36,6 +36,11 @@
       "types": "./dist/timing.d.ts",
       "import": "./dist/timing.js",
       "require": "./dist/timing.cjs"
+    },
+    "./logging": {
+      "types": "./dist/logging.d.ts",
+      "import": "./dist/logging.js",
+      "require": "./dist/logging.cjs"
     }
   },
   "files": [
@@ -60,7 +65,9 @@
     "fixtures",
     "mocks",
     "matchers",
-    "vitest"
+    "vitest",
+    "logging",
+    "logger"
   ],
   "license": "MIT",
   "dependencies": {

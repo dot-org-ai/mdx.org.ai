@@ -92,9 +92,67 @@ export interface Evaluator {
 }
 
 /**
- * Active miniflare instances
+ * Maximum number of Miniflare instances to keep in cache.
+ * When this limit is reached, the least recently used instance is evicted.
  */
-const instances = new Map<string, Miniflare>()
+export const MAX_INSTANCES = 50
+
+/**
+ * Cached instance with metadata for LRU eviction
+ */
+interface CachedInstance {
+  mf: Miniflare
+  lastUsed: number
+}
+
+/**
+ * Active miniflare instances with LRU metadata
+ */
+const instances = new Map<string, CachedInstance>()
+
+/**
+ * Generate a cache key that includes both content hash and sandbox options
+ */
+function getCacheKey(moduleId: string, sandbox?: SandboxOptions): string {
+  if (!sandbox || Object.keys(sandbox).length === 0) {
+    return moduleId
+  }
+  // Sort keys for consistent cache keys
+  const sortedSandbox = Object.keys(sandbox)
+    .sort()
+    .reduce(
+      (acc, key) => {
+        acc[key] = sandbox[key as keyof SandboxOptions]
+        return acc
+      },
+      {} as Record<string, unknown>
+    )
+  return `${moduleId}-${JSON.stringify(sortedSandbox)}`
+}
+
+/**
+ * Evict the least recently used instance when at capacity
+ */
+async function evictLRU(): Promise<void> {
+  if (instances.size < MAX_INSTANCES) {
+    return
+  }
+
+  let oldest: { key: string; time: number } | null = null
+  for (const [key, value] of instances) {
+    if (!oldest || value.lastUsed < oldest.time) {
+      oldest = { key, time: value.lastUsed }
+    }
+  }
+
+  if (oldest) {
+    const instance = instances.get(oldest.key)
+    if (instance) {
+      await instance.mf.dispose()
+      instances.delete(oldest.key)
+    }
+  }
+}
 
 /**
  * Create a miniflare instance for the compiled module
@@ -172,12 +230,20 @@ export async function evaluate<T = unknown>(
     ...compileOpts,
   })
   const moduleId = generateModuleId(content)
+  const cacheKey = getCacheKey(moduleId, sandbox)
 
   // Create or reuse miniflare instance
-  let mf = instances.get(moduleId)
-  if (!mf) {
+  let cached = instances.get(cacheKey)
+  let mf: Miniflare
+  if (cached) {
+    // Update last used time for LRU tracking
+    cached.lastUsed = Date.now()
+    mf = cached.mf
+  } else {
+    // Evict LRU if at capacity
+    await evictLRU()
     mf = await createMiniflareInstance(module, sandbox, miniflareOptions)
-    instances.set(moduleId, mf)
+    instances.set(cacheKey, { mf, lastUsed: Date.now() })
   }
 
   // Helper to call exported functions
@@ -203,12 +269,12 @@ export async function evaluate<T = unknown>(
     return response.json() as Promise<{ exports: string[]; hasDefault: boolean }>
   }
 
-  // Dispose helper
+  // Dispose helper - uses cacheKey for proper lookup
   const dispose = async () => {
-    const instance = instances.get(moduleId)
+    const instance = instances.get(cacheKey)
     if (instance) {
-      await instance.dispose()
-      instances.delete(moduleId)
+      await instance.mf.dispose()
+      instances.delete(cacheKey)
     }
   }
 
@@ -313,27 +379,31 @@ export async function runFile<R = unknown>(
  * ```
  */
 export function createEvaluator(defaultOptions: EvaluateOptions = {}): Evaluator {
-  const localInstances = new Set<string>()
+  // Track cache keys for this evaluator's instances
+  const localCacheKeys = new Set<string>()
 
   return {
     evaluate: async <T = unknown>(content: string, options: EvaluateOptions = {}) => {
-      const result = await evaluate<T>(content, { ...defaultOptions, ...options })
-      localInstances.add(result.moduleId)
+      const mergedOptions = { ...defaultOptions, ...options }
+      const result = await evaluate<T>(content, mergedOptions)
+      // Calculate cache key to track for disposal
+      const cacheKey = getCacheKey(result.moduleId, mergedOptions.sandbox)
+      localCacheKeys.add(cacheKey)
       return result
     },
 
     dispose: async () => {
-      for (const moduleId of localInstances) {
-        const instance = instances.get(moduleId)
+      for (const cacheKey of localCacheKeys) {
+        const instance = instances.get(cacheKey)
         if (instance) {
-          await instance.dispose()
-          instances.delete(moduleId)
+          await instance.mf.dispose()
+          instances.delete(cacheKey)
         }
       }
-      localInstances.clear()
+      localCacheKeys.clear()
     },
 
-    getInstanceCount: () => localInstances.size,
+    getInstanceCount: () => localCacheKeys.size,
   }
 }
 
@@ -341,8 +411,8 @@ export function createEvaluator(defaultOptions: EvaluateOptions = {}): Evaluator
  * Dispose all active miniflare instances
  */
 export async function disposeAll(): Promise<void> {
-  const disposals = Array.from(instances.entries()).map(async ([id, mf]) => {
-    await mf.dispose()
+  const disposals = Array.from(instances.entries()).map(async ([id, cached]) => {
+    await cached.mf.dispose()
     instances.delete(id)
   })
   await Promise.all(disposals)

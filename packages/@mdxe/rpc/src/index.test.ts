@@ -699,4 +699,205 @@ describe('@mdxe/rpc', () => {
       expect(typeof docWithObject.context).toBe('object')
     })
   })
+
+  describe('JSON-RPC 2.0 protocol compliance', () => {
+    let server: RPCServer
+
+    beforeEach(() => {
+      server = new RPCServer({})
+      server.register('echo', async (msg: string) => msg)
+    })
+
+    it('should handle notification (request without id)', async () => {
+      const request: RPCRequest = {
+        jsonrpc: '2.0',
+        method: 'echo',
+        params: ['test'],
+        // No id - this is a notification
+      }
+
+      const response = await server.handle(request)
+      // Notifications should still return a response with undefined id
+      expect(response.jsonrpc).toBe('2.0')
+      expect(response.id).toBeUndefined()
+    })
+
+    it('should handle request with undefined params', async () => {
+      server.register('noParams', async () => 'no params')
+      const request: RPCRequest = {
+        jsonrpc: '2.0',
+        method: 'noParams',
+        id: 1,
+      }
+
+      const response = await server.handle(request)
+      expect(response.result).toBe('no params')
+    })
+
+    it('should handle request with null params', async () => {
+      server.register('nullParams', async (param: unknown) => param === null ? 'was null' : 'not null')
+      const request: RPCRequest = {
+        jsonrpc: '2.0',
+        method: 'nullParams',
+        params: [null],
+        id: 2,
+      }
+
+      const response = await server.handle(request)
+      expect(response.result).toBe('was null')
+    })
+
+    it('should handle empty object params', async () => {
+      server.register('emptyObj', async (params: Record<string, unknown>) => {
+        return Object.keys(params).length === 0 ? 'empty' : 'not empty'
+      })
+      const request: RPCRequest = {
+        jsonrpc: '2.0',
+        method: 'emptyObj',
+        params: {},
+        id: 3,
+      }
+
+      const response = await server.handle(request)
+      expect(response.result).toBe('empty')
+    })
+
+    it('should handle empty array params', async () => {
+      server.register('emptyArray', async () => 'called')
+      const request: RPCRequest = {
+        jsonrpc: '2.0',
+        method: 'emptyArray',
+        params: [],
+        id: 4,
+      }
+
+      const response = await server.handle(request)
+      expect(response.result).toBe('called')
+    })
+
+    it('should return method not found error with correct code (-32601)', async () => {
+      const request: RPCRequest = {
+        jsonrpc: '2.0',
+        method: 'unknownMethod',
+        id: 5,
+      }
+
+      const response = await server.handle(request)
+      expect(response.error?.code).toBe(-32601)
+    })
+
+    it('should return internal error code (-32603) on handler exceptions', async () => {
+      server.register('throws', async () => {
+        throw new Error('Intentional error')
+      })
+
+      const request: RPCRequest = {
+        jsonrpc: '2.0',
+        method: 'throws',
+        id: 6,
+      }
+
+      const response = await server.handle(request)
+      expect(response.error?.code).toBe(-32603)
+    })
+  })
+
+  describe('server initialization edge cases', () => {
+    it('should handle empty options', () => {
+      const server = new RPCServer({})
+      expect(server.getFunctions()).toEqual([])
+    })
+
+    it('should register both functions and handlers simultaneously', () => {
+      const doc: MDXLDDocument = {
+        data: { name: 'docFunction' },
+        content: '',
+      }
+      const server = new RPCServer({
+        functions: [doc],
+        handlers: {
+          handlerFunction: async () => 'result',
+        },
+      })
+      const functions = server.getFunctions()
+      expect(functions).toContain('docFunction')
+      expect(functions).toContain('handlerFunction')
+      expect(functions).toHaveLength(2)
+    })
+
+    it('should handle multiple MDX documents', () => {
+      const docs: MDXLDDocument[] = [
+        { data: { name: 'func1' }, content: '' },
+        { data: { name: 'func2' }, content: '' },
+        { data: { name: 'func3' }, content: '' },
+      ]
+      const server = new RPCServer({ functions: docs })
+      expect(server.getFunctions()).toHaveLength(3)
+    })
+  })
+
+  describe('RPCError edge cases', () => {
+    it('should have correct error name', () => {
+      const error = new RPCError(-32000, 'Custom error')
+      expect(error.name).toBe('RPCError')
+    })
+
+    it('should handle standard JSON-RPC error codes', () => {
+      const parseError = new RPCError(-32700, 'Parse error')
+      const invalidRequest = new RPCError(-32600, 'Invalid Request')
+      const methodNotFound = new RPCError(-32601, 'Method not found')
+      const invalidParams = new RPCError(-32602, 'Invalid params')
+      const internalError = new RPCError(-32603, 'Internal error')
+
+      expect(parseError.code).toBe(-32700)
+      expect(invalidRequest.code).toBe(-32600)
+      expect(methodNotFound.code).toBe(-32601)
+      expect(invalidParams.code).toBe(-32602)
+      expect(internalError.code).toBe(-32603)
+    })
+
+    it('should support server error codes (-32000 to -32099)', () => {
+      const serverError = new RPCError(-32000, 'Server error')
+      expect(serverError.code).toBe(-32000)
+      expect(serverError.message).toBe('Server error')
+    })
+  })
+
+  describe('synchronous handler support', () => {
+    let server: RPCServer
+
+    beforeEach(() => {
+      server = new RPCServer({})
+    })
+
+    it('should handle synchronous function handlers', async () => {
+      // Even though handler is sync, server.handle is async
+      server.register('syncAdd', (a: number, b: number) => a + b)
+
+      const request: RPCRequest = {
+        jsonrpc: '2.0',
+        method: 'syncAdd',
+        params: [3, 4],
+        id: 1,
+      }
+
+      const response = await server.handle(request)
+      expect(response.result).toBe(7)
+    })
+
+    it('should handle synchronous handlers that throw', async () => {
+      server.register('syncThrow', () => {
+        throw new Error('Sync error')
+      })
+
+      const request: RPCRequest = {
+        jsonrpc: '2.0',
+        method: 'syncThrow',
+        id: 2,
+      }
+
+      const response = await server.handle(request)
+      expect(response.error?.message).toBe('Sync error')
+    })
+  })
 })

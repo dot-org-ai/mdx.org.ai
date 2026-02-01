@@ -6,6 +6,12 @@
  * - http: For web-based integration (Node, Bun, Workers)
  */
 
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
+import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
+import { z } from 'zod'
+import type { Readable, Writable } from 'node:stream'
+
 export interface MDXLDDocument {
   id?: string
   type?: string | string[]
@@ -83,6 +89,8 @@ export class MCPServer {
   private tools: Map<string, MCPTool & { handler?: (args: Record<string, unknown>) => Promise<unknown> }> = new Map()
   private resources: Map<string, MCPResource & { document: MDXLDDocument }> = new Map()
   private prompts: Map<string, MCPPrompt & { document: MDXLDDocument }> = new Map()
+  private mcpServer: McpServer | null = null
+  private transport: StdioServerTransport | WebStandardStreamableHTTPServerTransport | null = null
 
   constructor(options: MCPServerOptions) {
     this.options = options
@@ -291,12 +299,134 @@ export class MCPServer {
   }
 
   /**
+   * Create and configure the internal MCP server
+   */
+  private createMcpServer(): McpServer {
+    if (this.mcpServer) {
+      return this.mcpServer
+    }
+
+    this.mcpServer = new McpServer(
+      {
+        name: this.options.name,
+        version: this.options.version || '1.0.0',
+      },
+      {
+        capabilities: {
+          tools: this.tools.size > 0 ? {} : undefined,
+          resources: this.resources.size > 0 ? {} : undefined,
+          prompts: this.prompts.size > 0 ? {} : undefined,
+        },
+      }
+    )
+
+    // Register tools with the MCP server
+    // Use z.object().passthrough() to accept any arguments without strict validation
+    for (const [name, tool] of this.tools) {
+      const handler = tool.handler
+      const toolName = name
+
+      // Create a passthrough schema that accepts any object and passes all properties through
+      // The SDK parses request.params.arguments with this schema
+      const passthroughSchema = z.object({}).passthrough()
+
+      // Register with registerTool for full control
+      this.mcpServer.registerTool(
+        name,
+        {
+          description: tool.description,
+          inputSchema: passthroughSchema,
+        },
+        async (args: Record<string, unknown>) => {
+          if (!handler) {
+            return {
+              content: [{ type: 'text', text: `Tool handler not implemented: ${toolName}` }],
+              isError: true,
+            }
+          }
+          try {
+            const result = await handler(args)
+            return {
+              content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+            }
+          } catch (error) {
+            return {
+              content: [{ type: 'text', text: error instanceof Error ? error.message : 'Unknown error' }],
+              isError: true,
+            }
+          }
+        }
+      )
+    }
+
+    // Register resources with the MCP server
+    for (const [uri, resource] of this.resources) {
+      this.mcpServer.resource(
+        resource.name,
+        uri,
+        { description: resource.description, mimeType: resource.mimeType },
+        async () => ({
+          contents: [
+            {
+              uri,
+              mimeType: resource.mimeType,
+              text: resource.document.content,
+            },
+          ],
+        })
+      )
+    }
+
+    // Register prompts with the MCP server
+    // Create a passthrough schema shape that accepts string arguments
+    for (const [, prompt] of this.prompts) {
+      const promptContent = prompt.document.content
+
+      // Use the raw shape format expected by the SDK
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const passthroughArgsSchema: any = { _passthrough: z.string().optional() }
+
+      this.mcpServer.prompt(
+        prompt.name,
+        prompt.description || '',
+        passthroughArgsSchema,
+        async (args: Record<string, string>) => {
+          let content = promptContent
+          for (const [key, value] of Object.entries(args)) {
+            content = content.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value)
+          }
+          return {
+            messages: [
+              {
+                role: 'user' as const,
+                content: { type: 'text' as const, text: content },
+              },
+            ],
+          }
+        }
+      )
+    }
+
+    return this.mcpServer
+  }
+
+  /**
    * Start stdio transport (for Node.js/Bun)
    */
   private async startStdio(): Promise<void> {
     console.error(`MCP server (stdio) starting: ${this.options.name}`)
-    // Implementation would use @modelcontextprotocol/sdk
-    // for now, this is a placeholder
+    const mcpServer = this.createMcpServer()
+    this.transport = new StdioServerTransport()
+    await mcpServer.connect(this.transport)
+  }
+
+  /**
+   * Start stdio transport with custom streams (for testing)
+   */
+  async startWithStreams(stdin: Readable, stdout: Writable): Promise<void> {
+    const mcpServer = this.createMcpServer()
+    this.transport = new StdioServerTransport(stdin, stdout)
+    await mcpServer.connect(this.transport)
   }
 
   /**
@@ -305,8 +435,57 @@ export class MCPServer {
   private async startHttp(): Promise<void> {
     const { port = 3000 } = this.options
     console.log(`MCP server (http) starting on port ${port}: ${this.options.name}`)
-    // Implementation would create an HTTP server
-    // for now, this is a placeholder
+    // For HTTP transport, we don't auto-start a server
+    // Instead, the user should use createHttpHandler() and integrate with their own HTTP framework
+  }
+
+  /**
+   * Create an HTTP request handler for use with any HTTP framework
+   * Returns a function that handles Web Standard Request/Response
+   */
+  createHttpHandler(): (request: Request) => Promise<Response> {
+    const mcpServer = this.createMcpServer()
+
+    // Create a stateless HTTP transport
+    const httpTransport = new WebStandardStreamableHTTPServerTransport({
+      enableJsonResponse: true,
+    })
+
+    // Connect the transport
+    mcpServer.connect(httpTransport)
+
+    return async (request: Request): Promise<Response> => {
+      // Only accept POST, GET, DELETE methods
+      if (!['POST', 'GET', 'DELETE'].includes(request.method)) {
+        return new Response(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            error: { code: -32600, message: 'Method not allowed' },
+            id: null,
+          }),
+          {
+            status: 405,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+      }
+
+      return httpTransport.handleRequest(request)
+    }
+  }
+
+  /**
+   * Close the server
+   */
+  async close(): Promise<void> {
+    if (this.mcpServer) {
+      await this.mcpServer.close()
+      this.mcpServer = null
+    }
+    if (this.transport) {
+      await this.transport.close()
+      this.transport = null
+    }
   }
 
   /**

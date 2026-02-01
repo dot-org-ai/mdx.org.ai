@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest'
 
+// Import fixtures and mocks from @mdxe/test-utils
+import {
+  createMDXFixture,
+  createMDXWithFrontmatter,
+  FIXTURE_PRESETS,
+  createMockMiniflare,
+} from '@mdxe/test-utils'
+
 // Re-exports from mdxld
 import {
   parse as indexParse,

@@ -6,11 +6,37 @@
  * @packageDocumentation
  */
 
-import { resolve, basename, relative } from 'node:path'
+import { resolve, basename, relative, dirname } from 'node:path'
 import { spawn } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { glob } from 'glob'
 import { transform } from 'esbuild'
+
+/**
+ * Get the version from package.json
+ * Handles both development (source) and production (dist) environments
+ */
+function getVersion(): string {
+  try {
+    // Get the directory of the current module
+    const __filename = fileURLToPath(import.meta.url)
+    const __dirname = dirname(__filename)
+
+    // Try to find package.json relative to current file
+    // In development: src/cli.ts -> ../package.json
+    // In production: dist/cli.js -> ../package.json
+    const pkgPath = resolve(__dirname, '..', 'package.json')
+
+    if (existsSync(pkgPath)) {
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
+      return pkg.version || '0.0.0'
+    }
+  } catch {
+    // Fall through to default
+  }
+  return '0.0.0'
+}
 
 export interface CliOptions {
   command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'run' | 'admin' | 'notebook' | 'tail' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
@@ -49,7 +75,57 @@ export interface CliOptions {
   compatibilityDate?: string
 }
 
-export const VERSION = '0.0.0'
+export const VERSION = getVersion()
+
+/**
+ * Validation helpers for CLI argument parsing
+ */
+
+/**
+ * Check if a value is missing or is actually another flag.
+ * Exits with code 1 if validation fails.
+ * @param optionName - The name of the option being validated (e.g., '--port')
+ * @param value - The value to validate
+ * @param usage - Optional usage example to show on error
+ */
+export function requireValue(optionName: string, value: string | undefined, usage?: string): void {
+  if (!value || value.startsWith('-')) {
+    console.error(`Error: ${optionName} requires a value`)
+    if (usage) {
+      console.error(`Usage: ${usage}`)
+    }
+    process.exit(1)
+  }
+}
+
+/**
+ * Validate and parse a port number.
+ * Exits with code 1 if validation fails.
+ * @param optionName - The name of the option being validated (e.g., '--port')
+ * @param value - The value to validate
+ * @param usage - Optional usage example to show on error
+ * @returns The validated port number
+ */
+export function validatePort(optionName: string, value: string | undefined, usage?: string): number {
+  requireValue(optionName, value, usage)
+
+  const portNum = parseInt(value!, 10)
+
+  // Check if it's a valid integer (not a float)
+  if (isNaN(portNum) || !Number.isInteger(Number(value))) {
+    console.error(`Error: Invalid port number: ${value}`)
+    console.error('Port must be a valid integer between 1 and 65535')
+    process.exit(1)
+  }
+
+  if (portNum < 1 || portNum > 65535) {
+    console.error(`Error: Invalid port number: ${value}`)
+    console.error('Port must be between 1 and 65535')
+    process.exit(1)
+  }
+
+  return portNum
+}
 
 /**
  * Configuration extracted from docs frontmatter
@@ -393,7 +469,8 @@ export function parseArgs(args: string[]): CliOptions {
     switch (arg) {
       case '--dir':
       case '-d':
-        options.projectDir = resolve(next || '.')
+        requireValue('--dir', next, 'mdxe [command] --dir <path>')
+        options.projectDir = resolve(next)
         i++
         break
       case '--platform':
@@ -418,6 +495,7 @@ export function parseArgs(args: string[]): CliOptions {
         break
       case '--name':
       case '-n':
+        requireValue('--name', next, 'mdxe deploy --name <project-name>')
         options.projectName = next
         i++
         break
@@ -454,6 +532,7 @@ export function parseArgs(args: string[]): CliOptions {
         break
       case '--filter':
       case '-f':
+        requireValue('--filter', next, 'mdxe test --filter <pattern>')
         options.filter = next
         i++
         break
@@ -493,7 +572,7 @@ export function parseArgs(args: string[]): CliOptions {
         i++
         break
       case '--http-port':
-        options.httpPort = parseInt(next || '8123', 10)
+        options.httpPort = validatePort('--http-port', next, 'mdxe db --http-port 8123')
         i++
         break
       case '--clickhouse':
@@ -511,11 +590,12 @@ export function parseArgs(args: string[]): CliOptions {
         break
       // Server options
       case '--port':
-        options.port = parseInt(next, 10) || 3000
+        options.port = validatePort('--port', next, 'mdxe dev --port 3000')
         i++
         break
       case '--host':
-        options.host = next || 'localhost'
+        requireValue('--host', next, 'mdxe dev --host localhost')
+        options.host = next
         i++
         break
       case '--open':
@@ -530,6 +610,7 @@ export function parseArgs(args: string[]): CliOptions {
         options.contentHash = true
         break
       case '--compatibility-date':
+        requireValue('--compatibility-date', next, 'mdxe deploy workers --compatibility-date 2024-01-01')
         options.compatibilityDate = next
         i++
         break

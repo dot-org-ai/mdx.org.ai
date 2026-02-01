@@ -11,7 +11,6 @@
  * @packageDocumentation
  */
 
-import { createHash } from 'node:crypto'
 import { parse } from 'mdxld'
 
 // =============================================================================
@@ -266,10 +265,14 @@ export const DEFAULT_MIN_VERSIONS = 1
 // =============================================================================
 
 /**
- * Generate content hash
+ * Generate content hash using Web Crypto API (Workers-compatible)
  */
-function hashContent(content: string): string {
-  return createHash('sha256').update(content).digest('hex').slice(0, 16)
+async function hashContent(content: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(content)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 16)
 }
 
 /**
@@ -362,7 +365,7 @@ export async function storeInR2(
   key: string,
   env: StorageEnv
 ): Promise<{ r2Key: string; size: number }> {
-  const hash = hashContent(content)
+  const hash = await hashContent(content)
   const r2Key = `${key}-${hash}`
 
   await env.CONTENT_BUCKET.put(r2Key, content)
@@ -1152,7 +1155,7 @@ export async function getCompiledModule(
  * Hash content for cache invalidation
  * Exported for external use
  */
-export function hashContentForStorage(content: string): string {
+export async function hashContentForStorage(content: string): Promise<string> {
   return hashContent(content)
 }
 

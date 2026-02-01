@@ -50,9 +50,11 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@mdxe/test-utils": "workspace:*",
     "@mdxld/config": "workspace:^",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

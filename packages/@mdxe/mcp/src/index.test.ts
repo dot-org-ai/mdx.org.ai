@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { Readable, Writable, PassThrough } from 'node:stream'
 import {
   MCPServer,
   createMCPServer,
@@ -625,6 +626,432 @@ describe('@mdxe/mcp', () => {
       }
 
       expect(doc.id).toBe('https://example.com/doc')
+    })
+  })
+
+  describe('Stdio transport', () => {
+    it('should respond to initialize request via stdio', async () => {
+      const toolDoc: MDXLDDocument = {
+        data: { name: 'test-tool', description: 'A test tool' },
+        content: 'Test tool content',
+      }
+
+      const server = new MCPServer({
+        name: 'stdio-test-server',
+        version: '1.0.0',
+        transport: 'stdio',
+        tools: [toolDoc],
+      })
+
+      // Create mock stdin/stdout
+      const mockStdin = new PassThrough()
+      const mockStdout = new PassThrough()
+      const outputChunks: Buffer[] = []
+      mockStdout.on('data', (chunk) => outputChunks.push(chunk))
+
+      // Start the server with mock streams
+      await server.startWithStreams(mockStdin, mockStdout)
+
+      // Send an initialize request
+      const initRequest = {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test-client', version: '1.0.0' },
+        },
+      }
+
+      // The SDK uses newline-delimited JSON (NDJSON), not Content-Length headers
+      mockStdin.write(JSON.stringify(initRequest) + '\n')
+
+      // Wait for response
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      // Parse output
+      const output = Buffer.concat(outputChunks).toString()
+      expect(output).toContain('serverInfo')
+      expect(output).toContain('stdio-test-server')
+
+      await server.close()
+    })
+
+    it('should handle tools/list request via stdio', async () => {
+      const toolDoc: MDXLDDocument = {
+        data: { name: 'hello', description: 'Say hello' },
+        content: 'Greeting tool',
+      }
+
+      const server = new MCPServer({
+        name: 'tools-test-server',
+        transport: 'stdio',
+        tools: [toolDoc],
+      })
+
+      const mockStdin = new PassThrough()
+      const mockStdout = new PassThrough()
+      const outputChunks: Buffer[] = []
+      mockStdout.on('data', (chunk) => outputChunks.push(chunk))
+
+      await server.startWithStreams(mockStdin, mockStdout)
+
+      // Send initialize first
+      const initRequest = {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test-client', version: '1.0.0' },
+        },
+      }
+      // The SDK uses newline-delimited JSON (NDJSON), not Content-Length headers
+      mockStdin.write(JSON.stringify(initRequest) + '\n')
+
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      // Send initialized notification
+      const initializedNotification = {
+        jsonrpc: '2.0',
+        method: 'notifications/initialized',
+      }
+      mockStdin.write(JSON.stringify(initializedNotification) + '\n')
+
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      // Clear output
+      outputChunks.length = 0
+
+      // Send tools/list request
+      const listRequest = {
+        jsonrpc: '2.0',
+        id: 2,
+        method: 'tools/list',
+        params: {},
+      }
+      mockStdin.write(JSON.stringify(listRequest) + '\n')
+
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      const output = Buffer.concat(outputChunks).toString()
+      expect(output).toContain('hello')
+
+      await server.close()
+    })
+
+    it('should handle tools/call request via stdio', async () => {
+      const toolDoc: MDXLDDocument = {
+        data: { name: 'greet' },
+        content: 'Greet someone',
+      }
+
+      const server = new MCPServer({
+        name: 'call-test-server',
+        transport: 'stdio',
+        tools: [toolDoc],
+        toolHandlers: {
+          greet: async (args) => `Hello, ${args.name}!`,
+        },
+      })
+
+      const mockStdin = new PassThrough()
+      const mockStdout = new PassThrough()
+      const outputChunks: Buffer[] = []
+      mockStdout.on('data', (chunk) => outputChunks.push(chunk))
+
+      await server.startWithStreams(mockStdin, mockStdout)
+
+      // Initialize
+      const initRequest = {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test-client', version: '1.0.0' },
+        },
+      }
+      // The SDK uses newline-delimited JSON (NDJSON), not Content-Length headers
+      mockStdin.write(JSON.stringify(initRequest) + '\n')
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      const initializedNotification = { jsonrpc: '2.0', method: 'notifications/initialized' }
+      mockStdin.write(JSON.stringify(initializedNotification) + '\n')
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      outputChunks.length = 0
+
+      // Call the tool
+      const callRequest = {
+        jsonrpc: '2.0',
+        id: 3,
+        method: 'tools/call',
+        params: {
+          name: 'greet',
+          arguments: { name: 'World' },
+        },
+      }
+      mockStdin.write(JSON.stringify(callRequest) + '\n')
+
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      const output = Buffer.concat(outputChunks).toString()
+      expect(output).toContain('Hello, World!')
+
+      await server.close()
+    })
+  })
+
+  describe('HTTP transport', () => {
+    it('should create HTTP request handler', async () => {
+      const server = new MCPServer({
+        name: 'http-test-server',
+        version: '1.0.0',
+        transport: 'http',
+        port: 0, // Use random available port
+      })
+
+      const handler = server.createHttpHandler()
+      expect(typeof handler).toBe('function')
+    })
+
+    it('should handle initialize via HTTP POST', async () => {
+      const toolDoc: MDXLDDocument = {
+        data: { name: 'http-tool', description: 'HTTP tool' },
+        content: 'HTTP tool content',
+      }
+
+      const server = new MCPServer({
+        name: 'http-init-server',
+        transport: 'http',
+        tools: [toolDoc],
+      })
+
+      const handler = server.createHttpHandler()
+
+      // Create a mock Request
+      const initRequest = {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test-client', version: '1.0.0' },
+        },
+      }
+
+      const request = new Request('http://localhost/mcp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/event-stream',
+        },
+        body: JSON.stringify(initRequest),
+      })
+
+      const response = await handler(request)
+      expect(response).toBeInstanceOf(Response)
+      expect(response.status).toBe(200)
+
+      const body = await response.text()
+      expect(body).toContain('serverInfo')
+      expect(body).toContain('http-init-server')
+    })
+
+    it('should handle tools/list via HTTP POST', async () => {
+      const toolDoc: MDXLDDocument = {
+        data: { name: 'list-tool', description: 'List test' },
+        content: 'List tool content',
+      }
+
+      const server = new MCPServer({
+        name: 'http-list-server',
+        transport: 'http',
+        tools: [toolDoc],
+      })
+
+      const handler = server.createHttpHandler()
+
+      // Initialize first
+      const initRequest = {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test-client', version: '1.0.0' },
+        },
+      }
+      await handler(
+        new Request('http://localhost/mcp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+          body: JSON.stringify(initRequest),
+        })
+      )
+
+      // List tools
+      const listRequest = {
+        jsonrpc: '2.0',
+        id: 2,
+        method: 'tools/list',
+        params: {},
+      }
+
+      const response = await handler(
+        new Request('http://localhost/mcp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+          body: JSON.stringify(listRequest),
+        })
+      )
+
+      expect(response.status).toBe(200)
+      const body = await response.text()
+      expect(body).toContain('list-tool')
+    })
+
+    it('should handle tools/call via HTTP POST', async () => {
+      const toolDoc: MDXLDDocument = {
+        data: {
+          name: 'http-greet',
+          parameters: {
+            name: { type: 'string', required: true },
+          },
+        },
+        content: 'HTTP greet tool',
+      }
+
+      const server = new MCPServer({
+        name: 'http-call-server',
+        transport: 'http',
+        tools: [toolDoc],
+        toolHandlers: {
+          'http-greet': async (args) => `HTTP Hello, ${args.name}!`,
+        },
+      })
+
+      const handler = server.createHttpHandler()
+
+      // Initialize
+      const initRequest = {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test-client', version: '1.0.0' },
+        },
+      }
+      await handler(
+        new Request('http://localhost/mcp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+          body: JSON.stringify(initRequest),
+        })
+      )
+
+      // Call tool
+      const callRequest = {
+        jsonrpc: '2.0',
+        id: 3,
+        method: 'tools/call',
+        params: {
+          name: 'http-greet',
+          arguments: { name: 'HTTP World' },
+        },
+      }
+
+      const response = await handler(
+        new Request('http://localhost/mcp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+          body: JSON.stringify(callRequest),
+        })
+      )
+
+      expect(response.status).toBe(200)
+      const body = await response.text()
+      expect(body).toContain('HTTP Hello, HTTP World!')
+    })
+
+    it('should return error for invalid method', async () => {
+      const server = new MCPServer({
+        name: 'http-error-server',
+        transport: 'http',
+      })
+
+      const handler = server.createHttpHandler()
+
+      const response = await handler(
+        new Request('http://localhost/mcp', {
+          method: 'PUT',
+        })
+      )
+
+      expect(response.status).toBe(405)
+    })
+
+    it('should handle resources/list via HTTP POST', async () => {
+      const resourceDoc: MDXLDDocument = {
+        id: 'https://example.com/docs/readme',
+        data: { name: 'readme', description: 'Documentation' },
+        content: '# README',
+      }
+
+      const server = new MCPServer({
+        name: 'http-resource-server',
+        transport: 'http',
+        resources: [resourceDoc],
+      })
+
+      const handler = server.createHttpHandler()
+
+      // Initialize
+      const initRequest = {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test-client', version: '1.0.0' },
+        },
+      }
+      await handler(
+        new Request('http://localhost/mcp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+          body: JSON.stringify(initRequest),
+        })
+      )
+
+      // List resources
+      const listRequest = {
+        jsonrpc: '2.0',
+        id: 2,
+        method: 'resources/list',
+        params: {},
+      }
+
+      const response = await handler(
+        new Request('http://localhost/mcp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+          body: JSON.stringify(listRequest),
+        })
+      )
+
+      expect(response.status).toBe(200)
+      const body = await response.text()
+      expect(body).toContain('readme')
     })
   })
 })

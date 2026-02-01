@@ -417,7 +417,7 @@ export class CloudflareApi {
     assetsDir: string
   ): Promise<{ success: boolean; manifest?: Record<string, string>; errors?: Array<{ code: number; message: string }> }> {
     // Read all files recursively
-    const assets = this.readAssetsRecursively(assetsDir)
+    const assets = await this.readAssetsRecursively(assetsDir)
 
     if (assets.length === 0) {
       return {
@@ -463,10 +463,10 @@ export class CloudflareApi {
   /**
    * Read assets directory recursively
    */
-  private readAssetsRecursively(
+  private async readAssetsRecursively(
     dir: string,
     basePath: string = ''
-  ): Array<{ path: string; fullPath: string; hash: string }> {
+  ): Promise<Array<{ path: string; fullPath: string; hash: string }>> {
     const assets: Array<{ path: string; fullPath: string; hash: string }> = []
 
     if (!existsSync(dir)) {
@@ -481,11 +481,12 @@ export class CloudflareApi {
       const stat = statSync(fullPath)
 
       if (stat.isDirectory()) {
-        assets.push(...this.readAssetsRecursively(fullPath, relativePath))
+        const subAssets = await this.readAssetsRecursively(fullPath, relativePath)
+        assets.push(...subAssets)
       } else {
-        // Generate simple hash for deduplication
+        // Generate secure SHA-256 hash for deduplication
         const content = readFileSync(fullPath)
-        const hash = this.simpleHash(content)
+        const hash = await this.secureHash(content)
         assets.push({ path: relativePath, fullPath, hash })
       }
     }
@@ -494,16 +495,14 @@ export class CloudflareApi {
   }
 
   /**
-   * Simple hash function for asset deduplication
+   * Secure hash function for asset deduplication using SHA-256
    */
-  private simpleHash(content: Buffer): string {
-    let hash = 0
-    for (let i = 0; i < content.length; i++) {
-      const char = content[i] ?? 0
-      hash = ((hash << 5) - hash) + char
-      hash = hash & hash // Convert to 32-bit integer
-    }
-    return Math.abs(hash).toString(16).padStart(8, '0')
+  private async secureHash(content: Buffer): Promise<string> {
+    // Create a new Uint8Array copy to ensure compatibility with crypto.subtle
+    const data = Uint8Array.from(content)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16)
   }
 
   /**

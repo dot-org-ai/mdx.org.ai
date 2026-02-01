@@ -20,6 +20,80 @@ import { CloudflareApi, type WorkerMetadata, type WorkerBinding } from '../cloud
 import { ensureLoggedIn } from 'oauth.do'
 
 /**
+ * Default timeout for fetch requests in milliseconds (60 seconds)
+ */
+export const DEFAULT_FETCH_TIMEOUT = 60000
+
+/**
+ * Options for fetchWithTimeout
+ */
+export interface FetchWithTimeoutOptions extends RequestInit {
+  /**
+   * Timeout in milliseconds
+   * @default 60000 (60 seconds)
+   */
+  timeout?: number
+}
+
+/**
+ * Fetch with automatic timeout handling
+ *
+ * Wraps the native fetch API with an AbortController to prevent
+ * requests from hanging indefinitely. Throws a descriptive error
+ * when the timeout is exceeded.
+ *
+ * @param url - The URL to fetch
+ * @param options - Fetch options plus optional timeout
+ * @returns The fetch Response
+ * @throws Error when request times out
+ */
+export async function fetchWithTimeout(
+  url: string,
+  options: FetchWithTimeoutOptions = {}
+): Promise<Response> {
+  const { timeout = DEFAULT_FETCH_TIMEOUT, ...fetchOptions } = options
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+  try {
+    const response = await fetch(url, {
+      ...fetchOptions,
+      signal: controller.signal,
+    })
+    clearTimeout(timeoutId)
+    return response
+  } catch (error) {
+    clearTimeout(timeoutId)
+    if (error instanceof Error && error.name === 'AbortError') {
+      const seconds = timeout / 1000
+      throw new Error(`Deployment request timed out after ${seconds} seconds`)
+    }
+    throw error
+  }
+}
+
+/**
+ * Safely read and parse a JSON file
+ * Returns null if the file cannot be read or parsed
+ */
+function safeReadJSON<T>(path: string, description: string): T | null {
+  try {
+    const content = readFileSync(path, 'utf-8')
+    const parsed = JSON.parse(content)
+    if (parsed === null || typeof parsed !== 'object') {
+      console.error(`Invalid ${description} at ${path}: expected object, got ${parsed === null ? 'null' : typeof parsed}`)
+      return null
+    }
+    return parsed as T
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error(`Failed to parse ${description} at ${path}: ${message}`)
+    return null
+  }
+}
+
+/**
  * Detect the data source type by analyzing the project configuration
  */
 export function detectSourceType(projectDir: string): SourceTypeInfo {
@@ -44,7 +118,10 @@ export function detectSourceType(projectDir: string): SourceTypeInfo {
     // Check package.json dependencies as fallback
     const pkgPath = join(projectDir, 'package.json')
     if (existsSync(pkgPath)) {
-      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
+      const pkg = safeReadJSON<{ dependencies?: Record<string, string>; devDependencies?: Record<string, string> }>(pkgPath, 'package.json')
+      if (!pkg) {
+        return { isStatic: true, adapter: 'unknown', configPath: undefined }
+      }
       const deps = { ...pkg.dependencies, ...pkg.devDependencies }
 
       if (deps['@mdxdb/fs']) {
@@ -113,7 +190,8 @@ function checkOpenNext(projectDir: string): boolean {
   const pkgPath = join(projectDir, 'package.json')
   if (!existsSync(pkgPath)) return false
 
-  const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
+  const pkg = safeReadJSON<{ dependencies?: Record<string, string>; devDependencies?: Record<string, string> }>(pkgPath, 'package.json')
+  if (!pkg) return false
   const deps = { ...pkg.dependencies, ...pkg.devDependencies }
   return !!deps['@opennextjs/cloudflare']
 }
@@ -938,13 +1016,14 @@ async function deployViaManagedApi(
     // POST to /workers endpoint
     logs.push(`Deploying to ${managedApiUrl}/workers...`)
 
-    const response = await fetch(`${managedApiUrl}/workers`, {
+    const response = await fetchWithTimeout(`${managedApiUrl}/workers`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
+      timeout: DEFAULT_FETCH_TIMEOUT,
     })
 
     if (!response.ok) {

@@ -745,6 +745,89 @@ export function Button({ children }) {
   })
 
   // ============================================================================
+  // createHandler Tests
+  // ============================================================================
+
+  describe('createHandler', () => {
+    // Mock WorkerEnv for testing (createHandler needs env, but we're testing error handling)
+    const mockEnv = {} as any
+
+    it('does NOT expose stack traces in production mode (default)', async () => {
+      // Import createHandler
+      const { createHandler } = await import('./index.js')
+
+      // Create handler without debug option (production mode)
+      const handler = createHandler(mockEnv, {})
+
+      // Create a request with invalid JSON to trigger an error
+      const request = new Request('http://localhost/test', {
+        method: 'POST',
+        body: 'invalid json{{{',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      const response = await handler(request)
+      const body = await response.json() as { error: string; stack?: string }
+
+      // Should have error message
+      expect(body.error).toBeDefined()
+      // Should NOT have stack trace in production
+      expect(body.stack).toBeUndefined()
+    })
+
+    it('DOES expose stack traces when debug mode is enabled', async () => {
+      // Import createHandler
+      const { createHandler } = await import('./index.js')
+
+      // Create handler with debug option enabled
+      const handler = createHandler(mockEnv, { debug: true })
+
+      // Create a request with invalid JSON to trigger an error
+      const request = new Request('http://localhost/test', {
+        method: 'POST',
+        body: 'invalid json{{{',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      const response = await handler(request)
+      const body = await response.json() as { error: string; stack?: string }
+
+      // Should have error message
+      expect(body.error).toBeDefined()
+      // Should have stack trace in debug mode
+      expect(body.stack).toBeDefined()
+    })
+
+    it('returns 405 for non-POST requests', async () => {
+      const { createHandler } = await import('./index.js')
+      const handler = createHandler(mockEnv, {})
+
+      const request = new Request('http://localhost/test', { method: 'GET' })
+      const response = await handler(request)
+
+      expect(response.status).toBe(405)
+    })
+
+    it('sanitizes internal paths in error messages by default', async () => {
+      const { createHandler } = await import('./index.js')
+      const handler = createHandler(mockEnv, {})
+
+      // Create a request with invalid JSON to trigger an error
+      const request = new Request('http://localhost/test', {
+        method: 'POST',
+        body: 'invalid json{{{',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      const response = await handler(request)
+      const body = await response.json() as { error: string }
+
+      // Error message should not contain internal paths
+      expect(body.error).not.toMatch(/\/Users\/|\/home\/|\/app\//)
+    })
+  })
+
+  // ============================================================================
   // Type Exports
   // ============================================================================
 
