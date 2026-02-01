@@ -73,7 +73,7 @@ function hashContent(content: string): string {
  * $id is derived from the DO name.
  */
 export class MDXDatabase extends DurableObject<Env> {
-  private sql: SqlStorage
+  protected sql: SqlStorage
   private baseId: string
   private initialized = false
   private doCtx: DurableObjectState

@@ -368,7 +368,7 @@ async function runBenchmarks(): Promise<void> {
   // Get database stats
   const db = RPC(WORKER_URL)
   const stats = await db.stats()
-  console.log(`\n  Database: ${stats.things} things, ~${stats.relationships} relationships`)
+  console.log(`\n  Database: ${stats.things} things, ${stats.relationships} relationships${stats.dbSize ? `, ${(stats.dbSize / 1024 / 1024).toFixed(1)} MB` : ''}`)
 
   // Find an occupation for testing
   const db2 = RPC(WORKER_URL)

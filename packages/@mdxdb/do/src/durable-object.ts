@@ -243,34 +243,25 @@ export class MDXDurableObject extends MDXDatabase {
   }
 
   /**
-   * Get database statistics
+   * Get database statistics using direct SQL COUNT queries
    */
   async stats(): Promise<{
     things: number
     relationships: number
+    dbSize: number
     types: { type: string; count: number }[]
   }> {
-    const things = await this.list({ limit: 100000 })
-    const typeMap = new Map<string, number>()
-    for (const t of things) {
-      typeMap.set(t.type, (typeMap.get(t.type) || 0) + 1)
-    }
-
-    // Count relationships by querying each thing
-    let relCount = 0
-    for (const t of things.slice(0, 100)) { // Sample first 100
-      const rels = await this.relationships(t.url)
-      relCount += rels.length
-    }
-    // Estimate total
-    const estimatedRels = things.length > 0 ? Math.round((relCount / Math.min(100, things.length)) * things.length) : 0
+    const thingCount = this.sql.exec<{ count: number }>('SELECT COUNT(*) as count FROM _data').toArray()[0]!.count
+    const relCount = this.sql.exec<{ count: number }>('SELECT COUNT(*) as count FROM _rels').toArray()[0]!.count
+    const types = this.sql.exec<{ type: string; count: number }>(
+      'SELECT type, COUNT(*) as count FROM _data GROUP BY type ORDER BY count DESC'
+    ).toArray()
 
     return {
-      things: things.length,
-      relationships: estimatedRels,
-      types: Array.from(typeMap.entries())
-        .map(([type, count]) => ({ type, count }))
-        .sort((a, b) => b.count - a.count),
+      things: thingCount,
+      relationships: relCount,
+      dbSize: this.sql.databaseSize,
+      types: types.map(t => ({ type: t.type, count: t.count })),
     }
   }
 

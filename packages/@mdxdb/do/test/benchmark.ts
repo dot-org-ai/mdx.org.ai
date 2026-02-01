@@ -358,7 +358,8 @@ async function main() {
   console.log('DATABASE STATE')
   console.log('='.repeat(60))
   console.log(`  Total things: ${finalStats.things}`)
-  console.log(`  Estimated relationships: ${finalStats.relationships}`)
+  console.log(`  Total relationships: ${finalStats.relationships}`)
+  if (finalStats.dbSize) console.log(`  Database size: ${(finalStats.dbSize / 1024 / 1024).toFixed(1)} MB`)
   console.log('  Types:')
   for (const t of finalStats.types.slice(0, 10)) {
     console.log(`    ${t.type}: ${t.count}`)

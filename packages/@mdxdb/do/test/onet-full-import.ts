@@ -538,7 +538,8 @@ async function showStats(): Promise<void> {
   const db = RPC(WORKER_URL)
   const stats = await db.stats()
   console.log(`  Things: ${stats.things}`)
-  console.log(`  Est. Relationships: ${stats.relationships}`)
+  console.log(`  Relationships: ${stats.relationships}`)
+  if (stats.dbSize) console.log(`  Database size: ${(stats.dbSize / 1024 / 1024).toFixed(1)} MB`)
   console.log('\n  By type:')
   for (const t of stats.types) {
     console.log(`    ${t.type.padEnd(20)} ${t.count}`)
