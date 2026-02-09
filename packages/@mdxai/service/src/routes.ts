@@ -3,10 +3,14 @@
  *
  * Organized route handlers for session management.
  * These can be used standalone or composed into the main Hono app.
+ *
+ * Uses Workers RPC for direct method calls to SessionDO where possible.
+ * WebSocket upgrades still use fetch() since they require HTTP upgrade handshake.
  */
 
 import { Hono } from 'hono'
-import type { Env, SessionConfig } from './types'
+import type { Env, SessionConfig, StreamEvent } from './types'
+import type { SessionStub } from './session-do'
 
 /**
  * Create session routes
@@ -20,12 +24,10 @@ export function createSessionRoutes() {
     const sessionId = config.sessionId || crypto.randomUUID()
 
     const doId = c.env.SESSIONS.idFromName(sessionId)
-    const stub = c.env.SESSIONS.get(doId)
+    const stub = c.env.SESSIONS.get(doId) as unknown as SessionStub
 
-    // Initialize session
-    const initUrl = new URL(c.req.url)
-    initUrl.pathname = '/state'
-    await stub.fetch(new Request(initUrl))
+    // Initialize session via RPC
+    await stub.getState()
 
     return c.json({
       sessionId,
@@ -44,51 +46,46 @@ export function createSessionRoutes() {
   routes.get('/:id', async (c) => {
     const sessionId = c.req.param('id')
     const doId = c.env.SESSIONS.idFromName(sessionId)
-    const stub = c.env.SESSIONS.get(doId)
+    const stub = c.env.SESSIONS.get(doId) as unknown as SessionStub
 
-    const url = new URL(c.req.url)
-    url.pathname = '/state'
-    return stub.fetch(new Request(url))
+    return c.json(await stub.getState())
   })
 
   // Get session MDX
   routes.get('/:id/mdx', async (c) => {
     const sessionId = c.req.param('id')
     const doId = c.env.SESSIONS.idFromName(sessionId)
-    const stub = c.env.SESSIONS.get(doId)
+    const stub = c.env.SESSIONS.get(doId) as unknown as SessionStub
 
-    const url = new URL(c.req.url)
-    url.pathname = '/mdx'
-    return stub.fetch(new Request(url))
+    return new Response(await stub.getMDX(), {
+      headers: { 'Content-Type': 'text/markdown' },
+    })
   })
 
   // Get session markdown
   routes.get('/:id/markdown', async (c) => {
     const sessionId = c.req.param('id')
     const doId = c.env.SESSIONS.idFromName(sessionId)
-    const stub = c.env.SESSIONS.get(doId)
+    const stub = c.env.SESSIONS.get(doId) as unknown as SessionStub
 
-    const url = new URL(c.req.url)
-    url.pathname = '/markdown'
-    return stub.fetch(new Request(url))
+    return new Response(await stub.getMarkdown(), {
+      headers: { 'Content-Type': 'text/markdown' },
+    })
   })
 
   // Post event to session
   routes.post('/:id/event', async (c) => {
     const sessionId = c.req.param('id')
     const doId = c.env.SESSIONS.idFromName(sessionId)
-    const stub = c.env.SESSIONS.get(doId)
+    const stub = c.env.SESSIONS.get(doId) as unknown as SessionStub
 
-    const url = new URL(c.req.url)
-    url.pathname = '/event'
-    return stub.fetch(new Request(url, {
-      method: 'POST',
-      body: c.req.raw.body,
-      headers: c.req.raw.headers,
-    }))
+    const event = await c.req.json<StreamEvent>()
+    await stub.postEvent(event)
+
+    return new Response('ok')
   })
 
-  // WebSocket endpoint
+  // WebSocket endpoint — must use fetch() for HTTP upgrade handshake
   routes.get('/:id/ws', async (c) => {
     const sessionId = c.req.param('id')
 

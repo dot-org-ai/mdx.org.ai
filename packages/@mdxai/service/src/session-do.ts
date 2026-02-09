@@ -134,6 +134,20 @@ function updateState(state: SessionState, event: StreamEvent): void {
 }
 
 /**
+ * Typed RPC interface for SessionDO
+ *
+ * Used by callers to get typed method signatures when calling via RPC
+ * instead of stub.fetch(). WebSocket upgrades still require fetch().
+ */
+export interface SessionStub {
+  getState(): Promise<SessionState>
+  getMDX(): Promise<string>
+  getMarkdown(): Promise<string>
+  postEvent(event: StreamEvent): Promise<void>
+  runNative(config: SessionConfig): Promise<{ started: boolean; sessionId: string }>
+}
+
+/**
  * Session Durable Object
  *
  * Features:
@@ -142,6 +156,9 @@ function updateState(state: SessionState, event: StreamEvent): void {
  * - Event handling from external runners
  * - MDX/Markdown rendering endpoints
  * - DO-native Agent SDK execution (future)
+ * - Public RPC methods for direct invocation (no HTTP overhead)
+ *
+ * WebSocket upgrades still require fetch() since they need the HTTP upgrade handshake.
  */
 export class SessionDO implements DurableObject {
   private state: DurableObjectState
@@ -173,6 +190,10 @@ export class SessionDO implements DurableObject {
 
   /**
    * Handle HTTP requests and WebSocket upgrades
+   *
+   * fetch() is retained for WebSocket upgrade requests, which require the
+   * HTTP upgrade handshake and cannot use RPC. All other operations should
+   * prefer the public RPC methods below (getState, getMDX, etc.).
    */
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url)
@@ -182,33 +203,129 @@ export class SessionDO implements DurableObject {
       return this.handleWebSocketUpgrade(request)
     }
 
-    // REST endpoints
+    // REST endpoints (kept for backward compatibility)
     switch (url.pathname) {
       case '/':
       case '/state':
-        return this.handleGetState(request)
+        return Response.json(await this.getState())
 
       case '/mdx':
-        return this.handleGetMDX(request)
+        return new Response(await this.getMDX(), {
+          headers: { 'Content-Type': 'text/markdown' },
+        })
 
       case '/markdown':
-        return this.handleGetMarkdown(request)
+        return new Response(await this.getMarkdown(), {
+          headers: { 'Content-Type': 'text/markdown' },
+        })
 
       case '/event':
         if (request.method === 'POST') {
-          return this.handlePostEvent(request)
+          try {
+            const event = await request.json() as StreamEvent
+            await this.postEvent(event)
+            return new Response('ok')
+          } catch (error) {
+            console.error('Error handling event:', error)
+            return new Response('Error processing event', { status: 500 })
+          }
         }
         break
 
       case '/run/native':
         if (request.method === 'POST') {
-          return this.handleRunNative(request)
+          try {
+            const config = await request.json() as SessionConfig
+            const result = await this.runNative(config)
+            return Response.json(result)
+          } catch (error) {
+            console.error('Error starting native execution:', error)
+            return new Response('Error starting execution', { status: 500 })
+          }
         }
         break
     }
 
     return new Response('Not found', { status: 404 })
   }
+
+  // ── Public RPC Methods ──────────────────────────────────────────────
+
+  /**
+   * Get current session state
+   */
+  async getState(): Promise<SessionState> {
+    return this.sessionState
+  }
+
+  /**
+   * Get MDX representation of session
+   * TODO: Implement full MDX rendering
+   */
+  async getMDX(): Promise<string> {
+    return `---
+$type: AgentSession
+$id: ${this.sessionState.id}
+status: ${this.sessionState.status}
+---
+
+# Agent Session
+
+Status: ${this.sessionState.status}
+Model: ${this.sessionState.model}
+
+## Todos
+
+${this.sessionState.todos.map(t => `- [${t.status === 'completed' ? 'x' : t.status === 'in_progress' ? '-' : ' '}] ${t.content}`).join('\n')}
+
+## Tools
+
+${this.sessionState.tools.map(t => `- ${t.tool}: ${t.status}`).join('\n')}
+`
+  }
+
+  /**
+   * Get Markdown representation of session
+   * TODO: Implement GitHub-specific markdown rendering
+   */
+  async getMarkdown(): Promise<string> {
+    // For now, return similar to MDX
+    return this.getMDX()
+  }
+
+  /**
+   * Handle incoming event from external runner
+   */
+  async postEvent(event: StreamEvent): Promise<void> {
+    // Update state
+    updateState(this.sessionState, event)
+
+    // Persist to storage
+    await this.state.storage.put('state', this.sessionState)
+
+    // Broadcast to all connected clients
+    await this.broadcast({
+      type: 'event',
+      event,
+      state: this.sessionState,
+    })
+  }
+
+  /**
+   * Start DO-native execution
+   * TODO: Implement Agent SDK V2 integration
+   */
+  async runNative(config: SessionConfig): Promise<{ started: boolean; sessionId: string }> {
+    // Start execution in background
+    this.state.waitUntil(this.runDONativeInternal(config))
+
+    return {
+      started: true,
+      sessionId: this.sessionState.id,
+    }
+  }
+
+  // ── Private Methods ─────────────────────────────────────────────────
 
   /**
    * Handle WebSocket upgrade
@@ -235,104 +352,10 @@ export class SessionDO implements DurableObject {
   }
 
   /**
-   * Get current session state
-   */
-  private handleGetState(request: Request): Response {
-    return Response.json(this.sessionState)
-  }
-
-  /**
-   * Get MDX representation of session
-   * TODO: Implement MDX rendering
-   */
-  private handleGetMDX(request: Request): Response {
-    // For now, return placeholder
-    const mdx = `---
-$type: AgentSession
-$id: ${this.sessionState.id}
-status: ${this.sessionState.status}
----
-
-# Agent Session
-
-Status: ${this.sessionState.status}
-Model: ${this.sessionState.model}
-
-## Todos
-
-${this.sessionState.todos.map(t => `- [${t.status === 'completed' ? 'x' : t.status === 'in_progress' ? '-' : ' '}] ${t.content}`).join('\n')}
-
-## Tools
-
-${this.sessionState.tools.map(t => `- ${t.tool}: ${t.status}`).join('\n')}
-`
-    return new Response(mdx, {
-      headers: { 'Content-Type': 'text/markdown' },
-    })
-  }
-
-  /**
-   * Get Markdown representation of session
-   * TODO: Implement GitHub-specific markdown rendering
-   */
-  private handleGetMarkdown(request: Request): Response {
-    // For now, return similar to MDX
-    return this.handleGetMDX(request)
-  }
-
-  /**
-   * Handle incoming event from external runner
-   */
-  private async handlePostEvent(request: Request): Promise<Response> {
-    try {
-      const event = await request.json() as StreamEvent
-
-      // Update state
-      updateState(this.sessionState, event)
-
-      // Persist to storage
-      await this.state.storage.put('state', this.sessionState)
-
-      // Broadcast to all connected clients
-      await this.broadcast({
-        type: 'event',
-        event,
-        state: this.sessionState,
-      })
-
-      return new Response('ok')
-    } catch (error) {
-      console.error('Error handling event:', error)
-      return new Response('Error processing event', { status: 500 })
-    }
-  }
-
-  /**
-   * Handle DO-native execution request
-   * TODO: Implement Agent SDK V2 integration
-   */
-  private async handleRunNative(request: Request): Promise<Response> {
-    try {
-      const config = await request.json() as SessionConfig
-
-      // Start execution in background
-      this.state.waitUntil(this.runDONative(config))
-
-      return Response.json({
-        started: true,
-        sessionId: this.sessionState.id
-      })
-    } catch (error) {
-      console.error('Error starting native execution:', error)
-      return new Response('Error starting execution', { status: 500 })
-    }
-  }
-
-  /**
    * Run Agent SDK V2 in DO-native mode
    * TODO: Implement full Agent SDK integration
    */
-  private async runDONative(config: SessionConfig): Promise<void> {
+  private async runDONativeInternal(config: SessionConfig): Promise<void> {
     this.sessionState.status = 'running'
     this.sessionState.executionMode = 'do-native'
     await this.persist()
