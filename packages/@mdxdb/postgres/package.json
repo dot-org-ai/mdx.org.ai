@@ -35,7 +35,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "ai-database": "workspace:^",
+    "ai-database": "^2.4.0",
     "pg": "^8.13.1"
   },
   "devDependencies": {

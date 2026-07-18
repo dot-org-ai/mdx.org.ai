@@ -44,7 +44,7 @@
     "@mdxld/config": "workspace:*",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.0",
-    "ai-database": "workspace:*",
+    "ai-database": "^2.4.0",
     "eslint": "^9.16.0",
     "hono": "^4.6.0",
     "ink": "^5.0.1",
@@ -60,5 +60,10 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "pnpm": {
+    "overrides": {
+      "org.ai": "-"
+    }
   }
 }

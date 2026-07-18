@@ -83,9 +83,9 @@
     }
   },
   "devDependencies": {
-    "ai-functions": "workspace:*",
-    "ai-database": "workspace:*",
-    "ai-workflows": "workspace:*",
+    "ai-functions": "^2.4.0",
+    "ai-database": "^2.4.0",
+    "ai-workflows": "^2.4.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

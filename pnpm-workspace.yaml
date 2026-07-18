@@ -6,4 +6,3 @@ packages:
   - 'packages/@mdxdb/*'
   - 'packages/@mdxld/*'
   - 'packages/@mdxui/*'
-  - 'primitives/packages/*'

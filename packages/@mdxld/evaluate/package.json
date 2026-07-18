@@ -26,9 +26,6 @@
     "mdxld": "workspace:*",
     "@mdxld/compile": "workspace:*"
   },
-  "optionalDependencies": {
-    "ai-sandbox": "workspace:*"
-  },
   "devDependencies": {
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

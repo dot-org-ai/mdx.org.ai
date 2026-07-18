@@ -44,7 +44,7 @@
     "rpc.do": "^0.1.2"
   },
   "peerDependencies": {
-    "ai-database": "workspace:*",
+    "ai-database": "^2.4.0",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
@@ -54,7 +54,7 @@
     "@mdxdb/server": "workspace:*",
     "@mdxdb/sqlite": "workspace:*",
     "@mdxld/config": "workspace:^",
-    "ai-database": "workspace:*",
+    "ai-database": "^2.4.0",
     "hono": "^4.6.18",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
