@@ -49,14 +49,14 @@
   "license": "MIT",
   "devDependencies": {
     "@mdxui/storybook": "workspace:^",
-    "digital-products": "workspace:^",
+    "digital-products": "^2.4.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   },
   "peerDependencies": {
     "@mdxui/storybook": "workspace:*",
-    "digital-products": "workspace:*"
+    "digital-products": "^2.4.0"
   },
   "peerDependenciesMeta": {
     "@mdxui/storybook": {

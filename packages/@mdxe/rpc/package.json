@@ -44,7 +44,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "ai-functions": "workspace:^"
+    "ai-functions": "^2.4.0"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",

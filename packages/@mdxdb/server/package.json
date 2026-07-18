@@ -52,13 +52,13 @@
   },
   "peerDependencies": {
     "@mdxdb/fs": "workspace:*",
-    "ai-database": "workspace:*",
+    "ai-database": "^2.4.0",
     "mdxld": "workspace:*"
   },
   "devDependencies": {
     "@mdxdb/fs": "workspace:*",
     "@mdxld/config": "workspace:^",
-    "ai-database": "workspace:*",
+    "ai-database": "^2.4.0",
     "mdxld": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
