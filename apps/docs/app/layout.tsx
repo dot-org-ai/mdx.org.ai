@@ -12,6 +12,28 @@ export const metadata: Metadata = {
   alternates: {
     canonical: './',
   },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    siteName: 'MDX.org.ai',
+    title: 'MDXLD is an extension of MDX',
+    description: 'Linked-data frontmatter over the open MDX format authored by the MDX community.',
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+        type: 'image/png',
+        alt: 'MDX.org.ai — MDXLD is an extension of MDX. Linked-data frontmatter over the open MDX format authored by the MDX community.',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MDXLD is an extension of MDX',
+    description: 'Linked-data frontmatter over the open MDX format authored by the MDX community.',
+    images: ['/og.png'],
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

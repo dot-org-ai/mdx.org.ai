@@ -1,0 +1,86 @@
+<!doctype html>
+<!-- Source for public/og.png (1200×630). Rendered by headless Chrome:
+
+       "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+         --headless=new --disable-gpu --hide-scrollbars \
+         --screenshot=apps/docs/public/og.png --window-size=1200,630 \
+         --allow-file-access-from-files "file://$PWD/apps/docs/og-card.html"
+
+     The PNG is committed so an ordinary build never needs a browser.
+     Layout mirrors foundation.org.ai's card (thin accent edge at left,
+     wordmark, claim, domain) — one family, one shape.
+
+     Palette: fumadocs' stock `neutral` preset, which this site uses
+     unmodified (apps/docs/app/global.css). Every token is 0% saturation,
+     so the accent here is the theme's own dark-mode --fd-primary, near
+     white. The card is monochrome because the site is. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --bg: #141414;          /* --fd-background dark: 0 0% 8.04% */
+    --fg: #ebebeb;          /* --fd-foreground dark: 0 0% 92%   */
+    --accent: #fafafa;      /* --fd-primary    dark: 0 0% 98%   */
+    --muted: #9b9b9b;       /* --fd-muted-foreground dark       */
+    --dim: #6f6f6f;
+    --line: rgba(255, 255, 255, 0.13);
+    --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    background: var(--bg);
+    font-family: var(--sans);
+    color: var(--fg);
+    position: relative;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .edge {
+    position: absolute; left: 96px; top: 96px; bottom: 96px;
+    width: 6px; background: var(--accent);
+  }
+  .in {
+    position: absolute; left: 150px; right: 96px; top: 96px; bottom: 96px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .wordmark {
+    font: 500 26px/1 var(--mono);
+    letter-spacing: 0.02em; color: var(--muted);
+  }
+  .body { display: flex; flex-direction: column; gap: 26px; }
+  .claim {
+    font-size: 66px; font-weight: 600; line-height: 1.12;
+    letter-spacing: -0.028em; color: var(--accent); max-width: 940px;
+  }
+  .sub {
+    font-size: 29px; font-weight: 400; line-height: 1.4;
+    letter-spacing: -0.005em; color: var(--muted); max-width: 900px;
+  }
+  .foot { display: flex; align-items: baseline; justify-content: space-between; }
+  .site { font-size: 26px; font-weight: 400; color: var(--muted); }
+  .layers {
+    font: 400 16px/1 var(--mono);
+    letter-spacing: 0.05em; text-transform: uppercase; color: var(--dim);
+  }
+  .layers span { color: var(--line); padding: 0 6px; }
+</style>
+</head>
+<body>
+  <div class="edge"></div>
+  <div class="in">
+    <div class="wordmark">MDX.org.ai</div>
+    <div class="body">
+      <div class="claim">MDXLD is an extension of&nbsp;MDX.</div>
+      <div class="sub">Linked-data frontmatter over the open MDX format authored by the MDX&nbsp;community.</div>
+    </div>
+    <div class="foot">
+      <div class="site">mdx.org.ai</div>
+      <div class="layers">Structured data<span>/</span>Prose<span>/</span>Code<span>/</span>Components</div>
+    </div>
+  </div>
+</body>
+</html>
