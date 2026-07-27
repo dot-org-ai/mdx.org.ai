@@ -1,17 +1,17 @@
 ---
 title: Structured Data
-description: YAML-LD frontmatter, schemas, templates, and database storage for MDX documents
+description: MDXLD frontmatter — a superset of YAML-LD — plus schemas, templates, and database storage
 root: true
 defaultOpen: true
 ---
 
-The **Structured Data** layer of MDX provides semantic frontmatter using YAML-LD (YAML + Linked Data), enabling type-safe schemas, validation, and database storage.
+**Structured Data** is the concern MDXLD adds. [MDX](https://mdxjs.com) itself defines no frontmatter and assigns it no semantics; MDXLD supplies both, as a **superset of YAML-LD** (YAML + Linked Data), enabling type-safe schemas, validation, and database storage.
 
 ## Core Concepts
 
 ### [Document](/Document)
 
-The fundamental unit - combines YAML-LD frontmatter with content body.
+The fundamental unit - combines MDXLD frontmatter (a superset of YAML-LD) with content body.
 
 ```yaml
 ---
@@ -30,7 +30,7 @@ Schema-first database modeling with automatic bi-directional relationships.
 const db = DB({
   Post: {
     title: 'string',
-    author: 'Author.posts',  // Creates both directions
+    author: 'Author.posts', // Creates both directions
   },
 })
 ```

@@ -10,6 +10,8 @@ pages: [index, getting-started, parsing, validation, ast, compilation, formats]
 
 **mdxld** is the core package for working with MDXLD (MDX + Linked Data) documents. It provides utilities to parse, stringify, validate, and compile MDX documents with semantic frontmatter.
 
+[MDX](https://mdxjs.com) is an open standard authored by the MDX community. **MDXLD is ours: a superset of MDX**, and in the frontmatter a **superset of YAML-LD**. Every valid MDX document is already a valid MDXLD document — one that declares no linked data.
+
 ## Installation
 
 ```bash
@@ -18,9 +20,9 @@ npm install mdxld
 
 ## What is MDXLD?
 
-MDXLD extends standard MDX frontmatter with JSON-LD compatible properties, enabling semantic web capabilities in your MDX documents.
+MDXLD extends MDX frontmatter with JSON-LD compatible properties, enabling semantic web capabilities in your MDX documents. (Strictly, MDX has no frontmatter of its own — it comes from `remark-frontmatter` and MDX assigns it no meaning. MDXLD is what gives it meaning.)
 
-### Standard MDX
+### Plain MDX
 
 ```mdx
 ---
@@ -39,7 +41,7 @@ Content here...
 ---
 $type: Article
 $id: https://example.com/posts/hello-world
-$context: https://schema.org
+$context: https://schema.org.ai
 title: Hello World
 author:
   $type: Person
@@ -59,11 +61,29 @@ Content here with **semantic** meaning.
 
 MDXLD recognizes special frontmatter properties that map to JSON-LD:
 
-| MDXLD | JSON-LD | Description |
-|-------|---------|-------------|
-| `$type` | `@type` | Document or entity type |
-| `$id` | `@id` | Unique identifier (URI) |
-| `$context` | `@context` | JSON-LD context |
+| MDXLD      | JSON-LD / YAML-LD | Description                |
+| ---------- | ----------------- | -------------------------- |
+| `$type`    | `@type`           | Document or entity type    |
+| `$id`      | `@id`             | Unique identifier (URI)    |
+| `$context` | `@context`        | The vocabulary binding IRI |
+
+**`$id` and `$type` are not a deviation.** JSON-LD 1.1 permits keyword aliasing through the
+context, and the JSON-LD community publishes exactly this alias set at
+[`dollar-convenience.jsonld`](https://json-ld.org/contexts/dollar-convenience.jsonld).
+MDXLD's `$id` and `$type` are that convention, not an invention of ours.
+
+**`$context` is the deviation**, and it is a real one: `@context` is the single JSON-LD
+keyword that [cannot be aliased](https://www.w3.org/TR/json-ld11/#aliasing-keywords), and
+an alias could not be used inside a context in any case. MDXLD spells it `$context`
+regardless, for one mechanical reason — an MDX document compiles to **ESM**, `@context` is
+not a legal JavaScript identifier, and a document forced to quote `'@context'` has lost the
+very property that makes the `$` set worth having. In YAML, too, a bare `@` is a reserved
+indicator character and must be quoted; `$` needs no quoting on either side.
+
+The compatibility shim is one rename: a conforming JSON-LD processor reads MDXLD frontmatter
+by renaming `$context` to `@context`. **User-defined keys never begin with `$`.**
+
+`$context` is always `https://schema.org.ai`, **unversioned**.
 
 ### Document Structure
 
@@ -101,7 +121,7 @@ Hello, world!
 
 console.log(doc.data.$type) // 'BlogPost'
 console.log(doc.data.title) // 'My First Post'
-console.log(doc.content)    // '# My First Post\n\nHello, world!'
+console.log(doc.content) // '# My First Post\n\nHello, world!'
 ```
 
 ### Stringifying
@@ -166,11 +186,13 @@ Validate documents with ArkType schemas:
 import { createValidator } from 'mdxld/validate'
 import { type } from 'arktype'
 
-const validateArticle = createValidator(type({
-  '$type': '"Article"',
-  'title': 'string',
-  'author': 'string',
-}))
+const validateArticle = createValidator(
+  type({
+    $type: '"Article"',
+    title: 'string',
+    author: 'string',
+  })
+)
 
 const result = validateArticle(doc)
 if (result.success) {
@@ -199,13 +221,7 @@ const result = await compile(doc, {
 TypeScript types for MDXLD:
 
 ```typescript
-import type {
-  MDXLDDocument,
-  MDXLDData,
-  MDXLDAst,
-  MDXLDAstNode,
-  LDProperties,
-} from 'mdxld/types'
+import type { MDXLDDocument, MDXLDData, MDXLDAst, MDXLDAstNode, LDProperties } from 'mdxld/types'
 ```
 
 ## API Reference
@@ -245,14 +261,14 @@ function processDocument(doc: MDXLDDocument) {
 
 The `@mdxld/*` ecosystem includes packages for bi-directional conversion between objects and various formats:
 
-| Package | Description |
-|---------|-------------|
-| [`@mdxld/markdown`](/docs/mdxld/formats/markdown) | Object ↔ Markdown conversion |
-| [`@mdxld/json`](/docs/mdxld/formats/json) | JSON, JSON-LD, JSON Schema, OpenAPI, MCP, GraphQL |
-| [`@mdxld/html`](/docs/mdxld/formats/html) | Semantic HTML with microdata |
-| [`@mdxld/yaml`](/docs/mdxld/formats/yaml) | YAML for configs, K8s, CI/CD |
-| [`@mdxld/typescript`](/docs/mdxld/formats/typescript) | TypeScript types, Zod schemas, JSON5 |
-| [`@mdxld/diff`](/docs/mdxld/formats/diff) | Git-style diffing and 3-way merge |
+| Package                                               | Description                                       |
+| ----------------------------------------------------- | ------------------------------------------------- |
+| [`@mdxld/markdown`](/docs/mdxld/formats/markdown)     | Object ↔ Markdown conversion                      |
+| [`@mdxld/json`](/docs/mdxld/formats/json)             | JSON, JSON-LD, JSON Schema, OpenAPI, MCP, GraphQL |
+| [`@mdxld/html`](/docs/mdxld/formats/html)             | Semantic HTML with microdata                      |
+| [`@mdxld/yaml`](/docs/mdxld/formats/yaml)             | YAML for configs, K8s, CI/CD                      |
+| [`@mdxld/typescript`](/docs/mdxld/formats/typescript) | TypeScript types, Zod schemas, JSON5              |
+| [`@mdxld/diff`](/docs/mdxld/formats/diff)             | Git-style diffing and 3-way merge                 |
 
 See [Format Conversion](/docs/mdxld/formats) for the complete guide.
 

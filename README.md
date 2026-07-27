@@ -1,8 +1,20 @@
 # mdx.org.ai
 
-A monorepo for building MDX-based AI applications that combine structured data, unstructured content, executable code, and UI components.
+A monorepo for **MDXLD** and its toolchain.
 
-## Why MDX?
+**MDX is not ours.** [MDX](https://mdxjs.com) is an open standard authored by the MDX
+community. **MDXLD is ours:** an extension of MDX — a superset — that adds `$id`, `$type`
+and `$context` to the frontmatter, making it also a superset of YAML-LD. Every valid MDX
+document is already a valid MDXLD document. `$context` is always `https://schema.org.ai`,
+unversioned.
+
+MDXLD is pre-1.0 and deliberately unfixed.
+
+Documentation: [mdx.org.ai](https://mdx.org.ai) · also served at
+[mdxld.org](https://mdxld.org) · vocabulary at [schema.org.ai](https://schema.org.ai) ·
+maintained by [The Org.AI Foundation](https://foundation.org.ai).
+
+## What MDXLD asks one file to carry
 
 - **Structured Data** - YAML-LD frontmatter with JSON-LD semantics (`$id`, `$type`, `$context`)
 - **Unstructured Content** - Markdown for human-readable documentation
@@ -177,7 +189,7 @@ pnpm dev
 ---
 $type: BlogPost
 $id: https://example.com/posts/hello-world
-$context: https://schema.org
+$context: https://schema.org.ai
 title: Hello World
 author:
   $type: Person

@@ -1,22 +1,52 @@
 ---
-title: MDX.org.ai Documentation
-description: The complete MDX ecosystem combining structured data, unstructured content, executable code, and UI components
+title: MDXLD
+description: MDXLD is an extension of MDX — linked-data frontmatter over the open MDX format authored by the MDX community
 root: true
 pages: [index, structured-data, unstructured-content, executable-code, ui-components]
 ---
 
-# MDX.org.ai
+# MDXLD
 
-MDX.org.ai extends MDX to combine four integrated layers in a single document format:
+**MDXLD is an extension of MDX.** It adds `$id`, `$type` and `$context` to the frontmatter,
+so a document says what it _is_ and not only how it renders.
 
-- **Structured Data** - YAML-LD frontmatter with JSON-LD semantics
+## What is ours, and what is not
+
+[**MDX**](https://mdxjs.com) is an **open standard authored by the MDX community**, not by
+us. That Markdown, JSX and ESM compose in a single file is the MDX project's achievement,
+and everything documented here is written in it. We are downstream users of that work and
+we conform to it.
+
+**MDXLD is ours.** It is a **superset of MDX** — every valid MDX document is a valid MDXLD
+document — and, in the frontmatter, a **superset of YAML-LD**. The relationship reads the
+same way twice over:
+
+```
+  Markdown  ──▶  MDX             ──▶  MDXLD
+  (theirs)       (theirs, open)       (ours, superset)
+
+  JSON-LD   ──▶  YAML-LD         ──▶  MDXLD frontmatter
+  (theirs)       (theirs, open)       (ours, superset)
+```
+
+Same pattern as [schema.org](https://schema.org) → [schema.org.ai](https://schema.org.ai):
+conform on the shared core, extend deliberately above it, and say which half is which.
+
+MDXLD is **pre-1.0 and deliberately unfixed** — nothing here freezes until real external
+implementations prove the shape.
+
+## The four concerns
+
+MDXLD asks one file to carry four things at once:
+
+- **Structured Data** - YAML-LD frontmatter, superset with `$id` / `$type` / `$context`
 - **Unstructured Content** - Markdown prose with rich formatting
 - **Executable Code** - TypeScript/JSX for logic and interactions
 - **UI Components** - React components for rendering
 
-## The Four Layers
-
-Every MDX document naturally contains these four distinct layers:
+Only the first is ours. MDX already gives the other three, and it deliberately assigns
+frontmatter **no semantics** — frontmatter comes from `remark-frontmatter` and is handed to
+the host to interpret. MDXLD fills that open seam rather than overriding an MDX rule.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -43,14 +73,15 @@ Every MDX document naturally contains these four distinct layers:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Why MDX.org.ai?
+## Why MDXLD?
 
 Traditional content systems force you to choose between:
+
 - **CMS databases** - structured but not code-friendly
 - **Markdown files** - portable but no schema validation
 - **React apps** - powerful but content is buried in code
 
-MDX.org.ai unifies all four concerns in a single, portable file format that works with any database, any framework, and any rendering target.
+MDXLD unifies all four concerns in a single, portable file that works with any database, any framework, and any rendering target — and, because it is a superset, any MDX toolchain that ignores the frontmatter entirely still renders the document correctly.
 
 ## Quick Start
 
@@ -75,56 +106,56 @@ author: /authors/jane
 This is an **MDXLD** document with linked data.
 `)
 
-console.log(doc.data.$type)  // 'Article'
-console.log(doc.data.title)  // 'Hello World'
-console.log(doc.content)     // '# Hello World\n\nThis is an **MDXLD**...'
+console.log(doc.data.$type) // 'Article'
+console.log(doc.data.title) // 'Hello World'
+console.log(doc.content) // '# Hello World\n\nThis is an **MDXLD**...'
 ```
 
-## The Four Layers in Detail
+## The four concerns in detail
 
 ### [Structured Data](/docs/structured-data)
 
-YAML-LD frontmatter provides typed, validated, linked data:
+The MDXLD half. A superset of YAML-LD frontmatter, providing typed, validated, linked data:
 
-| Package | Description |
-|---------|-------------|
-| [mdxld](/docs/structured-data/mdxld) | Core parser for YAML-LD frontmatter |
-| [mdxdb](/docs/structured-data/mdxdb) | Database storage for MDX documents |
-| [@mdxld/jsonld](/docs/structured-data/mdxld/jsonld) | JSON-LD conversion and vocabularies |
-| [@mdxld/validate](/docs/structured-data/mdxld/validate) | Schema validation with ArkType |
+| Package                                                 | Description                         |
+| ------------------------------------------------------- | ----------------------------------- |
+| [mdxld](/docs/structured-data/mdxld)                    | Core parser for YAML-LD frontmatter |
+| [mdxdb](/docs/structured-data/mdxdb)                    | Database storage for MDX documents  |
+| [@mdxld/jsonld](/docs/structured-data/mdxld/jsonld)     | JSON-LD conversion and vocabularies |
+| [@mdxld/validate](/docs/structured-data/mdxld/validate) | Schema validation with ArkType      |
 
 ### [Unstructured Content](/docs/unstructured-content)
 
 Markdown content body with parsing and bi-directional extraction:
 
-| Package | Description |
-|---------|-------------|
+| Package                                              | Description                                    |
+| ---------------------------------------------------- | ---------------------------------------------- |
 | [@mdxld/extract](/docs/unstructured-content/extract) | Extract structured data from rendered markdown |
-| [@mdxld/ast](/docs/unstructured-content/ast) | AST manipulation and traversal |
+| [@mdxld/ast](/docs/unstructured-content/ast)         | AST manipulation and traversal                 |
 
 ### [Executable Code](/docs/executable-code)
 
 TypeScript functions, AI agents, and multi-runtime execution:
 
-| Package | Description |
-|---------|-------------|
-| [mdxe](/docs/executable-code/mdxe) | MDX execution runtime |
-| [mdxai](/docs/executable-code/mdxai) | AI agents with MCP server integration |
-| [@mdxe/next](/docs/executable-code/mdxe/next) | Next.js App Router integration |
-| [@mdxe/workers](/docs/executable-code/mdxe/workers) | Cloudflare Workers runtime |
-| [@mdxe/hono](/docs/executable-code/mdxe/hono) | Hono web framework middleware |
+| Package                                             | Description                           |
+| --------------------------------------------------- | ------------------------------------- |
+| [mdxe](/docs/executable-code/mdxe)                  | MDX execution runtime                 |
+| [mdxai](/docs/executable-code/mdxai)                | AI agents with MCP server integration |
+| [@mdxe/next](/docs/executable-code/mdxe/next)       | Next.js App Router integration        |
+| [@mdxe/workers](/docs/executable-code/mdxe/workers) | Cloudflare Workers runtime            |
+| [@mdxe/hono](/docs/executable-code/mdxe/hono)       | Hono web framework middleware         |
 
 ### [UI Components](/docs/ui-components)
 
 Component specifications and multi-format rendering:
 
-| Package | Description |
-|---------|-------------|
-| [mdxui](/docs/ui-components/mdxui) | Component specifications (31 components) |
-| [@mdxui/html](/docs/ui-components/mdxui/html) | Render to HTML strings |
-| [@mdxui/json](/docs/ui-components/mdxui/json) | Render to JSON-LD |
-| [@mdxui/shadcn](/docs/ui-components/mdxui/shadcn) | Render with shadcn/ui |
-| [@mdxui/fumadocs](/docs/ui-components/mdxui/fumadocs) | Documentation site rendering |
+| Package                                               | Description                              |
+| ----------------------------------------------------- | ---------------------------------------- |
+| [mdxui](/docs/ui-components/mdxui)                    | Component specifications (31 components) |
+| [@mdxui/html](/docs/ui-components/mdxui/html)         | Render to HTML strings                   |
+| [@mdxui/json](/docs/ui-components/mdxui/json)         | Render to JSON-LD                        |
+| [@mdxui/shadcn](/docs/ui-components/mdxui/shadcn)     | Render with shadcn/ui                    |
+| [@mdxui/fumadocs](/docs/ui-components/mdxui/fumadocs) | Documentation site rendering             |
 
 ## Architecture
 
@@ -151,19 +182,43 @@ Component specifications and multi-format rendering:
 
 ### Linked Data with YAML-LD
 
-MDXLD extends frontmatter with JSON-LD compatible properties:
+MDXLD is a superset of YAML-LD: `$`-prefixed keys carry the linked data, and every other
+key stays ordinary YAML frontmatter meaning whatever your toolchain already made it mean.
 
 ```yaml
 ---
-$type: BlogPost           # JSON-LD @type
-$id: /posts/hello         # JSON-LD @id
-$context: https://schema.org  # JSON-LD @context
-author: /authors/jane     # Linked reference
+$context: https://schema.org.ai # the binding IRI — always this, unversioned
+$type: BlogPost # YAML-LD @type
+$id: /posts/hello # YAML-LD @id
+author: /authors/jane # Linked reference
 tags:
   - typescript
   - mdx
 ---
 ```
+
+`$context` is **always `https://schema.org.ai`, unversioned and permanently so.** A binding
+IRI is an identity, and identities do not carry version numbers — a versioned `$context`
+URL is a defect. `schema.org.ai` is our superset of [schema.org](https://schema.org), so a
+`$type` schema.org already defines keeps schema.org's meaning.
+
+### Why `$` and not `@`
+
+**`$id` and `$type` are not a deviation.** JSON-LD 1.1 permits keyword aliasing through the
+context, and the JSON-LD community publishes exactly this alias set at
+[`dollar-convenience.jsonld`](https://json-ld.org/contexts/dollar-convenience.jsonld).
+MDXLD's `$id` and `$type` are that convention, not an invention of ours.
+
+**`$context` is the deviation**, and it is a real one: `@context` is the single JSON-LD
+keyword that [cannot be aliased](https://www.w3.org/TR/json-ld11/#aliasing-keywords), and
+an alias could not be used inside a context in any case. MDXLD spells it `$context`
+regardless, for one mechanical reason — an MDX document compiles to **ESM**, `@context` is
+not a legal JavaScript identifier, and a document forced to quote `'@context'` has lost the
+very property that makes the `$` set worth having. In YAML, too, a bare `@` is a reserved
+indicator character and must be quoted; `$` needs no quoting on either side.
+
+The compatibility shim is one rename: a conforming JSON-LD processor reads MDXLD frontmatter
+by renaming `$context` to `@context`. **User-defined keys never begin with `$`.**
 
 ### Type-Safe Validation
 
@@ -174,9 +229,9 @@ import { parse } from 'mdxld'
 import { type } from 'arktype'
 
 const Article = type({
-  '$type': '"Article"',
-  'title': 'string',
-  'author': 'string',
+  $type: '"Article"',
+  title: 'string',
+  author: 'string',
   'publishedAt?': 'Date',
 })
 

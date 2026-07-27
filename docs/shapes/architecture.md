@@ -474,7 +474,7 @@ export default {
 | Template mode | Custom JSX with explicit markup |
 | Format conversion | `@mdxld/{markdown,json,html,yaml,typescript,diff}` |
 | Version control | `@mdxld/diff` (patches, 3-way merge) |
-| Presentation layer | `@mdxui/*` (adds styling) |
+| Presentation | `@mdxui/*` (adds styling) |
 
 ## Format Package Capabilities
 
