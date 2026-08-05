@@ -67,7 +67,13 @@ A Field's `confidence` is a **branded** `ModelConfidence`, constructed only thro
 and is a different quantity; the brand is what stops one being assigned to the other.
 
 A constructed Field and an assembled Frame are **deep-frozen**. A guard you can walk past after it
-runs is not a guard.
+runs is not a guard. Three limits, named rather than implied: the freeze applies to the *caller's*
+object, not a copy (`present(sharedAppState, obs)` freezes your application state in place); a
+`value` that is a typed array, `Date`, `Map` or `Set` is **skipped and stays mutable**, because
+freezing a typed array throws and freezing the other three is a lie the runtime reports as `true`;
+and `Map`/`Set` entries were never reached. A skipped value reports `Object.isFrozen === false`,
+truthfully. A Field carrying an event hash, a signature or a symbol image is therefore
+constructible — hold an immutable form (hex string, ISO instant) where immutability matters.
 
 **asOf is carried from day one, and this package decides nothing about it.** There is no `maxAge`,
 no `isStale` and no freshness glyph anywhere in the contract. What to do about an old value is
@@ -112,6 +118,14 @@ Fields, widening with row count. One number is either too small for the data fac
 all on the markdown one. So a View declares `budgets: { markdown: 200, data: 800 }`; `markdown` is
 required, and a face with no entry is refused at render time rather than given an invented default.
 
+**A registry cannot be mutated out from under a Rendering in flight**, and that is now true rather
+than aspirational. `withRoles`/`withViews` copy each spec and deep-freeze the copy: the registry
+resolves objects the caller holds no mutable reference to. Until this landed, holding onto your own
+`View` literal and setting `view.budgets.markdown = NaN` after registration switched budgeting off
+silently — every comparison against `NaN` is `false`, so the render returned `{ budget: NaN,
+spent: 520 }` and threw nothing. That was the same defect the `budget` override validation had
+already closed at the other door.
+
 Each Role declares its **markdown face** as data — a shape (`list` or `table`), a heading depth,
 the exact key set it shows, labels, and where the provenance mark goes. It is declarative on
 purpose: a face that cannot author a string cannot invent a value. A Role with no declared markdown
@@ -135,9 +149,30 @@ has no reset, and a second `beginFrame` throws rather than silently concatenatin
 **The sink declares what it emitted, and the walk is the oracle.** `endFrame()` returns a
 `SinkReport` — the body plus the face's own claim about what it emitted, including the literal
 fragments it wrote for each Field — and `renderFrame` reconciles that claim against the walk and
-against the bytes. A sink that discards every value and returns a body of its own invention is
-refused; so is one that declares bytes its body does not contain, and one that produces a body
-while naming none of the bytes it wrote for a Field.
+against the bytes. Against the walk it checks path-set equality (nothing dropped, nothing
+invented, nothing doubled) and, per Field, `presence`, `attribution` and `text` against the
+canonical glyph. Against the bytes it checks that a face returning a non-empty body named
+fragments for every Field, and that each declared fragment occurs in the body at least as often as
+it was declared.
+
+**And here is what that does not mean.** The byte half is not an independent check — the sink
+supplies both the fragments and the body they are counted in — so it is worth being exact about
+its limits, because an overstated guarantee is worse than none:
+
+- **`wrote` is not related to `text`.** Declaring `wrote: [' ']` for every Field and returning a
+  body of pure invention passes. Nothing requires a fragment to be, contain, or escape the glyph.
+- **The glyph is often literally not in the bytes.** Any escaped value: `present('x | y')` has the
+  glyph `x | y [OBS s]` and the markdown body holds `x \| y [OBS s]`. That is correct behaviour,
+  and it is why `wrote` exists — but it means "the glyph is in the bytes" is not a true sentence.
+- **There is no position check.** Fragments are counted over the whole body. A face can write
+  every glyph exactly once at the wrong address — row 0's GTIN beside row 1's quantity — and pass.
+- **It is not a parse.** Bytes around the fragments are unconstrained.
+- **An empty body skips the byte checks entirely.**
+
+Both of the first and third are verified attacks with tests in `render.test.ts`. What
+reconciliation genuinely buys is that a face cannot silently drop, invent, duplicate or re-word a
+Field, and cannot return a body while naming no bytes at all for one. Relating `wrote` to `text`
+and checking emission order against position is the tracked follow-up that would close the rest.
 
 **Values cannot author structure.** The markdown sink escapes `|`, newlines and leading block
 markers at its own boundary. A supplier string containing `\n## Shipment\n- **Status**: DELIVERED`
@@ -174,15 +209,17 @@ catches a dropped Field, an invented path, a Field emitted twice, a `withheld` v
 into a bare absence, an absent value filled in with a zero, and — by default — a face that rounded
 or re-formatted a number.
 
-**What it cannot do, said plainly.** Parity compares *declared emissions*. A face written as a
-`RenderSink` has its declaration generated by the one walk and reconciled against its own bytes
-inside `renderFrame`, so it cannot declare one thing and write another. A face that declares its
-emissions by hand (`declareRendering`) is being taken at its word about what it emitted; parity
-holds that word against the Frame, but it cannot see bytes the face never declared. Even for a
-sink, fragment reconciliation is occurrence-checking rather than a parse: it guarantees every
-Field's honest glyph is in the bytes in the count the face declared, not that the face wrote
-nothing else around them. Both are real limits, and the first is the reason to write faces as
-sinks.
+**What it cannot do, said plainly.** Parity compares *declared emissions*, and **never reads a
+body** — `faceParity` does not look at `rendering.body` at all. Every check above runs against the
+`path`, `presence`, `attribution` and `text` a face claims. Writing a face as a `RenderSink`
+narrows this, because a sink's declaration is generated by the one walk and reconciled against its
+own bytes inside `renderFrame` — but that byte reconciliation is occurrence-counting of fragments
+the face itself declared, with no relation to the glyph and no relation to position, so a face
+that writes the right glyphs at the wrong addresses passes both reconciliation and parity. See
+"and here is what that does not mean" above for the enumerated limits.
+
+So parity catches every disagreement expressible as a difference between two declarations, and
+nothing that lives only in the bytes.
 
 ## Example
 
@@ -290,7 +327,8 @@ trading model does not have:
 ## API
 
 `makeField` · `present` · `unconfirmed` · `absent` · `withheld` · `assertFieldHonest` · `isField` ·
-`isHonestConfidence` · `modelConfidence` · `hasValue` · `isBlank` · `deepFreeze` — the Field.
+`isHonestConfidence` · `modelConfidence` · `hasValue` · `isBlank` · `deepFreeze` · `isUnfreezable`
+— the Field.
 
 `makeFrame` · `walkFrame` · `framePaths` · `scalarPath` · `cellPath` · `assertAddressable` ·
 `STATE_KEY` — the Frame.

@@ -41,10 +41,13 @@
  * typechecked before {@link ModelConfidence} existed. It is a branded number now: the only way to
  * make one is {@link modelConfidence}, which is where the range contract is enforced.
  *
- * ## A constructed Field is frozen
+ * ## A constructed Field is frozen — with three named exceptions
  * {@link makeField} deep-freezes what it returns. A Field whose `attribution` or `watermark` can
  * be rewritten after the honesty guard ran is not guarded at all — the guard would be a checkpoint
- * a caller walks past.
+ * a caller walks past. The freeze covers the provenance completely; it does NOT cover a `value`
+ * that is a typed array, a `Date`, a `Map` or a `Set`, and it freezes the caller's object rather
+ * than a copy. All three limits are spelled out on {@link deepFreeze}, and none of them is
+ * papered over: an unfreezable built-in reports `Object.isFrozen === false`, truthfully.
  *
  * ## asOf, and no staleness policy
  * Every Field carries an {@link AsOf} from day one. What a renderer should DO when a value is
@@ -237,15 +240,56 @@ export function isField(v: unknown): v is Field<unknown> {
 }
 
 /**
+ * True for the built-ins whose state lives in internal slots rather than in own properties, so
+ * that `Object.freeze` on them is either a hard error or a lie. See {@link deepFreeze}.
+ *
+ * `ArrayBuffer.isView` covers every `TypedArray` and `DataView`, and therefore `Buffer` too.
+ */
+export function isUnfreezable(value: object): boolean {
+  return (
+    ArrayBuffer.isView(value) ||
+    value instanceof ArrayBuffer ||
+    value instanceof Date ||
+    value instanceof Map ||
+    value instanceof Set ||
+    value instanceof WeakMap ||
+    value instanceof WeakSet ||
+    (typeof SharedArrayBuffer !== 'undefined' && value instanceof SharedArrayBuffer)
+  )
+}
+
+/**
  * Freeze a Field, a Frame or any structure this package hands back, all the way down. Shallow
  * freezing is not enough: `f.watermark.modelVersion = 'fabricated-9.9'` rewrites the receipt
  * through a frozen Field, and the glyph then prints the fabrication under the honesty guard's
  * signature.
+ *
+ * ## Three limits, stated rather than implied
+ *
+ * **1. It freezes the CALLER'S object, not a copy.** `present(sharedAppState, obs)` freezes
+ * `sharedAppState` itself, in place, for the rest of the process — every other holder of that
+ * reference finds it frozen. That is a side effect on memory this package does not own. Pass a
+ * value the Frame is allowed to keep, or copy it at the call site.
+ *
+ * **2. Some built-ins cannot be frozen, and this function no longer pretends otherwise.** A
+ * typed array with elements makes `Object.freeze` THROW (`TypeError: Cannot freeze array buffer
+ * views with elements`) — which made a Field carrying an event hash, a signature or a symbol
+ * image unconstructible. A `Date`, `Map` or `Set` does the opposite: `Object.freeze` succeeds,
+ * `Object.isFrozen` then returns `true`, and `d.setTime(0)` / `m.set(k, v)` / `s.add(v)` all keep
+ * working, because their state is in internal slots and freezing only covers own properties. So
+ * {@link isUnfreezable} values are SKIPPED entirely: not frozen, not recursed into, and
+ * `Object.isFrozen` on them truthfully reports `false`. **A `Uint8Array`, `Date`, `Map` or `Set`
+ * inside a Field is mutable.** If that matters for a given value, hold an immutable form of it —
+ * a hex string for a hash, an ISO instant for a date, a frozen plain object for a map.
+ *
+ * **3. It does not recurse into container internals.** A `Map`'s or `Set`'s entries were never
+ * reached (they are not own properties) and are not reached now.
  */
 export function deepFreeze<T>(value: T, seen: WeakSet<object> = new WeakSet()): T {
   if (value === null || typeof value !== 'object') return value
   if (seen.has(value)) return value
   seen.add(value)
+  if (isUnfreezable(value)) return value
   Object.freeze(value)
   for (const key of Object.getOwnPropertyNames(value)) deepFreeze((value as Record<string, unknown>)[key], seen)
   return value

@@ -25,18 +25,58 @@
  * about what it emitted, path by path, including {@link EmittedValue.wrote} — the literal
  * fragments it put into the body for each Field. {@link renderFrame} then **reconciles** that
  * claim against the walk and against the body, and throws a {@link FaceParityError} on any
- * divergence. Concretely it refuses a sink that:
+ * divergence.
  *
- * - never emitted a Field the walk handed it, or emitted a path the walk never produced;
- * - disagrees with the walk about a Field's presence, attribution or canonical glyph;
- * - produced a non-empty body but declared no bytes for a Field (the discard-everything sink);
- * - declared a fragment that does not occur in its body as many times as it claimed it.
+ * ## Exactly what reconciliation checks
  *
- * **The residual limit, stated rather than papered over.** Fragment occurrence is not a parse: a
- * sink can still write bytes AROUND its declared fragments, and this package cannot know that a
- * body containing the honest glyph for `unitPrice` also contains a sentence contradicting it. What
- * reconciliation now guarantees is that every Field's honest glyph is IN the bytes, in the count
- * the face declared — which is what the walk-as-answer-key version did not guarantee at all.
+ * Against the walk, per Field — and the walk is an oracle the sink cannot influence:
+ *
+ * - **path set equality.** It refuses a sink that never emitted a Field the walk handed it, that
+ *   emitted a path the walk never produced, or that emitted one path twice;
+ * - **presence, attribution and `text`.** `text` must equal the Frame's canonical glyph exactly.
+ *
+ * Against the body — and **here the sink supplies both sides of the comparison**:
+ *
+ * - a sink that produced a non-empty body must give a non-empty {@link EmittedValue.wrote} for
+ *   every Field (the discard-everything sink declared none);
+ * - each distinct declared fragment must occur in the body **at least** as many times as it was
+ *   declared, counted over the whole body.
+ *
+ * ## Exactly what it does NOT check. Read this before trusting it.
+ *
+ * **1. `wrote` is not related to `text` in any way.** Nothing requires a declared fragment to be
+ * the glyph, to contain the glyph, to be an escaping of the glyph, or to be non-trivial. A sink
+ * that declares `wrote: [' ']` for every Field and returns a body of pure invention —
+ * `"Status: DELIVERED. Unit price: $4.20."` — **passes**, verified. The body contains a space, so
+ * the count check is satisfied, and no other clause looks at `wrote` at all. What is actually
+ * checked is that *fragments the face declares* occur in *the body the same face returns*.
+ *
+ * **2. The glyph is frequently not in the bytes, by design.** Any face that escapes writes
+ * something else. `present('x | y')` has the canonical glyph `x | y [OBS epcis-spine]` while the
+ * markdown body holds `x \| y [OBS epcis-spine]`, so `body.includes(glyph)` is `false`. This is
+ * correct behaviour — it is why {@link EmittedValue.wrote} exists — and it means "the honest glyph
+ * is in the bytes" is not a sentence this package can say.
+ *
+ * **3. There is no position check.** Occurrences are counted over the entire body; nothing relates
+ * a fragment to the address it was declared under. A face can therefore write every glyph exactly
+ * once and put each one at the WRONG address — `lines[0]`'s GTIN paired with `lines[1]`'s
+ * quantity — and reconciliation passes, verified. Right glyphs, wrong rows, clean render. That is
+ * the failure the path system exists to prevent and it is not currently prevented.
+ *
+ * **4. It is not a parse.** Bytes between and around the declared fragments are unconstrained. A
+ * body containing the honest glyph for `unitPrice` may also contain a sentence contradicting it.
+ *
+ * **5. An empty body skips the byte checks entirely** — deliberately, for a face with no textual
+ * body, and see {@link declareRendering} for the honest door to that case.
+ *
+ * What reconciliation genuinely buys, then, is narrower than it sounds: **a face cannot silently
+ * drop, invent, duplicate or re-word a Field**, because those are all checked against the walk;
+ * and a face that returns a body must name bytes for every Field, which kills the
+ * discard-everything sink of the previous paragraph. It buys nothing about *where* those bytes
+ * went or *what else* is around them. Closing (1) and (3) — declare the escape, assert
+ * `unescape(wrote.join(''))` covers `valueText`, and check emission order monotonically against
+ * position in the body — is tracked as a follow-up, and until it lands this section is the
+ * contract.
  *
  * ## An over-budget View throws, against a PER-FACE budget
  * After the sink returns its report, the tokenizer counts the body against `view.budgets[format]`.
@@ -71,11 +111,22 @@ export interface EmittedValue {
    * The literal fragments this face wrote into its body for this Field — what a reader recombines
    * to recover {@link text}. Usually one string; two when the face factors part of the glyph
    * elsewhere (the markdown `legend` mode writes the value in the cell and the provenance mark in
-   * the legend line). Each must occur in the body at least as often as it is declared.
+   * the legend line).
    *
    * Absent for a face with no textual body (a React face declaring through
    * {@link declareRendering}). A sink that DOES produce a body must declare fragments for every
    * Field: a face that emits bytes it will not name is the case reconciliation exists to catch.
+   *
+   * **What is enforced is weaker than the sentence above.** The ONLY check on these strings is
+   * that each occurs in the body at least as often as it is declared. Nothing relates them to
+   * {@link text}: `wrote: [' ']` satisfies the check for every Field of every Frame, and nothing
+   * relates them to a POSITION either, so the right fragments at the wrong addresses pass. Both
+   * are demonstrated in `render.test.ts` and spelled out in the module note. Declaring these
+   * honestly is currently on the face author, not on this package.
+   *
+   * Note that for an escaping face `wrote: [glyph]` is simply WRONG — the markdown face writes
+   * `x \| y [OBS s]` for the glyph `x | y [OBS s]` — and the render will throw, which is the one
+   * piece of feedback an author does get here.
    */
   readonly wrote?: readonly string[]
 }
@@ -210,7 +261,12 @@ function countOccurrences(haystack: string, needle: string): number {
 
 /**
  * Reconcile a sink's claim against the walk (the oracle) and against its own bytes. Returns every
- * way they diverge. See the module note for what this does and does not guarantee.
+ * way they diverge.
+ *
+ * The walk half is an independent check. The byte half is NOT: the sink supplies both the
+ * fragments and the body they are counted in, so it establishes only internal consistency between
+ * two things the same face authored. Read the module note's "Exactly what it does NOT check"
+ * before treating a clean reconciliation as a statement about the bytes.
  */
 function reconcile(format: string, walked: readonly EmittedValue[], report: SinkReport): ParityBreach[] {
   const breaches: ParityBreach[] = []

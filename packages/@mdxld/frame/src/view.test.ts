@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { createRegistry, ViewRegistry, isHonestBudget, type RoleSpec } from './view.js'
-import { UnknownIdError } from './errors.js'
-import { fixtureRegistry } from './fixtures.js'
+import { UnknownIdError, BudgetExceededError } from './errors.js'
+import { renderMarkdown } from './render.js'
+import { fixtureFrame, fixtureRegistry } from './fixtures.js'
 
 const listFace = { kind: 'list' as const, keys: ['x'] }
 const oneRole: RoleSpec = { id: 'a', title: 'A', markdown: listFace }
@@ -128,5 +129,53 @@ describe('ViewRegistry is immutable, with no public bypass', () => {
     const bypass = () => new ViewRegistry(new Map(), new Map())
     expect(typeof bypass).toBe('function')
     expect(createRegistry().roleIds).toEqual([])
+  })
+})
+
+describe('a registry cannot be mutated out from under a Rendering — the specs, not just the Maps', () => {
+  it('deep-freezes the View it registered, so a post-registration NaN budget cannot disable budgeting', () => {
+    const registry = fixtureRegistry({ markdown: 200 })
+    const view = registry.view('shipment-detail') as { budgets: Record<string, number> }
+
+    // The exact NaN-disables-budgeting attack the override door already refuses. `spent > NaN` is
+    // false, so before the freeze this rendered clean with `{ budget: NaN, spent: 136 }`.
+    expect(() => {
+      view.budgets.markdown = Number.NaN
+    }).toThrow(TypeError)
+    expect(registry.view('shipment-detail').budgets.markdown).toBe(200)
+
+    const rendering = renderMarkdown(fixtureFrame(), { registry })
+    expect(rendering.tokens?.budget).toBe(200)
+  })
+
+  it('still throws BudgetExceededError after an attempt to raise the budget through the registry', () => {
+    const registry = fixtureRegistry({ markdown: 20 })
+    const view = registry.view('shipment-detail') as { budgets: Record<string, number> }
+    try {
+      view.budgets.markdown = 100000
+    } catch {
+      /* frozen in strict mode; the point is the render below */
+    }
+    expect(() => renderMarkdown(fixtureFrame(), { registry })).toThrow(BudgetExceededError)
+  })
+
+  it('deep-freezes a registered Role spec, so its declared key set cannot be widened later', () => {
+    const registry = createRegistry().withRoles(oneRole)
+    const spec = registry.role('a')
+    expect(Object.isFrozen(spec)).toBe(true)
+    expect(Object.isFrozen(spec.markdown)).toBe(true)
+    expect(Object.isFrozen(spec.markdown.keys)).toBe(true)
+    expect(() => (spec.markdown.keys as string[]).push('smuggled')).toThrow(TypeError)
+    expect(registry.role('a').markdown.keys).toEqual(['x'])
+  })
+
+  it('registers a COPY, so freezing the registry does not freeze the caller’s own literal', () => {
+    const mine = { id: 'b', title: 'B', markdown: { kind: 'list' as const, keys: ['x'], labels: { x: 'X' } } }
+    const registry = createRegistry().withRoles(mine)
+    expect(Object.isFrozen(mine)).toBe(false)
+    expect(Object.isFrozen(mine.markdown.keys)).toBe(false)
+
+    mine.markdown.labels.x = 'relabelled after registration'
+    expect(registry.role('b').markdown.labels?.x).toBe('X')
   })
 })

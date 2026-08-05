@@ -44,7 +44,7 @@
 
 import { UnknownIdError } from './errors.js'
 import { assertAddressable } from './frame.js'
-import { isBlank } from './field.js'
+import { deepFreeze, isBlank } from './field.js'
 
 /** How a Role's markdown face lays its Fields out. Shape only — never appearance. */
 export type MarkdownFaceKind = 'list' | 'table'
@@ -127,6 +127,22 @@ export interface View {
  * REFERENCE — so a caller could hold onto its Map and add a Role mid-render, which is the exact
  * mutation the class docstring promised was impossible. Both are closed: build with
  * {@link createRegistry}, and every Map is copied on the way in.
+ *
+ * **Copying the Maps was only half of it, and the other half was open until now.** The Maps held
+ * the caller's `RoleSpec` and `View` objects BY REFERENCE, so the second door was still standing:
+ *
+ * ```ts
+ * const registry = createRegistry().withRoles(role).withViews(view)
+ * view.budgets.markdown = NaN            // the same object the registry resolves
+ * renderMarkdown(bigFrame, { registry }) // → { budget: NaN, spent: 520 }, and NO throw
+ * ```
+ *
+ * Every comparison against `NaN` is `false`, so `spent > budget` is `false` and budgeting is off —
+ * the exact defect the {@link RenderOptions.budget} override validation closed at the other door.
+ * So `withRoles` and `withViews` now **copy each spec and deep-freeze the copy** before validating
+ * it. The registry resolves specs the caller no longer holds a mutable reference to, the caller's
+ * own objects are left alone (freezing someone else's literal is a side effect on memory this
+ * class does not own), and the immutability sentence above is true rather than aspirational.
  */
 export class ViewRegistry {
   private readonly rolesById: ReadonlyMap<string, RoleSpec>
@@ -184,7 +200,7 @@ export class ViewRegistry {
         if (keys.has(key)) throw new TypeError(`Role ${JSON.stringify(role.id)} declares key ${JSON.stringify(key)} twice — a key emitted twice is an invented value to face parity`)
         keys.add(key)
       }
-      next.set(role.id, role)
+      next.set(role.id, frozenRoleSpec(role))
     }
     return new ViewRegistry(next, this.viewsById)
   }
@@ -209,7 +225,7 @@ export class ViewRegistry {
         if (!this.rolesById.has(roleId)) throw new UnknownIdError('role', roleId, this.roleIds)
       }
       assertBudgets(view)
-      next.set(view.id, view)
+      next.set(view.id, frozenView(view))
     }
     return new ViewRegistry(this.rolesById, next)
   }
@@ -232,6 +248,24 @@ export class ViewRegistry {
   rolesOf(view: View): RoleSpec[] {
     return view.roles.map((id) => this.role(id))
   }
+}
+
+/**
+ * A registered spec is a COPY, deep-frozen. The two mutable containers the contract declares —
+ * `keys` and `labels` — are copied explicitly, so a caller that keeps its own literal keeps a
+ * separate, still-mutable object and cannot reach the registry's through it.
+ */
+function frozenRoleSpec(role: RoleSpec): RoleSpec {
+  const markdown: MarkdownFace =
+    role.markdown.labels === undefined
+      ? { ...role.markdown, keys: [...role.markdown.keys] }
+      : { ...role.markdown, keys: [...role.markdown.keys], labels: { ...role.markdown.labels } }
+  return deepFreeze({ ...role, markdown })
+}
+
+/** As {@link frozenRoleSpec}, for a View. `budgets` is the one that mattered: see the class note. */
+function frozenView(view: View): View {
+  return deepFreeze({ ...view, roles: [...view.roles], budgets: { ...view.budgets } })
 }
 
 /** The `Number.isFinite(b) && b > 0` contract every budget is held to, in one place. */

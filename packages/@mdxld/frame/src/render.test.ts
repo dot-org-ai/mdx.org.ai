@@ -554,3 +554,107 @@ describe('unconfirmed values survive the round trip', () => {
     expect(body).toContain('- **other**: — [OBS epcis-spine]')
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The limits of byte reconciliation, executed. These tests PASS by demonstrating
+// an attack that gets through — they are the receipts for the "Exactly what it
+// does NOT check" section of `render.ts`, so that if a future change closes one
+// of these holes the doc is forced to change with it.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** A sink that returns a body of pure fiction and declares a single space as its bytes. */
+function oneSpaceSink(body: string): RenderSink {
+  const emitted: EmittedValue[] = []
+  return {
+    format: 'fiction',
+    beginFrame(): void {},
+    beginRole(): void {},
+    field(pathed, _spec, glyph): void {
+      emitted.push({ path: pathed.path, presence: pathed.field.presence, attribution: pathed.field.attribution, text: glyph, wrote: [' '] })
+    },
+    beginRow(): void {},
+    endRow(): void {},
+    endRole(): void {},
+    endFrame(): SinkReport {
+      return { body, emitted }
+    },
+  }
+}
+
+/** A sink that writes every cell's honest bytes, and pairs each address with the other row's cell. */
+function transposingSink(): RenderSink {
+  const emitted: EmittedValue[] = []
+  const cells: { path: string; presence: EmittedValue['presence']; attribution: EmittedValue['attribution']; glyph: string }[] = []
+  return {
+    format: 'transposed',
+    beginFrame(): void {},
+    beginRole(): void {},
+    field(pathed, _spec, glyph): void {
+      cells.push({ path: pathed.path, presence: pathed.field.presence, attribution: pathed.field.attribution, glyph })
+    },
+    beginRow(): void {},
+    endRow(): void {},
+    endRole(): void {},
+    endFrame(): SinkReport {
+      // Two rows of two columns. Row 0's addresses get row 1's bytes, and vice versa.
+      const body = [`| ${cells[2]?.glyph} | ${cells[1]?.glyph} |`, `| ${cells[0]?.glyph} | ${cells[3]?.glyph} |`].join('\n')
+      for (const c of cells) emitted.push({ path: c.path, presence: c.presence, attribution: c.attribution, text: c.glyph, wrote: [c.glyph] })
+      return { body, emitted }
+    },
+  }
+}
+
+describe('what byte reconciliation does NOT check — the documented limits, executed', () => {
+  it('does not relate `wrote` to `text`: a fiction body with wrote:[" "] renders clean', () => {
+    const registry = createRegistry()
+      .withRoles({ id: 'r', title: 'R', markdown: { kind: 'list', keys: ['unitPrice'] } })
+      .withViews({ id: 'v', roles: ['r'], budgets: { markdown: 500, fiction: 500 } })
+    const frame = makeFrame({ view: 'v', snapshot: { token: 't', asOf }, roles: [{ role: 'r', fields: { unitPrice: withheld('commercial-terms', obs) } }] })
+    const body = 'Status: DELIVERED. Unit price: $4.20.'
+
+    const rendering = renderFrame(frame, { registry, sink: oneSpaceSink(body) })
+
+    // The body contains a space, so the count check passes, and no clause looks at the glyph.
+    expect(rendering.body).toBe(body)
+    expect(rendering.body).not.toContain('withheld(commercial-terms)')
+  })
+
+  it('does not put the canonical glyph in the bytes for any escaped value', () => {
+    const registry = createRegistry()
+      .withRoles({ id: 'r', title: 'R', markdown: { kind: 'list', keys: ['k'] } })
+      .withViews({ id: 'v', roles: ['r'], budgets: { markdown: 500 } })
+    const frame = makeFrame({ view: 'v', snapshot: { token: 't', asOf }, roles: [{ role: 'r', fields: { k: present('x | y', obs) } }] })
+
+    const rendering = renderFrame(frame, { registry, sink: markdownSink() })
+    const glyph = rendering.emitted[0]?.text as string
+
+    expect(glyph).toBe('x | y [OBS epcis-spine]')
+    expect(rendering.body.includes(glyph)).toBe(false)
+    expect(rendering.body).toContain('x \\| y [OBS epcis-spine]')
+  })
+
+  it('does not check position: the right glyphs at the wrong addresses render clean', () => {
+    const registry = createRegistry()
+      .withRoles({ id: 'lines', title: 'Lines', markdown: { kind: 'table', keys: ['gtin', 'qty'] } })
+      .withViews({ id: 'v', roles: ['lines'], budgets: { markdown: 500, transposed: 500 } })
+    const frame = makeFrame({
+      view: 'v',
+      snapshot: { token: 't', asOf },
+      roles: [
+        {
+          role: 'lines',
+          rows: [
+            { gtin: present('AAA', obs), qty: present(1, obs) },
+            { gtin: present('BBB', obs), qty: present(2, obs) },
+          ],
+        },
+      ],
+    })
+
+    const rendering = renderFrame(frame, { registry, sink: transposingSink() })
+
+    // Every glyph occurs exactly once, so reconciliation passes — but row 0 now reads BBB/1.
+    expect(rendering.body.split('\n')[0]).toBe('| BBB [OBS epcis-spine] | 1 [OBS epcis-spine] |')
+    expect(rendering.emitted.find((e) => e.path === 'lines[0].gtin')?.text).toBe('AAA [OBS epcis-spine]')
+  })
+})

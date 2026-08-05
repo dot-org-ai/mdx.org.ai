@@ -10,6 +10,8 @@ import {
   isHonestConfidence,
   modelConfidence,
   isBlank,
+  deepFreeze,
+  isUnfreezable,
   type Field,
   type ModelConfidence,
 } from './field.js'
@@ -266,5 +268,60 @@ describe('makeField spec form', () => {
   it('takes an explicit presence', () => {
     expect(makeField({ presence: 'unconfirmed', value: 12, ...obs }).presence).toBe('unconfirmed')
     expect(makeField({ value: 12, ...obs }).presence).toBe('present')
+  })
+})
+
+describe('deepFreeze — a Field carrying bytes is constructible, and nothing lies about being frozen', () => {
+  it('constructs a Field whose value is a typed array — a hash, a signature, a symbol image', () => {
+    // Object.freeze on a typed array with elements THROWS, so all three of these used to be
+    // unconstructible with `TypeError: Cannot freeze array buffer views with elements`.
+    const hash = present(new Uint8Array([1, 2, 3]), obs)
+    expect(Array.from(hash.presence === 'present' ? (hash.value as Uint8Array) : [])).toEqual([1, 2, 3])
+
+    expect(() => present({ sig: new Uint8Array(32) }, obs)).not.toThrow()
+    expect(() => present(Buffer.from('x'), obs)).not.toThrow()
+    expect(() => present(new DataView(new ArrayBuffer(8)), obs)).not.toThrow()
+    expect(() => present(new ArrayBuffer(8), obs)).not.toThrow()
+  })
+
+  it('still freezes the provenance of a Field whose value it had to skip', () => {
+    const f = present({ sig: new Uint8Array(4) }, obs)
+    expect(Object.isFrozen(f)).toBe(true)
+    expect(Object.isFrozen(f.watermark)).toBe(true)
+    expect(() => {
+      ;(f.watermark as { modelVersion?: string }).modelVersion = 'fabricated-9.9'
+    }).toThrow(TypeError)
+  })
+
+  it('does not report a Date, Map or Set as frozen while it is still mutable', () => {
+    const d = new Date(1000)
+    const m = new Map<string, number>()
+    const s = new Set<number>()
+    deepFreeze({ d, m, s })
+
+    // Object.freeze covers own properties; these three keep their state in internal slots, so
+    // freezing them succeeded and isFrozen answered `true` while every mutator kept working.
+    expect(Object.isFrozen(d)).toBe(false)
+    expect(Object.isFrozen(m)).toBe(false)
+    expect(Object.isFrozen(s)).toBe(false)
+
+    d.setTime(0)
+    m.set('a', 1)
+    s.add(1)
+    expect([d.getTime(), m.size, s.size]).toEqual([0, 1, 1])
+  })
+
+  it('names the skipped types in one predicate', () => {
+    for (const v of [new Uint8Array(1), new DataView(new ArrayBuffer(1)), new ArrayBuffer(1), new Date(), new Map(), new Set(), new WeakMap(), new WeakSet()]) {
+      expect(isUnfreezable(v)).toBe(true)
+    }
+    for (const v of [{}, [], { a: 1 }, Object.create(null) as object]) expect(isUnfreezable(v)).toBe(false)
+  })
+
+  it('freezes the CALLER’S object rather than a copy — documented, not fixed', () => {
+    const sharedAppState = { rows: [1, 2, 3] }
+    present(sharedAppState, obs)
+    expect(Object.isFrozen(sharedAppState)).toBe(true)
+    expect(() => sharedAppState.rows.push(4)).toThrow(TypeError)
   })
 })

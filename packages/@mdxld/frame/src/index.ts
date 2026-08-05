@@ -47,6 +47,7 @@ export {
   assertFieldHonest,
   isBlank,
   deepFreeze,
+  isUnfreezable,
 } from './field.js'
 
 export {
