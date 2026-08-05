@@ -518,7 +518,7 @@ export function markdownSink(): RenderSink {
       started = true
       lines.push(`_snapshot ${escapeMarkdown(ctx.frame.snapshot.token)} · as of ${escapeMarkdown(asOfText(ctx.frame.snapshot.asOf))}_`)
     },
-    beginRole(spec: RoleSpec, role: RoleFrame): void {
+    beginRole(spec: RoleSpec, _role: RoleFrame): void {
       lines.push('', `${'#'.repeat(spec.markdown.heading ?? 2)} ${escapeMarkdown(spec.title)}`, '')
       if (spec.markdown.kind === 'table') table = { spec, columns: spec.markdown.keys, rows: [] }
     },

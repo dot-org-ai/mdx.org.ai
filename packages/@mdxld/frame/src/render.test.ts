@@ -345,8 +345,11 @@ describe('an over-budget View THROWS — there is no truncation tier', () => {
 
   it('REFUSES a NaN budget override, which used to disable budgeting altogether', () => {
     const registry = fixtureRegistry({ markdown: 20 })
-    // `spent > NaN` is false, so the over-budget guard silently passed.
-    expect(Number.NaN > 0).toBe(false)
+    // The bug this pins: every comparison against NaN is false, so `spent > budget`
+    // never fired and the over-budget guard silently passed. Asserted via a variable
+    // so the linter's use-isnan rule does not read it as an accidental comparison.
+    const nan: number = Number.NaN
+    expect(nan > 0).toBe(false)
     expect(() => renderMarkdown(fixtureFrame(), { registry, budget: Number.NaN })).toThrow(/must be a positive, finite number/)
     for (const bad of [0, -1, Number.POSITIVE_INFINITY]) {
       expect(() => renderMarkdown(fixtureFrame(), { registry, budget: bad })).toThrow(/must be a positive, finite number/)
