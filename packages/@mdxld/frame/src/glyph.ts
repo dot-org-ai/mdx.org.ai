@@ -7,9 +7,32 @@
  * it, so there is no seam at which a face could round a number, default a null, or promote an
  * unconfirmed value to a confirmed one.
  *
- * It also means the four presence states are distinguishable in EVERY face by construction:
- * `—` is absent, `withheld(<class>)` is licence-gated, `~` marks a value the server has not
- * acknowledged, and a bare value is a matter of record.
+ * ## The four presence states are recoverable from the text, and that is enforced
+ * A value's text is not passed through raw. `—` means absent, `withheld(<class>)` means
+ * licence-gated and a trailing ` ~` means unacknowledged — so a PRESENT value whose own text is
+ * one of those forms would be indistinguishable from the state it imitates. `present('—')` and
+ * `absent()` were byte-identical; so were `present('withheld(commercial-terms)')` and
+ * `withheld('commercial-terms')`, and `present('12 ~')` and `unconfirmed(12)`. An agent parsing
+ * the markdown face could not tell them apart, which makes the four-state design decorative in
+ * exactly the face it exists for.
+ *
+ * {@link valueText} therefore QUOTES a value whose text would collide — JSON string quoting, so
+ * the escape is itself unambiguous and reversible:
+ *
+ * | Field                                  | text                        |
+ * |----------------------------------------|-----------------------------|
+ * | `absent()`                             | `—`                         |
+ * | `present('—')`                         | `"—"`                       |
+ * | `withheld('commercial-terms')`         | `withheld(commercial-terms)`|
+ * | `present('withheld(commercial-terms)')`| `"withheld(commercial-terms)"` |
+ * | `unconfirmed(12)`                      | `12 ~`                      |
+ * | `present('12 ~')`                      | `"12 ~"`                    |
+ * | `present('"already quoted"')`          | `"\"already quoted\""`      |
+ *
+ * A reader recovers the presence state by testing, in order: a trailing ` ~` is unconfirmed; a
+ * `withheld(...)` form is withheld; `—` or `— (reason)` is absent; anything else is present, and
+ * an outer pair of quotes is stripped. {@link COLLIDES_WITH_A_PRESENCE_MARKER} is the predicate,
+ * exported so a consumer's own face can be held to the same rule.
  *
  * @packageDocumentation
  */
@@ -23,9 +46,32 @@ export const ABSENT_GLYPH = '—'
 export const UNCONFIRMED_MARK = '~'
 
 /**
+ * True when a present value's own text would imitate one of the presence markers, and so must be
+ * quoted before it is emitted. The clauses, in order: the bare absent glyph; the absent-with-reason
+ * form; the withheld form; a trailing unconfirmed mark; a leading quote (which would otherwise
+ * make the un-quoting step ambiguous); and the two literals {@link canonicalText} produces for a
+ * `null`/`undefined` value.
+ */
+export const COLLIDES_WITH_A_PRESENCE_MARKER = (text: string): boolean =>
+  text === ABSENT_GLYPH ||
+  text.startsWith(`${ABSENT_GLYPH} (`) ||
+  /^withheld\(.*\)$/s.test(text) ||
+  text.endsWith(` ${UNCONFIRMED_MARK}`) ||
+  text.startsWith('"') ||
+  text === 'null' ||
+  text === 'undefined'
+
+/**
  * A value's text. One place, so every face agrees. Strings pass through; numbers and booleans
  * are `String()`-ed with NO rounding (rounding is invention, and the place to format a number is
  * upstream, in the model, once); anything else is JSON.
+ *
+ * A `null` renders `null` and an `undefined` renders `undefined` — NOT the absent glyph. A
+ * present `null` is either a real value (a JSON null the record actually holds) or a modelling
+ * error, and quietly promoting it to UNKNOWN is precisely the failure the four presence states
+ * exist to eliminate: it makes "the record says null" and "we have no reading" the same bytes. If
+ * a null means unknown, the Frame's author says so with {@link absent}, which is the constructor
+ * that carries a reason.
  *
  * If a caller wants a locale date or a unit suffix, it belongs in the Field's `value` — computed
  * once where the Frame is assembled, not at each face.
@@ -33,8 +79,20 @@ export const UNCONFIRMED_MARK = '~'
 export function canonicalText(value: unknown): string {
   if (typeof value === 'string') return value
   if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') return String(value)
-  if (value === null || value === undefined) return ABSENT_GLYPH
+  if (value === null) return 'null'
+  if (value === undefined) return 'undefined'
   return JSON.stringify(value)
+}
+
+/**
+ * A present/unconfirmed value's text, quoted when it would imitate a presence marker. A real
+ * `null`/`undefined` keeps its bare literal — it is not imitating anything — while the STRING
+ * `'null'` is quoted, so the two stay distinguishable in both directions.
+ */
+function presentText(value: unknown): string {
+  const text = canonicalText(value)
+  if (value === null || value === undefined) return text
+  return COLLIDES_WITH_A_PRESENCE_MARKER(text) ? JSON.stringify(text) : text
 }
 
 /**
@@ -55,9 +113,9 @@ export function provenanceMark(field: Field<unknown>): string {
 export function valueText(field: Field<unknown>): string {
   switch (field.presence) {
     case 'present':
-      return canonicalText(field.value)
+      return presentText(field.value)
     case 'unconfirmed':
-      return `${canonicalText(field.value)} ${UNCONFIRMED_MARK}`
+      return `${presentText(field.value)} ${UNCONFIRMED_MARK}`
     case 'withheld':
       return `withheld(${field.licenceClass})`
     case 'absent':

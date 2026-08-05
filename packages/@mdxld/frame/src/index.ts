@@ -33,6 +33,9 @@ export {
   type AbsentField,
   type WithheldField,
   type FieldSpec,
+  type FieldProvenanceSpec,
+  type ModelConfidence,
+  modelConfidence,
   makeField,
   present,
   unconfirmed,
@@ -42,39 +45,49 @@ export {
   isField,
   isHonestConfidence,
   assertFieldHonest,
+  isBlank,
+  deepFreeze,
 } from './field.js'
 
 export {
   type FieldMap,
   type SnapshotToken,
+  type RoleStateKind,
+  type RoleState,
   type RoleFrame,
   type Frame,
   type PathedField,
+  STATE_KEY,
   makeFrame,
   walkFrame,
   framePaths,
   scalarPath,
   cellPath,
+  assertAddressable,
 } from './frame.js'
 
-export { ABSENT_GLYPH, UNCONFIRMED_MARK, canonicalText, provenanceMark, valueText, renderGlyph, isConfirmed } from './glyph.js'
+export { ABSENT_GLYPH, UNCONFIRMED_MARK, COLLIDES_WITH_A_PRESENCE_MARKER, canonicalText, provenanceMark, valueText, renderGlyph, isConfirmed } from './glyph.js'
 
-export { type MarkdownFaceKind, type MarkdownFace, type RoleSpec, type View, ViewRegistry, createRegistry } from './view.js'
+export { type MarkdownFaceKind, type MarkdownFace, type RoleSpec, type View, ViewRegistry, createRegistry, isHonestBudget } from './view.js'
 
 export { type Tokenizer, type TokenAccount, approxCharsPerToken } from './tokenize.js'
 
 export {
   type EmittedValue,
+  type SinkReport,
   type Rendering,
   type RenderContext,
   type RenderSink,
   type RenderOptions,
+  type RoleStateEmission,
+  DATA_FACE_VERSION,
   renderFrame,
   markdownSink,
   dataSink,
   renderMarkdown,
   renderData,
   declareRendering,
+  escapeMarkdown,
 } from './render.js'
 
 export { type ParityOptions, faceParity, assertFaceParity } from './parity.js'

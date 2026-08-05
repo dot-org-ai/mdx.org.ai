@@ -7,9 +7,13 @@
  * zero and not a default: it is an explicit UNKNOWN.
  *
  * ## Four presence states, and why four
- * Kestrel's shipped Field has three provenance classes and one absence. This contract carries a
- * fourth and a fifth state that the trading model has no use for and a shared-record model
- * cannot do without:
+ * Kestrel's shipped `Field` (`src/frame/types.ts`) has three provenance classes — `OBS`, `CALC`,
+ * `MODEL` — and **no absence state at all**: its `value: T` is REQUIRED, and an unavailable value
+ * is modelled OUTSIDE the Field, as a `null` input the renderer prints as `—`, or as one of the
+ * four cell states in `PaneRefusal` (`src/frame/refusals.ts`: LATENT and DEFECTIVE cells, each
+ * naming the train or the written reason behind it). What this contract ports is the provenance
+ * ladder and the construct-time refusal; what it ADDS is folding absence INTO the value type, in
+ * four states:
  *
  * | presence      | means                                                            |
  * |---------------|------------------------------------------------------------------|
@@ -29,6 +33,18 @@
  * `confidence` in `[0,1]`; an `OBS`/`CALC` value must carry neither. A Field that mis-attributes
  * is REFUSED — {@link makeField} throws, and {@link assertFieldHonest} re-checks Fields that
  * arrived across a JSON boundary and so never met a constructor.
+ *
+ * ## Confidence is branded, because two different numbers are called confidence
+ * A Field's `confidence` is a MODEL confidence — how much the model believes its own output. A
+ * parse-coverage figure (`matchedSlots / totalSlots`, as `@mdxld/extract`'s `ExtractResult` carries)
+ * is a different quantity that happens to live in `[0,1]`, and assigning one to the other
+ * typechecked before {@link ModelConfidence} existed. It is a branded number now: the only way to
+ * make one is {@link modelConfidence}, which is where the range contract is enforced.
+ *
+ * ## A constructed Field is frozen
+ * {@link makeField} deep-freezes what it returns. A Field whose `attribution` or `watermark` can
+ * be rewritten after the honesty guard ran is not guarded at all — the guard would be a checkpoint
+ * a caller walks past.
  *
  * ## asOf, and no staleness policy
  * Every Field carries an {@link AsOf} from day one. What a renderer should DO when a value is
@@ -76,13 +92,22 @@ export interface SourceWatermark {
   readonly modelVersion?: string
 }
 
+declare const MODEL_CONFIDENCE: unique symbol
+
+/**
+ * A MODEL's confidence in its own output, in `[0,1]`. A **branded** number: a bare `number` does
+ * not satisfy it, so a parse-coverage ratio, a match score or a percentage cannot be assigned to a
+ * Field's `confidence` by accident. {@link modelConfidence} is the only constructor.
+ */
+export type ModelConfidence = number & { readonly [MODEL_CONFIDENCE]: 'model' }
+
 /** The provenance every Field carries, whatever its presence state. */
 interface FieldProvenance {
   readonly attribution: Attribution
   readonly watermark: SourceWatermark
   readonly asOf: AsOf
   /** Model confidence in `[0,1]`. Required for a `MODEL` value; forbidden otherwise. */
-  readonly confidence?: number
+  readonly confidence?: ModelConfidence
 }
 
 /** A value the Frame holds and the server has confirmed. */
@@ -133,27 +158,97 @@ export function isHonestConfidence(confidence: number): boolean {
   return confidence >= 0 && confidence <= 1
 }
 
+/**
+ * The one constructor for a {@link ModelConfidence}. Refuses anything outside `[0,1]` — including
+ * `NaN` and `±Infinity`, which fail both comparisons — and normalises `-0` to `0`, because `-0` is
+ * a number the contract cannot mean and it prints as `0` anyway.
+ */
+export function modelConfidence(value: number): ModelConfidence {
+  if (!isHonestConfidence(value)) {
+    throw new FieldHonestyError(`confidence ${value} is outside [0,1] — a MODEL confidence is a probability, not a score`)
+  }
+  return (Object.is(value, -0) ? 0 : value) as ModelConfidence
+}
+
+/**
+ * Blank by the contract's reckoning: whitespace, or a string of invisibles. `''.trim()` does not
+ * strip U+200B, so a source watermark of one zero-width space passed the emptiness guard and
+ * rendered as `[OBS ]` — an attribution to nowhere, wearing the shape of an attribution.
+ */
+const INVISIBLE_ONLY = /^[\s\u00A0\u1680\u180E\u2000-\u200F\u202F\u205F\u2060\u3000\uFEFF]*$/u
+
+export function isBlank(text: string): boolean {
+  return INVISIBLE_ONLY.test(text)
+}
+
 const PRESENCES: readonly Presence[] = ['present', 'absent', 'withheld', 'unconfirmed']
 const ATTRIBUTIONS: readonly Attribution[] = ['OBS', 'CALC', 'MODEL']
 
 function isAsOf(v: unknown): v is AsOf {
   if (typeof v !== 'object' || v === null) return false
   const o = v as { seq?: unknown; instant?: unknown }
-  if (typeof o.seq === 'number') return Number.isFinite(o.seq)
-  return typeof o.instant === 'string' && o.instant !== ''
+  if ('seq' in o) return typeof o.seq === 'number' && Number.isInteger(o.seq)
+  return typeof o.instant === 'string' && !isBlank(o.instant)
 }
 
 /**
- * Structural check that an unknown value has the SHAPE of a Field. Says nothing about honesty —
- * {@link assertFieldHonest} does that.
+ * Structural check that an unknown value has the SHAPE of a Field — including the payload its
+ * presence state requires, which is the half that used to be missing. `presence` is a
+ * discriminant, so a Field is only shaped like a Field if it carries what that discriminant
+ * promises:
+ *
+ * | presence                 | MUST carry     | MUST NOT carry |
+ * |--------------------------|----------------|----------------|
+ * | `present` / `unconfirmed`| a `value` key  | —              |
+ * | `absent`                 | —              | a `value` key  |
+ * | `withheld`               | `licenceClass` | a `value` key  |
+ *
+ * Without those clauses `{"presence":"present"}` with no `value` at all was a Field by every guard
+ * in this package: `hasValue` said true, the glyph read `—`, and a face printed a confirmed
+ * UNKNOWN — which is the exact lie the four-state design exists to make unrepresentable. It is
+ * checked HERE rather than only in {@link assertFieldHonest} because the JSON boundary is where
+ * such objects come from and `isField` is what the boundary calls.
+ *
+ * Says nothing about honesty (a MODEL value's receipt, a withheld value's licence class being
+ * non-blank) — {@link assertFieldHonest} does that.
  */
 export function isField(v: unknown): v is Field<unknown> {
   if (typeof v !== 'object' || v === null) return false
-  const o = v as Partial<Field<unknown>> & { watermark?: { source?: unknown } }
+  const o = v as Partial<Field<unknown>> & { watermark?: { source?: unknown }; value?: unknown; licenceClass?: unknown; reason?: unknown }
   if (!PRESENCES.includes(o.presence as Presence)) return false
   if (!ATTRIBUTIONS.includes(o.attribution as Attribution)) return false
   if (typeof o.watermark !== 'object' || o.watermark === null || typeof o.watermark.source !== 'string') return false
-  return isAsOf(o.asOf)
+  if (o.watermark.modelVersion !== undefined && typeof o.watermark.modelVersion !== 'string') return false
+  if (!isAsOf(o.asOf)) return false
+  if (o.confidence !== undefined && typeof o.confidence !== 'number') return false
+
+  const carriesValueKey = 'value' in o
+  switch (o.presence) {
+    case 'present':
+    case 'unconfirmed':
+      return carriesValueKey
+    case 'absent':
+      return !carriesValueKey && (o.reason === undefined || typeof o.reason === 'string')
+    case 'withheld':
+      return !carriesValueKey && typeof o.licenceClass === 'string'
+    default:
+      return false
+  }
+}
+
+/**
+ * Freeze a Field, a Frame or any structure this package hands back, all the way down. Shallow
+ * freezing is not enough: `f.watermark.modelVersion = 'fabricated-9.9'` rewrites the receipt
+ * through a frozen Field, and the glyph then prints the fabrication under the honesty guard's
+ * signature.
+ */
+export function deepFreeze<T>(value: T, seen: WeakSet<object> = new WeakSet()): T {
+  if (value === null || typeof value !== 'object') return value
+  if (seen.has(value)) return value
+  seen.add(value)
+  Object.freeze(value)
+  for (const key of Object.getOwnPropertyNames(value)) deepFreeze((value as Record<string, unknown>)[key], seen)
+  return value
 }
 
 /**
@@ -168,16 +263,24 @@ export function isField(v: unknown): v is Field<unknown> {
  * 4. a `confidence` on a Field with NO value (`absent`/`withheld`) — there is nothing to be
  *    confident about;
  * 5. a `withheld` Field with no licence class — an unnamed refusal is indistinguishable from
- *    a hole in the record.
+ *    a hole in the record;
+ * 6. anything {@link isField} refuses, including a presence state whose payload contradicts it: a
+ *    `present` Field with no `value` key, an `absent` or `withheld` Field carrying one, a
+ *    `withheld` Field with no `licenceClass` at all. Those all arrive over the wire, they all
+ *    throw a `FieldHonestyError` here rather than a `TypeError` two frames deeper, and a caller
+ *    catching `FieldHonestyError` therefore catches every one of them.
  *
  * Call it on any Field that did not come from {@link makeField} — notably one parsed from JSON.
  * {@link makeFrame} calls it on every leaf.
  */
 export function assertFieldHonest(field: Field<unknown>, where = 'Field'): void {
   if (!isField(field)) {
-    throw new FieldHonestyError(`${where} is not a Field (needs presence, attribution, watermark.source and asOf)`)
+    throw new FieldHonestyError(
+      `${where} is not a Field — it needs presence, attribution, watermark.source, asOf, and the payload its presence state promises ` +
+        '(a value for present/unconfirmed, no value for absent/withheld, a licenceClass for withheld)'
+    )
   }
-  if (field.watermark.source.trim() === '') {
+  if (isBlank(field.watermark.source)) {
     throw new FieldHonestyError(`${where} carries an empty source watermark — every value names where it came from`)
   }
 
@@ -186,7 +289,7 @@ export function assertFieldHonest(field: Field<unknown>, where = 'Field'): void 
   if (field.attribution === 'MODEL') {
     const version = field.watermark.modelVersion
     if (carriesValue) {
-      if (version === undefined || version.trim() === '') {
+      if (version === undefined || isBlank(version)) {
         throw new FieldHonestyError(`${where} is a MODEL value with no modelVersion receipt — a MODEL value MUST carry source + modelVersion + confidence`)
       }
       if (field.confidence === undefined) {
@@ -207,7 +310,7 @@ export function assertFieldHonest(field: Field<unknown>, where = 'Field'): void 
     }
   }
 
-  if (field.presence === 'withheld' && field.licenceClass.trim() === '') {
+  if (field.presence === 'withheld' && isBlank(field.licenceClass)) {
     throw new FieldHonestyError(`${where} is withheld with no licence class — a withheld value names the class that gates it`)
   }
 }
@@ -220,7 +323,7 @@ export type FieldSpec<T> =
       readonly attribution: Attribution
       readonly watermark: SourceWatermark
       readonly asOf: AsOf
-      readonly confidence?: number
+      readonly confidence?: ModelConfidence
     }
   | { readonly presence: 'absent'; readonly attribution: Attribution; readonly watermark: SourceWatermark; readonly asOf: AsOf; readonly reason?: string }
   | {
@@ -233,7 +336,8 @@ export type FieldSpec<T> =
 
 /**
  * Construct a Field, REFUSING a dishonest one at construct time. Never returns a Field that
- * violates {@link assertFieldHonest}.
+ * violates {@link assertFieldHonest}, and never returns one a caller can go on to edit: the Field
+ * is deep-frozen, so the honesty guard is a wall rather than a checkpoint.
  */
 export function makeField<T>(spec: FieldSpec<T>): Field<T> {
   const presence: Presence = spec.presence ?? 'present'
@@ -257,16 +361,24 @@ export function makeField<T>(spec: FieldSpec<T>): Field<T> {
   }
 
   assertFieldHonest(field)
-  return field
+  return deepFreeze(field)
+}
+
+/** The provenance a narrow constructor takes. */
+export interface FieldProvenanceSpec {
+  readonly attribution: Attribution
+  readonly watermark: SourceWatermark
+  readonly asOf: AsOf
+  readonly confidence?: ModelConfidence
 }
 
 /** Narrow constructor: a confirmed value. */
-export function present<T>(value: T, provenance: { attribution: Attribution; watermark: SourceWatermark; asOf: AsOf; confidence?: number }): Field<T> {
+export function present<T>(value: T, provenance: FieldProvenanceSpec): Field<T> {
   return makeField<T>({ ...provenance, presence: 'present', value })
 }
 
 /** Narrow constructor: a local optimistic value the server has not acknowledged. */
-export function unconfirmed<T>(value: T, provenance: { attribution: Attribution; watermark: SourceWatermark; asOf: AsOf; confidence?: number }): Field<T> {
+export function unconfirmed<T>(value: T, provenance: FieldProvenanceSpec): Field<T> {
   return makeField<T>({ ...provenance, presence: 'unconfirmed', value })
 }
 

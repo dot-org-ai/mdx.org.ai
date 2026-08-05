@@ -77,11 +77,20 @@ export class BudgetExceededError extends Error {
   }
 }
 
-/** One way two faces of the same Frame disagreed. */
+/** One way two faces of the same Frame disagreed — or one way a face disagreed with its own bytes. */
 export interface ParityBreach {
-  /** `missing` — a Frame Field the face never emitted. `invented` — a value the Frame does not
-   * hold. `presence` / `attribution` / `text` — the two faces disagree about one Field. */
-  readonly kind: 'missing' | 'invented' | 'presence' | 'attribution' | 'text'
+  /**
+   * - `missing` — a Frame Field the face never emitted.
+   * - `invented` — a value the Frame does not hold, or one emitted twice.
+   * - `presence` / `attribution` / `text` — the face and the Frame, or two faces, disagree about
+   *   one Field.
+   * - `bytes` — the face's declared emission does not match the bytes it produced: it named no
+   *   bytes for a Field while producing a body, or declared a fragment its body does not contain
+   *   as often as it claimed. This is the one the walk-as-answer-key design could not see.
+   * - `snapshot` — the Rendering is of a different View or a different moment than the Frame it
+   *   is being checked against. Two faces of two different snapshots agree about nothing useful.
+   */
+  readonly kind: 'missing' | 'invented' | 'presence' | 'attribution' | 'text' | 'bytes' | 'snapshot'
   /** The canonical Field path, e.g. `shipment.status` or `lines[0].gtin`. */
   readonly path: string
   readonly detail: string

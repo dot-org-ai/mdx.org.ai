@@ -23,6 +23,19 @@ export interface Tokenizer {
  * The default: `ceil(chars / 4)`. An APPROXIMATION, and its id says so. It is close enough to
  * make a budget bite on English prose and GFM tables, and wrong enough that anyone measuring
  * real spend should pass a real tokenizer.
+ *
+ * ## Where it is wrong, and in which direction
+ * `text.length` counts **UTF-16 code units**, and the 4:1 ratio is an English-prose ratio. On CJK
+ * text a real BPE tokenizer spends roughly 1–1.5 tokens per character, so this counter reports
+ * about a **third to a fifth** of the true spend — and it therefore fails OPEN: a Frame of
+ * Japanese supplier names passes a budget it actually blows, and the budget stops biting exactly
+ * where token economy matters most. Emoji and other astral-plane characters go the other way
+ * (two code units each), so it over-counts them.
+ *
+ * This is not a bug to fix here. Making the shipped counter model-accurate means importing a
+ * model's vocabulary, and a types-only contract does not get to drag a BPE table into every
+ * consumer's bundle. It is a caveat to KNOW: if a View's values are not mostly Latin script,
+ * pass a real tokenizer.
  */
 export const approxCharsPerToken: Tokenizer = {
   id: 'approx-chars/4@1',

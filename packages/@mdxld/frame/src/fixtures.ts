@@ -9,20 +9,31 @@
  * It is a fixture, not a demo: it describes a shipment because the contract was ported for a
  * supply-chain spine, and nothing in the package knows or cares what a shipment is.
  *
+ * The default budgets are the MEASURED spends of the two shipped faces on this Frame, rounded up
+ * — markdown 136 and data 644 under `approx-chars/4@1`. They are two different numbers because
+ * the faces are two different sizes; see the note in `view.ts`.
+ *
  * @packageDocumentation
  */
 
-import { absent, present, unconfirmed, withheld, type AsOf } from './field.js'
+import { absent, modelConfidence, present, unconfirmed, withheld, type AsOf } from './field.js'
 import { makeFrame, type Frame } from './frame.js'
 import { createRegistry, type ViewRegistry } from './view.js'
 
 const asOf: AsOf = { instant: '2026-08-04T12:00:00Z' }
 const observed = { attribution: 'OBS' as const, watermark: { source: 'epcis-spine' }, asOf }
 const computed = { attribution: 'CALC' as const, watermark: { source: 'coverage-rollup' }, asOf }
-const modelled = { attribution: 'MODEL' as const, watermark: { source: 'eta-model', modelVersion: '2.1.0' }, asOf, confidence: 0.62 }
+const modelled = { attribution: 'MODEL' as const, watermark: { source: 'eta-model', modelVersion: '2.1.0' }, asOf, confidence: modelConfidence(0.62) }
 
-/** A registry holding the fixture's two Roles and its View. */
-export function fixtureRegistry(budget = 400): ViewRegistry {
+/** The measured spend of each shipped face on {@link fixtureFrame}, with a little headroom. */
+export const FIXTURE_BUDGETS: Readonly<Record<string, number>> = { markdown: 200, data: 800 }
+
+/**
+ * A registry holding the fixture's two Roles and its View. Pass a partial budget map to override
+ * one face's budget — `fixtureRegistry({ markdown: 20 })` is how a test exercises the over-budget
+ * refusal without touching the data face's budget.
+ */
+export function fixtureRegistry(budgets: Readonly<Record<string, number>> = {}): ViewRegistry {
   return createRegistry()
     .withRoles(
       {
@@ -32,6 +43,7 @@ export function fixtureRegistry(budget = 400): ViewRegistry {
         markdown: {
           kind: 'list',
           heading: 2,
+          keys: ['status', 'eta', 'temperature', 'unitPrice', 'receivedQty'],
           labels: { status: 'Status', eta: 'ETA (days)', temperature: 'Temperature', unitPrice: 'Unit price', receivedQty: 'Received qty' },
         },
       },
@@ -48,7 +60,12 @@ export function fixtureRegistry(budget = 400): ViewRegistry {
         },
       }
     )
-    .withViews({ id: 'shipment-detail', roles: ['shipment', 'lines'], budget, describe: 'one shipment, header and lines' })
+    .withViews({
+      id: 'shipment-detail',
+      roles: ['shipment', 'lines'],
+      budgets: { ...FIXTURE_BUDGETS, ...budgets },
+      describe: 'one shipment, header and lines',
+    })
 }
 
 /** The fixture Frame: all four presence states, all three attributions. */
