@@ -12,15 +12,24 @@ import { existsSync, readFileSync, realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { glob } from 'glob'
 import { transform } from 'esbuild'
+// The shared resolvers live in the @mdxe/cli-core LEAF (mdx-8je.26): mdxe depends on @mdxe/hono, so
+// the HTTP faces could not import them from here without a cycle. cli-core imports only node
+// built-ins (lazily), so it stays on the light hot path (tests/cli-light.test.ts).
+import {
+  resolveFromProcess,
+  resolveCallerFromProcess,
+  FAILSAFE_CTX,
+  EXIT,
+  fail,
+  usageError,
+  type OutputCtx,
+  type Caller,
+} from '@mdxe/cli-core'
 import { extractGlobals } from './cli/args.js'
-import { resolveFromProcess, FAILSAFE_CTX, type OutputCtx } from './cli/context.js'
-import { resolveCallerFromProcess, type Caller } from './cli/caller.js'
-import { EXIT, fail, usageError } from './cli/errors.js'
 import { orientCommand } from './cli/orient.js'
 
-export type { OutputCtx, RenderMode, GlobalFlags } from './cli/context.js'
-export type { Caller } from './cli/caller.js'
-export { CliError, EXIT } from './cli/errors.js'
+export type { OutputCtx, RenderMode, GlobalFlags, Caller } from '@mdxe/cli-core'
+export { CliError, EXIT } from '@mdxe/cli-core'
 
 /**
  * Get the version from package.json

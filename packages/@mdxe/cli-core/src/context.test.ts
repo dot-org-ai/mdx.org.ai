@@ -1,5 +1,5 @@
 /**
- * cli/context — the capability resolver is a PURE function of (flags, env, streams). These tests
+ * context — the capability resolver is a PURE function of (flags, env, streams). These tests
  * pin the precedence (explicit flag > Accept > --agent/env > CI > piped > TTY), CI + NO_COLOR +
  * piped handling, and the invariant that machine modes never wrap/truncate/color. No `process`
  * is touched.

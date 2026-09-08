@@ -1,5 +1,5 @@
 /**
- * cli/tokens — every count is LABELLED with how it was produced; the native cache fails CLOSED on a
+ * tokens — every count is LABELLED with how it was produced; the native cache fails CLOSED on a
  * miss or a base drift (never a fabricated precise-looking number); the open tokenizers never throw.
  */
 

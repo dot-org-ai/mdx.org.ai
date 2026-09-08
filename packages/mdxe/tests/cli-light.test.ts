@@ -48,13 +48,13 @@ describe('the CLI hot path is LIGHT', () => {
     }
   })
 
-  test('every src/cli/*.ts module imports only node built-ins and its siblings', () => {
+  test('every src/cli/*.ts module imports only node built-ins, its siblings, and the @mdxe/cli-core leaf', () => {
     const dir = join(SRC, 'cli')
     const files = readdirSync(dir).filter((f) => f.endsWith('.ts') && !f.endsWith('.test.ts'))
-    expect(files.sort()).toEqual(['args.ts', 'caller.ts', 'context.ts', 'errors.ts', 'orient.ts', 'tokens.ts'])
+    expect(files.sort()).toEqual(['args.ts', 'orient.ts'])
     for (const f of files) {
       for (const spec of staticImports(readFileSync(join(dir, f), 'utf8'))) {
-        expect(spec.startsWith('./') || spec.startsWith('node:'), `${f} imports ${spec}`).toBe(true)
+        expect(spec.startsWith('./') || spec.startsWith('node:') || spec === '@mdxe/cli-core', `${f} imports ${spec}`).toBe(true)
       }
     }
   })

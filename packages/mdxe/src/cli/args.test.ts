@@ -6,7 +6,7 @@
 import { describe, expect, test } from 'vitest'
 
 import { parseArgs, required, extractGlobals, GLOBAL_FLAGS } from './args.js'
-import { CliError, EXIT } from './errors.js'
+import { CliError, EXIT } from '@mdxe/cli-core'
 
 function usage(fn: () => unknown): CliError {
   try {
