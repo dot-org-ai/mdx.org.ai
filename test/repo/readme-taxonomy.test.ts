@@ -3,7 +3,7 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 
 describe('README.md package taxonomy', () => {
-  const readmePath = resolve(__dirname, '../README.md')
+  const readmePath = resolve(__dirname, '../../README.md')
   const readme = readFileSync(readmePath, 'utf-8')
 
   describe('@mdxe Package Taxonomy', () => {
@@ -89,7 +89,7 @@ describe('README.md package taxonomy', () => {
   })
 
   it('should be consistent with CLAUDE.md package descriptions', () => {
-    const claudeMdPath = resolve(__dirname, '../CLAUDE.md')
+    const claudeMdPath = resolve(__dirname, '../../CLAUDE.md')
     const claudeMd = readFileSync(claudeMdPath, 'utf-8')
 
     // Verify key packages mentioned in both files

@@ -105,6 +105,9 @@ jobs:
       - name: Run unit tests
         run: pnpm test:unit
 
+      - name: Run repo guard tests
+        run: pnpm test:repo
+
       - name: Run integration tests
         run: pnpm test:integration
 
