@@ -2,7 +2,13 @@
   "extends": "@mdxld/config/typescript/library.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    // Resolve the workspace sibling to source so `pnpm --filter mdxe build` (plain tsup,
+    // no turbo ^build ordering) type-checks on a fresh checkout before @mdxdb/clickhouse
+    // has emitted dist/schema/index.d.ts. No `rootDir`: a paths target outside ./src would
+    // otherwise fail TS6059, and tsup does not need it to lay out dist/.
+    "paths": {
+      "@mdxdb/clickhouse/schema": ["../@mdxdb/clickhouse/schema/index.ts"]
+    }
   },
   "include": ["src"]
 }

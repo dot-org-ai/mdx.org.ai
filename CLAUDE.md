@@ -22,6 +22,12 @@ pnpm test
 pnpm --filter <package-name> test
 # e.g., pnpm --filter mdxld test
 
+# Build or test ONE package on a fresh checkout (orders workspace siblings first).
+# `pnpm --filter <pkg> build` runs that package's tsup directly and skips turbo's
+# `^build`, so it is red until siblings whose types resolve to dist/ are built.
+pnpm exec turbo run build --filter=<package-name>
+pnpm exec turbo run test --filter=<package-name>
+
 # Watch mode for development
 pnpm dev
 
@@ -316,6 +322,7 @@ pnpm test                           # All packages via turbo, then pnpm test:rep
 pnpm --filter mdxld test           # Single package
 pnpm test:mdx                       # MDX-specific tests
 pnpm test:repo                      # Repo-level guard suites (test/repo/, own CI step)
+pnpm exec turbo run test --filter=mdxe  # Single package, siblings built first (fresh checkout)
 ```
 
 Repo-level guards (workspace layout, dependency policy, tsconfig boundaries, README taxonomy) live in `test/repo/` only — see `test/repo/README.md`. Turbo never runs them; `vitest.repo.config.ts` does. Do not put `*.test.ts` under `tests/` (that is the `.mdx` fixture directory) — `test/repo/guard-test-home.test.ts` fails the build if one appears.
