@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { mkdirSync, writeFileSync, rmSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { ensureLoggedIn } from 'oauth.do'
+import { ensureLoggedIn } from '../src/auth.js'
 
 describe('E2E: mdxe deploy --managed', () => {
   let testDir: string

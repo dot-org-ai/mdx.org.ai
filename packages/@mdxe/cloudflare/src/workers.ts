@@ -551,7 +551,7 @@ async function deployWithManagedApi(options: CloudflareWorkersOptions): Promise<
       logs.push('Skipping authentication (dry run)')
     } else {
       logs.push('Authenticating via oauth.do...')
-      const { ensureLoggedIn } = await import('oauth.do')
+      const { ensureLoggedIn } = await import('oauth.do/node')
       const auth = await ensureLoggedIn()
       token = auth.token
       logs.push(auth.isNewLogin ? 'Logged in successfully' : 'Using existing session')
