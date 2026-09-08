@@ -1,9 +1,10 @@
 /**
  * SQLite Schema Module
  *
- * Clean schema with _data and _rels tables.
+ * Clean schema with _data, _rels and _meta tables.
  * - _data: Things (graph nodes)
  * - _rels: Relationships (graph edges with bidirectional predicates)
+ * - _meta: Per-object metadata (the persisted $id)
  *
  * @packageDocumentation
  */
@@ -17,6 +18,20 @@ export const DATA_TABLE = '_data' as const
  * _rels table name
  */
 export const RELS_TABLE = '_rels' as const
+
+/**
+ * _meta table name
+ */
+export const META_TABLE = '_meta' as const
+
+/**
+ * _meta key under which the object's canonical $id (base URL) is persisted.
+ *
+ * A Durable Object cannot read its own name (`ctx.id.name` is undefined
+ * inside the object in workerd), so the name-derived $id is written here on
+ * `$init()` and re-read whenever the object is re-instantiated.
+ */
+export const META_ID_KEY = '$id' as const
 
 /**
  * _data table schema - graph nodes with executable code
@@ -81,9 +96,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_rels_unique ON _rels("from", predicate, "t
 `.trim()
 
 /**
+ * _meta table schema - key/value metadata about this object
+ */
+export const META_SCHEMA = `
+CREATE TABLE IF NOT EXISTS _meta (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+)
+`.trim()
+
+/**
  * All table names
  */
-export const TABLES = [DATA_TABLE, RELS_TABLE] as const
+export const TABLES = [DATA_TABLE, RELS_TABLE, META_TABLE] as const
 
 export type TableName = (typeof TABLES)[number]
 
@@ -96,10 +121,11 @@ export function getAllSchemaStatements(): string[] {
     ...DATA_INDEXES.split(';').map(s => s.trim()).filter(Boolean),
     RELS_SCHEMA,
     ...RELS_INDEXES.split(';').map(s => s.trim()).filter(Boolean),
+    META_SCHEMA,
   ]
 }
 
 /**
  * Schema version
  */
-export const SCHEMA_VERSION = 2
+export const SCHEMA_VERSION = 3

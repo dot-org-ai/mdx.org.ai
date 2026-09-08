@@ -8,6 +8,9 @@ import { describe, it, expect } from 'vitest'
 import {
   DATA_TABLE,
   RELS_TABLE,
+  META_TABLE,
+  META_ID_KEY,
+  META_SCHEMA,
   DATA_SCHEMA,
   DATA_INDEXES,
   RELS_SCHEMA,
@@ -30,10 +33,23 @@ describe('Schema Version', () => {
 })
 
 describe('Tables', () => {
-  it('exposes exactly the _data and _rels tables', () => {
+  it('exposes exactly the _data, _rels and _meta tables', () => {
     expect(DATA_TABLE).toBe('_data')
     expect(RELS_TABLE).toBe('_rels')
-    expect([...TABLES]).toEqual(['_data', '_rels'])
+    expect(META_TABLE).toBe('_meta')
+    expect([...TABLES]).toEqual(['_data', '_rels', '_meta'])
+  })
+})
+
+describe('_meta schema', () => {
+  it('creates the _meta table idempotently as a key/value store', () => {
+    expect(META_SCHEMA).toMatch(/^CREATE TABLE IF NOT EXISTS _meta \(/)
+    expect(META_SCHEMA).toContain('key TEXT PRIMARY KEY')
+    expect(META_SCHEMA).toContain('value TEXT NOT NULL')
+  })
+
+  it('reserves the $id key for the persisted base URL', () => {
+    expect(META_ID_KEY).toBe('$id')
   })
 })
 
@@ -104,7 +120,8 @@ describe('getAllSchemaStatements', () => {
   it('returns one statement per table and index', () => {
     const dataIndexCount = DATA_INDEXES.split(';').filter((s) => s.trim()).length
     const relsIndexCount = RELS_INDEXES.split(';').filter((s) => s.trim()).length
-    expect(statements.length).toBe(2 + dataIndexCount + relsIndexCount)
+    expect(statements.length).toBe(TABLES.length + dataIndexCount + relsIndexCount)
+    expect(statements).toContain(META_SCHEMA)
   })
 
   it('creates tables before their indexes', () => {
