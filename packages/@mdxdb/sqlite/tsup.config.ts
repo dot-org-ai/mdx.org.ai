@@ -9,6 +9,7 @@ export default defineConfig([
       client: 'src/client.ts',
       types: 'src/types.ts',
       schema: 'src/schema/index.ts',
+      miniflare: 'src/miniflare.ts',
     },
     format: ['esm', 'cjs'],
     dts: false,

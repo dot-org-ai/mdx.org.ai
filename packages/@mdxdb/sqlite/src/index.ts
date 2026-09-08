@@ -47,6 +47,9 @@ export type {
   DataRow,
   RelsRow,
   MDXDatabaseRPC,
+  MDXDatabaseTarget,
+  MDXDatabaseNamespace,
+  MDXDatabaseStub,
   Env,
   MDXClientConfig,
 } from './types.js'
