@@ -13,12 +13,14 @@ mdxe now serves as the primary execution layer that integrates all primitives:
 
 ### 1. Package Dependencies (package.json)
 
-Added dependencies to primitives packages:
+Dependencies on the primitives are plain npm specifiers (the `^2.4.0` train; the
+`primitives/` submodule and `file:` links are gone, see mdx-8je.2). `ai-functions`
+is not a dependency of mdxe: nothing in mdxe imports it, and it ships no RPC
+(capnweb RPC is `rpc.do`).
 ```json
 "dependencies": {
-  "ai-sandbox": "file:../../primitives/packages/ai-sandbox",
-  "ai-functions": "file:../../primitives/packages/ai-functions",
-  "ai-workflows": "file:../../primitives/packages/ai-workflows",
+  "ai-evaluate": "^2.4.0",
+  "ai-workflows": "^2.4.0",
   ...
 }
 ```

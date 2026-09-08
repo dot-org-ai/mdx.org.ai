@@ -47,9 +47,13 @@ describe('README.md package taxonomy', () => {
     })
 
     describe('Protocols', () => {
-      it('should point RPC users at ai-functions instead of a removed @mdxe/rpc package', () => {
+      it('should point RPC users at rpc.do instead of a removed @mdxe/rpc package (mdx-8je.29)', () => {
         expect(readme).toMatch(/RPC is not an `@mdxe` package/)
-        expect(readme).toMatch(/ai-functions/)
+        expect(readme).toMatch(/rpc\.do/)
+        // ai-functions@2.4 ships no RPC / RPCPromise; the README must not send RPC users there,
+        // nor link the primitives submodule path that mdx-8je.2 deleted.
+        expect(readme).not.toMatch(/import\s*\{[^}]*\bRPC\b[^}]*\}\s*from\s*['"]ai-functions['"]/)
+        expect(readme).not.toMatch(/primitives\/packages\/ai-functions/)
       })
 
       it('should document @mdxe/mcp for Model Context Protocol', () => {

@@ -2,7 +2,7 @@
  * mdxai - Unified AI SDK for MDX-based Applications
  *
  * This package provides a complete AI SDK that combines:
- * - ai-functions: AI primitives, RPC, generation, embeddings, auto-define
+ * - ai-functions: AI primitives, generation, embeddings, auto-define (no RPC; capnweb RPC is rpc.do)
  * - ai-workflows: Event-driven workflows with $ context
  * - ai-database: Simplified AI-powered database interface
  * - Persistence: mdxdb-backed storage for functions, workflows, experiments
@@ -17,7 +17,8 @@ export const name = 'mdxai'
 // Re-export everything from ai-functions
 // =============================================================================
 
-// RPC primitives with capnweb promise pipelining
+// AI primitives (generation, embeddings, define/auto-define). ai-functions@2.4
+// ships no RPC / RPCPromise; capnweb RPC is rpc.do (mdx-8je.29).
 export * from 'ai-functions'
 
 // =============================================================================
