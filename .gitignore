@@ -46,6 +46,8 @@ web_modules/
 
 # TypeScript cache
 *.tsbuildinfo
+# vitest typecheck lane writes this next to the tsconfig it was given (test/repo/)
+tsconfig.vitest-temp.json
 
 # Optional npm cache directory
 .npm

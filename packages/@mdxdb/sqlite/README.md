@@ -78,7 +78,7 @@ new_sqlite_classes = ["MDXDatabase"]
 
 The package ships two vitest pools:
 
-- **node** (`vitest.config.ts`): pure-JS tests (schema, `MDXClient` wrapper) under `tests/*.test.ts`.
+- **node** (`vitest.config.ts`): pure-JS tests (schema, `MDXClient` wrapper, in-memory binding) under `tests/*.test.ts`.
 - **workers** (`vitest.workers.config.ts`): Durable Object tests under `tests/workers/` run inside
   workerd via `@cloudflare/vitest-pool-workers`, with `MDXDatabase` declared in `wrangler.test.jsonc`.
 

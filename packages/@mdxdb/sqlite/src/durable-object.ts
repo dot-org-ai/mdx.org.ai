@@ -467,9 +467,11 @@ export class MDXDatabase extends DurableObject<Env> {
       throw new Error(`Thing has no content to compile: ${url}`)
     }
 
-    // Dynamic import to avoid bundling @mdxe/isolate when not needed
+    // Dynamic import to avoid bundling @mdxe/isolate when not needed.
+    // bundleRuntime: the loaded isolate has no node_modules, so the JSX
+    // runtime the MDX component imports must ship inside the module map.
     const { compileToModule } = await import('@mdxe/isolate')
-    const compiled = await compileToModule(thing.content)
+    const compiled = await compileToModule(thing.content, { bundleRuntime: true })
 
     // Store compiled code for caching
     const codeJson = JSON.stringify(compiled)
@@ -519,14 +521,20 @@ export class MDXDatabase extends DurableObject<Env> {
     const { createWorkerConfig } = await import('@mdxe/isolate')
     const config = createWorkerConfig(compiled, { blockNetwork: true })
 
-    // Get or create the worker
-    const worker = await this.loader.get(compiled.hash, async () => ({
-      modules: Object.entries(config.modules).map(([name, esModule]) => ({
-        name,
-        esModule,
-      })),
+    // Get or create the isolate (cached by content hash) and its entrypoint.
+    // Modules are passed as explicit `{ js }` descriptors: the loader infers
+    // the type from the extension otherwise, and the bundled JSX runtime is
+    // named `jsx-runtime` (no extension) by @mdxe/isolate.
+    const stub = this.loader.get(compiled.hash, () => ({
       compatibilityDate: config.compatibilityDate,
+      mainModule: config.mainModule,
+      modules: Object.fromEntries(
+        Object.entries(config.modules).map(([name, js]) => [name, { js }])
+      ),
+      env: config.env,
+      globalOutbound: config.globalOutbound === null ? null : undefined,
     }))
+    const worker = stub.getEntrypoint()
 
     // Call the function
     const request = new Request(`http://worker/call/${options.fn}`, {
@@ -570,12 +578,17 @@ export class MDXDatabase extends DurableObject<Env> {
       return { functions: [], hasDefault: false, exports: [] }
     }
 
-    // Extract exports from compiled code
+    // Extract exports from compiled code. getExports() lists *named* exports
+    // only (it never reports `default` by contract), so the default export is
+    // detected separately from the compiled MDX source.
     const { getExports } = await import('@mdxe/isolate')
     const allExports = getExports(compiled)
+    const mdxCode = compiled.modules['mdx.js'] ?? ''
+    const hasDefault =
+      /\bexport\s+default\b/.test(mdxCode) ||
+      /\bexport\s*\{[^}]*\bas\s+default\b[^}]*\}/.test(mdxCode)
 
     // Determine which are functions (heuristic: check for function patterns)
-    const mdxCode = compiled.modules['mdx.js'] ?? ''
     const functions: string[] = []
     const other: string[] = []
 
@@ -593,7 +606,7 @@ export class MDXDatabase extends DurableObject<Env> {
 
     return {
       functions,
-      hasDefault: allExports.includes('default'),
+      hasDefault,
       exports: other,
     }
   }
@@ -604,8 +617,11 @@ export class MDXDatabase extends DurableObject<Env> {
   async render(url: string, props?: Record<string, unknown>): Promise<string> {
     this.ensureInitialized()
 
-    // Call the default export with props
-    const result = await this.call<{ html?: string; toString?: () => string }>(url, {
+    // Call the default export with props. The result crosses the isolate
+    // boundary as JSON, so it is always a string or a plain object here: a
+    // custom toString() can never survive the trip, and checking `'toString'
+    // in obj` would match Object.prototype.toString ("[object Object]").
+    const result = await this.call<{ html?: string }>(url, {
       fn: 'default',
       args: [props ?? {}],
     })
@@ -618,12 +634,11 @@ export class MDXDatabase extends DurableObject<Env> {
       if ('html' in result.result && typeof result.result.html === 'string') {
         return result.result.html
       }
-      if ('toString' in result.result && typeof result.result.toString === 'function') {
-        return result.result.toString()
-      }
     }
 
-    // Serialize as JSON if nothing else works
+    // Otherwise the default export returned an element tree from the bundled
+    // JSX runtime; serialise it as JSON (there is no HTML renderer in the
+    // isolate — tracked as model gap mdx-cbe).
     return JSON.stringify(result.result)
   }
 

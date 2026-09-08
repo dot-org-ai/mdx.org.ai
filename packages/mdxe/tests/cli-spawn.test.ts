@@ -107,7 +107,7 @@ describe('the entry chunk is LIGHT — help/orientation never load a runtime', (
     walk(BIN)
     expect(statics.length).toBeGreaterThan(0)
     for (const spec of statics) {
-      expect(spec.startsWith('node:') || ['glob', 'esbuild'].includes(spec) || spec.startsWith('./chunk-'), `entry statically imports ${spec}`).toBe(true)
+      expect(spec.startsWith('node:') || ['glob', 'esbuild', '@mdxe/cli-core'].includes(spec) || spec.startsWith('./chunk-'), `entry statically imports ${spec}`).toBe(true)
     }
     expect(readFileSync(BIN, 'utf8')).toMatch(/import\("\.\/[^"]+"\)/) // the command arms are lazy chunks
   })

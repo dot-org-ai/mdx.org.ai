@@ -1,0 +1,72 @@
+{
+  "name": "@mdxe/cli-core",
+  "version": "1.9.1",
+  "description": "The resolvers mdxe's faces share: the output-context ladder (with its Accept rung), caller detection, fail-closed errors, and the labelled token-count oracle",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./context": {
+      "types": "./dist/context.d.ts",
+      "import": "./dist/context.js",
+      "require": "./dist/context.cjs"
+    },
+    "./caller": {
+      "types": "./dist/caller.d.ts",
+      "import": "./dist/caller.js",
+      "require": "./dist/caller.cjs"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js",
+      "require": "./dist/errors.cjs"
+    },
+    "./tokens": {
+      "types": "./dist/tokens.d.ts",
+      "import": "./dist/tokens.js",
+      "require": "./dist/tokens.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdx",
+    "mdxe",
+    "cli",
+    "accept",
+    "content-negotiation",
+    "tokens",
+    "tokenizer"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "@types/node": "^22.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxe/cli-core"
+  },
+  "author": "MDX.org.ai"
+}

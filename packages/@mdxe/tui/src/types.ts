@@ -143,3 +143,15 @@ export class ViewerError extends Error {
     super(message)
   }
 }
+
+/**
+ * Is this the seam's error? Structural, not `instanceof`: a viewer package and the conformance
+ * suite are separate bundles (and may be separate copies of this package), so class identity is
+ * not shared. Like CLI errors, the seam matches on the stable `name` + `code`, never on prose.
+ */
+export function isViewerError(e: unknown): e is ViewerError {
+  if (e instanceof ViewerError) return true
+  if (typeof e !== 'object' || e === null) return false
+  const { name, code } = e as { name?: unknown; code?: unknown }
+  return name === 'ViewerError' && (code === 'NOT_A_TTY' || code === 'ALREADY_MOUNTED')
+}

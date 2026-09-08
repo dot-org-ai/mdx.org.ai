@@ -1,247 +1,76 @@
 ---
 title: "@mdxe/ink"
-description: Terminal MDX rendering with Ink
+description: Ink 7 terminal viewer over the @mdxe/tui seam
 ---
 
 # @mdxe/ink
 
-Render MDX documents in the terminal using Ink.
+The Ink viewer for the `@mdxe/tui` seam. It displays rendered terminal bytes and handles input; it never renders MDX itself, never invents or changes a byte, and never attaches to a pipe.
+
+Ink is the no-native-binary viewer: Node ≥ 22 and Bun, with `ink ^7` and `react ^19.2` as peer dependencies.
 
 ## Installation
 
 ```bash
-npm install @mdxe/ink
+pnpm add @mdxe/ink ink react
 ```
 
 ## Usage
 
 ```typescript
-import { render } from '@mdxe/ink'
+import { createInkViewer } from '@mdxe/ink'
 
-const mdx = `
-# Hello Terminal
+const viewer = createInkViewer()
 
-This is **bold** and *italic* text.
-
-<Box borderStyle="round" padding={1}>
-  <Text color="green">Success!</Text>
-</Box>
-`
-
-render(mdx)
-```
-
-## Configuration
-
-```typescript
-interface InkRenderOptions {
-  /** Custom Ink components */
-  components?: Record<string, Component>
-
-  /** Enable interactive mode */
-  interactive?: boolean
-
-  /** Output stream */
-  stdout?: NodeJS.WriteStream
-
-  /** Input stream */
-  stdin?: NodeJS.ReadStream
-}
-```
-
-## Features
-
-### Markdown Rendering
-
-MDX markdown is automatically converted to terminal-friendly output:
-
-```typescript
-import { render } from '@mdxe/ink'
-
-const mdx = `
-# Heading
-
-This is a paragraph with **bold** and *italic*.
-
-- List item 1
-- List item 2
-- List item 3
-
-\`\`\`javascript
-const hello = 'world'
-\`\`\`
-`
-
-render(mdx)
-```
-
-### Ink Components
-
-Use Ink components directly in MDX:
-
-```typescript
-import { render } from '@mdxe/ink'
-
-const mdx = `
-# Status Report
-
-<Box flexDirection="column" gap={1}>
-  <Text>Loading...</Text>
-  <Spinner type="dots" />
-</Box>
-
-<Box marginTop={1}>
-  <Text color="cyan">Press any key to continue</Text>
-</Box>
-`
-
-render(mdx, {
-  components: {
-    Spinner: InkSpinner,
-  },
+const handle = await viewer.mount(frames, {
+  terminal: { stdout: process.stdout, stdin: process.stdin },
 })
-```
 
-### Interactive CLI
-
-```typescript
-import { render } from '@mdxe/ink'
-
-const mdx = `
-# Select an Option
-
-<SelectInput
-  items={[
-    { label: 'Option 1', value: '1' },
-    { label: 'Option 2', value: '2' },
-    { label: 'Option 3', value: '3' },
-  ]}
-  onSelect={handleSelect}
-/>
-`
-
-const { result } = await render(mdx, {
-  interactive: true,
-  components: {
-    SelectInput: InkSelectInput,
-  },
-  scope: {
-    handleSelect: (item) => {
-      console.log('Selected:', item.value)
-    },
-  },
+handle.onAction((action) => {
+  // quit | scroll | page | jump | select | back | search | insert | resize
+  // The host decides what each action means.
 })
+
+await viewer.unmount()
 ```
 
-### Progress Display
+`frames` is a `FrameStream` — an `AsyncIterable<Uint8Array | string>` where each chunk is one complete frame from the renderer (`@mdxui/text`). Input is decoded from `stdin` by the seam's shared `createInputSource` and mapped through `defaultKeymap`; pass `events` and/or `keymap` on mount to supply your own.
+
+### Choosing a viewer at runtime
+
+`inkViewer(options)` is a `ViewerFactory` that imports even this package's viewer module lazily:
 
 ```typescript
-import { render, rerender } from '@mdxe/ink'
+import { inkViewer } from '@mdxe/ink'
 
-const Progress = ({ value, total }) => `
-# Build Progress
-
-<Box width={50}>
-  <Text>{${'█'.repeat(Math.floor(value / total * 50))}}</Text>
-</Box>
-
-<Text>{value}/{total} files processed</Text>
-`
-
-let current = 0
-const total = 100
-
-const { rerender } = render(Progress({ value: current, total }))
-
-const interval = setInterval(() => {
-  current += 10
-  rerender(Progress({ value: current, total }))
-
-  if (current >= total) {
-    clearInterval(interval)
-  }
-}, 100)
+const factory = inkViewer()
+const viewer = await factory()
 ```
 
-## CLI Tool
+## Guarantees
 
-Build CLI tools with MDX:
-
-```typescript
-#!/usr/bin/env node
-import { render } from '@mdxe/ink'
-import { readFile } from 'fs/promises'
-
-const mdx = await readFile('./help.mdx', 'utf-8')
-
-render(mdx, {
-  scope: {
-    args: process.argv.slice(2),
-    version: '1.0.0',
-  },
-})
-```
-
-### help.mdx
-
-```mdx
-# My CLI Tool v{version}
-
-## Usage
-
-<Box marginLeft={2}>
-  <Text>my-cli [command] [options]</Text>
-</Box>
-
-## Commands
-
-<Box flexDirection="column" marginLeft={2}>
-  <Text><Text bold>init</Text>    Initialize a new project</Text>
-  <Text><Text bold>build</Text>   Build the project</Text>
-  <Text><Text bold>serve</Text>   Start development server</Text>
-</Box>
+- **Lazy** — importing `@mdxe/ink` loads neither `ink` nor `react`; `mount()` does, after the TTY guard has passed.
+- **Never on pipes** — when `stdout` or `stdin` is not a TTY, `mount()` rejects with a `ViewerError` whose `code` is the stable string `NOT_A_TTY`, writes nothing, and never touches raw mode. Route agents to the plain bytes instead.
+- **`strip(paint(bytes)) === bytes`** — each frame is laid out with Ink's `renderToString` and compared to the register bytes before it is written. Whenever Ink would alter a byte (it trims trailing whitespace per line and wraps lines wider than its layout width) the frame is written verbatim instead, so Ink never wraps a line — the terminal does.
+- **Terminal-width layout** — each paint lays out at `terminal.stdout.columns` (a resize is honoured; `DEFAULT_COLUMNS` = 80 when unreported). Ink's layout cost is linear in the width, so wrapping is prevented by the verbatim fallback, not by a huge width.
+- **Unmount releases** — raw mode is released, the cursor restored, and nothing is written afterwards. `unmount()` is idempotent; a `quit` action unmounts.
 
 ## Options
 
-<Box flexDirection="column" marginLeft={2}>
-  <Text><Text color="cyan">--help</Text>     Show this help</Text>
-  <Text><Text color="cyan">--version</Text>  Show version</Text>
-</Box>
+```typescript
+createInkViewer({
+  /** Fixed Ink layout width. Default: terminal.stdout.columns, else DEFAULT_COLUMNS (80). */
+  columns?: number,
+})
 ```
 
-## Styling
+`paint(frame, runtime, columns?)` is exported as a pure function for hosts that want the laid-out bytes without a terminal; it reports which engine produced them (`ink` or `verbatim`).
 
-### Colors
+## Conformance and benchmark
 
-```mdx
-<Text color="red">Error message</Text>
-<Text color="yellow">Warning</Text>
-<Text color="green">Success</Text>
-<Text color="cyan">Info</Text>
-```
+The `@mdxe/tui/conformance` suite runs against this viewer in its test suite. `pnpm --filter @mdxe/ink bench` runs the shared benchmark harness and prints JSON (`startupMs`, `installBytes`, repaint `p50Ms`/`p95Ms`/`maxMs`).
 
-### Box Model
+## Related
 
-```mdx
-<Box
-  borderStyle="round"
-  borderColor="cyan"
-  padding={1}
-  margin={1}
->
-  <Text>Boxed content</Text>
-</Box>
-```
-
-### Layout
-
-```mdx
-<Box flexDirection="row" gap={2}>
-  <Box width="50%">
-    <Text>Left column</Text>
-  </Box>
-  <Box width="50%">
-    <Text>Right column</Text>
-  </Box>
-</Box>
-```
+- [@mdxe/tui](/docs/mdxe/runtimes) — the seam: `Viewer`, input abstraction, conformance suite, benchmark harness
+- [ink](https://www.npmjs.com/package/ink) — React for CLIs

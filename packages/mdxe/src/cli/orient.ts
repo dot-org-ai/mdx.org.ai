@@ -21,8 +21,8 @@
  * LIGHT by construction: node built-ins only. This module must never import a runtime.
  */
 
-import type { Caller } from './caller.js'
-import type { OutputCtx } from './context.js'
+import type { Caller } from '@mdxe/cli-core'
+import type { OutputCtx } from '@mdxe/cli-core'
 
 /** One command line of the orientation: the verb and a one-line purpose. */
 export interface OrientCommand {

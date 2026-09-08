@@ -14,11 +14,21 @@ import { defineConfig } from 'vitest/config'
  * the (plural) mdx-fixture directory by mistake still executes instead of
  * silently going dark; test/repo/guard-test-home.test.ts then fails with a
  * pointer to the canonical location.
+ *
+ * test/repo/**\/*.test-d.ts are type-level guards compiled by tsc through the
+ * vitest typecheck lane (test/repo/tsconfig.json scopes tsc to those files).
+ * Use one when the invariant is "this symbol exists in that package" - a
+ * source-text regex cannot go red for a missing export (mdx-8je.29).
  */
 export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
     include: ['test/repo/**/*.test.ts', 'tests/**/*.test.ts'],
+    typecheck: {
+      enabled: true,
+      include: ['test/repo/**/*.test-d.ts'],
+      tsconfig: 'test/repo/tsconfig.json',
+    },
   },
 })

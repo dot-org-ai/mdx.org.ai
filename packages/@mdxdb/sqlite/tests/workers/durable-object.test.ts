@@ -267,9 +267,24 @@ describe('MDXDatabase (workerd)', () => {
     })
   })
 
-  describe('code execution guards', () => {
-    // The execution path itself (compile/call/meta/render via @mdxe/isolate and
-    // a Worker Loader binding) is not exercised in this pool; see stubs/.
+  describe('code execution', () => {
+    const MDX = `---
+title: Greeter
+---
+
+export function greet(name) {
+  return \`Hello, \${name}!\`
+}
+
+export async function add(a, b) {
+  return a + b
+}
+
+export const answer = 42
+
+# Welcome
+`
+
     it('compile rejects a missing thing', async () => {
       const { ns, base } = await open()
       await expect(stubFor(ns).compile(`${base}/Doc/missing`)).rejects.toThrow(/not found/)
@@ -279,6 +294,98 @@ describe('MDXDatabase (workerd)', () => {
       const { ns, db } = await open()
       const t = await db.create({ type: 'Doc', id: 'no-content', data: {} })
       await expect(stubFor(ns).compile(t.url)).rejects.toThrow(/no content to compile/)
+    })
+
+    it('call rejects a thing without content or code', async () => {
+      const { ns, db } = await open()
+      const t = await db.create({ type: 'Doc', id: 'empty', data: {} })
+      await expect(stubFor(ns).call(t.url, { fn: 'greet' })).rejects.toThrow(/no executable code/)
+    })
+
+    it('env.LOADER (Worker Loader) is bound in the test pool', () => {
+      expect(env.LOADER).toBeDefined()
+      expect(typeof env.LOADER?.get).toBe('function')
+    })
+
+    it('compiles MDX content and caches the module on the row', async () => {
+      const { ns, db } = await open()
+      const t = await db.create({ type: 'Doc', id: 'greeter', data: {}, content: MDX })
+
+      const compiled = await stubFor(ns).compile(t.url)
+      expect(compiled.mainModule).toBe('entry.js')
+      expect(Object.keys(compiled.modules)).toEqual(
+        expect.arrayContaining(['entry.js', 'mdx.js', 'jsx-runtime'])
+      )
+      expect(compiled.data).toEqual({ title: 'Greeter' })
+      expect(compiled.hash).toBe(t.hash)
+
+      const stored = await db.get(t.url)
+      expect(stored?.code).toBeTruthy()
+      expect(JSON.parse(stored!.code!)).toEqual(compiled)
+    })
+
+    it('meta lists exported functions and the default MDX component', async () => {
+      const { ns, db } = await open()
+      const t = await db.create({ type: 'Doc', id: 'greeter', data: {}, content: MDX })
+
+      const meta = await stubFor(ns).meta(t.url)
+      expect(meta.hasDefault).toBe(true)
+      expect(meta.functions).toEqual(expect.arrayContaining(['greet', 'add']))
+      expect(meta.exports).toContain('answer')
+      expect(meta.functions).not.toContain('answer')
+    })
+
+    it('meta returns an empty shape for a thing without content', async () => {
+      const { ns, db } = await open()
+      const t = await db.create({ type: 'Doc', id: 'blank', data: {} })
+      expect(await stubFor(ns).meta(t.url)).toEqual({ functions: [], hasDefault: false, exports: [] })
+    })
+
+    it('call runs an exported function in a dynamically loaded isolate', async () => {
+      const { ns, db } = await open()
+      const t = await db.create({ type: 'Doc', id: 'greeter', data: {}, content: MDX })
+
+      const hello = await stubFor(ns).call<string>(t.url, { fn: 'greet', args: ['World'] })
+      expect(hello.result).toBe('Hello, World!')
+      expect(hello.duration).toBeGreaterThanOrEqual(0)
+
+      const sum = await stubFor(ns).call<number>(t.url, { fn: 'add', args: [2, 3] })
+      expect(sum.result).toBe(5)
+    })
+
+    it('call surfaces isolate errors and unknown functions', async () => {
+      const { ns, db } = await open()
+      const t = await db.create({ type: 'Doc', id: 'greeter', data: {}, content: MDX })
+      await expect(stubFor(ns).call(t.url, { fn: 'nope' })).rejects.toThrow(/Function not found: nope/)
+      // `answer` is a value, not a function
+      await expect(stubFor(ns).call(t.url, { fn: 'answer' })).rejects.toThrow(/Function not found/)
+    })
+
+    it('call recompiles after the content changes', async () => {
+      const { ns, db } = await open()
+      const t = await db.create({ type: 'Doc', id: 'v', data: {}, content: 'export const v = () => 1\n' })
+      expect((await stubFor(ns).call<number>(t.url, { fn: 'v' })).result).toBe(1)
+
+      await db.update(t.url, { content: 'export const v = () => 2\n' })
+      const after = await db.get(t.url)
+      expect(after?.code).toBeUndefined() // content change clears the cached module
+      expect((await stubFor(ns).call<number>(t.url, { fn: 'v' })).result).toBe(2)
+    })
+
+    it('render invokes the default MDX export', async () => {
+      const { ns, db } = await open()
+      const t = await db.create({ type: 'Doc', id: 'greeter', data: {}, content: MDX })
+      const out = await stubFor(ns).render(t.url, {})
+      // The bundled JSX runtime produces a serialisable element tree, which
+      // render() falls back to JSON-encoding (no HTML renderer in the isolate).
+      expect(typeof out).toBe('string')
+      expect(out).not.toBe('[object Object]')
+      // The document body is a single heading, so the tree is that element
+      // (a multi-node body would come back wrapped in a Fragment whose Symbol
+      // `type` JSON drops). Frontmatter must not leak into the tree.
+      const tree = JSON.parse(out) as { type?: string; props: { children?: unknown } }
+      expect(tree).toEqual({ type: 'h1', props: { children: 'Welcome' } })
+      expect(out).not.toContain('title: Greeter')
     })
   })
 

@@ -69,6 +69,7 @@
   "dependencies": {
     "@mdxdb/clickhouse": "workspace:*",
     "@mdxdb/fs": "^1.9.0",
+    "@mdxe/cli-core": "workspace:*",
     "@mdxe/deploy": "^1.9.0",
     "@mdxe/fumadocs": "^0.0.1",
     "@mdxe/hono": "^1.9.0",

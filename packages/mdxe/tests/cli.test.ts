@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { parseArgs, runDeploy, main, VERSION, getWorkerdRuntime, requireValue, validatePort, CliError, EXIT, type CliOptions } from '../src/cli.js'
-import { FAILSAFE_CTX } from '../src/cli/context.js'
+import { FAILSAFE_CTX } from '@mdxe/cli-core'
 
 // Mock @mdxe/fumadocs for checkDocsType
 vi.mock('@mdxe/fumadocs', () => ({

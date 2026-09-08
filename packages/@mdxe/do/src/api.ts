@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { ensureLoggedIn, getToken } from 'oauth.do'
+import { ensureLoggedIn, getToken } from 'oauth.do/node'
 import type { DeployPayload, DeployResult } from './types.js'
 
 /**

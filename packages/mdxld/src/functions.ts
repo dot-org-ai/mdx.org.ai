@@ -6,10 +6,10 @@
  *
  * @example
  * ```ts
- * import { RPC, AI, generateText } from 'mdxld/functions'
+ * import { AI, generateText } from 'mdxld/functions'
  *
- * // Use RPC primitives
- * const rpc = RPC({ functions: { hello: () => 'world' } })
+ * // Note: ai-functions@2.4 ships no RPC / RPCPromise. capnweb RPC is rpc.do:
+ * //   import { RPC } from 'rpc.do'
  *
  * // Use AI function constructors
  * const ai = AI('Generate a summary', { input: schema({ text: 'string' }) })

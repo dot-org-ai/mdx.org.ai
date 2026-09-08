@@ -959,7 +959,7 @@ import type {
 | [@mdxui/fumadocs](https://www.npmjs.com/package/@mdxui/fumadocs) | Docs | Fumadocs utilities |
 | [@mdxui/widgets](https://www.npmjs.com/package/@mdxui/widgets) | React | Chat, Editor, Search widgets |
 
-> **Note:** CLI/terminal rendering uses [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) since Ink output is coupled to the Ink runtime.
+> **Note:** Terminal output is plain bytes (`@mdxui/text`, planned). [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) is a viewer over the `@mdxe/tui` seam that displays those bytes and handles input; it does not render MDX itself.
 
 ### Core Packages
 

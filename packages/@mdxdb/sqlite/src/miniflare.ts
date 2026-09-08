@@ -18,24 +18,33 @@
  * @packageDocumentation
  */
 
-import type { MDXDatabaseRPC, Thing, Relationship } from './types.js'
+import type {
+  MDXDatabaseRPC,
+  MDXDatabaseNamespace,
+  MDXDatabaseStub,
+  Thing,
+  Relationship,
+  CreateOptions,
+  UpdateOptions,
+  RelateOptions,
+} from './types.js'
 
 // Miniflare types
 interface Miniflare {
-  getDurableObjectNamespace(name: string): Promise<DurableObjectNamespace<MDXDatabaseRPC>>
+  getDurableObjectNamespace(name: string): Promise<MDXDatabaseNamespace>
   dispose(): Promise<void>
 }
 
 // Cache miniflare instance
 let miniflareInstance: Miniflare | null = null
-let miniflareBinding: DurableObjectNamespace<MDXDatabaseRPC> | null = null
+let miniflareBinding: MDXDatabaseNamespace | null = null
 
 /**
  * Create a miniflare-based Durable Object binding
  */
 export async function createMiniflareBinding(
   persistPath?: string
-): Promise<DurableObjectNamespace<MDXDatabaseRPC>> {
+): Promise<MDXDatabaseNamespace> {
   if (miniflareBinding) {
     return miniflareBinding
   }
@@ -93,9 +102,8 @@ export async function disposeMiniflare(): Promise<void> {
 /**
  * Create a simple in-memory implementation for testing
  */
-export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const instances = new Map<string, any>()
+export function createInMemoryBinding(): MDXDatabaseNamespace {
+  const instances = new Map<string, MDXDatabaseRPC>()
 
   const createInMemoryInstance = (name: string): MDXDatabaseRPC => {
     const data = new Map<string, Record<string, unknown>>()
@@ -130,9 +138,16 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
 
         const orderDir = options.order === 'asc' ? 1 : -1
         if (options.orderBy) {
+          const key = options.orderBy
+          // SQLite compares mixed types by class (NULL < numbers < text); the in-memory shim
+          // only needs a stable, sensible order for the number/string values tests use.
+          const valueOf = (row: Record<string, unknown>): number | string => {
+            const v = (row.data as Record<string, unknown>)[key] ?? row[key]
+            return typeof v === 'number' ? v : v == null ? '' : String(v)
+          }
           result.sort((a, b) => {
-            const aVal = (a.data as Record<string, unknown>)[options.orderBy!] ?? a[options.orderBy!]
-            const bVal = (b.data as Record<string, unknown>)[options.orderBy!] ?? b[options.orderBy!]
+            const aVal = valueOf(a)
+            const bVal = valueOf(b)
             if (aVal < bVal) return -1 * orderDir
             if (aVal > bVal) return 1 * orderDir
             return 0
@@ -178,7 +193,9 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         return instance.get(buildUrl(type, id))
       },
 
-      async create(options) {
+      async create<TData = Record<string, unknown>>(
+        options: CreateOptions<TData>
+      ): Promise<Thing<TData>> {
         const id = options.id ?? generateId()
         const url = buildUrl(options.type, id)
         const now = new Date().toISOString()
@@ -213,10 +230,13 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
           by: options.by,
           in: options.in,
           version: 1,
-        } as Thing
+        } as Thing<TData>
       },
 
-      async update(url, options) {
+      async update<TData = Record<string, unknown>>(
+        url: string,
+        options: UpdateOptions<TData>
+      ): Promise<Thing<TData>> {
         const existing = data.get(url)
         if (!existing) {
           throw new Error(`Thing not found: ${url}`)
@@ -251,15 +271,17 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
           by: options.by,
           in: options.in,
           version: existing.version as number,
-        } as Thing
+        } as Thing<TData>
       },
 
-      async upsert(options) {
+      async upsert<TData = Record<string, unknown>>(
+        options: CreateOptions<TData>
+      ): Promise<Thing<TData>> {
         const id = options.id ?? generateId()
         const url = buildUrl(options.type, id)
 
         if (data.has(url)) {
-          return instance.update(url, {
+          return instance.update<TData>(url, {
             data: options.data,
             content: options.content,
             by: options.by,
@@ -267,7 +289,7 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
           })
         }
 
-        return instance.create({ ...options, id })
+        return instance.create<TData>({ ...options, id })
       },
 
       async delete(url) {
@@ -280,7 +302,9 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         return data.delete(url)
       },
 
-      async relate(options) {
+      async relate<TData = Record<string, unknown>>(
+        options: RelateOptions<TData>
+      ): Promise<Relationship<TData>> {
         const id = `rel_${options.from}_${options.predicate}_${options.to}`
         const now = new Date().toISOString()
 
@@ -308,7 +332,7 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
           by: options.by,
           in: options.in,
           do: options.do,
-        } as Relationship
+        } as Relationship<TData>
       },
 
       async unrelate(from, predicate, to) {
@@ -378,6 +402,27 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
         return result
       },
 
+      // Code execution needs @mdxe/isolate plus a Worker loader binding, neither of which
+      // the in-memory shim has. Fail loudly instead of pretending to run code.
+      async compile(url) {
+        throw new Error(`compile(${url}) is not supported by the in-memory binding`)
+      },
+
+      async call(url, options) {
+        throw new Error(`call(${url}, ${options.fn}) is not supported by the in-memory binding`)
+      },
+
+      async meta(url) {
+        if (!data.has(url)) {
+          throw new Error(`Thing not found: ${url}`)
+        }
+        return { functions: [], hasDefault: false, exports: [] }
+      },
+
+      async render(url) {
+        throw new Error(`render(${url}) is not supported by the in-memory binding`)
+      },
+
       getDatabaseSize() {
         return 0
       },
@@ -386,34 +431,55 @@ export function createInMemoryBinding(): DurableObjectNamespace<MDXDatabaseRPC> 
     return instance
   }
 
-  return {
+  // Minimal DurableObjectId: identity is the string form, `name` is set for
+  // name-derived ids so the DO can derive its $id the same way it does in Workers.
+  const makeId = (id: string, name?: string): DurableObjectId => ({
+    toString: () => id,
+    equals: (other: DurableObjectId) => other.toString() === id,
+    name,
+  })
+
+  const getStub = (id: DurableObjectId): MDXDatabaseStub => {
+    const name = id.name ?? id.toString()
+
+    let inst = instances.get(name)
+    if (!inst) {
+      inst = createInMemoryInstance(name)
+      instances.set(name, inst)
+    }
+
+    // The in-memory instance implements the structural MDXDatabaseRPC contract but is not
+    // a real RPC stub (no Rpc brand, no Disposable, no pipelining thenables), so the cast
+    // has to go through `unknown`.
+    return { ...inst, id, name } as unknown as MDXDatabaseStub
+  }
+
+  const namespace: MDXDatabaseNamespace = {
     idFromName(name: string): DurableObjectId {
-      return { toString: () => name, name }
+      return makeId(name, name)
     },
 
     idFromString(id: string): DurableObjectId {
-      return { toString: () => id }
+      return makeId(id)
     },
 
     newUniqueId(): DurableObjectId {
-      const id = `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`
-      return { toString: () => id }
+      return makeId(`${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`)
     },
 
-    get(id: DurableObjectId): DurableObjectStub<MDXDatabaseRPC> {
-      const name = id.name ?? id.toString()
+    get(id: DurableObjectId): MDXDatabaseStub {
+      return getStub(id)
+    },
 
-      if (!instances.has(name)) {
-        instances.set(name, createInMemoryInstance(name))
-      }
+    getByName(name: string): MDXDatabaseStub {
+      return getStub(makeId(name, name))
+    },
 
-      const inst = instances.get(name)!
-
-      return {
-        ...inst,
-        id,
-        name,
-      } as DurableObjectStub<MDXDatabaseRPC>
+    // Jurisdictions are a placement concern; the in-memory binding has a single location.
+    jurisdiction(): MDXDatabaseNamespace {
+      return namespace
     },
   }
+
+  return namespace
 }

@@ -1,517 +1,67 @@
 # @mdxe/ink
 
-Terminal rendering for MDX content using Ink and React. Render MDX documents beautifully in the CLI.
+The Ink viewer for the [`@mdxe/tui`](../tui) seam. It displays `@mdxui/text` register bytes in the terminal through Ink 7 and handles input; it never renders MDX, never invents or changes a byte, and never attaches to a pipe.
 
-## Installation
+Ink stays the no-native-binary viewer: Node ≥ 22 and Bun, `ink ^7` and `react ^19.2` as peers.
 
 ```bash
-npm install @mdxe/ink
-# or
-pnpm add @mdxe/ink
-# or
-yarn add @mdxe/ink
+pnpm add @mdxe/ink ink react
 ```
-
-## Features
-
-- **Terminal Rendering** - Render MDX as styled terminal output
-- **React Components** - Use Ink components for rich formatting
-- **Markdown Support** - Headings, lists, code blocks, links
-- **Color Support** - Automatic color detection and theming
-- **Interactive** - Full Ink interactivity support
-- **Type-Safe** - Full TypeScript support
-
-## Quick Start
-
-```typescript
-import { renderToText, MDXDocument } from '@mdxe/ink'
-import { parse } from 'mdxld'
-import { render } from 'ink'
-
-const doc = parse(`---
-title: Hello CLI
----
-
-# Welcome
-
-This is **bold** and *italic* text.
-
-- Item 1
-- Item 2
-- Item 3
-
-\`\`\`javascript
-console.log('Hello, World!')
-\`\`\`
-`)
-
-// Render to string
-const text = renderToText(doc)
-console.log(text)
-
-// Or render with Ink
-render(<MDXDocument doc={doc} />)
-```
-
-## API Reference
-
-### `MDXDocument`
-
-React component for rendering an MDXLD document.
-
-```typescript
-function MDXDocument(props: MDXDocumentProps): React.ReactElement
-
-interface MDXDocumentProps {
-  doc: MDXLDDocument
-  options?: RenderOptions
-}
-
-interface RenderOptions {
-  colors?: boolean          // Enable colors (default: auto-detect)
-  width?: number            // Max width (default: terminal width)
-  showFrontmatter?: boolean // Show frontmatter (default: false)
-  theme?: Theme             // Color theme
-}
-```
-
-**Example:**
-
-```typescript
-import { render } from 'ink'
-import { MDXDocument } from '@mdxe/ink'
-import { parse } from 'mdxld'
-
-const doc = parse(`---
-title: My Document
----
-
-# Hello World
-
-Some content here.`)
-
-render(
-  <MDXDocument
-    doc={doc}
-    options={{
-      colors: true,
-      width: 80,
-      showFrontmatter: true
-    }}
-  />
-)
-```
-
-### `MDXContent`
-
-Render just the content portion of an MDX document.
-
-```typescript
-function MDXContent(props: MDXContentProps): React.ReactElement
-
-interface MDXContentProps {
-  content: string
-  options?: RenderOptions
-}
-```
-
-**Example:**
-
-```typescript
-import { render } from 'ink'
-import { MDXContent } from '@mdxe/ink'
-
-render(
-  <MDXContent
-    content="# Hello\n\nThis is **markdown** content."
-    options={{ colors: true }}
-  />
-)
-```
-
-### `renderToText(doc, options?)`
-
-Render an MDXLD document to a plain text string.
-
-```typescript
-function renderToText(doc: MDXLDDocument, options?: RenderOptions): string
-```
-
-**Example:**
-
-```typescript
-import { renderToText } from '@mdxe/ink'
-import { parse } from 'mdxld'
-
-const doc = parse(`
-# Hello
-
-- Item 1
-- Item 2
-`)
-
-const text = renderToText(doc, { colors: false })
-console.log(text)
-// Output:
-// ╔═══════╗
-// ║ Hello ║
-// ╚═══════╝
-//
-// • Item 1
-// • Item 2
-```
-
-### `renderToText` with Colors
-
-When colors are enabled, the output includes ANSI escape codes:
-
-```typescript
-const text = renderToText(doc, { colors: true })
-// Output includes ANSI color codes for syntax highlighting
-```
-
-## Theming
-
-### Built-in Themes
-
-```typescript
-import { themes } from '@mdxe/ink'
-
-const doc = parse(content)
-
-renderToText(doc, { theme: themes.dark })
-renderToText(doc, { theme: themes.light })
-renderToText(doc, { theme: themes.monokai })
-```
-
-### Custom Theme
-
-```typescript
-import { renderToText } from '@mdxe/ink'
-
-const customTheme = {
-  heading: { color: 'cyan', bold: true },
-  text: { color: 'white' },
-  bold: { bold: true },
-  italic: { italic: true },
-  code: { color: 'yellow', backgroundColor: 'gray' },
-  codeBlock: { color: 'green' },
-  link: { color: 'blue', underline: true },
-  listBullet: { color: 'magenta' },
-  blockquote: { color: 'gray', italic: true }
-}
-
-const text = renderToText(doc, { theme: customTheme })
-```
-
-## Markdown Elements
-
-### Headings
-
-```markdown
-# Heading 1
-## Heading 2
-### Heading 3
-```
-
-Rendered with box borders and appropriate sizing:
-
-```
-╔═══════════╗
-║ Heading 1 ║
-╚═══════════╝
-
-── Heading 2 ──
-
-Heading 3
-─────────
-```
-
-### Lists
-
-```markdown
-- Unordered item 1
-- Unordered item 2
-
-1. Ordered item 1
-2. Ordered item 2
-```
-
-Output:
-
-```
-• Unordered item 1
-• Unordered item 2
-
-1. Ordered item 1
-2. Ordered item 2
-```
-
-### Code Blocks
-
-````markdown
-```javascript
-const greeting = 'Hello'
-console.log(greeting)
-```
-````
-
-Output with syntax highlighting:
-
-```
-┌─ javascript ────────────────┐
-│ const greeting = 'Hello'    │
-│ console.log(greeting)       │
-└─────────────────────────────┘
-```
-
-### Inline Elements
-
-```markdown
-**bold text** and *italic text* and `inline code`
-```
-
-### Links
-
-```markdown
-[Link text](https://example.com)
-```
-
-Output:
-
-```
-Link text (https://example.com)
-```
-
-### Blockquotes
-
-```markdown
-> This is a quote
-> with multiple lines
-```
-
-Output:
-
-```
-│ This is a quote
-│ with multiple lines
-```
-
-## Examples
-
-### CLI Documentation Viewer
-
-```typescript
-#!/usr/bin/env node
-import { renderToText } from '@mdxe/ink'
-import { parse } from 'mdxld'
-import { readFileSync } from 'fs'
-
-const file = process.argv[2]
-const content = readFileSync(file, 'utf-8')
-const doc = parse(content)
-
-console.log(renderToText(doc, {
-  colors: process.stdout.isTTY,
-  width: process.stdout.columns || 80
-}))
-```
-
-### Interactive Document Browser
-
-```typescript
-import { render, Box, Text, useInput } from 'ink'
-import { MDXDocument } from '@mdxe/ink'
-import { useState } from 'react'
-
-function DocBrowser({ docs }) {
-  const [index, setIndex] = useState(0)
-
-  useInput((input, key) => {
-    if (key.leftArrow) setIndex(i => Math.max(0, i - 1))
-    if (key.rightArrow) setIndex(i => Math.min(docs.length - 1, i + 1))
-    if (input === 'q') process.exit(0)
-  })
-
-  return (
-    <Box flexDirection="column">
-      <Box marginBottom={1}>
-        <Text>
-          Document {index + 1} of {docs.length} (← → to navigate, q to quit)
-        </Text>
-      </Box>
-      <MDXDocument doc={docs[index]} />
-    </Box>
-  )
-}
-
-render(<DocBrowser docs={documents} />)
-```
-
-### Help Command
-
-```typescript
-import { renderToText } from '@mdxe/ink'
-import { parse } from 'mdxld'
-
-function showHelp() {
-  const helpDoc = parse(`
-# My CLI Tool
-
-A powerful command-line utility.
 
 ## Usage
 
-\`\`\`bash
-mycli <command> [options]
-\`\`\`
+```ts
+import { createInkViewer } from '@mdxe/ink'
 
-## Commands
+const viewer = createInkViewer()
+const handle = await viewer.mount(frames, {
+  terminal: { stdout: process.stdout, stdin: process.stdin },
+})
+handle.onAction((action) => {
+  // quit | scroll | page | jump | select | back | search | insert | resize — the host decides what they mean
+})
+await viewer.unmount()
+```
 
-- **init** - Initialize a new project
-- **build** - Build the project
-- **deploy** - Deploy to production
+`frames` is a `FrameStream` (`AsyncIterable<Uint8Array | string>`): each chunk is one complete frame from the renderer. Input is decoded from `stdin` by the seam's shared `createInputSource` and mapped through `defaultKeymap`; pass `events` and/or `keymap` on mount to supply your own.
+
+For hosts that choose a viewer at runtime, `inkViewer(options)` is a `ViewerFactory` that imports even this package's viewer module lazily:
+
+```ts
+import { inkViewer } from '@mdxe/ink'
+const factory = inkViewer()
+const viewer = await factory()
+```
+
+## What it guarantees
+
+- **Lazy.** Importing `@mdxe/ink` loads neither `ink` nor `react`; `mount()` does, after the TTY guard has passed. A pipe never pays for the framework.
+- **Never on pipes.** When `stdout` or `stdin` is not a TTY, `mount()` rejects with `ViewerError` whose `code` is the stable string `NOT_A_TTY`, writes nothing and never touches raw mode. Route agents to the plain register bytes instead.
+- **`strip(paint(bytes)) === bytes`.** Each frame is laid out with Ink's `renderToString` and compared to the register bytes before it is written. Ink trims trailing whitespace per line and wraps lines wider than its layout width; whenever it would alter a byte the frame is written verbatim instead, so the invariant holds unconditionally and Ink never wraps a line — the terminal does.
+- **Terminal-width layout.** Each paint lays out at `terminal.stdout.columns` (so a resize is honoured; `DEFAULT_COLUMNS` = 80 when unreported). Ink's layout cost is linear in the width, so wrapping is not "disabled" with a huge width — that costs about a second per frame through Yoga — it is prevented by the verbatim fallback above.
+- **Unmount releases.** Raw mode is released, the cursor restored, and nothing is written afterwards. `unmount()` is idempotent; a `quit` action unmounts.
+
+The `@mdxe/tui/conformance` suite is run against this viewer in `src/viewer.test.ts`.
 
 ## Options
 
-- \`--help, -h\` - Show help
-- \`--version, -v\` - Show version
-- \`--verbose\` - Enable verbose output
-
-## Examples
-
-\`\`\`bash
-mycli init my-project
-mycli build --verbose
-mycli deploy --production
-\`\`\`
-`)
-
-  console.log(renderToText(helpDoc, { colors: true }))
-}
+```ts
+createInkViewer({ columns?: number }) // fixed Ink layout width; default: terminal.stdout.columns, else DEFAULT_COLUMNS (80)
 ```
 
-### Progress Display with MDX
+`paint(frame, runtime, columns?)` is exported as a pure function for tests and hosts that want the laid-out bytes without a terminal; it reports which engine produced them (`ink` or `verbatim`).
 
-```typescript
-import { render, Box } from 'ink'
-import { MDXContent } from '@mdxe/ink'
-import { useState, useEffect } from 'react'
+## Benchmark
 
-function ProgressDisplay() {
-  const [step, setStep] = useState(0)
+`pnpm --filter @mdxe/ink bench` runs the shared harness (`@mdxe/tui/benchmark`) against a fake 80×24 TTY and prints JSON. `installBytes` counts `ink`, `react` and their transitive dependencies once each by real path.
 
-  const steps = [
-    '## Step 1\n\nInstalling dependencies...',
-    '## Step 2\n\nBuilding project...',
-    '## Step 3\n\n**Complete!** ✓'
-  ]
+See `BENCHMARK.md` for the recorded run.
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setStep(s => Math.min(s + 1, steps.length - 1))
-    }, 2000)
-    return () => clearInterval(timer)
-  }, [])
+## Related
 
-  return (
-    <Box flexDirection="column">
-      <MDXContent content={steps[step]} />
-    </Box>
-  )
-}
-
-render(<ProgressDisplay />)
-```
-
-## Integration
-
-### With Commander.js
-
-```typescript
-import { Command } from 'commander'
-import { renderToText } from '@mdxe/ink'
-import { parse } from 'mdxld'
-
-const program = new Command()
-
-program
-  .command('docs <topic>')
-  .description('Show documentation')
-  .action(async (topic) => {
-    const content = await fetchDocs(topic)
-    const doc = parse(content)
-    console.log(renderToText(doc, { colors: true }))
-  })
-
-program.parse()
-```
-
-### With Inquirer
-
-```typescript
-import inquirer from 'inquirer'
-import { renderToText } from '@mdxe/ink'
-
-const docs = await loadAllDocs()
-
-const { selected } = await inquirer.prompt([{
-  type: 'list',
-  name: 'selected',
-  message: 'Select a document:',
-  choices: docs.map(d => ({ name: d.data.title, value: d }))
-}])
-
-console.log(renderToText(selected, { colors: true }))
-```
-
-## Types
-
-### `MDXLDDocument`
-
-```typescript
-interface MDXLDDocument<TData = Record<string, unknown>> {
-  data: TData & {
-    title?: string
-    [key: string]: unknown
-  }
-  content: string
-}
-```
-
-### `Theme`
-
-```typescript
-interface Theme {
-  heading?: TextStyle
-  text?: TextStyle
-  bold?: TextStyle
-  italic?: TextStyle
-  code?: TextStyle
-  codeBlock?: TextStyle
-  link?: TextStyle
-  listBullet?: TextStyle
-  blockquote?: TextStyle
-}
-
-interface TextStyle {
-  color?: string
-  backgroundColor?: string
-  bold?: boolean
-  italic?: boolean
-  underline?: boolean
-  strikethrough?: boolean
-}
-```
-
-## Related Packages
-
-| Package | Description |
-|---------|-------------|
-| [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
-| [ink](https://www.npmjs.com/package/ink) | React for CLI |
-| [@mdxe/node](https://www.npmjs.com/package/@mdxe/node) | Node.js evaluation |
-
-## License
+| Package | Role |
+|---------|------|
+| [@mdxe/tui](../tui) | The seam: `Viewer`, input abstraction, conformance suite, benchmark harness |
+| [ink](https://www.npmjs.com/package/ink) | React for CLIs |
 
 MIT

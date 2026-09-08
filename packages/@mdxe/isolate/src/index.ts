@@ -8,7 +8,7 @@
  */
 
 import { compile as compileMDX, type CompileOptions } from '@mdx-js/mdx'
-import { parse, type MDXLDDocument } from 'mdxld'
+import { parse } from 'mdxld'
 
 export { parse } from 'mdxld'
 export type { MDXLDDocument } from 'mdxld'
@@ -223,11 +223,13 @@ export async function compileToModule(
 ): Promise<CompiledModule> {
   const opts = { ...defaultCompileOptions, ...options }
 
-  // Parse frontmatter
+  // Parse frontmatter. Only the body is handed to the MDX compiler: @mdx-js
+  // has no frontmatter syntax of its own, so leaving the `---` block in would
+  // render it as content (a thematic break + an `h2` of the YAML text).
   const doc = parse(content)
 
   // Compile MDX to JS
-  const compiled = await compileMDX(content, {
+  const compiled = await compileMDX(doc.content, {
     ...options,
     outputFormat: 'program',
     jsx: false,

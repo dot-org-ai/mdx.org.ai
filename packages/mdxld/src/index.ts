@@ -12,7 +12,7 @@
  * - @mdxld/validate: Schema validation
  *
  * Optional primitives integration:
- * - mdxld/functions: AI functions, RPC, generation (requires ai-functions)
+ * - mdxld/functions: AI functions, generation (requires ai-functions; capnweb RPC is rpc.do, not ai-functions)
  * - mdxld/database: Schema-first DB with bi-directional relationships (requires ai-database)
  * - mdxld/workflows: Event-driven workflows with $ context (requires ai-workflows)
  *

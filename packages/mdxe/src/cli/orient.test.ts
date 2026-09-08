@@ -7,8 +7,8 @@
 import { describe, expect, test } from 'vitest'
 
 import { buildOrientation, renderOrientation, orientCommand, TASK_GROUPS } from './orient.js'
-import type { OutputCtx } from './context.js'
-import type { Caller } from './caller.js'
+import type { OutputCtx } from '@mdxe/cli-core'
+import type { Caller } from '@mdxe/cli-core'
 
 const TEXT_CTX: OutputCtx = { mode: 'text', color: false, width: Infinity, interactive: false, stream: false }
 const JSON_CTX: OutputCtx = { mode: 'json', color: false, width: Infinity, interactive: false, stream: false }
