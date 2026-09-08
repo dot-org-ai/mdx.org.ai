@@ -49,7 +49,7 @@ mdxe is the **execution layer** of the mdx.org.ai ecosystem. While other package
     |   |              |  |              |  |              |     |
     |   | @mdxe/node   |  | @mdxe/mcp    |  | @mdxe/hono   |     |
     |   | @mdxe/bun    |  | (RPC: use    |  | @mdxe/next   |     |
-    |   | @mdxe/workers|  | ai-functions)|  | @mdxe/ink    |     |
+    |   | @mdxe/workers|  | rpc.do)      |  | @mdxe/ink    |     |
     |   +--------------+  +--------------+  +--------------+     |
     |                                                            |
     +-------------------------+----------------------------------+
@@ -240,7 +240,7 @@ const response = await claude.chat({
 | Pattern | mdxe Package | mdxai Package | Use Case |
 |---------|--------------|---------------|----------|
 | MCP Server | @mdxe/mcp | - | Claude Code tools |
-| RPC Functions | ai-functions `RPC` (no @mdxe package) | - | Distributed AI calls |
+| RPC Functions | rpc.do `RPC` (no @mdxe package) | - | Distributed AI calls |
 | Claude Integration | mdxe | @mdxai/claude | Claude-powered apps |
 | Agent Framework | mdxe | @mdxai/mastra | Multi-agent systems |
 | Voice AI | mdxe | @mdxai/vapi | Voice interfaces |
@@ -527,7 +527,7 @@ What are you building?
 |   |
 |   +-- Which protocol?
 |       +-- AI tools (Claude) --> @mdxe/mcp
-|       +-- RPC calls --> ai-functions RPC (no @mdxe/rpc)
+|       +-- RPC calls --> rpc.do (no @mdxe/rpc)
 |
 +-- Rendering MDX?
 |   |

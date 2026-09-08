@@ -186,13 +186,6 @@ describe('SDK Provider', () => {
     })
   })
 
-  describe('ai-functions Integration', () => {
-    it('should have RPC types available', async () => {
-      // Import to verify types exist
-      const module = await import('../src/index.js')
-      expect(module).toBeDefined()
-    })
-  })
 })
 
 describe('SDK Configuration', () => {

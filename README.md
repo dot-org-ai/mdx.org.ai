@@ -132,7 +132,7 @@ Detailed taxonomy of all `@mdxe` scoped packages for execution environments and 
 |---------|-------------|----------|
 | **@mdxe/mcp** | Model Context Protocol for AI tools | Claude Code, AI integrations |
 
-> RPC is not an `@mdxe` package. Use the capnweb `RPC` / `RPCPromise` primitives from [ai-functions](https://www.npmjs.com/package/ai-functions) directly (re-exported as types from `mdxe`). The former `@mdxe/rpc` package was removed as a duplicate of ai-functions RPC.
+> RPC is not an `@mdxe` package and `mdxe` re-exports no RPC types. Use [rpc.do](https://www.npmjs.com/package/rpc.do) directly (`RPC`, `RPCPromise`; capnweb transport via [@dotdo/capnweb](https://www.npmjs.com/package/@dotdo/capnweb)). The former `@mdxe/rpc` package was removed as a duplicate of capnweb RPC; `ai-functions@2.4` ships no `RPC` / `RPCPromise`.
 
 ### Deployment
 
@@ -214,7 +214,7 @@ const slack = await toSlack(doc)      // Slack blocks
 
 ```typescript
 import { createMCPServer } from '@mdxe/mcp'
-import { RPC } from 'ai-functions'
+import { RPC } from 'rpc.do'
 
 // Expose MDX functions via MCP (for Claude, etc.)
 const mcp = createMCPServer({
@@ -223,7 +223,7 @@ const mcp = createMCPServer({
   transport: 'stdio' // or 'http'
 })
 
-// Call MDX functions over capnweb RPC (ai-functions, promise pipelining)
+// Call MDX functions over capnweb RPC (rpc.do, promise pipelining)
 const rpc = RPC<typeof functions>('https://functions.example.com')
 const result = await rpc.summarize({ text })
 ```

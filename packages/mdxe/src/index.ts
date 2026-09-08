@@ -216,12 +216,6 @@ export type {
   EveryProxy,
 } from 'ai-workflows'
 
-// Re-export ai-functions capnweb RPC types (use ai-functions RPC directly; @mdxe/rpc was removed)
-export type {
-  RPC,
-  RPCPromise,
-} from 'ai-functions'
-
 // =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================

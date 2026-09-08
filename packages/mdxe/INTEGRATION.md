@@ -6,7 +6,7 @@ This document describes the integration of AI primitives (ai-sandbox, ai-functio
 
 mdxe now serves as the primary execution layer that integrates all primitives:
 - **ai-sandbox** - Secure code execution in sandboxed environments
-- **ai-functions** - RPC primitives and AI function interfaces
+- **ai-functions** - AI function interfaces (no RPC export; capnweb RPC is `rpc.do`)
 - **ai-workflows** - Event-driven workflows with the `$` context
 
 ## Changes Made
@@ -60,7 +60,6 @@ Updated to export primitives integration:
 - SDK provider types and functions
 - Re-export `evaluate` and `createEvaluator` from ai-sandbox
 - Re-export workflow types from ai-workflows
-- Re-export RPC types from ai-functions
 
 ```typescript
 // SDK Provider
@@ -73,9 +72,6 @@ export type { EvaluateOptions, EvaluateResult, ... }
 
 // ai-workflows
 export type { WorkflowContext, EventHandler, OnProxy, EveryProxy }
-
-// ai-functions
-export type { RPC, RPCPromise, RPCServer, RPCClient }
 ```
 
 ### 5. Types (src/types.ts)
@@ -120,7 +116,6 @@ Added comprehensive documentation:
 - Primitives integration section with usage examples
 - ai-sandbox integration examples
 - ai-workflows type examples
-- ai-functions RPC type examples
 
 ## Usage Examples
 
@@ -204,8 +199,8 @@ mdxe (execution layer)
 ├── ai-sandbox (secure execution)
 │   └── evaluate(), createEvaluator()
 │
-├── ai-functions (RPC & AI)
-│   └── capnweb RPC / RPCPromise types (re-exported by mdxe)
+├── ai-functions (AI)
+│   └── AI function interfaces (mdxe re-exports no RPC types; capnweb RPC is rpc.do)
 │
 └── ai-workflows (events)
     └── on, every, send types
@@ -233,7 +228,7 @@ Tests cover:
 1. **Complete mdxdb Integration**: Once mdxdb packages are implemented, remove stub fallbacks
 2. **Local AI Models**: Implement local AI provider using mdxai packages
 3. **Enhanced Workflow Support**: Add state machine integration from ai-workflows
-4. **RPC Server**: Implement full RPC server for remote context using ai-functions
+4. **RPC Server**: Implement full RPC server for remote context using capnweb (`rpc.do`)
 5. **Multi-tenant Support**: Add tenant isolation for dispatch namespaces
 
 ## Dependencies
