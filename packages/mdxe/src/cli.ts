@@ -8,10 +8,19 @@
 
 import { resolve, basename, relative, dirname } from 'node:path'
 import { spawn } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { glob } from 'glob'
 import { transform } from 'esbuild'
+import { extractGlobals } from './cli/args.js'
+import { resolveFromProcess, FAILSAFE_CTX, type OutputCtx } from './cli/context.js'
+import { resolveCallerFromProcess, type Caller } from './cli/caller.js'
+import { EXIT, fail, usageError } from './cli/errors.js'
+import { orientCommand } from './cli/orient.js'
+
+export type { OutputCtx, RenderMode, GlobalFlags } from './cli/context.js'
+export type { Caller } from './cli/caller.js'
+export { CliError, EXIT } from './cli/errors.js'
 
 /**
  * Get the version from package.json
@@ -39,6 +48,8 @@ function getVersion(): string {
 }
 
 export interface CliOptions {
+  /** The frozen render context resolved ONCE in `main` — every command reads this, never `isTTY`. */
+  ctx: OutputCtx
   command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'run' | 'admin' | 'notebook' | 'tail' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
   projectDir: string
   platform: 'do' | 'cloudflare' | 'vercel' | 'github'
@@ -83,24 +94,20 @@ export const VERSION = getVersion()
 
 /**
  * Check if a value is missing or is actually another flag.
- * Exits with code 1 if validation fails.
+ * Throws a USAGE `CliError` (exit 2) if validation fails — rendered to stderr by `fail`.
  * @param optionName - The name of the option being validated (e.g., '--port')
  * @param value - The value to validate
  * @param usage - Optional usage example to show on error
  */
-export function requireValue(optionName: string, value: string | undefined, usage?: string): void {
+export function requireValue(optionName: string, value: string | undefined, usage?: string): asserts value is string {
   if (!value || value.startsWith('-')) {
-    console.error(`Error: ${optionName} requires a value`)
-    if (usage) {
-      console.error(`Usage: ${usage}`)
-    }
-    process.exit(1)
+    throw usageError(`${optionName} requires a value`, usage ? `usage: ${usage}` : undefined)
   }
 }
 
 /**
  * Validate and parse a port number.
- * Exits with code 1 if validation fails.
+ * Throws a USAGE `CliError` (exit 2) if validation fails.
  * @param optionName - The name of the option being validated (e.g., '--port')
  * @param value - The value to validate
  * @param usage - Optional usage example to show on error
@@ -113,15 +120,11 @@ export function validatePort(optionName: string, value: string | undefined, usag
 
   // Check if it's a valid integer (not a float)
   if (isNaN(portNum) || !Number.isInteger(Number(value))) {
-    console.error(`Error: Invalid port number: ${value}`)
-    console.error('Port must be a valid integer between 1 and 65535')
-    process.exit(1)
+    throw usageError(`invalid port number: ${value}`, 'port must be a valid integer between 1 and 65535')
   }
 
   if (portNum < 1 || portNum > 65535) {
-    console.error(`Error: Invalid port number: ${value}`)
-    console.error('Port must be between 1 and 65535')
-    process.exit(1)
+    throw usageError(`invalid port number: ${value}`, 'port must be between 1 and 65535')
   }
 
   return portNum
@@ -191,6 +194,21 @@ Commands:
   db:publish          Publish MDX files to database
   help                Show this help message
   version             Show version
+
+  (a bare "mdxe" prints an orientation and exits — it never starts a server)
+
+Global Options (any command):
+  --format <mode>        Output: json | text | human (default: auto — human on a TTY,
+                         text when piped, under CI, or under an agent harness)
+  --json                 Shorthand for --format json
+  --agent                Render for an agent (text unless --json); also set by MDXE_AGENT=1,
+                         AGENT=1, or a harness marker (CLAUDECODE, CODEX_*, CURSOR_AGENT, ...)
+  --color <when>         always | never | auto (NO_COLOR in the environment always wins)
+  --no-color             Disable color
+  --help, -h             Show this help; --version, -V show the version
+
+Exit codes: 0 ok · 1 crash · 2 usage · 3 not found · 4 runtime unavailable · 6 refused (fail-closed)
+Errors always go to stderr (one line: "error<TAB>code=..." in text, a JSON envelope in json).
 
 Server Options:
   --dir, -d <path>       Project directory (default: current directory)
@@ -388,8 +406,16 @@ Environment Variables:
   GITHUB_TOKEN             GitHub personal access token
 `
 
-export function parseArgs(args: string[]): CliOptions {
+/**
+ * Parse a command argv (the global render flags already peeled off by `extractGlobals`). Fails
+ * CLOSED: an unknown command word, an unknown flag (mid-argv or trailing), a missing or malformed
+ * value, and a bad enumeration are each a USAGE `CliError` (exit 2) — never silently ignored.
+ * `ctx` is the frozen render context resolved once in `main`; it defaults to the machine-safe
+ * `FAILSAFE_CTX` when constructed outside `main` (tests, embedders).
+ */
+export function parseArgs(args: string[], ctx: OutputCtx = FAILSAFE_CTX): CliOptions {
   const options: CliOptions = {
+    ctx,
     command: 'dev', // Default to dev
     projectDir: process.cwd(),
     platform: 'do', // Default to .do platform
@@ -413,8 +439,9 @@ export function parseArgs(args: string[]): CliOptions {
   }
 
   // Parse command
-  if (args.length > 0 && !args[0].startsWith('-')) {
-    const cmd = args[0].toLowerCase()
+  const first = args[0]
+  if (first !== undefined && !first.startsWith('-')) {
+    const cmd = first.toLowerCase()
     if (cmd === 'dev') {
       options.command = 'dev'
     } else if (cmd === 'build') {
@@ -445,18 +472,25 @@ export function parseArgs(args: string[]): CliOptions {
       options.command = 'version'
     } else if (cmd === 'help' || cmd === '-h' || cmd === '--help') {
       options.command = 'help'
+    } else {
+      // A typo'd verb (`dpeloy`) must never fall through to the dev server.
+      throw usageError(`unknown command ${JSON.stringify(first)}`, 'run `mdxe help` for the command list')
     }
     args = args.slice(1)
   }
 
+  // `tail` owns its argv (`parseTailArgs`): hand it through untouched, never pre-validated here.
+  if (options.command === 'tail') return options
+
   // Handle positional argument after command (e.g., mdxe notebook ./path/to/file.mdx)
   // For deploy, check if it's a subcommand like 'workers'
-  if (args.length > 0 && !args[0].startsWith('-')) {
-    if (options.command === 'deploy' && args[0] === 'workers') {
+  const positional = args[0]
+  if (positional !== undefined && !positional.startsWith('-')) {
+    if (options.command === 'deploy' && positional === 'workers') {
       options.subcommand = 'workers'
       args = args.slice(1)
     } else {
-      options.projectDir = resolve(args[0])
+      options.projectDir = resolve(positional)
       args = args.slice(1)
     }
   }
@@ -468,6 +502,7 @@ export function parseArgs(args: string[]): CliOptions {
 
     switch (arg) {
       case '--dir':
+      case '--path':
       case '-d':
         requireValue('--dir', next, 'mdxe [command] --dir <path>')
         options.projectDir = resolve(next)
@@ -478,8 +513,7 @@ export function parseArgs(args: string[]): CliOptions {
         if (next === 'do' || next === 'cloudflare' || next === 'vercel' || next === 'github') {
           options.platform = next
         } else {
-          console.error(`Invalid platform: ${next}. Supported: do, cloudflare, vercel, github`)
-          process.exit(1)
+          throw usageError(`Invalid platform: ${next}. Supported: do, cloudflare, vercel, github`)
         }
         i++
         break
@@ -488,8 +522,7 @@ export function parseArgs(args: string[]): CliOptions {
         if (next === 'static' || next === 'opennext') {
           options.mode = next
         } else {
-          console.error(`Invalid mode: ${next}. Use 'static' or 'opennext'.`)
-          process.exit(1)
+          throw usageError(`Invalid mode: ${next}. Use 'static' or 'opennext'.`)
         }
         i++
         break
@@ -510,13 +543,14 @@ export function parseArgs(args: string[]): CliOptions {
         options.verbose = true
         break
       case '--env':
-      case '-e':
-        if (next && next.includes('=')) {
-          const [key, ...valueParts] = next.split('=')
-          options.env[key] = valueParts.join('=')
-        }
+      case '-e': {
+        requireValue('--env', next, 'mdxe deploy --env KEY=value')
+        const eq = next.indexOf('=')
+        if (eq < 1) throw usageError(`--env expects KEY=value, got ${JSON.stringify(next)}`)
+        options.env[next.slice(0, eq)] = next.slice(eq + 1)
         i++
         break
+      }
       case '--help':
       case '-h':
         options.help = true
@@ -548,8 +582,7 @@ export function parseArgs(args: string[]): CliOptions {
         if (next === 'local' || next === 'remote' || next === 'all') {
           options.context = next
         } else {
-          console.error(`Invalid context: ${next}. Use 'local', 'remote', or 'all'.`)
-          process.exit(1)
+          throw usageError(`Invalid context: ${next}. Use 'local', 'remote', or 'all'.`)
         }
         i++
         break
@@ -557,17 +590,15 @@ export function parseArgs(args: string[]): CliOptions {
         if (next === 'node' || next === 'bun' || next === 'workers' || next === 'all') {
           options.target = next
         } else {
-          console.error(`Invalid target: ${next}. Use 'node', 'bun', 'workers', or 'all'.`)
-          process.exit(1)
+          throw usageError(`Invalid target: ${next}. Use 'node', 'bun', 'workers', or 'all'.`)
         }
         i++
         break
       case '--db':
-        if (['memory', 'fs', 'sqlite', 'sqlite-do', 'clickhouse', 'all'].includes(next)) {
+        if (next !== undefined && ['memory', 'fs', 'sqlite', 'sqlite-do', 'clickhouse', 'all'].includes(next)) {
           options.db = next as CliOptions['db']
         } else {
-          console.error(`Invalid db backend: ${next}. Use memory, fs, sqlite, sqlite-do, clickhouse, or all.`)
-          process.exit(1)
+          throw usageError(`Invalid db backend: ${next}. Use memory, fs, sqlite, sqlite-do, clickhouse, or all.`)
         }
         i++
         break
@@ -576,15 +607,15 @@ export function parseArgs(args: string[]): CliOptions {
         i++
         break
       case '--clickhouse':
-        options.clickhouseUrl = next || 'http://localhost:8123'
+        requireValue('--clickhouse', next, 'mdxe db:publish --clickhouse http://localhost:8123')
+        options.clickhouseUrl = next
         i++
         break
       case '--ai':
         if (next === 'local' || next === 'remote') {
           options.aiMode = next
         } else {
-          console.error(`Invalid AI mode: ${next}. Use 'local' or 'remote'.`)
-          process.exit(1)
+          throw usageError(`Invalid AI mode: ${next}. Use 'local' or 'remote'.`)
         }
         i++
         break
@@ -614,6 +645,11 @@ export function parseArgs(args: string[]): CliOptions {
         options.compatibilityDate = next
         i++
         break
+      default:
+        // Fail closed BEFORE any value is consumed: a typo'd flag errors identically mid-argv or
+        // trailing, and can never be swallowed to masquerade as an intentional run.
+        if (arg !== undefined && arg.startsWith('-')) throw usageError(`unknown flag ${arg}`, 'run `mdxe help` for the option list')
+        throw usageError(`bad argument ${JSON.stringify(arg ?? '')} — expected a --flag here`)
     }
   }
 
@@ -884,7 +920,7 @@ function extractScriptBlocks(content: string): { name: string; code: string; imp
  */
 function isLocalImport(imp: string): boolean {
   // Match imports like: import X from './path' or import X from '../path' or import X from '/path'
-  return /from\s+['"][.\/]/.test(imp)
+  return /from\s+['"][./]/.test(imp)
 }
 
 /**
@@ -1029,7 +1065,7 @@ async function findMdxTestFiles(projectDir: string, filter?: string): Promise<st
  * Get database provider config for the SDK
  * The SDK injects DB, db, etc. as globals based on this config
  */
-function getDbConfig(db: CliOptions['db'], target: CliOptions['target']): { provider: string; config: Record<string, unknown> } {
+function getDbConfig(db: CliOptions['db'], _target: CliOptions['target']): { provider: string; config: Record<string, unknown> } {
   switch (db) {
     case 'memory':
       return { provider: 'memory', config: {} }
@@ -1447,7 +1483,7 @@ export async function runScript(options: CliOptions): Promise<void> {
  */
 export async function runDev(options: CliOptions): Promise<void> {
   // Check for Docs type project
-  const { isDocsType, detection } = await checkDocsType(options.projectDir)
+  const { isDocsType } = await checkDocsType(options.projectDir)
 
   if (isDocsType) {
     console.log('📚 mdxe dev (Fumadocs)\n')
@@ -1632,68 +1668,139 @@ export async function runAdmin(options: CliOptions): Promise<void> {
   })
 }
 
-export async function main(): Promise<void> {
-  const args = process.argv.slice(2)
-  const options = parseArgs(args)
+/**
+ * The router. Resolves the render context ({@link resolveFromProcess}) and the Caller
+ * ({@link resolveCallerFromProcess}) exactly ONCE, fast-paths `help`/`version` BEFORE any dynamic
+ * import (help never loads a runtime), renders the ORIENTATION on a bare invocation (never the dev
+ * server — a wrongly-launched server blocks a harness forever), then dispatches with the frozen
+ * `ctx` on every command's options. The whole body is one try/catch: any throw is rendered by
+ * {@link fail} to **stderr** in the active mode and its exit code RETURNED — stdout stays a pure
+ * payload. `process.exit` is the entrypoint's job (bottom of this file), never `main`'s.
+ */
+export async function main(argv: readonly string[] = process.argv.slice(2)): Promise<number> {
+  // Arg pre-parse + context resolution BOTH fail closed to the minimal machine-safe context: a bad
+  // global flag (`--format xml`, `--color` with no value) renders the same clean error line and a
+  // nonzero exit as any other failure — never an unhandled rejection.
+  let parsed: ReturnType<typeof extractGlobals>
+  let ctx: OutputCtx
+  let caller: Caller
+  try {
+    parsed = extractGlobals(argv)
+    ctx = resolveFromProcess(parsed.globals)
+    caller = resolveCallerFromProcess(parsed.globals)
+  } catch (err) {
+    return fail(FAILSAFE_CTX, err)
+  }
+  const { rest, wantHelp, wantVersion } = parsed
 
-  switch (options.command) {
-    case 'dev':
-      await runDev(options)
-      break
-    case 'build':
-      await runBuild(options)
-      break
-    case 'start':
-      await runStart(options)
-      break
-    case 'test':
-      await runTest(options)
-      break
-    case 'run':
-      await runScript(options)
-      break
-    case 'deploy':
-      await runDeploy(options)
-      break
-    case 'admin':
-      await runAdmin(options)
-      break
-    case 'notebook':
-      const { runNotebook } = await import('./commands/notebook')
-      await runNotebook({
-        path: options.projectDir,
-        port: options.port,
-        host: options.host,
-        open: options.open,
-        verbose: options.verbose,
-      })
-      break
-    case 'tail':
-      // Pass remaining args to tail command for its own parsing
-      const tailArgs = process.argv.slice(3) // Skip node, script, 'tail'
-      const { parseTailArgs, runTail } = await import('./commands/tail.js')
-      const tailOptions = parseTailArgs(tailArgs)
-      tailOptions.verbose = tailOptions.verbose || options.verbose
-      await runTail(tailOptions)
-      break
-    case 'db':
-    case 'db:server':
-    case 'db:client':
-    case 'db:publish':
-      await runDbCommand(options)
-      break
-    case 'version':
-      console.log(`mdxe version ${VERSION}`)
-      break
-    case 'help':
-    default:
+  try {
+    // Meta fast-path — BEFORE any dynamic import.
+    if (wantVersion) {
+      console.log(ctx.mode === 'json' ? JSON.stringify({ name: 'mdxe', version: VERSION }) : `mdxe version ${VERSION}`)
+      return EXIT.OK
+    }
+    if (wantHelp) {
       console.log(HELP_TEXT)
-      break
+      return EXIT.OK
+    }
+    // The bare invocation renders the ORIENTATION: an agent/CI/pipe gets static text and exits 0
+    // without reading stdin; a confident human gets the same orientation as the opening view.
+    if (rest.length === 0) return orientCommand(ctx, caller, VERSION)
+
+    const options = parseArgs(rest, ctx)
+
+    switch (options.command) {
+      case 'dev':
+        await runDev(options)
+        break
+      case 'build':
+        await runBuild(options)
+        break
+      case 'start':
+        await runStart(options)
+        break
+      case 'test':
+        await runTest(options)
+        break
+      case 'run':
+        await runScript(options)
+        break
+      case 'deploy':
+        await runDeploy(options)
+        break
+      case 'admin':
+        await runAdmin(options)
+        break
+      case 'notebook': {
+        const { runNotebook } = await import('./commands/notebook')
+        await runNotebook({
+          path: options.projectDir,
+          port: options.port,
+          host: options.host,
+          open: options.open,
+          verbose: options.verbose,
+        })
+        break
+      }
+      case 'tail': {
+        // `tail` parses its own argv. The global render flags were peeled off already, so hand the
+        // resolved ctx back to it in its own vocabulary (`--json`, `--no-color`) — NO_COLOR and the
+        // --format ladder now govern tail exactly like every other command.
+        const tailArgs = [...rest.slice(1)]
+        if (ctx.mode === 'json') tailArgs.push('--json')
+        if (!ctx.color) tailArgs.push('--no-color')
+        const { parseTailArgs, runTail } = await import('./commands/tail.js')
+        const tailOptions = parseTailArgs(tailArgs)
+        tailOptions.verbose = tailOptions.verbose || options.verbose
+        await runTail(tailOptions)
+        break
+      }
+      case 'db':
+      case 'db:server':
+      case 'db:client':
+      case 'db:publish':
+        await runDbCommand(options)
+        break
+      case 'version':
+        console.log(`mdxe version ${VERSION}`)
+        break
+      case 'help':
+      default:
+        console.log(HELP_TEXT)
+        break
+    }
+    return EXIT.OK
+  } catch (err) {
+    return fail(ctx, err)
   }
 }
 
-// Run CLI
-main().catch((error) => {
-  console.error('Error:', error.message)
-  process.exit(1)
-})
+/**
+ * True iff this module is the process entrypoint — the `mdxe` bin, `node dist/cli.js`, or a
+ * Bun-compiled executable — as opposed to being IMPORTED (tests, embedders), where auto-running
+ * `main` would parse the host's argv. Undeterminable ⇒ run: the module's only purpose is the bin.
+ */
+function isEntrypoint(): boolean {
+  const script = process.argv[1]
+  if (!script) return true
+  if (script.startsWith('/$bunfs/')) return true // `bun build --compile` virtual entry path
+  try {
+    return realpathSync(script) === fileURLToPath(import.meta.url)
+  } catch {
+    return true
+  }
+}
+
+// Run CLI. The exit code is main's return value; a nonzero code exits immediately (a dangling
+// server must not keep a failed invocation alive), zero lets the event loop drain (dev server).
+if (isEntrypoint()) {
+  main().then(
+    (code) => {
+      process.exitCode = code
+      if (code !== 0) process.exit(code)
+    },
+    (error: unknown) => {
+      process.exit(fail(FAILSAFE_CTX, error))
+    },
+  )
+}
