@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import type { MDXLDDocument, MDXLDData } from './types.js'
+import type { MDXLDDocument } from './types.js'
 
 /**
  * TypeScript type representation
