@@ -21,16 +21,31 @@ First, decide which storage backend fits your needs:
 
 ## Installation
 
-Install the core package and your chosen adapter:
+Each adapter is a standalone package. Install the one you need:
 
 ```bash
-# Core package (optional, included with adapters)
-npm install mdxdb
-
-# Choose an adapter
 npm install @mdxdb/fs      # File system
 npm install @mdxdb/sqlite  # SQLite
 npm install @mdxdb/postgres # PostgreSQL
+```
+
+The `mdxdb` root package is the schema-first `DB()` facade that picks an
+adapter from `DATABASE_URL`. Install it too if you want typed entities and
+relationships instead of the document-level API shown below:
+
+```bash
+npm install mdxdb
+```
+
+```typescript
+import { DB } from 'mdxdb'
+
+const db = DB({
+  Post: { title: 'string', content: 'markdown', author: 'Author.posts' },
+  Author: { name: 'string', email: 'string' },
+})
+
+const post = await db.Post.get('hello-world')
 ```
 
 ## Basic Setup
@@ -227,6 +242,8 @@ content/
 
 ## TypeScript Types
 
+Every adapter exports the shared `Database` interface and its option/result types:
+
 ```typescript
 import type {
   Database,
@@ -237,7 +254,8 @@ import type {
   SearchOptions,
   ListResult,
   SearchResult,
-} from 'mdxdb'
+  MDXLDDocument,
+} from '@mdxdb/fs'
 
 // Type your documents
 interface Article {
@@ -256,14 +274,35 @@ async function getArticle(path: string) {
 
 ## Error Handling
 
+`get()` resolves to `null` for a missing document; it does not throw. Writes
+that violate an option (for example `set()` on an existing path without
+`overwrite`) reject with a plain `Error`:
+
 ```typescript
-import { DatabaseError, NotFoundError } from 'mdxdb'
+const doc = await db.get('articles/missing')
+if (!doc) {
+  console.log('Document not found')
+}
 
 try {
-  const doc = await db.get('articles/missing')
+  // Rejects: the path already exists and `overwrite` was not set
+  await db.set('articles/my-first-article', parse('# Duplicate'))
 } catch (error) {
-  if (error instanceof NotFoundError) {
-    console.log('Document not found')
+  console.error('Database error:', (error as Error).message)
+}
+```
+
+The schema-first `DB()` facade in `mdxdb` also returns `null` from `get()`,
+and throws typed errors from writes:
+
+```typescript
+import { DB, DatabaseError, EntityNotFoundError } from 'mdxdb'
+
+try {
+  await db.Post.update('missing', { title: 'New title' })
+} catch (error) {
+  if (error instanceof EntityNotFoundError) {
+    console.log('Post not found')
   } else if (error instanceof DatabaseError) {
     console.error('Database error:', error.message)
   }

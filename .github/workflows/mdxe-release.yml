@@ -108,7 +108,7 @@ jobs:
 
             This single binary includes:
             - **mdxe CLI** - Execute, test, and deploy MDX applications
-            - **mdxdb CLI** - Database management with ClickHouse
+            - **mdxdb** - Schema-first `DB()` facade over the @mdxdb adapters
             - **@mdxdb/clickhouse** - ClickHouse adapter (auto-downloads binary)
             - All dependencies bundled
 
