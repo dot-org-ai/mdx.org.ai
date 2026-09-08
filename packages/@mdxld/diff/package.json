@@ -48,6 +48,7 @@
     "diff": "^7.0.0"
   },
   "devDependencies": {
+    "@mdxld/config": "workspace:*",
     "@types/diff": "^6.0.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
