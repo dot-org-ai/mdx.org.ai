@@ -9,6 +9,7 @@ import {
   findMDXTestFiles,
   generateTestCode,
   SANDBOX_MODULE,
+  SANDBOX_JSX_PRELUDE,
   sandboxFailureMessage,
   runMDXTests,
   createMDXTestTransformer,
@@ -749,6 +750,71 @@ expect(true).toBe(true)
         expect(passed.success).toBe(true)
         expect(passed.testResults?.total).toBe(1)
         expect(sandboxFailureMessage(passed)).toBeUndefined()
+      },
+      60_000
+    )
+
+    function jsxSandboxTestFile(name: string, body: string): MDXTestFile {
+      return {
+        path: '/path/to/jsx.mdx',
+        doc: parse('# JSX'),
+        // JSX alone routes the block to the sandbox (needsSandbox -> containsJSX).
+        tests: [{ name, lang: 'ts', code: body, line: 5, async: false, meta: { test: true } }],
+        isCompanionTest: false,
+      }
+    }
+
+    it('should bind h/Fragment in the sandbox source only for blocks that contain JSX', () => {
+      expect(SANDBOX_JSX_PRELUDE).toContain('function h(type, props, ...children)')
+      expect(SANDBOX_JSX_PRELUDE).toContain('function Fragment(props)')
+
+      const jsx = generateTestCode(jsxSandboxTestFile('renders', "const el = <div>hi</div>\nexpect(el.type).toBe('div')"))
+      // The prelude opens the tests source, ahead of the it() that carries the body,
+      // so the factory is bound in the enclosing scope when the body runs.
+      expect(jsx).toContain('tests: `' + SANDBOX_JSX_PRELUDE + "\nit('renders', async () => {")
+      expect(jsx).toContain("const el = <div>hi</div>\nexpect(el.type).toBe('div')\n})`,")
+
+      // A sandbox block without JSX (hooks, Hono app, 'use client') gets no prelude.
+      const plain = generateTestCode(sandboxTestFile('no jsx', 'expect(1).toBe(1)'))
+      expect(plain).not.toContain('function h(')
+      expect(plain).not.toContain('Fragment')
+      expect(plain).toContain("tests: `it('no jsx', async () => {")
+    })
+
+    it(
+      'generated JSX sandbox test passes through ai-evaluate/node instead of throwing h is not defined',
+      async () => {
+        const { evaluate } = (await import(/* @vite-ignore */ SANDBOX_MODULE)) as {
+          evaluate: (options: { tests: string }) => Promise<Parameters<typeof sandboxFailureMessage>[0]>
+        }
+
+        const body = [
+          `const el = <div class="greeting">hi</div>`,
+          `expect(el.type).toBe('div')`,
+          `expect(el.props.class).toBe('greeting')`,
+          `expect(el.props.children).toBe('hi')`,
+          `const list = <><span>a</span><span>b</span></>`,
+          `expect(list.type === Fragment).toBe(true)`,
+          `expect(list.props.children.length).toBe(2)`,
+          `expect(list.props.children[1].props.children).toBe('b')`,
+        ].join('\n')
+        const passing = generateTestCode(jsxSandboxTestFile('renders jsx', body))
+        const passed = await evaluate({ tests: emittedSandboxTests(passing) })
+        expect(sandboxFailureMessage(passed)).toBeUndefined()
+        expect(passed.success).toBe(true)
+        expect(passed.testResults?.total).toBe(1)
+
+        // A wrong assertion on a JSX element still fails with its own message,
+        // not the ReferenceError the unbound factory used to throw.
+        const failing = generateTestCode(
+          jsxSandboxTestFile('renders jsx', "const el = <p>x</p>\nexpect(el.type).toBe('div')")
+        )
+        const failed = await evaluate({ tests: emittedSandboxTests(failing) })
+        expect(failed.success).toBe(false)
+        const failure = sandboxFailureMessage(failed)
+        expect(failure).toContain('renders jsx')
+        expect(failure).not.toContain('h is not defined')
+        expect(failure).toContain('Expected')
       },
       60_000
     )

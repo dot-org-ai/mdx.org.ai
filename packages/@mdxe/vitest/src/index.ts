@@ -296,6 +296,27 @@ function containsJSX(code: string): boolean {
 export const SANDBOX_MODULE = 'ai-evaluate/node'
 
 /**
+ * Prelude prepended to the sandbox `tests` source of a block that contains JSX.
+ *
+ * ai-evaluate compiles JSX with the classic runtime (`jsxFactory: 'h'`,
+ * `jsxFragment: 'Fragment'`) but binds neither name, so a bare `<div />` throws
+ * `ReferenceError: h is not defined` inside the worker. This binds both with
+ * the same plain-object shape the inline path's `createElement` shim produces,
+ * so `el.type` / `el.props.children` assertions read the same on either path.
+ * A block that declares its own `h` or `Fragment` shadows these: the body runs
+ * inside the `it()` callback, one scope below.
+ */
+export const SANDBOX_JSX_PRELUDE = [
+  `// JSX factory for the sandbox: ai-evaluate compiles <tag/> to h() but binds no h`,
+  `function h(type, props, ...children) {`,
+  `  return { type, props: { ...props, children: children.length === 1 ? children[0] : children } }`,
+  `}`,
+  `function Fragment(props) {`,
+  `  return props.children`,
+  `}`,
+].join('\n')
+
+/**
  * The parts of an ai-evaluate `EvaluateResult` that decide whether a sandboxed
  * test block passed. Declared structurally so @mdxe/vitest never imports its
  * optional peer at build time.
@@ -534,12 +555,19 @@ export function generateTestCode(testFile: MDXTestFile): string {
       // "registration error" that leaves success=true. So register the body as
       // one it() inside the sandbox and let sandboxFailureMessage() surface the
       // assertion text, which ai-evaluate reports in testResults, not `error`.
+      // A block with JSX also needs the h/Fragment factory bound ahead of the
+      // it(): ai-evaluate compiles <tag/> to h() but defines no h (mdx-8je.37).
       const escapedCode = escapeForTemplate(test.code)
       const quotedName = test.name.replace(/'/g, "\\'")
       const sandboxName = escapeForTemplate(test.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'"))
       lines.push(`  ${itFn}('${quotedName}', async () => {`)
       lines.push(`    const result = await evaluate({`)
-      lines.push(`      tests: \`it('${sandboxName}', async () => {`)
+      if (containsJSX(test.code)) {
+        lines.push(`      tests: \`${escapeForTemplate(SANDBOX_JSX_PRELUDE)}`)
+        lines.push(`it('${sandboxName}', async () => {`)
+      } else {
+        lines.push(`      tests: \`it('${sandboxName}', async () => {`)
+      }
       lines.push(escapedCode)
       lines.push(`})\`,`)
       lines.push(`    })`)

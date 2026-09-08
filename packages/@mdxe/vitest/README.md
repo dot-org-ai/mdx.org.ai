@@ -325,6 +325,23 @@ for example `renders button: Expected "Go" but got "Stop"`, or the parse or
 timeout error when the worker never ran it (`sandboxFailureMessage()` builds
 that message; it is exported for custom runners).
 
+A block that contains JSX gets a small prelude at the top of its sandbox
+source. ai-evaluate compiles `<div>hi</div>` to `h('div', null, 'hi')`
+(classic runtime) but binds neither `h` nor `Fragment`, so `@mdxe/vitest`
+defines both: `h` returns `{ type, props: { ...props, children } }` (a single
+child is unwrapped), the same shape as the inline path's `createElement` shim,
+and `Fragment` is a component that returns its children. Declare your own `h`
+or `Fragment` inside the block to override them; `SANDBOX_JSX_PRELUDE` exports
+the exact source.
+
+````mdx
+```tsx test name="renders a greeting"
+const el = <div class="greeting">hi</div>
+expect(el.type).toBe('div')
+expect(el.props.children).toBe('hi')
+```
+````
+
 `ai-evaluate` is an optional peer dependency: install it only if you have
 sandboxed tests.
 
