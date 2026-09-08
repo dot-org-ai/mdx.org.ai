@@ -14,7 +14,12 @@ import type {
   UpdateOptions,
   RelateOptions,
   RelationshipQueryOptions,
+  CallOptions,
+  CallResult,
+  ExportMeta,
+  CompiledModule,
   MDXDatabaseRPC,
+  MDXDatabaseStub,
   MDXClientConfig,
 } from './types.js'
 
@@ -22,7 +27,7 @@ import type {
  * MDXClient - wrapper for MDXDatabase RPC calls
  */
 export class MDXClient implements MDXDatabaseRPC {
-  private stub: DurableObjectStub<MDXDatabaseRPC>
+  private stub: MDXDatabaseStub
   private _$id: string
 
   constructor(config: MDXClientConfig) {
@@ -97,6 +102,24 @@ export class MDXClient implements MDXDatabaseRPC {
     options?: RelationshipQueryOptions
   ): Promise<Relationship[]> {
     return this.stub.relationships(url, options)
+  }
+
+  // Code execution
+
+  async compile(url: string): Promise<CompiledModule> {
+    return this.stub.compile(url)
+  }
+
+  async call<T = unknown>(url: string, options: CallOptions): Promise<CallResult<T>> {
+    return this.stub.call(url, options) as Promise<CallResult<T>>
+  }
+
+  async meta(url: string): Promise<ExportMeta> {
+    return this.stub.meta(url)
+  }
+
+  async render(url: string, props?: Record<string, unknown>): Promise<string> {
+    return this.stub.render(url, props)
   }
 
   getDatabaseSize(): number {
