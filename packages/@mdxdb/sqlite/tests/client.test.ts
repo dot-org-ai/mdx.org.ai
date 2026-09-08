@@ -16,9 +16,12 @@ function fakeBinding() {
   for (const method of [
     '$id', 'list', 'get', 'getById', 'create', 'update', 'upsert', 'delete',
     'relate', 'unrelate', 'related', 'relatedBy', 'relationships',
+    'compile', 'call', 'meta', 'render',
   ]) {
     stub[method] = vi.fn(async (...args: unknown[]) => ({ method, args }))
   }
+  // The DO derives its $id from the name the client passes on $init.
+  stub.$init = vi.fn(async (name: string) => `https://${name}`)
   const idFromName = vi.fn((name: string) => ({ name, toString: () => `id:${name}` }))
   const get = vi.fn(() => stub)
   const binding = { idFromName, get } as unknown as DurableObjectNamespace<MDXDatabaseRPC>
@@ -41,6 +44,44 @@ describe('MDXClient', () => {
   it('createClient returns an MDXClient', () => {
     const { binding } = fakeBinding()
     expect(createClient({ $id: 'example.com', binding })).toBeInstanceOf(MDXClient)
+  })
+
+  it('does not talk to the DO until the first operation', () => {
+    const { binding, stub } = fakeBinding()
+    new MDXClient({ $id: 'example.com', binding })
+    expect(stub.$init).not.toHaveBeenCalled()
+  })
+
+  it('$init() names the DO with the configured $id and resolves its base URL', async () => {
+    const { binding, stub } = fakeBinding()
+    const client = new MDXClient({ $id: 'example.com', binding })
+    expect(await client.$init()).toBe('https://example.com')
+    expect(stub.$init).toHaveBeenCalledWith('example.com')
+  })
+
+  it('names the DO exactly once, before the first RPC, across many operations', async () => {
+    const { binding, stub } = fakeBinding()
+    const client = new MDXClient({ $id: 'example.com', binding })
+
+    await Promise.all([client.list(), client.get('https://example.com/Post/1'), client.$init()])
+    await client.create({ type: 'Post', data: {} })
+
+    expect(stub.$init).toHaveBeenCalledTimes(1)
+    expect(stub.$init.mock.invocationCallOrder[0]).toBeLessThan(stub.list.mock.invocationCallOrder[0]!)
+    expect(stub.$init.mock.invocationCallOrder[0]).toBeLessThan(stub.get.mock.invocationCallOrder[0]!)
+  })
+
+  it('retries $init after a failure instead of caching the rejection', async () => {
+    const { binding, stub } = fakeBinding()
+    stub.$init.mockRejectedValueOnce(new Error('transient'))
+    const client = new MDXClient({ $id: 'example.com', binding })
+
+    await expect(client.list()).rejects.toThrow('transient')
+    expect(stub.list).not.toHaveBeenCalled()
+
+    await client.list()
+    expect(stub.$init).toHaveBeenCalledTimes(2)
+    expect(stub.list).toHaveBeenCalledTimes(1)
   })
 
   it('forwards thing operations to the stub with the same arguments', async () => {
@@ -90,6 +131,24 @@ describe('MDXClient', () => {
 
     await client.relationships(from, { predicate: 'author' })
     expect(stub.relationships).toHaveBeenCalledWith(from, { predicate: 'author' })
+  })
+
+  it('forwards code execution operations to the stub', async () => {
+    const { binding, stub } = fakeBinding()
+    const client = new MDXClient({ $id: 'example.com', binding })
+    const url = 'https://example.com/Doc/1'
+
+    await client.compile(url)
+    expect(stub.compile).toHaveBeenCalledWith(url)
+
+    await client.call(url, { fn: 'hello', args: [1] })
+    expect(stub.call).toHaveBeenCalledWith(url, { fn: 'hello', args: [1] })
+
+    await client.meta(url)
+    expect(stub.meta).toHaveBeenCalledWith(url)
+
+    await client.render(url, { a: 1 })
+    expect(stub.render).toHaveBeenCalledWith(url, { a: 1 })
   })
 
   it('getDatabaseSize is a sync placeholder over RPC', () => {
