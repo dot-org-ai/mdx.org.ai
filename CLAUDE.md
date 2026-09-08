@@ -79,7 +79,7 @@ Defines rendering conventions for core components (`Site`, `Docs`, `App`, `Page`
 └── widgets    → Interactive widgets (Chat, Editor, Search)
 ```
 
-> **Note:** Terminal rendering uses `@mdxe/ink` (not @mdxui) because Ink output is inherently coupled to the Ink runtime execution context.
+> **Note:** Terminal output is rendered to plain bytes by `@mdxui/text` (planned). `@mdxe/ink` is a *viewer* over the `@mdxe/tui` seam: it displays those bytes and handles input, never renders MDX itself, loads Ink lazily on `mount()`, and refuses to attach when stdout or stdin is not a TTY.
 
 ### @mdxe - Execution Environments & Protocols
 
@@ -92,7 +92,7 @@ Defines runtimes, servers, and communication protocols:
 ├── workers    → Cloudflare Workers runtime
 ├── hono       → HTTP middleware (Hono)
 ├── next       → Next.js App Router integration
-├── ink        → Terminal UI (React Ink) - runtime + rendering
+├── ink        → Ink 7 viewer over the @mdxe/tui seam (displays @mdxui/text bytes; never a renderer)
 ├── tui        → Viewer seam: Viewer interface, input abstraction, conformance suite, benchmark harness
 ├── mcp        → Model Context Protocol
 │   ├── stdio  → stdio transport (Node, Bun)

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { describeViewerConformance, runConformance, createFakeTerminal, frameFixtures } from './conformance'
 import { createStubViewer } from './stub'
 import { canAttach } from './tty'
-import { ViewerError } from './types'
+import { ViewerError, isViewerError } from './types'
 import type { Viewer } from './types'
 
 // The acceptance criterion: the suite is green against the stub viewer.
@@ -48,6 +48,30 @@ describe('runConformance', () => {
     expect(byId['refuses-piped-stdout']!.ok).toBe(false)
     expect(byId['refuses-piped-stdin']!.ok).toBe(false)
     expect(byId['input-actions']!.ok).toBe(true)
+  })
+
+  it('accepts a NOT_A_TTY refusal thrown by another copy of the seam (no shared class identity)', async () => {
+    // An implementation package is a separate bundle: its ViewerError is not `instanceof` ours.
+    const foreign = (): Viewer => {
+      const inner = createStubViewer()
+      return {
+        name: 'foreign',
+        async mount(stream, input) {
+          try {
+            return await inner.mount(stream, input)
+          } catch (e) {
+            if (e instanceof ViewerError) throw Object.assign(new Error(e.message), { name: 'ViewerError', code: e.code })
+            throw e
+          }
+        },
+        unmount: () => inner.unmount(),
+      }
+    }
+    const report = await runConformance(foreign)
+    expect(report.results.filter((r) => !r.ok)).toEqual([])
+    expect(isViewerError(Object.assign(new Error('x'), { name: 'ViewerError', code: 'NOT_A_TTY' }))).toBe(true)
+    expect(isViewerError(Object.assign(new Error('x'), { name: 'ViewerError', code: 'OTHER' }))).toBe(false)
+    expect(isViewerError(new Error('x'))).toBe(false)
   })
 })
 
