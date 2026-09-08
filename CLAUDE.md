@@ -312,10 +312,13 @@ Run with `mdxe test` which uses `ai-evaluate` (formerly `ai-sandbox`) for execut
 
 Each package has its own vitest config. Tests run with:
 ```bash
-pnpm test                           # All packages via turbo
+pnpm test                           # All packages via turbo, then pnpm test:repo
 pnpm --filter mdxld test           # Single package
 pnpm test:mdx                       # MDX-specific tests
+pnpm test:repo                      # Repo-level guard suites (test/repo/, own CI step)
 ```
+
+Repo-level guards (workspace layout, dependency policy, tsconfig boundaries, README taxonomy) live in `test/repo/` only — see `test/repo/README.md`. Turbo never runs them; `vitest.repo.config.ts` does. Do not put `*.test.ts` under `tests/` (that is the `.mdx` fixture directory) — `test/repo/guard-test-home.test.ts` fails the build if one appears.
 
 ## Dependency Structure
 
