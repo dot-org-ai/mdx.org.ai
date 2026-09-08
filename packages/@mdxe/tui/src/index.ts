@@ -28,7 +28,7 @@ export type {
   ViewerFactory,
   ViewerInput,
 } from './types'
-export { ViewerError } from './types'
+export { ViewerError, isViewerError } from './types'
 export { stripAnsi, hasAnsi, frameToString } from './ansi'
 export { decodeInput, defaultKeymap, mapActions, createInputSource, createQueue } from './input'
 export { canAttach, assertAttachable } from './tty'

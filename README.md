@@ -45,7 +45,7 @@ Defines rendering conventions for core components (`Site`, `Docs`, `App`, etc.) 
 | **@mdxui/fumadocs** | Documentation | Fumadocs |
 | **@mdxui/widgets** | Chat, Editor, Search | React |
 
-> **Note:** Terminal rendering uses **@mdxe/ink** since Ink output is coupled to the Ink runtime.
+> **Note:** Terminal output is plain bytes from **@mdxui/text** (planned); **@mdxe/ink** is a viewer over the **@mdxe/tui** seam that displays those bytes and handles input — it never renders MDX itself and never attaches to a pipe.
 
 ### @mdxe - Execution Environments & Protocols
 
@@ -60,7 +60,7 @@ Defines runtimes, servers, and communication protocols. See the [Ecosystem Integ
 | **@mdxe/workers** | Cloudflare Workers | Workers |
 | **@mdxe/hono** | HTTP middleware | Node, Bun, Workers |
 | **@mdxe/next** | Next.js App Router | Node, Edge |
-| **@mdxe/ink** | Terminal UI (React Ink) | Node, Bun |
+| **@mdxe/ink** | Terminal viewer (Ink 7) over the @mdxe/tui seam | Node, Bun |
 | **@mdxe/mcp** | Model Context Protocol | stdio: Node/Bun, http: all |
 | **@mdxe/vitest** | Test runner | Node, Bun |
 | **@mdxe/isolate** | V8 isolate compilation | Workers |
@@ -148,7 +148,7 @@ Detailed taxonomy of all `@mdxe` scoped packages for execution environments and 
 | Package | Description | Use Case |
 |---------|-------------|----------|
 | **@mdxe/vitest** | Vitest integration for testing MDX | Test runner |
-| **@mdxe/ink** | Terminal UI with React Ink | CLI applications |
+| **@mdxe/ink** | Terminal viewer with Ink 7 (displays @mdxui/text bytes) | CLI applications |
 | **@mdxe/electron** | Desktop applications | Cross-platform desktop |
 | **@mdxe/expo** | React Native mobile apps | iOS/Android |
 | **@mdxe/remotion** | Programmatic video rendering | Video generation |

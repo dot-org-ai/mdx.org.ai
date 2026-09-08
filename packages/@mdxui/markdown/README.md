@@ -485,7 +485,7 @@ interface MDXLDAstNode {
 | Package | Description |
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
-| [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) | Terminal rendering |
+| [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) | Terminal viewer (displays rendered bytes) |
 
 ## License
 

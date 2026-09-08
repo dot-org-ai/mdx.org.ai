@@ -10,7 +10,7 @@
  */
 
 import type { Action, InputEvent, Keymap, MountHandle, Terminal, Viewer, ViewerFactory } from './types'
-import { ViewerError } from './types'
+import { isViewerError } from './types'
 import { stripAnsi } from './ansi'
 import { createQueue, defaultKeymap, mapActions } from './input'
 
@@ -317,7 +317,8 @@ async function refuses(factory: ViewerFactory, term: FakeTerminal, keymap: Keyma
   } catch (e) {
     error = e
   }
-  assert(error instanceof ViewerError, 'mount must reject with a ViewerError')
+  // Structural: the viewer under test is another bundle, so `instanceof` cannot be relied on.
+  assert(isViewerError(error), `mount must reject with a ViewerError (name + code), got ${String(error)}`)
   assert(error.code === 'NOT_A_TTY', `expected code NOT_A_TTY, got ${error.code}`)
   await tick()
   assert(term.output() === '', `viewer wrote ${JSON.stringify(term.output())} to a non-TTY`)

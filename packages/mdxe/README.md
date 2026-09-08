@@ -694,7 +694,7 @@ mdxe integrates with several runtime-specific packages:
 | [@mdxe/bun](https://www.npmjs.com/package/@mdxe/bun) | Bun runtime |
 | [@mdxe/workers](https://www.npmjs.com/package/@mdxe/workers) | Cloudflare Workers |
 | [@mdxe/vitest](https://www.npmjs.com/package/@mdxe/vitest) | Vitest testing integration |
-| [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) | CLI applications with Ink |
+| [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) | Terminal viewer (Ink 7) over the @mdxe/tui seam |
 | [@mdxe/isolate](https://www.npmjs.com/package/@mdxe/isolate) | Isolated execution |
 | [@mdxe/mcp](https://www.npmjs.com/package/@mdxe/mcp) | Model Context Protocol server |
 

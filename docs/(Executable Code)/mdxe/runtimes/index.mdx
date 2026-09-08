@@ -60,16 +60,17 @@ export default {
 
 ### CLI Applications
 
-For terminal UIs, use `@mdxe/ink`:
+For terminal UIs, render to plain bytes and display them with the `@mdxe/ink` viewer. The viewer never renders MDX itself; it displays frames and handles input:
 
 ```typescript
-import { render } from '@mdxe/ink'
+import { createInkViewer } from '@mdxe/ink'
 
-render(mdx, {
-  components: {
-    Box: InkBox,
-    Text: InkText,
-  },
+const viewer = createInkViewer()
+const handle = await viewer.mount(frames, {
+  terminal: { stdout: process.stdout, stdin: process.stdin },
+})
+handle.onAction((action) => {
+  /* quit | scroll | page | jump | select | back | search | insert | resize */
 })
 ```
 
