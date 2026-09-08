@@ -32,7 +32,7 @@ export default defineConfig({
           '@mdxld/compile',
           '@mdxld/evaluate',
           '@mdxld/validate',
-          'ai-sandbox',
+          'ai-evaluate',
         ],
       },
     },
