@@ -1,8 +1,8 @@
 /**
- * # cli/tokens — the per-model token-count ORACLE (labelled counts, fail-closed cache)
+ * # @mdxe/cli-core `tokens` — the per-model token-count ORACLE (labelled counts, fail-closed cache)
  *
  * Ported from kestrel (`kestrel.markets` `src/render/tokens.ts`, MIT, © 2026 Nathan Clevenger) into
- * mdxe by mdx-8je.16, minus the kestrel-only committed fixture path and refresh script: here the
+ * mdxe by mdx-8je.16 (lifted into the leaf package `@mdxe/cli-core` by mdx-8je.26), minus the kestrel-only committed fixture path and refresh script: here the
  * native cache path is an explicit argument, and a miss names the measurement protocol rather than
  * a repo script.
  *

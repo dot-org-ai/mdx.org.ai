@@ -1,8 +1,9 @@
 /**
- * # cli/caller — the ONE Caller resolver: env-first / TTY-second, fail-closed to non-interactive
+ * # @mdxe/cli-core `caller` — the ONE Caller resolver: env-first / TTY-second, fail-closed to non-interactive
  *
  * Ported from kestrel (`kestrel.markets` `src/cli/caller.ts`, MIT, © 2026 Nathan Clevenger) into
- * mdxe by mdx-8je.16 (`KESTREL_AGENT` → `MDXE_AGENT`; otherwise the ADR-0035 table verbatim).
+ * mdxe by mdx-8je.16 (`KESTREL_AGENT` → `MDXE_AGENT`; otherwise the ADR-0035 table verbatim), then
+ * lifted into the leaf package `@mdxe/cli-core` by mdx-8je.26 so the HTTP faces share ONE resolver.
  *
  * `resolveCaller()` decides **who is invoking** `mdxe` — an automated **agent** (a coding-agent
  * harness, CI, a pipe) or a **human** — and whether the invocation is eligible for an interactive

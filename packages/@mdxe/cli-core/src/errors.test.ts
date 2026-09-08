@@ -1,5 +1,5 @@
 /**
- * cli/errors — stable exit codes, stderr-only rendering in every mode, and the fail-closed-working
+ * errors — stable exit codes, stderr-only rendering in every mode, and the fail-closed-working
  * vs crash distinction (REFUSED 6 ≠ GENERIC 1).
  */
 

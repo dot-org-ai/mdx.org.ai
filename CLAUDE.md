@@ -91,6 +91,7 @@ Defines runtimes, servers, and communication protocols:
 ├── bun        → Bun runtime evaluation
 ├── workers    → Cloudflare Workers runtime
 ├── hono       → HTTP middleware (Hono)
+├── cli-core   → Leaf shared by mdxe + @mdxe/hono: OutputCtx ladder (Accept rung), caller detection, CliError/EXIT, token oracle
 ├── next       → Next.js App Router integration
 ├── ink        → Terminal UI (React Ink) - runtime + rendering
 ├── tui        → Viewer seam: Viewer interface, input abstraction, conformance suite, benchmark harness

@@ -1,19 +1,20 @@
 /**
- * # cli/context — the one capability resolver
+ * # @mdxe/cli-core `context` — the one capability resolver
  *
  * Ported from kestrel (`kestrel.markets` `src/cli/context.ts`, MIT, © 2026 Nathan Clevenger) into
- * mdxe by mdx-8je.16, with the repo-specific env names renamed (`KESTREL_AGENT` → `MDXE_AGENT`,
+ * mdxe by mdx-8je.16 (then lifted into the leaf package `@mdxe/cli-core` by mdx-8je.26 so
+ * `@mdxe/hono` can share it without a dependency cycle through `mdxe`), with the repo-specific env names renamed (`KESTREL_AGENT` → `MDXE_AGENT`,
  * `KESTREL_COLOR` → `MDXE_COLOR`) and one extra rung — an HTTP face's `Accept` header — so the CLI
  * and the served text registers (@mdxe/hono, mdx-8je.18) resolve their format from ONE ladder.
  *
  * `resolveOutputCtx` is the single place that decides HOW output renders. It is called **exactly
- * once** in `src/cli.ts` `main` before dispatch; the frozen {@link OutputCtx} it returns is threaded
+ * once** in mdxe `src/cli.ts` `main` before dispatch; the frozen {@link OutputCtx} it returns is threaded
  * to every command handler (`CliOptions.ctx`). Nothing downstream re-probes `isTTY` — the golden rule
  * is enforced structurally: this resolver returns only rendering knobs, so the same inputs produce
  * the same data and the same exit code across all three modes.
  *
  * Pure + deterministic: it reads its `flags`/`env`/`streams` arguments, never `process` directly,
- * so it is trivially unit-testable (see `src/cli/context.test.ts`). No heavy imports.
+ * so it is trivially unit-testable (see `./context.test.ts`). No heavy imports.
  */
 
 import { usageError } from './errors.js'

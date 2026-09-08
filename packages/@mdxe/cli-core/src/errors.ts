@@ -1,13 +1,13 @@
 /**
- * # cli/errors — fail closed, loud, machine-parseable
+ * # @mdxe/cli-core `errors` — fail closed, loud, machine-parseable
  *
  * Ported from kestrel (`kestrel.markets` `src/cli/errors.ts`, MIT, © 2026 Nathan Clevenger) into
- * mdxe by mdx-8je.16. The kestrel-specific `application/problem+json` client type is replaced by a
+ * mdxe by mdx-8je.16, then lifted into the leaf package `@mdxe/cli-core` by mdx-8je.26. The kestrel-specific `application/problem+json` client type is replaced by a
  * local RFC 9457 shape so the HTTP faces (@mdxe/hono, mdx-8je.18) can preserve a server's typed
  * refusal through the throw without coupling to any client module.
  *
  * One error type ({@link CliError}) carrying a stable `code`, an `exit` code, and an optional
- * `hint`. The router body (`src/cli.ts` `main`) is wrapped in a single try/catch; any throw is
+ * `hint`. The router body (mdxe `src/cli.ts` `main`) is wrapped in a single try/catch; any throw is
  * rendered by {@link fail} to **stderr** in the active mode and its exit code returned. stdout
  * stays a pure payload channel, so an agent's `JSON.parse(stdout)` never sees a half-written
  * object followed by an error. `code` strings are stable across releases — agents match on

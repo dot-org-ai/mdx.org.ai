@@ -15,8 +15,8 @@
  * a clean argv (with only its own flags) and the resolver sees the global flags.
  */
 
-import type { GlobalFlags } from './context.js'
-import { usageError } from './errors.js'
+import type { GlobalFlags } from '@mdxe/cli-core'
+import { usageError } from '@mdxe/cli-core'
 
 /** A parsed argv: leading positionals, then `--flag value` pairs, plus consumed boolean flags. */
 export interface ParsedArgs {
