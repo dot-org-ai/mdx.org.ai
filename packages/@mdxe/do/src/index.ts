@@ -14,7 +14,7 @@
 import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join, resolve, relative, extname } from 'node:path'
 import { execSync } from 'node:child_process'
-import { ensureLoggedIn } from 'oauth.do'
+import { ensureLoggedIn } from 'oauth.do/node'
 
 export * from './types.js'
 export { DoApi, createDoApiFromEnv, DEFAULT_API_URL } from './api.js'
