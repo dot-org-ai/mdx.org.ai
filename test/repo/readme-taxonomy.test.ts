@@ -21,28 +21,25 @@ describe('README.md package taxonomy', () => {
         expect(readme).toMatch(/@mdxe\/workers\/local|miniflare/i)
       })
 
-      it('should document @mdxe/bun for Bun runtime', () => {
-        expect(readme).toContain('@mdxe/bun')
+      it('should document @mdxe/isolate for isolated Worker modules', () => {
+        expect(readme).toContain('@mdxe/isolate')
       })
 
-      it('should document @mdxe/node with deprecation note', () => {
-        expect(readme).toContain('@mdxe/node')
-        expect(readme).toMatch(/node.*deprecated|deprecated.*node/i)
+      it('should state that the Cloudflare-native prune removed the node/bun runtimes (mdx-8je.7)', () => {
+        expect(readme).toMatch(/Cloudflare-native only/)
+        expect(readme).toMatch(/@mdxe\/node.*removed|removed.*@mdxe\/node/s)
+        expect(readme).not.toMatch(/\|\s*\*\*@mdxe\/(node|bun|next|honox|electron|expo|remotion|slidev|vercel|github|payload)\*\*/)
       })
     })
 
     describe('Framework Integrations', () => {
-      it('should document @mdxe/next for Next.js App Router', () => {
-        expect(readme).toContain('@mdxe/next')
-        expect(readme).toMatch(/next.*app router|next\.js/i)
-      })
-
       it('should document @mdxe/hono for Hono HTTP servers', () => {
         expect(readme).toContain('@mdxe/hono')
       })
 
-      it('should document @mdxe/honox for HonoX full-stack', () => {
-        expect(readme).toContain('@mdxe/honox')
+      it('should document @mdxe/fumadocs for docs sites on Workers via OpenNext', () => {
+        expect(readme).toContain('@mdxe/fumadocs')
+        expect(readme).toMatch(/OpenNext/)
       })
     })
 
@@ -67,8 +64,10 @@ describe('README.md package taxonomy', () => {
         expect(readme).toMatch(/@mdxe\/cloudflare|cloudflare workers|cloudflare pages/i)
       })
 
-      it('should document @mdxe/vercel for Vercel deployment', () => {
-        expect(readme).toMatch(/@mdxe\/vercel|vercel/i)
+      it('should document @mdxe/do and @mdxe/deploy, and no Vercel / GitHub Pages target', () => {
+        expect(readme).toContain('@mdxe/do')
+        expect(readme).toContain('@mdxe/deploy')
+        expect(readme).not.toMatch(/\|\s*\*\*@mdxe\/(vercel|github)\*\*/)
       })
     })
 
@@ -82,12 +81,8 @@ describe('README.md package taxonomy', () => {
         expect(readme).toMatch(/ink.*terminal/i)
       })
 
-      it('should document @mdxe/electron for Desktop apps', () => {
-        expect(readme).toContain('@mdxe/electron')
-      })
-
-      it('should document @mdxe/expo for React Native', () => {
-        expect(readme).toContain('@mdxe/expo')
+      it('should document @mdxe/tui as the viewer seam', () => {
+        expect(readme).toContain('@mdxe/tui')
       })
     })
   })
@@ -99,11 +94,10 @@ describe('README.md package taxonomy', () => {
     // Verify key packages mentioned in both files
     // CLAUDE.md uses both `@mdxe/name` and tree notation `├── name`
     const keyPackages = [
-      { readme: '@mdxe/node', claudeMd: /(@mdxe\/node|├── node)/ },
-      { readme: '@mdxe/bun', claudeMd: /(@mdxe\/bun|├── bun)/ },
       { readme: '@mdxe/workers', claudeMd: /(@mdxe\/workers|├── workers)/ },
+      { readme: '@mdxe/isolate', claudeMd: /(@mdxe\/isolate|├── isolate)/ },
       { readme: '@mdxe/hono', claudeMd: /(@mdxe\/hono|├── hono)/ },
-      { readme: '@mdxe/next', claudeMd: /(@mdxe\/next|├── next)/ },
+      { readme: '@mdxe/deploy', claudeMd: /(@mdxe\/deploy|├── deploy)/ },
       { readme: '@mdxe/ink', claudeMd: /@mdxe\/ink/ },
       { readme: '@mdxe/mcp', claudeMd: /@mdxe\/mcp/ },
       { readme: '@mdxe/vitest', claudeMd: /(@mdxe\/vitest|├── vitest)/ },

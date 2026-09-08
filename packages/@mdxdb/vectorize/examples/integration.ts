@@ -7,7 +7,7 @@
  * The @mdxdb/vectorize package is designed to work alongside:
  * - @mdxdb/sqlite: Vector search with SQLite/Turso (local-first)
  * - @mdxdb/clickhouse: Analytics + vector search (warehouse scale)
- * - @mdxdb/postgres: Traditional RDBMS with pgvector
+ * - @mdxdb/sqlite: Durable Object SQLite
  * - @mdxdb/fs: File system storage with vector index
  */
 

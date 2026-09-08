@@ -77,10 +77,10 @@ interface ClaudeServerConfig<TData> {
 ```typescript
 import { createClaudeServer } from '@mdxai/claude'
 import { createFsDatabase } from '@mdxdb/fs'
-import { createNodeExecutor } from '@mdxe/node'
+import { createWorkersExecutor } from '@mdxe/workers'
 
 const db = await createFsDatabase({ basePath: './content' })
-const executor = createNodeExecutor()
+const executor = createWorkersExecutor()
 
 const server = createClaudeServer({
   name: 'my-content-server',
@@ -416,11 +416,11 @@ const response = await query({
 ```typescript
 import { createClaudeServer } from '@mdxai/claude'
 import { createFsDatabase } from '@mdxdb/fs'
-import { createNodeExecutor } from '@mdxe/node'
+import { createWorkersExecutor } from '@mdxe/workers'
 import { query } from '@anthropic-ai/claude-agent-sdk'
 
 const db = await createFsDatabase({ basePath: './src' })
-const executor = createNodeExecutor()
+const executor = createWorkersExecutor()
 
 const server = createClaudeServer({
   name: 'dev-env',

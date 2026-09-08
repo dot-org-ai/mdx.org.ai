@@ -16,8 +16,6 @@ PACKAGES=(
   "packages/@mdxld/compile"
   "packages/@mdxe/cloudflare"
   "packages/@mdxe/do"
-  "packages/@mdxe/github"
-  "packages/@mdxe/vercel"
   "packages/@mdxdb/sqlite"
   "packages/@mdxe/fumadocs"
   "packages/@mdxdb/fs"
@@ -25,9 +23,7 @@ PACKAGES=(
   "packages/@mdxdb/fumadocs"
   "packages/@mdxdb/clickhouse"
   "packages/@mdxui/fumadocs"
-  "packages/@mdxdb/payload"
   "packages/@mdxe/hono"
-  "packages/@mdxe/payload"
   "packages/mdxe"
 )
 

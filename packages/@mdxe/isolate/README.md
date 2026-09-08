@@ -535,7 +535,6 @@ This allows MDX to compile without external React dependencies in the Worker env
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
 | [@mdxe/workers](https://www.npmjs.com/package/@mdxe/workers) | Cloudflare Workers runtime |
-| [@mdxe/node](https://www.npmjs.com/package/@mdxe/node) | Node.js evaluation |
 | [workerd](https://github.com/cloudflare/workerd) | Cloudflare's JS runtime |
 
 ## License

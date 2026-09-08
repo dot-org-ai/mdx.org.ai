@@ -89,23 +89,23 @@ Defines rendering conventions for core components (`Site`, `Docs`, `App`, `Page`
 
 ### @mdxe - Execution Environments & Protocols
 
-Defines runtimes, servers, and communication protocols:
+Defines runtimes, servers, and communication protocols. Cloudflare-native only (mdx-8je.7): code executes through Dynamic Worker Loaders (workerd) in production and under Miniflare locally; Node and Bun are thin CLI shells, never evaluation runtimes. `test/repo/package-allowlist.test.ts` is the allowlist for `packages/@mdxe` and `packages/@mdxdb`; the former `@mdxe/{node,bun,next,honox,electron,expo,remotion,slidev,vercel,github,payload}` are gone and deprecated on npm.
 
 ```
 @mdxe/
-├── node       → Node.js runtime evaluation
-├── bun        → Bun runtime evaluation
-├── workers    → Cloudflare Workers runtime
+├── workers    → Cloudflare Workers runtime (workers/local = Miniflare)
+├── isolate    → Compile MDX to isolated Worker modules
 ├── hono       → HTTP middleware (Hono)
 ├── cli-core   → Leaf shared by mdxe + @mdxe/hono: OutputCtx ladder (Accept rung), caller detection, CliError/EXIT, token oracle
-├── next       → Next.js App Router integration
+├── deploy     → Unified deploy over .do (@mdxe/do) and Cloudflare (@mdxe/cloudflare)
+├── fumadocs   → Docs site generation, deployed to Workers via OpenNext
 ├── ink        → Ink 7 viewer over the @mdxe/tui seam (displays @mdxui/text bytes; never a renderer)
 ├── tui        → Viewer seam: Viewer interface, input abstraction, conformance suite, benchmark harness
 ├── mcp        → Model Context Protocol
-│   ├── stdio  → stdio transport (Node, Bun)
-│   └── http   → HTTP transport (Node, Bun, Workers)
+│   ├── stdio  → stdio transport (CLI shells)
+│   └── http   → HTTP transport (Workers)
 ├── vitest     → Test runner integration
-└── isolate    → V8 isolate compilation
+└── test-utils → Shared fixtures, mocks, matchers
 ```
 
 **Key distinction:**
@@ -116,15 +116,21 @@ Defines runtimes, servers, and communication protocols:
 
 ```
 @mdxdb/
+├── do         → Durable Objects (primary backend: hierarchy, hibernatable WebSockets, parquet export)
+├── sqlite     → Durable Object SQLite graph database (_data / _rels)
+├── vectorize  → Cloudflare Vectorize vector search
+├── parquet    → Pure JS parquet read/write (Workers, Snippets)
 ├── fs         → Filesystem (git-friendly .mdx files)
-├── sqlite     → SQLite/Turso (vector search, local-first)
-├── postgres   → PostgreSQL (pgvector)
-├── mongo      → MongoDB (Atlas Vector Search)
 ├── clickhouse → ClickHouse (analytics)
 ├── api        → HTTP API client
+├── rpc        → rpc.do (capnweb) client
+├── server     → Hono HTTP API server
+├── github     → Octokit-backed store (fetch; runs in Workers)
 ├── fumadocs   → Fumadocs content source
-└── sources    → Unified source interface
+└── sources    → Unified source interface (moving to primitives, mdx-8je.17)
 ```
+
+The former `@mdxdb/{postgres,mongo,git,payload,desktop,mobile,studio}` were removed (mdx-8je.7): none could run in workerd.
 
 ### @mdxld - Parsing & Transformation
 
@@ -335,10 +341,10 @@ mdxld (core parsing)
 ├── @mdxld/* (AST, compile, validate, jsonld)
 │
 ├── mdxdb (database abstraction)
-│   └── @mdxdb/* (fs, sqlite, postgres, mongo, clickhouse, api)
+│   └── @mdxdb/* (do, sqlite, vectorize, parquet, fs, clickhouse, api, rpc, server, github)
 │
 ├── mdxe (execution)
-│   └── @mdxe/* (node, bun, workers, hono, next, ink, tui, mcp, vitest)
+│   └── @mdxe/* (workers, isolate, hono, cli-core, deploy, fumadocs, ink, tui, mcp, vitest)
 │
 ├── mdxui (rendering)
 │   └── @mdxui/* (html, json, markdown, email, slack, shadcn)
@@ -361,8 +367,8 @@ When creating a new scoped package, ask:
    - Rendering MDX to HTML, JSON, Markdown, Slack, Email, Terminal
 
 2. **Is it about EXECUTION?** → `@mdxe/`
-   - Runtimes (node, bun, workers)
-   - Protocols (rpc, mcp, http)
+   - Runtimes (workers only — Cloudflare-native; no node/bun eval)
+   - Protocols (mcp, http)
    - Testing (vitest)
 
 3. **Is it about STORAGE?** → `@mdxdb/`

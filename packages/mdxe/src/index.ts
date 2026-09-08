@@ -52,7 +52,7 @@ export {
  * SDK Provider (Multi-Runtime)
  *
  * Use for Node.js, Bun, or environments with flexible database backends.
- * Supports: memory, fs, sqlite, postgres, clickhouse, mongo
+ * Supports: memory, fs, sqlite, clickhouse
  *
  * @see {@link ./sdk-provider.ts} for implementation
  * @see README.md "SDK Provider" section for decision guide

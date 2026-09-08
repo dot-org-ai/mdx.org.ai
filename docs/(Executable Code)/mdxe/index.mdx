@@ -31,9 +31,7 @@ mdxe is the execution layer for MDX documents. It compiles and runs MDX content 
 
 | Package | Runtime | Description |
 |---------|---------|-------------|
-| [@mdxe/node](/docs/mdxe/runtimes/node) | Node.js | Server-side execution |
-| [@mdxe/workers](/docs/mdxe/runtimes/workers) | Cloudflare | Edge worker execution |
-| [@mdxe/next](/docs/mdxe/runtimes/next) | Next.js | Full-stack integration |
+| [@mdxe/workers](/docs/mdxe/runtimes/workers) | Cloudflare | Edge worker execution (local dev via Miniflare) |
 | [@mdxe/hono](/docs/mdxe/runtimes/hono) | Hono | Lightweight web framework |
 | [@mdxe/ink](/docs/mdxe/runtimes/ink) | Terminal | CLI applications |
 
@@ -54,14 +52,11 @@ npm install mdxe
 Or install runtime-specific packages:
 
 ```bash
-# Node.js
-npm install @mdxe/node
-
-# Next.js
-npm install @mdxe/next
-
 # Cloudflare Workers
 npm install @mdxe/workers
+
+# Hono HTTP serving
+npm install @mdxe/hono
 ```
 
 ## Quick Example
@@ -100,5 +95,4 @@ const result = await execute(mdx, {
 ## Next Steps
 
 - [Getting Started](/docs/mdxe/getting-started) - Set up your first mdxe project
-- [Node.js Runtime](/docs/mdxe/runtimes/node) - Server-side execution
-- [Next.js Integration](/docs/mdxe/runtimes/next) - Full-stack apps
+- [Workers Runtime](/docs/mdxe/runtimes/workers) - Cloudflare Workers and local Miniflare execution

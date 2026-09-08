@@ -283,7 +283,7 @@ async function deploy() {
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
 | [@mdxe/isolate](https://www.npmjs.com/package/@mdxe/isolate) | Compile MDX to Worker modules |
-| [@mdxe/node](https://www.npmjs.com/package/@mdxe/node) | Node.js evaluation (with Miniflare) |
+| [miniflare](https://www.npmjs.com/package/miniflare) | Local workerd runtime used by `@mdxe/workers/local` |
 | [wrangler](https://www.npmjs.com/package/wrangler) | Cloudflare Workers CLI |
 
 ## License

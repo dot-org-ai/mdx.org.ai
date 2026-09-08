@@ -684,15 +684,12 @@ const handlers = {
 
 ## Runtime Packages
 
-mdxe integrates with several runtime-specific packages:
+mdxe is Cloudflare-native only: MDX executes on workerd (Workers in production, Miniflare locally). The former `@mdxe/node`, `@mdxe/bun`, `@mdxe/next`, `@mdxe/honox` and `@mdxe/payload` packages were removed (mdx-8je.7) and are deprecated on npm; the `mdxe admin` command and the `vercel` / `github` deploy platforms went with them.
 
 | Package | Description |
 |---------|-------------|
 | [@mdxe/hono](https://www.npmjs.com/package/@mdxe/hono) | Hono framework integration |
-| [@mdxe/next](https://www.npmjs.com/package/@mdxe/next) | Next.js integration |
-| [@mdxe/node](https://www.npmjs.com/package/@mdxe/node) | Node.js runtime |
-| [@mdxe/bun](https://www.npmjs.com/package/@mdxe/bun) | Bun runtime |
-| [@mdxe/workers](https://www.npmjs.com/package/@mdxe/workers) | Cloudflare Workers |
+| [@mdxe/workers](https://www.npmjs.com/package/@mdxe/workers) | Cloudflare Workers (local dev via Miniflare) |
 | [@mdxe/vitest](https://www.npmjs.com/package/@mdxe/vitest) | Vitest testing integration |
 | [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) | Terminal viewer (Ink 7) over the @mdxe/tui seam |
 | [@mdxe/isolate](https://www.npmjs.com/package/@mdxe/isolate) | Isolated execution |

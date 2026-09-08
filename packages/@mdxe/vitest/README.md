@@ -511,7 +511,7 @@ jobs:
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
 | [vitest](https://www.npmjs.com/package/vitest) | Test framework |
-| [@mdxe/node](https://www.npmjs.com/package/@mdxe/node) | Node.js MDX evaluation |
+| [@mdxe/workers](https://www.npmjs.com/package/@mdxe/workers) | Cloudflare Workers MDX evaluation (local via Miniflare) |
 
 ## License
 
