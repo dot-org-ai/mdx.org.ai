@@ -60,7 +60,6 @@ Updated to export primitives integration:
 - SDK provider types and functions
 - Re-export `evaluate` and `createEvaluator` from ai-sandbox
 - Re-export workflow types from ai-workflows
-- Re-export RPC types from ai-functions
 
 ```typescript
 // SDK Provider
@@ -73,9 +72,6 @@ export type { EvaluateOptions, EvaluateResult, ... }
 
 // ai-workflows
 export type { WorkflowContext, EventHandler, OnProxy, EveryProxy }
-
-// ai-functions
-export type { RPC, RPCPromise, RPCServer, RPCClient }
 ```
 
 ### 5. Types (src/types.ts)
