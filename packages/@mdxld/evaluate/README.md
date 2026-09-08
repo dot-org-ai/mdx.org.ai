@@ -12,10 +12,7 @@ pnpm add @mdxld/evaluate @mdxld/compile mdxld
 yarn add @mdxld/evaluate @mdxld/compile mdxld
 ```
 
-**Optional:** For sandbox execution, install `ai-sandbox`:
-```bash
-npm install ai-sandbox
-```
+Sandbox execution (`evaluateInSandbox`) uses [`ai-evaluate`](https://www.npmjs.com/package/ai-evaluate) (formerly `ai-sandbox`), which is installed as a dependency. It runs on Cloudflare worker_loaders; see the `ai-evaluate` docs for the `LOADER` binding and the `ai-evaluate/node` local runtime.
 
 ## Features
 
@@ -141,7 +138,7 @@ console.log(result.frontmatter)
 
 ### `evaluateInSandbox(content, options?)`
 
-Execute MDX content in an isolated sandbox environment using `ai-sandbox`. Ideal for untrusted content or when you need execution isolation.
+Execute MDX content in an isolated sandbox environment using `ai-evaluate`. Ideal for untrusted content or when you need execution isolation.
 
 ```typescript
 async function evaluateInSandbox(

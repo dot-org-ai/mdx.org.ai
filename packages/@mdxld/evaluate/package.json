@@ -24,7 +24,8 @@
   },
   "dependencies": {
     "mdxld": "workspace:*",
-    "@mdxld/compile": "workspace:*"
+    "@mdxld/compile": "workspace:*",
+    "ai-evaluate": "^2.4.0"
   },
   "devDependencies": {
     "tsup": "^8.3.5",
