@@ -17,7 +17,6 @@
   - [ ] `@mdxe/vitest` 
   - [ ] `@mdxe/ink` 
 - [ ] `mdxai` Manage, Deploy, & Run MDX-based AI Agents 
-  - [ ] `@mdxai/agentkit` 
   - [ ] `@mdxai/claude` 
   - [ ] `@mdxai/mastra` 
   - [ ] `@mdxai/vapi` 

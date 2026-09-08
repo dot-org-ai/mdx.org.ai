@@ -47,9 +47,9 @@ describe('README.md package taxonomy', () => {
     })
 
     describe('Protocols', () => {
-      it('should document @mdxe/rpc for capnweb RPC', () => {
-        expect(readme).toContain('@mdxe/rpc')
-        expect(readme).toMatch(/rpc.*capnweb/i)
+      it('should point RPC users at ai-functions instead of a removed @mdxe/rpc package', () => {
+        expect(readme).toMatch(/RPC is not an `@mdxe` package/)
+        expect(readme).toMatch(/ai-functions/)
       })
 
       it('should document @mdxe/mcp for Model Context Protocol', () => {
@@ -101,7 +101,6 @@ describe('README.md package taxonomy', () => {
       { readme: '@mdxe/hono', claudeMd: /(@mdxe\/hono|├── hono)/ },
       { readme: '@mdxe/next', claudeMd: /(@mdxe\/next|├── next)/ },
       { readme: '@mdxe/ink', claudeMd: /@mdxe\/ink/ },
-      { readme: '@mdxe/rpc', claudeMd: /@mdxe\/rpc/ },
       { readme: '@mdxe/mcp', claudeMd: /@mdxe\/mcp/ },
       { readme: '@mdxe/vitest', claudeMd: /(@mdxe\/vitest|├── vitest)/ },
     ]

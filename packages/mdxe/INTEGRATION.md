@@ -205,7 +205,7 @@ mdxe (execution layer)
 │   └── evaluate(), createEvaluator()
 │
 ├── ai-functions (RPC & AI)
-│   └── RPC types for @mdxe/rpc
+│   └── capnweb RPC / RPCPromise types (re-exported by mdxe)
 │
 └── ai-workflows (events)
     └── on, every, send types

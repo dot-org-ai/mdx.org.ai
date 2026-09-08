@@ -1,8 +1,0 @@
-{
-  "extends": "@mdxld/config/typescript/library",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
-  },
-  "include": ["src"]
-}

@@ -61,7 +61,6 @@ Defines runtimes, servers, and communication protocols. See the [Ecosystem Integ
 | **@mdxe/hono** | HTTP middleware | Node, Bun, Workers |
 | **@mdxe/next** | Next.js App Router | Node, Edge |
 | **@mdxe/ink** | Terminal UI (React Ink) | Node, Bun |
-| **@mdxe/rpc** | capnweb RPC protocol | Node, Bun, Workers |
 | **@mdxe/mcp** | Model Context Protocol | stdio: Node/Bun, http: all |
 | **@mdxe/vitest** | Test runner | Node, Bun |
 | **@mdxe/isolate** | V8 isolate compilation | Workers |
@@ -101,7 +100,6 @@ Defines runtimes, servers, and communication protocols. See the [Ecosystem Integ
 |---------|-------------|
 | **@mdxai/claude** | Claude AI with MCP tools |
 | **@mdxai/mastra** | Mastra agent framework |
-| **@mdxai/agentkit** | Agent composition toolkit |
 | **@mdxai/vapi** | Vapi voice AI |
 
 ## @mdxe Packages
@@ -132,8 +130,9 @@ Detailed taxonomy of all `@mdxe` scoped packages for execution environments and 
 
 | Package | Description | Use Case |
 |---------|-------------|----------|
-| **@mdxe/rpc** | capnweb RPC protocol implementation | Distributed function calls |
 | **@mdxe/mcp** | Model Context Protocol for AI tools | Claude Code, AI integrations |
+
+> RPC is not an `@mdxe` package. Use the capnweb `RPC` / `RPCPromise` primitives from [ai-functions](https://www.npmjs.com/package/ai-functions) directly (re-exported as types from `mdxe`). The former `@mdxe/rpc` package was removed as a duplicate of ai-functions RPC.
 
 ### Deployment
 
@@ -215,7 +214,7 @@ const slack = await toSlack(doc)      // Slack blocks
 
 ```typescript
 import { createMCPServer } from '@mdxe/mcp'
-import { createRPCServer } from '@mdxe/rpc'
+import { RPC } from 'ai-functions'
 
 // Expose MDX functions via MCP (for Claude, etc.)
 const mcp = createMCPServer({
@@ -224,11 +223,9 @@ const mcp = createMCPServer({
   transport: 'stdio' // or 'http'
 })
 
-// Expose MDX functions via capnweb RPC
-const rpc = createRPCServer({
-  functions: functionDocs,
-  port: 3000
-})
+// Call MDX functions over capnweb RPC (ai-functions, promise pipelining)
+const rpc = RPC<typeof functions>('https://functions.example.com')
+const result = await rpc.summarize({ text })
 ```
 
 ## License
