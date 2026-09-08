@@ -93,6 +93,7 @@ Defines runtimes, servers, and communication protocols:
 ├── hono       → HTTP middleware (Hono)
 ├── next       → Next.js App Router integration
 ├── ink        → Terminal UI (React Ink) - runtime + rendering
+├── tui        → Viewer seam: Viewer interface, input abstraction, conformance suite, benchmark harness
 ├── mcp        → Model Context Protocol
 │   ├── stdio  → stdio transport (Node, Bun)
 │   └── http   → HTTP transport (Node, Bun, Workers)
@@ -326,7 +327,7 @@ mdxld (core parsing)
 │   └── @mdxdb/* (fs, sqlite, postgres, mongo, clickhouse, api)
 │
 ├── mdxe (execution)
-│   └── @mdxe/* (node, bun, workers, hono, next, ink, mcp, vitest)
+│   └── @mdxe/* (node, bun, workers, hono, next, ink, tui, mcp, vitest)
 │
 ├── mdxui (rendering)
 │   └── @mdxui/* (html, json, markdown, email, slack, shadcn)
