@@ -1825,6 +1825,9 @@ importers:
       '@mdxld/compile':
         specifier: workspace:*
         version: link:../compile
+      ai-evaluate:
+        specifier: ^2.4.0
+        version: 2.4.0
       mdxld:
         specifier: workspace:*
         version: link:../../mdxld

@@ -6,5 +6,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ['mdxld', '@mdxld/compile', 'ai-sandbox'],
+  external: ['mdxld', '@mdxld/compile', 'ai-evaluate'],
 })
