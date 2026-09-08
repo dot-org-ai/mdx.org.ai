@@ -256,6 +256,14 @@ export type RelsRow = {
   do: string | null
 }
 
+/**
+ * _meta row in SQLite
+ */
+export type MetaRow = {
+  key: string
+  value: string
+}
+
 // =============================================================================
 // RPC Interface
 // =============================================================================
@@ -265,7 +273,21 @@ export type RelsRow = {
  */
 export interface MDXDatabaseRPC {
   // Identity
-  /** Get the DO's canonical $id */
+  /**
+   * Tell the object its name so it can derive its canonical $id.
+   *
+   * A Durable Object cannot read its own name (`ctx.id.name` is undefined
+   * inside the object in workerd), so the caller that resolved the stub via
+   * `idFromName(name)` passes the same name here. The derived $id is
+   * persisted in `_meta` and survives re-instantiation; later calls with the
+   * same name are no-ops, and a different name is rejected.
+   *
+   * `MDXClient` calls this automatically before its first RPC.
+   *
+   * @returns the canonical $id (`https://<name>`, no trailing slash)
+   */
+  $init(name: string): string
+  /** Get the DO's canonical $id (throws until `$init()` has run) */
   $id(): string
 
   // Thing operations

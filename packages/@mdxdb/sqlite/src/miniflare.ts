@@ -116,6 +116,15 @@ export function createInMemoryBinding(): MDXDatabaseNamespace {
     const buildUrl = (type: string, id: string) => `${baseId}/${type}/${id}`
 
     const instance: MDXDatabaseRPC = {
+      $init(requested: string): string {
+        const wanted = requested.includes('://') ? requested : `https://${requested}`
+        const normalized = wanted.endsWith('/') ? wanted.slice(0, -1) : wanted
+        if (normalized !== baseId) {
+          throw new Error(`MDXDatabase $id mismatch: this object is ${baseId}, got ${normalized}`)
+        }
+        return baseId
+      },
+
       $id(): string {
         return baseId
       },

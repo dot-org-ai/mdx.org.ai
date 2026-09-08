@@ -2,7 +2,13 @@
  * MDXDatabase Durable Object
  *
  * Clean implementation with _data and _rels tables.
- * $id is derived from the DO name, not stored.
+ *
+ * $id is derived from the DO name. A Durable Object cannot read its own name
+ * (`ctx.id.name` is undefined inside the object in workerd — the name only
+ * exists on the caller's id object), so the caller passes it once via
+ * `$init(name)`; the derived $id is persisted in `_meta` so it survives
+ * re-instantiation. Until then every URL-building operation throws rather
+ * than silently basing URLs on the 64-hex object id.
  *
  * @packageDocumentation
  */
@@ -22,10 +28,11 @@ import type {
   CompiledModule,
   DataRow,
   RelsRow,
+  MetaRow,
   Env,
   WorkerLoader,
 } from './types.js'
-import { getAllSchemaStatements } from './schema/index.js'
+import { getAllSchemaStatements, META_ID_KEY } from './schema/index.js'
 
 // =============================================================================
 // Utilities
@@ -46,10 +53,17 @@ function generateRelId(from: string, predicate: string, to: string): string {
   return `rel_${Math.abs(hash).toString(36)}`
 }
 
+/**
+ * Canonical $id for a DO name: a URL with no trailing slash.
+ * Bare names (e.g. `example.com`) are treated as https hosts.
+ */
+export function baseIdFromName(name: string): string {
+  const base = name.includes('://') ? name : `https://${name}`
+  return base.endsWith('/') ? base.slice(0, -1) : base
+}
+
 function buildUrl(baseId: string, type: string, id: string): string {
-  // Remove trailing slash from baseId if present
-  const base = baseId.endsWith('/') ? baseId.slice(0, -1) : baseId
-  return `${base}/${type}/${id}`
+  return `${baseId}/${type}/${id}`
 }
 
 function hashContent(content: string): string {
@@ -70,11 +84,12 @@ function hashContent(content: string): string {
  * MDXDatabase Durable Object
  *
  * Clean graph database with _data (nodes) and _rels (edges).
- * $id is derived from the DO name.
+ * $id is derived from the DO name supplied via `$init()` (see module docs).
  */
 export class MDXDatabase extends DurableObject<Env> {
   protected sql: SqlStorage
-  private baseId: string
+  /** Resolved canonical $id; undefined until derived from the name or storage. */
+  private baseId?: string
   private initialized = false
   private doCtx: DurableObjectState
   protected loader?: WorkerLoader
@@ -84,11 +99,6 @@ export class MDXDatabase extends DurableObject<Env> {
     this.doCtx = ctx
     this.sql = ctx.storage.sql
     this.loader = env.LOADER
-
-    // Derive $id from DO name
-    // If name looks like a domain, prefix with https://
-    const name = ctx.id.name ?? ctx.id.toString()
-    this.baseId = name.includes('://') ? name : `https://${name}`
   }
 
   private ensureInitialized(): void {
@@ -109,10 +119,68 @@ export class MDXDatabase extends DurableObject<Env> {
   // ===========================================================================
 
   /**
+   * Resolve the canonical $id without requiring it: the runtime-provided
+   * name if there is one, else the value persisted by `$init()`.
+   */
+  private resolveBaseId(): string | undefined {
+    if (this.baseId) return this.baseId
+
+    const name = this.doCtx.id.name
+    if (name) {
+      this.baseId = baseIdFromName(name)
+      return this.baseId
+    }
+
+    this.ensureInitialized()
+    const row = this.sql
+      .exec<MetaRow>('SELECT value FROM _meta WHERE key = ?', META_ID_KEY)
+      .toArray()[0]
+    if (row) this.baseId = row.value
+    return this.baseId
+  }
+
+  /** Canonical $id, or a clear error when the object has not been named. */
+  private get base(): string {
+    const base = this.resolveBaseId()
+    if (!base) {
+      throw new Error(
+        'MDXDatabase has no $id: the runtime did not expose the DO name (ctx.id.name) ' +
+          'and none has been persisted. Call $init(name) with the name passed to ' +
+          'idFromName() first (MDXClient does this automatically).'
+      )
+    }
+    return base
+  }
+
+  /**
+   * Tell the object its name so it can derive (and persist) its $id.
+   * Idempotent for the same name; rejects a different one.
+   */
+  $init(name: string): string {
+    if (typeof name !== 'string' || name.length === 0) {
+      throw new Error('MDXDatabase.$init() requires a non-empty name')
+    }
+    const requested = baseIdFromName(name)
+    const current = this.resolveBaseId()
+    if (current !== undefined && current !== requested) {
+      throw new Error(`MDXDatabase $id mismatch: this object is ${current}, got ${requested}`)
+    }
+
+    this.ensureInitialized()
+    this.sql.exec(
+      'INSERT OR IGNORE INTO _meta (key, value) VALUES (?, ?)',
+      META_ID_KEY,
+      requested
+    )
+    this.baseId = requested
+    return requested
+  }
+
+  /**
    * Get the DO's canonical $id
    */
   $id(): string {
-    return this.baseId
+    return this.base
   }
 
   // ===========================================================================
@@ -173,7 +241,7 @@ export class MDXDatabase extends DurableObject<Env> {
   }
 
   async getById(type: string, id: string): Promise<Thing | null> {
-    return this.get(buildUrl(this.baseId, type, id))
+    return this.get(buildUrl(this.base, type, id))
   }
 
   async create<TData = Record<string, unknown>>(
@@ -182,7 +250,7 @@ export class MDXDatabase extends DurableObject<Env> {
     this.ensureInitialized()
 
     const id = options.id ?? generateId()
-    const url = buildUrl(this.baseId, options.type, id)
+    const url = buildUrl(this.base, options.type, id)
     const now = new Date().toISOString()
 
     // Check if exists
@@ -281,7 +349,7 @@ export class MDXDatabase extends DurableObject<Env> {
     options: CreateOptions<TData>
   ): Promise<Thing<TData>> {
     const id = options.id ?? generateId()
-    const url = buildUrl(this.baseId, options.type, id)
+    const url = buildUrl(this.base, options.type, id)
 
     const existing = await this.get(url)
     if (existing) {

@@ -25,38 +25,69 @@ pnpm add @mdxdb/sqlite
 ### Cloudflare Workers
 
 ```ts
-import { createMDXClient, MDXDatabase, type Env } from '@mdxdb/sqlite'
+import { createClient } from '@mdxdb/sqlite/client'
+import { MDXDatabase } from '@mdxdb/sqlite/durable-object'
+import type { Env } from '@mdxdb/sqlite'
 
 // Export the Durable Object class for wrangler.toml
 export { MDXDatabase }
 
 export default {
   async fetch(request: Request, env: Env) {
-    // Create client for a namespace
-    const client = createMDXClient({
-      namespace: 'example.com',
+    // Create client for a namespace; $id is the DO name
+    const client = createClient({
+      $id: 'example.com',
       binding: env.MDXDB,
     })
 
     // CRUD operations
     const post = await client.create({
-      ns: 'example.com',
       type: 'Post',
       data: { title: 'Hello World', content: '...' },
     })
+    // post.url === 'https://example.com/Post/<id>'
 
     const posts = await client.list({ type: 'Post' })
 
     // Relationships
     await client.relate({
-      type: 'authored',
-      from: 'https://example.com/User/alice',
-      to: post.url,
+      predicate: 'author',
+      reverse: 'posts',
+      from: post.url,
+      to: 'https://example.com/User/alice',
     })
 
     return Response.json(posts)
   }
 }
+```
+
+### Identity (`$id`)
+
+Every `MDXDatabase` object has one canonical `$id`, a URL with no trailing
+slash, and every `Thing.url` is `${$id}/${type}/${id}`. The `$id` is derived
+from the Durable Object **name** (`idFromName('example.com')` gives
+`https://example.com`; a name that already carries a scheme is kept as is).
+
+A Durable Object cannot read its own name: inside the object `ctx.id.name` is
+undefined in workerd, the name only exists on the caller's id object. So the
+caller passes it once via the `$init(name)` RPC, and the object persists the
+derived `$id` in its `_meta` table, where it survives eviction and
+re-instantiation. `MDXClient` does this automatically before its first RPC
+(one extra round trip per client instance; `await client.$init()` returns the
+DO-side `$id` if you need it up front). Until an object has been named,
+`$id()`, `create()`, `upsert()` and `getById()` throw
+`MDXDatabase has no $id` instead of silently building URLs on the 64-hex
+object id; `$init()` with a different name than the one on record throws
+`MDXDatabase $id mismatch`.
+
+If you talk to the stub directly rather than through `MDXClient`, call
+`$init` yourself:
+
+```ts
+const stub = env.MDXDB.get(env.MDXDB.idFromName('example.com'))
+await stub.$init('example.com') // idempotent
+await stub.create({ type: 'Post', data: {} })
 ```
 
 ### wrangler.toml
@@ -103,9 +134,8 @@ const thing = await client.create({ type: 'Post', data: { title: 'Test' } })
 ### Thing Operations
 
 ```ts
-// Create
+// Create (url = `${client $id}/Post/<id>`)
 const thing = await client.create({
-  ns: 'example.com',
   type: 'Post',
   data: { title: 'Hello' },
 })
@@ -121,7 +151,7 @@ const posts = await client.list({ type: 'Post', limit: 10 })
 await client.update(url, { data: { title: 'Updated' } })
 
 // Upsert
-await client.upsert({ ns, type, id, data })
+await client.upsert({ type, id, data })
 
 // Delete
 await client.delete(url)
