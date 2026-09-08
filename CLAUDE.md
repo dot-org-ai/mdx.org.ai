@@ -22,6 +22,12 @@ pnpm test
 pnpm --filter <package-name> test
 # e.g., pnpm --filter mdxld test
 
+# Build or test ONE package on a fresh checkout (orders workspace siblings first).
+# `pnpm --filter <pkg> build` runs that package's tsup directly and skips turbo's
+# `^build`, so it is red until siblings whose types resolve to dist/ are built.
+pnpm exec turbo run build --filter=<package-name>
+pnpm exec turbo run test --filter=<package-name>
+
 # Watch mode for development
 pnpm dev
 
@@ -315,6 +321,7 @@ Each package has its own vitest config. Tests run with:
 pnpm test                           # All packages via turbo
 pnpm --filter mdxld test           # Single package
 pnpm test:mdx                       # MDX-specific tests
+pnpm exec turbo run test --filter=mdxe  # Single package, siblings built first (fresh checkout)
 ```
 
 ## Dependency Structure
