@@ -1618,6 +1618,24 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@edge-runtime/vm@3.2.0)(@types/node@25.1.0)(happy-dom@20.4.0)(jsdom@27.4.0(@noble/hashes@1.8.0))(lightningcss@1.31.1)(terser@5.46.0)
 
+  packages/@mdxe/tui:
+    devDependencies:
+      '@mdxld/config':
+        specifier: workspace:^
+        version: link:../../@mdxld/config
+      '@types/node':
+        specifier: ^22.10.1
+        version: 22.19.7
+      tsup:
+        specifier: ^8.3.5
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@edge-runtime/vm@3.2.0)(@types/node@25.1.0)(happy-dom@20.4.0)(jsdom@27.4.0(@noble/hashes@1.8.0))(lightningcss@1.31.1)(terser@5.46.0)
+
   packages/@mdxe/vercel:
     dependencies:
       oauth.do:
