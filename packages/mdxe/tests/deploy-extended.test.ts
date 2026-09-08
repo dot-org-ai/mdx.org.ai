@@ -14,6 +14,14 @@ vi.mock('node:child_process', () => ({
   spawnSync: vi.fn(),
 }))
 
+// Mock the oauth.do wrapper (mdxe's single import site for oauth.do).
+// deployViaManagedApi authenticates before it builds, so without this the
+// spawn-mocked build tests below silently depend on a live auth.apis.do login.
+vi.mock('../src/auth.js', () => ({
+  ensureLoggedIn: vi.fn().mockResolvedValue({ token: 'test-token', isNewLogin: false }),
+  getToken: vi.fn().mockResolvedValue(null),
+}))
+
 // Import after mocking
 import { spawn, spawnSync } from 'node:child_process'
 import { deploy, detectSourceType } from '../src/commands/deploy.js'

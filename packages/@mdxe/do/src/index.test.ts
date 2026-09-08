@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import type { DeployPayload, DeployResult, DoDeployOptions } from './types.js'
 
 // Mock oauth.do module
-vi.mock('oauth.do', () => ({
+vi.mock('oauth.do/node', () => ({
   ensureLoggedIn: vi.fn().mockResolvedValue({ token: 'mock-token', isNewLogin: false }),
   getToken: vi.fn().mockResolvedValue(null),
 }))

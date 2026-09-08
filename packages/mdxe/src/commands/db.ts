@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import { ensureLoggedIn } from 'oauth.do'
+import { ensureLoggedIn } from '../auth.js'
 import { resolve, dirname } from 'node:path'
 import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, writeFileSync, watch } from 'node:fs'
 import { join, relative } from 'node:path'
