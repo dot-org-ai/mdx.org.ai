@@ -5,7 +5,7 @@
   "fixed": [],
   "linked": [
     ["mdxld", "@mdxld/*"],
-    ["mdxdb", "@mdxdb/*"],
+    ["{mdxdb,@mdxdb/*}"],
     ["mdxe", "@mdxe/*"],
     ["mdxui", "@mdxui/*"],
     ["mdxai", "@mdxai/*"]
@@ -13,9 +13,11 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@mdxld/config"
-  ],
+  "ignore": [],
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  },
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "onlyUpdatePeerDependentsWhenOutOfRange": true
   }
