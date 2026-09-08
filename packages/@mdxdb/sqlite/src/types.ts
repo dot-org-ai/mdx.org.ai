@@ -327,32 +327,67 @@ export type MDXDatabaseStub = DurableObjectStub<MDXDatabaseTarget>
 // =============================================================================
 
 /**
- * Worker loader interface for dynamic worker creation
+ * Worker Loader binding (Cloudflare Dynamic Workers).
+ *
+ * Mirrors the runtime's `WorkerLoader` interface: `get()` returns a stub
+ * synchronously; the code callback runs only when the isolate is not already
+ * cached under `id`. Declared in wrangler as a `worker_loaders` binding (or
+ * `unsafe.bindings[{ type: "worker-loader" }]` on older wrangler releases).
  */
 export interface WorkerLoader {
   get(
-    id: string,
-    factory: () => Promise<WorkerConfig> | WorkerConfig
-  ): Promise<WorkerInstance>
+    id: string | null,
+    getCode: () => Promise<WorkerLoaderCode> | WorkerLoaderCode
+  ): WorkerStub
 }
 
 /**
- * Worker configuration for loader
+ * Code passed to `WorkerLoader.get()`.
  */
-export interface WorkerConfig {
-  modules: Array<{ name: string; esModule: string }>
-  bindings?: Record<string, unknown>
-  compatibilityDate?: string
+export interface WorkerLoaderCode {
+  compatibilityDate: string
   compatibilityFlags?: string[]
+  mainModule: string
+  /** Module name -> ES module source (or a typed module descriptor) */
+  modules: Record<string, string | WorkerLoaderModule>
+  env?: Record<string, unknown>
+  /** `null` blocks all outbound network access from the loaded worker */
+  globalOutbound?: WorkerFetcher | null
 }
 
 /**
- * Worker instance from loader
+ * Typed module descriptor for `WorkerLoaderCode.modules`
  */
-export interface WorkerInstance {
-  fetch(request: Request): Promise<Response>
-  scheduled?(event: ScheduledEvent): Promise<void>
+export interface WorkerLoaderModule {
+  js?: string
+  cjs?: string
+  text?: string
+  json?: unknown
 }
+
+/**
+ * Stub returned by `WorkerLoader.get()`
+ */
+export interface WorkerStub {
+  getEntrypoint(name?: string, options?: { props?: unknown }): WorkerFetcher
+}
+
+/**
+ * Minimal fetch-capable entrypoint (a `Fetcher`)
+ */
+export interface WorkerFetcher {
+  fetch(request: Request): Promise<Response>
+}
+
+/**
+ * @deprecated Use `WorkerLoaderCode`; kept as an alias for older imports.
+ */
+export type WorkerConfig = WorkerLoaderCode
+
+/**
+ * @deprecated Use `WorkerFetcher`; kept as an alias for older imports.
+ */
+export type WorkerInstance = WorkerFetcher
 
 /**
  * Environment with MDXDatabase binding

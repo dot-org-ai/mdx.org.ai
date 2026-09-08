@@ -9,5 +9,12 @@
   "durable_objects": {
     "bindings": [{ "name": "MDXDB", "class_name": "MDXDatabase" }]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MDXDatabase"] }]
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MDXDatabase"] }],
+  // Worker Loader binding (`env.LOADER`) for the DO's compile/call/meta/render
+  // path. The wrangler bundled with @cloudflare/vitest-pool-workers 0.8.x
+  // (4.35) only knows the unsafe spelling; newer wrangler accepts a top-level
+  // `worker_loaders: [{ "binding": "LOADER" }]`.
+  "unsafe": {
+    "bindings": [{ "name": "LOADER", "type": "worker-loader" }]
+  }
 }
