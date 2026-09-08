@@ -327,7 +327,7 @@ mdxld (core parsing)
 │   └── @mdxdb/* (fs, sqlite, postgres, mongo, clickhouse, api)
 │
 ├── mdxe (execution)
-│   └── @mdxe/* (node, bun, workers, hono, next, ink, mcp, vitest)
+│   └── @mdxe/* (node, bun, workers, hono, next, ink, tui, mcp, vitest)
 │
 ├── mdxui (rendering)
 │   └── @mdxui/* (html, json, markdown, email, slack, shadcn)

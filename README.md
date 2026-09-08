@@ -132,7 +132,7 @@ Detailed taxonomy of all `@mdxe` scoped packages for execution environments and 
 |---------|-------------|----------|
 | **@mdxe/mcp** | Model Context Protocol for AI tools | Claude Code, AI integrations |
 
-> RPC is not an `@mdxe` package. Use the capnweb `RPC` / `RPCPromise` primitives from [ai-functions](./primitives/packages/ai-functions) directly (re-exported as types from `mdxe`). The former `@mdxe/rpc` package was removed as a duplicate of ai-functions RPC.
+> RPC is not an `@mdxe` package. Use the capnweb `RPC` / `RPCPromise` primitives from [ai-functions](https://www.npmjs.com/package/ai-functions) directly (re-exported as types from `mdxe`). The former `@mdxe/rpc` package was removed as a duplicate of ai-functions RPC.
 
 ### Deployment
 
