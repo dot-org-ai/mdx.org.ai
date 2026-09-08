@@ -12,7 +12,7 @@ const REMOVED_DIRS = ['packages/@mdxe/rpc', 'packages/@mdxai/agentkit'] as const
 const DEP_FIELDS = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'] as const
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.turbo', '.git', '.next', '.source', 'coverage'])
 
-const root = resolve(__dirname, '..')
+const root = resolve(__dirname, '..', '..')
 
 function findPackageJsons(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {

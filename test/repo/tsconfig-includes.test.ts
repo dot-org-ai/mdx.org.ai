@@ -19,7 +19,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'fs'
 import { isAbsolute, join, relative, resolve } from 'path'
 import ts from 'typescript'
 
-const repoRoot = resolve(__dirname, '..')
+const repoRoot = resolve(__dirname, '..', '..')
 const packagesRoot = join(repoRoot, 'packages')
 
 /** Directories directly under packages/ or packages/@scope/ that hold a package.json. */
