@@ -16,15 +16,14 @@ import {
 } from './errors.js'
 
 describe('error utilities', () => {
-  const originalEnv = process.env.NODE_ENV
-
   beforeEach(() => {
     // Reset environment between tests
     vi.resetModules()
   })
 
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv
+    // Restore NODE_ENV (and anything else stubbed) to its pre-test value
+    vi.unstubAllEnvs()
   })
 
   // ============================================================================
@@ -33,22 +32,22 @@ describe('error utilities', () => {
 
   describe('isDevelopment', () => {
     it('returns true when NODE_ENV is development', () => {
-      process.env.NODE_ENV = 'development'
+      vi.stubEnv('NODE_ENV', 'development')
       expect(isDevelopment()).toBe(true)
     })
 
     it('returns true when NODE_ENV is undefined', () => {
-      delete process.env.NODE_ENV
+      vi.stubEnv('NODE_ENV', undefined)
       expect(isDevelopment()).toBe(true)
     })
 
     it('returns false when NODE_ENV is production', () => {
-      process.env.NODE_ENV = 'production'
+      vi.stubEnv('NODE_ENV', 'production')
       expect(isDevelopment()).toBe(false)
     })
 
     it('returns false when NODE_ENV is test', () => {
-      process.env.NODE_ENV = 'test'
+      vi.stubEnv('NODE_ENV', 'test')
       // In test mode, we should NOT expose stack traces by default
       // Tests can opt-in to debug mode explicitly
       expect(isDevelopment()).toBe(false)
@@ -134,7 +133,7 @@ describe('error utilities', () => {
     testError.stack = 'Error: Something went wrong\n    at Object.<anonymous> (/app/src/handler.ts:15:11)'
 
     it('returns sanitized response in production', () => {
-      process.env.NODE_ENV = 'production'
+      vi.stubEnv('NODE_ENV', 'production')
       const response = createErrorResponse(testError)
 
       expect(response.error).toBe('Something went wrong')
@@ -142,7 +141,7 @@ describe('error utilities', () => {
     })
 
     it('includes stack trace in development', () => {
-      process.env.NODE_ENV = 'development'
+      vi.stubEnv('NODE_ENV', 'development')
       const response = createErrorResponse(testError)
 
       expect(response.error).toBe('Something went wrong')
@@ -150,14 +149,14 @@ describe('error utilities', () => {
     })
 
     it('respects explicit debug option over NODE_ENV', () => {
-      process.env.NODE_ENV = 'production'
+      vi.stubEnv('NODE_ENV', 'production')
       const response = createErrorResponse(testError, { debug: true })
 
       expect(response.stack).toBeDefined()
     })
 
     it('can suppress stack even in development', () => {
-      process.env.NODE_ENV = 'development'
+      vi.stubEnv('NODE_ENV', 'development')
       const response = createErrorResponse(testError, { debug: false })
 
       expect(response.stack).toBeUndefined()
@@ -180,7 +179,7 @@ describe('error utilities', () => {
     })
 
     it('sanitizes internal paths from error in production', () => {
-      process.env.NODE_ENV = 'production'
+      vi.stubEnv('NODE_ENV', 'production')
       const pathError = new Error('Module not found: /home/user/app/node_modules/secret/index.js')
       const response = createErrorResponse(pathError)
 
@@ -241,7 +240,7 @@ describe('error utilities', () => {
 
   describe('integration with createHandler pattern', () => {
     it('produces safe error JSON for HTTP responses', () => {
-      process.env.NODE_ENV = 'production'
+      vi.stubEnv('NODE_ENV', 'production')
 
       // Simulate what createHandler would do
       const error = new Error('Database connection failed')
