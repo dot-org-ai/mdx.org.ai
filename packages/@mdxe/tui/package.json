@@ -1,0 +1,68 @@
+{
+  "name": "@mdxe/tui",
+  "version": "0.1.0",
+  "description": "The viewer seam: a TUI is a shell that displays @mdxui/text bytes and handles input, never a renderer. Viewer interface, input abstraction, conformance suite, benchmark harness.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./conformance": {
+      "types": "./dist/conformance.d.ts",
+      "import": "./dist/conformance.js",
+      "require": "./dist/conformance.cjs"
+    },
+    "./benchmark": {
+      "types": "./dist/benchmark.d.ts",
+      "import": "./dist/benchmark.js",
+      "require": "./dist/benchmark.cjs"
+    },
+    "./stub": {
+      "types": "./dist/stub.d.ts",
+      "import": "./dist/stub.js",
+      "require": "./dist/stub.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "bench": "tsup && node dist/bench.js",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdxe",
+    "tui",
+    "terminal",
+    "viewer",
+    "ansi",
+    "ink",
+    "opentui"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@mdxld/config": "workspace:^",
+    "@types/node": "^22.10.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-primitives/mdx.org.ai",
+    "directory": "packages/@mdxe/tui"
+  },
+  "author": "MDX.org.ai"
+}
