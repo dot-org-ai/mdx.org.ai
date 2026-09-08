@@ -17,7 +17,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSy
 import { join, resolve, relative } from 'node:path'
 import type { CloudflareDeployOptions, DeployResult, SourceTypeInfo } from '../types.js'
 import { CloudflareApi, type WorkerMetadata, type WorkerBinding } from '../cloudflare/api.js'
-import { ensureLoggedIn } from 'oauth.do'
+import { ensureLoggedIn } from '../auth.js'
 
 /**
  * Default timeout for fetch requests in milliseconds (60 seconds)
