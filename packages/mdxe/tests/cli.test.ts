@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { parseArgs, runDeploy, main, VERSION, getWorkerdRuntime, requireValue, validatePort, type CliOptions } from '../src/cli.js'
+import { parseArgs, runDeploy, main, VERSION, getWorkerdRuntime, requireValue, validatePort, CliError, EXIT, type CliOptions } from '../src/cli.js'
+import { FAILSAFE_CTX } from '../src/cli/context.js'
 
 // Mock @mdxe/fumadocs for checkDocsType
 vi.mock('@mdxe/fumadocs', () => ({
@@ -76,9 +77,38 @@ describe('CLI parseArgs', () => {
       expect(result.help).toBe(true)
     })
 
-    it('should handle unknown commands as dev', () => {
-      const result = parseArgs(['unknown'])
-      expect(result.command).toBe('dev')
+    it('should reject an unknown command as USAGE (exit 2) — never fall through to dev', () => {
+      expect(() => parseArgs(['unknown'])).toThrow(CliError)
+      try {
+        parseArgs(['dpeloy', '--force'])
+      } catch (e) {
+        expect((e as CliError).code).toBe('USAGE')
+        expect((e as CliError).exit).toBe(EXIT.USAGE)
+        expect((e as CliError).message).toContain('dpeloy')
+      }
+    })
+
+    it('should reject an unknown flag before consuming its value (mid-argv or trailing)', () => {
+      for (const argv of [['deploy', '--nmae', 'x', '--force'], ['deploy', '--force', '--nmae'], ['dev', '-x']]) {
+        try {
+          parseArgs(argv)
+          throw new Error('expected a USAGE CliError')
+        } catch (e) {
+          expect(e).toBeInstanceOf(CliError)
+          expect((e as CliError).exit).toBe(2)
+          expect((e as CliError).message).toMatch(/unknown flag/)
+        }
+      }
+    })
+
+    it('should attach the frozen ctx to every parsed options object (FAILSAFE_CTX by default)', () => {
+      expect(parseArgs(['deploy']).ctx).toBe(FAILSAFE_CTX)
+      const ctx = { mode: 'json', color: false, width: Infinity, interactive: false, stream: false } as const
+      expect(parseArgs(['deploy'], ctx).ctx).toBe(ctx)
+    })
+
+    it('should hand tail its argv untouched (tail owns its own parser)', () => {
+      expect(parseArgs(['tail', '--live', '--source', 'x']).command).toBe('tail')
     })
   })
 
@@ -185,9 +215,9 @@ describe('CLI parseArgs', () => {
       expect(result.env).toEqual({ URL: 'https://example.com?foo=bar' })
     })
 
-    it('should ignore invalid env format', () => {
-      const result = parseArgs(['deploy', '--env', 'NOEQUALS'])
-      expect(result.env).toEqual({})
+    it('should reject an invalid env format as USAGE (fail closed, never silently dropped)', () => {
+      expect(() => parseArgs(['deploy', '--env', 'NOEQUALS'])).toThrow(CliError)
+      expect(() => parseArgs(['deploy', '--env', '=novalue'])).toThrow(CliError)
     })
 
     it('should handle empty env value', () => {
@@ -284,11 +314,15 @@ describe('CLI parseArgs', () => {
       expect(result.help).toBe(true)
     })
 
-    it('should handle options before command', () => {
-      // Options before command should still work
-      const result = parseArgs(['--dry-run', 'deploy'])
-      // The first non-flag arg becomes the command
-      expect(result.command).toBe('dev') // deploy is consumed as an arg value
+    it('should reject a stray word after the flags as USAGE (a command must come first)', () => {
+      // Previously `deploy` was silently swallowed and the DEV SERVER ran. Fail closed instead.
+      expect(() => parseArgs(['--dry-run', 'deploy'])).toThrow(CliError)
+      try {
+        parseArgs(['--dry-run', 'deploy'])
+      } catch (e) {
+        expect((e as CliError).exit).toBe(EXIT.USAGE)
+        expect((e as CliError).message).toContain('"deploy"')
+      }
     })
   })
 
@@ -660,14 +694,63 @@ describe('main', () => {
     expect(logs.some(l => l.includes('mdxe - Execute, Test, & Deploy'))).toBe(true)
   })
 
-  it('should run dev command when no command is provided', async () => {
+  it('should render the ORIENTATION (never the dev server) when no command is provided, exit 0', async () => {
     process.argv = ['node', 'cli.js']
+    const chunks: string[] = []
+    const write = vi.spyOn(process.stdout, 'write').mockImplementation(((chunk: string | Uint8Array) => {
+      chunks.push(String(chunk))
+      return true
+    }) as typeof process.stdout.write)
+    const stdinRead = vi.spyOn(process.stdin, 'read')
+    try {
+      const code = await main()
+      expect(code).toBe(0)
+      expect(stdinRead).not.toHaveBeenCalled()
+      const out = chunks.join('')
+      expect(out).toContain('mdxe')
+      expect(out).toContain('mdxe help')
+      for (const verb of ['dev', 'test', 'deploy', 'tail', 'db']) expect(out).toContain(verb)
+      // The orientation is not the dev server and not the help.
+      expect(logs.some(l => l.includes('mdxe dev') || l.includes('Starting'))).toBe(false)
+      expect(out).not.toContain('mdxe - Execute, Test, & Deploy')
+    } finally {
+      write.mockRestore()
+      stdinRead.mockRestore()
+    }
+  })
 
-    await main()
+  it('returns 0 for version/help and never calls process.exit from main', async () => {
+    process.argv = ['node', 'cli.js', '--version']
+    expect(await main()).toBe(0)
+    expect(exitCode).toBeUndefined()
+    expect(await main(['help'])).toBe(0)
+    expect(await main(['-h'])).toBe(0)
+  })
 
-    // Default command is now 'dev', which starts the dev server
-    // The main function will try to start the dev server
-    expect(logs.some(l => l.includes('mdxe dev') || l.includes('Starting'))).toBe(true)
+  it('bad --format is USAGE (exit 2) rendered to stderr, nothing on stdout', async () => {
+    const errChunks: string[] = []
+    const outChunks: string[] = []
+    const werr = vi.spyOn(process.stderr, 'write').mockImplementation(((c: string | Uint8Array) => {
+      errChunks.push(String(c))
+      return true
+    }) as typeof process.stderr.write)
+    const wout = vi.spyOn(process.stdout, 'write').mockImplementation(((c: string | Uint8Array) => {
+      outChunks.push(String(c))
+      return true
+    }) as typeof process.stdout.write)
+    try {
+      expect(await main(['--format', 'xml'])).toBe(EXIT.USAGE)
+      expect(errChunks.join('')).toContain('code=USAGE')
+      expect(outChunks.join('')).toBe('')
+      expect(logs).toEqual([])
+      // an unknown command and an unknown flag are USAGE too
+      expect(await main(['dpeloy'])).toBe(2)
+      expect(await main(['deploy', '--nmae', 'x'])).toBe(2)
+      expect(await main(['--color'])).toBe(2) // missing value fails closed inside main, never an unhandled rejection
+    } finally {
+      werr.mockRestore()
+      wout.mockRestore()
+    }
   })
 
   it('should run deploy command', async () => {
@@ -821,194 +904,175 @@ describe('Unified Workerd Execution', () => {
 // =============================================================================
 
 describe('CLI Argument Validation', () => {
-  const originalExit = process.exit
-  const originalConsoleError = console.error
-
-  let exitCode: number | undefined
-  let errors: string[] = []
-
-  beforeEach(() => {
-    exitCode = undefined
-    errors = []
-
-    // Mock process.exit
-    process.exit = vi.fn((code?: number) => {
-      exitCode = code
-      throw new Error(`process.exit(${code})`)
-    }) as never
-
-    // Mock console.error to capture error messages
-    console.error = vi.fn((...args) => {
-      errors.push(args.join(' '))
-    })
-  })
-
-  afterEach(() => {
-    process.exit = originalExit
-    console.error = originalConsoleError
-  })
+  /** Assert a USAGE CliError (exit 2) and return it for message/hint checks. */
+  function usage(fn: () => unknown): CliError {
+    try {
+      fn()
+    } catch (e) {
+      expect(e).toBeInstanceOf(CliError)
+      expect((e as CliError).code).toBe('USAGE')
+      expect((e as CliError).exit).toBe(EXIT.USAGE)
+      return e as CliError
+    }
+    throw new Error('expected a USAGE CliError')
+  }
+  const text = (e: CliError): string => `${e.message} ${e.hint ?? ''}`
 
   describe('--port validation', () => {
     it('should fail when --port is missing a value', () => {
-      expect(() => parseArgs(['dev', '--port'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--port requires'))).toBe(true)
+      expect(usage(() => parseArgs(['dev', '--port'])).message).toContain('--port requires')
     })
 
     it('should fail when --port value starts with dash (another flag)', () => {
-      expect(() => parseArgs(['dev', '--port', '--verbose'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--port requires'))).toBe(true)
+      expect(usage(() => parseArgs(['dev', '--port', '--verbose'])).message).toContain('--port requires')
     })
 
     it('should fail when --port is not a number', () => {
-      expect(() => parseArgs(['dev', '--port', 'abc'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('Invalid port'))).toBe(true)
+      expect(usage(() => parseArgs(['dev', '--port', 'abc'])).message).toContain('invalid port')
     })
 
     it('should fail when --port is negative', () => {
-      expect(() => parseArgs(['dev', '--port', '-5'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--port requires') || e.includes('Invalid port'))).toBe(true)
+      expect(usage(() => parseArgs(['dev', '--port', '-5'])).message).toMatch(/--port requires|invalid port/)
     })
 
     it('should fail when --port is zero', () => {
-      expect(() => parseArgs(['dev', '--port', '0'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('Invalid port') || e.includes('between 1 and 65535'))).toBe(true)
+      expect(text(usage(() => parseArgs(['dev', '--port', '0'])))).toMatch(/invalid port|between 1 and 65535/)
     })
 
     it('should fail when --port exceeds 65535', () => {
-      expect(() => parseArgs(['dev', '--port', '99999'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('Invalid port') || e.includes('between 1 and 65535'))).toBe(true)
+      expect(text(usage(() => parseArgs(['dev', '--port', '99999'])))).toMatch(/invalid port|between 1 and 65535/)
     })
 
     it('should fail when --port is a float', () => {
-      expect(() => parseArgs(['dev', '--port', '3000.5'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('Invalid port'))).toBe(true)
+      expect(usage(() => parseArgs(['dev', '--port', '3000.5'])).message).toContain('invalid port')
     })
 
     it('should accept valid port numbers', () => {
-      const result = parseArgs(['dev', '--port', '3000'])
-      expect(result.port).toBe(3000)
+      expect(parseArgs(['dev', '--port', '3000']).port).toBe(3000)
     })
 
     it('should accept port 1 (minimum valid)', () => {
-      const result = parseArgs(['dev', '--port', '1'])
-      expect(result.port).toBe(1)
+      expect(parseArgs(['dev', '--port', '1']).port).toBe(1)
     })
 
     it('should accept port 65535 (maximum valid)', () => {
-      const result = parseArgs(['dev', '--port', '65535'])
-      expect(result.port).toBe(65535)
+      expect(parseArgs(['dev', '--port', '65535']).port).toBe(65535)
     })
   })
 
   describe('--http-port validation', () => {
     it('should fail when --http-port is missing a value', () => {
-      expect(() => parseArgs(['db', '--http-port'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--http-port requires'))).toBe(true)
+      expect(usage(() => parseArgs(['db', '--http-port'])).message).toContain('--http-port requires')
     })
 
     it('should fail when --http-port value starts with dash', () => {
-      expect(() => parseArgs(['db', '--http-port', '--verbose'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--http-port requires'))).toBe(true)
+      expect(usage(() => parseArgs(['db', '--http-port', '--verbose'])).message).toContain('--http-port requires')
     })
 
     it('should fail when --http-port is not a number', () => {
-      expect(() => parseArgs(['db', '--http-port', 'abc'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('Invalid port'))).toBe(true)
+      expect(usage(() => parseArgs(['db', '--http-port', 'abc'])).message).toContain('invalid port')
     })
 
     it('should fail when --http-port is zero', () => {
-      expect(() => parseArgs(['db', '--http-port', '0'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('Invalid port') || e.includes('between 1 and 65535'))).toBe(true)
+      expect(text(usage(() => parseArgs(['db', '--http-port', '0'])))).toMatch(/invalid port|between 1 and 65535/)
     })
 
     it('should fail when --http-port exceeds 65535', () => {
-      expect(() => parseArgs(['db', '--http-port', '70000'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('Invalid port') || e.includes('between 1 and 65535'))).toBe(true)
+      expect(text(usage(() => parseArgs(['db', '--http-port', '70000'])))).toMatch(/invalid port|between 1 and 65535/)
     })
 
     it('should accept valid http-port numbers', () => {
-      const result = parseArgs(['db', '--http-port', '8123'])
-      expect(result.httpPort).toBe(8123)
+      expect(parseArgs(['db', '--http-port', '8123']).httpPort).toBe(8123)
     })
   })
 
   describe('--name validation', () => {
     it('should fail when --name is missing a value', () => {
-      expect(() => parseArgs(['deploy', '--name'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--name requires'))).toBe(true)
+      expect(usage(() => parseArgs(['deploy', '--name'])).message).toContain('--name requires')
     })
 
     it('should fail when --name value starts with dash', () => {
-      expect(() => parseArgs(['deploy', '--name', '--verbose'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--name requires'))).toBe(true)
+      expect(usage(() => parseArgs(['deploy', '--name', '--verbose'])).message).toContain('--name requires')
     })
 
     it('should fail when -n is missing a value', () => {
-      expect(() => parseArgs(['deploy', '-n'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--name requires') || e.includes('-n requires'))).toBe(true)
+      expect(usage(() => parseArgs(['deploy', '-n'])).message).toMatch(/--name requires|-n requires/)
     })
   })
 
   describe('--filter validation', () => {
     it('should fail when --filter is missing a value', () => {
-      expect(() => parseArgs(['test', '--filter'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--filter requires'))).toBe(true)
+      expect(usage(() => parseArgs(['test', '--filter'])).message).toContain('--filter requires')
     })
 
     it('should fail when -f is missing a value', () => {
-      expect(() => parseArgs(['test', '-f'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--filter requires') || e.includes('-f requires'))).toBe(true)
+      expect(usage(() => parseArgs(['test', '-f'])).message).toMatch(/--filter requires|-f requires/)
     })
   })
 
   describe('--host validation', () => {
     it('should fail when --host is missing a value', () => {
-      expect(() => parseArgs(['dev', '--host'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--host requires'))).toBe(true)
+      expect(usage(() => parseArgs(['dev', '--host'])).message).toContain('--host requires')
     })
 
     it('should fail when --host value starts with dash', () => {
-      expect(() => parseArgs(['dev', '--host', '--port'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--host requires'))).toBe(true)
+      expect(usage(() => parseArgs(['dev', '--host', '--port'])).message).toContain('--host requires')
     })
   })
 
   describe('--dir validation', () => {
     it('should fail when --dir is missing a value', () => {
-      expect(() => parseArgs(['dev', '--dir'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--dir requires'))).toBe(true)
+      expect(usage(() => parseArgs(['dev', '--dir'])).message).toContain('--dir requires')
     })
 
     it('should fail when -d is missing a value', () => {
-      expect(() => parseArgs(['dev', '-d'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--dir requires') || e.includes('-d requires'))).toBe(true)
+      expect(usage(() => parseArgs(['dev', '-d'])).message).toMatch(/--dir requires|-d requires/)
+    })
+
+    it('should accept --path as an alias of --dir (the db help advertises it)', () => {
+      expect(parseArgs(['db:publish', '--path', '/content']).projectDir).toBe('/content')
+    })
+  })
+
+  describe('--env validation', () => {
+    it('should fail closed on a missing or malformed KEY=value', () => {
+      expect(usage(() => parseArgs(['deploy', '--env'])).message).toContain('--env requires')
+      expect(usage(() => parseArgs(['deploy', '--env', 'NOEQUALS'])).message).toContain('KEY=value')
+    })
+
+    it('should accept KEY=value (with = inside the value)', () => {
+      expect(parseArgs(['deploy', '--env', 'A=b=c']).env).toEqual({ A: 'b=c' })
+    })
+  })
+
+  describe('enumeration validation', () => {
+    it('bad --platform / --mode / --context / --target / --db / --ai are USAGE', () => {
+      usage(() => parseArgs(['deploy', '--platform', 'aws']))
+      usage(() => parseArgs(['deploy', '--mode', 'ssr']))
+      usage(() => parseArgs(['test', '--context', 'edge']))
+      usage(() => parseArgs(['test', '--target', 'deno']))
+      usage(() => parseArgs(['test', '--db', 'redis']))
+      usage(() => parseArgs(['test', '--ai', 'hybrid']))
     })
   })
 
   describe('--compatibility-date validation', () => {
     it('should fail when --compatibility-date is missing a value', () => {
-      expect(() => parseArgs(['deploy', 'workers', '--compatibility-date'])).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--compatibility-date requires'))).toBe(true)
+      expect(usage(() => parseArgs(['deploy', 'workers', '--compatibility-date'])).message).toContain('--compatibility-date requires')
     })
   })
 
   describe('error message quality', () => {
     it('should provide usage example for --port', () => {
-      try {
-        parseArgs(['dev', '--port'])
-      } catch {
-        // expected
-      }
-      expect(errors.some(e => e.includes('Usage:') || e.includes('mdxe'))).toBe(true)
+      const e = usage(() => parseArgs(['dev', '--port']))
+      expect(e.hint).toContain('usage:')
+      expect(e.hint).toContain('mdxe')
     })
 
     it('should mention valid range for port numbers', () => {
-      try {
-        parseArgs(['dev', '--port', '99999'])
-      } catch {
-        // expected
-      }
-      expect(errors.some(e => e.includes('1') && e.includes('65535'))).toBe(true)
+      const e = usage(() => parseArgs(['dev', '--port', '99999']))
+      expect(e.hint).toContain('1')
+      expect(e.hint).toContain('65535')
     })
   })
 
@@ -1017,82 +1081,64 @@ describe('CLI Argument Validation', () => {
       expect(() => requireValue('--test', 'value')).not.toThrow()
     })
 
-    it('should exit for undefined values', () => {
-      expect(() => requireValue('--test', undefined)).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--test requires'))).toBe(true)
+    it('should throw USAGE for undefined values', () => {
+      expect(usage(() => requireValue('--test', undefined)).message).toContain('--test requires')
     })
 
-    it('should exit for empty string values', () => {
-      expect(() => requireValue('--test', '')).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--test requires'))).toBe(true)
+    it('should throw USAGE for empty string values', () => {
+      expect(usage(() => requireValue('--test', '')).message).toContain('--test requires')
     })
 
-    it('should exit when value starts with dash', () => {
-      expect(() => requireValue('--test', '-v')).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('--test requires'))).toBe(true)
+    it('should throw USAGE when value starts with dash', () => {
+      expect(usage(() => requireValue('--test', '-v')).message).toContain('--test requires')
     })
 
     it('should include usage hint when provided', () => {
-      try {
-        requireValue('--test', undefined, 'mdxe test --test value')
-      } catch {
-        // expected
-      }
-      expect(errors.some(e => e.includes('Usage:') && e.includes('mdxe test --test value'))).toBe(true)
+      const e = usage(() => requireValue('--test', undefined, 'mdxe test --test value'))
+      expect(e.hint).toContain('usage:')
+      expect(e.hint).toContain('mdxe test --test value')
     })
   })
 
   describe('validatePort helper', () => {
     it('should return valid port numbers', () => {
-      const result = validatePort('--port', '8080')
-      expect(result).toBe(8080)
+      expect(validatePort('--port', '8080')).toBe(8080)
     })
 
     it('should accept minimum valid port (1)', () => {
-      const result = validatePort('--port', '1')
-      expect(result).toBe(1)
+      expect(validatePort('--port', '1')).toBe(1)
     })
 
     it('should accept maximum valid port (65535)', () => {
-      const result = validatePort('--port', '65535')
-      expect(result).toBe(65535)
+      expect(validatePort('--port', '65535')).toBe(65535)
     })
 
-    it('should exit for missing value', () => {
-      expect(() => validatePort('--port', undefined)).toThrow('process.exit(1)')
+    it('should throw USAGE for missing value', () => {
+      usage(() => validatePort('--port', undefined))
     })
 
-    it('should exit for non-numeric value', () => {
-      expect(() => validatePort('--port', 'abc')).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('Invalid port'))).toBe(true)
+    it('should throw USAGE for non-numeric value', () => {
+      expect(usage(() => validatePort('--port', 'abc')).message).toContain('invalid port')
     })
 
-    it('should exit for negative port', () => {
-      expect(() => validatePort('--port', '-1')).toThrow('process.exit(1)')
+    it('should throw USAGE for negative port', () => {
+      usage(() => validatePort('--port', '-1'))
     })
 
-    it('should exit for port zero', () => {
-      expect(() => validatePort('--port', '0')).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('between 1 and 65535'))).toBe(true)
+    it('should throw USAGE for port zero', () => {
+      expect(usage(() => validatePort('--port', '0')).hint).toContain('between 1 and 65535')
     })
 
-    it('should exit for port exceeding 65535', () => {
-      expect(() => validatePort('--port', '65536')).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('between 1 and 65535'))).toBe(true)
+    it('should throw USAGE for port exceeding 65535', () => {
+      expect(usage(() => validatePort('--port', '65536')).hint).toContain('between 1 and 65535')
     })
 
-    it('should exit for float values', () => {
-      expect(() => validatePort('--port', '8080.5')).toThrow('process.exit(1)')
-      expect(errors.some(e => e.includes('Invalid port'))).toBe(true)
+    it('should throw USAGE for float values', () => {
+      expect(usage(() => validatePort('--port', '8080.5')).message).toContain('invalid port')
     })
 
     it('should include usage hint when provided', () => {
-      try {
-        validatePort('--port', 'abc', 'mdxe dev --port 3000')
-      } catch {
-        // expected
-      }
-      expect(errors.some(e => e.includes('Invalid port'))).toBe(true)
+      expect(usage(() => validatePort('--port', 'abc', 'mdxe dev --port 3000')).message).toContain('invalid port')
     })
   })
 })

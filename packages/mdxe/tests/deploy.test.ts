@@ -369,10 +369,10 @@ describe('Deploy Command Integration', () => {
 })
 
 describe('API-based Deployment Options', () => {
-  it('should parse --use-api flag', () => {
-    const result = parseArgs(['deploy', '--use-api'])
-    expect(result.command).toBe('deploy')
-    // Note: useApi would need to be added to CLI if we want to support it via command line
+  it('should reject the unimplemented --use-api flag as USAGE (never silently swallowed)', () => {
+    // useApi is a programmatic CloudflareDeployOptions field only; the CLI has no --use-api flag.
+    // Fail closed (mdx-8je.16): an unknown flag is exit 2, never an intentional-looking deploy.
+    expect(() => parseArgs(['deploy', '--use-api'])).toThrow(/unknown flag --use-api/)
   })
 
   it('should support all CloudflareDeployOptions programmatically', async () => {
