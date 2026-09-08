@@ -318,6 +318,13 @@ inline. The generated file wraps them in `evaluate({ tests })` from
 `ai-sandbox`), which runs them in an isolated V8 worker via Miniflare locally
 and Cloudflare `worker_loaders` in production.
 
+A block is a test body, so inside the sandbox it is registered as one `it()`
+(ai-evaluate only counts assertions made inside `it()`). When it fails, the
+thrown error carries the assertion text the sandbox reported for that test,
+for example `renders button: Expected "Go" but got "Stop"`, or the parse or
+timeout error when the worker never ran it (`sandboxFailureMessage()` builds
+that message; it is exported for custom runners).
+
 `ai-evaluate` is an optional peer dependency: install it only if you have
 sandboxed tests.
 

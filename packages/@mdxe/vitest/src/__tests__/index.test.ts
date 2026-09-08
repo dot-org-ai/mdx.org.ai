@@ -9,6 +9,7 @@ import {
   findMDXTestFiles,
   generateTestCode,
   SANDBOX_MODULE,
+  sandboxFailureMessage,
   runMDXTests,
   createMDXTestTransformer,
   mdxTestPlugin,
@@ -674,6 +675,143 @@ expect(true).toBe(true)
       const mod = (await import(/* @vite-ignore */ SANDBOX_MODULE)) as { evaluate?: unknown }
       expect(typeof mod.evaluate).toBe('function')
     })
+
+    it('should register the sandbox body as an it() and throw sandboxFailureMessage()', () => {
+      const testFile: MDXTestFile = {
+        path: '/path/to/client.mdx',
+        doc: parse('# Client'),
+        tests: [
+          {
+            name: "it's sandboxed",
+            lang: 'ts',
+            code: "'use client'\nexpect(1).toBe(2)",
+            line: 5,
+            async: false,
+            meta: { test: true },
+          },
+        ],
+        isCompanionTest: false,
+      }
+
+      const code = generateTestCode(testFile)
+
+      expect(code).toContain("import { should, assert, sandboxFailureMessage } from '@mdxe/vitest'")
+      // The block is a test body: ai-evaluate only counts assertions inside it().
+      // The name is quoted for the inner it() and then escaped again for the
+      // template literal that carries it into the sandbox, so `'` -> `\\'`.
+      expect(code).toContain("tests: `it('it\\\\'s sandboxed', async () => {")
+      expect(code).toContain("'use client'\nexpect(1).toBe(2)\n})`,")
+      expect(code).toContain('const failure = sandboxFailureMessage(result)')
+      expect(code).toContain('throw new Error(failure)')
+      expect(code).not.toContain('Test failed in sandbox')
+    })
+
+    /**
+     * Pull the exact `tests` template the generator emitted for one sandbox
+     * block and evaluate it as a template literal, undoing escapeForTemplate()
+     * the same way the generated file would when vitest runs it.
+     */
+    function emittedSandboxTests(code: string): string {
+      const match = code.match(/tests: `([\s\S]*?)`,\n\s*\}\)/)
+      if (!match) throw new Error('generated code has no tests: template')
+      return new Function(`return \`${match[1]}\``)() as string
+    }
+
+    function sandboxTestFile(name: string, body: string): MDXTestFile {
+      return {
+        path: '/path/to/sandbox.mdx',
+        doc: parse('# Sandbox'),
+        // 'use client' forces the sandbox path without needing a JSX factory.
+        tests: [{ name, lang: 'ts', code: `'use client'\n${body}`, line: 5, async: false, meta: { test: true } }],
+        isCompanionTest: false,
+      }
+    }
+
+    it(
+      'generated sandbox test surfaces the assertion message through ai-evaluate/node',
+      async () => {
+        const { evaluate } = (await import(/* @vite-ignore */ SANDBOX_MODULE)) as {
+          evaluate: (options: { tests: string }) => Promise<Parameters<typeof sandboxFailureMessage>[0]>
+        }
+
+        const failing = generateTestCode(sandboxTestFile('adds numbers', 'expect(1 + 1).toBe(3)'))
+        const failed = await evaluate({ tests: emittedSandboxTests(failing) })
+        expect(failed.success).toBe(false)
+        // ai-evaluate leaves `error` unset on an assertion failure; the message
+        // is only in testResults, which is what the old generated throw dropped.
+        expect(failed.error).toBeUndefined()
+        const failure = sandboxFailureMessage(failed)
+        expect(failure).toContain('adds numbers')
+        expect(failure).toContain('Expected 3 but got 2')
+
+        const passing = generateTestCode(sandboxTestFile('adds numbers', 'expect(1 + 1).toBe(2)'))
+        const passed = await evaluate({ tests: emittedSandboxTests(passing) })
+        expect(passed.success).toBe(true)
+        expect(passed.testResults?.total).toBe(1)
+        expect(sandboxFailureMessage(passed)).toBeUndefined()
+      },
+      60_000
+    )
+  })
+
+  describe('sandboxFailureMessage', () => {
+    const passedTest = { name: 'ok', passed: true }
+
+    it('returns undefined when every sandbox test passed', () => {
+      expect(
+        sandboxFailureMessage({ success: true, testResults: { total: 1, tests: [passedTest] }, logs: [] })
+      ).toBeUndefined()
+    })
+
+    it('returns undefined for a plain script run with no tests', () => {
+      expect(sandboxFailureMessage({ success: true, logs: [] })).toBeUndefined()
+    })
+
+    it('names each failed test with its assertion message when error is unset', () => {
+      const message = sandboxFailureMessage({
+        success: false,
+        testResults: {
+          total: 3,
+          tests: [
+            { name: 'a', passed: false, error: 'Expected 2 but got 1' },
+            { name: 'b', passed: false, error: 'Expected "y" but got "x"' },
+            passedTest,
+          ],
+        },
+        logs: [],
+      })
+      expect(message).toBe('a: Expected 2 but got 1\nb: Expected "y" but got "x"')
+    })
+
+    it('surfaces an execution error such as a parse failure', () => {
+      expect(
+        sandboxFailureMessage({ success: false, error: 'Unable to parse "script:0": Unexpected token', logs: [] })
+      ).toBe('Unable to parse "script:0": Unexpected token')
+    })
+
+    it('treats a registration error as a failure even though success is true', () => {
+      // A throw outside it() never reaches testResults; ai-evaluate logs it and
+      // reports success. Without this the block would pass silently.
+      const message = sandboxFailureMessage({
+        success: true,
+        testResults: { total: 0, tests: [] },
+        logs: [{ level: 'error', message: 'Test registration error: h is not defined' }],
+      })
+      expect(message).toBe('h is not defined')
+    })
+
+    it('fails a run that registered no tests at all', () => {
+      expect(sandboxFailureMessage({ success: true, testResults: { total: 0, tests: [] }, logs: [] })).toBe(
+        'No tests ran in sandbox'
+      )
+    })
+
+    it('falls back to a generic message when success is false with nothing else', () => {
+      expect(sandboxFailureMessage({ success: false, logs: [] })).toBe('Test failed in sandbox')
+    })
+  })
+
+  describe('generateTestCode (continued)', () => {
 
     it('should generate async test functions', () => {
       const testFile: MDXTestFile = {
