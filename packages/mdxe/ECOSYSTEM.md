@@ -47,9 +47,9 @@ mdxe is the **execution layer** of the mdx.org.ai ecosystem. While other package
     |   +--------------+  +--------------+  +--------------+     |
     |   |  Runtimes    |  |  Protocols   |  |  Servers     |     |
     |   |              |  |              |  |              |     |
-    |   | @mdxe/node   |  | @mdxe/rpc    |  | @mdxe/hono   |     |
-    |   | @mdxe/bun    |  | @mdxe/mcp    |  | @mdxe/next   |     |
-    |   | @mdxe/workers|  |              |  | @mdxe/ink    |     |
+    |   | @mdxe/node   |  | @mdxe/mcp    |  | @mdxe/hono   |     |
+    |   | @mdxe/bun    |  | (RPC: use    |  | @mdxe/next   |     |
+    |   | @mdxe/workers|  | ai-functions)|  | @mdxe/ink    |     |
     |   +--------------+  +--------------+  +--------------+     |
     |                                                            |
     +-------------------------+----------------------------------+
@@ -61,7 +61,7 @@ mdxe is the **execution layer** of the mdx.org.ai ecosystem. While other package
                     |                   |
                     | @mdxai/claude     |
                     | @mdxai/mastra     |
-                    | @mdxai/agentkit   |
+                    | @mdxai/vapi       |
                     +-------------------+
 
     ============================================================================
@@ -240,7 +240,7 @@ const response = await claude.chat({
 | Pattern | mdxe Package | mdxai Package | Use Case |
 |---------|--------------|---------------|----------|
 | MCP Server | @mdxe/mcp | - | Claude Code tools |
-| RPC Functions | @mdxe/rpc | - | Distributed AI calls |
+| RPC Functions | ai-functions `RPC` (no @mdxe package) | - | Distributed AI calls |
 | Claude Integration | mdxe | @mdxai/claude | Claude-powered apps |
 | Agent Framework | mdxe | @mdxai/mastra | Multi-agent systems |
 | Voice AI | mdxe | @mdxai/vapi | Voice interfaces |
@@ -527,7 +527,7 @@ What are you building?
 |   |
 |   +-- Which protocol?
 |       +-- AI tools (Claude) --> @mdxe/mcp
-|       +-- RPC calls --> @mdxe/rpc
+|       +-- RPC calls --> ai-functions RPC (no @mdxe/rpc)
 |
 +-- Rendering MDX?
 |   |
@@ -542,7 +542,7 @@ What are you building?
     |
     +-- Claude AI --> @mdxai/claude
     +-- Agent framework --> @mdxai/mastra
-    +-- Agent composition --> @mdxai/agentkit
+    +-- Agent composition --> autonomous-agents (primitive; no @mdxai/agentkit)
     +-- Voice AI --> @mdxai/vapi
 ```
 

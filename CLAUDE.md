@@ -93,7 +93,6 @@ Defines runtimes, servers, and communication protocols:
 ├── hono       → HTTP middleware (Hono)
 ├── next       → Next.js App Router integration
 ├── ink        → Terminal UI (React Ink) - runtime + rendering
-├── rpc        → capnweb RPC protocol (Node, Bun, Workers)
 ├── mcp        → Model Context Protocol
 │   ├── stdio  → stdio transport (Node, Bun)
 │   └── http   → HTTP transport (Node, Bun, Workers)
@@ -102,7 +101,7 @@ Defines runtimes, servers, and communication protocols:
 ```
 
 **Key distinction:**
-- `@mdxe/rpc` uses capnweb's `RPC` and `RPCPromise` from ai-functions
+- RPC is not an `@mdxe` package: use capnweb's `RPC` and `RPCPromise` from `ai-functions` directly (`mdxe` re-exports the types). `@mdxe/rpc` was removed as a duplicate.
 - `@mdxe/mcp` is separate - different transports (stdio, http) and different runtimes
 
 ### @mdxdb - Database Adapters
@@ -170,7 +169,6 @@ Use cases:
 @mdxai/
 ├── claude     → Claude AI with MCP tools
 ├── mastra     → Mastra agent framework
-├── agentkit   → Agent composition toolkit
 └── vapi       → Vapi voice AI
 ```
 
@@ -246,9 +244,9 @@ const email = await toEmail(doc)    // Email HTML for notifications
 ### Execution via Protocols
 
 ```typescript
-// capnweb RPC (from ai-functions)
-import { createRPCServer } from '@mdxe/rpc'
-const rpc = createRPCServer({ functions, port: 3000 })
+// capnweb RPC (from ai-functions; there is no @mdxe/rpc)
+import { RPC } from 'ai-functions'
+const rpc = RPC<typeof functions>('https://functions.example.com')
 
 // MCP for Claude/AI tools
 import { createMCPServer } from '@mdxe/mcp'
@@ -328,16 +326,16 @@ mdxld (core parsing)
 │   └── @mdxdb/* (fs, sqlite, postgres, mongo, clickhouse, api)
 │
 ├── mdxe (execution)
-│   └── @mdxe/* (node, bun, workers, hono, next, ink, rpc, mcp, vitest)
+│   └── @mdxe/* (node, bun, workers, hono, next, ink, mcp, vitest)
 │
 ├── mdxui (rendering)
 │   └── @mdxui/* (html, json, markdown, email, slack, shadcn)
 │
 └── mdxai (AI integrations)
-    └── @mdxai/* (claude, mastra, agentkit, vapi)
+    └── @mdxai/* (claude, mastra, vapi)
 
 ai-* primitives (npm, ^2.4.0)
-├── ai-functions → used by @mdxe/rpc
+├── ai-functions → capnweb RPC types re-exported by mdxe (use its RPC directly; @mdxe/rpc was removed)
 ├── ai-workflows → used by mdxai
 ├── ai-database → used by mdxdb
 └── ai-evaluate → used by mdxe
