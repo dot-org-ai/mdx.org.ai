@@ -1,7 +1,14 @@
 /**
  * E2E Tests for mdxe deploy --managed
  *
- * These tests use real oauth.do tokens and hit real endpoints
+ * The first block uses real oauth.do tokens and hits real endpoints
+ * (auth.apis.do device flow, then POST https://apis.do/workers). It is
+ * opt-in: set MDXE_E2E=1 to run it. Without the flag it is reported as
+ * skipped, not failed, so `pnpm --filter mdxe test` is witnessable offline
+ * and does not flap on auth.apis.do outages (see tracker mdx-d5s).
+ *
+ * The second block ('E2E: CLI integration') is dry-run only and never touches
+ * the network, so it always runs.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
@@ -10,7 +17,10 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { ensureLoggedIn } from '../src/auth.js'
 
-describe('E2E: mdxe deploy --managed', () => {
+/** Live-network E2E cases run only when explicitly requested. */
+const LIVE_E2E = process.env.MDXE_E2E === '1'
+
+describe.skipIf(!LIVE_E2E)('E2E: mdxe deploy --managed (live, MDXE_E2E=1)', () => {
   let testDir: string
 
   beforeEach(() => {
