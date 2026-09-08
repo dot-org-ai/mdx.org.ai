@@ -8,6 +8,7 @@ import {
   extractTestsFromFile,
   findMDXTestFiles,
   generateTestCode,
+  SANDBOX_MODULE,
   runMDXTests,
   createMDXTestTransformer,
   mdxTestPlugin,
@@ -621,6 +622,57 @@ expect(true).toBe(true)
       expect(code).toContain("describe('test.mdx', () => {")
       expect(code).toContain("it('should work', () => {")
       expect(code).toContain('expect(1 + 1).toBe(2)')
+    })
+
+    it('should not import the sandbox when no test needs it', () => {
+      const testFile: MDXTestFile = {
+        path: '/path/to/plain.mdx',
+        doc: parse('# Plain'),
+        tests: [
+          { name: 'plain', lang: 'ts', code: 'expect(1).toBe(1)', line: 5, async: false, meta: { test: true } },
+        ],
+        isCompanionTest: false,
+      }
+
+      const code = generateTestCode(testFile)
+
+      expect(code).not.toContain('ai-evaluate')
+      expect(code).not.toContain('ai-sandbox')
+    })
+
+    it('should import evaluate from ai-evaluate/node for sandbox tests (never ai-sandbox)', () => {
+      const testFile: MDXTestFile = {
+        path: '/path/to/jsx.mdx',
+        doc: parse('# JSX'),
+        tests: [
+          {
+            name: 'renders',
+            lang: 'tsx',
+            code: 'const el = <Button label="Go" />\nexpect(el.props.label).toBe("Go")',
+            line: 5,
+            async: false,
+            meta: { test: true },
+          },
+        ],
+        isCompanionTest: false,
+      }
+
+      const code = generateTestCode(testFile)
+
+      expect(SANDBOX_MODULE).toBe('ai-evaluate/node')
+      expect(code).toContain(`import { evaluate } from '${SANDBOX_MODULE}'`)
+      // ai-sandbox was renamed ai-evaluate on 2025-12-20; npm ai-sandbox is a 0.0.0 placeholder
+      expect(code).not.toContain('ai-sandbox')
+      expect(code).toContain('const result = await evaluate({')
+      expect(code).toContain('tests: `')
+    })
+
+    it('generated sandbox import resolves to a real evaluate()', async () => {
+      // Witness that the emitted specifier resolves in an install, which the
+      // old 'ai-sandbox' specifier never could. ai-evaluate/node lazy-loads
+      // miniflare/esbuild, so importing it here has no side effects.
+      const mod = (await import(/* @vite-ignore */ SANDBOX_MODULE)) as { evaluate?: unknown }
+      expect(typeof mod.evaluate).toBe('function')
     })
 
     it('should generate async test functions', () => {

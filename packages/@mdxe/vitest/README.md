@@ -310,6 +310,21 @@ users.should.have.length(1)
 ```
 ````
 
+### Sandboxed Tests
+
+Tests that render JSX, use React hooks, or exercise a Hono `app` are not run
+inline. The generated file wraps them in `evaluate({ tests })` from
+[`ai-evaluate/node`](https://www.npmjs.com/package/ai-evaluate) (formerly
+`ai-sandbox`), which runs them in an isolated V8 worker via Miniflare locally
+and Cloudflare `worker_loaders` in production.
+
+`ai-evaluate` is an optional peer dependency: install it only if you have
+sandboxed tests.
+
+```bash
+pnpm add -D ai-evaluate miniflare
+```
+
 ## Assertions Reference
 
 ### Equality

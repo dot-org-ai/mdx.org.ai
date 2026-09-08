@@ -299,7 +299,7 @@ expect(1 + 1).toBe(2)
 ```
 ````
 
-Run with `mdxe test` which uses `ai-sandbox` for execution.
+Run with `mdxe test` which uses `ai-evaluate` (formerly `ai-sandbox`) for execution; `@mdxe/vitest` runs the same blocks under vitest, sandboxing JSX/Hono tests via `ai-evaluate/node`.
 
 ## File Conventions
 

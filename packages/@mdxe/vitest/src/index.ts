@@ -289,6 +289,13 @@ function containsJSX(code: string): boolean {
 }
 
 /**
+ * Module the generated test file imports `evaluate` from when a test needs the
+ * sandbox. Resolved from the consumer project, so ai-evaluate is an optional
+ * peer dependency of @mdxe/vitest.
+ */
+export const SANDBOX_MODULE = 'ai-evaluate/node'
+
+/**
  * Check if code needs sandbox features (app, Hono, JSX rendering)
  */
 function needsSandbox(code: string): boolean {
@@ -414,9 +421,11 @@ export function generateTestCode(testFile: MDXTestFile): string {
   lines.push(`import { describe, it, expect, vi } from 'vitest'`)
   lines.push(`import { should, assert } from '@mdxe/vitest'`)
 
-  // Add sandbox import if needed
+  // Add sandbox import if needed. Generated files run under vitest in Node, so
+  // use the `ai-evaluate/node` entry (Miniflare fallback); the root entry needs a
+  // Cloudflare worker_loaders binding. ai-evaluate is the renamed ai-sandbox.
   if (anySandboxTests) {
-    lines.push(`import { evaluate } from 'ai-sandbox'`)
+    lines.push(`import { evaluate } from '${SANDBOX_MODULE}'`)
   }
 
   // Add detected imports
