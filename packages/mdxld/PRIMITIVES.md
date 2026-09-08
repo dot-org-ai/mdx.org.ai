@@ -240,6 +240,6 @@ pnpm test
 ## See Also
 
 - [mdxld README](./README.md) - Main package documentation
-- [ai-functions](../../primitives/packages/ai-functions) - RPC and AI functions
-- [ai-database](../../primitives/packages/ai-database) - Schema-first database
-- [ai-workflows](../../primitives/packages/ai-workflows) - Event-driven workflows
+- [ai-functions](https://www.npmjs.com/package/ai-functions) - RPC and AI functions
+- [ai-database](https://www.npmjs.com/package/ai-database) - Schema-first database
+- [ai-workflows](https://www.npmjs.com/package/ai-workflows) - Event-driven workflows

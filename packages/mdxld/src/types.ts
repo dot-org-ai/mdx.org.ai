@@ -63,6 +63,18 @@ export interface MDXLDDocument<TData extends MDXLDData = MDXLDData> {
 }
 
 /**
+ * Legacy name for {@link MDXLDDocument}.
+ *
+ * Kept so consumers published against the original `mdxld` surface keep
+ * compiling — notably `ai-database`, whose `ThingExpanded extends MDXLD`
+ * (`dist/types.d.ts`) imports this name from `mdxld`.
+ *
+ * @deprecated Use {@link MDXLDDocument}. This alias is structurally identical
+ * and will be removed in the next major version.
+ */
+export type MDXLD<TData extends MDXLDData = MDXLDData> = MDXLDDocument<TData>
+
+/**
  * Type guard to check if document has a specific $type
  *
  * @example
