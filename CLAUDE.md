@@ -174,13 +174,14 @@ Use cases:
 └── vapi       → Vapi voice AI
 ```
 
-### Primitives (primitives/)
+### Primitives (npm `ai-*` packages)
 
-AI primitives packages (submodule) providing core functionality:
+AI primitives live in one place, [primitives.org.ai](https://github.com/dot-org-ai/primitives.org.ai), and are consumed here **only as published npm packages** (currently the `^2.4.0` train). They are never vendored as a submodule or linked through the pnpm workspace — `pnpm test:repo` enforces this.
+
 - **ai-functions** - AI function definitions, RPC, generation
 - **ai-workflows** - Event-driven workflows with `$` context
 - **ai-database** - Schema-first DB with bi-directional relationships
-- **ai-sandbox** - Test execution environment
+- **ai-evaluate** - Sandboxed code evaluation (used by mdxe)
 
 ## Key Concepts
 
@@ -335,11 +336,11 @@ mdxld (core parsing)
 └── mdxai (AI integrations)
     └── @mdxai/* (claude, mastra, agentkit, vapi)
 
-primitives/ (submodule)
+ai-* primitives (npm, ^2.4.0)
 ├── ai-functions → used by @mdxe/rpc
 ├── ai-workflows → used by mdxai
 ├── ai-database → used by mdxdb
-└── ai-sandbox → used by @mdxe/vitest
+└── ai-evaluate → used by mdxe
 ```
 
 ## Creating New Packages

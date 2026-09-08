@@ -7,8 +7,9 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "test": "turbo run test",
-    "test:unit": "turbo run test:unit",
+    "test": "turbo run test && pnpm test:repo",
+    "test:unit": "turbo run test:unit && pnpm test:repo",
+    "test:repo": "vitest run --config vitest.repo.config.ts",
     "test:mdx": "vitest run --config vitest.mdx.config.ts",
     "lint": "turbo run lint",
     "lint:root": "eslint .",
