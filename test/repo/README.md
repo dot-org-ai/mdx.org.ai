@@ -26,3 +26,9 @@ runs it as its own step.
   level in a `*.test-d.ts` that tsc compiles through the vitest typecheck lane
   (`test/repo/tsconfig.json` scopes tsc to those files). A regex over a source
   file stays green while the export it pins is TS2305 (mdx-8je.29).
+- **Verify against this checkout's node_modules, never a symlink.** The
+  installed tree must be the one `pnpm-lock.yaml` resolves;
+  `lockfile-drift.test.ts` fails when a primitive / `.do` package is installed
+  at a different version than the committed lockfile pins (mdx-8je.55). Run
+  `pnpm install --frozen-lockfile` here instead of linking `node_modules` from
+  another checkout.
