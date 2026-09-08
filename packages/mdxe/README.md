@@ -643,7 +643,6 @@ mdxe integrates with the primitives packages for core functionality:
 | Package | Description | Usage in mdxe |
 |---------|-------------|---------------|
 | [ai-sandbox](../../primitives/packages/ai-sandbox) | Secure code execution | `evaluate()`, `createEvaluator()` for running untrusted code |
-| [ai-functions](../../primitives/packages/ai-functions) | AI functions & RPC | RPC types for `@mdxe/rpc`, AI function interfaces |
 | [ai-workflows](../../primitives/packages/ai-workflows) | Event-driven workflows | Workflow types (`on`, `every`, `send`) in SDK provider |
 
 ### ai-sandbox
@@ -681,16 +680,6 @@ const handlers = {
     }
   }
 }
-```
-
-### ai-functions RPC
-
-RPC types for distributed execution:
-
-```typescript
-import type { RPC, RPCPromise, RPCServer, RPCClient } from 'mdxe'
-
-// Use with @mdxe/rpc for capnweb promise pipelining
 ```
 
 ## Runtime Packages

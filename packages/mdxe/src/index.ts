@@ -216,12 +216,6 @@ export type {
   EveryProxy,
 } from 'ai-workflows'
 
-// Re-export ai-functions RPC types (for @mdxe/rpc integration)
-export type {
-  RPC,
-  RPCPromise,
-} from 'ai-functions'
-
 // =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================
