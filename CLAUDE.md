@@ -102,7 +102,7 @@ Defines runtimes, servers, and communication protocols:
 ```
 
 **Key distinction:**
-- RPC is not an `@mdxe` package: use capnweb's `RPC` and `RPCPromise` from `ai-functions` directly (`mdxe` re-exports the types). `@mdxe/rpc` was removed as a duplicate.
+- RPC is not an `@mdxe` package and `mdxe` re-exports no RPC types: use `rpc.do` directly (`RPC`, `RPCPromise`; capnweb transport via `@dotdo/capnweb`). `@mdxe/rpc` was removed as a duplicate; `ai-functions@2.4` ships no `RPC` / `RPCPromise`.
 - `@mdxe/mcp` is separate - different transports (stdio, http) and different runtimes
 
 ### @mdxdb - Database Adapters
@@ -177,7 +177,7 @@ Use cases:
 
 AI primitives live in one place, [primitives.org.ai](https://github.com/dot-org-ai/primitives.org.ai), and are consumed here **only as published npm packages** (currently the `^2.4.0` train). They are never vendored as a submodule or linked through the pnpm workspace — `pnpm test:repo` enforces this.
 
-- **ai-functions** - AI function definitions, RPC, generation
+- **ai-functions** - AI function definitions, generation (RPC lives in `rpc.do`, not here)
 - **ai-workflows** - Event-driven workflows with `$` context
 - **ai-database** - Schema-first DB with bi-directional relationships
 - **ai-evaluate** - Sandboxed code evaluation (used by mdxe)
@@ -245,8 +245,8 @@ const email = await toEmail(doc)    // Email HTML for notifications
 ### Execution via Protocols
 
 ```typescript
-// capnweb RPC (from ai-functions; there is no @mdxe/rpc)
-import { RPC } from 'ai-functions'
+// capnweb RPC via rpc.do (there is no @mdxe/rpc and mdxe re-exports no RPC types)
+import { RPC } from 'rpc.do'
 const rpc = RPC<typeof functions>('https://functions.example.com')
 
 // MCP for Claude/AI tools
@@ -339,7 +339,7 @@ mdxld (core parsing)
     └── @mdxai/* (claude, mastra, vapi)
 
 ai-* primitives (npm, ^2.4.0)
-├── ai-functions → capnweb RPC types re-exported by mdxe (use its RPC directly; @mdxe/rpc was removed)
+├── ai-functions → AI function definitions and generation (no RPC export; capnweb RPC is rpc.do / @dotdo/capnweb, @mdxe/rpc was removed)
 ├── ai-workflows → used by mdxai
 ├── ai-database → used by mdxdb
 └── ai-evaluate → used by mdxe

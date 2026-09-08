@@ -656,13 +656,13 @@ import { ... } from '@mdxe/mcp/tools'
 | Package | Description |
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser for parsing MDX documents |
-| [ai-functions](https://www.npmjs.com/package/ai-functions) | capnweb RPC for function calls (there is no `@mdxe/rpc`) |
+| [rpc.do](https://www.npmjs.com/package/rpc.do) | capnweb RPC for function calls (there is no `@mdxe/rpc`; `ai-functions` ships no RPC) |
 | [@mdxai/claude](https://www.npmjs.com/package/@mdxai/claude) | Claude AI integration with MCP tools |
 | [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk) | Official MCP SDK |
 
-## Differences from ai-functions RPC
+## Differences from rpc.do (capnweb RPC)
 
-| Feature | @mdxe/mcp | ai-functions RPC |
+| Feature | @mdxe/mcp | rpc.do |
 |---------|-----------|-----------|
 | **Protocol** | Model Context Protocol | capnweb RPC |
 | **Use Case** | AI assistants (Claude) | General function calls |
