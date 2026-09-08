@@ -643,7 +643,7 @@ mdxe integrates with the primitives packages for core functionality:
 | Package | Description | Usage in mdxe |
 |---------|-------------|---------------|
 | [ai-sandbox](../../primitives/packages/ai-sandbox) | Secure code execution | `evaluate()`, `createEvaluator()` for running untrusted code |
-| [ai-functions](../../primitives/packages/ai-functions) | AI functions & RPC | RPC types for `@mdxe/rpc`, AI function interfaces |
+| [ai-functions](../../primitives/packages/ai-functions) | AI functions & capnweb RPC | `RPC` / `RPCPromise` types, AI function interfaces |
 | [ai-workflows](../../primitives/packages/ai-workflows) | Event-driven workflows | Workflow types (`on`, `every`, `send`) in SDK provider |
 
 ### ai-sandbox
@@ -688,9 +688,11 @@ const handlers = {
 RPC types for distributed execution:
 
 ```typescript
-import type { RPC, RPCPromise, RPCServer, RPCClient } from 'mdxe'
+import type { RPC, RPCPromise } from 'mdxe'
+import { RPC } from 'ai-functions'
 
-// Use with @mdxe/rpc for capnweb promise pipelining
+// capnweb promise pipelining comes straight from ai-functions.
+// (The former @mdxe/rpc package was removed; it duplicated ai-functions RPC.)
 ```
 
 ## Runtime Packages
@@ -707,7 +709,6 @@ mdxe integrates with several runtime-specific packages:
 | [@mdxe/vitest](https://www.npmjs.com/package/@mdxe/vitest) | Vitest testing integration |
 | [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) | CLI applications with Ink |
 | [@mdxe/isolate](https://www.npmjs.com/package/@mdxe/isolate) | Isolated execution |
-| [@mdxe/rpc](https://www.npmjs.com/package/@mdxe/rpc) | capnweb RPC protocol |
 | [@mdxe/mcp](https://www.npmjs.com/package/@mdxe/mcp) | Model Context Protocol server |
 
 ## Examples

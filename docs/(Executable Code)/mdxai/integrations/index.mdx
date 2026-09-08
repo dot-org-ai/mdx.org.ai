@@ -2,7 +2,7 @@
 title: Integrations
 description: AI platform integrations for mdxai
 defaultOpen: true
-pages: [index, claude, agentkit, mastra, vapi]
+pages: [index, claude, mastra, vapi]
 ---
 
 # Integrations
@@ -14,7 +14,6 @@ Connect mdxai to various AI platforms and frameworks.
 | Integration | Package | Description |
 |-------------|---------|-------------|
 | Claude | [@mdxai/claude](/docs/mdxai/integrations/claude) | Anthropic Claude for content generation |
-| AgentKit | [@mdxai/agentkit](/docs/mdxai/integrations/agentkit) | Multi-agent orchestration |
 | Mastra | [@mdxai/mastra](/docs/mdxai/integrations/mastra) | AI workflow automation |
 | Vapi | [@mdxai/vapi](/docs/mdxai/integrations/vapi) | Voice AI assistants |
 
@@ -34,10 +33,10 @@ const doc = await generateMDX({
 
 ### Agent Workflows
 
-For complex multi-step processes, use **@mdxai/agentkit**:
+For complex multi-step processes, use the `autonomous-agents` primitive (the former `@mdxai/agentkit` package was removed as a duplicate of it):
 
 ```typescript
-import { createAgent } from '@mdxai/agentkit'
+import { createAgent } from 'autonomous-agents'
 
 const agent = createAgent({
   name: 'documentation-writer',
