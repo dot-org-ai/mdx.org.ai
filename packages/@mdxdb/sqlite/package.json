@@ -39,12 +39,13 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run",
+    "test": "vitest run && vitest run --config vitest.workers.config.ts",
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo"
+    "clean": "rm -rf dist .turbo",
+    "test:workers": "vitest run --config vitest.workers.config.ts"
   },
   "keywords": [
     "mdxdb",
@@ -71,6 +72,7 @@
     }
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.0",
     "@cloudflare/workers-types": "^4.20241127.0",
     "@mdxld/config": "workspace:^",
     "miniflare": "^3.20241106.1",

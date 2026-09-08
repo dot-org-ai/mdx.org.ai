@@ -1,0 +1,13 @@
+// Test-only wrangler config consumed by vitest.workers.config.ts.
+// Declares the MDXDatabase Durable Object so @cloudflare/vitest-pool-workers
+// can provide `env.MDXDB` inside workerd. Not used for deploys.
+{
+  "name": "mdxdb-sqlite-test",
+  "main": "src/durable-object.ts",
+  "compatibility_date": "2025-09-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [{ "name": "MDXDB", "class_name": "MDXDatabase" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MDXDatabase"] }]
+}

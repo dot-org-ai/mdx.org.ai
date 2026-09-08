@@ -74,40 +74,28 @@ tag = "v1"
 new_sqlite_classes = ["MDXDatabase"]
 ```
 
-### Node.js with Miniflare
+### Testing
 
-```ts
-import { createMiniflareClient } from '@mdxdb/sqlite'
+The package ships two vitest pools:
 
-// Create client with miniflare backend
-const client = await createMiniflareClient({
-  namespace: 'example.com',
-  persistPath: './.data', // Optional: persist to disk
-})
+- **node** (`vitest.config.ts`): pure-JS tests (schema, `MDXClient` wrapper) under `tests/*.test.ts`.
+- **workers** (`vitest.workers.config.ts`): Durable Object tests under `tests/workers/` run inside
+  workerd via `@cloudflare/vitest-pool-workers`, with `MDXDatabase` declared in `wrangler.test.jsonc`.
 
-await client.create({
-  ns: 'example.com',
-  type: 'Post',
-  data: { title: 'Hello' },
-})
+```bash
+pnpm test           # both pools
+pnpm test:unit      # node pool only
+pnpm test:workers   # workers pool only
 ```
 
-### In-Memory Testing
+Inside a workers-pool test the DO binding comes from `cloudflare:test`:
 
 ```ts
-import { createInMemoryBinding, MDXClient } from '@mdxdb/sqlite'
+import { env } from 'cloudflare:test'
+import { MDXClient } from '@mdxdb/sqlite/client'
 
-const binding = createInMemoryBinding()
-const id = binding.idFromName('test.local')
-const stub = binding.get(id)
-const client = new MDXClient(stub, 'test.local')
-
-// Use in tests
-const thing = await client.create({
-  ns: 'test.local',
-  type: 'Post',
-  data: { title: 'Test' },
-})
+const client = new MDXClient({ $id: 'test.local', binding: env.MDXDB })
+const thing = await client.create({ type: 'Post', data: { title: 'Test' } })
 ```
 
 ## API
