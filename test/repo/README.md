@@ -21,3 +21,8 @@ runs it as its own step.
   the repo root; never rely on `process.cwd()`.
 - **Name the issue** the guard protects (e.g. `mdx-8je.4`) in the file header
   so the next reader knows why the invariant exists.
+- **Witness symbols, not source text.** When the invariant is "package X
+  exports symbol Y", import Y: at runtime in a `*.test.ts`, and at the type
+  level in a `*.test-d.ts` that tsc compiles through the vitest typecheck lane
+  (`test/repo/tsconfig.json` scopes tsc to those files). A regex over a source
+  file stays green while the export it pins is TS2305 (mdx-8je.29).

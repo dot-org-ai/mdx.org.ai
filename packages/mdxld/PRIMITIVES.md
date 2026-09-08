@@ -24,7 +24,7 @@ To use the primitives integration:
 pnpm add mdxld
 
 # Install the primitives you want to use (optional)
-pnpm add ai-functions  # For RPC and AI functions
+pnpm add ai-functions  # For AI functions and generation (capnweb RPC is rpc.do, not ai-functions)
 pnpm add ai-database   # For schema-first database
 pnpm add ai-workflows  # For event-driven workflows
 ```
@@ -34,15 +34,10 @@ pnpm add ai-workflows  # For event-driven workflows
 ### AI Functions
 
 ```typescript
-import { RPC, AI, generateText, generateObject } from 'mdxld/functions'
+import { AI, generateText, generateObject } from 'mdxld/functions'
 
-// Use RPC primitives
-const rpc = RPC({
-  functions: {
-    hello: () => 'world',
-    greet: (name: string) => `Hello, ${name}!`,
-  },
-})
+// capnweb RPC is not part of ai-functions (2.4 ships no RPC / RPCPromise);
+// use rpc.do directly: import { RPC } from 'rpc.do'
 
 // Use AI function constructors
 const summarize = AI('Generate a summary', {
@@ -175,7 +170,7 @@ The integration follows the mdx.org.ai architecture principles:
 | Scope | Purpose |
 |-------|---------|
 | **mdxld** | Core parsing & transformation |
-| **mdxld/functions** | AI functions, RPC, generation (via ai-functions) |
+| **mdxld/functions** | AI functions, generation (via ai-functions; RPC is `rpc.do`) |
 | **mdxld/database** | Storage & persistence (via ai-database) |
 | **mdxld/workflows** | Event-driven workflows (via ai-workflows) |
 
@@ -240,6 +235,7 @@ pnpm test
 ## See Also
 
 - [mdxld README](./README.md) - Main package documentation
-- [ai-functions](https://www.npmjs.com/package/ai-functions) - RPC and AI functions
+- [ai-functions](https://www.npmjs.com/package/ai-functions) - AI functions and generation
+- [rpc.do](https://www.npmjs.com/package/rpc.do) - capnweb RPC (`RPC`, `RPCPromise`)
 - [ai-database](https://www.npmjs.com/package/ai-database) - Schema-first database
 - [ai-workflows](https://www.npmjs.com/package/ai-workflows) - Event-driven workflows

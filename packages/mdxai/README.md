@@ -18,7 +18,7 @@ mdxai combines multiple AI primitives into a unified SDK:
 
 ### Core Primitives
 
-- **ai-functions** - RPC primitives, generation, embeddings, auto-define
+- **ai-functions** - AI function definitions, generation, embeddings, auto-define (no RPC: capnweb RPC is `rpc.do`)
 - **ai-workflows** - Event-driven workflows with `$` context
 - **ai-database** - Simplified AI-powered database interface
 - **ai-providers** - Unified AI provider registry with Cloudflare AI Gateway support
@@ -763,7 +763,7 @@ mdxai re-exports functionality from all primitive packages for convenience:
 
 | Package | Key Exports |
 |---------|------------|
-| `ai-functions` | `AI`, `ai`, `generateObject`, `generateText`, `RPC`, `RPCPromise`, `autoDefine` |
+| `ai-functions` | `AI`, `ai`, `generateObject`, `generateText`, `define`, `defineFunction` (no `RPC` / `RPCPromise` - those live in `rpc.do`) |
 | `ai-workflows` | `Workflow`, `on`, `every`, `send`, `createWorkflowContext`, `createIsolatedContext` |
 | `ai-database` | `DB`, `db`, `configureDB`, `MemoryDB`, `createMemoryDB` |
 | `ai-providers` | `createRegistry`, `model`, `embeddingModel`, `configureRegistry`, `DIRECT_PROVIDERS` |
