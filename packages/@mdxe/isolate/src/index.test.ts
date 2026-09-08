@@ -9,7 +9,6 @@ import {
   type CompiledModule,
   type WorkerConfig,
   type SandboxOptions,
-  type CompileToModuleOptions,
 } from './index.js'
 
 describe('@mdxe/isolate', () => {
@@ -271,6 +270,16 @@ export function Forward({ as: Component = 'div', ...rest }) {
         expect(module.data.title).toBe('Test Document')
         expect(module.data.author).toBe('Test Author')
         expect(module.data.tags).toEqual(['mdx', 'test'])
+      })
+
+      it('does not render the frontmatter block as content', async () => {
+        const module = await compileToModule(fixtures.withFrontmatter)
+        const code = module.modules['mdx.js']!
+
+        // Without stripping, @mdx-js emits `---` as an <hr/> followed by an
+        // <h2> whose text is the YAML ("title: Test Document").
+        expect(code).not.toContain('title: Test Document')
+        expect(code).not.toMatch(/_components\.hr/)
       })
 
       it('compiles MDX with exports', async () => {
