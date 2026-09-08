@@ -40,10 +40,17 @@
     "@mdxld/ast": "workspace:*"
   },
   "peerDependencies": {
+    "ai-evaluate": ">=2.4.0",
     "vitest": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ai-evaluate": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
+    "ai-evaluate": "^2.4.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
