@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { Readable, Writable, PassThrough } from 'node:stream'
+import { describe, it, expect } from 'vitest'
+import { PassThrough } from 'node:stream'
 import {
   MCPServer,
   createMCPServer,
-  type MCPServerOptions,
   type MDXLDDocument,
   type MCPTool,
   type MCPResource,

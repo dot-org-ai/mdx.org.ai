@@ -8,8 +8,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { TailClient, type TailClientOptions } from './ws-client.js'
-import { type MdxeEvent, createEvent } from './types.js'
+import { TailClient } from './ws-client.js'
+import { createEvent } from './types.js'
 import { type EventFilter } from './filter.js'
 
 /**
