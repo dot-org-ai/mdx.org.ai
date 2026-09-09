@@ -3,9 +3,25 @@
  *
  * Bi-directional conversion between Objects and Markdown.
  * Convention-based automatic layouts from object structure.
+ *
+ * Diffing and merging of the objects that come back out is not this package's job:
+ * `diffPaths` / `applyPaths` / `merge3wayObjects` live in `@mdxld/diff` (the one diff
+ * implementation in the repo, mdx-8je.12) and `@mdxld/extract` re-exports them as
+ * `diff` / `applyExtract` / `mergeExtract`.
  */
 
 import type { DocumentFormat, FormatFetchOptions } from '@mdxld/types'
+import { isTableRow, isTableSeparator, parseTable, renderTable } from './table.js'
+
+export {
+  parseTable,
+  renderTable,
+  isTableRow,
+  isTableSeparator,
+  cellText,
+  type MarkdownTable,
+  type RenderTableOptions,
+} from './table.js'
 
 export interface ToMarkdownOptions {
   /** Starting heading depth (default: 1) */
@@ -25,13 +41,6 @@ export interface FromMarkdownOptions {
   type?: string
   /** Strict mode - throw on parse errors */
   strict?: boolean
-}
-
-export interface DiffResult {
-  added: Record<string, unknown>
-  modified: Record<string, { from: unknown; to: unknown }>
-  removed: string[]
-  hasChanges: boolean
 }
 
 /**
@@ -77,12 +86,13 @@ export function toMarkdown<T extends object>(
     }>
 
     if (tableStyle === 'github') {
-      lines.push('| Property | Type | Required | Description |')
-      lines.push('|----------|------|----------|-------------|')
-      for (const prop of props) {
-        const req = prop.required ? '✓' : ''
-        lines.push(`| ${prop.name} | ${prop.type || ''} | ${req} | ${prop.description || ''} |`)
-      }
+      lines.push(
+        renderTable(
+          ['Property', 'Type', 'Required', 'Description'],
+          props.map((prop) => [prop.name, prop.type || '', prop.required ? '✓' : '', prop.description || '']),
+          { separator: 'padded' }
+        )
+      )
     } else {
       for (const prop of props) {
         const bullet = listStyle === 'dash' ? '-' : listStyle === 'asterisk' ? '*' : '+'
@@ -135,10 +145,10 @@ export function fromMarkdown<T = Record<string, unknown>>(
   let currentSection: string | null = null
   const sections: Array<{ name: string; content: string }> = []
   const properties: Array<{ name: string; type?: string; required?: boolean; description?: string }> = []
-  let inTable = false
-  let tableHeaders: string[] = []
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!
+
     // Parse headings
     const headingMatch = line.match(/^(#{1,6})\s+(.+)$/)
     if (headingMatch && headingMatch[1] && headingMatch[2]) {
@@ -153,43 +163,34 @@ export function fromMarkdown<T = Record<string, unknown>>(
         }
         currentSection = text
       }
-      inTable = false
       continue
     }
 
-    // Parse table headers
-    if (line.includes('|') && !inTable) {
-      const cells = line.split('|').map((c) => c.trim()).filter(Boolean)
-      if (cells.length > 0 && !line.includes('---')) {
-        tableHeaders = cells.map((c) => c.toLowerCase())
-        inTable = true
-        continue
+    // Parse a table: the contiguous run of `|` rows starting here, through the shared primitive
+    if (isTableRow(line) && !isTableSeparator(line)) {
+      let end = i + 1
+      while (end < lines.length && isTableRow(lines[end]!)) end++
+      const { headers, rows } = parseTable(lines.slice(i, end).join('\n'))
+      const byLowerHeader = (row: Record<string, string>, name: string): string | undefined => {
+        const header = headers.find((h) => h.toLowerCase() === name)
+        return header === undefined ? undefined : row[header]
       }
-    }
-
-    // Skip table separator
-    if (line.match(/^\|[\s-|]+\|$/)) {
-      continue
-    }
-
-    // Parse table rows
-    if (inTable && line.includes('|')) {
-      const cells = line.split('|').map((c) => c.trim()).filter(Boolean)
-      if (cells.length > 0) {
+      for (const row of rows) {
+        const cells = headers.map((h) => row[h] ?? '')
         const prop: { name: string; type?: string; required?: boolean; description?: string } = {
           name: cells[0] || '',
         }
-        if (tableHeaders.includes('type') && cells[1]) {
-          prop.type = cells[1]
+        const type = byLowerHeader(row, 'type')
+        if (type) prop.type = type
+        const required = byLowerHeader(row, 'required')
+        if (required !== undefined) {
+          prop.required = required === '✓' || required.toLowerCase() === 'yes'
         }
-        if (tableHeaders.includes('required') && cells[2]) {
-          prop.required = cells[2] === '✓' || cells[2].toLowerCase() === 'yes'
-        }
-        if (tableHeaders.includes('description') && cells[3]) {
-          prop.description = cells[3]
-        }
+        const description = byLowerHeader(row, 'description')
+        if (description) prop.description = description
         properties.push(prop)
       }
+      i = end - 1
       continue
     }
 
@@ -218,92 +219,6 @@ export function fromMarkdown<T = Record<string, unknown>>(
   }
 
   return result as T
-}
-
-/**
- * Compute the diff between original and extracted data.
- *
- * @example
- * ```ts
- * const changes = diff(original, updated)
- * if (changes.hasChanges) {
- *   console.log('Modified:', Object.keys(changes.modified))
- * }
- * ```
- */
-export function diff<T extends object>(original: T, extracted: T): DiffResult {
-  const added: Record<string, unknown> = {}
-  const modified: Record<string, { from: unknown; to: unknown }> = {}
-  const removed: string[] = []
-
-  const origKeys = new Set(Object.keys(original))
-  const extractedKeys = new Set(Object.keys(extracted))
-
-  // Find added keys
-  for (const key of extractedKeys) {
-    if (!origKeys.has(key)) {
-      added[key] = (extracted as Record<string, unknown>)[key]
-    }
-  }
-
-  // Find removed keys
-  for (const key of origKeys) {
-    if (!extractedKeys.has(key)) {
-      removed.push(key)
-    }
-  }
-
-  // Find modified keys
-  for (const key of origKeys) {
-    if (extractedKeys.has(key)) {
-      const origValue = (original as Record<string, unknown>)[key]
-      const extractedValue = (extracted as Record<string, unknown>)[key]
-      if (JSON.stringify(origValue) !== JSON.stringify(extractedValue)) {
-        modified[key] = { from: origValue, to: extractedValue }
-      }
-    }
-  }
-
-  return {
-    added,
-    modified,
-    removed,
-    hasChanges: Object.keys(added).length > 0 || Object.keys(modified).length > 0 || removed.length > 0,
-  }
-}
-
-/**
- * Apply extracted data to original document.
- */
-export function applyExtract<T extends object>(
-  original: T,
-  extracted: Partial<T>,
-  options: { paths?: string[]; arrayMerge?: 'replace' | 'append' | 'prepend' } = {}
-): T {
-  const { paths, arrayMerge = 'replace' } = options
-  const result = { ...original }
-
-  for (const [key, value] of Object.entries(extracted)) {
-    if (paths && !paths.includes(key)) {
-      continue
-    }
-
-    const origValue = (original as Record<string, unknown>)[key]
-
-    if (Array.isArray(origValue) && Array.isArray(value)) {
-      if (arrayMerge === 'append') {
-        ;(result as Record<string, unknown>)[key] = [...origValue, ...value]
-      } else if (arrayMerge === 'prepend') {
-        ;(result as Record<string, unknown>)[key] = [...value, ...origValue]
-      } else {
-        ;(result as Record<string, unknown>)[key] = value
-      }
-    } else {
-      ;(result as Record<string, unknown>)[key] = value
-    }
-  }
-
-  return result
 }
 
 // ============================================================================

@@ -626,6 +626,55 @@ expect(true).toBe(true)
       expect(code).toContain('expect(1 + 1).toBe(2)')
     })
 
+    it('imports renderMarkdown from npm @mdxui/text/md, never from a workspace @mdxui package (mdx-8je.8)', () => {
+      const testFile: MDXTestFile = {
+        path: '/path/to/md.mdx',
+        doc: parse('# MD'),
+        tests: [
+          {
+            name: 'renders markdown',
+            lang: 'ts',
+            code: "const md = renderMarkdown(parse('# Hi'))\nexpect(md).toContain('# Hi')",
+            line: 5,
+            async: false,
+            meta: { test: true },
+          },
+        ],
+        isCompanionTest: false,
+      }
+
+      const code = generateTestCode(testFile)
+
+      expect(code).toContain("import { renderMarkdown } from '@mdxui/text/md'")
+      expect(code).toContain("import { parse } from 'mdxld'")
+      // The pre-mdx-8je.8 specifiers (the deleted workspace packages) must not come back.
+      expect(code).not.toMatch(/from\s+['"]@mdxui\/markdown['"]/)
+      expect(code).not.toMatch(/from\s+['"]mdxui['"]/)
+    })
+
+    it('does not auto-import the mdxui component factory (it lives in dot-do/ui)', () => {
+      const testFile: MDXTestFile = {
+        path: '/path/to/components.mdx',
+        doc: parse('# Components'),
+        tests: [
+          {
+            name: 'components',
+            lang: 'ts',
+            code: 'const components = createComponents(createElement)',
+            line: 5,
+            async: false,
+            meta: { test: true },
+          },
+        ],
+        isCompanionTest: false,
+      }
+
+      const code = generateTestCode(testFile)
+
+      expect(code).not.toMatch(/from\s+['"]mdxui['"]/)
+      expect(code).not.toMatch(/from\s+['"]@mdxui\//)
+    })
+
     it('should not import the sandbox when no test needs it', () => {
       const testFile: MDXTestFile = {
         path: '/path/to/plain.mdx',

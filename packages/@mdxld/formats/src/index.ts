@@ -200,19 +200,22 @@ export type {
 // Markdown
 // ============================================================================
 
+// Diffing the objects that come back is @mdxld/diff's job (diffPaths / applyPaths /
+// merge3wayObjects), re-exported by @mdxld/extract as diff / applyExtract / mergeExtract.
 export {
   Markdown,
   toMarkdown,
   fromMarkdown,
   fetchMarkdown,
-  diff,
-  applyExtract,
+  parseTable,
+  renderTable,
 } from '@mdxld/markdown'
 
 export type {
   ToMarkdownOptions,
   FromMarkdownOptions,
-  DiffResult,
+  MarkdownTable,
+  RenderTableOptions,
 } from '@mdxld/markdown'
 
 // ============================================================================

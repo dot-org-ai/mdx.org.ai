@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { toMarkdown, fromMarkdown, diff, applyExtract } from './index.js'
+import * as markdown from './index.js'
+import { toMarkdown, fromMarkdown, parseTable, renderTable } from './index.js'
+
+type Parsed = { name?: string; description?: string; properties: Array<{ name: string; type?: string; required?: boolean; description?: string }> }
 
 // =============================================================================
 // toMarkdown Tests
@@ -264,7 +267,7 @@ describe('fromMarkdown', () => {
 | id | string | ✓ | Unique ID |
 | email | string | ✓ | Email address |`
 
-      const result = fromMarkdown(markdown)
+      const result = fromMarkdown<Parsed>(markdown)
       expect(result.properties).toHaveLength(2)
       expect(result.properties[0]).toEqual({
         name: 'id',
@@ -280,9 +283,9 @@ describe('fromMarkdown', () => {
 | id | string | yes | ID |
 | name | string | no | Name |`
 
-      const result = fromMarkdown(markdown)
-      expect(result.properties[0].required).toBe(true)
-      expect(result.properties[1].required).toBe(false)
+      const result = fromMarkdown<Parsed>(markdown)
+      expect(result.properties[0]!.required).toBe(true)
+      expect(result.properties[1]!.required).toBe(false)
     })
 
     it('should handle table without required column', () => {
@@ -290,7 +293,7 @@ describe('fromMarkdown', () => {
 |----------|------|
 | id | string |`
 
-      const result = fromMarkdown(markdown)
+      const result = fromMarkdown<Parsed>(markdown)
       expect(result.properties[0]).toEqual({
         name: 'id',
         type: 'string',
@@ -342,7 +345,7 @@ describe('fromMarkdown', () => {
     it('should round-trip simple entity', () => {
       const original = { name: 'Customer', description: 'A customer' }
       const markdown = toMarkdown(original)
-      const parsed = fromMarkdown(markdown)
+      const parsed = fromMarkdown<Parsed>(markdown)
 
       expect(parsed.name).toBe(original.name)
       expect(parsed.description).toBe(original.description)
@@ -356,194 +359,91 @@ describe('fromMarkdown', () => {
         ],
       }
       const markdown = toMarkdown(original)
-      const parsed = fromMarkdown(markdown)
+      const parsed = fromMarkdown<Parsed>(markdown)
 
       expect(parsed.name).toBe(original.name)
       expect(parsed.properties).toHaveLength(1)
-      expect(parsed.properties[0].name).toBe('id')
-      expect(parsed.properties[0].type).toBe('string')
-      expect(parsed.properties[0].required).toBe(true)
+      expect(parsed.properties[0]!.name).toBe('id')
+      expect(parsed.properties[0]!.type).toBe('string')
+      expect(parsed.properties[0]!.required).toBe(true)
     })
   })
 })
 
+
 // =============================================================================
-// diff Tests
+// Table primitives (shared with @mdxld/extract entity components, mdx-8je.12)
 // =============================================================================
 
-describe('diff', () => {
-  describe('detecting changes', () => {
-    it('should detect added fields', () => {
-      const result = diff({ name: 'Test' }, { name: 'Test', email: 'test@example.com' })
+describe('table primitives', () => {
+  describe('parseTable', () => {
+    it('parses headers and rows, keeping empty cells positional', () => {
+      const result = parseTable(`| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| nickname | string |  | Optional nickname |`)
 
-      expect(result.added).toEqual({ email: 'test@example.com' })
-      expect(result.hasChanges).toBe(true)
+      expect(result.headers).toEqual(['Property', 'Type', 'Required', 'Description'])
+      expect(result.rows).toEqual([{ Property: 'nickname', Type: 'string', Required: '', Description: 'Optional nickname' }])
     })
 
-    it('should detect removed fields', () => {
-      const result = diff({ name: 'Test', email: 'test@example.com' }, { name: 'Test' })
-
-      expect(result.removed).toContain('email')
-      expect(result.hasChanges).toBe(true)
+    it('tolerates a missing separator row and short rows', () => {
+      const result = parseTable('| a | b |\n| 1 |')
+      expect(result.rows).toEqual([{ a: '1', b: '' }])
     })
 
-    it('should detect modified fields', () => {
-      const result = diff({ name: 'Old' }, { name: 'New' })
-
-      expect(result.modified).toEqual({
-        name: { from: 'Old', to: 'New' },
-      })
-      expect(result.hasChanges).toBe(true)
-    })
-
-    it('should detect no changes', () => {
-      const result = diff({ name: 'Same' }, { name: 'Same' })
-
-      expect(result.hasChanges).toBe(false)
-      expect(result.added).toEqual({})
-      expect(result.modified).toEqual({})
-      expect(result.removed).toEqual([])
+    it('returns nothing for a one-line table', () => {
+      expect(parseTable('| incomplete table')).toEqual({ headers: [], rows: [] })
+      expect(parseTable('')).toEqual({ headers: [], rows: [] })
     })
   })
 
-  describe('complex changes', () => {
-    it('should handle multiple changes', () => {
-      const result = diff(
-        { a: 1, b: 2, c: 3 },
-        { a: 1, b: 20, d: 4 }
+  describe('renderTable', () => {
+    it('renders records keyed by header with a compact separator', () => {
+      expect(renderTable(['name', 'slug'], [{ name: 'JavaScript', slug: 'javascript' }])).toBe(
+        '| name | slug |\n|---|---|\n| JavaScript | javascript |'
       )
-
-      expect(result.modified).toEqual({ b: { from: 2, to: 20 } })
-      expect(result.added).toEqual({ d: 4 })
-      expect(result.removed).toContain('c')
     })
 
-    it('should handle nested objects', () => {
-      const result = diff(
-        { data: { value: 1 } },
-        { data: { value: 2 } }
+    it('renders array rows with a padded separator', () => {
+      expect(renderTable(['Property', 'Type'], [['id', 'string']], { separator: 'padded' })).toBe(
+        '| Property | Type |\n|----------|------|\n| id | string |'
       )
-
-      expect(result.modified).toHaveProperty('data')
     })
 
-    it('should handle array changes', () => {
-      const result = diff({ items: [1, 2] }, { items: [1, 2, 3] })
+    it('renders null as empty and objects as JSON', () => {
+      expect(renderTable(['a', 'b'], [{ a: null, b: { x: 1 } }])).toContain('|  | {"x":1} |')
+    })
 
-      expect(result.modified.items).toEqual({
-        from: [1, 2],
-        to: [1, 2, 3],
-      })
+    it('round-trips through parseTable', () => {
+      const rows = [
+        { name: 'JavaScript', slug: 'javascript' },
+        { name: 'TypeScript', slug: '' },
+      ]
+      expect(parseTable(renderTable(['name', 'slug'], rows)).rows).toEqual(rows)
     })
   })
 
-  describe('edge cases', () => {
-    it('should handle empty objects', () => {
-      const result = diff({}, {})
-      expect(result.hasChanges).toBe(false)
-    })
-
-    it('should handle null values', () => {
-      const result = diff({ value: null } as any, { value: 'defined' })
-      expect(result.modified.value).toEqual({ from: null, to: 'defined' })
-    })
-
-    it('should handle undefined vs missing', () => {
-      const result = diff({ a: undefined } as any, {})
-      expect(result.removed).toContain('a')
-    })
+  it('fromMarkdown reads an optional (empty Required cell) property without shifting columns', () => {
+    const result = fromMarkdown<{ properties: Array<Record<string, unknown>> }>(
+      toMarkdown({
+        name: 'Customer',
+        properties: [{ name: 'nickname', type: 'string', required: false, description: 'Optional nickname' }],
+      })
+    )
+    expect(result.properties[0]).toEqual({ name: 'nickname', type: 'string', required: false, description: 'Optional nickname' })
   })
 })
 
 // =============================================================================
-// applyExtract Tests
+// One diff implementation in the repo (mdx-8je.12)
 // =============================================================================
 
-describe('applyExtract', () => {
-  describe('basic merging', () => {
-    it('should merge extracted data into original', () => {
-      const result = applyExtract(
-        { name: 'Original', author: 'John' },
-        { name: 'Updated' }
-      )
-
-      expect(result).toEqual({ name: 'Updated', author: 'John' })
-    })
-
-    it('should add new fields', () => {
-      const result = applyExtract({ name: 'Test' }, { email: 'test@example.com' })
-
-      expect(result).toEqual({ name: 'Test', email: 'test@example.com' })
-    })
-  })
-
-  describe('paths option', () => {
-    it('should respect paths filter', () => {
-      const result = applyExtract(
-        { name: 'Original', description: 'Original desc' },
-        { name: 'Updated', description: 'Updated desc' },
-        { paths: ['name'] }
-      )
-
-      expect(result.name).toBe('Updated')
-      expect(result.description).toBe('Original desc')
-    })
-
-    it('should ignore updates not in paths', () => {
-      const result = applyExtract(
-        { a: 1, b: 2 },
-        { a: 10, b: 20 },
-        { paths: ['a'] }
-      )
-
-      expect(result).toEqual({ a: 10, b: 2 })
-    })
-  })
-
-  describe('array merge strategies', () => {
-    it('should replace arrays by default', () => {
-      const result = applyExtract({ items: ['a', 'b'] }, { items: ['c'] })
-
-      expect(result.items).toEqual(['c'])
-    })
-
-    it('should append arrays', () => {
-      const result = applyExtract(
-        { items: ['a', 'b'] },
-        { items: ['c'] },
-        { arrayMerge: 'append' }
-      )
-
-      expect(result.items).toEqual(['a', 'b', 'c'])
-    })
-
-    it('should prepend arrays', () => {
-      const result = applyExtract(
-        { items: ['a', 'b'] },
-        { items: ['c'] },
-        { arrayMerge: 'prepend' }
-      )
-
-      expect(result.items).toEqual(['c', 'a', 'b'])
-    })
-  })
-
-  describe('edge cases', () => {
-    it('should handle empty extracted data', () => {
-      const original = { name: 'Test' }
-      const result = applyExtract(original, {})
-
-      expect(result).toEqual(original)
-    })
-
-    it('should handle non-array values with array merge', () => {
-      const result = applyExtract(
-        { value: 'string' },
-        { value: 'updated' },
-        { arrayMerge: 'append' }
-      )
-
-      expect(result.value).toBe('updated')
-    })
+describe("diffing is not this package's job", () => {
+  it('exports no diff / applyExtract - those live in @mdxld/diff', () => {
+    const exported = Object.keys(markdown)
+    expect(exported).not.toContain('diff')
+    expect(exported).not.toContain('applyExtract')
+    expect((markdown as Record<string, unknown>).diff).toBeUndefined()
+    expect((markdown as Record<string, unknown>).applyExtract).toBeUndefined()
   })
 })

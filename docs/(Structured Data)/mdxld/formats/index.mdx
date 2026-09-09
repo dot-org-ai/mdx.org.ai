@@ -163,7 +163,8 @@ The format packages integrate seamlessly with `mdxdb` for storage:
 
 ```typescript
 import { DB } from 'mdxdb'
-import { toMarkdown, fromMarkdown, diff } from '@mdxld/markdown'
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
+import { diff } from '@mdxld/extract' // @mdxld/diff's diffPaths
 
 const db = DB({
   BlogPost: {

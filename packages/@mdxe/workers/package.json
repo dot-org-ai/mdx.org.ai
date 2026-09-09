@@ -54,7 +54,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@mdxe/isolate": "workspace:*"
+    "@mdxe/isolate": "workspace:*",
+    "@mdxui/text": "^0.1.0"
   },
   "optionalDependencies": {
     "esbuild": "^0.24.0",

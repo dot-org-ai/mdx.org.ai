@@ -215,6 +215,41 @@ app.use('/docs/*', mdx({ root: './docs' }))
 // GET /docs/intro with Accept: application/json → JSON response
 ```
 
+### Text registers (Markdown for Agents)
+
+`formatMiddleware()` + `formatResponse()` serve the two text registers rendered by
+[`@mdxui/text`](https://www.npmjs.com/package/@mdxui/text) — the same renderer the `mdxe` CLI's
+`--format md|plain` uses, so the bytes a served page emits are byte-identical to the CLI's:
+
+```typescript
+import { Hono } from 'hono'
+import { formatMiddleware, formatResponse } from '@mdxe/hono'
+
+const app = new Hono()
+app.use('*', formatMiddleware())
+app.get('/docs/intro', async (c) => formatResponse(c, await loadDoc('intro')))
+```
+
+| Request | Response |
+|---------|----------|
+| `Accept: text/markdown` | the `md` register — `Content-Type: text/markdown; charset=utf-8`, `Vary: Accept`, `x-markdown-tokens: <count>`, `x-markdown-tokens-method: <method>; tokenizer=<id>` |
+| `Accept: text/plain` | the `plain` register — `Content-Type: text/plain; charset=utf-8`, `Vary: Accept` |
+| `Accept: text/html` / none / `*/*` | HTML (the default face) |
+| `Accept: application/json` | the document as JSON |
+| `Accept: text/csv` (anything not implemented) | **406** `application/problem+json` naming every media type that exists — never a silent downgrade |
+| `/docs/intro.md`, `.txt`, `.json`, `.html`, `.xml` | the extension wins over `Accept` (no `Vary`) |
+| `/docs/intro.mdx` | the raw MDXLD source, `text/mdx` |
+
+`Accept` is read by `q` (highest wins, ties in header order); `q=0` refuses a type. The text
+register is resolved by `resolveCapabilities({ accept })` from `@mdxui/text/capabilities` — the one
+ladder — and the frozen capabilities ride on the format context (`getFormat(c).capabilities`):
+an `Accept`-decided request has `caller.detectedBy === 'accept'`, `kind: 'agent'` for md and
+`'human'` for plain, `harness: null`, never interactive.
+
+`x-markdown-tokens` is a **labelled** count from the `@mdxe/cli-core` token oracle: precise
+`tiktoken-o200k` when the optional `js-tiktoken` package is installed, otherwise the documented
+`chars-approx` estimate — the `x-markdown-tokens-method` header always says which.
+
 ## HTML Output
 
 The `renderToHtml` function generates a complete HTML document:

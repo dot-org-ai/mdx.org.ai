@@ -21,11 +21,10 @@ export default defineConfig({
           'mdxld',
           'mdxe',
           'mdxdb',
-          'mdxui',
           'mdxai',
           '@mdxe/hono',
           '@mdxe/vitest',
-          '@mdxui/markdown',
+          '@mdxui/text',
           '@mdxdb/fs',
           '@mdxai/claude',
           '@mdxld/ast',
@@ -43,7 +42,6 @@ export default defineConfig({
       mdxld: path.resolve(__dirname, 'packages/mdxld/src/index.ts'),
       mdxe: path.resolve(__dirname, 'packages/mdxe/src/index.ts'),
       mdxdb: path.resolve(__dirname, 'packages/mdxdb/src/index.ts'),
-      mdxui: path.resolve(__dirname, 'packages/mdxui/src/index.ts'),
       mdxai: path.resolve(__dirname, 'packages/mdxai/src/index.ts'),
 
       // @mdxe packages
@@ -51,8 +49,7 @@ export default defineConfig({
       '@mdxe/ink': path.resolve(__dirname, 'packages/@mdxe/ink/src/index.ts'),
       '@mdxe/vitest': path.resolve(__dirname, 'packages/@mdxe/vitest/src/index.ts'),
 
-      // @mdxui packages
-      '@mdxui/markdown': path.resolve(__dirname, 'packages/@mdxui/markdown/src/index.ts'),
+      // @mdxui/* lives in dot-do/ui and resolves from npm (mdx-8je.8) — no local aliases.
 
       // @mdxdb packages
       '@mdxdb/fs': path.resolve(__dirname, 'packages/@mdxdb/fs/src/index.ts'),

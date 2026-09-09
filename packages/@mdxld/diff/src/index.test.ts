@@ -16,6 +16,9 @@ import {
   diffArrays,
   merge3way,
   resolveConflict,
+  diffPaths,
+  applyPaths,
+  merge3wayObjects,
   formatChanges,
   countChanges,
   canApplyPatch,
@@ -31,20 +34,20 @@ describe('diffChars', () => {
     const changes = diffChars('hello', 'hallo')
 
     expect(changes).toHaveLength(4)
-    expect(changes[0].value).toBe('h')
-    expect(changes[0].count).toBe(1)
+    expect(changes[0]!.value).toBe('h')
+    expect(changes[0]!.count).toBe(1)
     expect(changes[1]).toMatchObject({ value: 'e', removed: true })
     expect(changes[2]).toMatchObject({ value: 'a', added: true })
-    expect(changes[3].value).toBe('llo')
+    expect(changes[3]!.value).toBe('llo')
   })
 
   it('should return single change for identical strings', () => {
     const changes = diffChars('hello', 'hello')
     expect(changes).toHaveLength(1)
-    expect(changes[0].value).toBe('hello')
+    expect(changes[0]!.value).toBe('hello')
     // The diff library returns explicit false for added/removed on unchanged parts
-    expect(changes[0].added).toBeFalsy()
-    expect(changes[0].removed).toBeFalsy()
+    expect(changes[0]!.added).toBeFalsy()
+    expect(changes[0]!.removed).toBeFalsy()
   })
 
   it('should handle empty strings', () => {
@@ -57,8 +60,8 @@ describe('diffChars', () => {
     const changes = diffChars('Hello', 'hello', { ignoreCase: true })
     expect(changes).toHaveLength(1)
     // With ignoreCase, they are the same so added/removed are falsy
-    expect(changes[0].added).toBeFalsy()
-    expect(changes[0].removed).toBeFalsy()
+    expect(changes[0]!.added).toBeFalsy()
+    expect(changes[0]!.removed).toBeFalsy()
   })
 })
 
@@ -117,8 +120,8 @@ describe('diffTrimmedLines', () => {
     const changes = diffTrimmedLines('  hello  ', 'hello')
     expect(changes).toHaveLength(1)
     // The diff library returns explicit false for added/removed on unchanged parts
-    expect(changes[0].added).toBeFalsy()
-    expect(changes[0].removed).toBeFalsy()
+    expect(changes[0]!.added).toBeFalsy()
+    expect(changes[0]!.removed).toBeFalsy()
   })
 })
 
@@ -194,9 +197,9 @@ describe('parsePatch', () => {
     const parsed = parsePatch(patch)
 
     expect(parsed).toHaveLength(1)
-    expect(parsed[0].hunks).toHaveLength(1)
-    expect(parsed[0].hunks[0].lines).toContain('-old')
-    expect(parsed[0].hunks[0].lines).toContain('+new')
+    expect(parsed[0]!.hunks).toHaveLength(1)
+    expect(parsed[0]!.hunks[0]!.lines).toContain('-old')
+    expect(parsed[0]!.hunks[0]!.lines).toContain('+new')
   })
 
   it('should parse multi-file patch', () => {
@@ -247,11 +250,12 @@ describe('reversePatch', () => {
   it('should create reverse patch', () => {
     const patch = createPatch('file.txt', 'old', 'new')
     const parsed = parsePatch(patch)
-    const reversed = reversePatch(parsed[0])
+    const reversed = reversePatch(parsed[0]!)
 
-    // Apply original then reversed should give back original
+    // Apply original, then the reversed patch gives the original back
     const afterForward = applyPatch('old', patch)
     expect(afterForward).toBe('new')
+    expect(applyPatch('new', reversed)).toBe('old')
   })
 })
 
@@ -262,8 +266,8 @@ describe('structuredPatch', () => {
     expect(patch.oldFileName).toBe('old.txt')
     expect(patch.newFileName).toBe('new.txt')
     expect(patch.hunks).toHaveLength(1)
-    expect(patch.hunks[0].oldStart).toBeDefined()
-    expect(patch.hunks[0].newStart).toBeDefined()
+    expect(patch.hunks[0]!.oldStart).toBeDefined()
+    expect(patch.hunks[0]!.newStart).toBeDefined()
   })
 })
 
@@ -391,35 +395,198 @@ describe('diffArrays', () => {
 // =============================================================================
 
 describe('merge3way', () => {
-  it('should merge non-conflicting changes', () => {
-    const base = 'line1\nline2\nline3'
-    const ours = 'line1\nmodified by us\nline3'
-    const theirs = 'line1\nline2\nmodified by them'
+  it('merges changes to different lines with an untouched line between them', () => {
+    const base = 'line1\nline2\nline3\nline4\n'
+    const ours = 'line1\nmodified by us\nline3\nline4\n'
+    const theirs = 'line1\nline2\nline3\nmodified by them\n'
 
     const result = merge3way(base, ours, theirs)
 
-    // Note: merge3way might have conflicts depending on implementation
-    expect(result.merged).toBeDefined()
+    expect(result.hasConflicts).toBe(false)
+    expect(result.conflicts).toEqual([])
+    expect(result.merged).toBe('line1\nmodified by us\nline3\nmodified by them\n')
   })
 
-  it('should detect conflicts', () => {
-    const base = 'line1\nline2\nline3'
-    const ours = 'line1\nour change\nline3'
-    const theirs = 'line1\ntheir change\nline3'
-
-    const result = merge3way(base, ours, theirs)
-
-    // Same line changed differently should conflict
-    expect(result).toBeDefined()
+  it('returns merged CONTENT, never a unified patch', () => {
+    const result = merge3way('a\nb\n', 'a\nB\n', 'a\nb\nc\n')
+    expect(result.merged).not.toMatch(/^Index:|^@@|^---|^\+\+\+/m)
   })
 
-  it('should handle identical changes', () => {
-    const base = 'original'
-    const ours = 'same change'
-    const theirs = 'same change'
+  it('takes our side when theirs is unchanged and vice versa', () => {
+    expect(merge3way('a\nb\n', 'a\nB\n', 'a\nb\n').merged).toBe('a\nB\n')
+    expect(merge3way('a\nb\n', 'a\nb\n', 'a\nB\n').merged).toBe('a\nB\n')
+  })
+
+  it('handles insertions and deletions on either side', () => {
+    expect(merge3way('a\nb\nc\n', 'x\na\nb\nc\n', 'a\nb\nc\nz\n').merged).toBe('x\na\nb\nc\nz\n')
+    expect(merge3way('a\nb\nc\nd\ne\n', 'b\nc\nd\ne\n', 'a\nb\nc\nd\n').merged).toBe('b\nc\nd\n')
+  })
+
+  it('marks the same line changed differently as a conflict with base, ours and theirs', () => {
+    const base = 'line1\nline2\nline3\n'
+    const ours = 'line1\nour change\nline3\n'
+    const theirs = 'line1\ntheir change\nline3\n'
 
     const result = merge3way(base, ours, theirs)
-    expect(result.merged).toBeDefined()
+
+    expect(result.hasConflicts).toBe(true)
+    expect(result.conflicts).toEqual([
+      { start: 1, end: 7, base: 'line2\n', ours: 'our change\n', theirs: 'their change\n' },
+    ])
+    expect(result.merged).toBe(
+      'line1\n<<<<<<< ours\nour change\n||||||| base\nline2\n=======\ntheir change\n>>>>>>> theirs\nline3\n'
+    )
+    expect(resolveConflict(result.merged, 'ours')).toBe(ours)
+    expect(resolveConflict(result.merged, 'theirs')).toBe(theirs)
+    expect(resolveConflict(result.merged, 'base')).toBe(base)
+  })
+
+  it('treats adjacent changes (no untouched line between) as one conflicting region, like git', () => {
+    const result = merge3way('a\nb\nc\n', 'a\nB\nc\n', 'a\nb\nC\n')
+    expect(result.hasConflicts).toBe(true)
+    expect(result.conflicts[0]).toMatchObject({ base: 'b\nc\n', ours: 'B\nc\n', theirs: 'b\nC\n' })
+  })
+
+  it('accepts identical changes on both sides without a conflict', () => {
+    const result = merge3way('original', 'same change', 'same change')
+    expect(result.hasConflicts).toBe(false)
+    expect(result.merged).toBe('same change')
+  })
+
+  it('preserves the absence of a trailing newline', () => {
+    expect(merge3way('a\nb', 'a\nB', 'a\nb').merged).toBe('a\nB')
+  })
+
+  it('always terminates a closing conflict marker with a newline so resolveConflict can find it', () => {
+    const result = merge3way('a', 'b', 'c')
+    expect(result.merged.endsWith('>>>>>>> theirs\n')).toBe(true)
+    expect(resolveConflict(result.merged, 'theirs')).toBe('c\n')
+  })
+
+  it('merges empty base (both sides added different content) as a conflict', () => {
+    const result = merge3way('', 'ours\n', 'theirs\n')
+    expect(result.hasConflicts).toBe(true)
+    expect(result.conflicts[0]).toMatchObject({ base: '', ours: 'ours\n', theirs: 'theirs\n' })
+  })
+})
+
+describe('diffPaths', () => {
+  it('reports added, modified and removed leaf paths', () => {
+    const result = diffPaths(
+      { data: { title: 'Hello', author: 'Jane' }, draft: true },
+      { data: { title: 'Hi', tags: ['a'] }, draft: true }
+    )
+    expect(result).toEqual({
+      added: { data: { tags: ['a'] } },
+      modified: { 'data.title': { from: 'Hello', to: 'Hi' } },
+      removed: ['data.author'],
+      hasChanges: true,
+    })
+  })
+
+  it('reports no changes for deep-equal values', () => {
+    const result = diffPaths({ a: { b: [1, { c: 2 }] } }, { a: { b: [1, { c: 2 }] } })
+    expect(result.hasChanges).toBe(false)
+  })
+
+  it('does not report a list of objects whose keys are merely reordered (mdx-8je.12 gap)', () => {
+    const original = { items: [{ title: 'A', description: 'a' }] }
+    const reordered = { items: [{ description: 'a', title: 'A' }] }
+    expect(diffPaths(original, reordered).hasChanges).toBe(false)
+  })
+
+  it('restricts the removal check to the given paths', () => {
+    const result = diffPaths({ a: 1, b: 2 }, {}, ['a'])
+    expect(result.removed).toEqual(['a'])
+  })
+})
+
+describe('applyPaths', () => {
+  it('overlays leaf paths without touching the rest', () => {
+    expect(applyPaths({ data: { title: 'Hello', author: 'Jane' } }, { data: { title: 'Hi' } })).toEqual({
+      data: { title: 'Hi', author: 'Jane' },
+    })
+  })
+
+  it('creates missing nesting', () => {
+    expect(applyPaths({ a: 1 }, { meta: { x: 'y' } })).toEqual({ a: 1, meta: { x: 'y' } })
+  })
+
+  it('honours paths and arrayMerge', () => {
+    const original = { title: 'T', tags: ['a', 'b'] }
+    expect(applyPaths(original, { title: 'U', tags: ['c'] }, { paths: ['tags'] })).toEqual({ title: 'T', tags: ['c'] })
+    expect(applyPaths(original, { tags: ['c'] }, { arrayMerge: 'append' })).toEqual({ title: 'T', tags: ['a', 'b', 'c'] })
+    expect(applyPaths(original, { tags: ['c'] }, { arrayMerge: 'prepend' })).toEqual({ title: 'T', tags: ['c', 'a', 'b'] })
+  })
+
+  it('does not mutate the original', () => {
+    const original = { data: { title: 'Hello' } }
+    applyPaths(original, { data: { title: 'Hi' } })
+    expect(original.data.title).toBe('Hello')
+  })
+})
+
+describe('merge3wayObjects', () => {
+  const base = { data: { title: 'Hello', author: 'Jane', body: 'one\ntwo\nthree' } }
+
+  it('takes each side where only that side changed', () => {
+    const ours = { data: { title: 'Hello', author: 'Jane Doe', body: base.data.body } }
+    const theirs = { data: { title: 'Hello, world', author: 'Jane', body: base.data.body } }
+
+    const result = merge3wayObjects(base, ours, theirs)
+
+    expect(result.hasConflicts).toBe(false)
+    expect(result.merged).toEqual({ data: { title: 'Hello, world', author: 'Jane Doe', body: base.data.body } })
+    expect(result.applied).toEqual({ ours: ['data.author'], theirs: ['data.title'] })
+  })
+
+  it('accepts identical changes on both sides', () => {
+    const both = { data: { ...base.data, title: 'Same' } }
+    const result = merge3wayObjects(base, both, both)
+    expect(result.hasConflicts).toBe(false)
+    expect(result.merged.data.title).toBe('Same')
+  })
+
+  it('line-merges a string both sides changed in different places', () => {
+    const ours = { data: { ...base.data, body: 'ONE\ntwo\nthree' } }
+    const theirs = { data: { ...base.data, body: 'one\ntwo\nTHREE' } }
+    const result = merge3wayObjects(base, ours, theirs)
+    expect(result.hasConflicts).toBe(false)
+    expect(result.merged.data.body).toBe('ONE\ntwo\nTHREE')
+  })
+
+  it('reports a conflict and keeps ours by default when both sides changed a value differently', () => {
+    const ours = { data: { ...base.data, title: 'Ours' } }
+    const theirs = { data: { ...base.data, title: 'Theirs' } }
+
+    const result = merge3wayObjects(base, ours, theirs)
+
+    expect(result.hasConflicts).toBe(true)
+    expect(result.conflicts).toEqual([{ path: 'data.title', base: 'Hello', ours: 'Ours', theirs: 'Theirs', resolution: 'ours' }])
+    expect(result.merged.data.title).toBe('Ours')
+    expect(merge3wayObjects(base, ours, theirs, { onConflict: 'theirs' }).merged.data.title).toBe('Theirs')
+    expect(merge3wayObjects(base, ours, theirs, { onConflict: 'base' }).merged.data.title).toBe('Hello')
+  })
+
+  it('carries a deletion from one side and an addition from the other', () => {
+    const ours = { data: { title: 'Hello', body: base.data.body } }
+    const theirs = { data: { ...base.data, tags: ['x'] } }
+    const result = merge3wayObjects(base, ours, theirs)
+    expect(result.merged).toEqual({ data: { title: 'Hello', body: base.data.body, tags: ['x'] } })
+  })
+
+  it('conflicts when one side deleted and the other changed the same path', () => {
+    const ours = { data: { title: 'Hello', body: base.data.body } }
+    const theirs = { data: { ...base.data, author: 'J. Doe' } }
+    const result = merge3wayObjects(base, ours, theirs, { onConflict: 'theirs' })
+    expect(result.conflicts).toEqual([{ path: 'data.author', base: 'Jane', ours: undefined, theirs: 'J. Doe', resolution: 'theirs' }])
+    expect(result.merged.data.author).toBe('J. Doe')
+  })
+
+  it('does not mutate any input', () => {
+    const ours = { data: { ...base.data, author: 'X' } }
+    merge3wayObjects(base, ours, base)
+    expect(base.data.author).toBe('Jane')
   })
 })
 

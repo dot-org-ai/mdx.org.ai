@@ -143,7 +143,8 @@ import { getSheetNames, parseAllSheets, xlsxToCSV } from '@mdxld/formats'
 import { extractPDFText, extractPDFMetadata, pdfToMarkdown, searchPDF } from '@mdxld/formats'
 
 // Markdown
-import { diff, applyExtract } from '@mdxld/formats'
+import { toMarkdown, fromMarkdown, parseTable, renderTable } from '@mdxld/formats'
+// (diff / applyExtract / mergeExtract live in @mdxld/extract, over @mdxld/diff)
 
 // HTML
 import { toJSONLDScript } from '@mdxld/formats'

@@ -405,8 +405,7 @@ function needsSandbox(code: string): boolean {
  */
 function detectImports(code: string): {
   mdxld: string[]
-  mdxui: string[]
-  mdxuiMarkdown: string[]
+  mdxuiText: string[]
   mdxeVitest: string[]
   needsDb: boolean
   needsAi: boolean
@@ -414,8 +413,7 @@ function detectImports(code: string): {
   needsSandbox: boolean
 } {
   const mdxld: string[] = []
-  const mdxui: string[] = []
-  const mdxuiMarkdown: string[] = []
+  const mdxuiText: string[] = []
   const mdxeVitest: string[] = []
 
   // mdxld imports
@@ -423,14 +421,10 @@ function detectImports(code: string): {
   if (/\bstringify\s*\(/.test(code)) mdxld.push('stringify')
   if (/\btoAst\s*\(/.test(code)) mdxld.push('toAst')
 
-  // mdxui imports
-  if (/\bcreateComponents\s*\(/.test(code)) mdxui.push('createComponents')
-  if (/\bgetComponentMeta\s*\(/.test(code)) mdxui.push('getComponentMeta')
-  if (/\bgetComponentNames\s*\(/.test(code)) mdxui.push('getComponentNames')
-  if (/\bgetComponentsByCategory\s*\(/.test(code)) mdxui.push('getComponentsByCategory')
-
-  // @mdxui/markdown imports
-  if (/\brenderMarkdown\s*\(/.test(code)) mdxuiMarkdown.push('renderMarkdown')
+  // @mdxui/text/md imports — the md register renderer (npm; received @mdxui/markdown, mdx-8je.8).
+  // The mdxui component factory (createComponents & co.) lives in dot-do/ui and is not
+  // auto-imported here.
+  if (/\brenderMarkdown\s*\(/.test(code)) mdxuiText.push('renderMarkdown')
 
   // @mdxe/vitest imports
   if (/\bextractTests\s*\(/.test(code)) mdxeVitest.push('extractTests')
@@ -441,15 +435,14 @@ function detectImports(code: string): {
   const needsAiFlag = /\bai\./.test(code)
 
   // Check if createElement is needed (for component rendering)
-  const needsCreateElementFlag = /\bcreateElement\b/.test(code) || mdxui.includes('createComponents')
+  const needsCreateElementFlag = /\bcreateElement\b/.test(code)
 
   // Check if sandbox is needed
   const needsSandboxFlag = needsSandbox(code)
 
   return {
     mdxld,
-    mdxui,
-    mdxuiMarkdown,
+    mdxuiText,
     mdxeVitest,
     needsDb: needsDbFlag,
     needsAi: needsAiFlag,
@@ -520,11 +513,8 @@ export function generateTestCode(testFile: MDXTestFile): string {
   if (imports.mdxld.length > 0) {
     lines.push(`import { ${imports.mdxld.join(', ')} } from 'mdxld'`)
   }
-  if (imports.mdxui.length > 0) {
-    lines.push(`import { ${imports.mdxui.join(', ')} } from 'mdxui'`)
-  }
-  if (imports.mdxuiMarkdown.length > 0) {
-    lines.push(`import { ${imports.mdxuiMarkdown.join(', ')} } from '@mdxui/markdown'`)
+  if (imports.mdxuiText.length > 0) {
+    lines.push(`import { ${imports.mdxuiText.join(', ')} } from '@mdxui/text/md'`)
   }
   if (imports.mdxeVitest.length > 0) {
     lines.push(`import { ${imports.mdxeVitest.join(', ')} } from '@mdxe/vitest'`)

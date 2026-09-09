@@ -769,11 +769,11 @@ Here is some text with \`inline code\`.
 })
 
 // =============================================================================
-// AI Extraction Tests (placeholder)
+// AI Extraction Tests (the mocked-generateObject suite is ai.test.ts)
 // =============================================================================
 
 describe('extractWithAI', () => {
-  it('should return pattern result if confidence is high', async () => {
+  it('should return pattern result if every slot matched', async () => {
     const result = await extractWithAI({
       template: '# {data.title}',
       rendered: '# Hello'
@@ -783,14 +783,14 @@ describe('extractWithAI', () => {
     expect(result.aiAssisted).toBe(false)
   })
 
-  it('should flag aiAssisted when pattern matching fails', async () => {
+  it('should flag aiAssisted and land the generator\'s answer when pattern matching cannot reverse a slot', async () => {
     const result = await extractWithAI({
       template: '{data.show ? "Yes" : "No"}',
-      rendered: 'Yes'
+      rendered: 'Yes',
+      generate: async () => ({ object: { data: { show: true } } })
     })
 
-    // For now, just returns with aiAssisted flag
-    // Full AI integration would extract the value
     expect(result.aiAssisted).toBe(true)
+    expect(result.data).toEqual({ data: { show: true } })
   })
 })
