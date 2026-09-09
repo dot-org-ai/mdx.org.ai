@@ -62,7 +62,7 @@ export type CliCommand = (typeof CLI_COMMANDS)[number]
 /**
  * Valid deployment platforms
  */
-export const PLATFORMS = ['do', 'cloudflare', 'vercel', 'github'] as const
+export const PLATFORMS = ['do', 'cloudflare'] as const
 export type Platform = (typeof PLATFORMS)[number]
 
 /**
@@ -234,7 +234,7 @@ export const DeployOptionsSchema = z.object({
   /** Target environment */
   target: z.string().optional(),
   /** Deployment platform */
-  platform: z.enum(['vercel', 'cloudflare', 'netlify', 'custom']).optional(),
+  platform: z.enum(['do', 'cloudflare', 'custom']).optional(),
   /** Environment variables for deployment */
   env: z.record(z.string()).optional(),
   /** Dry run mode */

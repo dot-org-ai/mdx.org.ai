@@ -24,7 +24,6 @@ export default defineConfig([
       '@mdxdb/clickhouse',
       'oauth.do',
       'ai-evaluate',
-      'ai-functions',
       'ai-workflows',
     ],
   },
@@ -43,7 +42,6 @@ export default defineConfig([
       '@mdxdb/clickhouse',
       'oauth.do',
       'ai-evaluate',
-      'ai-functions',
       'ai-workflows',
     ],
     banner: {

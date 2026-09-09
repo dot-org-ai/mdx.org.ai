@@ -510,29 +510,6 @@ describe('runDeploy', () => {
     expect(errors.some(l => l.includes('Build failed: syntax error'))).toBe(true)
   })
 
-  it('should support vercel platform (now unified deployment)', async () => {
-    mockDeploy.mockResolvedValue({
-      success: true,
-      url: 'https://my-app.vercel.app',
-    })
-
-    const options: CliOptions = {
-      command: 'deploy',
-      projectDir: '/test/project',
-      platform: 'vercel' as 'do',
-      dryRun: false,
-      force: false,
-      verbose: false,
-      env: {},
-      help: false,
-    }
-
-    await runDeploy(options)
-
-    expect(mockDeploy).toHaveBeenCalled()
-    expect(logs.some(l => l.includes('Deployment successful'))).toBe(true)
-  })
-
   it('should show dry run message', async () => {
     mockDeploy.mockResolvedValue({
       success: true,
