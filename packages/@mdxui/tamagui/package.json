@@ -79,5 +79,6 @@
     "url": "https://github.com/ai-primitives/mdx.org.ai",
     "directory": "packages/@mdxui/tamagui"
   },
-  "author": "MDX.org.ai"
+  "author": "MDX.org.ai",
+  "private": true
 }

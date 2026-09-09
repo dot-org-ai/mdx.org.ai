@@ -79,5 +79,6 @@
     "directory": "packages/@mdxui/notebook"
   },
   "license": "MIT",
-  "author": "MDX.org.ai"
+  "author": "MDX.org.ai",
+  "private": true
 }
