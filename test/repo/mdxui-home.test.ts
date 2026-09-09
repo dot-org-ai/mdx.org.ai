@@ -119,8 +119,10 @@ describe('mdxui home (mdx-8je.8): dot-do/ui owns mdxui and @mdxui/*', () => {
       dependencies?: Record<string, string>
     }
     expect(pkg.dependencies?.['@mdxui/text']).toMatch(/^\^?\d/)
-    const format = readFileSync(join(ROOT, 'packages/@mdxe/hono/src/format.ts'), 'utf-8')
-    expect(format).toMatch(/from\s+['"]@mdxui\/text\/md['"]/)
+    // mdx-8je.18: the md register renders via `./text.ts` → `@mdxui/text/core` render(doc, 'md');
+    // either entry of the registry package (`/md` or `/core`) is the witness that md goes through npm @mdxui/text.
+    const hono = ['format.ts', 'text.ts'].map((f) => readFileSync(join(ROOT, 'packages/@mdxe/hono/src', f), 'utf-8')).join('\n')
+    expect(hono).toMatch(/from\s+['"]@mdxui\/text\/(md|core)['"]/)
   })
 
   it('@mdxe/workers depends on @mdxui/text from the registry and emits the .md asset through it', () => {

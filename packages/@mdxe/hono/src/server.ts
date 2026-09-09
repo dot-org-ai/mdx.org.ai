@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import { Hono } from 'hono'
+import { Hono, type Context } from 'hono'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
@@ -65,13 +65,12 @@ import { generateCSS, parseStyleOptions } from './styles.js'
 import { generateAnalyticsScript, type AnalyticsConfig } from './analytics.js'
 import { getWidgetCSS, getWidgetJS, getAllWidgetCSS, getAllWidgetJS, parseWidgetQuery, type WidgetName } from './widgets.js'
 import {
+  contextFromExtension,
+  documentResponse,
   formatMiddleware,
   getFormat,
   parseFormat,
-  renderDocument,
   shouldHandleFormat,
-  type OutputFormat,
-  FORMAT_CONTENT_TYPES,
 } from './format.js'
 
 /**
@@ -594,24 +593,13 @@ export function createApp(options: ServerOptions): Hono {
 
   // Helper to serve document in requested format
   const serveDocument = (
-    c: import('hono').Context,
+    c: Context,
     doc: MDXLDDocument,
     toc?: string
-  ): Response => {
-    const { outputFormat } = getFormat(c)
-
-    // For HTML, use full page rendering
-    if (outputFormat === 'html') {
-      const html = renderPage(doc, config, toc)
-      return c.html(html)
-    }
-
-    // For other formats, use the format renderer
-    const { content, contentType } = renderDocument(doc, outputFormat)
-    return new Response(content, {
-      status: 200,
-      headers: { 'Content-Type': contentType },
-    })
+  ): Promise<Response> => {
+    // HTML is the full page; the text registers, json and xml (and a refused Accept → 406)
+    // go through the format-aware response so every face carries its negotiated headers.
+    return documentResponse(doc, getFormat(c), { renderHtml: (d) => renderPage(d, config, toc) })
   }
 
   // Dynamic CSS: /styles/:type.css?color=indigo&background=gradient
@@ -1027,12 +1015,8 @@ Frontmatter may include $type, $id, and $context for linked data.
       return c.notFound()
     }
 
-    // Render in the requested format
-    const { content, contentType } = renderDocument(doc, format)
-    return new Response(content, {
-      status: 200,
-      headers: { 'Content-Type': contentType },
-    })
+    // Render in the requested format (the extension is the HTTP flavor of `--format`)
+    return documentResponse(doc, contextFromExtension(format, basePath, c.req.header('Accept')))
   })
 
   // 404 handler

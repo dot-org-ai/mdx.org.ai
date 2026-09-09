@@ -36,6 +36,16 @@
       "types": "./dist/styles.d.ts",
       "import": "./dist/styles.js",
       "require": "./dist/styles.cjs"
+    },
+    "./format": {
+      "types": "./dist/format.d.ts",
+      "import": "./dist/format.js",
+      "require": "./dist/format.cjs"
+    },
+    "./text": {
+      "types": "./dist/text.d.ts",
+      "import": "./dist/text.js",
+      "require": "./dist/text.cjs"
     }
   },
   "files": [
@@ -44,12 +54,13 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run",
+    "test": "vitest run && vitest run --config vitest.workers.config.ts",
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo"
+    "clean": "rm -rf dist .turbo",
+    "test:workers": "vitest run --config vitest.workers.config.ts"
   },
   "keywords": [
     "mdxe",
@@ -65,12 +76,14 @@
     "@mdxe/cli-core": "workspace:*",
     "@mdxui/fumadocs": "^1.9.0",
     "@mdxui/text": "^0.1.0",
-    "mdxld": "^1.9.2"
+    "mdxld": "workspace:^"
   },
   "peerDependencies": {
     "hono": "^4.0.0"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.0",
+    "@cloudflare/workers-types": "^4.20241127.0",
     "@mdxe/test-utils": "workspace:*",
     "hono": "^4.6.0",
     "tsup": "^8.3.5",
