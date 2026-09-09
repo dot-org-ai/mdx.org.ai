@@ -5,7 +5,7 @@
   "fixed": [],
   "linked": [
     ["mdxld", "@mdxld/*"],
-    ["{mdxdb,@mdxdb/*}"],
+    ["mdxdb", "@mdxdb/*"],
     ["mdxe", "@mdxe/*"],
     ["mdxui", "@mdxui/*"],
     ["mdxai", "@mdxai/*"]
