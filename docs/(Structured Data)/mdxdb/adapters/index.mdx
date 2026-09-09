@@ -146,10 +146,10 @@ const doc = await db.get('articles/hello-world')
 
 ## Custom Adapters
 
-Create your own adapter by implementing the Database interface:
+Create your own adapter by implementing the `Database` interface (exported by every adapter):
 
 ```typescript
-import type { Database, MDXLDDocument } from 'mdxdb'
+import type { Database, MDXLDDocument, SetResult, DeleteResult, ListResult, SearchResult } from '@mdxdb/fs'
 
 class MyCustomAdapter implements Database {
   async get(path: string): Promise<MDXLDDocument | null> {
