@@ -487,18 +487,14 @@ function inferNamespace(): string {
   return parts[parts.length - 1] || 'local'
 }
 
+/**
+ * @mdxui/editor is an optional npm package from dot-do/ui (mdx-8je.8: no @mdxui sources live in
+ * this repo). Only an installed copy counts.
+ */
 function findEditorPackage(): string | null {
-  const locations = [
-    join(process.cwd(), 'packages', '@mdxui', 'editor'),
-    join(process.cwd(), '..', '@mdxui', 'editor'),
-    join(process.cwd(), '..', '..', 'packages', '@mdxui', 'editor'),
-    join(process.cwd(), 'node_modules', '@mdxui', 'editor'),
-  ]
-
-  for (const loc of locations) {
-    if (existsSync(join(loc, 'package.json'))) {
-      return loc
-    }
+  const installed = join(process.cwd(), 'node_modules', '@mdxui', 'editor')
+  if (existsSync(join(installed, 'package.json'))) {
+    return installed
   }
 
   try {

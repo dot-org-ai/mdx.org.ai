@@ -62,8 +62,7 @@ const MDX_ORG_AI_ORDER = [
   { name: '@mdxdb/fumadocs', path: 'packages/@mdxdb/fumadocs' },
   { name: '@mdxdb/clickhouse', path: 'packages/@mdxdb/clickhouse' },
 
-  // Layer 4
-  { name: '@mdxui/fumadocs', path: 'packages/@mdxui/fumadocs' },
+  // Layer 4 was @mdxui/fumadocs; mdxui and @mdxui/* publish from dot-do/ui now (mdx-8je.8)
 
   // Layer 5
   { name: '@mdxe/hono', path: 'packages/@mdxe/hono' },

@@ -8,7 +8,7 @@
 
 import type { Context, Next, MiddlewareHandler } from 'hono'
 import type { MDXLDDocument } from 'mdxld'
-import { stringify } from 'mdxld'
+import { render as renderMd } from '@mdxui/text/md'
 
 /**
  * Supported output formats
@@ -159,9 +159,10 @@ export function renderDocument(
       }
 
     case 'md':
-      // Reconstruct the original MDX source
+      // The `md` register of npm @mdxui/text (mdx-8je.8): frontmatter + clean markdown body,
+      // JSX and expressions stripped. Never the raw MDX source.
       return {
-        content: stringify(doc),
+        content: renderMd(doc),
         contentType,
       }
 

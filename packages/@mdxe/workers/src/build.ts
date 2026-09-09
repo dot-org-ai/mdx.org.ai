@@ -16,6 +16,7 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSy
 import { join, relative, extname, basename, dirname } from 'node:path'
 import { createHash } from 'node:crypto'
 import { parse } from 'mdxld'
+import { render as renderMd } from '@mdxui/text/md'
 import type {
   BuildOptions,
   BuildResult,
@@ -485,16 +486,18 @@ function buildAssetBundle(
     }
     totalSize += jsonContent.length
 
-    // Markdown version (just the content)
+    // Markdown version: the `md` register of npm @mdxui/text (mdx-8je.8) — clean markdown
+    // body with JSX / expressions stripped, no frontmatter (the .json asset carries the data)
+    const mdContent = renderMd(doc, { includeFrontmatter: false })
     const mdPath = `${basePath}.md`
     files[mdPath] = {
-      content: doc.content,
+      content: mdContent,
       contentType: 'text/markdown',
-      size: doc.content.length,
-      hash: computeAssetHash(doc.content, '.md'),
+      size: mdContent.length,
+      hash: computeAssetHash(mdContent, '.md'),
       binary: false,
     }
-    totalSize += doc.content.length
+    totalSize += mdContent.length
 
     // HTML version with fumadocs layout (pass all documents for sidebar)
     const htmlContent = generateHtmlPage(doc, siteConfig, content.documents)

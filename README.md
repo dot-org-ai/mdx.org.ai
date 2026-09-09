@@ -25,27 +25,21 @@ A monorepo for building MDX-based AI applications that combine structured data, 
 | **mdxld** | Parse, stringify, validate, and compile MDXLD documents |
 | **mdxdb** | Database abstraction with graph relationships and vector search |
 | **mdxe** | Execute MDX in different environments and protocols |
-| **mdxui** | Render MDX to different output formats |
+| **mdxui** | Render MDX to different output formats — lives in [dot-do/ui](https://github.com/dot-do/ui), consumed here from npm |
 | **mdxai** | AI integrations for generation, enrichment, and agents |
 
 ### @mdxui - Rendering & Output Formats
 
 **"How does a component render to X format?"**
 
-Defines rendering conventions for core components (`Site`, `Docs`, `App`, etc.) to various output formats:
+`mdxui` and `@mdxui/*` live in [dot-do/ui](https://github.com/dot-do/ui) and are consumed here from npm only (no @mdxui sources in this repo). The format renderers that used to be here moved there; `@mdxui/markdown` became the `md` register of `@mdxui/text`.
 
-| Package | Output Format | Technology |
-|---------|--------------|------------|
-| **@mdxui/html** | HTML strings | React → HTML |
-| **@mdxui/markdown** | Markdown strings | React → Markdown |
-| **@mdxui/json** | JSON / JSON-LD | React → JSON |
-| **@mdxui/email** | Email HTML | React Email |
-| **@mdxui/slack** | Slack blocks | Slack-JSX |
-| **@mdxui/shadcn** | React components | shadcn/ui |
-| **@mdxui/fumadocs** | Documentation | Fumadocs |
-| **@mdxui/widgets** | Chat, Editor, Search | React |
+| Package (npm) | Used here for |
+|---------------|---------------|
+| **@mdxui/text** | `@mdxui/text/md` renders a parsed document to markdown — `@mdxe/hono` `md` format, `@mdxe/workers` `.md` assets |
+| **@mdxui/fumadocs** | Hono JSX docs layouts re-exported by `@mdxe/hono/jsx` |
 
-> **Note:** Terminal output is plain bytes from **@mdxui/text** (planned); **@mdxe/ink** is a viewer over the **@mdxe/tui** seam that displays those bytes and handles input — it never renders MDX itself and never attaches to a pipe.
+> **Note:** Terminal output is the bytes **@mdxui/text** emits; **@mdxe/ink** is a viewer over the **@mdxe/tui** seam that displays those bytes and handles input — it never renders MDX itself and never attaches to a pipe.
 
 ### @mdxe - Execution Environments & Protocols
 
@@ -194,20 +188,18 @@ export const greeting = () => "Hello!"
 
 ## Example: Rendering to Multiple Formats
 
+The renderers are npm packages from [dot-do/ui](https://github.com/dot-do/ui); `@mdxe/hono` negotiates them by extension / `Accept` and `@mdxe/workers` emits them as static assets.
+
 ```typescript
 import { parse } from 'mdxld'
-import { toHTML } from '@mdxui/html'
-import { toJSON } from '@mdxui/json'
-import { toMarkdown } from '@mdxui/markdown'
-import { toSlack } from '@mdxui/slack'
+import { render as toMarkdown } from '@mdxui/text/md'   // the md register of npm @mdxui/text
 
 const doc = parse(mdxContent)
 
-// Render to different formats
-const html = await toHTML(doc)        // HTML string
-const json = await toJSON(doc)        // JSON-LD object
-const md = await toMarkdown(doc)      // Markdown string
-const slack = await toSlack(doc)      // Slack blocks
+const md = toMarkdown(doc)                              // frontmatter + clean markdown, JSX stripped
+const json = JSON.stringify(doc)                        // the parsed document as JSON
+// html: @mdxe/hono renderPage / @mdxe/workers generateHtmlPage (fumadocs-style layout)
+// slack / email / React HTML: @mdxui/{slack,email,html} from npm, not used by this repo
 ```
 
 ## Example: Execution via Protocols

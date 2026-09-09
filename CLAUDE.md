@@ -69,23 +69,22 @@ The monorepo follows a clear separation of concerns:
 | **@mdxld** | Parsing & Transformation | "How is MDXLD processed?" |
 | **@mdxai** | AI Integrations | "How does AI interact?" |
 
-### @mdxui - Rendering & Output Formats
+### @mdxui - Rendering & Output Formats (lives in dot-do/ui, consumed from npm)
 
-Defines rendering conventions for core components (`Site`, `Docs`, `App`, `Page`, etc.) to various output formats:
+`mdxui` and every `@mdxui/*` package are owned by [dot-do/ui](https://github.com/dot-do/ui) (mdx-8je.8). No @mdxui sources live in this repo: `packages/mdxui`, `packages/@mdxui` and the storybook app are gone, and `test/repo/mdxui-home.test.ts` keeps them gone. The format renderers that used to be here (`html`, `json`, `markdown`, `slack`, `email`) were received there with history; `@mdxui/markdown` became the `md` register of `@mdxui/text`.
+
+What this repo consumes, from the registry only:
 
 ```
-@mdxui/
-├── html       → React → HTML strings (SSR)
-├── markdown   → React → Markdown strings
-├── json       → React → JSON / JSON-LD / Tool Schemas
-├── email      → React → Email HTML (React Email)
-├── slack      → React → Slack blocks (Slack-JSX)
-├── shadcn     → React web components (shadcn/ui)
-├── fumadocs   → Documentation utilities (Fumadocs)
-└── widgets    → Interactive widgets (Chat, Editor, Search)
+@mdxui/text      → text registers (plain / md / ascii / unicode / ansi) + the capability resolver.
+                   `@mdxui/text/md` renders a parsed MDXLD document to markdown; @mdxe/hono's `md`
+                   format and @mdxe/workers' `.md` assets go through it.
+@mdxui/fumadocs  → Hono JSX docs layouts re-exported by @mdxe/hono/jsx.
 ```
 
-> **Note:** Terminal output is rendered to plain bytes by `@mdxui/text` (planned). `@mdxe/ink` is a *viewer* over the `@mdxe/tui` seam: it displays those bytes and handles input, never renders MDX itself, loads Ink lazily on `mount()`, and refuses to attach when stdout or stdin is not a TTY.
+Adding any other `@mdxui/*` dependency means adding it to `NPM_ALLOWED` in `test/repo/mdxui-home.test.ts` — with a registry range, never `workspace:`.
+
+> **Note:** Terminal output is the bytes `@mdxui/text` emits. `@mdxe/ink` is a *viewer* over the `@mdxe/tui` seam: it displays those bytes and handles input, never renders MDX itself, loads Ink lazily on `mount()`, and refuses to attach when stdout or stdin is not a TTY.
 
 ### @mdxe - Execution Environments & Protocols
 
@@ -239,20 +238,18 @@ const doc = parse(content) // Returns { id, type, context, data, content }
 
 ### Rendering to Multiple Formats
 
+The renderers are npm packages from dot-do/ui; this repo wires them into `@mdxe/hono` (content negotiation) and `@mdxe/workers` (static assets):
+
 ```typescript
 import { parse } from 'mdxld'
-import { toHTML } from '@mdxui/html'
-import { toJSON } from '@mdxui/json'
-import { toSlack } from '@mdxui/slack'
-import { toEmail } from '@mdxui/email'
+import { render as toMarkdown } from '@mdxui/text/md'   // the md register (npm @mdxui/text)
 
 const doc = parse(mdxContent)
 
-// Same document, different output formats
-const html = await toHTML(doc)      // HTML string for web
-const json = await toJSON(doc)      // JSON-LD for APIs
-const slack = await toSlack(doc)    // Slack blocks for messaging
-const email = await toEmail(doc)    // Email HTML for notifications
+const md = toMarkdown(doc)                              // frontmatter + clean markdown, JSX stripped
+const json = JSON.stringify(doc)                        // the parsed document as JSON
+// html: @mdxe/hono renderPage / @mdxe/workers generateHtmlPage (fumadocs-style layout)
+// slack / email / React HTML: @mdxui/{slack,email,html} from npm, not used by this repo
 ```
 
 ### Execution via Protocols
@@ -349,8 +346,8 @@ mdxld (core parsing)
 ├── mdxe (execution)
 │   └── @mdxe/* (workers, isolate, hono, cli-core, deploy, fumadocs, ink, tui, mcp, vitest)
 │
-├── mdxui (rendering)
-│   └── @mdxui/* (html, json, markdown, email, slack, shadcn)
+├── @mdxui/text, @mdxui/fumadocs (npm, from dot-do/ui — no mdxui sources here)
+│   └── used by @mdxe/hono (md format, docs JSX) and @mdxe/workers (.md assets)
 │
 └── mdxai (AI integrations)
     └── @mdxai/* (claude, mastra, vapi)
@@ -366,8 +363,8 @@ ai-* primitives (npm, ^2.4.0)
 
 When creating a new scoped package, ask:
 
-1. **Is it about OUTPUT FORMAT?** → `@mdxui/`
-   - Rendering MDX to HTML, JSON, Markdown, Slack, Email, Terminal
+1. **Is it about OUTPUT FORMAT?** → `@mdxui/` — in dot-do/ui, not here
+   - Rendering MDX to HTML, JSON, Markdown, Slack, Email, Terminal belongs to that repo; consume the published package
 
 2. **Is it about EXECUTION?** → `@mdxe/`
    - Runtimes (workers only — Cloudflare-native; no node/bun eval)
