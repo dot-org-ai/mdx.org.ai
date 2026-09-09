@@ -1,0 +1,10 @@
+// Test-only wrangler config consumed by vitest.workers.config.ts.
+// Runs the @mdxe/hono text-register suite inside workerd so the served
+// headers (mdx-8je.18) are verified in the production runtime. Not used
+// for deploys.
+{
+  "name": "mdxe-hono-test",
+  "main": "test/workers/worker.ts",
+  "compatibility_date": "2025-09-06",
+  "compatibility_flags": ["nodejs_compat"]
+}

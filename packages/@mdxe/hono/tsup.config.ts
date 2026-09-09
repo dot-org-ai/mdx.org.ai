@@ -9,6 +9,7 @@ export default defineConfig({
     'src/analytics.ts',
     'src/widgets.ts',
     'src/format.ts',
+    'src/text.ts',
     'src/jsx.tsx',
     'src/fumadocs.css.ts',
   ],
