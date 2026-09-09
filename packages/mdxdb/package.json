@@ -1,0 +1,99 @@
+{
+  "name": "mdxdb",
+  "version": "2.0.0",
+  "description": "Schema-first database for MDX content: ai-database DB() with Cloudflare-native backends (Durable Objects, ClickHouse, filesystem, HTTP API) resolved from DATABASE_URL",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tests": {
+      "types": "./dist/tests.d.ts",
+      "import": "./dist/tests.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run && vitest run --config vitest.workers.config.ts",
+    "test:unit": "vitest run",
+    "test:workers": "vitest run --config vitest.workers.config.ts",
+    "test:watch": "vitest",
+    "lint": "eslint src test",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p test/tsconfig.json",
+    "clean": "rm -rf dist .turbo"
+  },
+  "keywords": [
+    "mdx",
+    "mdxdb",
+    "mdxld",
+    "database",
+    "linked-data",
+    "cloudflare",
+    "durable-objects",
+    "workers",
+    "clickhouse",
+    "ai-database"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "ai-database": "^2.4.0"
+  },
+  "peerDependencies": {
+    "@mdxdb/api": ">=1.9.0",
+    "@mdxdb/clickhouse": ">=1.9.0",
+    "@mdxdb/do": ">=1.0.0",
+    "@mdxdb/fs": ">=1.9.0",
+    "vitest": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@mdxdb/api": {
+      "optional": true
+    },
+    "@mdxdb/clickhouse": {
+      "optional": true
+    },
+    "@mdxdb/do": {
+      "optional": true
+    },
+    "@mdxdb/fs": {
+      "optional": true
+    },
+    "vitest": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.0",
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "@mdxdb/api": "workspace:^",
+    "@mdxdb/clickhouse": "workspace:^",
+    "@mdxdb/do": "workspace:^",
+    "@mdxdb/fs": "workspace:^",
+    "@mdxdb/parquet": "workspace:^",
+    "@mdxdb/sqlite": "workspace:^",
+    "@mdxld/config": "workspace:^",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dot-org-ai/mdx.org.ai",
+    "directory": "packages/mdxdb"
+  },
+  "homepage": "https://mdxdb.org.ai",
+  "author": "MDX.org.ai",
+  "publishConfig": {
+    "access": "public"
+  }
+}

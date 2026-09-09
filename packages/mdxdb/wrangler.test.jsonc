@@ -1,0 +1,16 @@
+// Test-only wrangler config consumed by vitest.workers.config.ts.
+// Declares the @mdxdb/do MDXDurableObject so @cloudflare/vitest-pool-workers
+// can provide `env.MDXDB` inside workerd. Not used for deploys.
+{
+  "name": "mdxdb-test",
+  "main": "test/workers/worker.ts",
+  "compatibility_date": "2025-09-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [{ "name": "MDXDB", "class_name": "MDXDurableObject" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MDXDurableObject"] }],
+  "vars": {
+    "DATABASE_URL": "do://headless.ly"
+  }
+}

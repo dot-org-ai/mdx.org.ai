@@ -266,9 +266,9 @@ const mcp = createMCPServer({
 
 ### Database Interface
 
-Schema-first with automatic bi-directional relationships:
+Schema-first with automatic bi-directional relationships. `mdxdb` (packages/mdxdb) is a thin facade over ai-database's `DB()` with the mdxdb backends registered:
 ```ts
-import { DB } from 'ai-database'
+import { DB } from 'mdxdb'
 
 const db = DB({
   Post: {
@@ -289,13 +289,16 @@ const author = await post.author           // Resolved Author
 const posts = await db.Author.get('john').posts  // Post[]
 ```
 
-Provider resolved from `DATABASE_URL`:
+Provider resolved from `DATABASE_URL` (in a Worker pass the env: `DB(schema, { env })`):
 ```bash
-DATABASE_URL=./content              # Filesystem
-DATABASE_URL=sqlite://./content     # SQLite
-DATABASE_URL=libsql://your-db.turso.io  # Turso
-DATABASE_URL=chdb://./content       # ClickHouse (local)
+DATABASE_URL=do://headless.ly            # @mdxdb/do — Durable Object SQLite (primary)
+DATABASE_URL=./content                   # @mdxdb/fs — filesystem
+DATABASE_URL=clickhouse://host:8123/db   # @mdxdb/clickhouse — HTTP
+DATABASE_URL=https://db.example.com      # @mdxdb/api — HTTP API client
+DATABASE_URL=:memory:                    # in-memory (tests)
 ```
+
+`sqlite://<name>` is an alias for `do://<name>`. Unknown schemes, `libsql://` and `chdb://` fail closed (no adapter exists) rather than falling back to memory. Every backend must pass the shared contract suite from `mdxdb/tests`.
 
 ### MDX Test Files
 
