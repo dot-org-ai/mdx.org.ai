@@ -5,4 +5,3 @@ packages:
   - 'packages/@mdxai/*'
   - 'packages/@mdxdb/*'
   - 'packages/@mdxld/*'
-  - 'packages/@mdxui/*'

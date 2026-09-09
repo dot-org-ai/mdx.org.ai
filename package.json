@@ -34,14 +34,14 @@
     "mdxe": "node packages/mdxe/dist/cli.js",
     "mdxe:dev": "node packages/mdxe/dist/cli.js dev --dir examples",
     "mdxe:test": "node packages/mdxe/dist/cli.js test",
-    "notebook": "node packages/mdxe/dist/cli.js notebook examples/notebook.mdx --open",
-    "storybook": "pnpm --filter storybook dev"
+    "notebook": "node packages/mdxe/dist/cli.js notebook examples/notebook.mdx --open"
   },
   "devDependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.1.0",
     "@changesets/cli": "^2.29.8",
     "@eslint/js": "^9.16.0",
     "@mdxld/config": "workspace:*",
+    "@mdxui/text": "^0.1.0",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.0",
     "ai-database": "^2.4.0",

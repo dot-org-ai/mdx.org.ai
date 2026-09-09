@@ -17,10 +17,6 @@
       "@mdxe/*"
     ],
     [
-      "mdxui",
-      "@mdxui/*"
-    ],
-    [
       "mdxai",
       "@mdxai/*"
     ]

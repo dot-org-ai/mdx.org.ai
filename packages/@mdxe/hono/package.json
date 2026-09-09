@@ -64,6 +64,7 @@
     "@hono/node-server": "^1.13.0",
     "@mdxe/cli-core": "workspace:*",
     "@mdxui/fumadocs": "^1.9.0",
+    "@mdxui/text": "^0.1.0",
     "mdxld": "^1.9.2"
   },
   "peerDependencies": {
