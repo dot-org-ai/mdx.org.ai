@@ -10,7 +10,6 @@ import {
   type,
 } from './validate.js'
 import { parse } from './parse.js'
-import type { TypedData } from './types.js'
 
 describe('validate', () => {
   describe('validateDocument', () => {

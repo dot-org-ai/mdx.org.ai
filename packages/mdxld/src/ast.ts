@@ -69,7 +69,7 @@ function parseInline(text: string): MDXLDAstNode[] {
     }
 
     // Plain text - consume until next special character or end
-    const textMatch = remaining.match(/^[^`*_\[!]+/)
+    const textMatch = remaining.match(/^[^`*_[!]+/)
     if (textMatch) {
       nodes.push({ type: 'text', value: textMatch[0] })
       remaining = remaining.slice(textMatch[0].length)
@@ -456,7 +456,7 @@ export function fromAst(ast: MDXLDAst, options: ParseOptions = {}): MDXLDDocumen
   const yamlNode = ast.children.find((n) => n.type === 'yaml')
   const contentNodes = ast.children.filter((n) => n.type !== 'yaml')
 
-  let content = astToContent(contentNodes)
+  const content = astToContent(contentNodes)
 
   // Reconstruct full document string if we have YAML
   if (yamlNode && yamlNode.value) {

@@ -28,7 +28,7 @@
  * @packageDocumentation
  */
 
-import { type, Type } from 'arktype'
+import { type, type Type } from 'arktype'
 import type { MDXLDDocument, MDXLDData } from './types.js'
 
 /**
