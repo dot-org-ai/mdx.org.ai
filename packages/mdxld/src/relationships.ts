@@ -7,7 +7,7 @@
  * Aligns with ai-database conventions for Things + Relationships model.
  */
 
-import type { MDXLDDocument, MDXLDAst, MDXLDAstNode } from './types.js'
+import type { MDXLDDocument, MDXLDAstNode } from './types.js'
 import { toAst } from './ast.js'
 
 /**

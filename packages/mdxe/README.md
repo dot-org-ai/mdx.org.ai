@@ -14,18 +14,18 @@ yarn add mdxe
 
 ## Features
 
-- **Execute** - Run MDX documents as applications with ai-sandbox
+- **Execute** - Run MDX documents as applications with ai-evaluate
 - **Test** - Test MDX content with inline test blocks
 - **Deploy** - Deploy to Cloudflare Workers
 - **SDK Provider** - Local and remote SDK implementations for db, ai, workflows
 - **Multi-Runtime** - Support for Hono, Next.js, Node, Bun, Workers
-- **Primitives Integration** - Built-in support for ai-functions, ai-workflows, ai-sandbox
+- **Primitives Integration** - Built-in support for ai-functions, ai-workflows, ai-evaluate
 - **Type-Safe** - Full TypeScript support
 
 ## Documentation
 
 - [ECOSYSTEM.md](./ECOSYSTEM.md) - How mdxe integrates with mdxld, mdxdb, mdxui, and mdxai
-- [INTEGRATION.md](./INTEGRATION.md) - Primitives integration details (ai-sandbox, ai-functions, ai-workflows)
+- [INTEGRATION.md](./INTEGRATION.md) - Primitives integration details (ai-evaluate, ai-functions, ai-workflows)
 
 ## Quick Start
 
@@ -609,9 +609,9 @@ interface ExecutionResult<T = unknown> {
 }
 ```
 
-### ai-sandbox Integration
+### ai-evaluate Integration
 
-mdxe re-exports `evaluate` and `createEvaluator` from ai-sandbox for secure code execution:
+mdxe re-exports `evaluate` and `createEvaluator` from ai-evaluate (formerly ai-sandbox) for secure code execution:
 
 ```typescript
 import { evaluate } from 'mdxe'
@@ -642,11 +642,10 @@ mdxe integrates with the primitives packages for core functionality:
 
 | Package | Description | Usage in mdxe |
 |---------|-------------|---------------|
-| [ai-sandbox](../../primitives/packages/ai-sandbox) | Secure code execution | `evaluate()`, `createEvaluator()` for running untrusted code |
-| [ai-functions](../../primitives/packages/ai-functions) | AI functions & RPC | RPC types for `@mdxe/rpc`, AI function interfaces |
-| [ai-workflows](../../primitives/packages/ai-workflows) | Event-driven workflows | Workflow types (`on`, `every`, `send`) in SDK provider |
+| [ai-evaluate](https://www.npmjs.com/package/ai-evaluate) | Secure code execution | `evaluate()` for running untrusted code |
+| [ai-workflows](https://www.npmjs.com/package/ai-workflows) | Event-driven workflows | Workflow types (`on`, `every`, `send`) in SDK provider |
 
-### ai-sandbox
+### ai-evaluate
 
 Execute code safely in sandboxed environments:
 
@@ -683,31 +682,17 @@ const handlers = {
 }
 ```
 
-### ai-functions RPC
-
-RPC types for distributed execution:
-
-```typescript
-import type { RPC, RPCPromise, RPCServer, RPCClient } from 'mdxe'
-
-// Use with @mdxe/rpc for capnweb promise pipelining
-```
-
 ## Runtime Packages
 
-mdxe integrates with several runtime-specific packages:
+mdxe is Cloudflare-native only: MDX executes on workerd (Workers in production, Miniflare locally). The former `@mdxe/node`, `@mdxe/bun`, `@mdxe/next`, `@mdxe/honox` and `@mdxe/payload` packages were removed (mdx-8je.7) and are deprecated on npm; the `mdxe admin` command and the `vercel` / `github` deploy platforms went with them.
 
 | Package | Description |
 |---------|-------------|
 | [@mdxe/hono](https://www.npmjs.com/package/@mdxe/hono) | Hono framework integration |
-| [@mdxe/next](https://www.npmjs.com/package/@mdxe/next) | Next.js integration |
-| [@mdxe/node](https://www.npmjs.com/package/@mdxe/node) | Node.js runtime |
-| [@mdxe/bun](https://www.npmjs.com/package/@mdxe/bun) | Bun runtime |
-| [@mdxe/workers](https://www.npmjs.com/package/@mdxe/workers) | Cloudflare Workers |
+| [@mdxe/workers](https://www.npmjs.com/package/@mdxe/workers) | Cloudflare Workers (local dev via Miniflare) |
 | [@mdxe/vitest](https://www.npmjs.com/package/@mdxe/vitest) | Vitest testing integration |
-| [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) | CLI applications with Ink |
+| [@mdxe/ink](https://www.npmjs.com/package/@mdxe/ink) | Terminal viewer (Ink 7) over the @mdxe/tui seam |
 | [@mdxe/isolate](https://www.npmjs.com/package/@mdxe/isolate) | Isolated execution |
-| [@mdxe/rpc](https://www.npmjs.com/package/@mdxe/rpc) | capnweb RPC protocol |
 | [@mdxe/mcp](https://www.npmjs.com/package/@mdxe/mcp) | Model Context Protocol server |
 
 ## Examples

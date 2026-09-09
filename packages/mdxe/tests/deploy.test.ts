@@ -56,34 +56,19 @@ describe('Deploy Command', () => {
       expect(result.adapter).toBe('api')
     })
 
-    it('should detect @mdxdb/postgres as dynamic', () => {
+    it('should detect @mdxdb/do as dynamic', () => {
       writeFileSync(
         join(testDir, 'package.json'),
         JSON.stringify({
           dependencies: {
-            '@mdxdb/postgres': '^1.0.0',
+            '@mdxdb/do': '^1.0.0',
           },
         })
       )
 
       const result = detectSourceType(testDir)
       expect(result.isStatic).toBe(false)
-      expect(result.adapter).toBe('postgres')
-    })
-
-    it('should detect @mdxdb/mongo as dynamic', () => {
-      writeFileSync(
-        join(testDir, 'package.json'),
-        JSON.stringify({
-          dependencies: {
-            '@mdxdb/mongo': '^1.0.0',
-          },
-        })
-      )
-
-      const result = detectSourceType(testDir)
-      expect(result.isStatic).toBe(false)
-      expect(result.adapter).toBe('mongo')
+      expect(result.adapter).toBe('do')
     })
 
     it('should detect @mdxdb/sqlite as dynamic', () => {
@@ -369,10 +354,10 @@ describe('Deploy Command Integration', () => {
 })
 
 describe('API-based Deployment Options', () => {
-  it('should parse --use-api flag', () => {
-    const result = parseArgs(['deploy', '--use-api'])
-    expect(result.command).toBe('deploy')
-    // Note: useApi would need to be added to CLI if we want to support it via command line
+  it('should reject the unimplemented --use-api flag as USAGE (never silently swallowed)', () => {
+    // useApi is a programmatic CloudflareDeployOptions field only; the CLI has no --use-api flag.
+    // Fail closed (mdx-8je.16): an unknown flag is exit 2, never an intentional-looking deploy.
+    expect(() => parseArgs(['deploy', '--use-api'])).toThrow(/unknown flag --use-api/)
   })
 
   it('should support all CloudflareDeployOptions programmatically', async () => {
@@ -564,7 +549,7 @@ export const source = loader({
     expect(result.adapter).toBe('api')
   })
 
-  it('should correctly identify a Fumadocs project with Postgres adapter', () => {
+  it('should correctly identify a Fumadocs project with the Durable Object adapter', () => {
     mkdirSync(join(testDir, 'lib'), { recursive: true })
 
     writeFileSync(
@@ -574,7 +559,7 @@ export const source = loader({
         dependencies: {
           'next': '^14.0.0',
           'fumadocs-core': '^14.0.0',
-          '@mdxdb/postgres': '^1.0.0',
+          '@mdxdb/do': '^1.0.0',
           '@mdxdb/fumadocs': '^1.0.0',
         },
       })
@@ -583,13 +568,11 @@ export const source = loader({
     writeFileSync(
       join(testDir, 'lib', 'source.ts'),
       `
-import { createDatabase } from '@mdxdb/postgres'
+import { MDXDatabase } from '@mdxdb/do'
 import { createSource } from '@mdxdb/fumadocs'
 import { loader } from 'fumadocs-core/source'
 
-const db = createDatabase({
-  connectionString: process.env.DATABASE_URL,
-})
+const db = env.MDXDB.get(env.MDXDB.idFromName('docs'))
 
 const mdxdbSource = createSource(await db.list())
 
@@ -602,6 +585,6 @@ export const source = loader({
 
     const result = detectSourceType(testDir)
     expect(result.isStatic).toBe(false)
-    expect(result.adapter).toBe('postgres')
+    expect(result.adapter).toBe('do')
   })
 })

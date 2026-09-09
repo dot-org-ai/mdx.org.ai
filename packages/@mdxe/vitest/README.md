@@ -310,6 +310,45 @@ users.should.have.length(1)
 ```
 ````
 
+### Sandboxed Tests
+
+Tests that render JSX, use React hooks, or exercise a Hono `app` are not run
+inline. The generated file wraps them in `evaluate({ tests })` from
+[`ai-evaluate/node`](https://www.npmjs.com/package/ai-evaluate) (formerly
+`ai-sandbox`), which runs them in an isolated V8 worker via Miniflare locally
+and Cloudflare `worker_loaders` in production.
+
+A block is a test body, so inside the sandbox it is registered as one `it()`
+(ai-evaluate only counts assertions made inside `it()`). When it fails, the
+thrown error carries the assertion text the sandbox reported for that test,
+for example `renders button: Expected "Go" but got "Stop"`, or the parse or
+timeout error when the worker never ran it (`sandboxFailureMessage()` builds
+that message; it is exported for custom runners).
+
+A block that contains JSX gets a small prelude at the top of its sandbox
+source. ai-evaluate compiles `<div>hi</div>` to `h('div', null, 'hi')`
+(classic runtime) but binds neither `h` nor `Fragment`, so `@mdxe/vitest`
+defines both: `h` returns `{ type, props: { ...props, children } }` (a single
+child is unwrapped), the same shape as the inline path's `createElement` shim,
+and `Fragment` is a component that returns its children. Declare your own `h`
+or `Fragment` inside the block to override them; `SANDBOX_JSX_PRELUDE` exports
+the exact source.
+
+````mdx
+```tsx test name="renders a greeting"
+const el = <div class="greeting">hi</div>
+expect(el.type).toBe('div')
+expect(el.props.children).toBe('hi')
+```
+````
+
+`ai-evaluate` is an optional peer dependency: install it only if you have
+sandboxed tests.
+
+```bash
+pnpm add -D ai-evaluate miniflare
+```
+
 ## Assertions Reference
 
 ### Equality
@@ -489,7 +528,7 @@ jobs:
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
 | [vitest](https://www.npmjs.com/package/vitest) | Test framework |
-| [@mdxe/node](https://www.npmjs.com/package/@mdxe/node) | Node.js MDX evaluation |
+| [@mdxe/workers](https://www.npmjs.com/package/@mdxe/workers) | Cloudflare Workers MDX evaluation (local via Miniflare) |
 
 ## License
 

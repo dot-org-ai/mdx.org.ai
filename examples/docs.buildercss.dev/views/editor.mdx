@@ -32,11 +32,11 @@ A code or text editor view, typically Monaco-based for rich editing.
         <span>7</span>
         <span>8</span>
       </aside>
-      <pre><code>{`import { Database } from 'mdxdb'
+      <pre><code>{`import { DB } from 'mdxdb'
 
 export async function handler(req) {
-  const db = new Database()
-  const items = await db.list()
+  const db = DB({ Item: { name: 'string' } })
+  const items = await db.Item.list()
 
   return Response.json(items)
 }`}</code></pre>

@@ -378,7 +378,7 @@ export function createExecutorTools<TData extends MDXLDData = MDXLDData>(
     {
       target: z.string().optional().describe('Document ID/path or pattern to deploy'),
       platform: z
-        .enum(['vercel', 'cloudflare', 'netlify', 'custom'])
+        .enum(['do', 'cloudflare', 'custom'])
         .optional()
         .describe('Deployment platform'),
       env: z.record(z.string()).optional().describe('Environment variables for deployment'),

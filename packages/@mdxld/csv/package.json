@@ -47,6 +47,7 @@
     "papaparse": "^5.4.1"
   },
   "devDependencies": {
+    "@mdxld/config": "workspace:*",
     "@types/papaparse": "^5.3.14",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

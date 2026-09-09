@@ -8,6 +8,9 @@ import {
   extractTestsFromFile,
   findMDXTestFiles,
   generateTestCode,
+  SANDBOX_MODULE,
+  SANDBOX_JSX_PRELUDE,
+  sandboxFailureMessage,
   runMDXTests,
   createMDXTestTransformer,
   mdxTestPlugin,
@@ -622,6 +625,259 @@ expect(true).toBe(true)
       expect(code).toContain("it('should work', () => {")
       expect(code).toContain('expect(1 + 1).toBe(2)')
     })
+
+    it('should not import the sandbox when no test needs it', () => {
+      const testFile: MDXTestFile = {
+        path: '/path/to/plain.mdx',
+        doc: parse('# Plain'),
+        tests: [
+          { name: 'plain', lang: 'ts', code: 'expect(1).toBe(1)', line: 5, async: false, meta: { test: true } },
+        ],
+        isCompanionTest: false,
+      }
+
+      const code = generateTestCode(testFile)
+
+      expect(code).not.toContain('ai-evaluate')
+      expect(code).not.toContain('ai-sandbox')
+    })
+
+    it('should import evaluate from ai-evaluate/node for sandbox tests (never ai-sandbox)', () => {
+      const testFile: MDXTestFile = {
+        path: '/path/to/jsx.mdx',
+        doc: parse('# JSX'),
+        tests: [
+          {
+            name: 'renders',
+            lang: 'tsx',
+            code: 'const el = <Button label="Go" />\nexpect(el.props.label).toBe("Go")',
+            line: 5,
+            async: false,
+            meta: { test: true },
+          },
+        ],
+        isCompanionTest: false,
+      }
+
+      const code = generateTestCode(testFile)
+
+      expect(SANDBOX_MODULE).toBe('ai-evaluate/node')
+      expect(code).toContain(`import { evaluate } from '${SANDBOX_MODULE}'`)
+      // ai-sandbox was renamed ai-evaluate on 2025-12-20; npm ai-sandbox is a 0.0.0 placeholder
+      expect(code).not.toContain('ai-sandbox')
+      expect(code).toContain('const result = await evaluate({')
+      expect(code).toContain('tests: `')
+    })
+
+    it('generated sandbox import resolves to a real evaluate()', async () => {
+      // Witness that the emitted specifier resolves in an install, which the
+      // old 'ai-sandbox' specifier never could. ai-evaluate/node lazy-loads
+      // miniflare/esbuild, so importing it here has no side effects.
+      const mod = (await import(/* @vite-ignore */ SANDBOX_MODULE)) as { evaluate?: unknown }
+      expect(typeof mod.evaluate).toBe('function')
+    })
+
+    it('should register the sandbox body as an it() and throw sandboxFailureMessage()', () => {
+      const testFile: MDXTestFile = {
+        path: '/path/to/client.mdx',
+        doc: parse('# Client'),
+        tests: [
+          {
+            name: "it's sandboxed",
+            lang: 'ts',
+            code: "'use client'\nexpect(1).toBe(2)",
+            line: 5,
+            async: false,
+            meta: { test: true },
+          },
+        ],
+        isCompanionTest: false,
+      }
+
+      const code = generateTestCode(testFile)
+
+      expect(code).toContain("import { should, assert, sandboxFailureMessage } from '@mdxe/vitest'")
+      // The block is a test body: ai-evaluate only counts assertions inside it().
+      // The name is quoted for the inner it() and then escaped again for the
+      // template literal that carries it into the sandbox, so `'` -> `\\'`.
+      expect(code).toContain("tests: `it('it\\\\'s sandboxed', async () => {")
+      expect(code).toContain("'use client'\nexpect(1).toBe(2)\n})`,")
+      expect(code).toContain('const failure = sandboxFailureMessage(result)')
+      expect(code).toContain('throw new Error(failure)')
+      expect(code).not.toContain('Test failed in sandbox')
+    })
+
+    /**
+     * Pull the exact `tests` template the generator emitted for one sandbox
+     * block and evaluate it as a template literal, undoing escapeForTemplate()
+     * the same way the generated file would when vitest runs it.
+     */
+    function emittedSandboxTests(code: string): string {
+      const match = code.match(/tests: `([\s\S]*?)`,\n\s*\}\)/)
+      if (!match) throw new Error('generated code has no tests: template')
+      return new Function(`return \`${match[1]}\``)() as string
+    }
+
+    function sandboxTestFile(name: string, body: string): MDXTestFile {
+      return {
+        path: '/path/to/sandbox.mdx',
+        doc: parse('# Sandbox'),
+        // 'use client' forces the sandbox path without needing a JSX factory.
+        tests: [{ name, lang: 'ts', code: `'use client'\n${body}`, line: 5, async: false, meta: { test: true } }],
+        isCompanionTest: false,
+      }
+    }
+
+    it(
+      'generated sandbox test surfaces the assertion message through ai-evaluate/node',
+      async () => {
+        const { evaluate } = (await import(/* @vite-ignore */ SANDBOX_MODULE)) as {
+          evaluate: (options: { tests: string }) => Promise<Parameters<typeof sandboxFailureMessage>[0]>
+        }
+
+        const failing = generateTestCode(sandboxTestFile('adds numbers', 'expect(1 + 1).toBe(3)'))
+        const failed = await evaluate({ tests: emittedSandboxTests(failing) })
+        expect(failed.success).toBe(false)
+        // ai-evaluate leaves `error` unset on an assertion failure; the message
+        // is only in testResults, which is what the old generated throw dropped.
+        expect(failed.error).toBeUndefined()
+        const failure = sandboxFailureMessage(failed)
+        expect(failure).toContain('adds numbers')
+        expect(failure).toContain('Expected 3 but got 2')
+
+        const passing = generateTestCode(sandboxTestFile('adds numbers', 'expect(1 + 1).toBe(2)'))
+        const passed = await evaluate({ tests: emittedSandboxTests(passing) })
+        expect(passed.success).toBe(true)
+        expect(passed.testResults?.total).toBe(1)
+        expect(sandboxFailureMessage(passed)).toBeUndefined()
+      },
+      60_000
+    )
+
+    function jsxSandboxTestFile(name: string, body: string): MDXTestFile {
+      return {
+        path: '/path/to/jsx.mdx',
+        doc: parse('# JSX'),
+        // JSX alone routes the block to the sandbox (needsSandbox -> containsJSX).
+        tests: [{ name, lang: 'ts', code: body, line: 5, async: false, meta: { test: true } }],
+        isCompanionTest: false,
+      }
+    }
+
+    it('should bind h/Fragment in the sandbox source only for blocks that contain JSX', () => {
+      expect(SANDBOX_JSX_PRELUDE).toContain('function h(type, props, ...children)')
+      expect(SANDBOX_JSX_PRELUDE).toContain('function Fragment(props)')
+
+      const jsx = generateTestCode(jsxSandboxTestFile('renders', "const el = <div>hi</div>\nexpect(el.type).toBe('div')"))
+      // The prelude opens the tests source, ahead of the it() that carries the body,
+      // so the factory is bound in the enclosing scope when the body runs.
+      expect(jsx).toContain('tests: `' + SANDBOX_JSX_PRELUDE + "\nit('renders', async () => {")
+      expect(jsx).toContain("const el = <div>hi</div>\nexpect(el.type).toBe('div')\n})`,")
+
+      // A sandbox block without JSX (hooks, Hono app, 'use client') gets no prelude.
+      const plain = generateTestCode(sandboxTestFile('no jsx', 'expect(1).toBe(1)'))
+      expect(plain).not.toContain('function h(')
+      expect(plain).not.toContain('Fragment')
+      expect(plain).toContain("tests: `it('no jsx', async () => {")
+    })
+
+    it(
+      'generated JSX sandbox test passes through ai-evaluate/node instead of throwing h is not defined',
+      async () => {
+        const { evaluate } = (await import(/* @vite-ignore */ SANDBOX_MODULE)) as {
+          evaluate: (options: { tests: string }) => Promise<Parameters<typeof sandboxFailureMessage>[0]>
+        }
+
+        const body = [
+          `const el = <div class="greeting">hi</div>`,
+          `expect(el.type).toBe('div')`,
+          `expect(el.props.class).toBe('greeting')`,
+          `expect(el.props.children).toBe('hi')`,
+          `const list = <><span>a</span><span>b</span></>`,
+          `expect(list.type === Fragment).toBe(true)`,
+          `expect(list.props.children.length).toBe(2)`,
+          `expect(list.props.children[1].props.children).toBe('b')`,
+        ].join('\n')
+        const passing = generateTestCode(jsxSandboxTestFile('renders jsx', body))
+        const passed = await evaluate({ tests: emittedSandboxTests(passing) })
+        expect(sandboxFailureMessage(passed)).toBeUndefined()
+        expect(passed.success).toBe(true)
+        expect(passed.testResults?.total).toBe(1)
+
+        // A wrong assertion on a JSX element still fails with its own message,
+        // not the ReferenceError the unbound factory used to throw.
+        const failing = generateTestCode(
+          jsxSandboxTestFile('renders jsx', "const el = <p>x</p>\nexpect(el.type).toBe('div')")
+        )
+        const failed = await evaluate({ tests: emittedSandboxTests(failing) })
+        expect(failed.success).toBe(false)
+        const failure = sandboxFailureMessage(failed)
+        expect(failure).toContain('renders jsx')
+        expect(failure).not.toContain('h is not defined')
+        expect(failure).toContain('Expected')
+      },
+      60_000
+    )
+  })
+
+  describe('sandboxFailureMessage', () => {
+    const passedTest = { name: 'ok', passed: true }
+
+    it('returns undefined when every sandbox test passed', () => {
+      expect(
+        sandboxFailureMessage({ success: true, testResults: { total: 1, tests: [passedTest] }, logs: [] })
+      ).toBeUndefined()
+    })
+
+    it('returns undefined for a plain script run with no tests', () => {
+      expect(sandboxFailureMessage({ success: true, logs: [] })).toBeUndefined()
+    })
+
+    it('names each failed test with its assertion message when error is unset', () => {
+      const message = sandboxFailureMessage({
+        success: false,
+        testResults: {
+          total: 3,
+          tests: [
+            { name: 'a', passed: false, error: 'Expected 2 but got 1' },
+            { name: 'b', passed: false, error: 'Expected "y" but got "x"' },
+            passedTest,
+          ],
+        },
+        logs: [],
+      })
+      expect(message).toBe('a: Expected 2 but got 1\nb: Expected "y" but got "x"')
+    })
+
+    it('surfaces an execution error such as a parse failure', () => {
+      expect(
+        sandboxFailureMessage({ success: false, error: 'Unable to parse "script:0": Unexpected token', logs: [] })
+      ).toBe('Unable to parse "script:0": Unexpected token')
+    })
+
+    it('treats a registration error as a failure even though success is true', () => {
+      // A throw outside it() never reaches testResults; ai-evaluate logs it and
+      // reports success. Without this the block would pass silently.
+      const message = sandboxFailureMessage({
+        success: true,
+        testResults: { total: 0, tests: [] },
+        logs: [{ level: 'error', message: 'Test registration error: h is not defined' }],
+      })
+      expect(message).toBe('h is not defined')
+    })
+
+    it('fails a run that registered no tests at all', () => {
+      expect(sandboxFailureMessage({ success: true, testResults: { total: 0, tests: [] }, logs: [] })).toBe(
+        'No tests ran in sandbox'
+      )
+    })
+
+    it('falls back to a generic message when success is false with nothing else', () => {
+      expect(sandboxFailureMessage({ success: false, logs: [] })).toBe('Test failed in sandbox')
+    })
+  })
+
+  describe('generateTestCode (continued)', () => {
 
     it('should generate async test functions', () => {
       const testFile: MDXTestFile = {

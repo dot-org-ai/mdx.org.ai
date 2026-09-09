@@ -22,6 +22,12 @@ pnpm test
 pnpm --filter <package-name> test
 # e.g., pnpm --filter mdxld test
 
+# Build or test ONE package on a fresh checkout (orders workspace siblings first).
+# `pnpm --filter <pkg> build` runs that package's tsup directly and skips turbo's
+# `^build`, so it is red until siblings whose types resolve to dist/ are built.
+pnpm exec turbo run build --filter=<package-name>
+pnpm exec turbo run test --filter=<package-name>
+
 # Watch mode for development
 pnpm dev
 
@@ -79,45 +85,52 @@ Defines rendering conventions for core components (`Site`, `Docs`, `App`, `Page`
 └── widgets    → Interactive widgets (Chat, Editor, Search)
 ```
 
-> **Note:** Terminal rendering uses `@mdxe/ink` (not @mdxui) because Ink output is inherently coupled to the Ink runtime execution context.
+> **Note:** Terminal output is rendered to plain bytes by `@mdxui/text` (planned). `@mdxe/ink` is a *viewer* over the `@mdxe/tui` seam: it displays those bytes and handles input, never renders MDX itself, loads Ink lazily on `mount()`, and refuses to attach when stdout or stdin is not a TTY.
 
 ### @mdxe - Execution Environments & Protocols
 
-Defines runtimes, servers, and communication protocols:
+Defines runtimes, servers, and communication protocols. Cloudflare-native only (mdx-8je.7): code executes through Dynamic Worker Loaders (workerd) in production and under Miniflare locally; Node and Bun are thin CLI shells, never evaluation runtimes. `test/repo/package-allowlist.test.ts` is the allowlist for `packages/@mdxe` and `packages/@mdxdb`; the former `@mdxe/{node,bun,next,honox,electron,expo,remotion,slidev,vercel,github,payload}` are gone and deprecated on npm.
 
 ```
 @mdxe/
-├── node       → Node.js runtime evaluation
-├── bun        → Bun runtime evaluation
-├── workers    → Cloudflare Workers runtime
+├── workers    → Cloudflare Workers runtime (workers/local = Miniflare)
+├── isolate    → Compile MDX to isolated Worker modules
 ├── hono       → HTTP middleware (Hono)
-├── next       → Next.js App Router integration
-├── ink        → Terminal UI (React Ink) - runtime + rendering
-├── rpc        → capnweb RPC protocol (Node, Bun, Workers)
+├── cli-core   → Leaf shared by mdxe + @mdxe/hono: OutputCtx ladder (Accept rung), caller detection, CliError/EXIT, token oracle
+├── deploy     → Unified deploy over .do (@mdxe/do) and Cloudflare (@mdxe/cloudflare)
+├── fumadocs   → Docs site generation, deployed to Workers via OpenNext
+├── ink        → Ink 7 viewer over the @mdxe/tui seam (displays @mdxui/text bytes; never a renderer)
+├── tui        → Viewer seam: Viewer interface, input abstraction, conformance suite, benchmark harness
 ├── mcp        → Model Context Protocol
-│   ├── stdio  → stdio transport (Node, Bun)
-│   └── http   → HTTP transport (Node, Bun, Workers)
+│   ├── stdio  → stdio transport (CLI shells)
+│   └── http   → HTTP transport (Workers)
 ├── vitest     → Test runner integration
-└── isolate    → V8 isolate compilation
+└── test-utils → Shared fixtures, mocks, matchers
 ```
 
 **Key distinction:**
-- `@mdxe/rpc` uses capnweb's `RPC` and `RPCPromise` from ai-functions
+- RPC is not an `@mdxe` package and `mdxe` re-exports no RPC types: use `rpc.do` directly (`RPC`, `RPCPromise`; capnweb transport via `@dotdo/capnweb`). `@mdxe/rpc` was removed as a duplicate; `ai-functions@2.4` ships no `RPC` / `RPCPromise`.
 - `@mdxe/mcp` is separate - different transports (stdio, http) and different runtimes
 
 ### @mdxdb - Database Adapters
 
 ```
 @mdxdb/
+├── do         → Durable Objects (primary backend: hierarchy, hibernatable WebSockets, parquet export)
+├── sqlite     → Durable Object SQLite graph database (_data / _rels)
+├── vectorize  → Cloudflare Vectorize vector search
+├── parquet    → Pure JS parquet read/write (Workers, Snippets)
 ├── fs         → Filesystem (git-friendly .mdx files)
-├── sqlite     → SQLite/Turso (vector search, local-first)
-├── postgres   → PostgreSQL (pgvector)
-├── mongo      → MongoDB (Atlas Vector Search)
 ├── clickhouse → ClickHouse (analytics)
 ├── api        → HTTP API client
+├── rpc        → rpc.do (capnweb) client
+├── server     → Hono HTTP API server
+├── github     → Octokit-backed store (fetch; runs in Workers)
 ├── fumadocs   → Fumadocs content source
-└── sources    → Unified source interface
+└── sources    → Unified source interface (moving to primitives, mdx-8je.17)
 ```
+
+The former `@mdxdb/{postgres,mongo,git,payload,desktop,mobile,studio}` were removed (mdx-8je.7): none could run in workerd.
 
 ### @mdxld - Parsing & Transformation
 
@@ -170,17 +183,17 @@ Use cases:
 @mdxai/
 ├── claude     → Claude AI with MCP tools
 ├── mastra     → Mastra agent framework
-├── agentkit   → Agent composition toolkit
 └── vapi       → Vapi voice AI
 ```
 
-### Primitives (primitives/)
+### Primitives (npm `ai-*` packages)
 
-AI primitives packages (submodule) providing core functionality:
-- **ai-functions** - AI function definitions, RPC, generation
+AI primitives live in one place, [primitives.org.ai](https://github.com/dot-org-ai/primitives.org.ai), and are consumed here **only as published npm packages** (currently the `^2.4.0` train). They are never vendored as a submodule or linked through the pnpm workspace — `pnpm test:repo` enforces this.
+
+- **ai-functions** - AI function definitions, generation (RPC lives in `rpc.do`, not here)
 - **ai-workflows** - Event-driven workflows with `$` context
 - **ai-database** - Schema-first DB with bi-directional relationships
-- **ai-sandbox** - Test execution environment
+- **ai-evaluate** - Sandboxed code evaluation (used by mdxe)
 
 ## Key Concepts
 
@@ -245,9 +258,9 @@ const email = await toEmail(doc)    // Email HTML for notifications
 ### Execution via Protocols
 
 ```typescript
-// capnweb RPC (from ai-functions)
-import { createRPCServer } from '@mdxe/rpc'
-const rpc = createRPCServer({ functions, port: 3000 })
+// capnweb RPC via rpc.do (there is no @mdxe/rpc and mdxe re-exports no RPC types)
+import { RPC } from 'rpc.do'
+const rpc = RPC<typeof functions>('https://functions.example.com')
 
 // MCP for Claude/AI tools
 import { createMCPServer } from '@mdxe/mcp'
@@ -259,9 +272,9 @@ const mcp = createMCPServer({
 
 ### Database Interface
 
-Schema-first with automatic bi-directional relationships:
+Schema-first with automatic bi-directional relationships. `mdxdb` (packages/mdxdb) is a thin facade over ai-database's `DB()` with the mdxdb backends registered:
 ```ts
-import { DB } from 'ai-database'
+import { DB } from 'mdxdb'
 
 const db = DB({
   Post: {
@@ -282,13 +295,16 @@ const author = await post.author           // Resolved Author
 const posts = await db.Author.get('john').posts  // Post[]
 ```
 
-Provider resolved from `DATABASE_URL`:
+Provider resolved from `DATABASE_URL` (in a Worker pass the env: `DB(schema, { env })`):
 ```bash
-DATABASE_URL=./content              # Filesystem
-DATABASE_URL=sqlite://./content     # SQLite
-DATABASE_URL=libsql://your-db.turso.io  # Turso
-DATABASE_URL=chdb://./content       # ClickHouse (local)
+DATABASE_URL=do://headless.ly            # @mdxdb/do — Durable Object SQLite (primary)
+DATABASE_URL=./content                   # @mdxdb/fs — filesystem
+DATABASE_URL=clickhouse://host:8123/db   # @mdxdb/clickhouse — HTTP
+DATABASE_URL=https://db.example.com      # @mdxdb/api — HTTP API client
+DATABASE_URL=:memory:                    # in-memory (tests)
 ```
+
+`sqlite://<name>` is an alias for `do://<name>`. Unknown schemes, `libsql://` and `chdb://` fail closed (no adapter exists) rather than falling back to memory. Every backend must pass the shared contract suite from `mdxdb/tests`.
 
 ### MDX Test Files
 
@@ -299,7 +315,7 @@ expect(1 + 1).toBe(2)
 ```
 ````
 
-Run with `mdxe test` which uses `ai-sandbox` for execution.
+Run with `mdxe test` which uses `ai-evaluate` (formerly `ai-sandbox`) for execution; `@mdxe/vitest` runs the same blocks under vitest, sandboxing JSX/Hono tests via `ai-evaluate/node`.
 
 ## File Conventions
 
@@ -312,10 +328,14 @@ Run with `mdxe test` which uses `ai-sandbox` for execution.
 
 Each package has its own vitest config. Tests run with:
 ```bash
-pnpm test                           # All packages via turbo
+pnpm test                           # All packages via turbo, then pnpm test:repo
 pnpm --filter mdxld test           # Single package
 pnpm test:mdx                       # MDX-specific tests
+pnpm test:repo                      # Repo-level guard suites (test/repo/, own CI step)
+pnpm exec turbo run test --filter=mdxe  # Single package, siblings built first (fresh checkout)
 ```
+
+Repo-level guards (workspace layout, dependency policy, tsconfig boundaries, README taxonomy) live in `test/repo/` only — see `test/repo/README.md`. Turbo never runs them; `vitest.repo.config.ts` does. Do not put `*.test.ts` under `tests/` (that is the `.mdx` fixture directory) — `test/repo/guard-test-home.test.ts` fails the build if one appears.
 
 ## Dependency Structure
 
@@ -324,22 +344,22 @@ mdxld (core parsing)
 ├── @mdxld/* (AST, compile, validate, jsonld)
 │
 ├── mdxdb (database abstraction)
-│   └── @mdxdb/* (fs, sqlite, postgres, mongo, clickhouse, api)
+│   └── @mdxdb/* (do, sqlite, vectorize, parquet, fs, clickhouse, api, rpc, server, github)
 │
 ├── mdxe (execution)
-│   └── @mdxe/* (node, bun, workers, hono, next, ink, rpc, mcp, vitest)
+│   └── @mdxe/* (workers, isolate, hono, cli-core, deploy, fumadocs, ink, tui, mcp, vitest)
 │
 ├── mdxui (rendering)
 │   └── @mdxui/* (html, json, markdown, email, slack, shadcn)
 │
 └── mdxai (AI integrations)
-    └── @mdxai/* (claude, mastra, agentkit, vapi)
+    └── @mdxai/* (claude, mastra, vapi)
 
-primitives/ (submodule)
-├── ai-functions → used by @mdxe/rpc
+ai-* primitives (npm, ^2.4.0)
+├── ai-functions → AI function definitions and generation (no RPC export; capnweb RPC is rpc.do / @dotdo/capnweb, @mdxe/rpc was removed)
 ├── ai-workflows → used by mdxai
 ├── ai-database → used by mdxdb
-└── ai-sandbox → used by @mdxe/vitest
+└── ai-evaluate → used by mdxe
 ```
 
 ## Creating New Packages
@@ -350,8 +370,8 @@ When creating a new scoped package, ask:
    - Rendering MDX to HTML, JSON, Markdown, Slack, Email, Terminal
 
 2. **Is it about EXECUTION?** → `@mdxe/`
-   - Runtimes (node, bun, workers)
-   - Protocols (rpc, mcp, http)
+   - Runtimes (workers only — Cloudflare-native; no node/bun eval)
+   - Protocols (mcp, http)
    - Testing (vitest)
 
 3. **Is it about STORAGE?** → `@mdxdb/`

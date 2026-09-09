@@ -1,21 +1,21 @@
 ---
 title: Storage Adapters
 description: Choose the right storage backend for your needs
-pages: [index, fs, sqlite, postgres, mongo, clickhouse, api]
+pages: [index, fs, sqlite, clickhouse, api]
 ---
 
 # Storage Adapters
 
-mdxdb supports multiple storage backends through adapter packages.
+mdxdb supports multiple storage backends through adapter packages. All of them run on Cloudflare (Durable Objects, Vectorize, R2-backed parquet) or are runtime-agnostic HTTP clients; the former `@mdxdb/postgres`, `@mdxdb/mongo` and `@mdxdb/git` adapters were removed and are deprecated on npm.
 
 ## Available Adapters
 
 | Package | Backend | Description |
 |---------|---------|-------------|
 | [@mdxdb/fs](/docs/mdxdb/adapters/fs) | File System | Store documents as files |
-| [@mdxdb/sqlite](/docs/mdxdb/adapters/sqlite) | SQLite | Embedded SQL database |
-| [@mdxdb/postgres](/docs/mdxdb/adapters/postgres) | PostgreSQL | Full-featured SQL database |
-| [@mdxdb/mongo](/docs/mdxdb/adapters/mongo) | MongoDB | Document database |
+| [@mdxdb/sqlite](/docs/mdxdb/adapters/sqlite) | Durable Object SQLite | Graph database inside a Durable Object |
+| @mdxdb/do | Durable Objects | Parent/child hierarchy, hibernatable WebSockets, parquet export |
+| @mdxdb/vectorize | Cloudflare Vectorize | Vector search |
 | [@mdxdb/clickhouse](/docs/mdxdb/adapters/clickhouse) | ClickHouse | Analytics database |
 | [@mdxdb/api](/docs/mdxdb/adapters/api) | HTTP | Remote mdxdb server |
 
@@ -58,41 +58,20 @@ mdxdb supports multiple storage backends through adapter packages.
 - Single-writer limitation
 - Not suitable for distributed systems
 
-### @mdxdb/postgres - PostgreSQL
+### @mdxdb/do - Durable Objects
 
 **Best for:**
-- Production applications
-- Multi-server deployments
-- Complex queries
-- Full-text search
+- Production applications on Cloudflare
+- Per-tenant or per-document isolation
+- Real-time collaboration (hibernatable WebSockets)
 
 **Pros:**
-- Robust and battle-tested
-- Advanced query capabilities
-- Excellent full-text search
-- ACID compliance
+- Strongly consistent, single-writer per object
+- Parent/child hierarchy across objects
+- Parquet export to R2 for analytics
 
 **Cons:**
-- Requires database server
-- More complex setup
-
-### @mdxdb/mongo - MongoDB
-
-**Best for:**
-- Document-heavy workloads
-- Flexible schemas
-- Horizontal scaling
-- Real-time applications
-
-**Pros:**
-- Flexible document model
-- Horizontal scaling
-- Rich query language
-- Change streams
-
-**Cons:**
-- Requires MongoDB server
-- No ACID across documents (by default)
+- Cloudflare-only
 
 ### @mdxdb/clickhouse - ClickHouse
 
@@ -133,11 +112,11 @@ The unified interface makes it easy to switch adapters:
 // Development: file system
 import { createDatabase as createFsDb } from '@mdxdb/fs'
 
-// Production: PostgreSQL
-import { createDatabase as createPgDb } from '@mdxdb/postgres'
+// Production: ClickHouse
+import { createClickHouseDatabase } from '@mdxdb/clickhouse'
 
 const db = process.env.NODE_ENV === 'production'
-  ? createPgDb({ connectionString: process.env.DATABASE_URL })
+  ? await createClickHouseDatabase({ url: process.env.CLICKHOUSE_URL })
   : createFsDb({ path: './content' })
 
 // Same API regardless of backend
@@ -146,10 +125,10 @@ const doc = await db.get('articles/hello-world')
 
 ## Custom Adapters
 
-Create your own adapter by implementing the Database interface:
+Create your own adapter by implementing the `Database` interface (exported by every adapter):
 
 ```typescript
-import type { Database, MDXLDDocument } from 'mdxdb'
+import type { Database, MDXLDDocument, SetResult, DeleteResult, ListResult, SearchResult } from '@mdxdb/fs'
 
 class MyCustomAdapter implements Database {
   async get(path: string): Promise<MDXLDDocument | null> {

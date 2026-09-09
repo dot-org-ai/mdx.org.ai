@@ -9,16 +9,12 @@ import {
   listProviders,
   detectPlatform,
   deployToCloudflare,
-  deployToVercel,
-  deployToGitHub,
   deployToDo,
   getDeploymentStatus,
   cancelDeployment,
   deleteDeployment,
   type DeployProvider,
   type Platform,
-  type DeployResult,
-  type DeployOptions,
 } from './index.js'
 
 describe('@mdxe/deploy', () => {
@@ -55,18 +51,9 @@ describe('@mdxe/deploy', () => {
       expect(provider.name).toBe('Cloudflare')
     })
 
-    it('returns vercel provider', () => {
-      const provider = getProvider('vercel')
-      expect(provider).toBeDefined()
-      expect(provider.platform).toBe('vercel')
-      expect(provider.name).toBe('Vercel')
-    })
-
-    it('returns github provider', () => {
-      const provider = getProvider('github')
-      expect(provider).toBeDefined()
-      expect(provider.platform).toBe('github')
-      expect(provider.name).toBe('GitHub Pages')
+    it('no longer ships vercel or github providers (mdx-8je.7: Cloudflare-native only)', () => {
+      expect(() => getProvider('vercel' as Platform)).toThrow('Unknown platform: vercel')
+      expect(() => getProvider('github' as Platform)).toThrow('Unknown platform: github')
     })
 
     it('throws error for unknown platform', () => {
@@ -77,11 +64,7 @@ describe('@mdxe/deploy', () => {
   describe('listProviders', () => {
     it('returns all providers', () => {
       const providers = listProviders()
-      expect(providers).toHaveLength(4)
-      expect(providers.map((p) => p.platform)).toContain('do')
-      expect(providers.map((p) => p.platform)).toContain('cloudflare')
-      expect(providers.map((p) => p.platform)).toContain('vercel')
-      expect(providers.map((p) => p.platform)).toContain('github')
+      expect(providers.map((p) => p.platform).sort()).toEqual(['cloudflare', 'do'])
     })
   })
 
@@ -120,16 +103,13 @@ describe('@mdxe/deploy', () => {
       expect(result.reason).toContain('wrangler.toml')
     })
 
-    it('detects vercel when vercel.json exists', () => {
-      // Create real vercel.json
+    it('ignores vercel.json and falls back to .do (vercel support removed)', () => {
       writeFileSync(join(tmpDir, 'vercel.json'), JSON.stringify({}))
       writeFileSync(join(tmpDir, 'package.json'), JSON.stringify({}))
 
       const result = detectPlatform(tmpDir)
 
-      expect(result.platform).toBe('vercel')
-      expect(result.confidence).toBeGreaterThan(0.9)
-      expect(result.reason).toContain('vercel.json')
+      expect(result.platform).toBe('do')
     })
 
     it('defaults to .do platform when no config found', () => {
@@ -193,7 +173,7 @@ describe('@mdxe/deploy', () => {
         join(tmpDir, 'package.json'),
         JSON.stringify({
           dependencies: {
-            '@mdxdb/postgres': '^1.0.0',
+            '@mdxdb/do': '^1.0.0',
           },
         })
       )
@@ -315,24 +295,6 @@ describe('@mdxe/deploy', () => {
       expect(result.platform).toBe('cloudflare')
     })
 
-    it('deployToVercel sets platform to vercel', async () => {
-      const result = await deployToVercel({
-        projectDir: tmpDir,
-        dryRun: true,
-      })
-
-      expect(result.platform).toBe('vercel')
-    })
-
-    it('deployToGitHub sets platform to github', async () => {
-      const result = await deployToGitHub({
-        projectDir: tmpDir,
-        dryRun: true,
-      })
-
-      expect(result.platform).toBe('github')
-    })
-
     it('deployToDo sets platform to do', async () => {
       const result = await deployToDo({
         projectDir: tmpDir,
@@ -344,8 +306,8 @@ describe('@mdxe/deploy', () => {
   })
 
   describe('getDeploymentStatus', () => {
-    it('returns error when provider does not support status', async () => {
-      const status = await getDeploymentStatus('github', 'test-123')
+    it('returns error when provider does not support status (cloudflare)', async () => {
+      const status = await getDeploymentStatus('cloudflare', 'test-123')
 
       expect(status.success).toBe(false)
       expect(status.error).toContain('does not support status checks')
@@ -357,16 +319,11 @@ describe('@mdxe/deploy', () => {
       expect(status.success).toBe(false)
       expect(status.error).toContain('does not support status checks')
     })
-
-    it('vercel provider supports status checks', async () => {
-      const provider = getProvider('vercel')
-      expect(provider.getStatus).toBeDefined()
-    })
   })
 
   describe('cancelDeployment', () => {
-    it('returns error when provider does not support cancellation (github)', async () => {
-      const result = await cancelDeployment('github', 'test-123')
+    it('returns error when provider does not support cancellation (cloudflare)', async () => {
+      const result = await cancelDeployment('cloudflare', 'test-123')
 
       expect(result.success).toBe(false)
       expect(result.error).toContain('does not support cancellation')
@@ -378,19 +335,9 @@ describe('@mdxe/deploy', () => {
       expect(result.success).toBe(false)
       expect(result.error).toContain('does not support cancellation')
     })
-
-    it('vercel provider supports cancellation', async () => {
-      const provider = getProvider('vercel')
-      expect(provider.cancel).toBeDefined()
-    })
   })
 
   describe('deleteDeployment', () => {
-    it('vercel provider supports deletion', async () => {
-      const provider = getProvider('vercel')
-      expect(provider.delete).toBeDefined()
-    })
-
     it('do provider has deletion method', async () => {
       // Note: DoProvider.delete exists in the class but requires API setup
       // Test that deletion API exists via deleteDeployment function
@@ -399,8 +346,8 @@ describe('@mdxe/deploy', () => {
       expect(result).toBeDefined()
     })
 
-    it('returns error when provider does not support deletion (github)', async () => {
-      const result = await deleteDeployment('github', 'test-123')
+    it('returns error when provider does not support deletion (cloudflare)', async () => {
+      const result = await deleteDeployment('cloudflare', 'test-123')
 
       expect(result.success).toBe(false)
       expect(result.error).toContain('does not support deletion')
@@ -549,14 +496,14 @@ describe('@mdxe/deploy', () => {
       expect(result.reason).toContain('wrangler')
     })
 
-    it('detects .vercel directory', () => {
+    it('ignores a .vercel directory (vercel support removed)', () => {
       const vercelDir = join(tmpDir, '.vercel')
       mkdirSync(vercelDir)
       writeFileSync(join(tmpDir, 'package.json'), JSON.stringify({}))
 
       const result = detectPlatform(tmpDir)
 
-      expect(result.platform).toBe('vercel')
+      expect(result.platform).toBe('do')
     })
   })
 
@@ -568,15 +515,6 @@ describe('@mdxe/deploy', () => {
       const result = detectPlatform(tmpDir)
 
       expect(result.platform).toBe('cloudflare')
-    })
-
-    it('prefers vercel config over default', () => {
-      writeFileSync(join(tmpDir, 'vercel.json'), '{}')
-      writeFileSync(join(tmpDir, 'package.json'), JSON.stringify({}))
-
-      const result = detectPlatform(tmpDir)
-
-      expect(result.platform).toBe('vercel')
     })
 
     it('defaults to do when no explicit config', () => {

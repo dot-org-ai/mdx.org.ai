@@ -189,7 +189,7 @@ export interface DeployOptions {
   /** Target environment */
   target?: string
   /** Deployment platform */
-  platform?: 'vercel' | 'cloudflare' | 'netlify' | 'custom'
+  platform?: 'do' | 'cloudflare' | 'custom'
   /** Environment variables for deployment */
   env?: Record<string, string>
   /** Dry run mode */
@@ -275,7 +275,7 @@ export interface SourceTypeInfo {
   /** Whether the source is static (fs-based) */
   isStatic: boolean
   /** Detected source adapter */
-  adapter?: 'fs' | 'sqlite' | 'postgres' | 'mongo' | 'api' | 'clickhouse' | 'unknown'
+  adapter?: 'fs' | 'sqlite' | 'do' | 'api' | 'clickhouse' | 'unknown'
   /** Path to source configuration */
   configPath?: string
 }
@@ -451,14 +451,10 @@ export function isDeployError(result: DeployResult): result is DeployError {
 /**
  * Executor interface for MDX document execution
  *
- * All runtime adapters (node, workers, isolate, etc.) implement this interface
+ * All runtime adapters (workers, isolate, etc.) implement this interface
  *
  * @example
  * ```ts
- * // Using Node.js executor
- * import { createNodeExecutor } from '@mdxe/node'
- * const executor = createNodeExecutor()
- *
  * // Using Cloudflare Workers executor
  * import { createWorkersExecutor } from '@mdxe/workers'
  * const executor = createWorkersExecutor()

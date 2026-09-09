@@ -217,11 +217,15 @@ export interface CompiledModule {
 // =============================================================================
 // Row Types (internal SQLite representation)
 // =============================================================================
+//
+// These are type aliases rather than interfaces on purpose: `SqlStorage.exec<T>`
+// constrains `T extends Record<string, SqlStorageValue>`, and only object-literal
+// types (not interfaces) get the implicit index signature that satisfies it.
 
 /**
  * _data row in SQLite
  */
-export interface DataRow {
+export type DataRow = {
   url: string
   type: string
   id: string
@@ -239,7 +243,7 @@ export interface DataRow {
 /**
  * _rels row in SQLite
  */
-export interface RelsRow {
+export type RelsRow = {
   id: string
   predicate: string
   reverse: string | null
@@ -252,6 +256,14 @@ export interface RelsRow {
   do: string | null
 }
 
+/**
+ * _meta row in SQLite
+ */
+export type MetaRow = {
+  key: string
+  value: string
+}
+
 // =============================================================================
 // RPC Interface
 // =============================================================================
@@ -261,7 +273,21 @@ export interface RelsRow {
  */
 export interface MDXDatabaseRPC {
   // Identity
-  /** Get the DO's canonical $id */
+  /**
+   * Tell the object its name so it can derive its canonical $id.
+   *
+   * A Durable Object cannot read its own name (`ctx.id.name` is undefined
+   * inside the object in workerd), so the caller that resolved the stub via
+   * `idFromName(name)` passes the same name here. The derived $id is
+   * persisted in `_meta` and survives re-instantiation; later calls with the
+   * same name are no-ops, and a different name is rejected.
+   *
+   * `MDXClient` calls this automatically before its first RPC.
+   *
+   * @returns the canonical $id (`https://<name>`, no trailing slash)
+   */
+  $init(name: string): string
+  /** Get the DO's canonical $id (throws until `$init()` has run) */
   $id(): string
 
   // Thing operations
@@ -298,44 +324,99 @@ export interface MDXDatabaseRPC {
   getDatabaseSize(): number
 }
 
+/**
+ * RPC target type for Durable Object bindings.
+ *
+ * `@cloudflare/workers-types` constrains the generic on
+ * `DurableObjectNamespace<T>` / `DurableObjectStub<T>` to
+ * `Rpc.DurableObjectBranded` (nominal typing for classes that extend
+ * `DurableObject` from `cloudflare:workers`), so the plain structural
+ * `MDXDatabaseRPC` contract cannot be used there directly. This alias attaches
+ * the brand to the contract so bindings, stubs and the `MDXDatabase` class all
+ * share one method surface. Use `MDXDatabaseRPC` for anything that merely
+ * *implements* the methods (clients, in-memory shims, adapters).
+ */
+export type MDXDatabaseTarget = MDXDatabaseRPC & Rpc.DurableObjectBranded
+
+/** Durable Object namespace binding for `MDXDatabase` */
+export type MDXDatabaseNamespace = DurableObjectNamespace<MDXDatabaseTarget>
+
+/** Durable Object stub for a single `MDXDatabase` instance */
+export type MDXDatabaseStub = DurableObjectStub<MDXDatabaseTarget>
+
 // =============================================================================
 // Environment
 // =============================================================================
 
 /**
- * Worker loader interface for dynamic worker creation
+ * Worker Loader binding (Cloudflare Dynamic Workers).
+ *
+ * Mirrors the runtime's `WorkerLoader` interface: `get()` returns a stub
+ * synchronously; the code callback runs only when the isolate is not already
+ * cached under `id`. Declared in wrangler as a `worker_loaders` binding (or
+ * `unsafe.bindings[{ type: "worker-loader" }]` on older wrangler releases).
  */
 export interface WorkerLoader {
   get(
-    id: string,
-    factory: () => Promise<WorkerConfig> | WorkerConfig
-  ): Promise<WorkerInstance>
+    id: string | null,
+    getCode: () => Promise<WorkerLoaderCode> | WorkerLoaderCode
+  ): WorkerStub
 }
 
 /**
- * Worker configuration for loader
+ * Code passed to `WorkerLoader.get()`.
  */
-export interface WorkerConfig {
-  modules: Array<{ name: string; esModule: string }>
-  bindings?: Record<string, unknown>
-  compatibilityDate?: string
+export interface WorkerLoaderCode {
+  compatibilityDate: string
   compatibilityFlags?: string[]
+  mainModule: string
+  /** Module name -> ES module source (or a typed module descriptor) */
+  modules: Record<string, string | WorkerLoaderModule>
+  env?: Record<string, unknown>
+  /** `null` blocks all outbound network access from the loaded worker */
+  globalOutbound?: WorkerFetcher | null
 }
 
 /**
- * Worker instance from loader
+ * Typed module descriptor for `WorkerLoaderCode.modules`
  */
-export interface WorkerInstance {
-  fetch(request: Request): Promise<Response>
-  scheduled?(event: ScheduledEvent): Promise<void>
+export interface WorkerLoaderModule {
+  js?: string
+  cjs?: string
+  text?: string
+  json?: unknown
 }
+
+/**
+ * Stub returned by `WorkerLoader.get()`
+ */
+export interface WorkerStub {
+  getEntrypoint(name?: string, options?: { props?: unknown }): WorkerFetcher
+}
+
+/**
+ * Minimal fetch-capable entrypoint (a `Fetcher`)
+ */
+export interface WorkerFetcher {
+  fetch(request: Request): Promise<Response>
+}
+
+/**
+ * @deprecated Use `WorkerLoaderCode`; kept as an alias for older imports.
+ */
+export type WorkerConfig = WorkerLoaderCode
+
+/**
+ * @deprecated Use `WorkerFetcher`; kept as an alias for older imports.
+ */
+export type WorkerInstance = WorkerFetcher
 
 /**
  * Environment with MDXDatabase binding
  */
 export interface Env {
   /** MDXDatabase Durable Object namespace */
-  MDXDB: DurableObjectNamespace<MDXDatabaseRPC>
+  MDXDB: MDXDatabaseNamespace
   /** Worker loader for dynamic code execution */
   LOADER?: WorkerLoader
 }
@@ -347,7 +428,7 @@ export interface MDXClientConfig {
   /** The $id (canonical URL) for this database */
   $id: string
   /** DO namespace binding (for Workers) */
-  binding?: DurableObjectNamespace<MDXDatabaseRPC>
+  binding?: MDXDatabaseNamespace
   /** Use miniflare (for Node.js) */
   miniflare?: boolean
   /** Miniflare persistence path */

@@ -147,7 +147,7 @@ export interface SourceTypeInfo {
   isStatic: boolean
 
   /** Detected source adapter */
-  adapter?: 'fs' | 'sqlite' | 'postgres' | 'mongo' | 'api' | 'clickhouse' | 'unknown'
+  adapter?: 'fs' | 'sqlite' | 'do' | 'api' | 'clickhouse' | 'unknown'
 
   /** Path to source configuration */
   configPath?: string

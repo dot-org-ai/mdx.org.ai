@@ -379,7 +379,6 @@ interface RenderOptions {
 | Package | Description |
 |---------|-------------|
 | [mdxld](https://www.npmjs.com/package/mdxld) | MDX + Linked Data parser |
-| [@mdxe/next](https://www.npmjs.com/package/@mdxe/next) | Next.js integration |
 | [@mdxe/workers](https://www.npmjs.com/package/@mdxe/workers) | Cloudflare Workers |
 | [hono](https://www.npmjs.com/package/hono) | Web framework |
 

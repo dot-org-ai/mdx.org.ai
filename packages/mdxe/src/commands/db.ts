@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import { ensureLoggedIn } from 'oauth.do'
+import { ensureLoggedIn } from '../auth.js'
 import { resolve, dirname } from 'node:path'
 import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, writeFileSync, watch } from 'node:fs'
 import { join, relative } from 'node:path'
@@ -19,14 +19,13 @@ import { buildInsertQuery, isQuerySafe, escapeValue } from '../utils/sql-escape.
 import { createErrorResponse } from '../utils/errors.js'
 
 export interface DbCliOptions {
-  command: 'dev' | 'publish' | 'server' | 'client' | 'studio'
+  command: 'dev' | 'publish' | 'server' | 'client'
   path: string
   name?: string
   baseUrl: string
   clickhouseUrl?: string
   port: number
   httpPort: number
-  studioPort: number
   dryRun: boolean
   verbose: boolean
   useClickhouse: boolean
@@ -964,47 +963,4 @@ export async function runClient(_options: DbCliOptions): Promise<void> {
   client.on('exit', (code) => {
     process.exit(code ?? 0)
   })
-}
-
-interface StudioServer {
-  stop: () => Promise<void>
-}
-
-interface StudioModule {
-  startStudio: (opts: { contentDir: string; port: number; host: string }) => Promise<StudioServer>
-}
-
-export async function runStudio(options: DbCliOptions): Promise<void> {
-  console.log('🎨 mdxe studio\n')
-
-  const resolvedPath = resolve(options.path)
-  console.log(`📁 Content: ${resolvedPath}`)
-  console.log(`🌐 Studio:  http://localhost:${options.studioPort}\n`)
-
-  try {
-    // Use string variable to prevent static module resolution during type checking
-    const moduleName = '@mdxdb/studio/server'
-    const studioModule: StudioModule = await import(moduleName)
-
-    const server = await studioModule.startStudio({
-      contentDir: resolvedPath,
-      port: options.studioPort,
-      host: 'localhost',
-    })
-
-    console.log('\n✨ Studio ready! Press Ctrl+C to stop.\n')
-
-    process.on('SIGINT', async () => {
-      console.log('\n🛑 Shutting down...')
-      await server.stop()
-      process.exit(0)
-    })
-
-    await new Promise(() => {})
-  } catch (error) {
-    console.error('❌ Failed to start studio:', error)
-    console.log('\n💡 Make sure @mdxdb/studio is installed and built:')
-    console.log('   pnpm add @mdxdb/studio')
-    process.exit(1)
-  }
 }

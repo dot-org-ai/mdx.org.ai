@@ -10,16 +10,14 @@
  * Supported deployment platforms
  * 'do' is the default platform - a managed serverless platform powered by Cloudflare Workers
  */
-export type Platform = 'do' | 'cloudflare' | 'vercel' | 'github'
+export type Platform = 'do' | 'cloudflare'
 
 /**
  * Deployment target within a platform
  */
 export type DeployTarget =
   | 'workers'      // Cloudflare Workers
-  | 'pages'        // Cloudflare Pages or GitHub Pages
-  | 'serverless'   // Vercel Serverless
-  | 'edge'         // Vercel Edge
+  | 'pages'        // Cloudflare Pages
   | 'static'       // Static site (any platform)
 
 /**
@@ -106,83 +104,6 @@ export interface CloudflareOptions extends DeployOptions {
 }
 
 /**
- * Vercel-specific options
- */
-export interface VercelOptions extends DeployOptions {
-  platform: 'vercel'
-
-  /** Team ID or slug */
-  teamId?: string
-
-  /** API token */
-  token?: string
-
-  /** Deploy to production */
-  production?: boolean
-
-  /** Framework override */
-  framework?: 'nextjs' | 'vite' | 'remix' | 'astro' | 'gatsby' | 'nuxt' | 'svelte' | null
-
-  /** Root directory (for monorepos) */
-  rootDirectory?: string
-
-  /** Regions to deploy to */
-  regions?: string[]
-
-  /** Serverless function configuration */
-  functions?: Record<string, {
-    maxDuration?: number
-    memory?: number
-    runtime?: string
-  }>
-
-  /** Git metadata */
-  git?: {
-    commitSha?: string
-    commitMessage?: string
-    commitAuthorName?: string
-    branch?: string
-  }
-}
-
-/**
- * GitHub-specific options
- */
-export interface GitHubOptions extends DeployOptions {
-  platform: 'github'
-
-  /** Repository in format owner/repo */
-  repository?: string
-
-  /** Branch to deploy to (default: gh-pages) */
-  branch?: string
-
-  /** Source branch for content */
-  sourceBranch?: string
-
-  /** GitHub token */
-  token?: string
-
-  /** Commit message */
-  commitMessage?: string
-
-  /** Author name */
-  authorName?: string
-
-  /** Author email */
-  authorEmail?: string
-
-  /** Use GitHub Actions workflow instead of direct push */
-  useActions?: boolean
-
-  /** Clean target branch before deploy */
-  clean?: boolean
-
-  /** Files to preserve when cleaning */
-  preserve?: string[]
-}
-
-/**
  * .do Platform-specific options
  * The default deployment target - managed serverless platform
  */
@@ -226,7 +147,7 @@ export interface DoOptions extends DeployOptions {
 /**
  * Union type of all platform-specific options
  */
-export type PlatformOptions = DoOptions | CloudflareOptions | VercelOptions | GitHubOptions
+export type PlatformOptions = DoOptions | CloudflareOptions
 
 /**
  * Deployment state

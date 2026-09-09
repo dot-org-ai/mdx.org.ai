@@ -3,7 +3,7 @@
  *
  * Provides functions for executing MDX content:
  * - evaluate: Execute compiled MDX with a JSX runtime
- * - evaluateInSandbox: Execute in isolated ai-sandbox environment
+ * - evaluateInSandbox: Execute in an isolated ai-evaluate sandbox
  * - createRuntime: Create a custom MDX runtime
  *
  * @packageDocumentation
@@ -170,8 +170,12 @@ export interface SandboxResult {
 /**
  * Evaluate MDX content in an isolated sandbox environment
  *
- * Uses ai-sandbox for secure, isolated execution. Ideal for
- * untrusted content or when you need isolation guarantees.
+ * Uses ai-evaluate (formerly ai-sandbox) for secure, isolated execution.
+ * Ideal for untrusted content or when you need isolation guarantees.
+ *
+ * The root `ai-evaluate` entry runs on Cloudflare worker_loaders; without a
+ * `LOADER` binding it returns `{ success: false, error }` rather than
+ * throwing. For a local Node runtime see `ai-evaluate/node`.
  *
  * @param content - Raw MDX content to evaluate
  * @param options - Sandbox options
@@ -196,8 +200,8 @@ export interface SandboxResult {
  */
 export async function evaluateInSandbox(content: string, options: SandboxOptions = {}): Promise<SandboxResult> {
   try {
-    // Dynamic import ai-sandbox
-    const { evaluate: sandboxEvaluate } = await import('ai-sandbox')
+    // ai-evaluate is loaded lazily so the plain evaluate/run path never pays for it
+    const { evaluate: sandboxEvaluate } = await import('ai-evaluate')
 
     // Compile MDX first
     const compiled = await compile(content, {
@@ -205,13 +209,16 @@ export async function evaluateInSandbox(content: string, options: SandboxOptions
       ...options.compile,
     })
 
-    // Run in sandbox
+    // Run in sandbox. ai-evaluate allows network by default; SandboxOptions
+    // documents allowNetwork as default-false, so forward it explicitly.
     const result = await sandboxEvaluate({
       script: compiled.code,
       sdk: true,
+      timeout: options.timeout,
+      fetch: options.allowNetwork ?? false,
     })
 
-    return result as SandboxResult
+    return result
   } catch (error) {
     return {
       success: false,

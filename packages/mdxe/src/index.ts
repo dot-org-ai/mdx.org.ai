@@ -52,7 +52,7 @@ export {
  * SDK Provider (Multi-Runtime)
  *
  * Use for Node.js, Bun, or environments with flexible database backends.
- * Supports: memory, fs, sqlite, postgres, clickhouse, mongo
+ * Supports: memory, fs, sqlite, clickhouse
  *
  * @see {@link ./sdk-provider.ts} for implementation
  * @see README.md "SDK Provider" section for decision guide
@@ -216,11 +216,9 @@ export type {
   EveryProxy,
 } from 'ai-workflows'
 
-// Re-export ai-functions RPC types (for @mdxe/rpc integration)
-export type {
-  RPC,
-  RPCPromise,
-} from 'ai-functions'
+// NOTE: no RPC types are re-exported here. The 2.4.0 primitives train moved
+// them from ai-functions to rpc.do; import them from 'rpc.do' directly
+// (@mdxe/rpc was removed in mdx-8je.6).
 
 // =============================================================================
 // VALIDATION SCHEMAS

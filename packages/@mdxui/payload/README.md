@@ -245,8 +245,7 @@ export default buildConfig({
 ## Related Packages
 
 - `mdxld` - Parse and stringify MDX-LD documents
-- `@mdxdb/payload` - Database adapter for Payload CMS
-- `@mdxe/payload` - Run Payload on Cloudflare Workers
+- `@mdxdb/payload` and `@mdxe/payload` were removed in mdx-8je.7 and are deprecated on npm; this package keeps only the UI-side field/collection types.
 
 ## License
 

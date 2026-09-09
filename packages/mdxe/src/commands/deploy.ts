@@ -3,7 +3,7 @@
  *
  * Supports deploying Fumadocs/Next.js sites to Cloudflare Workers using:
  * - Static Assets for static data sources (e.g., @mdxdb/fs)
- * - OpenNext.js for dynamic data sources (e.g., @mdxdb/api, @mdxdb/postgres)
+ * - OpenNext.js for dynamic data sources (e.g., @mdxdb/api, @mdxdb/do)
  *
  * Supports two deployment methods:
  * - wrangler CLI (default) - uses the standard wrangler deployment flow
@@ -17,7 +17,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSy
 import { join, resolve, relative } from 'node:path'
 import type { CloudflareDeployOptions, DeployResult, SourceTypeInfo } from '../types.js'
 import { CloudflareApi, type WorkerMetadata, type WorkerBinding } from '../cloudflare/api.js'
-import { ensureLoggedIn } from 'oauth.do'
+import { ensureLoggedIn } from '../auth.js'
 
 /**
  * Default timeout for fetch requests in milliseconds (60 seconds)
@@ -130,11 +130,8 @@ export function detectSourceType(projectDir: string): SourceTypeInfo {
       if (deps['@mdxdb/api']) {
         return { isStatic: false, adapter: 'api', configPath }
       }
-      if (deps['@mdxdb/postgres']) {
-        return { isStatic: false, adapter: 'postgres', configPath }
-      }
-      if (deps['@mdxdb/mongo']) {
-        return { isStatic: false, adapter: 'mongo', configPath }
+      if (deps['@mdxdb/do']) {
+        return { isStatic: false, adapter: 'do', configPath }
       }
       if (deps['@mdxdb/sqlite']) {
         // SQLite can be static if using D1 or Turso
@@ -155,11 +152,8 @@ export function detectSourceType(projectDir: string): SourceTypeInfo {
   if (configContent.includes('@mdxdb/api') || configContent.includes('createApiClient')) {
     return { isStatic: false, adapter: 'api', configPath }
   }
-  if (configContent.includes('@mdxdb/postgres') || configContent.includes('createDatabase') && configContent.includes('connectionString')) {
-    return { isStatic: false, adapter: 'postgres', configPath }
-  }
-  if (configContent.includes('@mdxdb/mongo')) {
-    return { isStatic: false, adapter: 'mongo', configPath }
+  if (configContent.includes('@mdxdb/do')) {
+    return { isStatic: false, adapter: 'do', configPath }
   }
   if (configContent.includes('@mdxdb/sqlite')) {
     return { isStatic: false, adapter: 'sqlite', configPath }

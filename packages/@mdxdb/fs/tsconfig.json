@@ -3,10 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "skipLibCheck": true,
-    "paths": {
-      "ai-database": ["../../primitives/packages/ai-database/src/index.ts"]
-    }
+    "skipLibCheck": true
   },
   "include": ["src"]
 }

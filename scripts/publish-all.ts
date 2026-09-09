@@ -48,8 +48,6 @@ const MDX_ORG_AI_ORDER = [
   { name: 'mdxld', path: 'packages/mdxld' },
   { name: '@mdxe/cloudflare', path: 'packages/@mdxe/cloudflare' },
   { name: '@mdxe/do', path: 'packages/@mdxe/do' },
-  { name: '@mdxe/github', path: 'packages/@mdxe/github' },
-  { name: '@mdxe/vercel', path: 'packages/@mdxe/vercel' },
   { name: '@mdxdb/sqlite', path: 'packages/@mdxdb/sqlite' },
 
   // Layer 1
@@ -66,11 +64,9 @@ const MDX_ORG_AI_ORDER = [
 
   // Layer 4
   { name: '@mdxui/fumadocs', path: 'packages/@mdxui/fumadocs' },
-  { name: '@mdxdb/payload', path: 'packages/@mdxdb/payload' },
 
   // Layer 5
   { name: '@mdxe/hono', path: 'packages/@mdxe/hono' },
-  { name: '@mdxe/payload', path: 'packages/@mdxe/payload' },
 
   // Layer 6 - Final
   { name: 'mdxe', path: 'packages/mdxe' },

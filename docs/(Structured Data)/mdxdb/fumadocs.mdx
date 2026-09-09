@@ -175,14 +175,14 @@ export const source = createSource(db, {
 })
 ```
 
-### PostgreSQL Backend
+### ClickHouse Backend
 
 ```typescript
 import { createSource } from '@mdxdb/fumadocs'
-import { createDatabase } from '@mdxdb/postgres'
+import { createClickHouseDatabase } from '@mdxdb/clickhouse'
 
-const db = createDatabase({
-  connectionString: process.env.DATABASE_URL,
+const db = await createClickHouseDatabase({
+  url: process.env.CLICKHOUSE_URL,
 })
 
 export const source = createSource(db, {

@@ -12,7 +12,7 @@
  * - @mdxld/validate: Schema validation
  *
  * Optional primitives integration:
- * - mdxld/functions: AI functions, RPC, generation (requires ai-functions)
+ * - mdxld/functions: AI functions, generation (requires ai-functions; capnweb RPC is rpc.do, not ai-functions)
  * - mdxld/database: Schema-first DB with bi-directional relationships (requires ai-database)
  * - mdxld/workflows: Event-driven workflows with $ context (requires ai-workflows)
  *
@@ -24,6 +24,8 @@ export type {
   LDProperties,
   MDXLDData,
   MDXLDDocument,
+  // Deprecated alias of MDXLDDocument, still imported by ai-database's types
+  MDXLD,
   MDXLDDocumentWithAST,
   MDXLDDocumentWithCode,
   MDXLDDocumentFull,
@@ -48,14 +50,7 @@ export { stringify } from './stringify.js'
 export { format, formatTypeComments, formatTypeDefinition, type FormatOptions } from './format.js'
 
 // Types extraction utilities
-export {
-  extractTypesFromContent,
-  generateDtsFromTypes,
-  deduplicateTypes,
-  sortTypes,
-  type ExtractedType,
-  type TypesExtractOptions,
-} from './types-extract.js'
+export { extractTypesFromContent, generateDtsFromTypes, deduplicateTypes, sortTypes, type ExtractedType, type TypesExtractOptions } from './types-extract.js'
 
 // AST utilities
 export { toAst } from './ast.js'

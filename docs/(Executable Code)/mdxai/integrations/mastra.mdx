@@ -180,10 +180,10 @@ const reviewWorkflow = mastra.createWorkflow({
 
 ```typescript
 import { mdxIntegration } from '@mdxai/mastra'
-import { createDatabase } from '@mdxdb/postgres'
+import { createClickHouseDatabase } from '@mdxdb/clickhouse'
 
-const db = createDatabase({
-  connectionString: process.env.DATABASE_URL,
+const db = await createClickHouseDatabase({
+  url: process.env.CLICKHOUSE_URL,
 })
 
 const mastra = new Mastra({

@@ -1,16 +1,19 @@
 {
   "name": "@mdxe/ink",
-  "version": "1.9.0",
-  "description": "Render MDXLD documents in the terminal with Ink",
+  "version": "2.0.0",
+  "description": "Ink viewer for @mdxe/tui: displays @mdxui/text register bytes in the terminal and handles input. Never a renderer; never attaches to a pipe.",
   "type": "module",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
+    },
+    "./viewer": {
+      "types": "./dist/viewer.d.ts",
+      "import": "./dist/viewer.js"
     }
   },
   "files": [
@@ -22,32 +25,37 @@
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:watch": "vitest",
+    "bench": "tsup && node dist/bench.js",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo"
   },
   "keywords": [
     "mdxe",
-    "mdxld",
+    "tui",
     "ink",
+    "viewer",
     "cli",
     "terminal",
     "react"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
-    "mdxld": "workspace:*"
+    "@mdxe/tui": "workspace:^"
   },
   "peerDependencies": {
-    "ink": "^5.0.0",
-    "react": "^18.0.0"
+    "ink": "^7.0.0",
+    "react": "^19.2.0"
   },
   "devDependencies": {
     "@mdxld/config": "workspace:^",
-    "@types/react": "^18.3.0",
-    "ink": "^5.0.1",
-    "ink-testing-library": "^4.0.0",
-    "react": "^18.3.1",
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.2.10",
+    "ink": "^7.1.1",
+    "react": "^19.2.4",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

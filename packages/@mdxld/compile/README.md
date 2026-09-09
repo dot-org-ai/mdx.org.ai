@@ -357,11 +357,11 @@ const { code, frontmatter } = await compile(mdxContent)
 const result = evaluate(code, { jsx: h, Fragment })
 ```
 
-### With ai-sandbox
+### With ai-evaluate
 
 ```typescript
 import { transformTestCode } from '@mdxld/compile'
-import { evaluate } from 'ai-sandbox'
+import { evaluate } from 'ai-evaluate/node' // formerly ai-sandbox
 
 const transformedTests = await transformTestCode(testCode)
 const result = await evaluate({ tests: transformedTests })

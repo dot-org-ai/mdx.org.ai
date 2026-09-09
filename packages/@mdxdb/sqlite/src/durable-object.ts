@@ -2,7 +2,13 @@
  * MDXDatabase Durable Object
  *
  * Clean implementation with _data and _rels tables.
- * $id is derived from the DO name, not stored.
+ *
+ * $id is derived from the DO name. A Durable Object cannot read its own name
+ * (`ctx.id.name` is undefined inside the object in workerd — the name only
+ * exists on the caller's id object), so the caller passes it once via
+ * `$init(name)`; the derived $id is persisted in `_meta` so it survives
+ * re-instantiation. Until then every URL-building operation throws rather
+ * than silently basing URLs on the 64-hex object id.
  *
  * @packageDocumentation
  */
@@ -22,10 +28,11 @@ import type {
   CompiledModule,
   DataRow,
   RelsRow,
+  MetaRow,
   Env,
   WorkerLoader,
 } from './types.js'
-import { getAllSchemaStatements } from './schema/index.js'
+import { getAllSchemaStatements, META_ID_KEY } from './schema/index.js'
 
 // =============================================================================
 // Utilities
@@ -46,10 +53,17 @@ function generateRelId(from: string, predicate: string, to: string): string {
   return `rel_${Math.abs(hash).toString(36)}`
 }
 
+/**
+ * Canonical $id for a DO name: a URL with no trailing slash.
+ * Bare names (e.g. `example.com`) are treated as https hosts.
+ */
+export function baseIdFromName(name: string): string {
+  const base = name.includes('://') ? name : `https://${name}`
+  return base.endsWith('/') ? base.slice(0, -1) : base
+}
+
 function buildUrl(baseId: string, type: string, id: string): string {
-  // Remove trailing slash from baseId if present
-  const base = baseId.endsWith('/') ? baseId.slice(0, -1) : baseId
-  return `${base}/${type}/${id}`
+  return `${baseId}/${type}/${id}`
 }
 
 function hashContent(content: string): string {
@@ -70,11 +84,12 @@ function hashContent(content: string): string {
  * MDXDatabase Durable Object
  *
  * Clean graph database with _data (nodes) and _rels (edges).
- * $id is derived from the DO name.
+ * $id is derived from the DO name supplied via `$init()` (see module docs).
  */
 export class MDXDatabase extends DurableObject<Env> {
   protected sql: SqlStorage
-  private baseId: string
+  /** Resolved canonical $id; undefined until derived from the name or storage. */
+  private baseId?: string
   private initialized = false
   private doCtx: DurableObjectState
   protected loader?: WorkerLoader
@@ -84,11 +99,6 @@ export class MDXDatabase extends DurableObject<Env> {
     this.doCtx = ctx
     this.sql = ctx.storage.sql
     this.loader = env.LOADER
-
-    // Derive $id from DO name
-    // If name looks like a domain, prefix with https://
-    const name = ctx.id.name ?? ctx.id.toString()
-    this.baseId = name.includes('://') ? name : `https://${name}`
   }
 
   private ensureInitialized(): void {
@@ -109,10 +119,68 @@ export class MDXDatabase extends DurableObject<Env> {
   // ===========================================================================
 
   /**
+   * Resolve the canonical $id without requiring it: the runtime-provided
+   * name if there is one, else the value persisted by `$init()`.
+   */
+  private resolveBaseId(): string | undefined {
+    if (this.baseId) return this.baseId
+
+    const name = this.doCtx.id.name
+    if (name) {
+      this.baseId = baseIdFromName(name)
+      return this.baseId
+    }
+
+    this.ensureInitialized()
+    const row = this.sql
+      .exec<MetaRow>('SELECT value FROM _meta WHERE key = ?', META_ID_KEY)
+      .toArray()[0]
+    if (row) this.baseId = row.value
+    return this.baseId
+  }
+
+  /** Canonical $id, or a clear error when the object has not been named. */
+  private get base(): string {
+    const base = this.resolveBaseId()
+    if (!base) {
+      throw new Error(
+        'MDXDatabase has no $id: the runtime did not expose the DO name (ctx.id.name) ' +
+          'and none has been persisted. Call $init(name) with the name passed to ' +
+          'idFromName() first (MDXClient does this automatically).'
+      )
+    }
+    return base
+  }
+
+  /**
+   * Tell the object its name so it can derive (and persist) its $id.
+   * Idempotent for the same name; rejects a different one.
+   */
+  $init(name: string): string {
+    if (typeof name !== 'string' || name.length === 0) {
+      throw new Error('MDXDatabase.$init() requires a non-empty name')
+    }
+    const requested = baseIdFromName(name)
+    const current = this.resolveBaseId()
+    if (current !== undefined && current !== requested) {
+      throw new Error(`MDXDatabase $id mismatch: this object is ${current}, got ${requested}`)
+    }
+
+    this.ensureInitialized()
+    this.sql.exec(
+      'INSERT OR IGNORE INTO _meta (key, value) VALUES (?, ?)',
+      META_ID_KEY,
+      requested
+    )
+    this.baseId = requested
+    return requested
+  }
+
+  /**
    * Get the DO's canonical $id
    */
   $id(): string {
-    return this.baseId
+    return this.base
   }
 
   // ===========================================================================
@@ -173,7 +241,7 @@ export class MDXDatabase extends DurableObject<Env> {
   }
 
   async getById(type: string, id: string): Promise<Thing | null> {
-    return this.get(buildUrl(this.baseId, type, id))
+    return this.get(buildUrl(this.base, type, id))
   }
 
   async create<TData = Record<string, unknown>>(
@@ -182,7 +250,7 @@ export class MDXDatabase extends DurableObject<Env> {
     this.ensureInitialized()
 
     const id = options.id ?? generateId()
-    const url = buildUrl(this.baseId, options.type, id)
+    const url = buildUrl(this.base, options.type, id)
     const now = new Date().toISOString()
 
     // Check if exists
@@ -281,7 +349,7 @@ export class MDXDatabase extends DurableObject<Env> {
     options: CreateOptions<TData>
   ): Promise<Thing<TData>> {
     const id = options.id ?? generateId()
-    const url = buildUrl(this.baseId, options.type, id)
+    const url = buildUrl(this.base, options.type, id)
 
     const existing = await this.get(url)
     if (existing) {
@@ -467,9 +535,11 @@ export class MDXDatabase extends DurableObject<Env> {
       throw new Error(`Thing has no content to compile: ${url}`)
     }
 
-    // Dynamic import to avoid bundling @mdxe/isolate when not needed
+    // Dynamic import to avoid bundling @mdxe/isolate when not needed.
+    // bundleRuntime: the loaded isolate has no node_modules, so the JSX
+    // runtime the MDX component imports must ship inside the module map.
     const { compileToModule } = await import('@mdxe/isolate')
-    const compiled = await compileToModule(thing.content)
+    const compiled = await compileToModule(thing.content, { bundleRuntime: true })
 
     // Store compiled code for caching
     const codeJson = JSON.stringify(compiled)
@@ -519,14 +589,20 @@ export class MDXDatabase extends DurableObject<Env> {
     const { createWorkerConfig } = await import('@mdxe/isolate')
     const config = createWorkerConfig(compiled, { blockNetwork: true })
 
-    // Get or create the worker
-    const worker = await this.loader.get(compiled.hash, async () => ({
-      modules: Object.entries(config.modules).map(([name, esModule]) => ({
-        name,
-        esModule,
-      })),
+    // Get or create the isolate (cached by content hash) and its entrypoint.
+    // Modules are passed as explicit `{ js }` descriptors: the loader infers
+    // the type from the extension otherwise, and the bundled JSX runtime is
+    // named `jsx-runtime` (no extension) by @mdxe/isolate.
+    const stub = this.loader.get(compiled.hash, () => ({
       compatibilityDate: config.compatibilityDate,
+      mainModule: config.mainModule,
+      modules: Object.fromEntries(
+        Object.entries(config.modules).map(([name, js]) => [name, { js }])
+      ),
+      env: config.env,
+      globalOutbound: config.globalOutbound === null ? null : undefined,
     }))
+    const worker = stub.getEntrypoint()
 
     // Call the function
     const request = new Request(`http://worker/call/${options.fn}`, {
@@ -570,12 +646,17 @@ export class MDXDatabase extends DurableObject<Env> {
       return { functions: [], hasDefault: false, exports: [] }
     }
 
-    // Extract exports from compiled code
+    // Extract exports from compiled code. getExports() lists *named* exports
+    // only (it never reports `default` by contract), so the default export is
+    // detected separately from the compiled MDX source.
     const { getExports } = await import('@mdxe/isolate')
     const allExports = getExports(compiled)
+    const mdxCode = compiled.modules['mdx.js'] ?? ''
+    const hasDefault =
+      /\bexport\s+default\b/.test(mdxCode) ||
+      /\bexport\s*\{[^}]*\bas\s+default\b[^}]*\}/.test(mdxCode)
 
     // Determine which are functions (heuristic: check for function patterns)
-    const mdxCode = compiled.modules['mdx.js'] ?? ''
     const functions: string[] = []
     const other: string[] = []
 
@@ -593,7 +674,7 @@ export class MDXDatabase extends DurableObject<Env> {
 
     return {
       functions,
-      hasDefault: allExports.includes('default'),
+      hasDefault,
       exports: other,
     }
   }
@@ -604,8 +685,11 @@ export class MDXDatabase extends DurableObject<Env> {
   async render(url: string, props?: Record<string, unknown>): Promise<string> {
     this.ensureInitialized()
 
-    // Call the default export with props
-    const result = await this.call<{ html?: string; toString?: () => string }>(url, {
+    // Call the default export with props. The result crosses the isolate
+    // boundary as JSON, so it is always a string or a plain object here: a
+    // custom toString() can never survive the trip, and checking `'toString'
+    // in obj` would match Object.prototype.toString ("[object Object]").
+    const result = await this.call<{ html?: string }>(url, {
       fn: 'default',
       args: [props ?? {}],
     })
@@ -618,12 +702,11 @@ export class MDXDatabase extends DurableObject<Env> {
       if ('html' in result.result && typeof result.result.html === 'string') {
         return result.result.html
       }
-      if ('toString' in result.result && typeof result.result.toString === 'function') {
-        return result.result.toString()
-      }
     }
 
-    // Serialize as JSON if nothing else works
+    // Otherwise the default export returned an element tree from the bundled
+    // JSX runtime; serialise it as JSON (there is no HTML renderer in the
+    // isolate — tracked as model gap mdx-cbe).
     return JSON.stringify(result.result)
   }
 

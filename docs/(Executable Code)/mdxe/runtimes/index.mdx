@@ -1,51 +1,29 @@
 ---
 title: Runtimes
-description: MDX execution across JavaScript runtimes
+description: MDX execution on Cloudflare Workers, locally through workerd
 defaultOpen: true
-pages: [index, node, next, workers, hono, ink]
+pages: [index, workers, hono, ink]
 ---
 
 # Runtimes
 
-mdxe provides adapters for executing MDX in any JavaScript environment.
+mdxe is Cloudflare-native. Arbitrary MDX code executes through Dynamic Worker Loaders (workerd) everywhere: in production via the `worker_loaders` binding, and locally via a Miniflare host worker. The Node and Bun CLIs are thin shells that boot workerd; there is no Node or Bun evaluation path.
+
+The former `@mdxe/node`, `@mdxe/bun`, `@mdxe/next`, `@mdxe/honox`, `@mdxe/electron`, `@mdxe/expo`, `@mdxe/slidev` and `@mdxe/remotion` packages were removed and are deprecated on npm.
 
 ## Available Runtimes
 
 | Runtime | Package | Use Case |
 |---------|---------|----------|
-| Node.js | [@mdxe/node](/docs/mdxe/runtimes/node) | Server-side, build tools, CLI |
-| Next.js | [@mdxe/next](/docs/mdxe/runtimes/next) | Full-stack React apps |
-| Workers | [@mdxe/workers](/docs/mdxe/runtimes/workers) | Cloudflare edge computing |
-| Hono | [@mdxe/hono](/docs/mdxe/runtimes/hono) | Lightweight edge servers |
-| Ink | [@mdxe/ink](/docs/mdxe/runtimes/ink) | Terminal applications |
+| Workers | [@mdxe/workers](/docs/mdxe/runtimes/workers) | Cloudflare edge computing; `@mdxe/workers/local` runs the same code under Miniflare |
+| Hono | [@mdxe/hono](/docs/mdxe/runtimes/hono) | HTTP serving on Workers |
+| Ink | [@mdxe/ink](/docs/mdxe/runtimes/ink) | Terminal viewer |
 
 ## Choosing a Runtime
 
-### Server-Side Rendering
-
-For traditional server rendering, use `@mdxe/node`:
-
-```typescript
-import { execute } from '@mdxe/node'
-
-const html = await execute(mdx, {
-  outputFormat: 'html',
-})
-```
-
-### Full-Stack Applications
-
-For Next.js applications, use `@mdxe/next`:
-
-```typescript
-import { compileMDX } from '@mdxe/next'
-
-const { content } = await compileMDX({ source: mdx })
-```
-
 ### Edge Computing
 
-For Cloudflare Workers or similar, use `@mdxe/workers`:
+For Cloudflare Workers, use `@mdxe/workers`:
 
 ```typescript
 import { execute } from '@mdxe/workers'
@@ -58,18 +36,44 @@ export default {
 }
 ```
 
-### CLI Applications
+### Local Development
 
-For terminal UIs, use `@mdxe/ink`:
+The same evaluator runs locally under Miniflare, so local behaviour matches production:
 
 ```typescript
-import { render } from '@mdxe/ink'
+import { createLocalEvaluator } from '@mdxe/workers/local'
 
-render(mdx, {
-  components: {
-    Box: InkBox,
-    Text: InkText,
-  },
+const evaluator = createLocalEvaluator()
+const result = await evaluator.evaluate(mdx)
+await evaluator.dispose()
+```
+
+### HTTP Servers
+
+For serving MDX over HTTP, use `@mdxe/hono`:
+
+```typescript
+import { Hono } from 'hono'
+import { mdx } from '@mdxe/hono'
+
+const app = new Hono()
+app.use('*', mdx({ root: './content' }))
+export default app
+```
+
+### CLI Applications
+
+For terminal UIs, render to plain bytes and display them with the `@mdxe/ink` viewer. The viewer never renders MDX itself; it displays frames and handles input:
+
+```typescript
+import { createInkViewer } from '@mdxe/ink'
+
+const viewer = createInkViewer()
+const handle = await viewer.mount(frames, {
+  terminal: { stdout: process.stdout, stdin: process.stdin },
+})
+handle.onAction((action) => {
+  /* quit | scroll | page | jump | select | back | search | insert | resize */
 })
 ```
 
@@ -106,10 +110,9 @@ interface ExecuteOptions {
 
 ## Feature Comparison
 
-| Feature | Node | Next | Workers | Hono | Ink |
-|---------|------|------|---------|------|-----|
-| React Components | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Server Components | - | ✓ | - | - | - |
-| Streaming | ✓ | ✓ | ✓ | ✓ | - |
-| Hot Reload | ✓ | ✓ | - | - | ✓ |
-| File System | ✓ | ✓ | - | - | ✓ |
+| Feature | Workers | Hono | Ink |
+|---------|---------|------|-----|
+| React Components | ✓ | ✓ | ✓ |
+| Streaming | ✓ | ✓ | - |
+| Hot Reload | ✓ (Miniflare) | ✓ (Miniflare) | ✓ |
+| File System | - | - | ✓ |

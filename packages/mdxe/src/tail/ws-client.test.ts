@@ -8,9 +8,18 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { TailClient, type TailClientOptions } from './ws-client.js'
-import { type MdxeEvent, createEvent } from './types.js'
+import { TailClient } from './ws-client.js'
+import { createEvent } from './types.js'
 import { type EventFilter } from './filter.js'
+
+/**
+ * Minimal CloseEvent shape. `CloseEvent` is not a global under the library
+ * tsconfig (lib: ES2022 + @types/node), so the mock declares what it needs.
+ */
+interface MockCloseEvent extends Event {
+  code: number
+  reason: string
+}
 
 // WebSocket readyState constants
 const WS_CONNECTING = 0
@@ -30,7 +39,7 @@ class MockWebSocket {
   url: string
   readyState: number = WS_CONNECTING
   onopen: ((event: Event) => void) | null = null
-  onclose: ((event: CloseEvent) => void) | null = null
+  onclose: ((event: MockCloseEvent) => void) | null = null
   onmessage: ((event: MessageEvent) => void) | null = null
   onerror: ((event: Event) => void) | null = null
   sentMessages: string[] = []
@@ -46,7 +55,7 @@ class MockWebSocket {
   close(): void {
     this.readyState = WS_CLOSED
     if (this.onclose) {
-      this.onclose({ code: 1000, reason: 'Normal closure' } as CloseEvent)
+      this.onclose({ code: 1000, reason: 'Normal closure' } as MockCloseEvent)
     }
   }
 
@@ -73,7 +82,7 @@ class MockWebSocket {
   simulateClose(code = 1000, reason = 'Normal closure'): void {
     this.readyState = WS_CLOSED
     if (this.onclose) {
-      this.onclose({ code, reason } as CloseEvent)
+      this.onclose({ code, reason } as MockCloseEvent)
     }
   }
 }
@@ -82,10 +91,12 @@ class MockWebSocket {
 let mockWebSocketInstance: MockWebSocket | null = null
 
 // Create mock constructor with static properties
+// Kept as a plain vi.fn mock (not cast to typeof WebSocket) so `.mock`,
+// `.mockClear()` and the vitest matchers stay typed; vi.stubGlobal accepts any value.
 const mockWebSocketConstructor = vi.fn((url: string) => {
   mockWebSocketInstance = new MockWebSocket(url)
   return mockWebSocketInstance
-}) as unknown as typeof WebSocket & { mockClear: () => void }
+})
 
 // Add static properties to the mock constructor
 Object.defineProperty(mockWebSocketConstructor, 'CONNECTING', { value: WS_CONNECTING })

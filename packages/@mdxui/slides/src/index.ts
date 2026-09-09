@@ -3,7 +3,7 @@
  *
  * Provides abstract types and utilities for rendering MDXLD documents as
  * presentations/slideshows. Concrete implementations are provided by
- * runtime packages like @mdxe/slidev and @mdxe/remotion.
+ * slide/video runtimes (the former @mdxe/slidev and @mdxe/remotion packages were removed in mdx-8je.7).
  *
  * This package defines:
  * - Slide/Presentation types aligned with digital-tools Nouns

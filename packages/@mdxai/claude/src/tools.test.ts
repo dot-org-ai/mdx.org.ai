@@ -419,7 +419,7 @@ describe('createExecutorTools', () => {
       // @ts-expect-error - accessing handler for testing
       const result = await deployTool.handler({
         target: 'test/doc',
-        platform: 'vercel',
+        platform: 'do',
       })
 
       const parsed = JSON.parse((result.content[0] as { text: string }).text)
@@ -449,7 +449,7 @@ describe('createExecutorTools', () => {
       // @ts-expect-error - accessing handler for testing
       const result = await deployTool.handler({
         target: 'test/doc',
-        platform: 'netlify',
+        platform: 'cloudflare',
         dryRun: true,
       })
 

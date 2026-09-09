@@ -33,8 +33,8 @@ mdxe is the **execution layer** of the mdx.org.ai ecosystem. While other package
     +-------+--------+     +-------+--------+     +-------+--------+
     | @mdxld/compile |     |  @mdxdb/fs     |     | @mdxui/html    |
     | @mdxld/ast     |     |  @mdxdb/sqlite |     | @mdxui/json    |
-    | @mdxld/jsonld  |     |  @mdxdb/postgres|    | @mdxui/email   |
-    | @mdxld/validate|     |  @mdxdb/mongo  |     | @mdxui/slack   |
+    | @mdxld/jsonld  |     |  @mdxdb/do     |     | @mdxui/email   |
+    | @mdxld/validate|     |  @mdxdb/clickhouse|  | @mdxui/slack   |
     +----------------+     +----------------+     +----------------+
             |                      |                      |
             +----------+-----------+----------+-----------+
@@ -47,9 +47,9 @@ mdxe is the **execution layer** of the mdx.org.ai ecosystem. While other package
     |   +--------------+  +--------------+  +--------------+     |
     |   |  Runtimes    |  |  Protocols   |  |  Servers     |     |
     |   |              |  |              |  |              |     |
-    |   | @mdxe/node   |  | @mdxe/rpc    |  | @mdxe/hono   |     |
-    |   | @mdxe/bun    |  | @mdxe/mcp    |  | @mdxe/next   |     |
-    |   | @mdxe/workers|  |              |  | @mdxe/ink    |     |
+    |   | @mdxe/workers|  | @mdxe/mcp    |  | @mdxe/hono   |     |
+    |   | (Miniflare   |  | (RPC: use    |  | @mdxe/fumadocs|    |
+    |   |  locally)    |  | rpc.do)      |  | @mdxe/ink    |     |
     |   +--------------+  +--------------+  +--------------+     |
     |                                                            |
     +-------------------------+----------------------------------+
@@ -61,7 +61,7 @@ mdxe is the **execution layer** of the mdx.org.ai ecosystem. While other package
                     |                   |
                     | @mdxai/claude     |
                     | @mdxai/mastra     |
-                    | @mdxai/agentkit   |
+                    | @mdxai/vapi       |
                     +-------------------+
 
     ============================================================================
@@ -155,8 +155,7 @@ const post = await sdkFS.db.create({
 | `DATABASE_URL=./content` | @mdxdb/fs | Git-versioned content |
 | `DATABASE_URL=sqlite://./db` | @mdxdb/sqlite | Local-first apps |
 | `DATABASE_URL=libsql://...` | @mdxdb/sqlite | Turso edge database |
-| `DATABASE_URL=postgresql://...` | @mdxdb/postgres | Production workloads |
-| `DATABASE_URL=mongodb://...` | @mdxdb/mongo | Document flexibility |
+| Durable Object binding | @mdxdb/do | Production workloads on Cloudflare |
 | `DATABASE_URL=clickhouse://...` | @mdxdb/clickhouse | Analytics |
 
 ### mdxe + mdxui: Rendering to Different Formats
@@ -240,7 +239,7 @@ const response = await claude.chat({
 | Pattern | mdxe Package | mdxai Package | Use Case |
 |---------|--------------|---------------|----------|
 | MCP Server | @mdxe/mcp | - | Claude Code tools |
-| RPC Functions | @mdxe/rpc | - | Distributed AI calls |
+| RPC Functions | rpc.do `RPC` (no @mdxe package) | - | Distributed AI calls |
 | Claude Integration | mdxe | @mdxai/claude | Claude-powered apps |
 | Agent Framework | mdxe | @mdxai/mastra | Multi-agent systems |
 | Voice AI | mdxe | @mdxai/vapi | Voice interfaces |
@@ -263,8 +262,6 @@ my-docs-site/
 │   ├── api/                    # API routes (via @mdxe/hono)
 │   │   ├── docs.ts
 │   │   └── search.ts
-│   ├── admin/                  # Admin dashboard (via @mdxe/next)
-│   │   └── page.tsx
 │   └── index.ts                # Main entry
 ├── package.json
 └── wrangler.toml              # Cloudflare deployment
@@ -276,18 +273,14 @@ my-docs-site/
 
 ```typescript
 // src/db.ts
-import { createDB } from 'mdxdb'
-import { createFSAdapter } from '@mdxdb/fs'
-import { createSQLiteAdapter } from '@mdxdb/sqlite'
+import { DB } from 'mdxdb'
 
-// Development: filesystem for git-friendly content
-export const contentDB = await createDB({
-  adapter: createFSAdapter({ path: './content' })
-})
-
-// Production: SQLite for vector search
-export const searchDB = await createDB({
-  adapter: createSQLiteAdapter({ path: './search.db' })
+// Backend resolves from DATABASE_URL:
+//   ./content          -> @mdxdb/fs (development, version-controlled content)
+//   do://my-app        -> @mdxdb/do (production, Durable Object SQLite)
+export const db = DB({
+  Post: { title: 'string', content: 'markdown', author: 'Author.posts' },
+  Author: { name: 'string', email: 'string' },
 })
 ```
 
@@ -508,26 +501,25 @@ What are you building?
 |   |
 |   +-- Git-friendly files --> @mdxdb/fs
 |   +-- Local-first app --> @mdxdb/sqlite
-|   +-- Production DB --> @mdxdb/postgres
-|   +-- Document store --> @mdxdb/mongo
+|   +-- Production DB --> @mdxdb/do
+|   +-- Vector search --> @mdxdb/vectorize
 |   +-- Analytics --> @mdxdb/clickhouse
 |   +-- Remote API --> @mdxdb/api
 |
 +-- Executing MDX?
 |   |
-|   +-- Which runtime?
-|   |   +-- Node.js --> @mdxe/node
-|   |   +-- Bun --> @mdxe/bun
+|   +-- Which runtime? (Cloudflare-native only)
 |   |   +-- Cloudflare --> @mdxe/workers
+|   |   +-- Locally --> @mdxe/workers/local (Miniflare)
 |   |
 |   +-- Which server?
 |   |   +-- Lightweight HTTP --> @mdxe/hono
-|   |   +-- Full-stack React --> @mdxe/next
+|   |   +-- Docs site --> @mdxe/fumadocs (OpenNext on Workers)
 |   |   +-- Terminal UI --> @mdxe/ink
 |   |
 |   +-- Which protocol?
 |       +-- AI tools (Claude) --> @mdxe/mcp
-|       +-- RPC calls --> @mdxe/rpc
+|       +-- RPC calls --> rpc.do (no @mdxe/rpc)
 |
 +-- Rendering MDX?
 |   |
@@ -542,7 +534,7 @@ What are you building?
     |
     +-- Claude AI --> @mdxai/claude
     +-- Agent framework --> @mdxai/mastra
-    +-- Agent composition --> @mdxai/agentkit
+    +-- Agent composition --> autonomous-agents (primitive; no @mdxai/agentkit)
     +-- Voice AI --> @mdxai/vapi
 ```
 
@@ -552,7 +544,7 @@ What are you building?
 |----------|-----------------|
 | **Static Docs Site** | mdxld, @mdxdb/fs, @mdxui/html |
 | **API with Database** | mdxld, mdxe, @mdxe/hono, @mdxdb/sqlite |
-| **Full-Stack App** | mdxld, mdxe, @mdxe/next, @mdxdb/postgres, @mdxui/shadcn |
+| **Full-Stack App** | mdxld, mdxe, @mdxe/hono, @mdxdb/do, @mdxui/shadcn |
 | **CLI Tool** | mdxld, mdxe, @mdxe/ink |
 | **AI-Powered App** | mdxld, mdxe, @mdxe/mcp, @mdxai/claude |
 | **Multi-tenant SaaS** | mdxld, mdxe, @mdxe/workers, @mdxdb/sqlite (Turso), @mdxe/do |
@@ -562,9 +554,8 @@ What are you building?
 
 | Runtime | Package | Startup | Memory | Best For |
 |---------|---------|---------|--------|----------|
-| Node.js | @mdxe/node | Slow | High | Full applications |
-| Bun | @mdxe/bun | Fast | Medium | Local development |
 | Workers | @mdxe/workers | Instant | Low | Edge, global scale |
+| Miniflare | @mdxe/workers/local | Fast | Low | Local development (same workerd code) |
 | Isolate | @mdxe/isolate | Instant | Low | Sandboxed execution |
 
 ## Related Documentation

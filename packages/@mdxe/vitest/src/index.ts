@@ -289,6 +289,97 @@ function containsJSX(code: string): boolean {
 }
 
 /**
+ * Module the generated test file imports `evaluate` from when a test needs the
+ * sandbox. Resolved from the consumer project, so ai-evaluate is an optional
+ * peer dependency of @mdxe/vitest.
+ */
+export const SANDBOX_MODULE = 'ai-evaluate/node'
+
+/**
+ * Prelude prepended to the sandbox `tests` source of a block that contains JSX.
+ *
+ * ai-evaluate compiles JSX with the classic runtime (`jsxFactory: 'h'`,
+ * `jsxFragment: 'Fragment'`) but binds neither name, so a bare `<div />` throws
+ * `ReferenceError: h is not defined` inside the worker. This binds both with
+ * the same plain-object shape the inline path's `createElement` shim produces,
+ * so `el.type` / `el.props.children` assertions read the same on either path.
+ * A block that declares its own `h` or `Fragment` shadows these: the body runs
+ * inside the `it()` callback, one scope below.
+ */
+export const SANDBOX_JSX_PRELUDE = [
+  `// JSX factory for the sandbox: ai-evaluate compiles <tag/> to h() but binds no h`,
+  `function h(type, props, ...children) {`,
+  `  return { type, props: { ...props, children: children.length === 1 ? children[0] : children } }`,
+  `}`,
+  `function Fragment(props) {`,
+  `  return props.children`,
+  `}`,
+].join('\n')
+
+/**
+ * The parts of an ai-evaluate `EvaluateResult` that decide whether a sandboxed
+ * test block passed. Declared structurally so @mdxe/vitest never imports its
+ * optional peer at build time.
+ */
+export interface SandboxResult {
+  /** Whether the worker ran to completion. Assertion failures do NOT clear this on their own. */
+  success: boolean
+  /** Execution-level error (compile error, timeout, missing binding). Unset on a plain assertion failure. */
+  error?: string | undefined
+  /** Per-test results; the assertion message lives in `tests[].error`. */
+  testResults?:
+    | {
+        total: number
+        tests: Array<{ name: string; passed: boolean; error?: string | undefined }>
+      }
+    | undefined
+  /** Console output captured inside the sandbox. */
+  logs?: Array<{ level: string; message: string }> | undefined
+}
+
+/** Prefix ai-evaluate's worker logs when the test body throws before any `it()` registers. */
+const SANDBOX_REGISTRATION_ERROR = 'Test registration error:'
+
+/**
+ * Explain why a sandboxed test block failed, or return `undefined` when it passed.
+ *
+ * ai-evaluate reports an assertion failure as `success: false` with `error`
+ * unset - the message is only in `testResults.tests[].error`. It also treats a
+ * throw outside `it()` as a registration error: `success` stays true, no test
+ * is counted, and the message only reaches the console log. Both cases are
+ * failures of the block; this folds them, plus any execution error, into one
+ * message the generated `throw` can surface.
+ */
+export function sandboxFailureMessage(result: SandboxResult): string | undefined {
+  const lines: string[] = []
+
+  if (result.error) {
+    lines.push(result.error)
+  }
+
+  const failedTests = (result.testResults?.tests ?? []).filter((t) => !t.passed)
+  for (const t of failedTests) {
+    lines.push(t.error ? `${t.name}: ${t.error}` : t.name)
+  }
+
+  for (const log of result.logs ?? []) {
+    if (log.level === 'error' && log.message.startsWith(SANDBOX_REGISTRATION_ERROR)) {
+      lines.push(log.message.slice(SANDBOX_REGISTRATION_ERROR.length).trim())
+    }
+  }
+
+  if (lines.length === 0) {
+    if (!result.success) return 'Test failed in sandbox'
+    if (result.testResults && result.testResults.total === 0) {
+      return 'No tests ran in sandbox'
+    }
+    return undefined
+  }
+
+  return lines.join('\n')
+}
+
+/**
  * Check if code needs sandbox features (app, Hono, JSX rendering)
  */
 function needsSandbox(code: string): boolean {
@@ -412,11 +503,17 @@ export function generateTestCode(testFile: MDXTestFile): string {
 
   lines.push(`// Generated from: ${fileName}`)
   lines.push(`import { describe, it, expect, vi } from 'vitest'`)
-  lines.push(`import { should, assert } from '@mdxe/vitest'`)
+  lines.push(
+    anySandboxTests
+      ? `import { should, assert, sandboxFailureMessage } from '@mdxe/vitest'`
+      : `import { should, assert } from '@mdxe/vitest'`
+  )
 
-  // Add sandbox import if needed
+  // Add sandbox import if needed. Generated files run under vitest in Node, so
+  // use the `ai-evaluate/node` entry (Miniflare fallback); the root entry needs a
+  // Cloudflare worker_loaders binding. ai-evaluate is the renamed ai-sandbox.
   if (anySandboxTests) {
-    lines.push(`import { evaluate } from 'ai-sandbox'`)
+    lines.push(`import { evaluate } from '${SANDBOX_MODULE}'`)
   }
 
   // Add detected imports
@@ -452,14 +549,31 @@ export function generateTestCode(testFile: MDXTestFile): string {
     const itFn = isSkipped ? 'it.skip' : 'it'
 
     if (test.needsSandbox) {
-      // Wrap sandbox-needing tests in evaluate call
+      // Wrap sandbox-needing tests in evaluate call. A block is a test body, not
+      // a suite (the inline path wraps it in it() too), and ai-evaluate only
+      // counts code inside it(): a bare `expect()` throw at the top level is a
+      // "registration error" that leaves success=true. So register the body as
+      // one it() inside the sandbox and let sandboxFailureMessage() surface the
+      // assertion text, which ai-evaluate reports in testResults, not `error`.
+      // A block with JSX also needs the h/Fragment factory bound ahead of the
+      // it(): ai-evaluate compiles <tag/> to h() but defines no h (mdx-8je.37).
       const escapedCode = escapeForTemplate(test.code)
-      lines.push(`  ${itFn}('${test.name.replace(/'/g, "\\'")}', async () => {`)
+      const quotedName = test.name.replace(/'/g, "\\'")
+      const sandboxName = escapeForTemplate(test.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'"))
+      lines.push(`  ${itFn}('${quotedName}', async () => {`)
       lines.push(`    const result = await evaluate({`)
-      lines.push(`      tests: \`${escapedCode}\`,`)
+      if (containsJSX(test.code)) {
+        lines.push(`      tests: \`${escapeForTemplate(SANDBOX_JSX_PRELUDE)}`)
+        lines.push(`it('${sandboxName}', async () => {`)
+      } else {
+        lines.push(`      tests: \`it('${sandboxName}', async () => {`)
+      }
+      lines.push(escapedCode)
+      lines.push(`})\`,`)
       lines.push(`    })`)
-      lines.push(`    if (!result.success) {`)
-      lines.push(`      throw new Error(result.error || 'Test failed in sandbox')`)
+      lines.push(`    const failure = sandboxFailureMessage(result)`)
+      lines.push(`    if (failure) {`)
+      lines.push(`      throw new Error(failure)`)
       lines.push(`    }`)
       lines.push(`  })`)
     } else {

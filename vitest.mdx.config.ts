@@ -32,7 +32,7 @@ export default defineConfig({
           '@mdxld/compile',
           '@mdxld/evaluate',
           '@mdxld/validate',
-          'ai-sandbox',
+          'ai-evaluate',
         ],
       },
     },
@@ -40,11 +40,11 @@ export default defineConfig({
   resolve: {
     alias: {
       // Core packages
-      'mdxld': path.resolve(__dirname, 'packages/mdxld/src/index.ts'),
-      'mdxe': path.resolve(__dirname, 'packages/mdxe/src/index.ts'),
-      'mdxdb': path.resolve(__dirname, 'packages/mdxdb/src/index.ts'),
-      'mdxui': path.resolve(__dirname, 'packages/mdxui/src/index.ts'),
-      'mdxai': path.resolve(__dirname, 'packages/mdxai/src/index.ts'),
+      mdxld: path.resolve(__dirname, 'packages/mdxld/src/index.ts'),
+      mdxe: path.resolve(__dirname, 'packages/mdxe/src/index.ts'),
+      mdxdb: path.resolve(__dirname, 'packages/mdxdb/src/index.ts'),
+      mdxui: path.resolve(__dirname, 'packages/mdxui/src/index.ts'),
+      mdxai: path.resolve(__dirname, 'packages/mdxai/src/index.ts'),
 
       // @mdxe packages
       '@mdxe/hono': path.resolve(__dirname, 'packages/@mdxe/hono/src/index.ts'),
@@ -68,8 +68,7 @@ export default defineConfig({
       '@mdxld/evaluate': path.resolve(__dirname, 'packages/@mdxld/evaluate/src/index.ts'),
       '@mdxld/validate': path.resolve(__dirname, 'packages/@mdxld/validate/src/index.ts'),
 
-      // Primitives packages
-      'ai-sandbox': path.resolve(__dirname, 'primitives/packages/ai-sandbox/src/index.ts'),
+      // Primitives (ai-*) resolve from npm — no local aliases.
     },
   },
 })

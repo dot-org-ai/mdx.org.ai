@@ -267,15 +267,10 @@ mdxld provides optional re-exports of AI primitives packages for convenient acce
 ### AI Functions
 
 ```typescript
-import { RPC, AI, generateText, generateObject } from 'mdxld/functions'
+import { AI, generateText, generateObject } from 'mdxld/functions'
 
-// Use RPC primitives with capnweb promise pipelining
-const rpc = RPC({
-  functions: {
-    hello: () => 'world',
-    greet: (name: string) => `Hello, ${name}!`,
-  },
-})
+// capnweb RPC is not part of ai-functions (2.4 ships no RPC / RPCPromise);
+// use rpc.do directly: import { RPC } from 'rpc.do'
 
 // Use AI function constructors
 const summarize = AI('Generate a summary', {
@@ -391,7 +386,7 @@ For additional functionality, use these companion packages:
 
 | Package | Description | Import |
 |---------|-------------|--------|
-| [ai-functions](https://npmjs.com/package/ai-functions) | RPC, AI functions, generation | `mdxld/functions` |
+| [ai-functions](https://npmjs.com/package/ai-functions) | AI functions, generation (no RPC; capnweb RPC is [rpc.do](https://npmjs.com/package/rpc.do)) | `mdxld/functions` |
 | [ai-database](https://npmjs.com/package/ai-database) | Schema-first DB with bi-directional relationships | `mdxld/database` |
 | [ai-workflows](https://npmjs.com/package/ai-workflows) | Event-driven workflows with $ context | `mdxld/workflows` |
 

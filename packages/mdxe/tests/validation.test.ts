@@ -344,7 +344,7 @@ describe('CliOptionsSchema', () => {
     })
 
     it('validates all platform types', () => {
-      const platforms = ['do', 'cloudflare', 'vercel', 'github'] as const
+      const platforms = ['do', 'cloudflare'] as const
       for (const platform of platforms) {
         const options = {
           command: 'deploy',
@@ -353,6 +353,13 @@ describe('CliOptionsSchema', () => {
         }
         const result = CliOptionsSchema.safeParse(options)
         expect(result.success).toBe(true)
+      }
+    })
+
+    it('rejects the platforms pruned in mdx-8je.7', () => {
+      for (const platform of ['vercel', 'github', 'netlify']) {
+        const result = CliOptionsSchema.safeParse({ command: 'deploy', projectDir: '/path', platform })
+        expect(result.success).toBe(false)
       }
     })
 

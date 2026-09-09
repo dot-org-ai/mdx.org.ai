@@ -49,6 +49,15 @@ export interface TransformJSXOptions {
    * @default 'esnext'
    */
   target?: string
+
+  /**
+   * Output module format. Pass `null` to leave the code unwrapped: esbuild
+   * treats a top-level `return` as CommonJS and, when asked for a module
+   * format, wraps it in a `__commonJS` shim and emits `export default`,
+   * which breaks function-body output.
+   * @default 'esm'
+   */
+  format?: 'esm' | 'cjs' | 'iife' | null
 }
 
 /**
@@ -97,6 +106,7 @@ export async function transformJSX(
     sourcefile = 'input.tsx',
     minify = false,
     target = 'esnext',
+    format = 'esm',
   } = options
 
   const transformOptions: TransformOptions = {
@@ -106,7 +116,7 @@ export async function transformJSX(
     sourcefile,
     minify,
     target,
-    format: 'esm',
+    format: format ?? undefined,
   }
 
   try {
@@ -142,6 +152,7 @@ export function transformJSXSync(
     sourcefile = 'input.tsx',
     minify = false,
     target = 'esnext',
+    format = 'esm',
   } = options
 
   // Use dynamic require for sync version
@@ -154,7 +165,7 @@ export function transformJSXSync(
     sourcefile,
     minify,
     target,
-    format: 'esm',
+    format: format ?? undefined,
   })
 
   return {
@@ -290,7 +301,12 @@ export const frontmatter = ${JSON.stringify(frontmatter ?? {})};`
 `
   }
 
-  const result = await transformJSX(codeToTransform, transformOptions)
+  // function-body output carries a top-level `return`; a module format would
+  // make esbuild wrap it in a __commonJS shim and emit `export default`.
+  const result = await transformJSX(codeToTransform, {
+    format: outputFormat === 'module' ? 'esm' : null,
+    ...transformOptions,
+  })
 
   return {
     ...result,

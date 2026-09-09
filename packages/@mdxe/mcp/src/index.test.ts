@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { Readable, Writable, PassThrough } from 'node:stream'
+import { describe, it, expect } from 'vitest'
+import { PassThrough } from 'node:stream'
 import {
   MCPServer,
   createMCPServer,
-  type MCPServerOptions,
   type MDXLDDocument,
   type MCPTool,
   type MCPResource,
@@ -85,8 +84,8 @@ describe('@mdxe/mcp', () => {
 
       const tools = server.listTools()
       expect(tools).toHaveLength(1)
-      expect(tools[0].name).toBe('sum')
-      expect(tools[0].description).toBe('Add two numbers')
+      expect(tools[0]?.name).toBe('sum')
+      expect(tools[0]?.description).toBe('Add two numbers')
     })
 
     it('should handle tools with minimal data', () => {
@@ -102,8 +101,8 @@ describe('@mdxe/mcp', () => {
 
       const tools = server.listTools()
       expect(tools).toHaveLength(1)
-      expect(tools[0].name).toBe('anonymous-tool')
-      expect(tools[0].description).toBe('A tool with minimal information')
+      expect(tools[0]?.name).toBe('anonymous-tool')
+      expect(tools[0]?.description).toBe('A tool with minimal information')
     })
 
     it('should generate JSON schema from parameters', () => {
@@ -125,10 +124,10 @@ describe('@mdxe/mcp', () => {
       })
 
       const tools = server.listTools()
-      expect(tools[0].inputSchema.type).toBe('object')
-      expect(tools[0].inputSchema.properties).toHaveProperty('query')
-      expect(tools[0].inputSchema.properties).toHaveProperty('limit')
-      expect(tools[0].inputSchema.properties).toHaveProperty('filter')
+      expect(tools[0]?.inputSchema.type).toBe('object')
+      expect(tools[0]?.inputSchema.properties).toHaveProperty('query')
+      expect(tools[0]?.inputSchema.properties).toHaveProperty('limit')
+      expect(tools[0]?.inputSchema.properties).toHaveProperty('filter')
     })
 
     it('should register tool handlers', () => {
@@ -199,7 +198,7 @@ describe('@mdxe/mcp', () => {
       const result = await server.callTool('calculate', { a: 5, b: 3 })
 
       expect(result.isError).toBeUndefined()
-      expect(result.content[0].text).toBe('8')
+      expect(result.content[0]?.text).toBe('8')
     })
 
     it('should return error for non-existent tool', async () => {
@@ -210,7 +209,7 @@ describe('@mdxe/mcp', () => {
       const result = await server.callTool('missing', {})
 
       expect(result.isError).toBe(true)
-      expect(result.content[0].text).toContain('Tool not found')
+      expect(result.content[0]?.text).toContain('Tool not found')
     })
 
     it('should return error for tool without handler', async () => {
@@ -227,7 +226,7 @@ describe('@mdxe/mcp', () => {
       const result = await server.callTool('unimplemented', {})
 
       expect(result.isError).toBe(true)
-      expect(result.content[0].text).toContain('Tool handler not implemented')
+      expect(result.content[0]?.text).toContain('Tool handler not implemented')
     })
 
     it('should handle tool handler errors', async () => {
@@ -251,7 +250,7 @@ describe('@mdxe/mcp', () => {
       const result = await server.callTool('failing', {})
 
       expect(result.isError).toBe(true)
-      expect(result.content[0].text).toBe('Something went wrong')
+      expect(result.content[0]?.text).toBe('Something went wrong')
     })
 
     it('should format tool result as JSON', async () => {
@@ -276,7 +275,7 @@ describe('@mdxe/mcp', () => {
       const result = await server.callTool('data', {})
 
       expect(result.isError).toBeUndefined()
-      const parsed = JSON.parse(result.content[0].text)
+      const parsed = JSON.parse(result.content[0]?.text ?? '')
       expect(parsed.users).toEqual(['Alice', 'Bob'])
       expect(parsed.count).toBe(2)
     })
@@ -300,9 +299,9 @@ describe('@mdxe/mcp', () => {
 
       const resources = server.listResources()
       expect(resources).toHaveLength(1)
-      expect(resources[0].uri).toBe('https://example.com/docs/readme')
-      expect(resources[0].name).toBe('readme')
-      expect(resources[0].mimeType).toBe('text/markdown')
+      expect(resources[0]?.uri).toBe('https://example.com/docs/readme')
+      expect(resources[0]?.name).toBe('readme')
+      expect(resources[0]?.mimeType).toBe('text/markdown')
     })
 
     it('should handle custom mime types', () => {
@@ -321,7 +320,7 @@ describe('@mdxe/mcp', () => {
       })
 
       const resources = server.listResources()
-      expect(resources[0].mimeType).toBe('application/json')
+      expect(resources[0]?.mimeType).toBe('application/json')
     })
 
     it('should generate resource URI when missing', () => {
@@ -336,7 +335,7 @@ describe('@mdxe/mcp', () => {
       })
 
       const resources = server.listResources()
-      expect(resources[0].uri).toContain('resource://')
+      expect(resources[0]?.uri).toContain('resource://')
     })
 
     it('should read resource content', async () => {
@@ -403,8 +402,8 @@ describe('@mdxe/mcp', () => {
 
       const prompts = server.listPrompts()
       expect(prompts).toHaveLength(1)
-      expect(prompts[0].name).toBe('summarize')
-      expect(prompts[0].arguments).toHaveLength(2)
+      expect(prompts[0]?.name).toBe('summarize')
+      expect(prompts[0]?.arguments).toHaveLength(2)
     })
 
     it('should handle prompts without arguments', () => {
@@ -422,7 +421,7 @@ describe('@mdxe/mcp', () => {
       })
 
       const prompts = server.listPrompts()
-      expect(prompts[0].arguments).toBeUndefined()
+      expect(prompts[0]?.arguments).toBeUndefined()
     })
 
     it('should get prompt with template substitution', async () => {
@@ -442,8 +441,9 @@ describe('@mdxe/mcp', () => {
       })
 
       expect(result.messages).toHaveLength(1)
-      expect(result.messages[0].role).toBe('user')
-      expect(result.messages[0].content.text).toBe('Hello, Alice! Welcome to Wonderland.')
+      const [message] = result.messages
+      expect(message?.role).toBe('user')
+      expect(message?.content.text).toBe('Hello, Alice! Welcome to Wonderland.')
     })
 
     it('should throw error for non-existent prompt', async () => {

@@ -541,7 +541,7 @@ await deploy({
 })
 ```
 
-Detection: Dynamic data sources (`@mdxdb/postgres`, `@mdxdb/api`, etc.)
+Detection: Dynamic data sources (`@mdxdb/do`, `@mdxdb/sqlite`, `@mdxdb/api`, etc.)
 
 ### Pages Mode
 

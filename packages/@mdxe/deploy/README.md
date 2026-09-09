@@ -1,6 +1,8 @@
 # @mdxe/deploy
 
-Unified deployment interface for MDX projects. Deploy to .do, Cloudflare, Vercel, or GitHub Pages with a single API.
+Unified deployment interface for MDX projects. Deploy to the .do platform or directly to Cloudflare Workers with a single API.
+
+Both targets run on Cloudflare Workers. Vercel and GitHub Pages providers were removed in 2.0 (mdx-8je.7: mdx.org.ai is Cloudflare-native only); `@mdxe/vercel` and `@mdxe/github` are deprecated on npm and receive no further releases.
 
 ## Installation
 
@@ -15,7 +17,7 @@ pnpm add @mdxe/deploy
 ```typescript
 import { deploy } from '@mdxe/deploy'
 
-// Detects platform from wrangler.toml, vercel.json, or defaults to .do
+// Detects Cloudflare from wrangler.toml / wrangler.jsonc, otherwise defaults to .do
 const result = await deploy({
   projectDir: './my-project',
   name: 'my-site',
@@ -38,27 +40,13 @@ await deploy({
   projectDir: './my-project',
   platform: 'cloudflare',
 })
-
-// Deploy to Vercel
-await deploy({
-  projectDir: './my-project',
-  platform: 'vercel',
-  production: true,
-})
-
-// Deploy to GitHub Pages
-await deploy({
-  projectDir: './my-project',
-  platform: 'github',
-  repository: 'user/repo',
-})
 ```
 
 ## Platform Detection
 
 The package automatically detects the best platform based on:
 
-1. **Explicit config** - `wrangler.toml` → Cloudflare, `vercel.json` → Vercel
+1. **Explicit config** - `wrangler.toml` / `wrangler.jsonc` → Cloudflare
 2. **Default** - .do platform (managed serverless)
 
 ```typescript
@@ -66,18 +54,16 @@ import { detectPlatform } from '@mdxe/deploy'
 
 const detection = detectPlatform('./my-project')
 console.log(detection)
-// { platform: 'do', confidence: 0.9, framework: 'nextjs', isStatic: false }
+// { platform: 'do', confidence: 0.9, framework: 'vite', isStatic: true }
 ```
 
 ## Platform-Specific Helpers
 
 ```typescript
-import { deployToDo, deployToCloudflare, deployToVercel, deployToGitHub } from '@mdxe/deploy'
+import { deployToDo, deployToCloudflare } from '@mdxe/deploy'
 
 await deployToDo({ projectDir: '.' })
 await deployToCloudflare({ projectDir: '.' })
-await deployToVercel({ projectDir: '.' })
-await deployToGitHub({ projectDir: '.' })
 ```
 
 ## Deployment Management
@@ -85,14 +71,12 @@ await deployToGitHub({ projectDir: '.' })
 ```typescript
 import { getDeploymentStatus, cancelDeployment, deleteDeployment } from '@mdxe/deploy'
 
-// Check status (Vercel)
-const status = await getDeploymentStatus('vercel', 'deployment-id')
+// Delete a .do worker
+await deleteDeployment('do', 'worker-name')
 
-// Cancel deployment
-await cancelDeployment('vercel', 'deployment-id')
-
-// Delete deployment
-await deleteDeployment('vercel', 'deployment-id')
+// Status checks and cancellation return { success: false, error } for providers
+// that do not implement them.
+const status = await getDeploymentStatus('cloudflare', 'deployment-id')
 ```
 
 ## Custom Providers

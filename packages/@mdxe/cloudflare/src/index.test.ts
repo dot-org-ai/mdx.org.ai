@@ -139,14 +139,14 @@ describe('detectSourceType()', () => {
     expect(result.adapter).toBe('fs')
   })
 
-  it('detects postgres adapter from source.config.ts', async () => {
+  it('detects do adapter from source.config.ts', async () => {
     const { detectSourceType } = await import('./workers.js')
-    const dir = createTestDir('detect-postgres')
-    createSourceConfig(dir, `import { createDatabase } from '@mdxdb/postgres'\nconnectionString: 'postgres://...'`)
+    const dir = createTestDir('detect-do')
+    createSourceConfig(dir, `import { MDXDatabase } from '@mdxdb/do'`)
 
     const result = detectSourceType(dir)
     expect(result.isStatic).toBe(false)
-    expect(result.adapter).toBe('postgres')
+    expect(result.adapter).toBe('do')
   })
 
   it('detects api adapter from source.config.ts', async () => {
@@ -159,14 +159,14 @@ describe('detectSourceType()', () => {
     expect(result.adapter).toBe('api')
   })
 
-  it('detects mongo adapter from package.json dependencies', async () => {
+  it('detects do adapter from package.json dependencies', async () => {
     const { detectSourceType } = await import('./workers.js')
-    const dir = createTestDir('detect-mongo')
-    createPackageJson(dir, { '@mdxdb/mongo': '^1.0.0' })
+    const dir = createTestDir('detect-do-pkg')
+    createPackageJson(dir, { '@mdxdb/do': '^1.0.0' })
 
     const result = detectSourceType(dir)
     expect(result.isStatic).toBe(false)
-    expect(result.adapter).toBe('mongo')
+    expect(result.adapter).toBe('do')
   })
 
   it('detects sqlite adapter from source.config.ts', async () => {
