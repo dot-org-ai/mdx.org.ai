@@ -35,6 +35,8 @@ export interface BenchmarkReport {
   readonly runtime: string
   readonly startupMs: number
   readonly installBytes: number | null
+  /** Number of packages under the measured install, when the caller counted them. */
+  readonly installPackages?: number
   readonly repaint: RepaintStats
   readonly samplesMs: readonly number[]
 }

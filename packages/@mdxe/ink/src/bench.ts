@@ -54,7 +54,7 @@ async function main(): Promise<void> {
   const here = dirname(fileURLToPath(import.meta.url))
   const install = await transitiveInstallBytes(here, ['ink', 'react'])
   const report = await benchmark(() => createInkViewer(), { installBytes: install.bytes, repaints: 50 })
-  process.stdout.write(formatReport({ ...report, installPackages: install.packages } as typeof report) + '\n')
+  process.stdout.write(formatReport({ ...report, installPackages: install.packages }) + '\n')
 }
 
 main().catch((error: unknown) => {

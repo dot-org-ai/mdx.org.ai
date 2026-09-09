@@ -66,8 +66,15 @@ async function load<T>(pkg: string, url: string, importer: () => Promise<T>): Pr
   try {
     return await importer()
   } catch (err) {
+    // Only a missing module is "not installed"; an installed adapter that throws
+    // during init (which may also say "not found") must surface as itself.
+    const code = (err as { code?: unknown } | null)?.code
     const msg = err instanceof Error ? err.message : String(err)
-    if (/Cannot find (module|package)|Failed to resolve|not found|ERR_MODULE_NOT_FOUND/i.test(msg)) {
+    if (
+      code === 'ERR_MODULE_NOT_FOUND' ||
+      code === 'ERR_PACKAGE_PATH_NOT_EXPORTED' ||
+      /Cannot find (module|package)|Failed to resolve (import|module)|ERR_MODULE_NOT_FOUND/i.test(msg)
+    ) {
       throw new AdapterNotInstalledError(pkg, url, err)
     }
     throw err
