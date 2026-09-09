@@ -46,9 +46,19 @@
     "directory": "packages/@mdxld/extract"
   },
   "dependencies": {
+    "@mdxld/diff": "workspace:*",
+    "@mdxld/markdown": "workspace:*",
     "mdxld": "workspace:*"
   },
+  "peerDependencies": {
+    "ai-functions": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ai-functions": { "optional": true }
+  },
   "devDependencies": {
+    "@mdxui/text": "^0.1.0",
+    "ai-functions": "^2.4.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

@@ -15,7 +15,8 @@
  * @packageDocumentation
  */
 
-import { roundTripComponent, type ComponentExtractor } from './extract.js'
+import { parseTable, renderTable } from '@mdxld/markdown'
+import { type ComponentExtractor } from './extract.js'
 
 // =============================================================================
 // Types
@@ -76,36 +77,11 @@ export interface ExtractedEntities {
 // =============================================================================
 
 /**
- * Parse a markdown table into structured data
+ * Parse a markdown table into structured data — `@mdxld/markdown`'s `parseTable`, the one
+ * table parser in the repo (mdx-8je.12).
  */
 export function parseMarkdownTable(content: string): { headers: string[]; rows: Record<string, string>[] } {
-  const lines = content.trim().split('\n').filter(line => line.trim())
-
-  if (lines.length < 2) {
-    return { headers: [], rows: [] }
-  }
-
-  // Parse header row
-  const headerLine = lines[0]!
-  const headers = headerLine
-    .split('|')
-    .filter(Boolean)
-    .map(cell => cell.trim())
-
-  // Skip separator row (|---|---|)
-  const dataLines = lines.slice(2)
-
-  // Parse data rows
-  const rows = dataLines.map(line => {
-    const cells = line.split('|').filter(Boolean).map(cell => cell.trim())
-    const row: Record<string, string> = {}
-    headers.forEach((header, i) => {
-      row[header] = cells[i] ?? ''
-    })
-    return row
-  })
-
-  return { headers, rows }
+  return parseTable(content)
 }
 
 /**
@@ -127,22 +103,7 @@ export function renderMarkdownTable(
     return '_No columns_'
   }
 
-  // Build header
-  const header = `| ${cols.join(' | ')} |`
-  const separator = `|${cols.map(() => '---').join('|')}|`
-
-  // Build rows
-  const rows = items.slice(0, options.limit).map(item => {
-    const cells = cols.map(col => {
-      const value = item[col]
-      if (value === null || value === undefined) return ''
-      if (typeof value === 'object') return JSON.stringify(value)
-      return String(value)
-    })
-    return `| ${cells.join(' | ')} |`
-  })
-
-  return [header, separator, ...rows].join('\n')
+  return renderTable(cols, items.slice(0, options.limit))
 }
 
 /**

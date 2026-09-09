@@ -20,8 +20,14 @@ import {
   merge3way, resolveConflict,
   // Object diffing
   diffObjects, diffJSON, diffArrays,
+  // Path-based diff, apply and 3-way merge of structured data
+  diffPaths, applyPaths, merge3wayObjects,
 } from '@mdxld/diff'
 ```
+
+This is the one diff implementation in the mdx.org.ai repo: `@mdxld/extract` re-exports
+`diffPaths` / `applyPaths` / `merge3wayObjects` as `diff` / `applyExtract` / `mergeExtract`,
+and `@mdxld/markdown` ships no diff of its own.
 
 ## Text Diffing
 
@@ -191,6 +197,11 @@ if (result.hasConflicts) {
 }
 ```
 
+`merged` is the merged CONTENT (never a patch). Changes to different lines with an untouched
+line between them merge cleanly; the same line changed differently on both sides, or two
+changes that touch, become one region marked `<<<<<<< ours` / `||||||| base` / `=======` /
+`>>>>>>> theirs`, and `conflicts` carries the base, ours and theirs text of each region.
+
 ### resolveConflict(content, resolution)
 
 Resolve all conflicts by choosing a side.
@@ -251,6 +262,52 @@ const diff = diffArrays(['a', 'b', 'c'], ['a', 'c', 'd'])
 //   moved: [],
 //   hasChanges: true
 // }
+```
+
+## Structured Data: Path-Based Diff, Apply and 3-Way Merge
+
+These walk nested objects by dotted leaf path (`data.title`); arrays are leaves compared deeply,
+so a list of objects whose keys are merely reordered is not a change.
+
+### diffPaths(original, extracted, paths?)
+
+```typescript
+diffPaths({ data: { title: 'Hello', author: 'Jane' } }, { data: { title: 'Hi', tags: ['a'] } })
+// {
+//   added: { data: { tags: ['a'] } },
+//   modified: { 'data.title': { from: 'Hello', to: 'Hi' } },
+//   removed: ['data.author'],
+//   hasChanges: true
+// }
+```
+
+### applyPaths(original, extracted, options?)
+
+Overlay `extracted` onto a copy of `original`, leaf by leaf. Paths absent from `extracted` are
+left alone. `options.paths` restricts which paths apply; `options.arrayMerge` is `'replace'`
+(default), `'append'` or `'prepend'`.
+
+```typescript
+applyPaths({ title: 'Hello', tags: ['a'] }, { tags: ['b'] }, { arrayMerge: 'append' })
+// { title: 'Hello', tags: ['a', 'b'] }
+```
+
+### merge3wayObjects(base, ours, theirs, options?)
+
+`merge3way` for objects: a path changed on one side takes that side, changed identically on
+both takes it, changed differently on both is a conflict. Two conflicting strings are first
+line-merged with `merge3way`. Conflicts are resolved by `options.onConflict` (`'ours'` by
+default, or `'theirs'` / `'base'`) and always reported.
+
+```typescript
+const result = merge3wayObjects(
+  { title: 'Hello', author: 'Jane' },
+  { title: 'Hello', author: 'Jane Doe' },   // ours: the record was edited
+  { title: 'Hello, world', author: 'Jane' } // theirs: the markdown was edited
+)
+result.merged       // { title: 'Hello, world', author: 'Jane Doe' }
+result.hasConflicts // false
+result.applied      // { ours: ['author'], theirs: ['title'] }
 ```
 
 ## Utilities

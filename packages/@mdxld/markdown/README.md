@@ -27,7 +27,8 @@ This is the **data layer** - no styling, just structure. For styled output, see 
 ## Quick Start
 
 ```typescript
-import { toMarkdown, fromMarkdown, diff } from '@mdxld/markdown'
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
+import { diff } from '@mdxld/extract' // @mdxld/diff's diffPaths - the one diff in the repo
 
 // 1. Define your data
 const storyBrand = {
@@ -155,21 +156,31 @@ const obj = fromMarkdown(markdown)
 // }
 ```
 
-### diff(original, updated)
+### parseTable(content) / renderTable(headers, rows, options?)
 
-Compute differences between two objects.
+The one markdown table primitive in the repo. `toMarkdown` / `fromMarkdown` and the entity
+components of `@mdxld/extract` all read and write tables through it.
 
 ```typescript
-function diff<T>(
-  original: T,
-  updated: T
-): Diff<T>
+renderTable(['name', 'slug'], [{ name: 'JavaScript', slug: 'javascript' }])
+// '| name | slug |\n|---|---|\n| JavaScript | javascript |'
 
-interface Diff<T> {
-  added: Record<string, unknown>
-  modified: Record<string, { from: unknown; to: unknown }>
-  removed: string[]
-}
+parseTable('| name | slug |\n|---|---|\n| JavaScript | javascript |')
+// { headers: ['name', 'slug'], rows: [{ name: 'JavaScript', slug: 'javascript' }] }
+```
+
+### Diffing what comes back
+
+Not this package's job. There is one diff implementation in the repo, `@mdxld/diff`
+(`diffPaths`, `applyPaths`, `merge3wayObjects`), and `@mdxld/extract` re-exports it as
+`diff`, `applyExtract` and the 3-way `mergeExtract`.
+
+```typescript
+import { fromMarkdown } from '@mdxld/markdown'
+import { diff, applyExtract } from '@mdxld/extract'
+
+const changes = diff(original, fromMarkdown(edited))
+const updated = applyExtract(original, fromMarkdown(edited))
 ```
 
 ### render(template, data)
@@ -348,6 +359,7 @@ await db.update(blogPost.id, updated)
 const improved = await ai.improve(toMarkdown(content))
 
 // Extract and review changes
+import { diff } from '@mdxld/extract'
 const updated = fromMarkdown(improved)
 const changes = diff(content, updated)
 

@@ -9,9 +9,11 @@
  *
  * - **Pattern-based extraction**: Convert templates to regex patterns for fast extraction
  * - **Component extractors**: Define custom render/extract pairs for components
- * - **Diff utilities**: Track changes between original and extracted data
+ * - **Diff, apply and 3-way merge**: `@mdxld/diff`'s path primitives, re-exported as
+ *   `diff` / `applyExtract` / `mergeExtract` (one diff implementation in the repo)
  * - **Template validation**: Check if templates are extractable
- * - **AI-assisted extraction**: Fall back to AI for complex patterns (conditionals, loops)
+ * - **AI-assisted extraction**: `extractWithAI` puts the slots the matcher cannot reverse
+ *   (conditionals, loops, components without an extractor) to `ai-functions` `generateObject`
  *
  * ## Basic Usage
  *
@@ -44,11 +46,11 @@
  * const extracted = Table.extract(rendered)
  * ```
  *
- * ## Diff and Apply
+ * ## Diff, Apply and 3-Way Merge
  *
  * @example
  * ```ts
- * import { extract, diff, applyExtract } from '@mdxld/extract'
+ * import { extract, diff, applyExtract, mergeExtract } from '@mdxld/extract'
  *
  * const original = { title: 'Hello', content: 'Original' }
  * const extracted = extract({ template, rendered: editedMarkdown })
@@ -57,6 +59,9 @@
  * console.log(changes.modified) // { title: { from: 'Hello', to: 'Updated' } }
  *
  * const merged = applyExtract(original, extracted.data)
+ *
+ * // When the record changed too since the markdown was rendered:
+ * const { merged: both, conflicts } = mergeExtract(original, currentRecord, extracted.data)
  * ```
  *
  * @packageDocumentation
@@ -66,9 +71,13 @@
 export {
   extract,
   extractWithAI,
+  expressionPath,
   parseTemplateSlots,
   validateTemplate,
   type ExtractOptions,
+  type ExtractWithAIOptions,
+  type AIGenerate,
+  type AIGenerateArgs,
   type ExtractResult,
   type ExtractDebugInfo,
   type TemplateSlot,
@@ -80,12 +89,15 @@ export {
   type ComponentExtractor,
 } from './extract.js'
 
-// Diff utilities
+// Diff, apply and 3-way merge (implemented once, in @mdxld/diff)
 export {
   diff,
   applyExtract,
+  mergeExtract,
   type ExtractDiff,
+  type MergeExtractOptions,
 } from './extract.js'
+export type { ObjectMergeResult, ObjectConflict, ApplyPathsOptions } from '@mdxld/diff'
 
 // Errors
 export {
