@@ -1,6 +1,6 @@
 {
   "name": "@mdxld/extract",
-  "version": "1.9.2",
+  "version": "1.10.0",
   "description": "Bi-directional MDX ↔ Markdown translation - extract structured data from rendered content",
   "type": "module",
   "main": "dist/index.js",
@@ -54,7 +54,9 @@
     "ai-functions": ">=2.0.0"
   },
   "peerDependenciesMeta": {
-    "ai-functions": { "optional": true }
+    "ai-functions": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@mdxui/text": "^0.1.0",
