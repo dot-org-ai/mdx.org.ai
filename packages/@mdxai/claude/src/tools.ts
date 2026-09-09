@@ -303,10 +303,10 @@ export function createExecutorTools<TData extends MDXLDData = MDXLDData>(
               text: JSON.stringify(
                 {
                   success: result.success,
-                  output: result.output,
-                  returnValue: result.returnValue,
+                  output: 'output' in result ? result.output : undefined,
+                  returnValue: 'returnValue' in result ? result.returnValue : undefined,
                   duration: result.duration,
-                  error: result.error,
+                  error: 'error' in result ? result.error : undefined,
                   logs: result.logs,
                 },
                 null,
@@ -402,9 +402,9 @@ export function createExecutorTools<TData extends MDXLDData = MDXLDData>(
               text: JSON.stringify(
                 {
                   success: result.success,
-                  url: result.url,
-                  deploymentId: result.deploymentId,
-                  error: result.error,
+                  url: 'url' in result ? result.url : undefined,
+                  deploymentId: 'deploymentId' in result ? result.deploymentId : undefined,
+                  error: 'error' in result ? result.error : undefined,
                   logs: result.logs,
                 },
                 null,

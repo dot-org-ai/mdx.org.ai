@@ -31,7 +31,7 @@ export interface PersistentRegistryConfig {
  * Create a callable function from a definition
  */
 function createCallable<TArgs = unknown, TReturn = unknown>(
-  definition: FunctionDefinition<TArgs, TReturn>
+  definition: FunctionDefinition<TReturn, TArgs>
 ): (args: TArgs) => Promise<TReturn> {
   // This is a placeholder - in production, this would:
   // - For 'code': compile and execute the generated code
@@ -50,8 +50,8 @@ function createCallable<TArgs = unknown, TReturn = unknown>(
  * Convert a function definition to a tool definition
  */
 function definitionToTool<TArgs = unknown, TReturn = unknown>(
-  definition: FunctionDefinition<TArgs, TReturn>
-): AIFunctionDefinition<TArgs, TReturn> {
+  definition: FunctionDefinition<TReturn, TArgs>
+): AIFunctionDefinition<TReturn, TArgs> {
   return {
     name: definition.name,
     description: definition.description ?? `Function: ${definition.name}`,
@@ -68,8 +68,8 @@ function definitionToTool<TArgs = unknown, TReturn = unknown>(
  * Create a DefinedFunction from a stored definition
  */
 function hydrateFunction<TArgs = unknown, TReturn = unknown>(
-  definition: FunctionDefinition<TArgs, TReturn>
-): DefinedFunction<TArgs, TReturn> {
+  definition: FunctionDefinition<TReturn, TArgs>
+): DefinedFunction<TReturn, TArgs> {
   return {
     definition,
     call: createCallable(definition),
@@ -338,8 +338,8 @@ export class PersistentFunctionRegistry implements FunctionRegistry {
    * Store a function definition directly
    */
   async defineAsync<TArgs = unknown, TReturn = unknown>(
-    definition: FunctionDefinition<TArgs, TReturn>
-  ): Promise<DefinedFunction<TArgs, TReturn>> {
+    definition: FunctionDefinition<TReturn, TArgs>
+  ): Promise<DefinedFunction<TReturn, TArgs>> {
     const fn = hydrateFunction(definition)
     await this.setAsync(definition.name, fn as DefinedFunction)
     return fn

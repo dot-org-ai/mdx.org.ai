@@ -648,7 +648,9 @@ export function createContext(options: ContextOptions = {}): UnifiedContext {
     }),
     on: workflowCtx.on,
     every: workflowCtx.every,
-    send: workflowCtx.send,
+    send: async <T = unknown>(event: string, data: T): Promise<void> => {
+      await workflowCtx.send(event, data)
+    },
     do: workflowCtx.do,
     try: workflowCtx.try,
     log: workflowCtx.log,
