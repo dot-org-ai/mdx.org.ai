@@ -76,7 +76,6 @@ export const TASK_GROUPS: readonly TaskGroup[] = Object.freeze([
       { verb: 'db:server', purpose: 'start only the ClickHouse server' },
       { verb: 'db:client', purpose: 'open a ClickHouse client shell' },
       { verb: 'db:publish', purpose: 'publish MDX files to a database' },
-      { verb: 'admin', purpose: 'Payload admin UI over the mdxdb backend' },
     ],
   },
 ])

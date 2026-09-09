@@ -49,8 +49,7 @@ export function detectSourceType(projectDir: string): SourceTypeInfo {
 
       if (deps['@mdxdb/fs']) return { isStatic: true, adapter: 'fs', configPath }
       if (deps['@mdxdb/api']) return { isStatic: false, adapter: 'api', configPath }
-      if (deps['@mdxdb/postgres']) return { isStatic: false, adapter: 'postgres', configPath }
-      if (deps['@mdxdb/mongo']) return { isStatic: false, adapter: 'mongo', configPath }
+      if (deps['@mdxdb/do']) return { isStatic: false, adapter: 'do', configPath }
       if (deps['@mdxdb/sqlite']) return { isStatic: false, adapter: 'sqlite', configPath }
       if (deps['@mdxdb/clickhouse']) return { isStatic: false, adapter: 'clickhouse', configPath }
     }
@@ -63,11 +62,8 @@ export function detectSourceType(projectDir: string): SourceTypeInfo {
   if (configContent.includes('@mdxdb/api') || configContent.includes('createApiClient')) {
     return { isStatic: false, adapter: 'api', configPath }
   }
-  if (configContent.includes('@mdxdb/postgres') || (configContent.includes('createDatabase') && configContent.includes('connectionString'))) {
-    return { isStatic: false, adapter: 'postgres', configPath }
-  }
-  if (configContent.includes('@mdxdb/mongo')) {
-    return { isStatic: false, adapter: 'mongo', configPath }
+  if (configContent.includes('@mdxdb/do')) {
+    return { isStatic: false, adapter: 'do', configPath }
   }
   if (configContent.includes('@mdxdb/sqlite')) {
     return { isStatic: false, adapter: 'sqlite', configPath }

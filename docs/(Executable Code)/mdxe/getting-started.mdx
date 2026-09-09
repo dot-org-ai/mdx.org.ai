@@ -60,30 +60,15 @@ const result = await execute(mdx, {
 
 Choose the right runtime for your environment:
 
-### Node.js Server
+### Local Development
+
+The dev server evaluates MDX under Miniflare, so it runs the same workerd code as production:
 
 ```typescript
-import { execute } from '@mdxe/node'
+import { createLocalEvaluator } from '@mdxe/workers/local'
 
-// Full Node.js APIs available
-const result = await execute(mdx, {
-  cwd: process.cwd(),
-})
-```
-
-### Next.js App
-
-```typescript
-// app/docs/[slug]/page.tsx
-import { compileMDX } from '@mdxe/next'
-
-export default async function Page({ params }) {
-  const { content, frontmatter } = await compileMDX({
-    source: await getContent(params.slug),
-  })
-
-  return <article>{content}</article>
-}
+const evaluator = createLocalEvaluator()
+const result = await evaluator.evaluate(mdx)
 ```
 
 ### Edge Runtime
@@ -139,6 +124,5 @@ try {
 
 ## Next Steps
 
-- [Node.js Runtime](/docs/mdxe/runtimes/node) - Server-side execution
-- [Next.js Integration](/docs/mdxe/runtimes/next) - Full-stack apps
+- [Workers Runtime](/docs/mdxe/runtimes/workers) - Cloudflare Workers and local Miniflare execution
 - [Isolated Execution](/docs/mdxe/isolate) - Sandboxed environments

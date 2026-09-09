@@ -17,7 +17,7 @@ const AGENT: Caller = { kind: 'agent', harness: 'CLAUDECODE', detectedBy: 'env',
 const HUMAN: Caller = { kind: 'human', harness: null, detectedBy: 'tty', interactive: true }
 
 /** Every verb `cli.ts` dispatches (the `CliOptions.command` union minus the meta words). */
-const DISPATCHED_VERBS = ['dev', 'build', 'start', 'deploy', 'test', 'run', 'admin', 'notebook', 'tail', 'db', 'db:server', 'db:client', 'db:publish']
+const DISPATCHED_VERBS = ['dev', 'build', 'start', 'deploy', 'test', 'run', 'notebook', 'tail', 'db', 'db:server', 'db:client', 'db:publish']
 
 describe('buildOrientation — the contract object', () => {
   test('carries scalars only, grouped by task, and attributes the caller', () => {

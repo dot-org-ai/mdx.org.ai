@@ -4,7 +4,7 @@ Abstract video rendering interface for MDX content.
 
 ## Overview
 
-This package provides abstract types and utilities for rendering MDXLD documents as videos. It defines the common interface that concrete implementations (like `@mdxe/remotion`) use.
+This package provides abstract types and utilities for rendering MDXLD documents as videos. It defines the common interface that concrete video runtimes implement (the former `@mdxe/remotion` package was removed in mdx-8je.7).
 
 ## Installation
 
@@ -222,16 +222,12 @@ interface VideoConfig {
 
 ## Integration with Runtime Packages
 
-This package provides the abstract interface. Use runtime packages for actual rendering:
-
-- `@mdxe/remotion` - Remotion video rendering
+This package provides the abstract interface only. mdx.org.ai ships no video runtime: the former `@mdxe/remotion` package was removed in mdx-8je.7 (Cloudflare-native only). Feed the extracted scenes to a renderer of your choice:
 
 ```typescript
 import { extractScenes } from '@mdxui/video'
-import { MDXComposition } from '@mdxe/remotion'
 
 const video = extractScenes(doc)
-// Use with Remotion components
 ```
 
 ## License

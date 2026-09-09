@@ -19,18 +19,6 @@ declare module '@mdxdb/sqlite' {
   export function createSqliteDatabase(config: { path: string }): Database<MDXLDData>
 }
 
-// @mdxdb/postgres - optional PostgreSQL database
-declare module '@mdxdb/postgres' {
-  import type { MDXLDData } from 'mdxld'
-  export function createPostgresDatabase(config: { connectionString: string }): Database<MDXLDData>
-}
-
-// @mdxdb/mongo - optional MongoDB database
-declare module '@mdxdb/mongo' {
-  import type { MDXLDData } from 'mdxld'
-  export function createMongoDatabase(config: { uri: string }): Database<MDXLDData>
-}
-
 // @mdxe/workers/local - optional Miniflare-backed evaluator used by the dev server.
 // mdxe does not declare @mdxe/workers as a dependency; dev-server.ts imports it
 // dynamically with `.catch(() => null)`, so only the shape it touches is declared.

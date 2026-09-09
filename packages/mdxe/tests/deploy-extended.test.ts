@@ -547,18 +547,17 @@ describe('Deploy Functions Extended', () => {
   })
 
   describe('Source Detection Edge Cases', () => {
-    it('should detect createDatabase with connectionString as postgres', () => {
+    it('should detect an @mdxdb/do import as the do adapter', () => {
       mkdirSync(join(testDir, 'lib'), { recursive: true })
       writeFileSync(
         join(testDir, 'lib', 'source.ts'),
         `
-import { createDatabase } from '@mdxdb/postgres'
-const db = createDatabase({ connectionString: process.env.DATABASE_URL })
+import { MDXDatabase } from '@mdxdb/do'
 `
       )
 
       const result = detectSourceType(testDir)
-      expect(result.adapter).toBe('postgres')
+      expect(result.adapter).toBe('do')
       expect(result.isStatic).toBe(false)
     })
 

@@ -110,7 +110,6 @@ TypeScript functions, AI agents, and multi-runtime execution:
 |---------|-------------|
 | [mdxe](/docs/executable-code/mdxe) | MDX execution runtime |
 | [mdxai](/docs/executable-code/mdxai) | AI agents with MCP server integration |
-| [@mdxe/next](/docs/executable-code/mdxe/next) | Next.js App Router integration |
 | [@mdxe/workers](/docs/executable-code/mdxe/workers) | Cloudflare Workers runtime |
 | [@mdxe/hono](/docs/executable-code/mdxe/hono) | Hono web framework middleware |
 
@@ -190,23 +189,23 @@ Store MDX documents anywhere:
 
 ```typescript
 import { createDatabase } from '@mdxdb/fs'
-// or @mdxdb/sqlite, @mdxdb/postgres, @mdxdb/mongo
+// or @mdxdb/sqlite, @mdxdb/do, @mdxdb/clickhouse
 
 const db = createDatabase({ path: './content' })
 await db.set('posts/hello-world', doc)
 const post = await db.get('posts/hello-world')
 ```
 
-### Multi-Runtime Execution
+### Cloudflare-Native Execution
 
-Run MDX in any environment:
+Run MDX on Cloudflare Workers, and locally under Miniflare:
 
 ```typescript
-// Next.js
-import { createMDXPage } from '@mdxe/next'
-
 // Cloudflare Workers
 import { createMDXHandler } from '@mdxe/workers'
+
+// Local development (same workerd code, under Miniflare)
+import { createLocalEvaluator } from '@mdxe/workers/local'
 
 // Hono
 import { mdx } from '@mdxe/hono'

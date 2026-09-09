@@ -4,7 +4,7 @@ Abstract slides rendering interface for MDX presentations.
 
 ## Overview
 
-This package provides abstract types and utilities for rendering MDXLD documents as presentations/slideshows. It defines the common interface that concrete implementations (like `@mdxe/slidev` and `@mdxe/remotion`) use.
+This package provides abstract types and utilities for rendering MDXLD documents as presentations/slideshows. It defines the common interface that concrete slide runtimes implement (the former `@mdxe/slidev` and `@mdxe/remotion` packages were removed in mdx-8je.7).
 
 ## Installation
 
@@ -199,18 +199,12 @@ interface Slide {
 
 ## Integration with Runtime Packages
 
-This package provides the abstract interface. Use runtime packages for actual rendering:
-
-- `@mdxe/slidev` - Slidev presentation runtime
-- `@mdxe/remotion` - Video rendering with Remotion
-- `@mdxe/revealjs` - Reveal.js presentations (future)
+This package provides the abstract interface only. mdx.org.ai ships no slide runtime: the former `@mdxe/slidev` and `@mdxe/remotion` packages were removed in mdx-8je.7 (Cloudflare-native only). Feed the extracted presentation to a renderer of your choice:
 
 ```typescript
 import { extractSlides } from '@mdxui/slides'
-import { toSlidev } from '@mdxe/slidev'
 
 const presentation = extractSlides(doc)
-const slidevMarkdown = toSlidev(doc)
 ```
 
 ## License

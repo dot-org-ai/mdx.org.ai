@@ -18,10 +18,10 @@ import { createDatabaseTools, createExecutorTools } from './tools.js'
  * ```ts
  * import { createClaudeServer } from '@mdxai/claude'
  * import { createFsDatabase } from '@mdxdb/fs'
- * import { createNodeExecutor } from '@mdxe/node'
+ * import { createWorkersExecutor } from '@mdxe/workers'
  *
  * const db = createFsDatabase({ root: './content' })
- * const executor = createNodeExecutor()
+ * const executor = createWorkersExecutor()
  *
  * const server = createClaudeServer({
  *   name: 'my-mdx-server',

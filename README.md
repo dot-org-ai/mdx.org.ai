@@ -55,11 +55,8 @@ Defines runtimes, servers, and communication protocols. See the [Ecosystem Integ
 
 | Package | Purpose | Runtimes |
 |---------|---------|----------|
-| **@mdxe/node** | Node.js runtime | Node.js |
-| **@mdxe/bun** | Bun runtime | Bun |
-| **@mdxe/workers** | Cloudflare Workers | Workers |
-| **@mdxe/hono** | HTTP middleware | Node, Bun, Workers |
-| **@mdxe/next** | Next.js App Router | Node, Edge |
+| **@mdxe/workers** | Cloudflare Workers (local dev via Miniflare) | Workers |
+| **@mdxe/hono** | HTTP middleware | Workers |
 | **@mdxe/ink** | Terminal viewer (Ink 7) over the @mdxe/tui seam | Node, Bun |
 | **@mdxe/mcp** | Model Context Protocol | stdio: Node/Bun, http: all |
 | **@mdxe/vitest** | Test runner | Node, Bun |
@@ -72,13 +69,19 @@ Defines runtimes, servers, and communication protocols. See the [Ecosystem Integ
 | Package | Backend | Features |
 |---------|---------|----------|
 | **@mdxdb/fs** | Filesystem | File-based, git-friendly |
-| **@mdxdb/sqlite** | SQLite/Turso | Vector search, local-first |
-| **@mdxdb/postgres** | PostgreSQL | pgvector, production-ready |
-| **@mdxdb/mongo** | MongoDB | Atlas Vector Search |
+| **@mdxdb/sqlite** | Durable Object SQLite | Graph database (_data / _rels) inside a Durable Object |
+| **@mdxdb/do** | Durable Objects | Parent/child hierarchy, hibernatable WebSockets, parquet export |
+| **@mdxdb/vectorize** | Cloudflare Vectorize | Vector search |
+| **@mdxdb/parquet** | Parquet | Pure JS read/write for Workers and Snippets |
 | **@mdxdb/clickhouse** | ClickHouse | Analytics, time-series |
 | **@mdxdb/api** | HTTP API | Remote database client |
+| **@mdxdb/rpc** | rpc.do | capnweb RPC client |
+| **@mdxdb/server** | Hono | HTTP API server |
+| **@mdxdb/github** | GitHub | Octokit-backed document store |
 | **@mdxdb/fumadocs** | Fumadocs | Content source adapter |
 | **@mdxdb/sources** | Multiple | Unified source interface |
+
+> **Cloudflare-native only.** The former `@mdxdb/postgres`, `@mdxdb/mongo`, `@mdxdb/git`, `@mdxdb/payload`, `@mdxdb/desktop`, `@mdxdb/mobile` and `@mdxdb/studio` packages were removed (mdx-8je.7) and are deprecated on npm. History stays in git.
 
 ### @mdxld - Parsing & Transformation
 
@@ -106,14 +109,15 @@ Defines runtimes, servers, and communication protocols. See the [Ecosystem Integ
 
 Detailed taxonomy of all `@mdxe` scoped packages for execution environments and protocols.
 
+mdx.org.ai is **Cloudflare-native only**. Arbitrary code executes through Dynamic Worker Loaders (workerd) everywhere: in production via the `worker_loaders` binding, locally via a Miniflare host worker. The Node and Bun CLIs are thin shells that boot workerd; there is no Node or Bun evaluation runtime. The former `@mdxe/node`, `@mdxe/bun`, `@mdxe/next`, `@mdxe/honox`, `@mdxe/electron`, `@mdxe/expo`, `@mdxe/remotion`, `@mdxe/slidev`, `@mdxe/vercel`, `@mdxe/github` and `@mdxe/payload` packages were removed (mdx-8je.7) and are deprecated on npm; `test/repo/package-allowlist.test.ts` is the allowlist that keeps them from coming back.
+
 ### Core Runtimes
 
 | Package | Description | Status |
 |---------|-------------|--------|
 | **@mdxe/workers** | Cloudflare Workers runtime (production) | Recommended |
 | **@mdxe/workers/local** | Local development via Miniflare | Development |
-| **@mdxe/bun** | Bun runtime for fast local execution | Stable |
-| **@mdxe/node** | Node.js runtime (deprecated, use workers/local for dev) | Deprecated |
+| **@mdxe/isolate** | Compile MDX to isolated Worker modules | Stable |
 
 > **Recommendation:** Use `@mdxe/workers` for production and `@mdxe/workers/local` (Miniflare) for local development. This provides the most consistent environment between development and production.
 
@@ -121,10 +125,9 @@ Detailed taxonomy of all `@mdxe` scoped packages for execution environments and 
 
 | Package | Description | Quick Start |
 |---------|-------------|-------------|
-| **@mdxe/next** | Next.js App Router integration | [Next.js Guide](./packages/@mdxe/next/README.md) |
 | **@mdxe/hono** | Hono HTTP servers and middleware | [Hono Guide](./packages/@mdxe/hono/README.md) |
-| **@mdxe/honox** | HonoX full-stack framework | [HonoX Guide](./packages/@mdxe/honox/README.md) |
-| **@mdxe/nuxt** | Nuxt.js integration | Coming soon |
+| **@mdxe/fumadocs** | Docs site generation, deployed to Workers via OpenNext | `mdxe deploy` on a `$type: Docs` project |
+| **@mdxe/cli-core** | Leaf shared by mdxe and @mdxe/hono (output context, caller detection, errors) | [cli-core](./packages/@mdxe/cli-core/README.md) |
 
 ### Protocols
 
@@ -140,8 +143,7 @@ Detailed taxonomy of all `@mdxe` scoped packages for execution environments and 
 |---------|-------------|-----------------|
 | **@mdxe/cloudflare** | Cloudflare Workers and Pages deployment | [Cloudflare](https://developers.cloudflare.com/workers/) |
 | **@mdxe/do** | .do platform deployment | [.do Platform](https://do.md) |
-| **@mdxe/vercel** | Vercel deployment | [Vercel](https://vercel.com) |
-| **@mdxe/github** | GitHub Pages deployment | [GitHub Pages](https://pages.github.com) |
+| **@mdxe/deploy** | Unified deploy interface over .do and Cloudflare | - |
 
 ### Specialized
 
@@ -149,10 +151,8 @@ Detailed taxonomy of all `@mdxe` scoped packages for execution environments and 
 |---------|-------------|----------|
 | **@mdxe/vitest** | Vitest integration for testing MDX | Test runner |
 | **@mdxe/ink** | Terminal viewer with Ink 7 (displays @mdxui/text bytes) | CLI applications |
-| **@mdxe/electron** | Desktop applications | Cross-platform desktop |
-| **@mdxe/expo** | React Native mobile apps | iOS/Android |
-| **@mdxe/remotion** | Programmatic video rendering | Video generation |
-| **@mdxe/slidev** | Presentation slides | Technical presentations |
+| **@mdxe/tui** | Viewer seam: Viewer interface, input abstraction, conformance suite | Terminal viewers |
+| **@mdxe/test-utils** | Shared fixtures, mocks and matchers | Package tests |
 
 ## Quick Start
 

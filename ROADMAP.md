@@ -9,11 +9,9 @@
     - [ ] `deploy`
   - [ ] `mdxe` CLI 
   - [ ] `mdxe` MCP `do`, `test`, & `deploy`
-  - [ ] `@mdxe/node` 
   - [ ] `@mdxe/workers` 
   - [ ] `@mdxe/hono` 
   - [ ] `@mdxe/isolate` 
-  - [ ] `@mdxe/next` 
   - [ ] `@mdxe/vitest` 
   - [ ] `@mdxe/ink` 
 - [ ] `mdxai` Manage, Deploy, & Run MDX-based AI Agents 
@@ -30,8 +28,8 @@
   - [ ] `mdxdb` CLI
   - [ ] `@mdxdb/fs` 
   - [ ] `@mdxdb/sqlite`
-  - [ ] `@mdxdb/postgres` 
-  - [ ] `@mdxdb/mongo` 
+  - [ ] `@mdxdb/do` 
+  - [ ] `@mdxdb/vectorize` 
   - [ ] `@mdxdb/clickhouse`  
   - [ ] `@mdxdb/api` 
 - [ ] `mdxld` Parse, Stringify, Validate, and Compile MDXLD Documents

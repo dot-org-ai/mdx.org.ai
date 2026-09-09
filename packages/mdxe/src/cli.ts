@@ -59,9 +59,9 @@ function getVersion(): string {
 export interface CliOptions {
   /** The frozen render context resolved ONCE in `main` — every command reads this, never `isTTY`. */
   ctx: OutputCtx
-  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'run' | 'admin' | 'notebook' | 'tail' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
+  command: 'dev' | 'build' | 'start' | 'deploy' | 'test' | 'run' | 'notebook' | 'tail' | 'db' | 'db:server' | 'db:client' | 'db:publish' | 'help' | 'version'
   projectDir: string
-  platform: 'do' | 'cloudflare' | 'vercel' | 'github'
+  platform: 'do' | 'cloudflare'
   mode?: 'static' | 'opennext'
   projectName?: string
   dryRun: boolean
@@ -193,7 +193,6 @@ Commands:
   start               Start production server
   test                Run MDX tests with vitest
   run <file.mdx>      Execute script blocks from an MDX file
-  admin               Start Payload admin UI with mdxdb backend
   notebook            Launch interactive notebook for MDX files
   tail                Stream or fetch events from mdxe applications
   deploy              Deploy to cloud platforms
@@ -346,7 +345,7 @@ Database Examples:
 
 Deploy Options:
   --dir, -d <path>       Project directory (default: current directory)
-  --platform, -p <name>  Deployment platform: do | cloudflare | vercel | github (default: do)
+  --platform, -p <name>  Deployment platform: do | cloudflare (default: do)
   --mode, -m <mode>      Deployment mode: static | opennext (auto-detected)
   --name, -n <name>      Project name for deployment
   --dry-run              Show what would be deployed without deploying
@@ -360,12 +359,6 @@ Deploy Examples:
 
   # Deploy to Cloudflare directly
   mdxe deploy --platform cloudflare
-
-  # Deploy to Vercel
-  mdxe deploy --platform vercel
-
-  # Deploy to GitHub Pages
-  mdxe deploy --platform github
 
   # Deploy with specific project name
   mdxe deploy --name my-docs
@@ -395,24 +388,13 @@ Platforms:
     Use this when you have a wrangler.toml configuration.
     Supports Workers for Platforms (multi-tenant).
 
-  Vercel:
-    Deploy to Vercel's serverless platform.
-    Supports preview and production deployments.
-    Auto-detects framework (Next.js, Vite, etc.).
-
-  GitHub:
-    Deploy to GitHub Pages.
-    Supports direct git push or GitHub Actions workflow.
-    Ideal for static documentation sites.
+  Both platforms run on Cloudflare Workers; other hosts are not supported.
 
 Environment Variables:
   DO_TOKEN                 .do platform API token (via oauth.do)
   DO_API_URL               .do platform API URL (default: https://apis.do)
   CLOUDFLARE_ACCOUNT_ID    Cloudflare account ID (for direct CF deploys)
   CLOUDFLARE_API_TOKEN     Cloudflare API token (for direct CF deploys)
-  VERCEL_TOKEN             Vercel API token
-  VERCEL_TEAM_ID           Vercel team ID (optional)
-  GITHUB_TOKEN             GitHub personal access token
 `
 
 /**
@@ -463,8 +445,6 @@ export function parseArgs(args: string[], ctx: OutputCtx = FAILSAFE_CTX): CliOpt
       options.command = 'run'
     } else if (cmd === 'deploy') {
       options.command = 'deploy'
-    } else if (cmd === 'admin') {
-      options.command = 'admin'
     } else if (cmd === 'notebook') {
       options.command = 'notebook'
     } else if (cmd === 'tail') {
@@ -519,10 +499,10 @@ export function parseArgs(args: string[], ctx: OutputCtx = FAILSAFE_CTX): CliOpt
         break
       case '--platform':
       case '-p':
-        if (next === 'do' || next === 'cloudflare' || next === 'vercel' || next === 'github') {
+        if (next === 'do' || next === 'cloudflare') {
           options.platform = next
         } else {
-          throw usageError(`Invalid platform: ${next}. Supported: do, cloudflare, vercel, github`)
+          throw usageError(`Invalid platform: ${next}. Supported: do, cloudflare`)
         }
         i++
         break
@@ -1629,7 +1609,6 @@ async function runDbCommand(options: CliOptions): Promise<void> {
     clickhouseUrl: options.clickhouseUrl,
     port: options.port,
     httpPort: options.httpPort,
-    studioPort: 4000,
     dryRun: options.dryRun,
     verbose: options.verbose,
     useClickhouse: !!options.clickhouseUrl && options.clickhouseUrl !== 'http://localhost:8123',
@@ -1645,36 +1624,11 @@ async function runDbCommand(options: CliOptions): Promise<void> {
     case 'client':
       await db.runClient(dbOptions)
       break
-    case 'studio':
-      await db.runStudio(dbOptions)
-      break
     case 'dev':
     default:
       await db.runDev(dbOptions)
       break
   }
-}
-
-/**
- * Run Payload admin with mdxdb backend
- *
- * Scans the current directory for MDX files, discovers types from $type frontmatter,
- * and starts a Payload instance with native mdxdb collections enabled.
- */
-export async function runAdmin(options: CliOptions): Promise<void> {
-  console.log('🎛️  mdxe admin\n')
-  console.log(`📁 Project: ${options.projectDir}`)
-  console.log(`🌐 Server: http://${options.host}:${options.port}`)
-  console.log('')
-
-  // Dynamic import of @mdxe/payload
-  const { adminCommand } = await import('@mdxe/payload')
-
-  await adminCommand({
-    contentDir: options.projectDir,
-    port: options.port,
-    verbose: options.verbose,
-  })
 }
 
 /**
@@ -1736,9 +1690,6 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
         break
       case 'deploy':
         await runDeploy(options)
-        break
-      case 'admin':
-        await runAdmin(options)
         break
       case 'notebook': {
         const { runNotebook } = await import('./commands/notebook')

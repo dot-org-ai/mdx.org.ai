@@ -29,7 +29,6 @@ const HEAVY = [
   '@mdxe/hono',
   '@mdxe/fumadocs',
   '@mdxe/deploy',
-  '@mdxe/payload',
   '@mdxdb/',
   'miniflare',
   'wrangler',

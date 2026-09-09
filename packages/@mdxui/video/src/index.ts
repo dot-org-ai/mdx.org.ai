@@ -2,8 +2,8 @@
  * @mdxui/video - Abstract video rendering interface for MDX content
  *
  * Provides abstract types and utilities for rendering MDXLD documents as
- * videos. Concrete implementations are provided by runtime packages like
- * @mdxe/remotion.
+ * videos. Concrete implementations are provided by a video runtime (the former
+ * @mdxe/remotion package was removed in mdx-8je.7).
  *
  * This package defines:
  * - Video/Scene/Frame types aligned with digital-tools Video Noun

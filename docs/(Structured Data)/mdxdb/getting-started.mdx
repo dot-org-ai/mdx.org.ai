@@ -15,8 +15,6 @@ First, decide which storage backend fits your needs:
 |---------|----------|
 | `@mdxdb/fs` | Local development, static sites, Git-based workflows |
 | `@mdxdb/sqlite` | Embedded applications, edge computing, serverless |
-| `@mdxdb/postgres` | Production apps, complex queries, full-text search |
-| `@mdxdb/mongo` | Document-heavy workloads, flexible schemas |
 | `@mdxdb/clickhouse` | Analytics, time-series data, large datasets |
 
 ## Installation
@@ -26,7 +24,6 @@ Each adapter is a standalone package. Install the one you need:
 ```bash
 npm install @mdxdb/fs      # File system
 npm install @mdxdb/sqlite  # SQLite
-npm install @mdxdb/postgres # PostgreSQL
 ```
 
 The `mdxdb` root package is the schema-first `DB()` facade that picks an
@@ -76,19 +73,13 @@ const db = createDatabase({
 })
 ```
 
-### PostgreSQL
+### ClickHouse
 
 ```typescript
-import { createDatabase } from '@mdxdb/postgres'
+import { createClickHouseDatabase } from '@mdxdb/clickhouse'
 
-const db = createDatabase({
-  connectionString: process.env.DATABASE_URL,
-  // Or individual options
-  // host: 'localhost',
-  // port: 5432,
-  // database: 'mdxdb',
-  // user: 'postgres',
-  // password: 'secret',
+const db = await createClickHouseDatabase({
+  url: process.env.CLICKHOUSE_URL,
 })
 ```
 

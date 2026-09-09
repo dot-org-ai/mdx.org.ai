@@ -1,8 +1,9 @@
 /**
  * @mdxe/deploy - Unified Deployment for MDX Projects
  *
- * Deploy to .do, Cloudflare, Vercel, or GitHub Pages with a single interface.
- * The .do platform is the default deployment target.
+ * Deploy to the .do platform or directly to Cloudflare with a single interface.
+ * The .do platform is the default deployment target. Both run on Cloudflare
+ * Workers; other hosts are not supported (mdx-8je.7).
  *
  * @packageDocumentation
  */
@@ -16,41 +17,11 @@ import type {
   DeployProvider,
   DoOptions,
   CloudflareOptions,
-  VercelOptions,
-  GitHubOptions,
   PlatformOptions,
   DetectionResult,
-  DeployState,
 } from './types.js'
 
 export * from './types.js'
-
-/**
- * Normalize deployment state to lowercase
- */
-function normalizeState(state?: string): DeployState | undefined {
-  if (!state) return undefined
-  const lower = state.toLowerCase()
-  switch (lower) {
-    case 'queued':
-    case 'pending':
-      return 'queued'
-    case 'building':
-    case 'initializing':
-      return 'building'
-    case 'deploying':
-      return 'deploying'
-    case 'ready':
-      return 'ready'
-    case 'error':
-      return 'error'
-    case 'canceled':
-    case 'cancelled':
-      return 'canceled'
-    default:
-      return 'pending'
-  }
-}
 
 /**
  * .do Platform deploy provider (default)
@@ -90,7 +61,7 @@ class DoProvider implements DeployProvider {
     }
   }
 
-  supports(options: DeployOptions): boolean {
+  supports(_options: DeployOptions): boolean {
     return true
   }
 
@@ -144,122 +115,8 @@ class CloudflareProvider implements DeployProvider {
     }
   }
 
-  supports(options: DeployOptions): boolean {
+  supports(_options: DeployOptions): boolean {
     // Cloudflare supports most project types
-    return true
-  }
-}
-
-/**
- * Vercel deploy provider
- */
-class VercelProvider implements DeployProvider {
-  readonly platform: Platform = 'vercel'
-  readonly name = 'Vercel'
-
-  async deploy(options: DeployOptions): Promise<DeployResult> {
-    const { deploy } = await import('@mdxe/vercel')
-    const vercelOptions = options as VercelOptions
-
-    const result = await deploy({
-      projectDir: options.projectDir,
-      projectName: options.name,
-      teamId: vercelOptions.teamId,
-      token: vercelOptions.token,
-      production: vercelOptions.production ?? (options.environment === 'production'),
-      buildCommand: options.buildCommand,
-      outputDir: options.outputDir,
-      framework: vercelOptions.framework,
-      rootDirectory: vercelOptions.rootDirectory,
-      env: options.env,
-      regions: vercelOptions.regions,
-      functions: vercelOptions.functions,
-      domains: options.domains,
-      dryRun: options.dryRun,
-      force: options.force,
-      git: vercelOptions.git,
-    })
-
-    return {
-      ...result,
-      platform: 'vercel',
-      state: normalizeState(result.state),
-    }
-  }
-
-  supports(options: DeployOptions): boolean {
-    return true
-  }
-
-  async getStatus(deploymentId: string): Promise<DeployResult> {
-    const { createVercelApiFromEnv } = await import('@mdxe/vercel')
-    const api = createVercelApiFromEnv()
-    const result = await api.getDeployment(deploymentId)
-
-    if (!result.success) {
-      return { success: false, error: result.error, platform: 'vercel' }
-    }
-
-    return {
-      success: true,
-      deploymentId: result.deployment?.id,
-      url: result.deployment?.url ? `https://${result.deployment.url}` : undefined,
-      state: result.deployment?.readyState?.toLowerCase() as DeployResult['state'],
-      platform: 'vercel',
-    }
-  }
-
-  async cancel(deploymentId: string): Promise<{ success: boolean; error?: string }> {
-    const { createVercelApiFromEnv } = await import('@mdxe/vercel')
-    const api = createVercelApiFromEnv()
-    return api.cancelDeployment(deploymentId)
-  }
-
-  async delete(deploymentId: string): Promise<{ success: boolean; error?: string }> {
-    const { createVercelApiFromEnv } = await import('@mdxe/vercel')
-    const api = createVercelApiFromEnv()
-    return api.deleteDeployment(deploymentId)
-  }
-}
-
-/**
- * GitHub deploy provider
- */
-class GitHubProvider implements DeployProvider {
-  readonly platform: Platform = 'github'
-  readonly name = 'GitHub Pages'
-
-  async deploy(options: DeployOptions): Promise<DeployResult> {
-    const { deploy } = await import('@mdxe/github')
-    const ghOptions = options as GitHubOptions
-
-    const result = await deploy({
-      projectDir: options.projectDir,
-      repository: ghOptions.repository,
-      branch: ghOptions.branch,
-      sourceBranch: ghOptions.sourceBranch,
-      outputDir: options.outputDir,
-      buildCommand: options.buildCommand,
-      token: ghOptions.token,
-      customDomain: options.domains?.[0],
-      commitMessage: ghOptions.commitMessage,
-      authorName: ghOptions.authorName,
-      authorEmail: ghOptions.authorEmail,
-      clean: ghOptions.clean,
-      preserve: ghOptions.preserve,
-      dryRun: options.dryRun,
-      force: options.force,
-      useActions: ghOptions.useActions,
-    })
-
-    return {
-      ...result,
-      platform: 'github',
-    }
-  }
-
-  supports(options: DeployOptions): boolean {
-    // GitHub Pages only supports static sites
     return true
   }
 }
@@ -271,8 +128,6 @@ class GitHubProvider implements DeployProvider {
 const providers: Record<Platform, DeployProvider> = {
   do: new DoProvider(),
   cloudflare: new CloudflareProvider(),
-  vercel: new VercelProvider(),
-  github: new GitHubProvider(),
 }
 
 /**
@@ -316,8 +171,6 @@ export function detectPlatform(projectDir: string): DetectionResult {
 
   // Check for platform-specific indicators
   const hasWrangler = existsSync(join(dir, 'wrangler.toml')) || existsSync(join(dir, 'wrangler.jsonc'))
-  const hasVercel = existsSync(join(dir, 'vercel.json')) || existsSync(join(dir, '.vercel'))
-  const hasGitHubActions = existsSync(join(dir, '.github/workflows'))
 
   // Check for framework
   let framework: string | undefined
@@ -351,8 +204,7 @@ export function detectPlatform(projectDir: string): DetectionResult {
   }
 
   // Check for MDXDB data sources
-  const hasDynamicDb = deps['@mdxdb/api'] || deps['@mdxdb/postgres'] ||
-    deps['@mdxdb/mongo'] || deps['@mdxdb/clickhouse']
+  const hasDynamicDb = deps['@mdxdb/api'] || deps['@mdxdb/sqlite'] || deps['@mdxdb/do'] || deps['@mdxdb/clickhouse']
   if (hasDynamicDb) {
     isStatic = false
   }
@@ -364,16 +216,6 @@ export function detectPlatform(projectDir: string): DetectionResult {
       platform: 'cloudflare',
       confidence: 0.95,
       reason: 'Found wrangler.toml configuration - using Cloudflare directly',
-      framework,
-      isStatic,
-    }
-  }
-
-  if (hasVercel) {
-    return {
-      platform: 'vercel',
-      confidence: 0.95,
-      reason: 'Found vercel.json or .vercel directory',
       framework,
       isStatic,
     }
@@ -412,10 +254,10 @@ export function detectPlatform(projectDir: string): DetectionResult {
  *   name: 'my-worker',
  * })
  *
- * // Deploy to production on Vercel
- * const prodResult = await deploy({
+ * // Deploy to the .do platform explicitly
+ * const doResult = await deploy({
  *   projectDir: './my-project',
- *   platform: 'vercel',
+ *   platform: 'do',
  *   environment: 'production',
  * })
  * ```
@@ -469,20 +311,6 @@ export async function deploy(options: DeployOptions | PlatformOptions): Promise<
  */
 export async function deployToCloudflare(options: Omit<CloudflareOptions, 'platform'>): Promise<DeployResult> {
   return deploy({ ...options, platform: 'cloudflare' })
-}
-
-/**
- * Deploy to Vercel specifically
- */
-export async function deployToVercel(options: Omit<VercelOptions, 'platform'>): Promise<DeployResult> {
-  return deploy({ ...options, platform: 'vercel' })
-}
-
-/**
- * Deploy to GitHub Pages specifically
- */
-export async function deployToGitHub(options: Omit<GitHubOptions, 'platform'>): Promise<DeployResult> {
-  return deploy({ ...options, platform: 'github' })
 }
 
 /**
