@@ -12,7 +12,8 @@ import { describe, it, expect } from 'vitest'
 import { env, runInDurableObject } from 'cloudflare:test'
 import { MDXClient } from '../../src/client.js'
 import { MDXDatabase } from '../../src/durable-object.js'
-import { TABLES } from '../../src/schema/index.js'
+import { TABLES, META_ID_KEY } from '../../src/schema/index.js'
+import type { MetaRow } from '../../src/types.js'
 
 let seq = 0
 /** Fresh DO name per test so tests never share storage. */
@@ -31,7 +32,7 @@ function clientFor(ns: string): MDXClient {
 /** Open a client and resolve the DO's actual base URL. */
 async function open(ns = uniqueNs()) {
   const db = clientFor(ns)
-  const base = await stubFor(ns).$id()
+  const base = await db.$init()
   return { ns, db, base }
 }
 
@@ -42,22 +43,75 @@ describe('MDXDatabase (workerd)', () => {
       expect(clientFor(ns).$id()).toBe(ns)
     })
 
-    it('$id() is an https URL with no trailing slash', async () => {
-      const base = await stubFor(uniqueNs()).$id()
-      expect(base).toMatch(/^https:\/\/[^/]+$/)
-    })
-
-    // Documented contract: "$id is derived from the DO name". Inside workerd the
-    // DO sees ctx.id.name === undefined, so $id() falls back to the hex id.
-    // Tracked as model gap mdx-8je.24; this it.fails flips to a failure once fixed.
-    it.fails('derives $id from the DO name (ctx.id.name)', async () => {
+    // workerd does not expose a DO's name to the object itself: ctx.id.name is
+    // undefined inside MDXDatabase (mdx-8je.24). That is why the name travels
+    // via $init(). This it.fails flips to a failure when the runtime starts
+    // populating it, at which point $init persistence becomes a fallback only.
+    it.fails('runtime exposes the DO name via ctx.id.name', async () => {
       const ns = uniqueNs()
       const name = await runInDurableObject(stubFor(ns), (_i: MDXDatabase, state) => state.id.name)
       expect(name).toBe(ns)
+    })
+
+    it('derives $id from the DO name supplied by MDXClient.$init()', async () => {
+      const ns = uniqueNs()
+      const db = clientFor(ns)
+      expect(await db.$init()).toBe(`https://${ns}`)
+      // The DO now knows its name; a bare stub sees the same $id.
       expect(await stubFor(ns).$id()).toBe(`https://${ns}`)
     })
 
-    it('creates the _data and _rels tables on first use', async () => {
+    it('$id() is an https URL with no trailing slash', async () => {
+      const { base } = await open()
+      expect(base).toMatch(/^https:\/\/[^/]+$/)
+    })
+
+    it('builds Thing urls on the name-derived $id, never the hex id', async () => {
+      const { ns, db } = await open()
+      const thing = await db.create({ type: 'Post', id: 'hello', data: {} })
+      expect(thing.url).toBe(`https://${ns}/Post/hello`)
+    })
+
+    it('normalizes a URL-shaped name: keeps the scheme, drops the trailing slash', async () => {
+      const ns = `http://${uniqueNs()}/`
+      expect(await clientFor(ns).$init()).toBe(ns.slice(0, -1))
+    })
+
+    it('refuses to build urls before the object has been named', async () => {
+      const stub = stubFor(uniqueNs())
+      await expect(stub.$id()).rejects.toThrow(/has no \$id/)
+      await expect(stub.create({ type: 'Post', id: 'x', data: {} })).rejects.toThrow(/has no \$id/)
+      await expect(stub.getById('Post', 'x')).rejects.toThrow(/has no \$id/)
+      // Name-independent operations still work.
+      expect(await stub.list()).toEqual([])
+    })
+
+    it('$init is idempotent for the same name and rejects a different one', async () => {
+      const ns = uniqueNs()
+      const stub = stubFor(ns)
+      expect(await stub.$init(ns)).toBe(`https://${ns}`)
+      expect(await stub.$init(ns)).toBe(`https://${ns}`)
+      expect(await stub.$init(`https://${ns}/`)).toBe(`https://${ns}`)
+      await expect(stub.$init('other.local')).rejects.toThrow(/\$id mismatch/)
+      await expect(stub.$init('')).rejects.toThrow(/non-empty name/)
+    })
+
+    it('persists $id in _meta so a re-instantiated object re-derives it', async () => {
+      const { ns, base } = await open()
+      const stub = stubFor(ns)
+      const { stored, fresh } = await runInDurableObject(stub, (_i: MDXDatabase, state) => {
+        const stored = state.storage.sql
+          .exec<MetaRow>('SELECT value FROM _meta WHERE key = ?', META_ID_KEY)
+          .toArray()[0]?.value
+        // Same storage, brand-new instance: must not need another $init().
+        const fresh = new MDXDatabase(state, env).$id()
+        return { stored, fresh }
+      })
+      expect(stored).toBe(base)
+      expect(fresh).toBe(`https://${ns}`)
+    })
+
+    it('creates the _data, _rels and _meta tables on first use', async () => {
       const stub = stubFor(uniqueNs())
       await stub.list()
       const tables = await runInDurableObject(stub, (instance: MDXDatabase, state) => {
