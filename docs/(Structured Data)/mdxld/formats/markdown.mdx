@@ -16,7 +16,8 @@ pnpm add @mdxld/markdown
 ## Quick Start
 
 ```typescript
-import { toMarkdown, fromMarkdown, diff, applyExtract } from '@mdxld/markdown'
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
+import { diff, applyExtract } from '@mdxld/extract' // path diff / apply, implemented once in @mdxld/diff
 
 // Object to Markdown
 const customer = {
@@ -122,72 +123,33 @@ const customer = fromMarkdown<Customer>(markdown)
 // }
 ```
 
-### diff(original, extracted)
+### parseTable(content) / renderTable(headers, rows, options?)
 
-Compute the difference between two objects.
+The one markdown table primitive: `toMarkdown` / `fromMarkdown` and the entity components of
+`@mdxld/extract` all read and write tables through it, so a table written by one is read by the other.
 
 ```typescript
-function diff<T extends object>(original: T, extracted: T): DiffResult
+renderTable(['name', 'slug'], [{ name: 'JavaScript', slug: 'javascript' }])
+// '| name | slug |\n|---|---|\n| JavaScript | javascript |'
 
-interface DiffResult {
-  added: Record<string, unknown>
-  modified: Record<string, { from: unknown; to: unknown }>
-  removed: string[]
-  hasChanges: boolean
-}
+parseTable('| name | slug |\n|---|---|\n| JavaScript | javascript |')
+// { headers: ['name', 'slug'], rows: [{ name: 'JavaScript', slug: 'javascript' }] }
 ```
 
-**Example:**
+### Diffing what comes back
+
+`@mdxld/markdown` exports no `diff` / `applyExtract`: there is one diff implementation in the repo,
+[`@mdxld/diff`](/docs/mdxld/formats/diff) (`diffPaths`, `applyPaths`, `merge3wayObjects`), and
+`@mdxld/extract` re-exports it as `diff`, `applyExtract` and the 3-way `mergeExtract`.
 
 ```typescript
-const original = { name: 'John', age: 30 }
-const updated = { name: 'John', age: 31, city: 'NYC' }
+import { fromMarkdown } from '@mdxld/markdown'
+import { diff, applyExtract } from '@mdxld/extract'
 
-const changes = diff(original, updated)
-// {
-//   added: { city: 'NYC' },
-//   modified: { age: { from: 30, to: 31 } },
-//   removed: [],
-//   hasChanges: true
-// }
-```
+const changes = diff(original, fromMarkdown(edited))
+// { added: {...}, modified: { 'age': { from: 30, to: 31 } }, removed: [], hasChanges: true }
 
-### applyExtract(original, extracted, options?)
-
-Apply extracted data to original document with merge strategies.
-
-```typescript
-function applyExtract<T extends object>(
-  original: T,
-  extracted: Partial<T>,
-  options?: ApplyOptions
-): T
-
-interface ApplyOptions {
-  /** Only apply specific paths */
-  paths?: string[]
-  /** Array merge strategy: 'replace' | 'append' | 'prepend' */
-  arrayMerge?: 'replace' | 'append' | 'prepend'
-}
-```
-
-**Example:**
-
-```typescript
-const original = { name: 'John', tags: ['a', 'b'] }
-const extracted = { name: 'Jane', tags: ['c'] }
-
-// Replace arrays (default)
-applyExtract(original, extracted)
-// { name: 'Jane', tags: ['c'] }
-
-// Append to arrays
-applyExtract(original, extracted, { arrayMerge: 'append' })
-// { name: 'Jane', tags: ['a', 'b', 'c'] }
-
-// Only apply specific paths
-applyExtract(original, extracted, { paths: ['name'] })
-// { name: 'Jane', tags: ['a', 'b'] }
+const updated = applyExtract(original, fromMarkdown(edited), { arrayMerge: 'append' })
 ```
 
 ## Layout Conventions
@@ -304,7 +266,8 @@ await Bun.write('docs/create-user.md', docs)
 ### CMS Content Editing
 
 ```typescript
-import { toMarkdown, fromMarkdown, diff, applyExtract } from '@mdxld/markdown'
+import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
+import { diff, applyExtract } from '@mdxld/extract'
 
 // Load structured content
 const post = await db.BlogPost.get('hello-world')

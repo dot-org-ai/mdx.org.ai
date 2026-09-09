@@ -412,7 +412,7 @@ function compareConfigs(oldConfig: object, newConfig: object) {
 ### Database Sync
 
 ```typescript
-import { diffObjects, applyExtract } from '@mdxld/diff'
+import { diffPaths, applyPaths, merge3wayObjects } from '@mdxld/diff'
 import { toMarkdown, fromMarkdown } from '@mdxld/markdown'
 
 // Load from database
@@ -424,18 +424,25 @@ const markdown = toMarkdown(doc)
 // User edits...
 const edited = await editor.edit(markdown)
 
-// Extract and compare
+// Extract and compare, leaf path by leaf path
 const extracted = fromMarkdown(edited)
-const changes = diffObjects(doc, extracted)
+const changes = diffPaths(doc, extracted)
 
 if (changes.hasChanges) {
   // Show what changed
-  console.log('Changes:', changes)
+  console.log('Changes:', changes.modified)
 
-  // Save if approved
-  await db.Document.update(id, extracted)
+  // Save if approved: overlay the extracted paths onto the record
+  await db.Document.update(id, applyPaths(doc, extracted))
 }
+
+// When the record ALSO changed since it was rendered, merge 3-way instead:
+const current = await db.Document.get(id)
+const { merged, conflicts } = merge3wayObjects(doc, current, applyPaths(doc, extracted))
 ```
+
+`@mdxld/extract` re-exports these as `diff`, `applyExtract` and `mergeExtract` for the
+template-based round trip; `@mdxld/markdown` exports no diff of its own.
 
 ## Related Packages
 

@@ -84,17 +84,75 @@ export interface ArrayDiff<T = unknown> {
 }
 
 export interface MergeResult {
+  /** The merged text. Where {@link hasConflicts} is true it carries git-style conflict markers. */
   merged: string
   hasConflicts: boolean
   conflicts: ConflictRegion[]
 }
 
 export interface ConflictRegion {
+  /** Line index in `merged` of the `<<<<<<<` marker */
   start: number
+  /** Line index in `merged` of the `>>>>>>>` marker */
   end: number
+  /** The base lines of the region, newline-terminated */
   base: string
+  /** Our lines of the region, newline-terminated */
   ours: string
+  /** Their lines of the region, newline-terminated */
   theirs: string
+}
+
+/**
+ * A path-flattened diff between two structured values (the shape `@mdxld/extract` reports as
+ * `ExtractDiff`). Keys are dotted leaf paths (`data.title`); arrays are leaves.
+ */
+export interface PathDiff {
+  /** Leaf paths present in `extracted` but absent from `original`, as a nested object */
+  added: Record<string, unknown>
+  /** Leaf paths whose value changed, keyed by dotted path */
+  modified: Record<string, { from: unknown; to: unknown }>
+  /** Dotted leaf paths present in `original` but absent from `extracted` */
+  removed: string[]
+  hasChanges: boolean
+}
+
+export interface ApplyPathsOptions {
+  /** Only apply these dotted paths */
+  paths?: string[]
+  /** Merge strategy when both sides hold an array at a path (default: 'replace') */
+  arrayMerge?: 'replace' | 'append' | 'prepend'
+}
+
+export interface ObjectMergeOptions {
+  /**
+   * Which side wins a path both sides changed differently (default: 'ours').
+   * The conflict is still reported in {@link ObjectMergeResult.conflicts}.
+   */
+  onConflict?: 'ours' | 'theirs' | 'base'
+  /**
+   * When both sides changed the same string, try a line-level {@link merge3way} of the two
+   * texts before declaring a conflict (default: true).
+   */
+  mergeText?: boolean
+}
+
+export interface ObjectConflict {
+  /** Dotted leaf path */
+  path: string
+  base: unknown
+  ours: unknown
+  theirs: unknown
+  /** The side whose value was kept */
+  resolution: 'ours' | 'theirs' | 'base'
+}
+
+export interface ObjectMergeResult<T = Record<string, unknown>> {
+  merged: T
+  hasConflicts: boolean
+  conflicts: ObjectConflict[]
+  /** Dotted paths taken from each side without conflict */
+  applied: { ours: string[]; theirs: string[] }
 }
 
 // ============================================================================
@@ -458,14 +516,75 @@ export function diffArrays<T>(oldArr: T[], newArr: T[]): ArrayDiff<T> {
  * ```
  */
 export function merge3way(base: string, ours: string, theirs: string): MergeResult {
-  // Diff.merge takes (mine, theirs, base) order and returns ParsedDiff
-  const result = Diff.merge(ours, theirs, base)
+  const baseLines = splitLines(base)
+  const oursHunks = hunksAgainst(baseLines.lines, splitLines(ours).lines)
+  const theirsHunks = hunksAgainst(baseLines.lines, splitLines(theirs).lines)
 
-  // Format the patch back into merged content
-  const merged = Diff.formatPatch(result)
+  const out: string[] = []
+  const conflicts: ConflictRegion[] = []
+  let pos = 0
+  let i = 0
+  let j = 0
 
-  // Check for conflict markers in the result
-  const conflicts = parseConflicts(merged)
+  while (i < oursHunks.length || j < theirsHunks.length) {
+    // Seed a region with whichever side's next hunk starts first, then grow it while any hunk
+    // on either side overlaps or touches it. Touching counts (git's rule): two changes with no
+    // untouched base line between them cannot be ordered, so they conflict.
+    const next = i < oursHunks.length && (j >= theirsHunks.length || oursHunks[i]!.start <= theirsHunks[j]!.start)
+      ? oursHunks[i]!
+      : theirsHunks[j]!
+    let start = next.start
+    let end = next.end
+    const regionOurs: LineHunk[] = []
+    const regionTheirs: LineHunk[] = []
+    let grew = true
+    while (grew) {
+      grew = false
+      while (i < oursHunks.length && touches(oursHunks[i]!, start, end)) {
+        const h = oursHunks[i++]!
+        regionOurs.push(h)
+        start = Math.min(start, h.start)
+        end = Math.max(end, h.end)
+        grew = true
+      }
+      while (j < theirsHunks.length && touches(theirsHunks[j]!, start, end)) {
+        const h = theirsHunks[j++]!
+        regionTheirs.push(h)
+        start = Math.min(start, h.start)
+        end = Math.max(end, h.end)
+        grew = true
+      }
+    }
+
+    out.push(...baseLines.lines.slice(pos, start))
+    const baseRegion = baseLines.lines.slice(start, end)
+    const oursRegion = applyHunks(baseLines.lines, start, end, regionOurs)
+    const theirsRegion = applyHunks(baseLines.lines, start, end, regionTheirs)
+
+    if (regionTheirs.length === 0 || sameLines(oursRegion, theirsRegion)) {
+      out.push(...oursRegion)
+    } else if (regionOurs.length === 0) {
+      out.push(...theirsRegion)
+    } else {
+      const markerStart = out.length
+      out.push('<<<<<<< ours', ...oursRegion, '||||||| base', ...baseRegion, '=======', ...theirsRegion, '>>>>>>> theirs')
+      conflicts.push({
+        start: markerStart,
+        end: out.length - 1,
+        base: joinTerminated(baseRegion),
+        ours: joinTerminated(oursRegion),
+        theirs: joinTerminated(theirsRegion),
+      })
+    }
+    pos = end
+  }
+  out.push(...baseLines.lines.slice(pos))
+
+  const oursTrailing = ours.endsWith('\n')
+  const theirsTrailing = theirs.endsWith('\n')
+  const trailing = oursTrailing !== baseLines.trailing ? oursTrailing : theirsTrailing
+  let merged = out.join('\n')
+  if (merged.length > 0 && (trailing || out[out.length - 1]?.startsWith('>>>>>>>'))) merged += '\n'
 
   return {
     merged,
@@ -474,56 +593,68 @@ export function merge3way(base: string, ours: string, theirs: string): MergeResu
   }
 }
 
-/**
- * Parse conflict markers from merged content.
- */
-function parseConflicts(content: string): ConflictRegion[] {
-  const conflicts: ConflictRegion[] = []
-  const lines = content.split('\n')
+/** A run of base lines `[start, end)` replaced by `lines` on one side. */
+interface LineHunk {
+  start: number
+  end: number
+  lines: string[]
+}
 
-  let i = 0
-  while (i < lines.length) {
-    const line = lines[i]
-    if (line && line.startsWith('<<<<<<<')) {
-      const start = i
-      let base = ''
-      let ours = ''
-      let theirs = ''
-      let section: 'ours' | 'base' | 'theirs' = 'ours'
+function splitLines(text: string): { lines: string[]; trailing: boolean } {
+  if (text === '') return { lines: [], trailing: false }
+  const trailing = text.endsWith('\n')
+  const lines = text.split('\n')
+  if (trailing) lines.pop()
+  return { lines, trailing }
+}
 
-      i++
-      while (i < lines.length) {
-        const currentLine = lines[i]
-        if (!currentLine) {
-          i++
-          continue
-        }
+function joinTerminated(lines: string[]): string {
+  return lines.length === 0 ? '' : lines.join('\n') + '\n'
+}
 
-        if (currentLine.startsWith('|||||||')) {
-          section = 'base'
-        } else if (currentLine.startsWith('=======')) {
-          section = 'theirs'
-        } else if (currentLine.startsWith('>>>>>>>')) {
-          conflicts.push({
-            start,
-            end: i,
-            base,
-            ours,
-            theirs,
-          })
-          break
-        } else {
-          if (section === 'ours') ours += currentLine + '\n'
-          else if (section === 'base') base += currentLine + '\n'
-          else if (section === 'theirs') theirs += currentLine + '\n'
-        }
-        i++
-      }
+function sameLines(a: string[], b: string[]): boolean {
+  return a.length === b.length && a.every((line, k) => line === b[k])
+}
+
+function touches(hunk: LineHunk, start: number, end: number): boolean {
+  return hunk.start <= end && hunk.end >= start
+}
+
+/** The edit script of `side` against `base` as a list of disjoint, ordered hunks. */
+function hunksAgainst(base: string[], side: string[]): LineHunk[] {
+  const hunks: LineHunk[] = []
+  let pos = 0
+  let current: LineHunk | null = null
+
+  for (const change of Diff.diffArrays(base, side)) {
+    const values = change.value as string[]
+    if (change.removed) {
+      current ??= { start: pos, end: pos, lines: [] }
+      current.end += values.length
+      pos += values.length
+    } else if (change.added) {
+      current ??= { start: pos, end: pos, lines: [] }
+      current.lines.push(...values)
+    } else {
+      if (current) hunks.push(current)
+      current = null
+      pos += values.length
     }
-    i++
   }
+  if (current) hunks.push(current)
+  return hunks
+}
 
-  return conflicts
+/** The base lines `[start, end)` with one side's hunks (disjoint, ordered) applied. */
+function applyHunks(base: string[], start: number, end: number, hunks: LineHunk[]): string[] {
+  const out: string[] = []
+  let pos = start
+  for (const hunk of hunks) {
+    out.push(...base.slice(pos, hunk.start), ...hunk.lines)
+    pos = hunk.end
+  }
+  out.push(...base.slice(pos, end))
+  return out
 }
 
 /**
@@ -547,6 +678,227 @@ export function resolveConflict(
         return ours
     }
   })
+}
+
+// ============================================================================
+// Structured (path-based) diff, apply and 3-way merge
+// ============================================================================
+
+/**
+ * Diff two structured values by dotted leaf path — the diff `@mdxld/extract` reports after a
+ * round trip. Nested objects are walked; arrays are leaves compared deeply (key order inside an
+ * array's objects does not count as a change).
+ *
+ * @param paths - Restrict the removal check to these paths (default: every leaf of `original`)
+ *
+ * @example
+ * ```ts
+ * diffPaths({ data: { title: 'Hello' } }, { data: { title: 'Hi', tags: ['a'] } })
+ * // { added: { data: { tags: ['a'] } }, modified: { 'data.title': { from: 'Hello', to: 'Hi' } }, removed: [], hasChanges: true }
+ * ```
+ */
+export function diffPaths(
+  original: Record<string, unknown>,
+  extracted: Record<string, unknown>,
+  paths?: string[]
+): PathDiff {
+  const added: Record<string, unknown> = {}
+  const modified: Record<string, { from: unknown; to: unknown }> = {}
+  const removed: string[] = []
+
+  for (const path of leafPaths(extracted)) {
+    const from = getPath(original, path)
+    const to = getPath(extracted, path)
+    if (from === undefined) {
+      setPath(added, path, to)
+    } else if (!deepEqual(from, to)) {
+      modified[path] = { from, to }
+    }
+  }
+
+  for (const path of paths ?? leafPaths(original)) {
+    if (getPath(extracted, path) === undefined) {
+      removed.push(path)
+    }
+  }
+
+  return {
+    added,
+    modified,
+    removed,
+    hasChanges: Object.keys(added).length > 0 || Object.keys(modified).length > 0 || removed.length > 0,
+  }
+}
+
+/**
+ * Apply a structured value onto a copy of `original`, leaf path by leaf path. Paths absent from
+ * `extracted` are left alone (a two-way overlay, not a replacement).
+ *
+ * @example
+ * ```ts
+ * applyPaths({ title: 'Hello', tags: ['a'] }, { tags: ['b'] }, { arrayMerge: 'append' })
+ * // { title: 'Hello', tags: ['a', 'b'] }
+ * ```
+ */
+export function applyPaths<T extends Record<string, unknown>>(
+  original: T,
+  extracted: Record<string, unknown>,
+  options: ApplyPathsOptions = {}
+): T {
+  const result = clone(original)
+
+  for (const path of leafPaths(extracted)) {
+    if (options.paths && !options.paths.includes(path)) continue
+    const value = getPath(extracted, path)
+    const current = getPath(result, path)
+    if (Array.isArray(current) && Array.isArray(value)) {
+      switch (options.arrayMerge) {
+        case 'append':
+          setPath(result, path, [...current, ...value])
+          break
+        case 'prepend':
+          setPath(result, path, [...value, ...current])
+          break
+        default:
+          setPath(result, path, value)
+      }
+    } else {
+      setPath(result, path, value)
+    }
+  }
+
+  return result
+}
+
+/**
+ * 3-way merge of structured values, leaf path by leaf path (like {@link merge3way} for objects).
+ *
+ * A path changed on one side only takes that side; changed identically on both takes it; changed
+ * differently on both is a conflict. Two conflicting strings are first line-merged with
+ * {@link merge3way} and only conflict when that does. Conflicts are resolved by `onConflict`
+ * ('ours' by default) and reported, never dropped.
+ *
+ * @param base - The common ancestor (the props the markdown was rendered from)
+ * @param ours - Our version (the props as they are now)
+ * @param theirs - Their version (the props extracted from the edited markdown)
+ *
+ * @example
+ * ```ts
+ * const result = merge3wayObjects(
+ *   { title: 'Hello', author: 'Jane' },
+ *   { title: 'Hello', author: 'Jane Doe' },   // record edited
+ *   { title: 'Hello, world', author: 'Jane' } // markdown edited
+ * )
+ * result.merged // { title: 'Hello, world', author: 'Jane Doe' }
+ * ```
+ */
+export function merge3wayObjects<T extends Record<string, unknown>>(
+  base: T,
+  ours: Record<string, unknown>,
+  theirs: Record<string, unknown>,
+  options: ObjectMergeOptions = {}
+): ObjectMergeResult<T> {
+  const { onConflict = 'ours', mergeText = true } = options
+  const merged = clone(base)
+  const conflicts: ObjectConflict[] = []
+  const applied = { ours: [] as string[], theirs: [] as string[] }
+
+  const paths = new Set<string>([...leafPaths(base), ...leafPaths(ours), ...leafPaths(theirs)])
+
+  for (const path of paths) {
+    const b = getPath(base, path)
+    const o = getPath(ours, path)
+    const t = getPath(theirs, path)
+    const oursChanged = !deepEqual(b, o)
+    const theirsChanged = !deepEqual(b, t)
+
+    if (!oursChanged && !theirsChanged) continue
+
+    let winner: unknown
+    if (!theirsChanged) {
+      winner = o
+      applied.ours.push(path)
+    } else if (!oursChanged) {
+      winner = t
+      applied.theirs.push(path)
+    } else if (deepEqual(o, t)) {
+      winner = o
+      applied.ours.push(path)
+      applied.theirs.push(path)
+    } else {
+      let resolved = false
+      if (mergeText && typeof o === 'string' && typeof t === 'string' && (typeof b === 'string' || b === undefined)) {
+        const text = merge3way(b ?? '', o, t)
+        if (!text.hasConflicts) {
+          winner = text.merged
+          applied.ours.push(path)
+          applied.theirs.push(path)
+          resolved = true
+        }
+      }
+      if (!resolved) {
+        winner = onConflict === 'theirs' ? t : onConflict === 'base' ? b : o
+        conflicts.push({ path, base: b, ours: o, theirs: t, resolution: onConflict })
+      }
+    }
+
+    if (winner === undefined) deletePath(merged, path)
+    else setPath(merged, path, winner)
+  }
+
+  return { merged, hasConflicts: conflicts.length > 0, conflicts, applied }
+}
+
+/** Dotted paths of every leaf (non-object value or array) in `obj`, in key order. */
+function leafPaths(obj: Record<string, unknown>, prefix = ''): string[] {
+  const out: string[] = []
+  for (const [key, value] of Object.entries(obj)) {
+    const path = prefix ? `${prefix}.${key}` : key
+    if (isPlainObject(value)) {
+      out.push(...leafPaths(value, path))
+    } else {
+      out.push(path)
+    }
+  }
+  return out
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+function getPath(obj: unknown, path: string): unknown {
+  let current: unknown = obj
+  for (const part of path.split('.')) {
+    if (current === null || current === undefined || typeof current !== 'object') return undefined
+    current = (current as Record<string, unknown>)[part]
+  }
+  return current
+}
+
+function setPath(obj: Record<string, unknown>, path: string, value: unknown): void {
+  const parts = path.split('.')
+  let current = obj
+  for (let i = 0; i < parts.length - 1; i++) {
+    const key = parts[i]!
+    if (!isPlainObject(current[key])) current[key] = {}
+    current = current[key] as Record<string, unknown>
+  }
+  current[parts[parts.length - 1]!] = value
+}
+
+function deletePath(obj: Record<string, unknown>, path: string): void {
+  const parts = path.split('.')
+  let current: unknown = obj
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (!isPlainObject(current)) return
+    current = current[parts[i]!]
+  }
+  if (isPlainObject(current)) delete current[parts[parts.length - 1]!]
+}
+
+function clone<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T
 }
 
 // ============================================================================
@@ -592,9 +944,9 @@ export function countChanges(changes: Change[]): { additions: number; deletions:
 }
 
 /**
- * Check if two values are deeply equal.
+ * Check if two values are deeply equal (key order inside objects does not matter).
  */
-function deepEqual(a: unknown, b: unknown): boolean {
+export function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true
   if (typeof a !== typeof b) return false
   if (a === null || b === null) return a === b

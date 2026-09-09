@@ -65,9 +65,10 @@ console.log(result.data)
 
 - 🔄 **Pattern-based extraction** - Converts templates to regex patterns for fast extraction
 - 🧩 **Component extractors** - Define custom render/extract pairs for components
-- 📊 **Diff utilities** - Track changes between original and extracted data
+- 📊 **Diff, apply and 3-way merge** - `@mdxld/diff`'s path primitives as `diff` / `applyExtract` / `mergeExtract` (one diff implementation in the repo)
 - ✅ **Template validation** - Check if templates are extractable before use
-- 🤖 **AI-assisted extraction** - Fall back to AI for complex patterns (conditionals, loops)
+- 🤖 **AI-assisted extraction** - `extractWithAI` puts conditionals, loops and extractor-less components to `ai-functions` `generateObject`
+- 🔁 **Render → extract identity** - proved against the npm `@mdxui/text` md register for every Role fixture
 - 🔌 **mdxdb integration** - Works seamlessly with the mdxdb ecosystem
 
 ## Core Concepts
@@ -189,6 +190,51 @@ applyExtract(
   { arrayMerge: 'append' }
 )
 // { tags: ['a', 'b', 'c'] }
+```
+
+### `mergeExtract(base, current, extracted, options): ObjectMergeResult`
+
+3-way merge for when the props AND the markdown both changed since the markdown was rendered
+(`@mdxld/diff`'s `merge3wayObjects`). `base` is what the markdown was rendered from, `current`
+the record as it is now, `extracted` what `extract` recovered from the edited markdown. The
+extracted side only speaks for the paths the template renders — a field the template does not
+show is never treated as deleted.
+
+```typescript
+const base = { data: { title: 'Hello', author: 'Jane' } }
+const current = { data: { title: 'Hello', author: 'Jane Doe' } }          // record edited
+const { data } = extract({ template, rendered: '# Hello, world\n\n*By Jane*' }) // markdown edited
+
+const result = mergeExtract(base, current, data)
+result.merged       // { data: { title: 'Hello, world', author: 'Jane Doe' } }
+result.hasConflicts // false
+
+// Both changed the title differently: reported, ours kept by default
+mergeExtract(base, { data: { title: 'Record' } }, { data: { title: 'Markdown' } })
+// { merged: { data: { title: 'Record' } }, hasConflicts: true,
+//   conflicts: [{ path: 'data.title', base: 'Hello', ours: 'Record', theirs: 'Markdown', resolution: 'ours' }] }
+mergeExtract(base, current, data, { onConflict: 'theirs' }) // prefer the markdown
+```
+
+### `extractWithAI(options): Promise<ExtractResult>`
+
+`extract`, then one `generateObject` call (from `ai-functions`, an optional peer dependency)
+for every slot the pattern matcher cannot reverse: a conditional, a loop, a component without an
+extractor, or an expression the edited content no longer matches. The model sees the template,
+the rendered content and the region captured for each slot; its answers land at the expression's
+data path (`{data.tags.map(...)}` lands at `data.tags`).
+
+```typescript
+const result = await extractWithAI({
+  template: '# {data.title}\n\n{data.tags.map(t => `- ${t}`).join("\\n")}',
+  rendered: '# Hello\n\n- a\n- b',
+  model: 'sonnet',            // any ai-functions model alias
+})
+result.data       // { data: { title: 'Hello', tags: ['a', 'b'] } }
+result.aiAssisted // true
+
+// Route through your own client, or test without a model:
+await extractWithAI({ template, rendered, generate: async ({ schema, prompt }) => ({ object: {...} }) })
 ```
 
 ### `validateTemplate(template): ValidationResult`
@@ -607,6 +653,19 @@ const { mutations, created } = await views.sync('[Tag]', {
 - 🤖 Loops: `{items.map(i => ...)}`
 - 🤖 Complex expressions with logic
 - 🤖 Heavily edited content that doesn't match template
+
+A loop or conditional slot no longer breaks the match for the scalars beside it: the pattern
+captures its rendered region, `extract` reports the slot in `unmatched` (with the region in
+`debug.regions`), and `extractWithAI` hands exactly those regions to the model.
+
+### Render → Extract Identity
+
+The forward direction is the `md` register of [`@mdxui/text`](https://www.npmjs.com/package/@mdxui/text)
+(dot-do/ui). That package publishes, for each of its Role fixtures, the template the register's
+bytes reverse under (`ROLE_MD_TEMPLATES`), the component extractors for its list shapes
+(`MD_EXTRACTORS`) and the list of what does not round-trip (`ROUND_TRIP_GAPS`);
+`src/round-trip.test.ts` proves `extract(template, render(props)).data` deep-equals the round-trip
+props for every Role, so a byte-changing renderer edit and an extractor regression both fail here.
 
 ### Best Practices
 

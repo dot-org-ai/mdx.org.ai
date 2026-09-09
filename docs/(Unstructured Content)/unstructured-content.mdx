@@ -109,8 +109,8 @@ const edited = markdown.replace('VP of Engineering', 'CTO')
 // 3. Extract changes back to object
 const updated = fromMarkdown<StoryBrand>(edited)
 
-// 4. Diff to see what changed
-import { diff } from '@mdxld/markdown'
+// 4. Diff to see what changed (one diff implementation: @mdxld/diff, re-exported by @mdxld/extract)
+import { diff } from '@mdxld/extract'
 const changes = diff(storyBrand, updated)
 // { modified: { 'hero.occupation': { from: 'VP of Engineering', to: 'CTO' } } }
 ```
