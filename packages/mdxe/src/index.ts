@@ -216,6 +216,10 @@ export type {
   EveryProxy,
 } from 'ai-workflows'
 
+// NOTE: `RPC` / `RPCPromise` are no longer re-exported here. The 2.4.0
+// primitives train moved them from ai-functions to rpc.do; import them from
+// 'rpc.do' directly (@mdxe/rpc was removed in mdx-8je.6).
+
 // =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================
