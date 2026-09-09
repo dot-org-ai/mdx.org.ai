@@ -1,6 +1,6 @@
 {
   "name": "mdxld",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "Lightweight MDX + Linked Data parser and stringifier",
   "type": "module",
   "main": "./dist/index.cjs",

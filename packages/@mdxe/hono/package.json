@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/hono",
-  "version": "1.9.1",
+  "version": "3.0.0",
   "description": "Serve and render MDXLD documents with Hono",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -64,7 +64,7 @@
     "@hono/node-server": "^1.13.0",
     "@mdxe/cli-core": "workspace:*",
     "@mdxui/fumadocs": "^1.9.0",
-    "mdxld": "^1.9.0"
+    "mdxld": "^1.9.2"
   },
   "peerDependencies": {
     "hono": "^4.0.0"

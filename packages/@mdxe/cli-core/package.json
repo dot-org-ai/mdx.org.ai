@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/cli-core",
-  "version": "1.9.1",
+  "version": "3.0.0",
   "description": "The resolvers mdxe's faces share: the output-context ladder (with its Accept rung), caller detection, fail-closed errors, and the labelled token-count oracle",
   "type": "module",
   "main": "./dist/index.cjs",

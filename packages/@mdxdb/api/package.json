@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/api",
-  "version": "1.9.0",
+  "version": "3.0.0",
   "description": "HTTP API client for mdxdb - fetch-based REST client",
   "type": "module",
   "main": "./dist/index.cjs",

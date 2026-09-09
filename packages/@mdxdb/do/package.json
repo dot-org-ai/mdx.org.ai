@@ -1,6 +1,6 @@
 {
   "name": "@mdxdb/do",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Extended Durable Object with parent/child hierarchy, hibernatable WebSocket, and parquet export",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "@mdxld/validate",
-  "version": "1.9.0",
+  "version": "1.9.2",
   "description": "Validate MDXLD documents against JSON-LD schemas",
   "type": "module",
   "main": "dist/index.js",

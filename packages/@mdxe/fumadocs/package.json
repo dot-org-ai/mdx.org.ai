@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/fumadocs",
-  "version": "0.0.1",
+  "version": "3.0.0",
   "description": "Zero-config Fumadocs integration for mdxe - automatic docs site generation",
   "type": "module",
   "main": "./dist/index.js",

@@ -4,18 +4,33 @@
   "commit": false,
   "fixed": [],
   "linked": [
-    ["mdxld", "@mdxld/*"],
-    ["mdxdb", "@mdxdb/*"],
-    ["mdxe", "@mdxe/*"],
-    ["mdxui", "@mdxui/*"],
-    ["mdxai", "@mdxai/*"]
+    [
+      "mdxld",
+      "@mdxld/*"
+    ],
+    [
+      "mdxdb",
+      "@mdxdb/*"
+    ],
+    [
+      "mdxe",
+      "@mdxe/*"
+    ],
+    [
+      "mdxui",
+      "@mdxui/*"
+    ],
+    [
+      "mdxai",
+      "@mdxai/*"
+    ]
   ],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [],
   "privatePackages": {
-    "version": false,
+    "version": true,
     "tag": false
   },
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {

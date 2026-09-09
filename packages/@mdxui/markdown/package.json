@@ -1,6 +1,6 @@
 {
   "name": "@mdxui/markdown",
-  "version": "1.9.0",
+  "version": "2.0.1",
   "description": "Render MDXLD documents to clean markdown (string to string)",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "@mdxe/workers",
-  "version": "1.9.0",
+  "version": "3.0.0",
   "description": "Pure Cloudflare Workers execution for MDX - evaluate MDX securely at the edge",
   "type": "module",
   "main": "./dist/index.cjs",
