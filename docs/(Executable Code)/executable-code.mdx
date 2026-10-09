@@ -9,7 +9,7 @@ The **Executable Code** layer brings MDX documents to life with TypeScript funct
 
 ## Core Concepts
 
-### [Function](/Function)
+### Function
 
 AI function definitions with four variants:
 
@@ -18,7 +18,9 @@ AI function definitions with four variants:
 - **AgenticFunction** - Multi-step AI reasoning
 - **HumanFunction** - Human-in-the-loop approval
 
-### [Agent](/Agent)
+See the [Function overview](/docs/Function).
+
+### Agent
 
 Autonomous AI entities with roles, goals, and team coordination.
 
@@ -31,7 +33,9 @@ const writer = await createAgent({
 })
 ```
 
-### [Workflow](/Workflow)
+See the [Agent overview](/docs/Agent).
+
+### Workflow
 
 Event-driven business logic using the `$` context:
 
@@ -46,9 +50,11 @@ $.every.day.at('9:00')(async () => {
 })
 ```
 
+See the [Workflow overview](/docs/Workflow).
+
 ## Packages
 
-### [mdxe](/mdxe)
+### mdxe
 
 Execute MDX in various runtimes:
 
@@ -56,10 +62,14 @@ Execute MDX in various runtimes:
 - **@mdxe/hono** - Hono web framework
 - **@mdxe/ink** - Terminal UI
 
-### [mdxai](/mdxai)
+See the [mdxe overview](/docs/mdxe).
+
+### mdxai
 
 AI integrations:
 
 - **@mdxai/claude** - Claude AI with MCP tools
 - **@mdxai/mastra** - Mastra agent framework
 - **@mdxai/vapi** - Voice AI
+
+See the [mdxai overview](/docs/mdxai).

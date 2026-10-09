@@ -9,7 +9,7 @@ The **Structured Data** layer of MDX provides semantic frontmatter using YAML-LD
 
 ## Core Concepts
 
-### [Document](/Document)
+### Document
 
 The fundamental unit - combines YAML-LD frontmatter with content body.
 
@@ -22,7 +22,9 @@ author: https://example.com/authors/jane
 ---
 ```
 
-### [Database](/Database)
+See the [Document overview](/docs/Document).
+
+### Database
 
 Schema-first database modeling with automatic bi-directional relationships.
 
@@ -34,6 +36,8 @@ const db = DB({
   },
 })
 ```
+
+See the [Database overview](/docs/Database).
 
 ### Templates (Shapes)
 
@@ -75,11 +79,11 @@ const schema = toJSONSchema(StoryBrandType)
 const data = fromMarkdown<StoryBrand>(editedMarkdown)
 ```
 
-See [Unstructured Content](/unstructured-content) for markdown layouts and [UI Components](/ui-components) for JSX rendering.
+See [Unstructured Content](/docs/unstructured-content) for markdown layouts and [UI Components](/docs/ui-components) for JSX rendering.
 
 ## Packages
 
-### [mdxld](/mdxld)
+### mdxld
 
 Parse, stringify, validate, and compile MDXLD documents.
 
@@ -87,7 +91,9 @@ Parse, stringify, validate, and compile MDXLD documents.
 npm install mdxld
 ```
 
-### [mdxdb](/mdxdb)
+See the [mdxld overview](/docs/mdxld).
+
+### mdxdb
 
 Database adapters for storing MDX documents:
 
@@ -96,3 +102,5 @@ Database adapters for storing MDX documents:
 - **@mdxdb/do** - Cloudflare Durable Objects (primary backend)
 - **@mdxdb/vectorize** - Cloudflare Vectorize vector search
 - **@mdxdb/clickhouse** - ClickHouse for analytics
+
+See the [mdxdb overview](/docs/mdxdb).

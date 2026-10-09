@@ -1,6 +1,6 @@
 import { DocsLayout } from 'fumadocs-ui/layouts/docs'
 import { source } from '@/lib/source'
-import Image from 'next/image'
+import { OrgAiMark } from '@/lib/org-ai-mark'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       nav={{
         title: (
           <>
-            <Image src="/org-ai.svg" alt="" width={24} height={24} />
+            <OrgAiMark />
             <span>MDX.org.ai</span>
           </>
         ),

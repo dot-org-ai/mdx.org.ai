@@ -82,48 +82,56 @@ console.log(doc.content)     // '# Hello World\n\nThis is an **MDXLD**...'
 
 ## The Four Layers in Detail
 
-### [Structured Data](/docs/structured-data)
+### Structured Data
 
 YAML-LD frontmatter provides typed, validated, linked data:
 
 | Package | Description |
 |---------|-------------|
-| [mdxld](/docs/structured-data/mdxld) | Core parser for YAML-LD frontmatter |
-| [mdxdb](/docs/structured-data/mdxdb) | Database storage for MDX documents |
-| [@mdxld/jsonld](/docs/structured-data/mdxld/jsonld) | JSON-LD conversion and vocabularies |
-| [@mdxld/validate](/docs/structured-data/mdxld/validate) | Schema validation with ArkType |
+| [mdxld](/docs/mdxld) | Core parser for YAML-LD frontmatter |
+| [mdxdb](/docs/mdxdb) | Database storage for MDX documents |
+| @mdxld/jsonld | JSON-LD conversion and vocabularies |
+| [@mdxld/validate](/docs/mdxld/validation) | Schema validation with ArkType |
 
-### [Unstructured Content](/docs/unstructured-content)
+See the [Structured Data overview](/docs/structured-data).
+
+### Unstructured Content
 
 Markdown content body with parsing and bi-directional extraction:
 
 | Package | Description |
 |---------|-------------|
-| [@mdxld/extract](/docs/unstructured-content/extract) | Extract structured data from rendered markdown |
-| [@mdxld/ast](/docs/unstructured-content/ast) | AST manipulation and traversal |
+| @mdxld/extract | Extract structured data from rendered markdown |
+| [@mdxld/ast](/docs/mdxld/ast) | AST manipulation and traversal |
 
-### [Executable Code](/docs/executable-code)
+See the [Unstructured Content overview](/docs/unstructured-content).
+
+### Executable Code
 
 TypeScript functions, AI agents, and multi-runtime execution:
 
 | Package | Description |
 |---------|-------------|
-| [mdxe](/docs/executable-code/mdxe) | MDX execution runtime |
-| [mdxai](/docs/executable-code/mdxai) | AI agents with MCP server integration |
-| [@mdxe/workers](/docs/executable-code/mdxe/workers) | Cloudflare Workers runtime |
-| [@mdxe/hono](/docs/executable-code/mdxe/hono) | Hono web framework middleware |
+| [mdxe](/docs/mdxe) | MDX execution runtime |
+| [mdxai](/docs/mdxai) | AI agents with MCP server integration |
+| [@mdxe/workers](/docs/mdxe/runtimes/workers) | Cloudflare Workers runtime |
+| [@mdxe/hono](/docs/mdxe/runtimes/hono) | Hono web framework middleware |
 
-### [UI Components](/docs/ui-components)
+See the [Executable Code overview](/docs/executable-code).
+
+### UI Components
 
 Component specifications and multi-format rendering:
 
 | Package | Description |
 |---------|-------------|
-| [mdxui](/docs/ui-components/mdxui) | Component specifications (31 components) |
-| [@mdxui/html](/docs/ui-components/mdxui/html) | Render to HTML strings |
-| [@mdxui/json](/docs/ui-components/mdxui/json) | Render to JSON-LD |
-| [@mdxui/shadcn](/docs/ui-components/mdxui/shadcn) | Render with shadcn/ui |
-| [@mdxui/fumadocs](/docs/ui-components/mdxui/fumadocs) | Documentation site rendering |
+| [mdxui](/docs/mdxui) | Component specifications (31 components) |
+| [@mdxui/html](/docs/mdxui/renderers/html) | Render to HTML strings |
+| [@mdxui/json](/docs/mdxui/renderers/json) | Render to JSON-LD |
+| [@mdxui/shadcn](/docs/mdxui/renderers/shadcn) | Render with shadcn/ui |
+| [@mdxui/fumadocs](/docs/mdxui/fumadocs) | Documentation site rendering |
+
+See the [UI Components overview](/docs/ui-components).
 
 ## Architecture
 
