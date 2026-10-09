@@ -6,6 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <DocsLayout
       tree={source.pageTree}
+      disableThemeSwitch
       nav={{
         title: (
           <>
