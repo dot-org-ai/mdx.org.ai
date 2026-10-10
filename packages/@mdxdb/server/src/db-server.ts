@@ -750,7 +750,11 @@ export function createDBServer<TData extends Record<string, unknown> = Record<st
   // ==========================================================================
 
   const rpcHandler = createRpcHandler({
-    dispatch: async (method, args) => {
+    dispatch: async (method, wireArgs) => {
+      // JSON has no undefined: an omitted optional positional arg (e.g. `direction` in
+      // relationships(url, type, direction)) arrives as null, which would bypass the
+      // client method's default parameter. Normalise top-level nulls back to undefined.
+      const args = wireArgs.map((arg) => (arg === null ? undefined : arg))
       // Method format: "db.methodName"
       const methodName = method.startsWith('db.') ? method.slice(3) : method
       // rpc.do passes args as an array, first element is the params object

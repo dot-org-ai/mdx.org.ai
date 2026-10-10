@@ -12,6 +12,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { glob } from 'glob'
 import { transform } from 'esbuild'
+import type { SDKConfig } from 'ai-evaluate'
 
 /**
  * Get the version from package.json
@@ -88,7 +89,7 @@ export const VERSION = getVersion()
  * @param value - The value to validate
  * @param usage - Optional usage example to show on error
  */
-export function requireValue(optionName: string, value: string | undefined, usage?: string): void {
+export function requireValue(optionName: string, value: string | undefined, usage?: string): asserts value is string {
   if (!value || value.startsWith('-')) {
     console.error(`Error: ${optionName} requires a value`)
     if (usage) {
@@ -109,7 +110,7 @@ export function requireValue(optionName: string, value: string | undefined, usag
 export function validatePort(optionName: string, value: string | undefined, usage?: string): number {
   requireValue(optionName, value, usage)
 
-  const portNum = parseInt(value!, 10)
+  const portNum = parseInt(value, 10)
 
   // Check if it's a valid integer (not a float)
   if (isNaN(portNum) || !Number.isInteger(Number(value))) {
@@ -413,7 +414,7 @@ export function parseArgs(args: string[]): CliOptions {
   }
 
   // Parse command
-  if (args.length > 0 && !args[0].startsWith('-')) {
+  if (args[0] !== undefined && !args[0].startsWith('-')) {
     const cmd = args[0].toLowerCase()
     if (cmd === 'dev') {
       options.command = 'dev'
@@ -451,7 +452,7 @@ export function parseArgs(args: string[]): CliOptions {
 
   // Handle positional argument after command (e.g., mdxe notebook ./path/to/file.mdx)
   // For deploy, check if it's a subcommand like 'workers'
-  if (args.length > 0 && !args[0].startsWith('-')) {
+  if (args[0] !== undefined && !args[0].startsWith('-')) {
     if (options.command === 'deploy' && args[0] === 'workers') {
       options.subcommand = 'workers'
       args = args.slice(1)
@@ -512,7 +513,7 @@ export function parseArgs(args: string[]): CliOptions {
       case '--env':
       case '-e':
         if (next && next.includes('=')) {
-          const [key, ...valueParts] = next.split('=')
+          const [key = '', ...valueParts] = next.split('=')
           options.env[key] = valueParts.join('=')
         }
         i++
@@ -563,7 +564,7 @@ export function parseArgs(args: string[]): CliOptions {
         i++
         break
       case '--db':
-        if (['memory', 'fs', 'sqlite', 'sqlite-do', 'clickhouse', 'all'].includes(next)) {
+        if (next !== undefined && ['memory', 'fs', 'sqlite', 'sqlite-do', 'clickhouse', 'all'].includes(next)) {
           options.db = next as CliOptions['db']
         } else {
           console.error(`Invalid db backend: ${next}. Use memory, fs, sqlite, sqlite-do, clickhouse, or all.`)
@@ -841,7 +842,7 @@ function extractTestBlocks(content: string): { name: string; code: string; impor
   while ((match = codeBlockRegex.exec(content)) !== null) {
     testIndex++
     const name = match[1] || `test ${testIndex}`
-    const rawCode = match[2].trim()
+    const rawCode = (match[2] ?? '').trim()
 
     // Extract imports from this test block
     const { imports, codeWithoutImports } = extractImports(rawCode)
@@ -868,7 +869,7 @@ function extractScriptBlocks(content: string): { name: string; code: string; imp
   while ((match = codeBlockRegex.exec(content)) !== null) {
     scriptIndex++
     const name = match[1] || `script ${scriptIndex}`
-    const rawCode = match[2].trim()
+    const rawCode = (match[2] ?? '').trim()
 
     // Extract imports from this script block
     const { imports, codeWithoutImports } = extractImports(rawCode)
@@ -1129,7 +1130,7 @@ export async function runTest(options: CliOptions): Promise<void> {
   }
 
   // Get SDK config from environment and CLI options
-  const sdkConfig = {
+  const sdkConfig: SDKConfig = {
     context: options.context as 'local' | 'remote',
     rpcUrl: process.env.DO_RPC_URL || 'https://rpc.do',
     token: process.env.DO_TOKEN || process.env.DO_ADMIN_TOKEN || '',
@@ -1209,15 +1210,14 @@ export async function runTest(options: CliOptions): Promise<void> {
     // Skip transformation if external imports exist (esbuild can't bundle them)
     const testCode = await transformCode(rawTestCode, imports.length > 0)
 
-    // Run through ai-sandbox with hoisted imports and db config
+    // Run through ai-evaluate with hoisted imports.
+    // NOTE: ai-evaluate@2.4 SDKConfig has no `db`/`target` fields, so the
+    // matrix's db/target selection (dbConfig, combo.target) cannot reach the
+    // sandbox yet - see the model-gap issue filed with mdx-8je.40.
     const startTime = Date.now()
     const result = await evaluate({
       tests: testCode,
-      sdk: {
-        ...sdkConfig,
-        db: dbConfig,
-        target: combo.target,
-      },
+      sdk: sdkConfig,
       imports,
     })
 
@@ -1572,7 +1572,7 @@ async function runDbCommand(options: CliOptions): Promise<void> {
   const db = await import('./commands/db.js')
 
   // Map mdxe CliOptions to DbCliOptions
-  const dbOptions: db.DbCliOptions = {
+  const dbOptions: import('./commands/db.js').DbCliOptions = {
     command: options.command === 'db' ? 'dev'
       : options.command === 'db:server' ? 'server'
       : options.command === 'db:client' ? 'client'

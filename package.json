@@ -10,6 +10,8 @@
     "test": "turbo run test",
     "test:unit": "turbo run test:unit",
     "test:mdx": "vitest run --config vitest.mdx.config.ts",
+    "test:integration": "turbo run test:integration",
+    "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
     "lint:root": "eslint .",
     "typecheck": "turbo run typecheck",

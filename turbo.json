@@ -17,6 +17,17 @@
       "dependsOn": ["build"],
       "outputs": []
     },
+    "test:integration": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "outputs": [],
+      "env": ["CLICKHOUSE_URL", "GITHUB_TOKEN", "GITHUB_TEST_OWNER", "GITHUB_TEST_REPO", "GITHUB_TEST_BRANCH"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "outputs": []
+    },
     "lint": {
       "dependsOn": ["^build"],
       "outputs": []

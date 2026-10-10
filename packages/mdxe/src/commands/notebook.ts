@@ -813,6 +813,11 @@ export async function runNotebook(options: NotebookOptions): Promise<void> {
     // Serve notebook UI
     if (url.pathname === '/' || url.pathname.endsWith('.html')) {
       const doc = documents[0] // For now, serve first document
+      if (!doc) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' })
+        res.end(`No MDX files found in ${targetPath}`)
+        return
+      }
       res.setHeader('Content-Type', 'text/html')
       res.end(generateNotebookHtml(doc))
       return
@@ -944,7 +949,7 @@ async function executeCode(
 
     // Find the last non-empty, non-comment line
     while (lastLineIndex >= 0) {
-      const line = lines[lastLineIndex].trim()
+      const line = (lines[lastLineIndex] ?? '').trim()
       if (line && !line.startsWith('//') && !line.startsWith('/*')) {
         break
       }
@@ -953,7 +958,7 @@ async function executeCode(
 
     let transformedCode = code
     if (lastLineIndex >= 0) {
-      const lastLine = lines[lastLineIndex].trim()
+      const lastLine = (lines[lastLineIndex] ?? '').trim()
 
       // Check if it's a block-ending statement
       const endsWithBrace = lastLine.endsWith('{') || lastLine.endsWith('}')

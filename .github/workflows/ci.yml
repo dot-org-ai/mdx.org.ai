@@ -105,8 +105,64 @@ jobs:
       - name: Run unit tests
         run: pnpm test:unit
 
-      - name: Run integration tests
-        run: pnpm test:integration
+  # Suites that need a live service or a runtime the plain Test job does not provide.
+  # Only suites that can go green on a hosted runner are gated here; the rest are
+  # local-only (see README.md "Integration & E2E suites").
+  integration:
+    name: Integration & E2E
+    runs-on: ubuntu-latest
+    services:
+      clickhouse:
+        # 25.3+ required: the @mdxdb/clickhouse schema uses the JSON column type,
+        # which is experimental (rejected by default) before 25.3.
+        image: clickhouse/clickhouse-server:25.3
+        env:
+          # The image restricts the passwordless `default` user to localhost; traffic
+          # from the runner arrives over the container network, so lift that restriction.
+          CLICKHOUSE_SKIP_USER_SETUP: '1'
+        ports:
+          - 8123:8123
+        options: >-
+          --health-cmd "clickhouse-client --query 'SELECT 1'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      CLICKHOUSE_URL: http://localhost:8123
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Run e2e tests
-        run: pnpm test:e2e
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      # The api/rpc suites silently fall back to in-memory SQLite when ClickHouse is
+      # unreachable; fail loudly here so a green lane really exercised ClickHouse.
+      - name: Verify ClickHouse service is reachable
+        run: curl --fail --silent --show-error -X POST --data 'SELECT version()' "$CLICKHOUSE_URL"
+
+      - name: Run ClickHouse-backed integration tests (@mdxdb/api, @mdxdb/rpc)
+        run: pnpm turbo run test:integration --filter=@mdxdb/api --filter=@mdxdb/rpc
+
+      # describe.skipIf-gated: skips (green) until the repo variables and secret below
+      # are configured. The token needs `repo` scope on a throwaway content repo; the
+      # suite creates and deletes files under a `mdxdb-test` branch.
+      - name: Run GitHub-backed integration tests (@mdxdb/github)
+        env:
+          GITHUB_TOKEN: ${{ secrets.MDXDB_GITHUB_TEST_TOKEN }}
+          GITHUB_TEST_OWNER: ${{ vars.MDXDB_GITHUB_TEST_OWNER }}
+          GITHUB_TEST_REPO: ${{ vars.MDXDB_GITHUB_TEST_REPO }}
+        run: pnpm turbo run test:integration --filter=@mdxdb/github
+
+      # wrangler unstable_dev boots workerd locally; no Cloudflare credentials needed.
+      - name: Run workerd e2e tests (@mdxdb/do)
+        run: pnpm turbo run test:e2e --filter=@mdxdb/do

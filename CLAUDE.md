@@ -315,7 +315,11 @@ Each package has its own vitest config. Tests run with:
 pnpm test                           # All packages via turbo
 pnpm --filter mdxld test           # Single package
 pnpm test:mdx                       # MDX-specific tests
+pnpm test:integration               # Service-backed suites (ClickHouse, GitHub, VS Code) - see README "Integration & E2E suites"
+pnpm test:e2e                       # Runtime suites (workerd, Playwright)
 ```
+
+Only `@mdxdb/api`, `@mdxdb/rpc`, `@mdxdb/github` (`test:integration`) and `@mdxdb/do` (`test:e2e`) are gated in CI by the `Integration & E2E` job; the `@mdxdb/studio`, `@mdxui/editor` and `mdxld-vscode` suites are local-only.
 
 ## Dependency Structure
 

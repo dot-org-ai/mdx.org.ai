@@ -171,6 +171,31 @@ pnpm test
 pnpm dev
 ```
 
+### Integration & E2E suites
+
+`pnpm test` runs every package's unit suite. Suites that need a live service or a runtime sit behind the `test:integration` and `test:e2e` turbo tasks (never cached). Only the ones that can go green on a hosted runner are gated by the `Integration & E2E` CI job; the rest are local-only.
+
+| Package                   | Script             | Needs                                                                                   | CI                                                                                                                         |
+| ------------------------- | ------------------ | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `@mdxdb/api`, `@mdxdb/rpc` | `test:integration` | ClickHouse at `CLICKHOUSE_URL` (falls back to in-memory SQLite when unreachable)        | Gated, against a `clickhouse/clickhouse-server` service container                                                          |
+| `@mdxdb/github`           | `test:integration` | `GITHUB_TOKEN`, `GITHUB_TEST_OWNER`, `GITHUB_TEST_REPO` (`describe.skipIf` without them) | Gated, opt-in: set repo variables `MDXDB_GITHUB_TEST_OWNER` / `MDXDB_GITHUB_TEST_REPO` and secret `MDXDB_GITHUB_TEST_TOKEN` |
+| `@mdxdb/do`               | `test:e2e`         | workerd via `wrangler unstable_dev` (no Cloudflare credentials)                          | Gated                                                                                                                      |
+| `@mdxdb/studio`           | `test:e2e`         | Playwright: `pnpm --filter @mdxdb/studio test:e2e:install` first                         | Local only (prune candidate)                                                                                               |
+| `@mdxui/editor`           | `test:e2e`         | The nested `app/` Playwright project, which is currently empty                           | Local only (script is dead until `app/` is restored)                                                                       |
+| `mdxld-vscode`            | `test:integration` | `@vscode/test-cli` downloads VS Code and needs a display (`xvfb-run -a` on Linux)        | Local only                                                                                                                 |
+
+```bash
+# Everything, locally (needs all of the above)
+pnpm test:integration
+pnpm test:e2e
+
+# Exactly what CI gates
+docker run -d -p 8123:8123 -e CLICKHOUSE_SKIP_USER_SETUP=1 clickhouse/clickhouse-server:25.3 # 25.3+ (schema uses the JSON column type)
+CLICKHOUSE_URL=http://localhost:8123 pnpm turbo run test:integration --filter=@mdxdb/api --filter=@mdxdb/rpc
+pnpm turbo run test:integration --filter=@mdxdb/github
+pnpm turbo run test:e2e --filter=@mdxdb/do
+```
+
 ## Example: MDXLD Document
 
 ```mdx
