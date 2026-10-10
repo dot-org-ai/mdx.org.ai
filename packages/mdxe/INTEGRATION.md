@@ -1,11 +1,11 @@
 # Primitives Integration in mdxe
 
-This document describes the integration of AI primitives (ai-sandbox, ai-functions, ai-workflows) into the mdxe package.
+This document describes the integration of AI primitives (ai-evaluate, ai-functions, ai-workflows) into the mdxe package.
 
 ## Overview
 
 mdxe now serves as the primary execution layer that integrates all primitives:
-- **ai-sandbox** - Secure code execution in sandboxed environments
+- **ai-evaluate** - Secure code execution in sandboxed environments
 - **ai-functions** - RPC primitives and AI function interfaces
 - **ai-workflows** - Event-driven workflows with the `$` context
 
@@ -16,7 +16,7 @@ mdxe now serves as the primary execution layer that integrates all primitives:
 Added dependencies to primitives packages:
 ```json
 "dependencies": {
-  "ai-sandbox": "file:../../primitives/packages/ai-sandbox",
+  "ai-evaluate": "^2.4.0",
   "ai-functions": "file:../../primitives/packages/ai-functions",
   "ai-workflows": "file:../../primitives/packages/ai-workflows",
   ...
@@ -58,7 +58,7 @@ New file that exposes SDK provider publicly:
 
 Updated to export primitives integration:
 - SDK provider types and functions
-- Re-export `evaluate` and `createEvaluator` from ai-sandbox
+- Re-export `evaluate` and `createEvaluator` from ai-evaluate
 - Re-export workflow types from ai-workflows
 - Re-export RPC types from ai-functions
 
@@ -67,7 +67,7 @@ Updated to export primitives integration:
 export { createSDKProvider, generateSDKInjectionCode }
 export type { SDKProviderConfig, SDKProvider, ... }
 
-// ai-sandbox
+// ai-evaluate
 export { evaluate, createEvaluator }
 export type { EvaluateOptions, EvaluateResult, ... }
 
@@ -105,7 +105,7 @@ New comprehensive test suite covering:
 - Remote context configuration
 - Code generation for local and remote contexts
 - Export validation
-- Integration with ai-sandbox, ai-workflows, ai-functions
+- Integration with ai-evaluate, ai-workflows, ai-functions
 - Configuration validation
 
 All 22 tests pass, even when dependencies are not available (using stubs).
@@ -118,7 +118,7 @@ Added comprehensive documentation:
 - Database backends documentation
 - Code generation for sandboxed execution
 - Primitives integration section with usage examples
-- ai-sandbox integration examples
+- ai-evaluate integration examples
 - ai-workflows type examples
 - ai-functions RPC type examples
 
@@ -201,7 +201,7 @@ mdxe (execution layer)
 │   ├── AI: local models or remote APIs
 │   └── Workflows: ai-workflows event handlers
 │
-├── ai-sandbox (secure execution)
+├── ai-evaluate (secure execution)
 │   └── evaluate(), createEvaluator()
 │
 ├── ai-functions (RPC & AI)
@@ -239,7 +239,7 @@ Tests cover:
 ## Dependencies
 
 The integration maintains proper separation:
-- **Required**: ai-sandbox (for execution)
+- **Required**: ai-evaluate (for execution)
 - **Optional**: mdxdb, @mdxdb/*, ai-functions, ai-workflows
 - **Peer**: mdxld
 

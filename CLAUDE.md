@@ -180,7 +180,7 @@ AI primitives packages (submodule) providing core functionality:
 - **ai-functions** - AI function definitions, RPC, generation
 - **ai-workflows** - Event-driven workflows with `$` context
 - **ai-database** - Schema-first DB with bi-directional relationships
-- **ai-sandbox** - Test execution environment
+- **ai-evaluate** - Secure code evaluation and test execution
 
 ## Key Concepts
 
@@ -299,7 +299,7 @@ expect(1 + 1).toBe(2)
 ```
 ````
 
-Run with `mdxe test` which uses `ai-sandbox` for execution.
+Run with `mdxe test` which uses `ai-evaluate` for execution.
 
 ## File Conventions
 
@@ -339,7 +339,7 @@ primitives/ (submodule)
 ├── ai-functions → used by @mdxe/rpc
 ├── ai-workflows → used by mdxai
 ├── ai-database → used by mdxdb
-└── ai-sandbox → used by @mdxe/vitest
+└── ai-evaluate → used by @mdxe/vitest
 ```
 
 ## Creating New Packages

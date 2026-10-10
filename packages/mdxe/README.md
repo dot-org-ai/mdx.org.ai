@@ -14,18 +14,18 @@ yarn add mdxe
 
 ## Features
 
-- **Execute** - Run MDX documents as applications with ai-sandbox
+- **Execute** - Run MDX documents as applications with ai-evaluate
 - **Test** - Test MDX content with inline test blocks
 - **Deploy** - Deploy to Cloudflare Workers
 - **SDK Provider** - Local and remote SDK implementations for db, ai, workflows
 - **Multi-Runtime** - Support for Hono, Next.js, Node, Bun, Workers
-- **Primitives Integration** - Built-in support for ai-functions, ai-workflows, ai-sandbox
+- **Primitives Integration** - Built-in support for ai-functions, ai-workflows, ai-evaluate
 - **Type-Safe** - Full TypeScript support
 
 ## Documentation
 
 - [ECOSYSTEM.md](./ECOSYSTEM.md) - How mdxe integrates with mdxld, mdxdb, mdxui, and mdxai
-- [INTEGRATION.md](./INTEGRATION.md) - Primitives integration details (ai-sandbox, ai-functions, ai-workflows)
+- [INTEGRATION.md](./INTEGRATION.md) - Primitives integration details (ai-evaluate, ai-functions, ai-workflows)
 
 ## Quick Start
 
@@ -609,9 +609,9 @@ interface ExecutionResult<T = unknown> {
 }
 ```
 
-### ai-sandbox Integration
+### ai-evaluate Integration
 
-mdxe re-exports `evaluate` and `createEvaluator` from ai-sandbox for secure code execution:
+mdxe re-exports `evaluate` and `createEvaluator` from ai-evaluate for secure code execution:
 
 ```typescript
 import { evaluate } from 'mdxe'
@@ -642,11 +642,11 @@ mdxe integrates with the primitives packages for core functionality:
 
 | Package | Description | Usage in mdxe |
 |---------|-------------|---------------|
-| [ai-sandbox](../../primitives/packages/ai-sandbox) | Secure code execution | `evaluate()`, `createEvaluator()` for running untrusted code |
+| [ai-evaluate](../../primitives/packages/ai-evaluate) | Secure code execution | `evaluate()`, `createEvaluator()` for running untrusted code |
 | [ai-functions](../../primitives/packages/ai-functions) | AI functions & RPC | RPC types for `@mdxe/rpc`, AI function interfaces |
 | [ai-workflows](../../primitives/packages/ai-workflows) | Event-driven workflows | Workflow types (`on`, `every`, `send`) in SDK provider |
 
-### ai-sandbox
+### ai-evaluate
 
 Execute code safely in sandboxed environments:
 
