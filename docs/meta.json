@@ -1,9 +1,9 @@
 {
   "pages": [
     "index",
-    "structured-data",
-    "unstructured-content",
-    "executable-code",
-    "ui-components"
+    "(Structured Data)",
+    "(Unstructured Content)",
+    "(Executable Code)",
+    "(UI Components)"
   ]
 }

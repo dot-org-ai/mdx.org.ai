@@ -3,3 +3,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* The Org.AI Foundation's palette, as foundation.org.ai defines it, in the form Fumadocs 14 takes its colours:
+   hue, saturation and lightness, converted from the Foundation's oklch tokens (named on the right), each exact to
+   the 8-bit colour the Foundation's own pages render. The docs are dark, as every Foundation site is, so the light and
+   dark sets are the same. */
+:root,
+.dark {
+  --fd-background: 35.90 13.33% 6.44%; /* ground */
+  --fd-foreground: 40.98 17.86% 94.35%; /* ink */
+  --fd-muted: 35.90 10.31% 10.26%; /* raise */
+  --fd-muted-foreground: 38.31 2.74% 58.05%; /* ink-3 */
+  --fd-popover: 35.90 10.31% 10.26%; /* raise */
+  --fd-popover-foreground: 40.98 17.86% 94.35%; /* ink */
+  --fd-card: 35.90 10.31% 10.26%; /* raise */
+  --fd-card-foreground: 40.98 17.86% 94.35%; /* ink */
+  --fd-border: 35.88 7.98% 13.76%; /* rule-faint */
+  --fd-primary: 31.77 82.03% 66.98%; /* now, the amber */
+  --fd-primary-foreground: 28.39 57.39% 8.52%; /* now-ink */
+  --fd-secondary: 35.90 10.31% 10.26%; /* raise */
+  --fd-secondary-foreground: 40.98 17.86% 94.35%; /* ink */
+  --fd-accent: 35.89 8.65% 14.65%; /* raise-hi */
+  --fd-accent-foreground: 40.98 17.86% 94.35%; /* ink */
+  --fd-ring: 31.77 82.03% 66.98%; /* now */
+  color-scheme: dark;
+}
+
+/* the Foundation's type: headings set light, with tight tracking, as on foundation.org.ai */
+.fd-title { font-weight: 360; letter-spacing: -0.025em; }
+.prose h1 { font-weight: 340; letter-spacing: -0.03em; }
+.prose h2 { font-weight: 400; letter-spacing: -0.02em; }
+.prose h3 { font-weight: 500; letter-spacing: -0.012em; }
+.prose h4 { font-weight: 600; }
