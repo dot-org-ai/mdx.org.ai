@@ -15,9 +15,12 @@
  * export { MDXDurableObject }
  *
  * export default {
- *   fetch(request, env) {
+ *   async fetch(request, env) {
  *     const id = env.MDXDB.idFromName('headless.ly')
  *     const db = env.MDXDB.get(id)
+ *     // The object cannot read its own name: hand it over once so it can
+ *     // derive its $id (idempotent, persisted). MDXDOClient does this for you.
+ *     await db.$init('headless.ly')
  *     return db.fetch(request)
  *   }
  * }
@@ -40,6 +43,9 @@ export type {
   Env,
   ChildInfo,
   MDXDurableObjectRPC,
+  MDXDurableObjectTarget,
+  MDXDurableObjectNamespace,
+  MDXDurableObjectStub,
   MDXDOClientConfig,
 } from './types.js'
 

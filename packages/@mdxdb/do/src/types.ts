@@ -23,6 +23,8 @@ export type {
   MDXClientConfig as BaseMDXClientConfig,
 } from '@mdxdb/sqlite'
 
+import type { MDXDatabaseRPC as SqliteDatabaseRPC } from '@mdxdb/sqlite'
+
 /**
  * Parquet export options
  */
@@ -44,7 +46,7 @@ export interface ExportOptions {
  */
 export interface Env {
   /** MDXDurableObject namespace */
-  MDXDB: DurableObjectNamespace<MDXDurableObjectRPC>
+  MDXDB: MDXDurableObjectNamespace
   /** Optional R2 bucket for caching */
   CACHE?: R2Bucket
 }
@@ -64,7 +66,7 @@ export interface ChildInfo {
 /**
  * Extended RPC interface for MDXDurableObject
  */
-export interface MDXDurableObjectRPC extends import('@mdxdb/sqlite').MDXDatabaseRPC {
+export interface MDXDurableObjectRPC extends SqliteDatabaseRPC {
   // Context (parent DO relationship)
   /** Get parent DO's $id (null if root) */
   $context(): Promise<string | null>
@@ -87,13 +89,34 @@ export interface MDXDurableObjectRPC extends import('@mdxdb/sqlite').MDXDatabase
 }
 
 /**
+ * RPC target type for Durable Object bindings.
+ *
+ * `@cloudflare/workers-types` constrains the generic on
+ * `DurableObjectNamespace<T>` / `DurableObjectStub<T>` to
+ * `Rpc.DurableObjectBranded`, so the plain structural `MDXDurableObjectRPC`
+ * contract cannot be used there directly. This alias attaches the brand so
+ * bindings, stubs and the `MDXDurableObject` class share one method surface
+ * (same shape as `MDXDatabaseTarget` in @mdxdb/sqlite).
+ */
+export type MDXDurableObjectTarget = MDXDurableObjectRPC & Rpc.DurableObjectBranded
+
+/** Durable Object namespace binding for `MDXDurableObject` */
+export type MDXDurableObjectNamespace = DurableObjectNamespace<MDXDurableObjectTarget>
+
+/** Durable Object stub for a single `MDXDurableObject` instance */
+export type MDXDurableObjectStub = DurableObjectStub<MDXDurableObjectTarget>
+
+/**
  * Client configuration for MDXDurableObject
  */
 export interface MDXDOClientConfig {
-  /** The canonical URL ($id) of the target DO */
+  /**
+   * The DO name, passed to `idFromName()` and forwarded to the object via
+   * `$init()` so it derives its canonical $id (`https://<name>`).
+   */
   $id: string
   /** DO namespace binding */
-  binding: DurableObjectNamespace<MDXDurableObjectRPC>
+  binding: MDXDurableObjectNamespace
 }
 
 /**

@@ -11,7 +11,7 @@
 import { MDXDatabase } from '@mdxdb/sqlite/durable-object'
 import { writeThings, writeRelationshipsIndexed } from '@mdxdb/parquet'
 import { newWorkersRpcResponse } from 'rpc.do/server'
-import type { ExportOptions, ChildInfo, Env, SerializableThing, SerializableRelationship } from './types.js'
+import type { ExportOptions, ChildInfo, Env, MDXDurableObjectStub, SerializableThing, SerializableRelationship } from './types.js'
 import type { Thing, Relationship, CreateOptions, UpdateOptions, ListOptions, RelateOptions, RelationshipQueryOptions } from '@mdxdb/sqlite/types'
 
 /**
@@ -43,13 +43,20 @@ function serializeRelationship<T>(rel: Relationship<T>): SerializableRelationshi
  * All public methods on MDXDatabase are automatically exposed via RPC.
  * Clients use rpc.do transports (capnweb, reconnectingWs, http) to connect.
  *
+ * The object cannot read its own name (`ctx.id.name` is undefined inside a
+ * Durable Object in workerd), so whoever resolved the stub via
+ * `idFromName(name)` must tell it the name once with `$init(name)` before any
+ * URL-building RPC (`$id`, `create`, `upsert`, `getById`). The worker entry
+ * below and `MDXDOClient` do this automatically; a raw stub must do it itself.
+ *
  * @example
  * ```ts
  * // Workers RPC (direct stub)
- * const stub = env.MDXDB.get(id)
+ * const stub = env.MDXDB.get(env.MDXDB.idFromName('example.com'))
+ * await stub.$init('example.com')
  * await stub.create({ type: 'Post', data: { title: 'Hello' } })
  *
- * // rpc.do client
+ * // rpc.do client (the worker entry names the object from the hostname)
  * import { RPC } from 'rpc.do'
  * const db = RPC('wss://my-do.workers.dev')
  * await db.create({ type: 'Post', data: { title: 'Hello' } })
@@ -275,8 +282,11 @@ export class MDXDurableObject extends MDXDatabase {
       ping: () => this.ping(),
       stats: () => this.stats(),
 
-      // Core CRUD
+      // Identity
+      $init: (name: string) => this.$init(name),
       $id: () => this.$id(),
+
+      // Core CRUD
       get: <TData = Record<string, unknown>>(url: string) => this.get<TData>(url),
       getById: <TData = Record<string, unknown>>(type: string, id: string) => this.getById<TData>(type, id),
       create: <TData = Record<string, unknown>>(options: CreateOptions<TData>) => this.create<TData>(options),
@@ -317,7 +327,32 @@ export class MDXDurableObject extends MDXDatabase {
 }
 
 /**
+ * DO names this isolate has already handed to `$init()`.
+ *
+ * `$init()` is idempotent and the object persists the derived $id, so the
+ * handshake only needs to reach each object once per isolate; the memo keeps
+ * the worker entry at one extra hop per name instead of one per request. A
+ * rejected handshake is dropped so the next request retries it.
+ */
+const named = new Map<string, Promise<string>>()
+
+function nameObject(stub: MDXDurableObjectStub, doName: string): Promise<string> {
+  let pending = named.get(doName)
+  if (!pending) {
+    pending = (async () => stub.$init(doName))().catch((err: unknown) => {
+      named.delete(doName)
+      throw err
+    })
+    named.set(doName, pending)
+  }
+  return pending
+}
+
+/**
  * Default export for Workers
+ *
+ * Routes each request to the object named by the request hostname and makes
+ * sure that object knows its name before the RPC session starts.
  */
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -327,6 +362,7 @@ export default {
     const id = env.MDXDB.idFromName(doName)
     const stub = env.MDXDB.get(id)
 
+    await nameObject(stub, doName)
     return stub.fetch(request)
   },
 }
