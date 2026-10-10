@@ -132,7 +132,9 @@ export async function providerFor(parsed: ParsedDatabaseUrl, options: ResolveOpt
     case 'api': {
       const { createDBClient } = await load('@mdxdb/api', url, () => import('@mdxdb/api/db'))
       const apiKey = typeof env['MDXDB_API_KEY'] === 'string' ? env['MDXDB_API_KEY'] : undefined
-      const client = createDBClient({ baseUrl: parsed.url, apiKey }) as unknown as ThingClientLike
+      // No cast: DBClient must satisfy ThingClientLike structurally, so a
+      // signature drift in @mdxdb/api fails typecheck here.
+      const client: ThingClientLike = createDBClient({ baseUrl: parsed.url, apiKey })
       return createApiProvider({ client, ns: parsed.ns })
     }
   }

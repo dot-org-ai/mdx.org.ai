@@ -11,6 +11,7 @@
  */
 
 import type { DBProvider, ListOptions, SearchOptions } from 'ai-database'
+import { EntityAlreadyExistsError, EntityNotFoundError } from 'ai-database'
 
 /** A Thing as returned by `@mdxdb/api` (ai-database `Thing` shape). */
 export interface ApiThing {
@@ -21,7 +22,17 @@ export interface ApiThing {
   data: Record<string, unknown>
 }
 
-/** The `DBApiClient` methods the provider uses. */
+/**
+ * The `DBApiClient` methods the provider uses.
+ *
+ * Structurally a subset of ai-database's `DBClient`, so a real client is
+ * assignable without a cast (`resolve.ts` relies on that: a drift between
+ * `@mdxdb/api` and this shape is a type error, not a runtime surprise).
+ *
+ * `related(url, type, direction)` follows the ai-database DBClient contract:
+ * `'to'` = outbound (things this url points to), `'from'` = inbound
+ * (`references`), `'both'` = either.
+ */
 export interface ThingClientLike {
   list(options?: {
     ns?: string
@@ -101,8 +112,10 @@ export class ApiProvider implements DBProvider {
   }
 
   async list(type: string, options?: ListOptions): Promise<FlatRecord[]> {
-    // The JSON:API client does not forward `where`; filter here and only
-    // push paging to the server when there is nothing to filter.
+    // `DBApiClient.list()` does not send `where` over the wire (its `find()`
+    // does, but drops `orderBy`). Filter here, and only push paging to the
+    // server when there is nothing to filter — a server-side page of an
+    // unfiltered list is not a page of the filtered one.
     const filtered = Boolean(options?.where && Object.keys(options.where).length > 0)
     const things = await this.client.list({
       ns: this.ns,
@@ -122,25 +135,55 @@ export class ApiProvider implements DBProvider {
   }
 
   async search(type: string, query: string, options?: SearchOptions): Promise<FlatRecord[]> {
+    // Same paging rule as list(): `where` is applied here, so the server may
+    // only page when there is no `where` to apply afterwards.
+    const filtered = Boolean(options?.where && Object.keys(options.where).length > 0)
     const things = await this.client.search({
       ns: this.ns,
       type,
       query,
       fields: options?.fields,
-      limit: options?.limit,
-      offset: options?.offset,
+      limit: filtered ? undefined : options?.limit,
+      offset: filtered ? undefined : options?.offset,
     })
-    return things.map(toRecord).filter((r) => matchesWhere(r, options?.where))
+    let records = things.map(toRecord)
+    if (filtered) {
+      records = records.filter((r) => matchesWhere(r, options?.where))
+      const offset = options?.offset ?? 0
+      records = options?.limit === undefined ? records.slice(offset) : records.slice(offset, offset + options.limit)
+    }
+    return records
   }
 
+  /**
+   * The wire carries JSON:API `errors[].detail`, which `DBApiClient` rethrows
+   * as a plain `Error(detail)` — the status and `code` are not surfaced. Map
+   * the backend messages (`Thing already exists: …`, `Thing not found: …`,
+   * shared by @mdxdb/sqlite, @mdxdb/do and @mdxdb/clickhouse) onto the
+   * ai-database error classes, as DOProvider does.
+   */
   async create(type: string, id: string | undefined, data: Record<string, unknown>): Promise<FlatRecord> {
-    const thing = await this.client.create({ ns: this.ns, type, id, data: toData(data) })
-    return toRecord(thing)
+    try {
+      const thing = await this.client.create({ ns: this.ns, type, id, data: toData(data) })
+      return toRecord(thing)
+    } catch (err) {
+      if (err instanceof Error && /already exists/i.test(err.message)) {
+        throw new EntityAlreadyExistsError(type, id ?? '', 'create', err)
+      }
+      throw err
+    }
   }
 
   async update(type: string, id: string, data: Record<string, unknown>): Promise<FlatRecord> {
-    const thing = await this.client.update(this.url(type, id), { data: toData(data) })
-    return toRecord(thing)
+    try {
+      const thing = await this.client.update(this.url(type, id), { data: toData(data) })
+      return toRecord(thing)
+    } catch (err) {
+      if (err instanceof Error && /not found/i.test(err.message)) {
+        throw new EntityNotFoundError(type, id, 'update', err)
+      }
+      throw err
+    }
   }
 
   async delete(type: string, id: string): Promise<boolean> {
@@ -148,7 +191,10 @@ export class ApiProvider implements DBProvider {
   }
 
   async related(type: string, id: string, relation: string): Promise<FlatRecord[]> {
-    const things = await this.client.related(this.url(type, id), relation, 'from')
+    // DBProvider.related() = the targets of `relation` edges leaving this
+    // entity. In DBClient terms that is direction `'to'` (outbound); `'from'`
+    // would be the inbound `references()` set.
+    const things = await this.client.related(this.url(type, id), relation, 'to')
     return things.map(toRecord)
   }
 
