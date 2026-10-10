@@ -46,6 +46,8 @@ const posts = await db.Author.get('john').posts // Post[]
 
 Adapters are optional peer dependencies, loaded on demand. A URL that names an adapter you have not installed fails with the package to add; an unknown scheme, `libsql://`, or `chdb://` (no embedded ClickHouse adapter exists — `@mdxdb/clickhouse` is HTTP-only, mdx-8je.58) fails with a clear error. mdxdb never falls back to memory silently.
 
+`do://` takes only `?binding=`. The `?vectorize=` (Vectorize semantic-search sidecar) and `?r2=` (R2 parquet export target) options are rejected until the do provider wires them (mdx-8je.66): the parser does not accept options the resolver would drop. Use `@mdxdb/vectorize` directly, or call `exportToParquet()` on the Durable Object stub, in the meantime.
+
 ### Where the URL comes from
 
 1. `DB(schema, { url })`

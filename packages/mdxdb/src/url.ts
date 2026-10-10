@@ -18,8 +18,11 @@
  * `libsql://` / `*.turso.io` are recognised and rejected: no Cloudflare-native
  * adapter exists for Turso. `chdb://` parses (it is the documented local
  * ClickHouse form) but `resolveProvider()` rejects it because
- * `@mdxdb/clickhouse` is HTTP-only. Rejecting is deliberate — a silent
- * fallback to memory (what ai-database does) hides a misconfigured
+ * `@mdxdb/clickhouse` is HTTP-only. `do://` accepts only `?binding=`: the
+ * `?vectorize=` (semantic-search sidecar) and `?r2=` (parquet export target)
+ * options are rejected until an adapter consumes them (mdx-8je.66) — a
+ * parser must not accept what the resolver drops. Rejecting is deliberate —
+ * a silent fallback to memory (what ai-database does) hides a misconfigured
  * production database.
  *
  * @packageDocumentation
@@ -40,10 +43,6 @@ export type ParsedDatabaseUrl =
       name: string
       /** Workers env binding holding the DO namespace */
       binding: string
-      /** Optional Vectorize index binding (semantic search sidecar) */
-      vectorize?: string
-      /** Optional R2 bucket binding (parquet export target) */
-      r2?: string
     }
   | { provider: 'clickhouse'; mode: 'chdb'; path: string }
   | { provider: 'clickhouse'; mode: 'http'; url: string; ns: string }
@@ -67,11 +66,24 @@ function stripTrailingSlash(s: string): string {
   return s.endsWith('/') ? s.slice(0, -1) : s
 }
 
+/** `do://` query options mdxdb understands. Anything else is rejected. */
+const DO_URL_PARAMS: ReadonlySet<string> = new Set(['binding'])
+
+/**
+ * `do://` query options that name sidecars mdxdb does not wire yet
+ * (mdx-8je.66). Listed so the error names the gap instead of reading as a
+ * typo.
+ */
+const DO_URL_UNWIRED_PARAMS: Readonly<Record<string, string>> = {
+  vectorize: 'Vectorize semantic-search sidecar',
+  r2: 'R2 parquet export target',
+}
+
 /**
  * Parse a `do://` (or `sqlite://`) URL.
  *
  * `do://headless.ly` → name `headless.ly`, binding `MDXDB`
- * `do://tenants/acme?binding=TENANTS&vectorize=VECTORS&r2=EXPORTS`
+ * `do://tenants/acme?binding=TENANTS`
  */
 function parseDoUrl(raw: string, scheme: string): ParsedDatabaseUrl {
   const rest = raw.slice(scheme.length)
@@ -89,16 +101,22 @@ function parseDoUrl(raw: string, scheme: string): ParsedDatabaseUrl {
     throw new UnsupportedDatabaseUrlError(raw, `"${scheme}" needs a Durable Object name`)
   }
   const params = new URLSearchParams(query)
-  const parsed: ParsedDatabaseUrl = {
+  for (const key of params.keys()) {
+    if (DO_URL_PARAMS.has(key)) continue
+    const unwired = DO_URL_UNWIRED_PARAMS[key]
+    throw new UnsupportedDatabaseUrlError(
+      raw,
+      unwired
+        ? `"?${key}=" (${unwired}) is not wired into the do provider yet (mdx-8je.66); ` +
+            `remove it from DATABASE_URL and call the sidecar directly.`
+        : `unknown "${scheme}" option "?${key}=". Supported: ?binding=<DO namespace binding>.`
+    )
+  }
+  return {
     provider: 'do',
     name,
     binding: params.get('binding') || DEFAULT_DO_BINDING,
   }
-  const vectorize = params.get('vectorize')
-  const r2 = params.get('r2')
-  if (vectorize) parsed.vectorize = vectorize
-  if (r2) parsed.r2 = r2
-  return parsed
 }
 
 /**

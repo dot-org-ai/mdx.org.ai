@@ -20,7 +20,7 @@ export type Bindings = Record<string, unknown>
 export interface ResolveOptions {
   /** Explicit DATABASE_URL; wins over `env.DATABASE_URL` and `process.env.DATABASE_URL`. */
   url?: string
-  /** Workers env: DO namespaces, Vectorize indexes, R2 buckets, `DATABASE_URL` var. */
+  /** Workers env: DO namespace bindings and vars (`DATABASE_URL`, `MDXDB_API_KEY`). */
   env?: Bindings
 }
 

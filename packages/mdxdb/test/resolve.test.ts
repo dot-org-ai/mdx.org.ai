@@ -58,6 +58,15 @@ describe('resolveProvider', () => {
       expect(TENANTS.objects.has('acme')).toBe(true)
     })
 
+    it('rejects ?vectorize= / ?r2= before touching env — the do provider does not wire them', async () => {
+      const MDXDB = new FakeNamespace()
+      await expect(resolveProvider({ url: 'do://headless.ly?vectorize=VECTORS', env: { MDXDB } })).rejects.toBeInstanceOf(
+        UnsupportedDatabaseUrlError
+      )
+      await expect(resolveProvider({ url: 'do://headless.ly?r2=EXPORTS', env: { MDXDB } })).rejects.toThrow(/mdx-8je\.66/)
+      expect(MDXDB.objects.size).toBe(0)
+    })
+
     it('fails closed when the binding is missing from env', async () => {
       await expect(resolveProvider({ url: 'do://headless.ly' })).rejects.toBeInstanceOf(MissingBindingError)
       await expect(resolveProvider({ url: 'do://headless.ly', env: { MDXDB: {} } })).rejects.toThrow(/binding "MDXDB"/)

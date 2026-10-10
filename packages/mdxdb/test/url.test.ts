@@ -35,14 +35,26 @@ describe('parseDatabaseUrl', () => {
       expect(parseDatabaseUrl('do://tenants/acme/')).toMatchObject({ provider: 'do', name: 'tenants/acme' })
     })
 
-    it('reads binding, vectorize and r2 from the query', () => {
-      expect(parseDatabaseUrl('do://headless.ly?binding=TENANTS&vectorize=VECTORS&r2=EXPORTS')).toEqual({
+    it('reads ?binding= from the query', () => {
+      expect(parseDatabaseUrl('do://headless.ly?binding=TENANTS')).toEqual({
         provider: 'do',
         name: 'headless.ly',
         binding: 'TENANTS',
-        vectorize: 'VECTORS',
-        r2: 'EXPORTS',
       })
+    })
+
+    it('rejects ?vectorize= and ?r2= — sidecars the do provider does not wire (mdx-8je.66)', () => {
+      // A parser must not accept what the resolver drops: before this guard a
+      // user writing ?vectorize=VECTORS got no error and no vector search.
+      expect(() => parseDatabaseUrl('do://headless.ly?vectorize=VECTORS')).toThrow(UnsupportedDatabaseUrlError)
+      expect(() => parseDatabaseUrl('do://headless.ly?vectorize=VECTORS')).toThrow(/\?vectorize=.*not wired/)
+      expect(() => parseDatabaseUrl('do://headless.ly?binding=TENANTS&r2=EXPORTS')).toThrow(/\?r2=.*not wired/)
+      expect(() => parseDatabaseUrl('sqlite://headless.ly?r2=EXPORTS')).toThrow(UnsupportedDatabaseUrlError)
+    })
+
+    it('rejects unknown do:// options instead of dropping them', () => {
+      expect(() => parseDatabaseUrl('do://headless.ly?bindng=TENANTS')).toThrow(UnsupportedDatabaseUrlError)
+      expect(() => parseDatabaseUrl('do://headless.ly?bindng=TENANTS')).toThrow(/unknown "do:\/\/" option "\?bindng="/)
     })
 
     it('sqlite://<name> is an alias for do://<name> (DO SQLite is the SQLite adapter)', () => {

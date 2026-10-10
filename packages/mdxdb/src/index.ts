@@ -28,12 +28,16 @@
  *
  * ```bash
  * DATABASE_URL=do://headless.ly          # @mdxdb/do (Durable Object SQLite) — primary
+ * DATABASE_URL=do://acme?binding=TENANTS # same, on a custom DO namespace binding
  * DATABASE_URL=./content                 # @mdxdb/fs (git-friendly .mdx files)
- * DATABASE_URL=chdb://./content          # @mdxdb/clickhouse (local chDB)
  * DATABASE_URL=clickhouse://host:8123    # @mdxdb/clickhouse (HTTP)
  * DATABASE_URL=https://db.example.com    # @mdxdb/api
  * DATABASE_URL=:memory:                  # in-memory (tests)
  * ```
+ *
+ * `chdb://` (embedded ClickHouse), `libsql://` (Turso) and unknown schemes
+ * are rejected with `UnsupportedDatabaseUrlError` — there is no adapter for
+ * them and mdxdb never falls back to memory silently.
  *
  * In a Worker there is no `process.env`; pass the env so bindings resolve:
  *
@@ -55,7 +59,7 @@ export type ProviderFactory = () => DBProvider | Promise<DBProvider>
 export interface MdxdbOptions extends Omit<DBOptions, 'provider'> {
   /** DATABASE_URL override (else `env.DATABASE_URL`, then `process.env.DATABASE_URL`, then `./content`). */
   url?: string
-  /** Workers env — Durable Object / Vectorize / R2 bindings and vars. */
+  /** Workers env — the Durable Object namespace binding and vars (`DATABASE_URL`, `MDXDB_API_KEY`). */
   env?: Bindings
   /** Explicit provider; skips URL resolution. */
   provider?: DBProvider | ProviderFactory
