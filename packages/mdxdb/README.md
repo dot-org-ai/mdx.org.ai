@@ -85,6 +85,8 @@ export default {
 }
 ```
 
+One `DB()` per request is safe: instances are independent, so two in-flight requests — or two tenants, `do://a` and `do://b` — never see each other's Durable Object (see *Notes on ai-database 2.4*). Add `nodejs_als` (or `nodejs_compat`) to `compatibility_flags`; mdxdb keeps each instance's context with `AsyncLocalStorage`.
+
 Or build the provider yourself:
 
 ```ts
@@ -134,7 +136,7 @@ pnpm --filter mdxdb test:workers    # workerd only
 
 ## Notes on ai-database 2.4
 
-- ai-database's entity operations read one process-wide provider (its `provider` option is only honoured by the events/actions/artifacts sub-APIs — mdx-8je.56), so the most recent `DB()` call decides the backend for every `DB()` instance. Create one `DB()` per process, or per request with its `env`.
+- ai-database's entity operations read one process-wide provider (its `provider` option is only honoured by the events/actions/artifacts sub-APIs — mdx-8je.56). mdxdb installs a router as that provider and binds every `DB()` instance to its own async context (`AsyncLocalStorage`, via `node:async_hooks`), so each instance's entity operations, DBPromise steps and relation getters reach its own backend — several live instances in one process are fine (mdx-8je.65). An entity operation that reaches ai-database's global outside any instance (for example through ai-database's own `DB()`) is served by the sole instance when there is one and otherwise throws `NoInstanceContextError` rather than guessing. Workers need the `nodejs_als` or `nodejs_compat` compatibility flag.
 - ai-database parses `'Author.posts'` into `Post.author` and `Author.posts` but only follows edges in the declared direction (mdx-8je.57); mdxdb wraps every provider so the reverse side resolves (`withSchemaRelations`). Backends that keep reverse indexes natively (`DOProvider`) implement `SchemaAwareProvider` and serve it themselves.
 - `db.Author.get('john').posts` works at runtime but `DBPromise` does not type relation getters yet (mdx-8je.57).
 

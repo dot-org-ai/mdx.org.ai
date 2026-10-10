@@ -66,6 +66,46 @@ describe('DOProvider on MDXDurableObject', () => {
   })
 })
 
+describe('two live DB() instances on different Durable Objects (mdx-8je.65)', () => {
+  it('route every operation to their own DO, including interleaved ones and relation getters', async () => {
+    const schema = { Post: { title: 'string', author: 'Author.posts' }, Author: { name: 'string' } }
+    const nameA = uniqueName()
+    const nameB = uniqueName()
+    // The README's per-request shape: one DB(schema, { env }) per in-flight request.
+    const tenantA = DB(schema, { env: { DATABASE_URL: `do://${nameA}`, MDXDB: env.MDXDB } })
+    const tenantB = DB(schema, { env: { DATABASE_URL: `do://${nameB}`, MDXDB: env.MDXDB } })
+
+    await tenantA.Author.create('ann', { name: 'Ann of A' })
+    await tenantB.Author.create('ann', { name: 'Ann of B' })
+    await Promise.all([
+      tenantA.Post.create('pa', { title: 'A', author: 'ann' }),
+      tenantB.Post.create('pb', { title: 'B', author: 'ann' }),
+    ])
+    // The older instance keeps writing to its own DO after the newer one exists.
+    await tenantA.Post.create('pa2', { title: 'A2', author: 'ann' })
+
+    const stubA = env.MDXDB.get(env.MDXDB.idFromName(nameA))
+    const stubB = env.MDXDB.get(env.MDXDB.idFromName(nameB))
+    expect((await stubA.list({ type: 'Post' })).map((t) => t.id).sort()).toEqual(['pa', 'pa2'])
+    expect((await stubB.list({ type: 'Post' })).map((t) => t.id).sort()).toEqual(['pb'])
+
+    expect(await tenantA.Post.get('pb')).toBeNull()
+    expect(await tenantB.Post.get('pa')).toBeNull()
+
+    const postA = (await tenantA.Post.get('pa')) as unknown as { author: Promise<{ name: string }> }
+    const postB = (await tenantB.Post.get('pb')) as unknown as { author: Promise<{ name: string }> }
+    expect((await postB.author).name).toBe('Ann of B')
+    expect((await postA.author).name).toBe('Ann of A')
+
+    // @ts-expect-error DBPromise does not type relation getters (model gap mdx-8je.57)
+    const postsA = (await tenantA.Author.get('ann').posts) as Array<{ $id: string }>
+    // @ts-expect-error DBPromise does not type relation getters (model gap mdx-8je.57)
+    const postsB = (await tenantB.Author.get('ann').posts) as Array<{ $id: string }>
+    expect(postsA.map((p) => p.$id).sort()).toEqual(['pa', 'pa2'])
+    expect(postsB.map((p) => p.$id)).toEqual(['pb'])
+  })
+})
+
 describe('CLAUDE.md "Database Interface" example (verbatim, on @mdxdb/do)', () => {
   it('runs against the Durable Object', async () => {
     const env2 = { DATABASE_URL: `do://${uniqueName()}`, MDXDB: env.MDXDB }

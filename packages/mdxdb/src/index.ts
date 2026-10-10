@@ -46,6 +46,7 @@
 
 import { DB as aiDB, setProvider } from 'ai-database'
 import type { DatabaseSchema, DBOptions, DBProvider, DBResult } from 'ai-database'
+import { bindInstance, router } from './context.js'
 import { createLazyProvider, type LazyProvider } from './lazy.js'
 import { schemaRelations, withSchemaRelations } from './relations.js'
 import { resolveProvider, type Bindings } from './resolve.js'
@@ -73,9 +74,12 @@ export type MdxdbResult<TSchema extends DatabaseSchema> = DBResult<TSchema> & {
  * DATABASE_URL via mdxdb's adapters, and `'Author.posts'` reverse fields
  * resolve on every backend.
  *
- * ai-database keeps one process-wide provider for entity operations, so the
- * most recent `DB()` call decides which backend *all* `DB()` instances use.
- * Create one `DB()` per process (or per Worker request with its `env`).
+ * Instances are independent: each `DB()` routes its entity operations,
+ * DBPromise steps and relation getters to its own backend, so several live
+ * instances — one per Worker request, one per tenant — never cross. (ai-database
+ * itself keeps one process-wide provider for entity operations, mdx-8je.56;
+ * mdxdb installs a router there and binds every instance to its async
+ * context. Workers need the `nodejs_als` or `nodejs_compat` flag.)
  */
 export function DB<TSchema extends DatabaseSchema>(
   schema: TSchema,
@@ -94,11 +98,13 @@ export function DB<TSchema extends DatabaseSchema>(
   })
 
   // Entity operations in ai-database 2.4 read the global provider, not the
-  // `provider` option (model gap mdx-8je.56); register the lazy provider in both places.
-  setProvider(lazy)
+  // `provider` option (model gap mdx-8je.56). The global is mdxdb's router,
+  // which forwards to whichever instance is current in the async context;
+  // `bindInstance` makes every call through `db` run in this instance's.
+  setProvider(router)
   const db = aiDB(schema, { ...rest, provider: lazy })
 
-  return Object.assign(db, { $provider: () => lazy.resolved() })
+  return bindInstance(Object.assign(db, { $provider: () => lazy.resolved() }), lazy)
 }
 
 // URL parsing and resolution
@@ -142,6 +148,7 @@ export {
   type ApiThing,
 } from './providers/api.js'
 export { LazyProvider, createLazyProvider } from './lazy.js'
+export { ProviderRouter, NoInstanceContextError, router, currentProvider, bindInstance } from './context.js'
 
 // Relationships
 export {
