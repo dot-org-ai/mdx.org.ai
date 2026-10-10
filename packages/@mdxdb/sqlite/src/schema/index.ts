@@ -34,6 +34,16 @@ export const META_TABLE = '_meta' as const
 export const META_ID_KEY = '$id' as const
 
 /**
+ * _meta key under which the schema version of the stored data is recorded.
+ *
+ * Written on first use and after every migration; read by
+ * `MDXDatabase.ensureInitialized()` to decide whether a migration is pending
+ * (stored < `SCHEMA_VERSION`) or the data is from a newer release
+ * (stored > `SCHEMA_VERSION`, refused).
+ */
+export const META_SCHEMA_VERSION_KEY = 'schema_version' as const
+
+/**
  * _data table schema - graph nodes with executable code
  */
 export const DATA_SCHEMA = `
@@ -126,6 +136,25 @@ export function getAllSchemaStatements(): string[] {
 }
 
 /**
- * Schema version
+ * Schema version of the code. Compared at runtime against the value stored
+ * under `META_SCHEMA_VERSION_KEY`; bump it together with an entry in
+ * `SCHEMA_VERSIONS` and a migration step in `MDXDatabase`.
  */
 export const SCHEMA_VERSION = 3
+
+/**
+ * Schema version assumed for storage that carries `_data` rows but no
+ * recorded version: objects written by releases before `_meta` existed.
+ * Their `Thing.url`s are based on `https://<64-hex object id>` and are
+ * rewritten onto the name-derived $id by the v2 -> v3 migration in `$init()`.
+ */
+export const LEGACY_SCHEMA_VERSION = 2
+
+/**
+ * Schema version history
+ */
+export const SCHEMA_VERSIONS = {
+  1: 'Initial _data / _rels graph schema',
+  2: 'Thing.url based on ctx.id.name, falling back to the 64-hex object id',
+  3: '_meta table; $id derived from $init(name) and persisted; legacy hex-based urls migrated on $init',
+} as const

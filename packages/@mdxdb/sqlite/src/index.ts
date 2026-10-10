@@ -64,6 +64,7 @@ export {
   RELS_TABLE,
   META_TABLE,
   META_ID_KEY,
+  META_SCHEMA_VERSION_KEY,
   DATA_SCHEMA,
   DATA_INDEXES,
   RELS_SCHEMA,
@@ -72,4 +73,6 @@ export {
   TABLES,
   getAllSchemaStatements,
   SCHEMA_VERSION,
+  LEGACY_SCHEMA_VERSION,
+  SCHEMA_VERSIONS,
 } from './schema/index.js'

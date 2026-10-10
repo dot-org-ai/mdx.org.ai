@@ -10,6 +10,15 @@
  * re-instantiation. Until then every URL-building operation throws rather
  * than silently basing URLs on the 64-hex object id.
  *
+ * Storage carries a schema version in `_meta` (`schema_version`). On first
+ * use the object records the version of the data it found (fresh storage:
+ * `SCHEMA_VERSION`; rows but no version: `LEGACY_SCHEMA_VERSION`), refuses
+ * data written by a newer release, and runs the pending migrations the first
+ * time it learns its $id. The v2 -> v3 step rewrites `Thing.url`s (and the
+ * `_rels` edges between them) from `https://<64-hex object id>/...` to the
+ * name-derived $id, so rows written before `$init()` existed are not orphaned
+ * from `getById()` / `create()` / `upsert()`.
+ *
  * @packageDocumentation
  */
 
@@ -32,7 +41,13 @@ import type {
   Env,
   WorkerLoader,
 } from './types.js'
-import { getAllSchemaStatements, META_ID_KEY } from './schema/index.js'
+import {
+  getAllSchemaStatements,
+  META_ID_KEY,
+  META_SCHEMA_VERSION_KEY,
+  SCHEMA_VERSION,
+  LEGACY_SCHEMA_VERSION,
+} from './schema/index.js'
 
 // =============================================================================
 // Utilities
@@ -101,6 +116,11 @@ export class MDXDatabase extends DurableObject<Env> {
     this.loader = env.LOADER
   }
 
+  /**
+   * Create the tables and reconcile the stored schema version with the code.
+   * Throws (and stays uninitialized) when storage was written by a newer
+   * release. Migrations that need the $id run later, in `adopt()`.
+   */
   private ensureInitialized(): void {
     if (this.initialized) return
 
@@ -109,9 +129,124 @@ export class MDXDatabase extends DurableObject<Env> {
       for (const stmt of statements) {
         this.sql.exec(stmt)
       }
+
+      const stored = this.readSchemaVersion()
+      if (stored === undefined) {
+        // No recorded version: fresh storage is current; storage that already
+        // holds rows predates _meta and carries hex-based urls (v2).
+        const { n } = this.sql.exec<{ n: number }>('SELECT COUNT(*) AS n FROM _data').toArray()[0]!
+        this.writeSchemaVersion(n > 0 ? LEGACY_SCHEMA_VERSION : SCHEMA_VERSION)
+      } else if (stored > SCHEMA_VERSION) {
+        throw new Error(
+          `MDXDatabase storage is schema version ${stored} but this build of @mdxdb/sqlite ` +
+            `understands ${SCHEMA_VERSION}; upgrade the worker before using this object.`
+        )
+      }
     })
 
     this.initialized = true
+  }
+
+  // ===========================================================================
+  // Schema version & migrations
+  // ===========================================================================
+
+  private readSchemaVersion(): number | undefined {
+    const row = this.sql
+      .exec<MetaRow>('SELECT value FROM _meta WHERE key = ?', META_SCHEMA_VERSION_KEY)
+      .toArray()[0]
+    if (!row) return undefined
+    const version = Number(row.value)
+    if (!Number.isInteger(version) || version < 1) {
+      throw new Error(`MDXDatabase _meta.${META_SCHEMA_VERSION_KEY} is corrupt: ${JSON.stringify(row.value)}`)
+    }
+    return version
+  }
+
+  private writeSchemaVersion(version: number): void {
+    this.sql.exec(
+      'INSERT OR REPLACE INTO _meta (key, value) VALUES (?, ?)',
+      META_SCHEMA_VERSION_KEY,
+      String(version)
+    )
+  }
+
+  /**
+   * Run every migration between the stored version and `SCHEMA_VERSION`.
+   * Must run inside a transaction; every step is given the canonical $id.
+   */
+  private migrate(base: string): void {
+    const stored = this.readSchemaVersion() ?? SCHEMA_VERSION
+    if (stored >= SCHEMA_VERSION) return
+
+    if (stored < 3) this.migrateLegacyUrlsToBase(base)
+
+    this.writeSchemaVersion(SCHEMA_VERSION)
+  }
+
+  /**
+   * v2 -> v3: rows written before `$init()` existed have urls based on
+   * `https://<64-hex object id>` (what `ctx.id.toString()` gave the old
+   * constructor when `ctx.id.name` was undefined). Rebase them, and the
+   * `_rels` edges that point at them, onto the name-derived $id. Rows under
+   * any other base are left alone.
+   */
+  private migrateLegacyUrlsToBase(base: string): void {
+    const legacyPrefix = `https://${this.doCtx.id.toString()}/`
+    const newPrefix = `${base}/`
+    const len = legacyPrefix.length
+
+    // Refuse rather than clobber when the same Thing exists under both bases.
+    const { n: collisions } = this.sql
+      .exec<{ n: number }>(
+        `SELECT COUNT(*) AS n FROM _data AS legacy
+         WHERE substr(legacy.url, 1, ?) = ?
+           AND EXISTS (SELECT 1 FROM _data AS cur WHERE cur.url = ? || substr(legacy.url, ?))`,
+        len,
+        legacyPrefix,
+        newPrefix,
+        len + 1
+      )
+      .toArray()[0]!
+    if (collisions > 0) {
+      throw new Error(
+        `MDXDatabase cannot migrate to ${base}: ${collisions} thing(s) exist under both ` +
+          `${legacyPrefix} and ${newPrefix}. Delete or rename one copy of each, then call $init() again.`
+      )
+    }
+
+    // _rels."from" references _data(url); check the constraint at commit.
+    this.sql.exec('PRAGMA defer_foreign_keys = ON')
+
+    this.sql.exec(
+      `UPDATE _data SET url = ? || substr(url, ?) WHERE substr(url, 1, ?) = ?`,
+      newPrefix,
+      len + 1,
+      len,
+      legacyPrefix
+    )
+
+    // Edge ids hash (from, predicate, to), so rewritten edges need new ids.
+    const edges = this.sql
+      .exec<RelsRow>(
+        `SELECT * FROM _rels WHERE substr("from", 1, ?) = ? OR substr("to", 1, ?) = ?`,
+        len,
+        legacyPrefix,
+        len,
+        legacyPrefix
+      )
+      .toArray()
+    for (const edge of edges) {
+      const from = edge.from.startsWith(legacyPrefix) ? newPrefix + edge.from.slice(len) : edge.from
+      const to = edge.to.startsWith(legacyPrefix) ? newPrefix + edge.to.slice(len) : edge.to
+      this.sql.exec(
+        `UPDATE _rels SET id = ?, "from" = ?, "to" = ? WHERE id = ?`,
+        generateRelId(from, edge.predicate, to),
+        from,
+        to,
+        edge.id
+      )
+    }
   }
 
   // ===========================================================================
@@ -120,23 +255,38 @@ export class MDXDatabase extends DurableObject<Env> {
 
   /**
    * Resolve the canonical $id without requiring it: the runtime-provided
-   * name if there is one, else the value persisted by `$init()`.
+   * name if there is one, else the value persisted by `$init()`. The first
+   * time a base is known, pending migrations run against it.
    */
   private resolveBaseId(): string | undefined {
     if (this.baseId) return this.baseId
 
+    let base: string | undefined
     const name = this.doCtx.id.name
     if (name) {
-      this.baseId = baseIdFromName(name)
-      return this.baseId
+      base = baseIdFromName(name)
+    } else {
+      this.ensureInitialized()
+      base = this.sql
+        .exec<MetaRow>('SELECT value FROM _meta WHERE key = ?', META_ID_KEY)
+        .toArray()[0]?.value
     }
 
-    this.ensureInitialized()
-    const row = this.sql
-      .exec<MetaRow>('SELECT value FROM _meta WHERE key = ?', META_ID_KEY)
-      .toArray()[0]
-    if (row) this.baseId = row.value
+    if (base) this.adopt(base)
     return this.baseId
+  }
+
+  /**
+   * Make `base` this object's $id: run pending migrations onto it and persist
+   * it, atomically. Nothing is remembered in memory if either step fails.
+   */
+  private adopt(base: string): void {
+    this.ensureInitialized()
+    this.doCtx.storage.transactionSync(() => {
+      this.migrate(base)
+      this.sql.exec('INSERT OR IGNORE INTO _meta (key, value) VALUES (?, ?)', META_ID_KEY, base)
+    })
+    this.baseId = base
   }
 
   /** Canonical $id, or a clear error when the object has not been named. */
@@ -162,17 +312,14 @@ export class MDXDatabase extends DurableObject<Env> {
     }
     const requested = baseIdFromName(name)
     const current = this.resolveBaseId()
-    if (current !== undefined && current !== requested) {
-      throw new Error(`MDXDatabase $id mismatch: this object is ${current}, got ${requested}`)
+    if (current !== undefined) {
+      if (current !== requested) {
+        throw new Error(`MDXDatabase $id mismatch: this object is ${current}, got ${requested}`)
+      }
+      return current
     }
 
-    this.ensureInitialized()
-    this.sql.exec(
-      'INSERT OR IGNORE INTO _meta (key, value) VALUES (?, ?)',
-      META_ID_KEY,
-      requested
-    )
-    this.baseId = requested
+    this.adopt(requested)
     return requested
   }
 
