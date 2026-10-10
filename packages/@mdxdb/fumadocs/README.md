@@ -409,7 +409,7 @@ const source = createSource(docTuples)
 ### Remote API
 
 ```typescript
-import { createApiClient } from '@mdxdb/api'
+import { createApiClient } from 'mdxdb'
 import { queryToSource } from '@mdxdb/fumadocs'
 
 const client = createApiClient({

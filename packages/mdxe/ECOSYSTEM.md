@@ -276,14 +276,18 @@ my-docs-site/
 
 ```typescript
 // src/db.ts
-import { DB } from 'mdxdb'
+import { createDB } from 'mdxdb'
+import { createFSAdapter } from '@mdxdb/fs'
+import { createSQLiteAdapter } from '@mdxdb/sqlite'
 
-// Backend resolves from DATABASE_URL:
-//   ./content          -> @mdxdb/fs (development, version-controlled content)
-//   do://my-app        -> @mdxdb/do (production, Durable Object SQLite)
-export const db = DB({
-  Post: { title: 'string', content: 'markdown', author: 'Author.posts' },
-  Author: { name: 'string', email: 'string' },
+// Development: filesystem for git-friendly content
+export const contentDB = await createDB({
+  adapter: createFSAdapter({ path: './content' })
+})
+
+// Production: SQLite for vector search
+export const searchDB = await createDB({
+  adapter: createSQLiteAdapter({ path: './search.db' })
 })
 ```
 
