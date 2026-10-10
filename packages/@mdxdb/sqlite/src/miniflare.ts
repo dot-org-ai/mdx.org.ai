@@ -27,7 +27,9 @@ import type {
   CreateOptions,
   UpdateOptions,
   RelateOptions,
+  MDXClientConfig,
 } from './types.js'
+import { MDXClient } from './client.js'
 
 // Miniflare types
 interface Miniflare {
@@ -86,6 +88,28 @@ export async function createMiniflareBinding(
   miniflareBinding = await miniflareInstance.getDurableObjectNamespace('MDXDB')
 
   return miniflareBinding
+}
+
+/**
+ * Create an MDXClient backed by a miniflare Durable Object binding.
+ *
+ * Node.js counterpart to `new MDXClient({ $id, binding })` in a Worker:
+ * resolves the binding via {@link createMiniflareBinding} and wires it to
+ * the client. `persistPath` follows `MDXClientConfig.persistPath`.
+ *
+ * @example
+ * ```ts
+ * import { createMiniflareClient } from '@mdxdb/sqlite/miniflare'
+ *
+ * const db = await createMiniflareClient({ $id: 'headless.ly', persistPath: './.data' })
+ * await db.create({ type: 'Post', data: { title: 'Hello' } })
+ * ```
+ */
+export async function createMiniflareClient(
+  config: Omit<MDXClientConfig, 'binding' | 'miniflare'>
+): Promise<MDXClient> {
+  const binding = await createMiniflareBinding(config.persistPath)
+  return new MDXClient({ $id: config.$id, binding })
 }
 
 /**

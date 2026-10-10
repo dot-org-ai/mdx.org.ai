@@ -58,7 +58,9 @@
     "rpc"
   ],
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0"
+  },
   "peerDependencies": {
     "@mdxe/isolate": "workspace:^",
     "miniflare": "^3.0.0"
@@ -73,7 +75,6 @@
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.8.0",
-    "@cloudflare/workers-types": "^4.20241127.0",
     "@mdxld/config": "workspace:^",
     "miniflare": "^3.20241106.1",
     "tsup": "^8.3.5",

@@ -7,7 +7,7 @@
  */
 
 import { createFsDatabase } from '@mdxdb/fs'
-import { createMiniflareClient } from '@mdxdb/sqlite'
+import { createMiniflareClient } from '@mdxdb/sqlite/miniflare'
 import type { AnyDatabase } from './index.js'
 import { resolve } from 'node:path'
 import { runMcpServer } from './server.js'
@@ -133,10 +133,10 @@ export async function createDatabase(options: CliOptions): Promise<AnyDatabase> 
   if (options.database === 'sqlite') {
     // Use miniflare for local SQLite via Durable Objects emulation
     const persistPath = options.path === ':memory:' ? undefined : resolve(options.path)
-    // Extract namespace from path or use default
-    const namespace = 'mdxai.local'
+    // The $id names the Durable Object and is the base of every Thing URL
+    // (https://mdxai.local/{type}/{id}).
     const client = await createMiniflareClient({
-      namespace,
+      $id: 'mdxai.local',
       persistPath,
     })
     return client as unknown as AnyDatabase

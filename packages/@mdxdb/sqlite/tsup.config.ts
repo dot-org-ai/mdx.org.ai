@@ -12,7 +12,11 @@ export default defineConfig([
       miniflare: 'src/miniflare.ts',
     },
     format: ['esm', 'cjs'],
-    dts: false,
+    // Emitted .d.ts files refer to the ambient DurableObjectNamespace / SqlStorage /
+    // Rpc globals, so carry the workers-types reference so consumers (mdxai) resolve
+    // them without configuring `types` themselves. rollup-plugin-dts drops a source-
+    // level triple-slash directive, hence the banner.
+    dts: { banner: '/// <reference types="@cloudflare/workers-types" />' },
     clean: true,
     sourcemap: true,
     external: ['miniflare', 'cloudflare:workers', '@mdxe/isolate'],
